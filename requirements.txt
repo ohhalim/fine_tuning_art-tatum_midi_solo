@@ -1,0 +1,7 @@
+music21
+pretty_midi
+mido
+torch
+transformers
+numpy
+pandas

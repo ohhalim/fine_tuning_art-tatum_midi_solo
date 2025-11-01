@@ -1,0 +1,19 @@
+# 큰 파일
+*.mid
+*.wav
+*.mp3
+*.zip
+*.pt
+*.pth
+
+# 데이터
+data/raw/
+pijama_midis/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Colab
+.config/
