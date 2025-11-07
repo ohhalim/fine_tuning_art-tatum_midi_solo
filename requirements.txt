@@ -1,7 +1,47 @@
+# Core Deep Learning
+torch>=2.0.0
+torchvision
+torchaudio
+diffusers>=0.21.0
+accelerate
+transformers>=4.30.0
+
+# Music Processing
 music21
 pretty_midi
 mido
-torch
-transformers
+muspy
+miditok
+
+# Math & Utils
 numpy
+scipy
+einops
 pandas
+
+# Training & Monitoring
+tensorboard
+wandb
+tqdm
+
+# Model Optimization
+onnx
+onnxruntime
+timm
+
+# Data Processing
+zenodo_get
+requests
+pillow
+
+# MIDI Communication (for FL Studio)
+python-rtmidi
+mido
+
+# Optional: GUI
+tkinter
+
+# Development
+jupyter
+matplotlib
+seaborn
