@@ -1,0 +1,40 @@
+# Default QLoRA Configuration
+# Balanced performance for 8-16GB VRAM GPUs (RTX 3060, RTX 3070, etc.)
+
+# Model
+model_name_or_path: null  # Set to pretrained model path or null for from scratch
+hidden_size: 512
+num_layers: 8
+num_heads: 8
+
+# QLoRA
+use_qlora: true
+lora_rank: 8
+lora_alpha: 16
+lora_dropout: 0.1
+
+# Training
+num_train_epochs: 5
+per_device_train_batch_size: 4
+per_device_eval_batch_size: 4
+gradient_accumulation_steps: 4  # Effective batch size: 16
+learning_rate: 3e-4
+warmup_steps: 100
+weight_decay: 0.01
+max_grad_norm: 1.0
+
+# Efficiency
+fp16: true  # Use bf16 if on A100
+bf16: false
+
+# Logging
+wandb_project: "brad-mehldau-finetuning"
+logging_steps: 10
+eval_steps: 100
+save_steps: 500
+
+# Data
+max_seq_len: 2048
+
+# Reproducibility
+seed: 42

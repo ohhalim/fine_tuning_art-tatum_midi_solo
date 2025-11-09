@@ -1,0 +1,41 @@
+# Production Requirements for Music Transformer
+# 업계 표준 라이브러리들
+
+# Deep Learning (핵심)
+torch>=2.0.0
+transformers>=4.35.0  # HuggingFace Transformers (필수!)
+peft>=0.7.0  # Parameter-Efficient Fine-Tuning (LoRA/QLoRA)
+bitsandbytes>=0.41.0  # 4-bit quantization
+
+# Data Processing
+datasets>=2.14.0  # HuggingFace Datasets (데이터 로딩)
+numpy>=1.24.0
+pandas>=2.0.0
+
+# MIDI Processing
+pretty_midi>=0.2.9  # MIDI 파일 처리
+mido>=1.2.10  # MIDI I/O
+
+# Training & Monitoring
+accelerate>=0.24.0  # 분산 학습
+wandb>=0.15.0  # Weights & Biases (실험 추적, 필수!)
+tensorboard>=2.14.0  # TensorBoard (대안)
+
+# Inference & Demo
+gradio>=4.0.0  # 웹 데모 인터페이스 (포트폴리오용)
+
+# Utilities
+pyyaml>=6.0  # Config 파일
+tqdm>=4.65.0  # Progress bars
+scikit-learn>=1.3.0  # Metrics
+
+# Development (Optional)
+jupyter>=1.0.0
+ipywidgets>=8.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Code Quality (Optional)
+black>=23.0.0  # 코드 포매팅
+isort>=5.12.0  # Import 정렬
+flake8>=6.0.0  # Linting
