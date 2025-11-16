@@ -1,0 +1,19 @@
+# 파인튜닝 평가 스크립트 필요 패키지
+
+# Core
+numpy>=1.21.0
+scipy>=1.7.0
+
+# Audio Processing
+librosa>=0.9.2
+soundfile>=0.11.0
+
+# Machine Learning
+torch>=2.0.0
+
+# Visualization
+matplotlib>=3.5.0
+
+# Optional (FAD 계산용, TensorFlow 있으면 더 정확)
+# tensorflow>=2.10.0
+# tensorflow-hub>=0.12.0
