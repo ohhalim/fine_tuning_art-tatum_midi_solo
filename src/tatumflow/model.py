@@ -85,30 +85,343 @@ class MusicTheoryEncoder(nn.Module):
         self.fusion = nn.Linear(hidden_dim, hidden_dim)
 
     def extract_harmony(self, tokens: torch.Tensor) -> torch.Tensor:
-        """Extract harmony features from token sequence"""
-        # Simplified: use pitch class histogram
-        batch_size = tokens.shape[0]
-        harmony = torch.zeros(batch_size, 128, device=tokens.device)
-        # This would be replaced with actual harmony extraction
-        return harmony
+        """
+        Extract harmony features using pitch class profiles
+
+        Returns (B, 128) tensor with:
+        - Pitch class histogram (12)
+        - Chord type indicators (24)
+        - Harmonic intervals (12)
+        - Rest: padding to 128
+        """
+        batch_size, seq_len = tokens.shape
+        harmony_features = []
+
+        for b in range(batch_size):
+            # Pitch class histogram (0-11)
+            pc_hist = torch.zeros(12, device=tokens.device)
+
+            # Track active pitches for chord detection
+            active_pitches = []
+
+            for t in range(seq_len):
+                token_id = tokens[b, t].item()
+                # Skip special tokens
+                if token_id < 5:  # PAD, SOS, EOS, MASK, T
+                    continue
+
+                # Detect NOTE_ON tokens (after TIME tokens which are 5-505)
+                # NOTE_ON tokens start after TIME tokens
+                if 506 <= token_id < 594:  # NOTE_ON range (88 notes)
+                    pitch = 21 + (token_id - 506)  # Convert to MIDI pitch
+                    pc = pitch % 12
+                    pc_hist[pc] += 1.0
+                    active_pitches.append(pitch)
+
+            # Normalize pitch class histogram
+            if pc_hist.sum() > 0:
+                pc_hist = pc_hist / pc_hist.sum()
+
+            # Chord type detection (simple heuristics)
+            chord_types = torch.zeros(24, device=tokens.device)
+            if len(active_pitches) >= 3:
+                unique_pcs = list(set([p % 12 for p in active_pitches]))
+                unique_pcs.sort()
+
+                # Major chord: 0, 4, 7
+                # Minor chord: 0, 3, 7
+                # Dim chord: 0, 3, 6
+                # Aug chord: 0, 4, 8
+                # Dominant 7th: 0, 4, 7, 10
+                # Major 7th: 0, 4, 7, 11
+                # Minor 7th: 0, 3, 7, 10
+
+                # Simple detection based on intervals
+                if len(unique_pcs) >= 3:
+                    intervals = [(unique_pcs[i+1] - unique_pcs[i]) % 12
+                                for i in range(len(unique_pcs)-1)]
+
+                    # Major (4, 3)
+                    if 4 in intervals and 3 in intervals:
+                        chord_types[0] = 1.0
+                    # Minor (3, 4)
+                    elif 3 in intervals and 4 in intervals:
+                        chord_types[1] = 1.0
+                    # Diminished (3, 3)
+                    elif intervals.count(3) >= 2:
+                        chord_types[2] = 1.0
+                    # Augmented (4, 4)
+                    elif intervals.count(4) >= 2:
+                        chord_types[3] = 1.0
+
+            # Harmonic intervals (adjacent pitch classes)
+            harmonic_intervals = torch.zeros(12, device=tokens.device)
+            for i in range(len(pc_hist)-1):
+                if pc_hist[i] > 0 and pc_hist[i+1] > 0:
+                    interval = (i+1 - i) % 12
+                    harmonic_intervals[interval] += 1.0
+
+            if harmonic_intervals.sum() > 0:
+                harmonic_intervals = harmonic_intervals / harmonic_intervals.sum()
+
+            # Concatenate features
+            features = torch.cat([pc_hist, chord_types, harmonic_intervals])
+
+            # Pad to 128
+            padding = torch.zeros(128 - features.shape[0], device=tokens.device)
+            features = torch.cat([features, padding])
+
+            harmony_features.append(features)
+
+        return torch.stack(harmony_features)
 
     def extract_melody(self, tokens: torch.Tensor) -> torch.Tensor:
-        """Extract melodic contour"""
-        batch_size = tokens.shape[0]
-        melody = torch.zeros(batch_size, 128, device=tokens.device)
-        return melody
+        """
+        Extract melodic contour using skyline algorithm
+
+        Returns (B, 128) tensor with:
+        - Melodic interval histogram (25)
+        - Contour patterns (3)
+        - Pitch range (1)
+        - Average pitch (1)
+        - Rest: melodic features
+        """
+        batch_size, seq_len = tokens.shape
+        melody_features = []
+
+        for b in range(batch_size):
+            # Extract notes with timing
+            notes = []  # (time_ms, pitch, velocity)
+            current_time = 0
+            chunk_start = 0
+
+            for t in range(seq_len):
+                token_id = tokens[b, t].item()
+
+                # Time shift token (resets time)
+                if token_id == 4:  # <T> token
+                    chunk_start = current_time
+
+                # TIME tokens (5-505)
+                elif 5 <= token_id <= 505:
+                    time_step = token_id - 5
+                    current_time = chunk_start + time_step * 10  # 10ms resolution
+
+                # NOTE_ON tokens (506-593)
+                elif 506 <= token_id < 594:
+                    pitch = 21 + (token_id - 506)
+                    notes.append((current_time, pitch))
+
+            if len(notes) == 0:
+                # No notes found, return zeros
+                melody_features.append(torch.zeros(128, device=tokens.device))
+                continue
+
+            # Skyline extraction (highest pitch at each time)
+            time_pitches = {}
+            for time, pitch in notes:
+                if time not in time_pitches:
+                    time_pitches[time] = []
+                time_pitches[time].append(pitch)
+
+            skyline = [max(pitches) for pitches in time_pitches.values()]
+
+            # Melodic intervals
+            if len(skyline) > 1:
+                intervals = [skyline[i+1] - skyline[i] for i in range(len(skyline)-1)]
+
+                # Interval histogram (-12 to +12)
+                interval_hist = torch.zeros(25, device=tokens.device)
+                for interval in intervals:
+                    idx = min(max(interval + 12, 0), 24)  # Clamp to 0-24
+                    interval_hist[idx] += 1.0
+
+                if interval_hist.sum() > 0:
+                    interval_hist = interval_hist / interval_hist.sum()
+
+                # Contour (up/down/same)
+                contour = torch.zeros(3, device=tokens.device)
+                for interval in intervals:
+                    if interval > 0:
+                        contour[0] += 1  # Up
+                    elif interval < 0:
+                        contour[1] += 1  # Down
+                    else:
+                        contour[2] += 1  # Same
+
+                if contour.sum() > 0:
+                    contour = contour / contour.sum()
+
+                # Pitch range (normalized)
+                pitch_range = (max(skyline) - min(skyline)) / 88.0
+
+                # Average pitch (normalized)
+                avg_pitch = sum(skyline) / len(skyline) / 127.0
+            else:
+                interval_hist = torch.zeros(25, device=tokens.device)
+                contour = torch.zeros(3, device=tokens.device)
+                pitch_range = 0.0
+                avg_pitch = skyline[0] / 127.0 if len(skyline) > 0 else 0.0
+
+            # Concatenate features
+            features = torch.cat([
+                interval_hist,
+                contour,
+                torch.tensor([pitch_range, avg_pitch], device=tokens.device)
+            ])
+
+            # Pad to 128
+            padding = torch.zeros(128 - features.shape[0], device=tokens.device)
+            features = torch.cat([features, padding])
+
+            melody_features.append(features)
+
+        return torch.stack(melody_features)
 
     def extract_rhythm(self, tokens: torch.Tensor) -> torch.Tensor:
-        """Extract rhythmic patterns"""
-        batch_size = tokens.shape[0]
-        rhythm = torch.zeros(batch_size, 64, device=tokens.device)
-        return rhythm
+        """
+        Extract rhythmic patterns from inter-onset intervals
+
+        Returns (B, 64) tensor with:
+        - IOI histogram (32 bins, log scale)
+        - Syncopation measure (1)
+        - Regularity/entropy (1)
+        - Rest: rhythmic complexity features
+        """
+        batch_size, seq_len = tokens.shape
+        rhythm_features = []
+
+        for b in range(batch_size):
+            # Extract onset times
+            onsets = []
+            current_time = 0
+            chunk_start = 0
+
+            for t in range(seq_len):
+                token_id = tokens[b, t].item()
+
+                # Time shift
+                if token_id == 4:
+                    chunk_start = current_time
+
+                # TIME tokens
+                elif 5 <= token_id <= 505:
+                    time_step = token_id - 5
+                    current_time = chunk_start + time_step * 10
+
+                # NOTE_ON
+                elif 506 <= token_id < 594:
+                    onsets.append(current_time)
+
+            if len(onsets) < 2:
+                rhythm_features.append(torch.zeros(64, device=tokens.device))
+                continue
+
+            # Inter-onset intervals (ms)
+            iois = [onsets[i+1] - onsets[i] for i in range(len(onsets)-1)]
+            iois = [max(ioi, 1) for ioi in iois]  # Avoid log(0)
+
+            # IOI histogram (log scale: 1ms to 10s)
+            ioi_hist = torch.zeros(32, device=tokens.device)
+            for ioi in iois:
+                log_ioi = np.log10(ioi)  # log10(1) = 0, log10(10000) = 4
+                bin_idx = int((log_ioi / 4.0) * 32)  # Map to 0-31
+                bin_idx = min(max(bin_idx, 0), 31)
+                ioi_hist[bin_idx] += 1.0
+
+            if ioi_hist.sum() > 0:
+                ioi_hist = ioi_hist / ioi_hist.sum()
+
+            # Syncopation (variance / mean)
+            mean_ioi = sum(iois) / len(iois)
+            variance = sum((ioi - mean_ioi)**2 for ioi in iois) / len(iois)
+            syncopation = (variance ** 0.5) / (mean_ioi + 1e-6)
+            syncopation = min(syncopation, 10.0) / 10.0  # Normalize
+
+            # Entropy (regularity measure)
+            probs = ioi_hist + 1e-10
+            entropy_val = -(probs * torch.log2(probs)).sum()
+            entropy_val = entropy_val / np.log2(32)  # Normalize to 0-1
+
+            # Concatenate features
+            features = torch.cat([
+                ioi_hist,
+                torch.tensor([syncopation, entropy_val.item()], device=tokens.device)
+            ])
+
+            # Pad to 64
+            padding = torch.zeros(64 - features.shape[0], device=tokens.device)
+            features = torch.cat([features, padding])
+
+            rhythm_features.append(features)
+
+        return torch.stack(rhythm_features)
 
     def extract_dynamics(self, tokens: torch.Tensor) -> torch.Tensor:
-        """Extract dynamic curve"""
-        batch_size = tokens.shape[0]
-        dynamics = torch.zeros(batch_size, 64, device=tokens.device)
-        return dynamics
+        """
+        Extract dynamic (velocity) features
+
+        Returns (B, 64) tensor with:
+        - Velocity histogram (32 bins)
+        - Dynamic range (1)
+        - Average velocity (1)
+        - Velocity variance (1)
+        - Rest: dynamic evolution features
+        """
+        batch_size, seq_len = tokens.shape
+        dynamics_features = []
+
+        for b in range(batch_size):
+            # Extract velocities
+            velocities = []
+
+            for t in range(seq_len):
+                token_id = tokens[b, t].item()
+
+                # VEL tokens (682-713 = 32 velocity bins)
+                if 682 <= token_id < 714:
+                    vel_bin = token_id - 682
+                    # Dequantize: bin * (128/32) + (128/64) for center of bin
+                    velocity = vel_bin * 4 + 2  # Approximate center
+                    velocities.append(velocity)
+
+            if len(velocities) == 0:
+                dynamics_features.append(torch.zeros(64, device=tokens.device))
+                continue
+
+            # Velocity histogram (32 bins: 0-127)
+            vel_hist = torch.zeros(32, device=tokens.device)
+            for vel in velocities:
+                bin_idx = min(int(vel / 4), 31)  # 128 / 4 = 32 bins
+                vel_hist[bin_idx] += 1.0
+
+            if vel_hist.sum() > 0:
+                vel_hist = vel_hist / vel_hist.sum()
+
+            # Dynamic range
+            dynamic_range = (max(velocities) - min(velocities)) / 127.0
+
+            # Average velocity
+            avg_velocity = sum(velocities) / len(velocities) / 127.0
+
+            # Velocity variance (expressiveness)
+            mean_vel = sum(velocities) / len(velocities)
+            variance = sum((v - mean_vel)**2 for v in velocities) / len(velocities)
+            vel_variance = (variance ** 0.5) / 127.0
+
+            # Concatenate features
+            features = torch.cat([
+                vel_hist,
+                torch.tensor([dynamic_range, avg_velocity, vel_variance], device=tokens.device)
+            ])
+
+            # Pad to 64
+            padding = torch.zeros(64 - features.shape[0], device=tokens.device)
+            features = torch.cat([features, padding])
+
+            dynamics_features.append(features)
+
+        return torch.stack(dynamics_features)
 
     def forward(self, tokens: torch.Tensor) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
         """
@@ -139,37 +452,105 @@ class MusicTheoryEncoder(nn.Module):
 
 
 class MultiScaleAttention(nn.Module):
-    """Multi-head attention with multi-scale temporal modeling"""
+    """
+    Multi-head attention with multi-scale temporal modeling
+
+    Operates at different temporal scales to capture both:
+    - Fine-grained patterns (note-level, scale=1)
+    - Medium patterns (beat-level, scale=2)
+    - Coarse patterns (phrase-level, scale=4)
+
+    Each scale uses separate attention heads, then results are combined.
+    """
     def __init__(self, hidden_dim: int, num_heads: int = 8, scales: list = [1, 2, 4]):
         super().__init__()
         self.hidden_dim = hidden_dim
         self.num_heads = num_heads
         self.scales = scales
+        self.num_scales = len(scales)
+
+        # Divide heads across scales
+        assert num_heads % self.num_scales == 0, f"num_heads ({num_heads}) must be divisible by num_scales ({self.num_scales})"
+        self.heads_per_scale = num_heads // self.num_scales
         self.head_dim = hidden_dim // num_heads
 
         assert hidden_dim % num_heads == 0
 
-        self.qkv = nn.Linear(hidden_dim, hidden_dim * 3)
+        # Separate QKV projections for each scale
+        self.scale_qkvs = nn.ModuleList([
+            nn.Linear(hidden_dim, hidden_dim * 3 // self.num_scales)
+            for _ in scales
+        ])
+
+        # Pooling layers for each scale (except scale=1)
+        self.scale_pools = nn.ModuleList([
+            nn.AvgPool1d(kernel_size=scale, stride=scale, padding=0) if scale > 1 else nn.Identity()
+            for scale in scales
+        ])
+
+        # Upsampling layers to restore original length
+        self.scale_upsample = nn.ModuleList([
+            nn.Upsample(scale_factor=scale, mode='linear', align_corners=False) if scale > 1 else nn.Identity()
+            for scale in scales
+        ])
+
         self.proj = nn.Linear(hidden_dim, hidden_dim)
         self.scale = self.head_dim ** -0.5
 
     def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None):
         B, L, D = x.shape
 
-        qkv = self.qkv(x).reshape(B, L, 3, self.num_heads, self.head_dim)
-        q, k, v = qkv.permute(2, 0, 3, 1, 4)  # (3, B, H, L, D)
+        scale_outputs = []
 
-        # Standard scaled dot-product attention
-        attn = (q @ k.transpose(-2, -1)) * self.scale
+        for scale_idx, (scale, qkv_layer, pool, upsample) in enumerate(
+            zip(self.scales, self.scale_qkvs, self.scale_pools, self.scale_upsample)
+        ):
+            # Pool to this scale
+            if scale > 1:
+                # Reshape for pooling: (B, L, D) -> (B, D, L)
+                x_pool = x.transpose(1, 2)
+                x_pool = pool(x_pool)
+                x_pool = x_pool.transpose(1, 2)  # Back to (B, L//scale, D)
+                L_scale = x_pool.shape[1]
+            else:
+                x_pool = x
+                L_scale = L
 
-        if mask is not None:
-            attn = attn.masked_fill(mask == 0, float('-inf'))
+            # QKV projection for this scale
+            qkv = qkv_layer(x_pool).reshape(B, L_scale, 3, self.heads_per_scale, self.head_dim)
+            q, k, v = qkv.permute(2, 0, 3, 1, 4)  # (3, B, heads_per_scale, L_scale, head_dim)
 
-        attn = F.softmax(attn, dim=-1)
-        out = attn @ v
+            # Scaled dot-product attention
+            attn = (q @ k.transpose(-2, -1)) * self.scale
 
-        out = out.transpose(1, 2).reshape(B, L, D)
-        return self.proj(out)
+            # Apply mask if provided (needs to be downsampled for scale > 1)
+            if mask is not None and scale > 1:
+                # Downsample mask to match this scale
+                mask_scale = mask[:, :, ::scale, ::scale] if mask.dim() == 4 else mask[:, ::scale]
+                attn = attn.masked_fill(mask_scale == 0, float('-inf'))
+            elif mask is not None:
+                attn = attn.masked_fill(mask == 0, float('-inf'))
+
+            attn = F.softmax(attn, dim=-1)
+            out = attn @ v
+
+            # Reshape: (B, heads_per_scale, L_scale, head_dim) -> (B, L_scale, D//num_scales)
+            out = out.transpose(1, 2).reshape(B, L_scale, -1)
+
+            # Upsample back to original length if needed
+            if scale > 1:
+                # (B, L_scale, D//num_scales) -> (B, D//num_scales, L_scale) -> upsample -> (B, D//num_scales, L)
+                out = out.transpose(1, 2)
+                out = upsample(out)
+                out = out.transpose(1, 2)  # Back to (B, L, D//num_scales)
+
+            scale_outputs.append(out)
+
+        # Concatenate outputs from all scales
+        multi_scale_out = torch.cat(scale_outputs, dim=-1)  # (B, L, D)
+
+        # Final projection
+        return self.proj(multi_scale_out)
 
 
 class DiffusionTransformerBlock(nn.Module):
@@ -266,6 +647,169 @@ class LatentDiffusionCore(nn.Module):
             sqrt_one_minus_alphas_cumprod_t = sqrt_one_minus_alphas_cumprod_t.unsqueeze(-1)
 
         return sqrt_alphas_cumprod_t * x_start + sqrt_one_minus_alphas_cumprod_t * noise
+
+    def predict_start_from_noise(self, x_t: torch.Tensor, t: torch.Tensor, noise: torch.Tensor):
+        """
+        Predict x_0 from x_t and predicted noise
+        Used in DDIM sampling
+        """
+        sqrt_alphas_cumprod_t = self.alphas_cumprod[t] ** 0.5
+        sqrt_one_minus_alphas_cumprod_t = (1 - self.alphas_cumprod[t]) ** 0.5
+
+        while len(sqrt_alphas_cumprod_t.shape) < len(x_t.shape):
+            sqrt_alphas_cumprod_t = sqrt_alphas_cumprod_t.unsqueeze(-1)
+            sqrt_one_minus_alphas_cumprod_t = sqrt_one_minus_alphas_cumprod_t.unsqueeze(-1)
+
+        # x_0 = (x_t - sqrt(1-alpha_t) * noise) / sqrt(alpha_t)
+        return (x_t - sqrt_one_minus_alphas_cumprod_t * noise) / sqrt_alphas_cumprod_t
+
+    @torch.no_grad()
+    def ddim_sample(
+        self,
+        noise_predictor,
+        shape: tuple,
+        num_inference_steps: int = 50,
+        eta: float = 0.0,
+        condition: Optional[torch.Tensor] = None,
+        device: str = 'cuda'
+    ):
+        """
+        DDIM sampling for faster generation
+
+        Args:
+            noise_predictor: Function that predicts noise from (x_t, t, condition)
+            shape: Shape of latent to generate (B, L, D)
+            num_inference_steps: Number of denoising steps (default 50, vs 1000 for DDPM)
+            eta: Stochasticity parameter (0 = deterministic DDIM, 1 = DDPM)
+            condition: Conditioning signal (style embedding, theory features, etc.)
+            device: Device to run on
+
+        Returns:
+            Denoised latent x_0
+        """
+        # Start from pure noise
+        x_t = torch.randn(shape, device=device)
+
+        # Create timestep schedule (subsample from full schedule)
+        step_size = self.num_steps // num_inference_steps
+        timesteps = list(range(0, self.num_steps, step_size))[::-1]  # Reverse order
+
+        for i, t in enumerate(timesteps):
+            t_tensor = torch.tensor([t], device=device).long()
+
+            # Predict noise
+            predicted_noise = noise_predictor(x_t, t_tensor, condition)
+
+            # Predict x_0
+            x_0_pred = self.predict_start_from_noise(x_t, t_tensor, predicted_noise)
+
+            # Compute previous timestep
+            if i < len(timesteps) - 1:
+                t_prev = timesteps[i + 1]
+            else:
+                t_prev = 0
+
+            # Get alpha values
+            alpha_t = self.alphas_cumprod[t]
+            alpha_t_prev = self.alphas_cumprod[t_prev] if t_prev > 0 else torch.tensor(1.0)
+
+            # Compute sigma (stochasticity)
+            sigma = eta * torch.sqrt((1 - alpha_t_prev) / (1 - alpha_t)) * torch.sqrt(1 - alpha_t / alpha_t_prev)
+
+            # Compute direction pointing to x_t
+            pred_direction = torch.sqrt(1 - alpha_t_prev - sigma**2) * predicted_noise
+
+            # Compute x_{t-1}
+            x_t_prev = torch.sqrt(alpha_t_prev) * x_0_pred + pred_direction
+
+            # Add noise if not deterministic
+            if eta > 0 and i < len(timesteps) - 1:
+                noise = torch.randn_like(x_t)
+                x_t_prev = x_t_prev + sigma * noise
+
+            x_t = x_t_prev
+
+        return x_t
+
+    @torch.no_grad()
+    def ddim_sample_with_cfg(
+        self,
+        noise_predictor,
+        shape: tuple,
+        condition: torch.Tensor,
+        num_inference_steps: int = 50,
+        eta: float = 0.0,
+        guidance_scale: float = 7.5,
+        device: str = 'cuda'
+    ):
+        """
+        DDIM sampling with Classifier-Free Guidance
+
+        Improves conditioning strength and generation quality
+        Used in Stable Diffusion, DALL-E 2, etc.
+
+        Args:
+            noise_predictor: Function that predicts noise from (x_t, t, condition)
+            shape: Shape of latent to generate
+            condition: Conditioning signal (must support None for unconditional)
+            num_inference_steps: Number of denoising steps
+            eta: Stochasticity parameter
+            guidance_scale: Strength of conditioning (1.0 = no guidance, 7.5 typical)
+            device: Device to run on
+
+        Returns:
+            Denoised latent x_0
+        """
+        # Start from pure noise
+        x_t = torch.randn(shape, device=device)
+
+        # Create timestep schedule
+        step_size = self.num_steps // num_inference_steps
+        timesteps = list(range(0, self.num_steps, step_size))[::-1]
+
+        for i, t in enumerate(timesteps):
+            t_tensor = torch.tensor([t], device=device).long()
+
+            # Predict noise with conditioning
+            noise_cond = noise_predictor(x_t, t_tensor, condition)
+
+            # Predict noise without conditioning (unconditional)
+            noise_uncond = noise_predictor(x_t, t_tensor, None)
+
+            # Classifier-free guidance
+            # noise = uncond + guidance_scale * (cond - uncond)
+            predicted_noise = noise_uncond + guidance_scale * (noise_cond - noise_uncond)
+
+            # Predict x_0
+            x_0_pred = self.predict_start_from_noise(x_t, t_tensor, predicted_noise)
+
+            # Compute previous timestep
+            if i < len(timesteps) - 1:
+                t_prev = timesteps[i + 1]
+            else:
+                t_prev = 0
+
+            # Get alpha values
+            alpha_t = self.alphas_cumprod[t]
+            alpha_t_prev = self.alphas_cumprod[t_prev] if t_prev > 0 else torch.tensor(1.0)
+
+            # Compute sigma
+            sigma = eta * torch.sqrt((1 - alpha_t_prev) / (1 - alpha_t)) * torch.sqrt(1 - alpha_t / alpha_t_prev)
+
+            # Compute direction
+            pred_direction = torch.sqrt(1 - alpha_t_prev - sigma**2) * predicted_noise
+
+            # Compute x_{t-1}
+            x_t_prev = torch.sqrt(alpha_t_prev) * x_0_pred + pred_direction
+
+            # Add noise
+            if eta > 0 and i < len(timesteps) - 1:
+                noise = torch.randn_like(x_t)
+                x_t_prev = x_t_prev + sigma * noise
+
+            x_t = x_t_prev
+
+        return x_t
 
 
 class TatumFlow(nn.Module):
