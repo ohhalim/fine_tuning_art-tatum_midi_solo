@@ -1,0 +1,99 @@
+# TatumFlow Configuration
+
+# Model configuration
+model:
+  size: "base"  # small, base, large
+  vocab_size: 2048
+  hidden_dim: 512
+  latent_dim: 256
+  num_layers: 12
+  num_heads: 8
+  max_seq_len: 2048
+  diffusion_steps: 1000
+  num_style_dims: 64
+
+# Tokenizer configuration
+tokenizer:
+  time_quantization_ms: 10
+  max_duration_ms: 10000
+  max_time_shift_ms: 5000
+  min_pitch: 21
+  max_pitch: 108
+  velocity_bins: 32
+  use_sustain: true
+
+# Training configuration
+training:
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  num_epochs: 100
+  learning_rate: 1.0e-4
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  warmup_steps: 1000
+
+  # Loss weights
+  lambda_recon: 1.0
+  lambda_diffusion: 0.5
+  lambda_kl: 0.1
+  lambda_theory: 0.2
+
+  # Diffusion training
+  diffusion_prob: 0.5  # Probability of using diffusion during training
+
+  # Optimization
+  optimizer: "adamw"
+  betas: [0.9, 0.95]
+  eps: 1.0e-8
+
+  # Learning rate schedule
+  scheduler: "cosine"
+  min_lr_ratio: 0.1
+
+# Data configuration
+data:
+  data_dir: "data/midi"
+  cache_dir: "cache"
+  train_split: 0.9
+  max_seq_len: 2048
+  num_workers: 4
+  pin_memory: true
+  augment: true
+
+  # Art Tatum specific
+  artist_filter: "art tatum"
+  pijama_dir: "data/pijama"
+
+# Generation configuration
+generation:
+  temperature: 1.0
+  top_k: 50
+  top_p: 0.95
+  num_diffusion_steps: 50
+
+  # Improvisation
+  creativity: 0.5
+  preserve_structure: true
+  num_variations: 5
+
+# Paths
+paths:
+  checkpoint_dir: "checkpoints"
+  log_dir: "logs"
+  output_dir: "outputs"
+
+# Hardware
+device: "cuda"  # cuda, cpu
+mixed_precision: true
+compile: false  # Use torch.compile (PyTorch 2.0+)
+
+# Logging
+logging:
+  log_interval: 100
+  save_interval: 1000
+  eval_interval: 500
+  log_level: "INFO"
+  use_tensorboard: true
+  use_wandb: false
+  wandb_project: "tatumflow"
+  wandb_entity: null
