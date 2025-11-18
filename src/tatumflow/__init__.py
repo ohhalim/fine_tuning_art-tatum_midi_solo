@@ -74,6 +74,14 @@ from .utils import (
     print_model_summary
 )
 
+from .metrics import MusicMetrics
+
+from .train_amp import (
+    TatumFlowTrainerAMP,
+    TatumFlowTrainerAMPEMA,
+    EMA
+)
+
 __all__ = [
     # Model
     'TatumFlow',
@@ -94,10 +102,16 @@ __all__ = [
     # Training
     'TatumFlowTrainer',
     'TatumFlowLoss',
+    'TatumFlowTrainerAMP',
+    'TatumFlowTrainerAMPEMA',
+    'EMA',
 
     # Generation
     'TatumFlowGenerator',
     'load_model_from_checkpoint',
+
+    # Metrics
+    'MusicMetrics',
 
     # Utils
     'set_seed',
