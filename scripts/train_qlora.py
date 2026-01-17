@@ -299,7 +299,7 @@ def main():
     
     # Training
     parser.add_argument("--epochs", type=int, default=3)
-    parser.add_argument("--batch_size", type=int, default=2)
+    parser.add_argument("--batch_size", type=int, default=16)  # Increased for better GPU utilization
     parser.add_argument("--lr", type=float, default=2e-4)
     parser.add_argument("--warmup_steps", type=int, default=100)
     parser.add_argument("--gradient_accumulation", type=int, default=4)
@@ -348,8 +348,8 @@ def main():
     train_dataset = MidiDataset(args.data_dir, max_seq=args.max_sequence, split="train")
     val_dataset = MidiDataset(args.data_dir, max_seq=args.max_sequence, split="val")
     
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=2)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=8, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=8, pin_memory=True)
     
     # Optimizer & Scheduler
     optimizer = AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr, weight_decay=0.01)
