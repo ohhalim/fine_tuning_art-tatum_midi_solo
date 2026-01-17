@@ -1,7 +1,27 @@
+# Core Deep Learning
+torch>=2.0.0
+torchaudio
+
+# Transformers & LoRA
+transformers>=4.30.0
+peft>=0.7.0
+bitsandbytes>=0.41.0
+accelerate
+
+# Music Processing
 music21
 pretty_midi
 mido
-torch
-transformers
+
+# Math & Utils
 numpy
+scipy
+tqdm
 pandas
+
+# Training & Monitoring
+tensorboard
+wandb
+
+# Development
+matplotlib
