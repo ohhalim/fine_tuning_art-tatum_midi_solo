@@ -355,7 +355,7 @@ def main():
     scheduler = CosineAnnealingLR(optimizer, T_max=total_steps, eta_min=1e-6)
     
     # Loss
-    loss_fn = SmoothCrossEntropyLoss(0.1, 388, TOKEN_PAD)
+    loss_fn = SmoothCrossEntropyLoss(0.1, 390, TOKEN_PAD)  # VOCAB_SIZE = 390
     
     # Training loop
     print("\n=== Starting Training ===")
