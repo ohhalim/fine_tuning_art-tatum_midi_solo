@@ -71,10 +71,13 @@ class LoRALayer(nn.Module):
     
     @property
     def weight(self):
-        """Return the effective weight (original + LoRA delta)"""
-        # For compatibility: return original weight
-        # The actual LoRA computation happens in forward
-        return self.original_layer.weight
+        """Return the effective weight with LoRA applied.
+        
+        This allows rpr.py to use .weight directly while still applying LoRA.
+        """
+        # Compute LoRA delta: B @ A gives [out_features, in_features]
+        lora_weight = self.lora_B @ self.lora_A
+        return self.original_layer.weight + lora_weight * self.scaling
     
     @property
     def bias(self):
