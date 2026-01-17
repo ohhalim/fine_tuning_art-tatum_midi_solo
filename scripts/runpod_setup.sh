@@ -31,7 +31,7 @@ echo "[4/5] Note: Download pretrained checkpoint from: $CHECKPOINT_URL"
 echo "      Place in ./checkpoints/pretrained/ if using pretrained weights"
 
 # 5. 학습 시작
-echo "[5/5] Starting LoRA training..."
+echo "[5/6] Starting LoRA training..."
 python scripts/train_qlora.py \
     --data_dir ./data/jazz_processed \
     --epochs 3 \
@@ -41,6 +41,17 @@ python scripts/train_qlora.py \
     --lora_alpha 32 \
     --output_dir ./checkpoints/jazz_lora
 
+# 6. 테스트: MIDI 샘플 생성
+echo "[6/6] Generating test samples..."
+python scripts/generate.py \
+    --lora_path ./checkpoints/jazz_lora \
+    --num_samples 5 \
+    --length 1024 \
+    --output ./samples/
+
 echo ""
 echo "=== Training Complete ==="
 echo "LoRA weights saved to: ./checkpoints/jazz_lora/"
+echo "Generated samples saved to: ./samples/"
+echo ""
+echo "Download samples and listen to evaluate quality!"
