@@ -16,9 +16,7 @@
 
 ---
 
-## Step 2: 코드 업로드
-
-### 2-1. GitHub에서 클론
+## Step 2: 코드 클론
 
 ```bash
 # RunPod 터미널에서
@@ -29,20 +27,7 @@ cd fine_tuning_art-tatum_midi_solo
 git checkout feature/music-transformer-qlora
 ```
 
-### 2-2. MIDI 데이터셋 업로드
-
-**옵션 A: 로컬에서 업로드** (권장)
-- RunPod File Browser 사용
-- `midi_dataset/` 폴더를 `/workspace/fine_tuning_art-tatum_midi_solo/`에 업로드
-
-**옵션 B: 압축 후 업로드**
-```bash
-# 로컬에서
-cd /Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo
-zip -r midi_dataset.zip midi_dataset/
-# RunPod File Browser로 업로드 후
-unzip midi_dataset.zip
-```
+**데이터셋 포함됨!** 별도 업로드 필요 없음.
 
 ---
 
