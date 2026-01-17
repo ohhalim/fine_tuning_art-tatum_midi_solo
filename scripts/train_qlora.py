@@ -299,7 +299,7 @@ def main():
     
     # Training
     parser.add_argument("--epochs", type=int, default=3)
-    parser.add_argument("--batch_size", type=int, default=16)  # Increased for better GPU utilization
+    parser.add_argument("--batch_size", type=int, default=8)  # Optimized for 24GB VRAM
     parser.add_argument("--lr", type=float, default=2e-4)
     parser.add_argument("--warmup_steps", type=int, default=100)
     parser.add_argument("--gradient_accumulation", type=int, default=4)
