@@ -1,5 +1,8 @@
 # RunPod Music Transformer QLoRA 학습 가이드
 
+> 최신 Stage A 자동화 스크립트: `scripts/runpod_train_stage_a.sh`
+> 이 문서는 초기 버전 참고용입니다.
+
 ## 준비물
 - RunPod 계정 (https://runpod.io)
 - 만원 정도 크레딧 (~$7-8)
