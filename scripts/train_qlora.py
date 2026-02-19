@@ -31,7 +31,7 @@ sys.path.insert(0, str(SCRIPT_DIR / "music_transformer" / "third_party"))
 
 from model.music_transformer import MusicTransformer
 from model.loss import SmoothCrossEntropyLoss
-from utilities.constants import TOKEN_PAD
+from utilities.constants import TOKEN_PAD, VOCAB_SIZE
 
 
 # =============================================================================
@@ -232,31 +232,50 @@ class MidiDataset(Dataset):
 # Training
 # =============================================================================
 
-def train_epoch(model, dataloader, optimizer, scheduler, loss_fn, device, epoch):
+def train_epoch(
+    model,
+    dataloader,
+    optimizer,
+    scheduler,
+    loss_fn,
+    device,
+    epoch,
+    gradient_accumulation: int = 1,
+):
     model.train()
     total_loss = 0
-    
+
+    gradient_accumulation = max(1, int(gradient_accumulation))
+    optimizer.zero_grad(set_to_none=True)
+
     pbar = tqdm(dataloader, desc=f"Epoch {epoch}")
     for batch_idx, (x, y) in enumerate(pbar):
         x, y = x.to(device), y.to(device)
-        
-        optimizer.zero_grad()
-        
+
         # Forward
         output = model(x)
-        
+
         # Compute loss
-        loss = loss_fn(output.view(-1, output.size(-1)), y.view(-1))
-        
+        raw_loss = loss_fn(output.view(-1, output.size(-1)), y.view(-1))
+        loss = raw_loss / gradient_accumulation
+
         # Backward
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-        optimizer.step()
-        scheduler.step()
-        
-        total_loss += loss.item()
-        pbar.set_postfix({"loss": f"{loss.item():.4f}", "lr": f"{scheduler.get_last_lr()[0]:.2e}"})
-    
+        should_step = (
+            (batch_idx + 1) % gradient_accumulation == 0
+            or (batch_idx + 1) == len(dataloader)
+        )
+        if should_step:
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            optimizer.step()
+            if scheduler is not None:
+                scheduler.step()
+            optimizer.zero_grad(set_to_none=True)
+
+        total_loss += raw_loss.item()
+        current_lr = optimizer.param_groups[0]["lr"]
+        pbar.set_postfix({"loss": f"{raw_loss.item():.4f}", "lr": f"{current_lr:.2e}"})
+
     return total_loss / len(dataloader)
 
 
@@ -288,7 +307,7 @@ def main():
     parser.add_argument("--num_heads", type=int, default=8)
     parser.add_argument("--d_model", type=int, default=512)
     parser.add_argument("--dim_feedforward", type=int, default=1024)
-    parser.add_argument("--max_sequence", type=int, default=2048)
+    parser.add_argument("--max_sequence", type=int, default=512)
     parser.add_argument("--rpr", action="store_true", default=True,
                         help="Use Relative Position Representation")
     
@@ -301,8 +320,9 @@ def main():
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch_size", type=int, default=8)  # Optimized for 24GB VRAM
     parser.add_argument("--lr", type=float, default=2e-4)
-    parser.add_argument("--warmup_steps", type=int, default=100)
     parser.add_argument("--gradient_accumulation", type=int, default=4)
+    parser.add_argument("--num_workers", type=int, default=0)
+    parser.add_argument("--label_smoothing", type=float, default=0.1)
     
     # Output
     parser.add_argument("--output_dir", type=str, default="./checkpoints/jazz_lora")
@@ -348,8 +368,20 @@ def main():
     train_dataset = MidiDataset(args.data_dir, max_seq=args.max_sequence, split="train")
     val_dataset = MidiDataset(args.data_dir, max_seq=args.max_sequence, split="val")
     
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=8, pin_memory=True)
-    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=8, pin_memory=True)
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=max(0, args.num_workers),
+        pin_memory=True,
+    )
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=args.batch_size,
+        shuffle=False,
+        num_workers=max(0, args.num_workers),
+        pin_memory=True,
+    )
     
     # Optimizer & Scheduler
     optimizer = AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr, weight_decay=0.01)
@@ -358,14 +390,27 @@ def main():
     scheduler = CosineAnnealingLR(optimizer, T_max=total_steps, eta_min=1e-6)
     
     # Loss
-    loss_fn = SmoothCrossEntropyLoss(0.1, 390, TOKEN_PAD)  # VOCAB_SIZE = 390
+    loss_fn = SmoothCrossEntropyLoss(
+        args.label_smoothing,
+        VOCAB_SIZE,
+        ignore_index=TOKEN_PAD,
+    )
     
     # Training loop
     print("\n=== Starting Training ===")
     best_val_loss = float("inf")
     
     for epoch in range(1, args.epochs + 1):
-        train_loss = train_epoch(model, train_loader, optimizer, scheduler, loss_fn, device, epoch)
+        train_loss = train_epoch(
+            model,
+            train_loader,
+            optimizer,
+            scheduler,
+            loss_fn,
+            device,
+            epoch,
+            gradient_accumulation=args.gradient_accumulation,
+        )
         val_loss = evaluate(model, val_loader, loss_fn, device)
         
         print(f"Epoch {epoch}: Train Loss = {train_loss:.4f}, Val Loss = {val_loss:.4f}")
