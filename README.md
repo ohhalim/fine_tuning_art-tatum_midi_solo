@@ -97,6 +97,27 @@ bash scripts/runpod_train_stage_a.sh \
 - `--mode generate`
 - `--mode eval`
 
+## Dead-Air 스프린트 자동화
+
+아래 스크립트는 계획된 dead-air 개선 스프린트를 한 번에 실행합니다.
+
+- Phase 1: primer sweep (`96,128,160`)
+- Phase 2: split_pitch sweep (`55,60,64`, 1epoch 재학습)
+- Phase 3: 베스트 후보 자동 선택
+- Phase 4: 베스트 후보 `num_samples=20` 재검증
+- Phase 5: 아티팩트 tar 백업
+
+```bash
+bash scripts/run_dead_air_sweep.sh \
+  --input_dir "./midi_dataset/midi/studio/Brad Mehldau"
+```
+
+주요 결과물:
+- `samples/dead_air_sweep/summary.json`
+- `samples/dead_air_sweep/summary.md`
+- `samples/dead_air_sweep/*/metrics.json`
+- `dead_air_sweep_artifacts.tgz`
+
 ## 기존 문서
 
 - 심볼릭 시스템 리팩터 계획: `docs/JAMBOT_MIDI_REFACTOR_PLAN.md`
