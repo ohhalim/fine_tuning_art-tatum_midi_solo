@@ -19,9 +19,9 @@ fi
 INPUT_DIR="./midi_dataset/midi/studio/Brad Mehldau"
 BASE_LORA="./checkpoints/jazz_lora_stage_a"
 BASE_COND="./data/roles/lead/000000/conditioning.mid"
-BASELINE_METRICS="./samples/stage_a_p128/metrics.json"
+BASELINE_METRICS="./samples/stage_a/metrics.json"
 
-PRIMER_VALUES="96,128,160"
+PRIMER_VALUES="64,96,128,160"
 SPLIT_VALUES="55,60,64"
 
 NUM_SAMPLES=10
@@ -49,8 +49,8 @@ Options:
   --input_dir <path>                  default: ./midi_dataset/midi/studio/Brad Mehldau
   --base_lora <path>                  default: ./checkpoints/jazz_lora_stage_a
   --base_conditioning <path>          default: ./data/roles/lead/000000/conditioning.mid
-  --baseline_metrics <path>           default: ./samples/stage_a_p128/metrics.json
-  --primer_values <csv>               default: 96,128,160
+  --baseline_metrics <path>           default: ./samples/stage_a/metrics.json
+  --primer_values <csv>               default: 64,96,128,160
   --split_values <csv>                default: 55,60,64
   --num_samples <int>                 default: 10
   --reval_samples <int>               default: 20
@@ -279,4 +279,3 @@ echo "Summary Markdown: $SUMMARY_MD"
 echo "Best candidate: $BEST_LABEL"
 echo "Revalidation metrics: ${REVAL_DIR}/metrics.json"
 echo "Archive: $ARCHIVE_NAME"
-

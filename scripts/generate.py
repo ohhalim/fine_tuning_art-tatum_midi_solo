@@ -5,8 +5,9 @@ Stage A usage:
     python scripts/generate.py \
       --lora_path ./checkpoints/jazz_lora \
       --conditioning_midi ./data/roles/lead/000000/conditioning.mid \
+      --primer_max_tokens 64 \
       --num_samples 3 \
-      --length 1024 \
+      --length 512 \
       --output ./samples
 """
 
@@ -183,7 +184,12 @@ def main():
 
     # Generation
     parser.add_argument("--conditioning_midi", type=str, default=None)
-    parser.add_argument("--primer_max_tokens", type=int, default=256)
+    parser.add_argument(
+        "--primer_max_tokens",
+        type=int,
+        default=64,
+        help="Number of conditioning tokens to keep. Stage A default is 64 (dead-air best).",
+    )
     parser.add_argument("--append_sep_token", action="store_true", default=True)
     parser.add_argument("--no_append_sep_token", action="store_false", dest="append_sep_token")
     parser.add_argument("--strip_primer_output", action="store_true", default=True)

@@ -11,6 +11,7 @@ TRAIN_EPOCHS=3
 BATCH_SIZE=8
 NUM_WORKERS=0
 MAX_SEQUENCE=512
+PRIMER_MAX_TOKENS=64
 TRANSPOSE_ALL_KEYS="false"
 OVERWRITE="false"
 INSTALL_DEPS="false"
@@ -42,6 +43,7 @@ Options:
   --epochs <int>                             (default: 3)
   --batch_size <int>                         (default: 8)
   --max_sequence <int>                       (default: 512)
+  --primer_max_tokens <int>                  (default: 64)
   --num_workers <int>                        (default: 0)
   --transpose_all_keys                       (flag)
   --overwrite                                (flag)
@@ -63,6 +65,7 @@ while [[ $# -gt 0 ]]; do
     --batch_size) BATCH_SIZE="$2"; shift 2 ;;
     --num_workers) NUM_WORKERS="$2"; shift 2 ;;
     --max_sequence) MAX_SEQUENCE="$2"; shift 2 ;;
+    --primer_max_tokens) PRIMER_MAX_TOKENS="$2"; shift 2 ;;
     --transpose_all_keys) TRANSPOSE_ALL_KEYS="true"; shift 1 ;;
     --overwrite) OVERWRITE="true"; shift 1 ;;
     --install_deps) INSTALL_DEPS="true"; shift 1 ;;
@@ -130,6 +133,7 @@ run_generate() {
   "$PYTHON_BIN" scripts/generate.py \
     --lora_path "$CHECKPOINT_DIR" \
     --conditioning_midi "$conditioning_midi" \
+    --primer_max_tokens "$PRIMER_MAX_TOKENS" \
     --length "$MAX_SEQUENCE" \
     --max_sequence "$MAX_SEQUENCE" \
     --num_samples 5 \

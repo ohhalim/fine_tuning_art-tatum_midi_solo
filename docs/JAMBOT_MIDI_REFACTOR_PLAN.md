@@ -152,12 +152,32 @@
 - d_model: 256~384
 - n_heads: 4~8
 - context/max_length: 256~512
+- primer_max_tokens: 64 (dead-air 스윕 베스트)
 - batch_size: GPU 상황 기준 최적화
 - LoRA rank: 8~16 (초기 권장)
 
 ---
 
-## 7) 실행 순서 (커밋 단위)
+## 7) Dead-Air 스윕 결과 (2026-02-20)
+
+결과 요약:
+- Best candidate: `p64`
+- 고정 모델: `checkpoints/jazz_lora_stage_a`
+- 고정 생성 파라미터: `--primer_max_tokens 64`
+
+핵심 지표:
+- baseline(기존 stage_a): `avg_dead_air_ratio = 0.534149`
+- p64(20샘플): `avg_dead_air_ratio = 0.454905`
+- p96(20샘플): `avg_dead_air_ratio = 0.482452`
+
+결정:
+1. Stage A 기본 생성값은 `primer_max_tokens=64`로 고정한다.
+2. split_pitch 재학습 계열(`sp52/55/...`)은 현재 기준으로 기본값 채택하지 않는다.
+3. Stage B 전까지는 base LoRA(`jazz_lora_stage_a`) + `p64` 조합을 기준선으로 사용한다.
+
+---
+
+## 8) 실행 순서 (커밋 단위)
 
 1. Commit 1
 - `prepare_role_dataset.py`
@@ -185,7 +205,7 @@
 
 ---
 
-## 8) 리스크 및 대응
+## 9) 리스크 및 대응
 
 - 리스크: 스타일은 붙었지만 실시간성이 깨짐
 - 대응: 모델 크기/컨텍스트를 먼저 줄이고 선생성 길이를 고정
@@ -198,11 +218,10 @@
 
 ---
 
-## 9) 최종 산출물 정의
+## 10) 최종 산출물 정의
 
 - RunPod 학습 자동화 스크립트
 - role-conditioned 데이터 파이프라인
 - 로컬 실시간 MIDI 런타임
 - KPI 리포트(TTFN, dead-air, chord-response)
 - 60초 데모 MIDI/영상(포트폴리오용)
-
