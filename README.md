@@ -125,20 +125,20 @@ python scripts/train_qlora.py \
 python scripts/generate.py \
   --lora_path ./checkpoints/jazz_lora_stage_a \
   --conditioning_midi ./data/roles/lead/000000/conditioning.mid \
-  --primer_max_tokens 128 \
+  --primer_max_tokens 64 \
   --num_samples 10 \
   --length 512 \
   --max_sequence 512 \
-  --output ./samples/stage_a_p128
+  --output ./samples/stage_a_p64
 ```
 
 ### 3-4. 평가
 
 ```bash
 python scripts/eval_offline_metrics.py \
-  --input ./samples/stage_a_p128 \
+  --input ./samples/stage_a_p64 \
   --dead_air_threshold_ms 180 \
-  --output_json ./samples/stage_a_p128/metrics.json
+  --output_json ./samples/stage_a_p64/metrics.json
 ```
 
 핵심 지표 해석:
@@ -152,7 +152,7 @@ python scripts/eval_offline_metrics.py \
 
 아래 스크립트는 dead-air 개선 실험을 자동으로 수행합니다.
 
-- Primer sweep: `96,128,160`
+- Primer sweep: `64,96,128,160`
 - split_pitch sweep: `55,60,64` (1 epoch 재학습)
 - 베스트 후보 자동 선정 + 재검증(`num_samples=20`)
 - 결과 아카이브 생성
@@ -225,14 +225,30 @@ PY
 
 ## 7) 다음 단계 (MVP 이후)
 
-1. dead-air 최적 조합 고정
-2. 베스트 설정으로 재검증(`num_samples=20`)
+1. `primer_max_tokens=64` 기본값으로 Stage A 생성 유지
+2. 베스트 설정으로 재검증(`num_samples=20`) 주기적으로 재실행
 3. KPI 업데이트 (`docs/JAMBOT_MIDI_REFACTOR_PLAN.md`)
 4. 이후 Stage B 확장(컨디셔닝 토큰 강화)
 
 ---
 
-## 8) 참고 문서
+## 8) 최신 실험 결과 (2026-02-20)
+
+Dead-air 스윕 결과, Stage A 기본 생성 파라미터는 아래로 확정했습니다.
+
+- 모델: `checkpoints/jazz_lora_stage_a`
+- 기본 primer: `--primer_max_tokens 64`
+- Dead-air(20샘플): `0.454905`
+- 비교군 p96(20샘플): `0.482452`
+
+비교(20샘플):
+
+| Candidate | Dead-air | Repetition | Note Density |
+|---|---:|---:|---:|
+| p64 (best, 20 samples) | 0.454905 | 0.019829 | 1.040259 |
+| p96 (20 samples) | 0.482452 | 0.013617 | 0.990787 |
+
+## 9) 참고 문서
 
 - 실행 계획: `docs/JAMBOT_MIDI_REFACTOR_PLAN.md`
 - Magenta RT 참고: `docs/MAGENTA_RT_FINETUNING_GUIDE.md`
