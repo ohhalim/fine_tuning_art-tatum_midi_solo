@@ -79,6 +79,11 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - 평균 dead-air ratio: 약 `0.31`.
   - 산출물: `outputs/sweeps/inprocess_runner_p256_27case_sparse_policy.json`, `outputs/sweeps/inprocess_runner_p256_27case_sparse_policy.md`.
   - 해석: 이전 `23/27` 결과는 sparse 후보의 긴 공백을 dead-air gate가 과도하게 탈락시킨 것이 주된 원인이었다. sparse는 density/pitch/note-count gate를 통과하면 긴 공백을 허용한다.
+- MVP demo contract:
+  - 실행 명령: `bash scripts/run_mvp_demo.sh`
+  - 산출물: `outputs/demo/demo_request.json`, `outputs/demo/generated.mid`, `outputs/demo/metrics.json`, `outputs/demo/result.json`.
+  - 기본 demo seed는 `13`.
+  - 현재 demo 결과: `COMPLETED`, fallback `false`, model repaired `true`, note count `7`.
 
 주의할 점:
 
@@ -200,6 +205,7 @@ python scripts/eval_offline_metrics.py \
 - inference 기본 `max_sequence`는 256으로 둔다.
 - sparse는 silence가 의도인 density mode이므로 dead-air 상한 gate를 적용하지 않는다. 단, note count, note density, pitch range gate는 유지한다.
 - 남은 문제는 request당 약 9~10초가 걸리는 autoregressive generation 병목과 실제 음악성/코드 적합성 평가다.
+- README의 MVP demo command는 `bash scripts/run_mvp_demo.sh`로 고정한다.
 
 ### Phase 3. Conditioning 의미 강화
 

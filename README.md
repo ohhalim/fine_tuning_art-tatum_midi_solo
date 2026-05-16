@@ -94,6 +94,40 @@ bash scripts/runpod_train_stage_a.sh \
 
 ---
 
+## 2-1) MVP 데모 실행
+
+이미 `checkpoints/jazz_lora_stage_a/lora_weights.pt`가 있는 로컬 환경에서는 아래 명령으로 현재 MVP inference contract를 바로 확인합니다.
+
+```bash
+bash scripts/run_mvp_demo.sh
+```
+
+고정 데모 조건:
+- BPM: `124`
+- Chords: `Cm7,Fm7,Bb7,Ebmaj7`
+- Bars: `2`
+- Section/Energy/Density: `drop/high/medium`
+- Sampling: `temperature=0.9`, `top_p=0.95`, `model_candidates=2`
+- Inference length: `max_sequence=256`
+- Seed: `13`
+
+생성 산출물:
+- `outputs/demo/demo_request.json`
+- `outputs/demo/generated.mid`
+- `outputs/demo/metrics.json`
+- `outputs/demo/result.json`
+- `outputs/demo/generated/mvp_demo_medium_cminor.mid`
+- `outputs/demo/metrics/mvp_demo_medium_cminor.json`
+
+현재 기준선:
+- 256-token 27-case sweep: model success `27/27`
+- fallback `0/27`
+- 평균 generation time 약 `9.5s/request`
+
+이 데모의 목적은 모델 연구 성능을 과장하는 것이 아니라, request-derived MIDI conditioning, model generation, repair, metrics gate, fallback contract가 하나의 재현 가능한 파이프라인으로 동작하는지 확인하는 것입니다.
+
+---
+
 ## 3) 단계별 실행 (문제 추적할 때 추천)
 
 ### 3-1. 데이터 준비
