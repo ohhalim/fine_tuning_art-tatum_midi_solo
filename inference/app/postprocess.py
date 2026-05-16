@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import random
 from pathlib import Path
 
 import pretty_midi
 
-from .fallback import parse_time_signature
+from .fallback import chord_pitches_in_range, parse_chord, parse_time_signature
 from .schemas import GenerationRequest
 
 
@@ -12,6 +13,14 @@ PREFERRED_SOLO_MIN = 48
 PREFERRED_SOLO_MAX = 88
 HARD_PIANO_MIN = 21
 HARD_PIANO_MAX = 108
+
+TARGET_NOTES_PER_BAR = {
+    "sparse": 0,
+    # Medium keeps the repaired model phrase unchanged; adding eighth-note fill
+    # raised dead-air in smoke sweeps. Dense gets explicit 16th-note gap fill.
+    "medium": 0,
+    "dense": 12,
+}
 
 
 def phrase_duration_sec(request: GenerationRequest) -> float:
@@ -30,6 +39,65 @@ def map_pitch_to_range(
         return max(HARD_PIANO_MIN, min(HARD_PIANO_MAX, int(pitch)))
     center = (pitch_min + pitch_max) / 2.0
     return min(candidates, key=lambda p: (abs(p - center), abs(p - int(pitch))))
+
+
+def chord_for_time(request: GenerationRequest, start_sec: float) -> str:
+    beats_per_bar = parse_time_signature(request.time_signature)
+    seconds_per_bar = beats_per_bar * (60.0 / float(request.bpm))
+    bar_idx = int(start_sec // max(1e-6, seconds_per_bar))
+    return request.chord_progression[bar_idx % len(request.chord_progression)]
+
+
+def has_nearby_start(notes: list[pretty_midi.Note], start_sec: float, tolerance_sec: float = 0.05) -> bool:
+    return any(abs(float(note.start) - start_sec) <= tolerance_sec for note in notes)
+
+
+def add_density_repair_notes(
+    instrument: pretty_midi.Instrument,
+    request: GenerationRequest,
+    max_duration: float,
+) -> None:
+    target_notes = TARGET_NOTES_PER_BAR.get(request.density, TARGET_NOTES_PER_BAR["medium"]) * request.bars
+    if target_notes <= 0 or len(instrument.notes) >= target_notes:
+        return
+
+    rng = random.Random(request.seed + 1009)
+    sixteenth = (60.0 / float(request.bpm)) / 4.0
+    duration = max(0.06, sixteenth * 0.85)
+    grid_positions = []
+    pos = 0.0
+    while pos < max_duration:
+        grid_positions.append(pos)
+        pos += sixteenth
+
+    if request.density == "medium":
+        grid_positions = grid_positions[::2]
+
+    previous_pitch = instrument.notes[-1].pitch if instrument.notes else 64
+    for start in grid_positions:
+        if len(instrument.notes) >= target_notes:
+            break
+        if has_nearby_start(instrument.notes, start):
+            continue
+
+        chord = chord_for_time(request, start)
+        root_pc, intervals = parse_chord(chord)
+        tones = chord_pitches_in_range(root_pc, intervals, PREFERRED_SOLO_MIN, PREFERRED_SOLO_MAX)
+        nearby = [pitch for pitch in tones if abs(pitch - previous_pitch) <= 7]
+        pool = nearby or tones or [previous_pitch]
+        pitch = rng.choice(pool)
+        previous_pitch = pitch
+        end = min(max_duration, start + duration)
+        if end <= start:
+            continue
+        instrument.notes.append(
+            pretty_midi.Note(
+                velocity=72 if request.energy != "high" else 88,
+                pitch=int(pitch),
+                start=float(start),
+                end=float(end),
+            )
+        )
 
 
 def repair_model_midi(
@@ -81,6 +149,8 @@ def repair_model_midi(
                 end=end,
             )
         )
+
+    add_density_repair_notes(instrument, request, max_duration)
 
     # Avoid dense duplicate same-pitch notes at the exact same start.
     deduped: list[pretty_midi.Note] = []

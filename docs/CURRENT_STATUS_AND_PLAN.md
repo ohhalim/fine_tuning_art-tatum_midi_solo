@@ -43,6 +43,14 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - pitch range octave mapping.
   - 첫 note 기준 phrase 정렬.
   - 요청 bars 기준 trim.
+  - dense request에서 16분음표 chord-tone gap fill 적용.
+
+최근 smoke sweep:
+
+- 범위: `Cm7,Fm7,Bb7,Ebmaj7`, seed `11,13,17`, density `sparse,medium,dense`.
+- repair 전 model success: `5/9`.
+- dense-only density repair 후 model success: `8/9`.
+- fallback: `4/9 -> 1/9`.
 
 주의할 점:
 
