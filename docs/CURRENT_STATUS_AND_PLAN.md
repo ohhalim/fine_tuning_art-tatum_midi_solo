@@ -62,12 +62,19 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - 현재 작은 sweep 기준 fallback: `0/27`.
 - request-derived conditioning smoke: 3개 chord progression x 1 seed x medium density에서 model success `3/3`, fallback `0/3`.
 - sampling/candidate selection smoke: 3개 chord progression x 1 seed x medium density, `temperature=0.9`, `top_p=0.95`, `model_candidates=2`에서 model success `3/3`, fallback `0/3`.
+- sampling/candidate 27-case sweep: 3개 chord progression x 3 seed x 3 density, `temperature=0.9`, `top_p=0.95`, `model_candidates=2`에서 model success `26/27`, fallback `1/27`.
+  - dense: `9/9`
+  - medium: `9/9`
+  - sparse: `8/9`
+  - 유일한 fallback: `sweep_model_p2_sparse_s17`, model candidate 2개 모두 dead-air `1.000 >= 0.900`.
+  - 평균 generation time: 약 `31.3s/request`.
 
 주의할 점:
 
 - `music_transformer/generate.py`는 원본 Music Transformer 계열의 legacy generator다.
 - 현재 Stage A에서 사용해야 하는 생성 엔트리포인트는 `scripts/generate.py`다.
 - MVP request contract 확인은 `python -m inference.app.generator`를 사용한다.
+- 다음 구현 우선순위는 모델을 매 요청마다 subprocess로 로드하지 않고, 한 번 로드한 runner에서 여러 request를 처리하는 구조다.
 - 로컬 워크트리에는 추적되지 않은 데이터, 샘플, 문서가 많다. 문서/코드 작업 시 기존 산출물을 정리하거나 삭제하지 않는다.
 
 ## 3. 현재 로컬 산출물
@@ -174,6 +181,12 @@ python scripts/eval_offline_metrics.py \
 - dead-air, repetition, note density가 모두 gating 기준에 들어감.
 - 실패 샘플은 파일명 또는 별도 JSON에 명확히 표시됨.
 - 여러 model candidate 중 metrics score 기준으로 최종 MIDI를 선택함.
+
+현재 상태:
+
+- 기본 sampling 후보값은 `temperature=0.9`, `top_p=0.95`, `model_candidates=2`로 둔다.
+- 27-case sweep 기준 model success는 `26/27`.
+- 남은 문제는 sparse 일부 케이스의 dead-air와 request당 약 31초가 걸리는 subprocess 병목이다.
 
 ### Phase 3. Conditioning 의미 강화
 
