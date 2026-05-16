@@ -2,7 +2,7 @@
 
 작성일: 2026-05-16
 
-목표: 한 달 안에 `API request -> valid MIDI output -> job status -> download -> metrics`가 동작하는 MVP를 만든다.
+목표: 한 달 안에 `musical request -> model generation -> repaired valid MIDI output -> metrics`가 동작하는 모델 MVP를 만든다.
 
 ## Week 1. Generation Baseline 고정
 
@@ -33,62 +33,53 @@
 - 한 명령으로 MIDI와 metrics가 생성된다.
 - 실패 시 실패 이유가 JSON에 남는다.
 
-## Week 2. Python FastAPI Inference Server
+## Week 2. Model Output Repair
 
 목표:
 
-- CLI generation pipeline을 API로 감싼다.
+- 기존 Stage A 모델 output을 fallback 전에 최대한 usable MIDI로 repair한다.
 
 작업:
 
-- `inference/app/main.py`
-- `inference/app/schemas.py`
-- `inference/app/generator.py`
-- `inference/app/metrics.py`
 - `inference/app/postprocess.py`
-- `POST /infer/midi` 구현.
-- request validation.
-- output path 규칙 정의.
-- structured error response.
+- pitch range octave mapping.
+- phrase start alignment.
+- requested bars 기준 trim.
+- model output gate 재검증.
+- fallback 전환 조건 기록.
 
 산출물:
 
-- FastAPI 서버.
-- curl 예시.
-- API request로 생성된 MIDI.
+- `model_repaired=true` 결과 JSON.
+- fallback 없이 통과하는 repaired model MIDI.
 
 완료 기준:
 
-- `curl POST /infer/midi`가 `midiPath`와 `metrics`를 반환한다.
+- 기존 Stage A 모델 output이 최소 1개 이상 fallback 없이 gate를 통과한다.
 
-## Week 3. Spring Boot Job API
+## Week 3. Model Quality Loop
 
 목표:
 
-- backend portfolio로 설명 가능한 job API를 만든다.
+- fallback 비율을 낮추고 모델 출력 품질을 개선한다.
 
 작업:
 
-- `GenerationJob` entity.
-- `GenerationJobStatus` enum.
-- request DTO, response DTO.
-- generation job service.
-- Python inference client.
-- job status lifecycle.
-- MIDI download endpoint.
-- PostgreSQL 연결.
-- 로컬 개발용 Docker Compose 초안.
+- seed/chord/density sweep.
+- repaired output metrics summary.
+- dead-air와 note density 기준 튜닝.
+- 필요 시 `scripts/generate.py` sampling parameter 추가.
+- 필요 시 tokenization/data format 재검토.
 
 산출물:
 
-- `POST /api/generation-jobs`
-- `GET /api/generation-jobs/{jobId}`
-- `GET /api/generation-jobs/{jobId}/download`
-- DB에 저장된 job metadata.
+- sweep metrics JSON.
+- best generation settings.
+- 실패 유형 목록.
 
 완료 기준:
 
-- Spring API 요청으로 Python inference를 호출하고 결과를 조회/다운로드할 수 있다.
+- model-first path가 반복 실행에서 일정 비율 이상 gate를 통과한다.
 
 ## Week 4. Quality Gate와 Portfolio Polish
 
@@ -124,15 +115,15 @@
 시간이 부족하면 반드시 남길 것:
 
 1. Python CLI valid MIDI generation.
-2. FastAPI inference endpoint.
-3. Spring Boot job status API.
-4. MIDI download.
+2. model output repair.
+3. fallback generator.
+4. metrics JSON.
 5. README.
 
 시간이 부족하면 미룰 것:
 
 1. realtime DAW routing.
 2. control token retraining.
-3. UI.
-4. Docker Compose 완성도.
+3. Spring Boot backend.
+4. UI.
 5. advanced jazz theory metric.

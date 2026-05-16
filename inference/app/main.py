@@ -80,6 +80,7 @@ def result_to_response(result: Any) -> dict[str, Any]:
         "midiPath": result.midi_path,
         "metricsPath": result.metrics_path,
         "fallbackUsed": result.fallback_used,
+        "modelRepaired": result.model_repaired,
         "metrics": metrics_to_camel(result.metrics),
     }
     if result.failure_reason:

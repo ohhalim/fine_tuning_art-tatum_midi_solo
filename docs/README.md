@@ -2,7 +2,7 @@
 
 작성일: 2026-05-16
 
-이 디렉터리는 `Personalized Live MIDI Improviser` MVP를 한 달 안에 만들기 위한 기준 문서 모음이다. 구현할 때는 아래 순서로 읽는다.
+이 디렉터리는 `Personalized Live MIDI Improviser` 모델 MVP를 한 달 안에 만들기 위한 기준 문서 모음이다. 구현할 때는 아래 순서로 읽는다.
 
 ## 1. 현재 상태
 
@@ -22,9 +22,9 @@
 - `SYSTEM_ARCHITECTURE.md`
   - 전체 아키텍처와 컴포넌트 책임.
 - `API_SPEC.md`
-  - Spring Boot API와 Python FastAPI inference API 계약.
+  - 현재 MVP에서는 Python CLI/FastAPI wrapper 계약. Spring Boot API는 deferred extension.
 - `ERD.md`
-  - PostgreSQL 기준 엔티티와 관계.
+  - 현재 MVP에서는 파일 기반 result metadata. PostgreSQL ERD는 deferred extension.
 - `INFERENCE_MODEL_SPEC.md`
   - MIDI 생성기, fallback, metrics, post-processing 명세.
 - `QA_ACCEPTANCE_PLAN.md`
@@ -46,8 +46,8 @@
 1. 기존 `scripts/generate.py`와 `scripts/eval_offline_metrics.py`로 Stage A 생성/평가를 재현한다.
 2. 빈 MIDI, density 0, undecodable output을 실패로 처리하는 gate를 추가한다.
 3. Python CLI를 MVP 입력 형태로 안정화한다.
-4. FastAPI inference server를 붙인다.
-5. Spring Boot job API를 붙인다.
+4. 모델 output repair와 fallback을 안정화한다.
+5. 필요하면 FastAPI inference wrapper를 얇게 붙인다.
 6. README와 데모 산출물을 정리한다.
 
-핵심 원칙: 새 모델 연구보다 먼저, API로 요청하면 valid MIDI가 생성되고 metrics가 저장되는 end-to-end 경로를 완성한다.
+핵심 원칙: backend 확장보다 먼저, 모델 입력에서 valid MIDI와 metrics가 안정적으로 나오는 end-to-end 경로를 완성한다.

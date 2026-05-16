@@ -35,6 +35,14 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - prepare/train/generate/eval 단일 실행 파이프라인.
 - `scripts/run_dead_air_sweep.sh`
   - primer sweep, split_pitch 재학습 sweep, best candidate 선택, 재검증, archive 생성.
+- `inference/app/generator.py`
+  - model-first generation contract.
+  - raw model output repair 후 gate 검증.
+  - 실패 시 fallback MIDI 생성.
+- `inference/app/postprocess.py`
+  - pitch range octave mapping.
+  - 첫 note 기준 phrase 정렬.
+  - 요청 bars 기준 trim.
 
 주의할 점:
 

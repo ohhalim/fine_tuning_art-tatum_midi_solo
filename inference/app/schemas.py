@@ -88,6 +88,7 @@ class GenerationResult:
     midi_path: str | None
     metrics_path: str | None
     fallback_used: bool
+    model_repaired: bool = False
     metrics: GenerationMetrics | None = None
     failure_reason: str | None = None
     model_failure_reason: str | None = None

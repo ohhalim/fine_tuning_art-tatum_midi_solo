@@ -295,7 +295,7 @@ python -m inference.app.generator \
 - `outputs/generated/<job_id>.mid`
 - `outputs/metrics/<job_id>.json`
 
-모델 출력이 비어 있거나 품질 gate를 통과하지 못하면 fallback MIDI를 생성하고, `model_failure_reason`에 원인을 남깁니다.
+모델 출력은 먼저 pitch range와 phrase length를 repair한 뒤 gate를 통과시키고, 그래도 실패하면 fallback MIDI를 생성합니다. 결과 JSON의 `model_repaired`, `fallback_used`, `model_failure_reason`으로 어떤 경로를 탔는지 확인합니다.
 
 FastAPI inference server:
 

@@ -17,14 +17,14 @@ Codex에게 항상 먼저 시킬 일:
 피할 요청:
 
 - “전체 MVP 한 번에 만들어줘.”
-- “Spring Boot, FastAPI, 모델, Docker, README 다 만들어줘.”
+- “FastAPI, Spring Boot, 모델, Docker, README 다 만들어줘.”
 - “실시간 DAW 연동까지 한 번에 해줘.”
 
 좋은 요청:
 
 - “기존 `scripts/generate.py`가 valid MIDI를 만드는지 확인하고, 실패 조건을 정리해줘.”
+- “model output repair만 추가해줘.”
 - “FastAPI inference server의 최소 파일만 추가해줘.”
-- “Spring Boot job entity와 controller skeleton만 만들어줘.”
 
 ## 2. 권장 프롬프트 1: 레포 점검
 
@@ -38,13 +38,19 @@ Inspect the repository first. Summarize the existing MIDI generation, training, 
 Implement the smallest Python generation contract for the MVP. Reuse existing scripts where possible. The function should accept bpm, chordProgression, bars, section, energy, density, and output_dir, then produce a valid MIDI file and metrics JSON. Add fallback generation if the model output is empty. Keep changes scoped and list changed files.
 ```
 
-## 4. 권장 프롬프트 3: FastAPI
+## 4. 권장 프롬프트 3: Model Repair
+
+```text
+Add model output repair before fallback. Map out-of-range pitches into a preferred piano solo range, align the generated phrase to the first note, trim to the requested bar length, then run metrics gate again. Keep fallback only for repaired model outputs that still fail.
+```
+
+## 5. 권장 프롬프트 4: FastAPI
 
 ```text
 Add a minimal FastAPI inference server around the generation contract. Implement GET /health and POST /infer/midi. Use Pydantic schemas, structured error handling, and local output paths. Do not add Spring Boot yet.
 ```
 
-## 5. 권장 프롬프트 4: Spring Boot
+## 6. Deferred Prompt: Spring Boot
 
 ```text
 Now add a Spring Boot API server for generation jobs. Implement POST /api/generation-jobs, GET /api/generation-jobs/{jobId}, and GET /api/generation-jobs/{jobId}/download. Store job metadata in PostgreSQL. Call the Python inference server. Keep the first version synchronous if async would add too much complexity.
@@ -88,9 +94,8 @@ Codex 결과를 받을 때 확인:
 
 1. docs: add MVP product and implementation specs
 2. feat: add MIDI generation contract and fallback
-3. feat: add FastAPI inference server
-4. feat: add Spring generation job API
-5. feat: persist generation jobs and metrics
-6. docs: add runnable MVP README and demo
+3. feat: add model output repair
+4. feat: add FastAPI inference server
+5. docs: add runnable MVP README and demo
 
 원격 push, PR 생성, 배포는 사용자 명시 허락 후에만 진행한다.

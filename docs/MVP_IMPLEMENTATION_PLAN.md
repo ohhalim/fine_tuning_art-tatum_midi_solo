@@ -11,7 +11,7 @@
 - `music_transformer/generate.py`는 legacy로 둔다.
 - valid MIDI output을 최우선으로 한다.
 - 모델이 실패하면 fallback phrase를 생성한다.
-- Spring Boot는 Python path가 안정화된 뒤 붙인다.
+- Spring Boot는 이번 모델 MVP 범위에서 제외하고, 필요하면 나중에 포트폴리오 확장으로 붙인다.
 
 ## 2. Target Structure
 
@@ -27,11 +27,6 @@ inference/
     postprocess.py
     fallback.py
   requirements.txt
-
-backend/
-  spring-api/
-    src/
-    build.gradle
 
 outputs/
   generated/
@@ -93,7 +88,25 @@ python inference/app/generator.py \
 - `outputs/generated/<job_id>.mid`
 - `outputs/metrics/<job_id>.json`
 
-## 5. Slice 3: FastAPI Inference Server
+## 5. Slice 3: Model Output Repair
+
+목표:
+
+- raw model output을 fallback 전에 usable phrase로 고친다.
+
+구성:
+
+- `postprocess.py`
+- pitch octave mapping.
+- first-note alignment.
+- requested bars trim.
+- duplicate cleanup.
+
+완료 기준:
+
+- `fallback_used=false`, `model_repaired=true` 결과가 생성된다.
+
+## 6. Slice 4: FastAPI Inference Server
 
 목표:
 
@@ -110,54 +123,7 @@ Endpoint:
 - validation error는 422.
 - generation failure는 structured 500 또는 success with fallback flag 중 하나로 일관되게 처리.
 
-## 6. Slice 4: Spring Boot API
-
-목표:
-
-- job lifecycle과 download API를 만든다.
-
-패키지 후보:
-
-```text
-com.personalizedimproviser.generation
-```
-
-구성:
-
-- controller
-- service
-- entity
-- repository
-- dto
-- client
-- exception
-
-완료 기준:
-
-- `POST /api/generation-jobs` creates job.
-- `GET /api/generation-jobs/{id}` returns status.
-- `GET /api/generation-jobs/{id}/download` returns MIDI.
-
-## 7. Slice 5: Persistence
-
-목표:
-
-- PostgreSQL에 job metadata를 저장한다.
-
-초기 저장 대상:
-
-- request fields
-- status
-- result paths
-- metrics JSON
-- failure reason
-- timestamps
-
-완료 기준:
-
-- 서버 재시작 후에도 job metadata 조회 가능.
-
-## 8. Slice 6: README와 Demo
+## 7. Slice 5: README와 Demo
 
 목표:
 
@@ -181,12 +147,9 @@ com.personalizedimproviser.generation
 - [ ] metrics 재사용 가능성 확인
 - [ ] generation request/result schema 작성
 - [ ] fallback MIDI generator 구현
+- [ ] model output repair 구현
 - [ ] CLI 구현
 - [ ] FastAPI 구현
-- [ ] Spring Boot skeleton 구현
-- [ ] DB entity 구현
-- [ ] inference client 구현
-- [ ] download endpoint 구현
 - [ ] README 업데이트
 
 ## 10. Merge 기준

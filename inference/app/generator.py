@@ -10,6 +10,7 @@ from pathlib import Path
 
 from .fallback import generate_fallback_midi
 from .metrics import compute_midi_metrics, validate_metrics
+from .postprocess import repair_model_midi
 from .schemas import GenerationRequest, GenerationResult
 
 
@@ -118,17 +119,26 @@ def generate_midi_phrase(
             max_sequence=max_sequence,
         )
         if candidate is not None:
+            repaired_candidate = output_dir / f"{request.job_id}_model_repaired.mid"
+            model_repaired = False
+            try:
+                candidate_for_metrics = repair_model_midi(candidate, repaired_candidate, request)
+                model_repaired = True
+            except Exception as exc:
+                candidate_for_metrics = candidate
+                model_failure_reason = f"model repair failed: {exc}"
             generation_time_ms = int((time.perf_counter() - start) * 1000)
-            metrics = compute_midi_metrics(candidate, generation_time_ms, fallback_used=False)
+            metrics = compute_midi_metrics(candidate_for_metrics, generation_time_ms, fallback_used=False)
             is_valid, reason = validate_metrics(metrics, request.density)
             if is_valid:
-                shutil.copyfile(candidate, final_midi_path)
+                shutil.copyfile(candidate_for_metrics, final_midi_path)
                 result = GenerationResult(
                     job_id=request.job_id,
                     status="COMPLETED",
                     midi_path=str(final_midi_path),
                     metrics_path=str(metrics_path),
                     fallback_used=False,
+                    model_repaired=model_repaired,
                     metrics=metrics,
                 )
                 write_json(metrics_path, result.to_dict())
@@ -148,6 +158,7 @@ def generate_midi_phrase(
                 midi_path=str(final_midi_path) if final_midi_path.exists() else None,
                 metrics_path=str(metrics_path),
                 fallback_used=True,
+                model_repaired=False,
                 metrics=metrics,
                 failure_reason=reason,
                 model_failure_reason=model_failure_reason,
@@ -161,6 +172,7 @@ def generate_midi_phrase(
             midi_path=None,
             metrics_path=str(metrics_path),
             fallback_used=True,
+            model_repaired=False,
             metrics=None,
             failure_reason=f"fallback generation failed: {exc}",
             model_failure_reason=model_failure_reason,
@@ -174,6 +186,7 @@ def generate_midi_phrase(
         midi_path=str(final_midi_path),
         metrics_path=str(metrics_path),
         fallback_used=fallback_used,
+        model_repaired=False,
         metrics=metrics,
         model_failure_reason=model_failure_reason,
     )

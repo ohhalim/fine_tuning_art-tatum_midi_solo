@@ -1,10 +1,44 @@
-# ERD
+# Result Metadata Schema
 
 작성일: 2026-05-16
 
-MVP는 PostgreSQL에 generation job metadata를 저장한다. MIDI 파일 자체는 local filesystem에 저장하고 DB에는 path만 저장한다.
+현재 모델 MVP는 PostgreSQL을 사용하지 않는다. MIDI와 metrics JSON을 local filesystem에 저장한다. 아래 PostgreSQL ERD는 backend 확장 시 참고용으로만 유지한다.
 
-## 1. Mermaid ERD
+## 1. Current File-Based Outputs
+
+```text
+outputs/
+  generated/<job_id>.mid
+  metrics/<job_id>.json
+```
+
+Metrics JSON:
+
+```json
+{
+  "job_id": "uuid",
+  "status": "COMPLETED",
+  "midi_path": "outputs/generated/uuid.mid",
+  "metrics_path": "outputs/metrics/uuid.json",
+  "fallback_used": false,
+  "model_repaired": true,
+  "metrics": {
+    "generation_time_ms": 15027,
+    "note_count": 5,
+    "duration_sec": 3.87,
+    "note_density": 1.29,
+    "dead_air_ratio": 0.75,
+    "repetition_score": 0.0,
+    "pitch_min": 63,
+    "pitch_max": 70,
+    "fallback_used": false
+  },
+  "failure_reason": null,
+  "model_failure_reason": null
+}
+```
+
+## 2. Deferred PostgreSQL ERD
 
 ```mermaid
 erDiagram

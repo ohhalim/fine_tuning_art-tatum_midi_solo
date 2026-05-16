@@ -5,75 +5,70 @@
 ## 1. 목표 아키텍처
 
 ```text
-Client / curl / future UI
-  -> Spring Boot API
-  -> PostgreSQL
-  -> Python FastAPI Inference Server
-  -> MIDI Generation Pipeline
-  -> File Storage
-  -> Spring Boot Download API
+CLI / optional FastAPI wrapper
+  -> MIDI Generation Contract
+  -> Stage A model generation
+  -> Model output repair
+  -> Metrics gate
+  -> Fallback generator if needed
+  -> generated.mid + metrics.json
 ```
 
 ## 2. Mermaid Overview
 
 ```mermaid
 flowchart LR
-    C[Client] --> S[Spring Boot API]
-    S --> DB[(PostgreSQL)]
-    S --> P[Python FastAPI Inference]
-    P --> G[MIDI Generation Pipeline]
-    G --> M[Model or Fallback Generator]
-    G --> F[(Generated MIDI Files)]
-    G --> Q[Metrics JSON]
-    P --> S
-    S --> C
+    C["CLI / Optional FastAPI"] --> G["Generation Contract"]
+    G --> M["Stage A Music Transformer + LoRA"]
+    M --> R["Model Output Repair"]
+    R --> Q["Metrics Gate"]
+    Q -->|Pass| F["Generated MIDI"]
+    Q -->|Fail| B["Fallback Generator"]
+    B --> F
+    F --> J["Metrics JSON"]
 ```
 
 ## 3. Component Responsibilities
 
-### Spring Boot API
+### Generation Contract
 
 책임:
 
-- public REST API 제공.
-- request validation.
-- generation job 생성.
-- job status 관리.
-- Python inference 호출.
-- result path와 metrics 저장.
-- MIDI download 제공.
+- structured musical request 검증.
+- 기존 Stage A model-first generation 실행.
+- model output repair 적용.
+- metrics gate 검사.
+- 실패 시 fallback MIDI 생성.
+- MIDI path와 metrics JSON 반환.
 
 하지 않는 것:
 
-- MIDI 생성 알고리즘 구현.
-- 모델 로딩.
-- 학습.
+- Spring Boot job lifecycle.
+- PostgreSQL persistence.
+- DAW realtime routing.
 
-### PostgreSQL
-
-책임:
-
-- generation job metadata 저장.
-- request payload 저장.
-- result metadata 저장.
-- failure reason 저장.
-
-### Python FastAPI Inference
+### Stage A Model
 
 책임:
 
-- model-serving boundary.
-- structured request를 MIDI generation input으로 변환.
-- generator 실행.
-- post-processing.
-- metrics 계산.
-- result metadata 반환.
+- `scripts/generate.py` 기반 LoRA Music Transformer 호출.
+- `conditioning.mid` primer 기반 MIDI 생성.
 
-하지 않는 것:
+### Model Output Repair
 
-- public job lifecycle 관리.
-- 사용자 인증.
-- 장기 DB persistence.
+책임:
+
+- pitch range octave mapping.
+- 첫 note 기준 phrase start 정렬.
+- 요청 bars 기준 trim.
+- duplicate cleanup.
+
+### Fallback Generator
+
+책임:
+
+- 모델 checkpoint 누락, empty output, gate fail 시 valid MIDI 생성.
+- BPM/chords/bars/density/energy를 반영한 simple phrase 생성.
 
 ### MIDI Generation Pipeline
 
@@ -99,16 +94,14 @@ outputs/
 
 ## 4. Request Flow
 
-1. Client가 `POST /api/generation-jobs` 호출.
-2. Spring Boot가 `GenerationJob`을 `PENDING`으로 저장.
-3. Spring Boot가 job을 `RUNNING`으로 바꾸고 Python inference를 호출.
-4. Python inference가 MIDI를 생성한다.
-5. Python inference가 metrics를 계산하고 path를 반환한다.
-6. Spring Boot가 job을 `COMPLETED`로 저장한다.
-7. Client가 job status를 조회한다.
-8. Client가 download endpoint로 MIDI를 받는다.
-
-MVP에서는 synchronous call로 시작해도 된다. 다만 API model은 job status 기반으로 설계한다.
+1. CLI 또는 FastAPI wrapper가 request를 받는다.
+2. `GenerationRequest` validation을 수행한다.
+3. Stage A model generation을 실행한다.
+4. raw model MIDI를 repair한다.
+5. metrics gate를 검사한다.
+6. 통과하면 repaired model MIDI를 결과로 저장한다.
+7. 실패하면 fallback MIDI를 생성한다.
+8. metrics JSON에 `fallback_used`, `model_repaired`, 실패 이유를 남긴다.
 
 ## 5. Failure Flow
 
@@ -124,7 +117,7 @@ MVP에서는 synchronous call로 시작해도 된다. 다만 API model은 job st
 
 - Python은 가능한 경우 fallback MIDI를 생성한다.
 - fallback도 실패하면 error response를 반환한다.
-- Spring은 job status를 `FAILED`로 저장하고 `failureReason`을 남긴다.
+- 결과 JSON에 `status=FAILED`와 `failure_reason`을 남긴다.
 
 ## 6. Future Realtime Extension
 
@@ -138,4 +131,4 @@ MIDI Input / DAW
   -> MIDI Output / DAW
 ```
 
-MVP backend는 realtime 전에 먼저 file-based generation을 안정화하기 위한 기반이다.
+현재 MVP는 realtime 전에 먼저 file-based model generation을 안정화하기 위한 기반이다.
