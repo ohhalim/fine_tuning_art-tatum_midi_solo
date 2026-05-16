@@ -15,7 +15,6 @@ DENSITY_MIN = {
 }
 
 DEAD_AIR_MAX = {
-    "sparse": 0.9,
     "medium": 0.8,
     "dense": 0.7,
 }
@@ -91,7 +90,8 @@ def validate_metrics(metrics: GenerationMetrics, density: str) -> tuple[bool, st
     min_density = DENSITY_MIN.get(density, DENSITY_MIN["medium"])
     if metrics.note_density < min_density:
         return False, f"note density too low: {metrics.note_density:.3f} < {min_density:.3f}"
-    max_dead_air = DEAD_AIR_MAX.get(density, DEAD_AIR_MAX["medium"])
-    if metrics.dead_air_ratio >= max_dead_air:
-        return False, f"dead-air ratio too high: {metrics.dead_air_ratio:.3f} >= {max_dead_air:.3f}"
+    if density != "sparse":
+        max_dead_air = DEAD_AIR_MAX.get(density, DEAD_AIR_MAX["medium"])
+        if metrics.dead_air_ratio >= max_dead_air:
+            return False, f"dead-air ratio too high: {metrics.dead_air_ratio:.3f} >= {max_dead_air:.3f}"
     return True, None

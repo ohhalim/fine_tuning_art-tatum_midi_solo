@@ -10,7 +10,8 @@ import pretty_midi
 from inference.app.conditioning import CONDITIONING_PITCH_MAX, build_request_conditioning_midi
 from inference.app.fallback import chord_for_time
 from inference.app.generator import candidate_quality_score, generate_midi_phrase
-from inference.app.schemas import GenerationRequest
+from inference.app.metrics import validate_metrics
+from inference.app.schemas import GenerationMetrics, GenerationRequest
 
 
 class RequestConditioningTest(unittest.TestCase):
@@ -74,6 +75,42 @@ class RequestConditioningTest(unittest.TestCase):
             candidate_quality_score(medium_candidate, "medium"),
             candidate_quality_score(sparse_candidate, "medium"),
         )
+
+    def test_sparse_validation_allows_long_gaps_when_density_is_valid(self) -> None:
+        metrics = GenerationMetrics(
+            generation_time_ms=100,
+            note_count=4,
+            duration_sec=3.0,
+            note_density=1.33,
+            dead_air_ratio=1.0,
+            repetition_score=0.0,
+            pitch_min=60,
+            pitch_max=72,
+            fallback_used=False,
+        )
+
+        valid, reason = validate_metrics(metrics, "sparse")
+
+        self.assertTrue(valid)
+        self.assertIsNone(reason)
+
+    def test_medium_validation_rejects_dead_air_at_threshold(self) -> None:
+        metrics = GenerationMetrics(
+            generation_time_ms=100,
+            note_count=4,
+            duration_sec=3.0,
+            note_density=1.33,
+            dead_air_ratio=0.8,
+            repetition_score=0.0,
+            pitch_min=60,
+            pitch_max=72,
+            fallback_used=False,
+        )
+
+        valid, reason = validate_metrics(metrics, "medium")
+
+        self.assertFalse(valid)
+        self.assertIn("dead-air ratio too high", str(reason))
 
     def test_generation_can_use_in_process_model_runner(self) -> None:
         class FakeRunner:

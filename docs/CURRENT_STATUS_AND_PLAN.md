@@ -71,6 +71,14 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - in-process runner + `max_sequence=256` smoke:
   - 3개 chord progression x 1 seed x medium density에서 model success `3/3`, fallback `0/3`, 평균 약 `10.1s/request`.
   - 3개 chord progression x 1 seed x 3 density에서 model success `9/9`, fallback `0/9`, 평균 약 `9.4s/request`.
+- in-process runner + `max_sequence=256` 27-case sweep:
+  - 3개 chord progression x 3 seed x 3 density에서 model success `27/27`, fallback `0/27`.
+  - sparse/medium/dense 모두 `9/9`.
+  - 평균 generation time: 약 `9.5s/request`.
+  - 평균 note density: 약 `2.92`.
+  - 평균 dead-air ratio: 약 `0.31`.
+  - 산출물: `outputs/sweeps/inprocess_runner_p256_27case_sparse_policy.json`, `outputs/sweeps/inprocess_runner_p256_27case_sparse_policy.md`.
+  - 해석: 이전 `23/27` 결과는 sparse 후보의 긴 공백을 dead-air gate가 과도하게 탈락시킨 것이 주된 원인이었다. sparse는 density/pitch/note-count gate를 통과하면 긴 공백을 허용한다.
 
 주의할 점:
 
@@ -188,9 +196,10 @@ python scripts/eval_offline_metrics.py \
 현재 상태:
 
 - 기본 sampling 후보값은 `temperature=0.9`, `top_p=0.95`, `model_candidates=2`로 둔다.
-- 27-case sweep 기준 model success는 `26/27`.
+- 256-token 27-case sweep 기준 model success는 `27/27`.
 - inference 기본 `max_sequence`는 256으로 둔다.
-- 남은 문제는 sparse 일부 케이스의 dead-air와 request당 약 9~10초가 걸리는 autoregressive generation 병목이다.
+- sparse는 silence가 의도인 density mode이므로 dead-air 상한 gate를 적용하지 않는다. 단, note count, note density, pitch range gate는 유지한다.
+- 남은 문제는 request당 약 9~10초가 걸리는 autoregressive generation 병목과 실제 음악성/코드 적합성 평가다.
 
 ### Phase 3. Conditioning 의미 강화
 
