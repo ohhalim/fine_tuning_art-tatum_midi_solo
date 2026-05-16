@@ -51,6 +51,8 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - repair 전 model success: `5/9`.
 - dense-only density repair 후 model success: `8/9`.
 - fallback: `4/9 -> 1/9`.
+- 3개 chord progression x 3 seed x 3 density sweep에서 medium gap repair 후 model success: `27/27`.
+- 현재 작은 sweep 기준 fallback: `0/27`.
 
 주의할 점:
 

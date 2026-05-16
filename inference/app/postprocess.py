@@ -16,8 +16,8 @@ HARD_PIANO_MAX = 108
 
 TARGET_NOTES_PER_BAR = {
     "sparse": 0,
-    # Medium keeps the repaired model phrase unchanged; adding eighth-note fill
-    # raised dead-air in smoke sweeps. Dense gets explicit 16th-note gap fill.
+    # Medium only gets targeted large-gap repair; broad eighth-note fill raised
+    # dead-air in smoke sweeps. Dense gets explicit 16th-note gap fill.
     "medium": 0,
     "dense": 12,
 }
@@ -100,6 +100,54 @@ def add_density_repair_notes(
         )
 
 
+def add_medium_gap_repair_notes(
+    instrument: pretty_midi.Instrument,
+    request: GenerationRequest,
+    max_duration: float,
+) -> None:
+    if request.density != "medium" or len(instrument.notes) < 2:
+        return
+
+    rng = random.Random(request.seed + 2027)
+    sixteenth = (60.0 / float(request.bpm)) / 4.0
+    duration = max(0.06, sixteenth * 0.85)
+    max_additions = 4
+    additions = 0
+
+    notes = sorted(instrument.notes, key=lambda n: (n.start, n.pitch))
+    for prev_note, next_note in zip(notes, notes[1:]):
+        if additions >= max_additions:
+            break
+        gap = float(next_note.start) - float(prev_note.start)
+        if gap < 0.36:
+            continue
+
+        start = float(prev_note.start) + sixteenth
+        if start >= float(next_note.start) - 0.03 or start >= max_duration:
+            continue
+        if has_nearby_start(instrument.notes, start):
+            continue
+
+        chord = chord_for_time(request, start)
+        root_pc, intervals = parse_chord(chord)
+        tones = chord_pitches_in_range(root_pc, intervals, PREFERRED_SOLO_MIN, PREFERRED_SOLO_MAX)
+        nearby = [pitch for pitch in tones if abs(pitch - int(prev_note.pitch)) <= 7]
+        pool = nearby or tones or [int(prev_note.pitch)]
+        pitch = rng.choice(pool)
+        end = min(max_duration, start + duration)
+        if end <= start:
+            continue
+        instrument.notes.append(
+            pretty_midi.Note(
+                velocity=78 if request.energy != "high" else 92,
+                pitch=int(pitch),
+                start=float(start),
+                end=float(end),
+            )
+        )
+        additions += 1
+
+
 def repair_model_midi(
     input_path: str | Path,
     output_path: str | Path,
@@ -151,6 +199,7 @@ def repair_model_midi(
         )
 
     add_density_repair_notes(instrument, request, max_duration)
+    add_medium_gap_repair_notes(instrument, request, max_duration)
 
     # Avoid dense duplicate same-pitch notes at the exact same start.
     deduped: list[pretty_midi.Note] = []
