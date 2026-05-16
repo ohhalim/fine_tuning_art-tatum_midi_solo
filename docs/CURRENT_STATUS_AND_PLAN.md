@@ -32,6 +32,10 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - `temperature`, `top_k`, `top_p` sampling 제어값 지원.
 - `scripts/eval_offline_metrics.py`
   - note density, dead-air proxy, 4-gram repetition 평가.
+- `scripts/analyze_chord_tone_errors.py`
+  - sweep JSON에서 낮은 chord-tone ratio 샘플을 선택.
+  - MIDI를 다시 읽어 active chord별 non-chord pitch class를 집계.
+  - postprocess 조정 또는 Stage B conditioning/token 설계로 넘어가기 전 진단 리포트 생성.
 - `scripts/runpod_train_stage_a.sh`
   - prepare/train/generate/eval 단일 실행 파이프라인.
 - `scripts/run_dead_air_sweep.sh`
@@ -95,6 +99,13 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - 평균 generation time 약 `9.8s/request`.
   - 평균 chord-tone ratio 약 `0.60`.
   - density별 chord-tone 평균: sparse 약 `0.38`, medium 약 `0.57`, dense 약 `0.85`.
+- chord-tone error analysis:
+  - 산출물: `outputs/sweeps/chord_tone_error_analysis.json`, `outputs/sweeps/chord_tone_error_analysis.md`.
+  - threshold `0.5` 이하 low sample: `10/27`.
+  - low sample 평균 chord-tone ratio: 약 `0.32`.
+  - low sample 분포: sparse `7`, medium `3`, dense `0`.
+  - top non-chord pitch classes: `F#`, `B`, `Bb`, `Ab`, `F`.
+  - 해석: dense는 chord-tone 안정성이 높고, sparse/medium 일부가 코드 밖 pitch class를 반복한다. 이제 postprocess를 건드리기 전에 수동 청취와 리뷰가 필요하다.
 
 주의할 점:
 
@@ -218,6 +229,7 @@ python scripts/eval_offline_metrics.py \
 - 남은 문제는 request당 약 9~10초가 걸리는 autoregressive generation 병목과 실제 음악성/코드 적합성 평가다.
 - README의 MVP demo command는 `bash scripts/run_mvp_demo.sh`로 고정한다.
 - chord-tone ratio는 metrics JSON에 포함하고 candidate score에 약하게 반영한다. 현재는 실패 기준으로 쓰지 않고, Stage B 또는 postprocess 개선 전후 비교 지표로 사용한다.
+- 다음 구현을 시작하기 전에 여기서 리뷰한다. 특히 low chord-tone sample이 단순 오류인지, approach note/tension으로 들리는지 먼저 판단한다.
 
 ### Phase 3. Conditioning 의미 강화
 

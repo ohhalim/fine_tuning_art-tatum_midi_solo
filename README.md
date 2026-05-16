@@ -407,6 +407,18 @@ python scripts/eval_generation_contract_sweep.py \
   --summary_md outputs/sweeps/generation_contract_sweep.md
 ```
 
+Chord-tone error analysis:
+
+```bash
+python scripts/analyze_chord_tone_errors.py \
+  --input_json outputs/sweeps/chord_scored_p256_27case.json \
+  --threshold 0.5 \
+  --output_json outputs/sweeps/chord_tone_error_analysis.json \
+  --output_md outputs/sweeps/chord_tone_error_analysis.md
+```
+
+이 리포트는 낮은 `chord_tone_ratio` 샘플에서 어떤 pitch class가 active chord 밖으로 나가는지 확인하기 위한 진단용입니다. 이 결과를 본 뒤 postprocess를 건드릴지, Stage B conditioning/token 설계로 넘어갈지 결정합니다.
+
 빠른 fallback-only smoke check:
 
 ```bash
