@@ -1,14 +1,26 @@
 # 큰 파일
 *.mid
+*.midi
 *.wav
 *.mp3
 *.zip
+*.tgz
 *.pt
 *.pth
 
 # 데이터
 data/raw/
+data/roles/
+data/roles_sp60/
 pijama_midis/
+
+# 생성 산출물
+samples/
+outputs/
+checkpoints/
+
+# 외부/실험 레포
+magenta-realtime/
 
 # Python
 __pycache__/
@@ -17,3 +29,8 @@ __pycache__/
 
 # Colab
 .config/
+
+# 로컬 환경
+.DS_Store
+.claude/
+.venv/
