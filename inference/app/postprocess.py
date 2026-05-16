@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pretty_midi
 
-from .fallback import chord_pitches_in_range, parse_chord, parse_time_signature
+from .fallback import chord_for_time, chord_pitches_in_range, parse_chord, phrase_duration_sec
 from .schemas import GenerationRequest
 
 
@@ -23,11 +23,6 @@ TARGET_NOTES_PER_BAR = {
 }
 
 
-def phrase_duration_sec(request: GenerationRequest) -> float:
-    beats_per_bar = parse_time_signature(request.time_signature)
-    return request.bars * beats_per_bar * (60.0 / float(request.bpm))
-
-
 def map_pitch_to_range(
     pitch: int,
     pitch_min: int = PREFERRED_SOLO_MIN,
@@ -39,13 +34,6 @@ def map_pitch_to_range(
         return max(HARD_PIANO_MIN, min(HARD_PIANO_MAX, int(pitch)))
     center = (pitch_min + pitch_max) / 2.0
     return min(candidates, key=lambda p: (abs(p - center), abs(p - int(pitch))))
-
-
-def chord_for_time(request: GenerationRequest, start_sec: float) -> str:
-    beats_per_bar = parse_time_signature(request.time_signature)
-    seconds_per_bar = beats_per_bar * (60.0 / float(request.bpm))
-    bar_idx = int(start_sec // max(1e-6, seconds_per_bar))
-    return request.chord_progression[bar_idx % len(request.chord_progression)]
 
 
 def has_nearby_start(notes: list[pretty_midi.Note], start_sec: float, tolerance_sec: float = 0.05) -> bool:

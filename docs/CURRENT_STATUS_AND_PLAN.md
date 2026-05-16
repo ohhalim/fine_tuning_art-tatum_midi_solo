@@ -37,13 +37,18 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - primer sweep, split_pitch 재학습 sweep, best candidate 선택, 재검증, archive 생성.
 - `inference/app/generator.py`
   - model-first generation contract.
+  - 요청 chord progression 기반 conditioning MIDI를 생성해 Stage A primer로 사용.
   - raw model output repair 후 gate 검증.
   - 실패 시 fallback MIDI 생성.
+- `inference/app/conditioning.py`
+  - structured request를 low-register chord guide MIDI로 변환.
+  - `--conditioning_midi` 명시값이 없을 때 기본 primer로 사용.
 - `inference/app/postprocess.py`
   - pitch range octave mapping.
   - 첫 note 기준 phrase 정렬.
   - 요청 bars 기준 trim.
   - dense request에서 16분음표 chord-tone gap fill 적용.
+  - medium request에서 큰 공백만 제한적으로 chord-tone 보정.
 
 최근 smoke sweep:
 
@@ -53,11 +58,13 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - fallback: `4/9 -> 1/9`.
 - 3개 chord progression x 3 seed x 3 density sweep에서 medium gap repair 후 model success: `27/27`.
 - 현재 작은 sweep 기준 fallback: `0/27`.
+- request-derived conditioning smoke: 3개 chord progression x 1 seed x medium density에서 model success `3/3`, fallback `0/3`.
 
 주의할 점:
 
 - `music_transformer/generate.py`는 원본 Music Transformer 계열의 legacy generator다.
 - 현재 Stage A에서 사용해야 하는 생성 엔트리포인트는 `scripts/generate.py`다.
+- MVP request contract 확인은 `python -m inference.app.generator`를 사용한다.
 - 로컬 워크트리에는 추적되지 않은 데이터, 샘플, 문서가 많다. 문서/코드 작업 시 기존 산출물을 정리하거나 삭제하지 않는다.
 
 ## 3. 현재 로컬 산출물

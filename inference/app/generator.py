@@ -8,6 +8,7 @@ import sys
 import time
 from pathlib import Path
 
+from .conditioning import build_request_conditioning_midi
 from .fallback import generate_fallback_midi
 from .metrics import compute_midi_metrics, validate_metrics
 from .postprocess import repair_model_midi
@@ -92,7 +93,7 @@ def generate_midi_phrase(
     output_dir: str | Path = PROJECT_ROOT / "outputs" / "generated",
     use_model: bool = True,
     lora_path: str | Path = DEFAULT_LORA_PATH,
-    conditioning_midi: str | Path = DEFAULT_CONDITIONING_MIDI,
+    conditioning_midi: str | Path | None = None,
     primer_max_tokens: int = 64,
     max_sequence: int = 512,
 ) -> GenerationResult:
@@ -108,13 +109,19 @@ def generate_midi_phrase(
 
     model_failure_reason = None
     fallback_used = False
+    resolved_conditioning_midi: Path | None = None
 
     if use_model:
+        resolved_conditioning_midi = (
+            Path(conditioning_midi)
+            if conditioning_midi is not None
+            else build_request_conditioning_midi(request, output_dir / "_conditioning")
+        )
         candidate, model_failure_reason = run_stage_a_model(
             request=request,
             output_dir=output_dir,
             lora_path=Path(lora_path),
-            conditioning_midi=Path(conditioning_midi),
+            conditioning_midi=resolved_conditioning_midi,
             primer_max_tokens=primer_max_tokens,
             max_sequence=max_sequence,
         )
@@ -139,6 +146,7 @@ def generate_midi_phrase(
                     metrics_path=str(metrics_path),
                     fallback_used=False,
                     model_repaired=model_repaired,
+                    conditioning_midi_path=str(resolved_conditioning_midi),
                     metrics=metrics,
                 )
                 write_json(metrics_path, result.to_dict())
@@ -159,6 +167,7 @@ def generate_midi_phrase(
                 metrics_path=str(metrics_path),
                 fallback_used=True,
                 model_repaired=False,
+                conditioning_midi_path=str(resolved_conditioning_midi) if resolved_conditioning_midi else None,
                 metrics=metrics,
                 failure_reason=reason,
                 model_failure_reason=model_failure_reason,
@@ -173,6 +182,7 @@ def generate_midi_phrase(
             metrics_path=str(metrics_path),
             fallback_used=True,
             model_repaired=False,
+            conditioning_midi_path=str(resolved_conditioning_midi) if resolved_conditioning_midi else None,
             metrics=None,
             failure_reason=f"fallback generation failed: {exc}",
             model_failure_reason=model_failure_reason,
@@ -187,6 +197,7 @@ def generate_midi_phrase(
         metrics_path=str(metrics_path),
         fallback_used=fallback_used,
         model_repaired=False,
+        conditioning_midi_path=str(resolved_conditioning_midi) if resolved_conditioning_midi else None,
         metrics=metrics,
         model_failure_reason=model_failure_reason,
     )
@@ -213,7 +224,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output_dir", type=str, default=str(PROJECT_ROOT / "outputs" / "generated"))
     parser.add_argument("--no_model", action="store_true", help="Skip Stage A model and use fallback generator")
     parser.add_argument("--lora_path", type=str, default=str(DEFAULT_LORA_PATH))
-    parser.add_argument("--conditioning_midi", type=str, default=str(DEFAULT_CONDITIONING_MIDI))
+    parser.add_argument(
+        "--conditioning_midi",
+        type=str,
+        default=None,
+        help="Optional explicit primer MIDI. Defaults to a request-derived chord conditioning MIDI.",
+    )
     parser.add_argument("--primer_max_tokens", type=int, default=64)
     parser.add_argument("--max_sequence", type=int, default=512)
     return parser

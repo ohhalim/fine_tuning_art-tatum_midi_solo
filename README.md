@@ -132,6 +132,8 @@ python scripts/train_qlora.py \
 
 ### 3-3. 생성
 
+Stage A 모델을 직접 호출하는 기본 생성 명령입니다.
+
 ```bash
 python scripts/generate.py \
   --lora_path ./checkpoints/jazz_lora_stage_a \
@@ -141,6 +143,18 @@ python scripts/generate.py \
   --length 512 \
   --max_sequence 512 \
   --output ./samples/stage_a_p64
+```
+
+MVP inference contract를 검증할 때는 아래 CLI를 사용합니다. 이 경로는 `--conditioning_midi`를 생략하면 요청한 코드 진행으로 low-register conditioning MIDI를 임시 생성한 뒤 모델 primer로 사용합니다.
+
+```bash
+python -m inference.app.generator \
+  --bpm 124 \
+  --chords Cm7,Fm7,Bb7,Ebmaj7 \
+  --bars 2 \
+  --density medium \
+  --energy high \
+  --seed 11
 ```
 
 ### 3-4. 평가

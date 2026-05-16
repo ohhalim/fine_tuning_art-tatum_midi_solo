@@ -19,7 +19,6 @@ PROJECT_ROOT_PATH = SCRIPT_DIR.parent
 sys.path.insert(0, str(PROJECT_ROOT_PATH))
 
 from inference.app.generator import (
-    DEFAULT_CONDITIONING_MIDI,
     DEFAULT_LORA_PATH,
     PROJECT_ROOT,
     generate_midi_phrase,
@@ -194,7 +193,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--summary_md", type=str, default=str(PROJECT_ROOT / "outputs" / "sweeps" / "generation_contract_sweep.md"))
     parser.add_argument("--no_model", action="store_true", help="Skip Stage A model and measure fallback only")
     parser.add_argument("--lora_path", type=str, default=str(DEFAULT_LORA_PATH))
-    parser.add_argument("--conditioning_midi", type=str, default=str(DEFAULT_CONDITIONING_MIDI))
+    parser.add_argument(
+        "--conditioning_midi",
+        type=str,
+        default=None,
+        help="Optional explicit primer MIDI. Defaults to request-derived chord conditioning MIDI.",
+    )
     parser.add_argument("--primer_max_tokens", type=int, default=64)
     parser.add_argument("--max_sequence", type=int, default=512)
     return parser

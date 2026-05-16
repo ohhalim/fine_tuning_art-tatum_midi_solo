@@ -28,7 +28,9 @@ MVP generator 우선순위:
 
 ### Path A: Existing Stage A Model
 
-- `conditioning_midi`가 있으면 기존 Stage A 방식 사용.
+- `conditioning_midi`가 명시되면 기존 Stage A 방식으로 해당 MIDI를 primer로 사용.
+- `conditioning_midi`가 없으면 request의 `chord_progression`, `bpm`, `bars`, `time_signature`를 low-register chord guide MIDI로 변환해 primer로 사용.
+- chord progression은 전체 phrase duration에 균등 배치한다. 예를 들어 `bars=2`와 코드 4개가 들어오면 각 코드는 half-bar 구간을 담당한다.
 - `primer_max_tokens=64` 기본.
 - LoRA checkpoint:
   - `checkpoints/jazz_lora_stage_a`
@@ -134,6 +136,7 @@ Fallback if:
   "midiPath": "outputs/generated/uuid.mid",
   "metricsPath": "outputs/metrics/uuid.json",
   "fallbackUsed": false,
+  "conditioning_midi_path": "outputs/generated/_conditioning/uuid_conditioning.mid",
   "metrics": {
     "generationTimeMs": 842,
     "noteCount": 43,

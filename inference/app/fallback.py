@@ -62,6 +62,11 @@ def parse_time_signature(time_signature: str) -> int:
     return max(1, min(12, numerator))
 
 
+def phrase_duration_sec(request: GenerationRequest) -> float:
+    beats_per_bar = parse_time_signature(request.time_signature)
+    return request.bars * beats_per_bar * (60.0 / float(request.bpm))
+
+
 def parse_chord(chord: str) -> tuple[int, list[int]]:
     match = re.match(r"^\s*([A-Ga-g])([#b]?)(.*)$", chord)
     if not match:
@@ -82,6 +87,14 @@ def chord_pitches_in_range(root_pc: int, intervals: list[int], pitch_min: int, p
     return [pitch for pitch in range(pitch_min, pitch_max + 1) if pitch % 12 in pitch_classes]
 
 
+def chord_for_time(request: GenerationRequest, start_sec: float) -> str:
+    phrase_duration = max(1e-6, phrase_duration_sec(request))
+    segment_duration = phrase_duration / max(1, len(request.chord_progression))
+    chord_index = int(max(0.0, start_sec) // max(1e-6, segment_duration))
+    chord_index = max(0, min(len(request.chord_progression) - 1, chord_index))
+    return request.chord_progression[chord_index]
+
+
 def generate_fallback_midi(request: GenerationRequest, output_path: str | Path) -> Path:
     rng = random.Random(request.seed)
     output_path = Path(output_path)
@@ -89,7 +102,7 @@ def generate_fallback_midi(request: GenerationRequest, output_path: str | Path) 
 
     beats_per_bar = parse_time_signature(request.time_signature)
     seconds_per_beat = 60.0 / float(request.bpm)
-    phrase_duration = request.bars * beats_per_bar * seconds_per_beat
+    phrase_duration = phrase_duration_sec(request)
     pm = pretty_midi.PrettyMIDI(initial_tempo=float(request.bpm))
     piano = pretty_midi.Instrument(program=0, is_drum=False, name="fallback_piano_solo")
 
@@ -101,12 +114,6 @@ def generate_fallback_midi(request: GenerationRequest, output_path: str | Path) 
     dur_min, dur_max = energy["duration_beats"]
 
     for bar_idx in range(request.bars):
-        chord = request.chord_progression[bar_idx % len(request.chord_progression)]
-        root_pc, intervals = parse_chord(chord)
-        chord_tones = chord_pitches_in_range(root_pc, intervals, pitch_min, pitch_max)
-        if not chord_tones:
-            chord_tones = list(range(pitch_min, pitch_max + 1))
-
         notes_per_bar = rng.randint(density_min, density_max)
         grid_size = 16
         positions = sorted(rng.sample(range(grid_size), k=min(notes_per_bar, grid_size)))
@@ -120,6 +127,12 @@ def generate_fallback_midi(request: GenerationRequest, output_path: str | Path) 
             end = min(start + duration, bar_start + beats_per_bar * seconds_per_beat)
             if end <= start:
                 continue
+
+            chord = chord_for_time(request, start)
+            root_pc, intervals = parse_chord(chord)
+            chord_tones = chord_pitches_in_range(root_pc, intervals, pitch_min, pitch_max)
+            if not chord_tones:
+                chord_tones = list(range(pitch_min, pitch_max + 1))
 
             pitch = rng.choice(chord_tones)
             if previous_pitch is not None and rng.random() < 0.55:
