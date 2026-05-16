@@ -29,6 +29,7 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - `scripts/generate.py`
   - LoRA checkpoint와 conditioning MIDI를 받아 MIDI 샘플 생성.
   - Stage A 기본 primer 길이는 64 token.
+  - `temperature`, `top_k`, `top_p` sampling 제어값 지원.
 - `scripts/eval_offline_metrics.py`
   - note density, dead-air proxy, 4-gram repetition 평가.
 - `scripts/runpod_train_stage_a.sh`
@@ -38,6 +39,7 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - `inference/app/generator.py`
   - model-first generation contract.
   - 요청 chord progression 기반 conditioning MIDI를 생성해 Stage A primer로 사용.
+  - 여러 model candidate를 생성한 뒤 repair/metrics gate 통과 후보 중 quality score가 가장 낮은 MIDI를 선택.
   - raw model output repair 후 gate 검증.
   - 실패 시 fallback MIDI 생성.
 - `inference/app/conditioning.py`
@@ -59,6 +61,7 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - 3개 chord progression x 3 seed x 3 density sweep에서 medium gap repair 후 model success: `27/27`.
 - 현재 작은 sweep 기준 fallback: `0/27`.
 - request-derived conditioning smoke: 3개 chord progression x 1 seed x medium density에서 model success `3/3`, fallback `0/3`.
+- sampling/candidate selection smoke: 3개 chord progression x 1 seed x medium density, `temperature=0.9`, `top_p=0.95`, `model_candidates=2`에서 model success `3/3`, fallback `0/3`.
 
 주의할 점:
 
@@ -170,6 +173,7 @@ python scripts/eval_offline_metrics.py \
 - 생성 결과 중 빈 MIDI 비율이 리포트에 표시됨.
 - dead-air, repetition, note density가 모두 gating 기준에 들어감.
 - 실패 샘플은 파일명 또는 별도 JSON에 명확히 표시됨.
+- 여러 model candidate 중 metrics score 기준으로 최종 MIDI를 선택함.
 
 ### Phase 3. Conditioning 의미 강화
 

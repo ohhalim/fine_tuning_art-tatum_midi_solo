@@ -154,7 +154,10 @@ python -m inference.app.generator \
   --bars 2 \
   --density medium \
   --energy high \
-  --seed 11
+  --seed 11 \
+  --temperature 0.9 \
+  --top_p 0.95 \
+  --model_candidates 2
 ```
 
 ### 3-4. 평가
@@ -312,12 +315,16 @@ python -m inference.app.generator \
   --section drop \
   --energy high \
   --density medium \
+  --temperature 0.9 \
+  --top_p 0.95 \
+  --model_candidates 2 \
   --output_dir outputs/generated
 ```
 
 결과:
 - `outputs/generated/<job_id>.mid`
 - `outputs/metrics/<job_id>.json`
+- `outputs/generated/_conditioning/<job_id>_conditioning.mid`
 
 모델 출력은 먼저 pitch range와 phrase length를 repair한 뒤 gate를 통과시키고, 그래도 실패하면 fallback MIDI를 생성합니다. 결과 JSON의 `model_repaired`, `fallback_used`, `model_failure_reason`으로 어떤 경로를 탔는지 확인합니다.
 

@@ -32,6 +32,8 @@ MVP generator 우선순위:
 - `conditioning_midi`가 없으면 request의 `chord_progression`, `bpm`, `bars`, `time_signature`를 low-register chord guide MIDI로 변환해 primer로 사용.
 - chord progression은 전체 phrase duration에 균등 배치한다. 예를 들어 `bars=2`와 코드 4개가 들어오면 각 코드는 half-bar 구간을 담당한다.
 - `primer_max_tokens=64` 기본.
+- `temperature`, `top_k`, `top_p`를 model sampling에 전달한다.
+- `model_candidates` 개수만큼 후보 MIDI를 생성하고, repair/metrics gate를 통과한 후보 중 dead-air, repetition, target density 이탈을 기준으로 가장 낮은 score의 후보를 최종 선택한다.
 - LoRA checkpoint:
   - `checkpoints/jazz_lora_stage_a`
 

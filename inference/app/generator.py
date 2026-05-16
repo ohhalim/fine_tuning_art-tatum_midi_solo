@@ -18,6 +18,11 @@ from .schemas import GenerationRequest, GenerationResult
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LORA_PATH = PROJECT_ROOT / "checkpoints" / "jazz_lora_stage_a"
 DEFAULT_CONDITIONING_MIDI = PROJECT_ROOT / "data" / "roles" / "lead" / "000000" / "conditioning.mid"
+TARGET_DENSITY = {
+    "sparse": 1.2,
+    "medium": 3.0,
+    "dense": 6.0,
+}
 
 
 def metrics_dir_for(output_dir: Path) -> Path:
@@ -38,14 +43,17 @@ def run_stage_a_model(
     conditioning_midi: Path,
     primer_max_tokens: int,
     max_sequence: int,
-) -> tuple[Path | None, str | None]:
+    model_candidates: int,
+) -> tuple[list[Path], str | None]:
     if not (lora_path / "lora_weights.pt").exists():
-        return None, f"missing LoRA weights: {lora_path / 'lora_weights.pt'}"
+        return [], f"missing LoRA weights: {lora_path / 'lora_weights.pt'}"
     if not conditioning_midi.exists():
-        return None, f"missing conditioning MIDI: {conditioning_midi}"
+        return [], f"missing conditioning MIDI: {conditioning_midi}"
 
     model_output_dir = output_dir / f"{request.job_id}_model_raw"
     model_output_dir.mkdir(parents=True, exist_ok=True)
+    for stale_candidate in model_output_dir.glob("jazz_sample_*.mid"):
+        stale_candidate.unlink()
     cmd = [
         sys.executable,
         str(PROJECT_ROOT / "scripts" / "generate.py"),
@@ -56,7 +64,7 @@ def run_stage_a_model(
         "--primer_max_tokens",
         str(primer_max_tokens),
         "--num_samples",
-        "1",
+        str(max(1, int(model_candidates))),
         "--length",
         str(max_sequence),
         "--max_sequence",
@@ -66,6 +74,12 @@ def run_stage_a_model(
         "--output",
         str(model_output_dir),
     ]
+    if request.temperature is not None:
+        cmd.extend(["--temperature", str(request.temperature)])
+    if request.top_k is not None:
+        cmd.extend(["--top_k", str(request.top_k)])
+    if request.top_p is not None:
+        cmd.extend(["--top_p", str(request.top_p)])
     try:
         completed = subprocess.run(
             cmd,
@@ -75,17 +89,23 @@ def run_stage_a_model(
             capture_output=True,
         )
     except Exception as exc:
-        return None, f"model subprocess failed to start: {exc}"
+        return [], f"model subprocess failed to start: {exc}"
 
     if completed.returncode != 0:
         stderr = completed.stderr.strip()[-1000:]
         stdout = completed.stdout.strip()[-1000:]
-        return None, f"model generation failed with exit {completed.returncode}: {stderr or stdout}"
+        return [], f"model generation failed with exit {completed.returncode}: {stderr or stdout}"
 
-    candidate = model_output_dir / "jazz_sample_1.mid"
-    if not candidate.exists():
-        return None, "model generation finished but did not create jazz_sample_1.mid"
-    return candidate, None
+    candidates = sorted(model_output_dir.glob("jazz_sample_*.mid"))
+    if not candidates:
+        return [], "model generation finished but did not create any jazz_sample_*.mid"
+    return candidates, None
+
+
+def candidate_quality_score(metrics, density: str) -> float:
+    target_density = TARGET_DENSITY.get(density, TARGET_DENSITY["medium"])
+    density_penalty = abs(metrics.note_density - target_density) / max(1e-6, target_density)
+    return (metrics.dead_air_ratio * 2.0) + (metrics.repetition_score * 2.0) + (density_penalty * 3.0)
 
 
 def generate_midi_phrase(
@@ -96,6 +116,7 @@ def generate_midi_phrase(
     conditioning_midi: str | Path | None = None,
     primer_max_tokens: int = 64,
     max_sequence: int = 512,
+    model_candidates: int = 2,
 ) -> GenerationResult:
     request.validate()
     output_dir = Path(output_dir)
@@ -117,27 +138,42 @@ def generate_midi_phrase(
             if conditioning_midi is not None
             else build_request_conditioning_midi(request, output_dir / "_conditioning")
         )
-        candidate, model_failure_reason = run_stage_a_model(
+        candidates, model_failure_reason = run_stage_a_model(
             request=request,
             output_dir=output_dir,
             lora_path=Path(lora_path),
             conditioning_midi=resolved_conditioning_midi,
             primer_max_tokens=primer_max_tokens,
             max_sequence=max_sequence,
+            model_candidates=model_candidates,
         )
-        if candidate is not None:
-            repaired_candidate = output_dir / f"{request.job_id}_model_repaired.mid"
-            model_repaired = False
-            try:
-                candidate_for_metrics = repair_model_midi(candidate, repaired_candidate, request)
-                model_repaired = True
-            except Exception as exc:
-                candidate_for_metrics = candidate
-                model_failure_reason = f"model repair failed: {exc}"
+        if candidates:
+            best_valid = None
+            invalid_reasons: list[str] = []
             generation_time_ms = int((time.perf_counter() - start) * 1000)
-            metrics = compute_midi_metrics(candidate_for_metrics, generation_time_ms, fallback_used=False)
-            is_valid, reason = validate_metrics(metrics, request.density)
-            if is_valid:
+
+            for candidate_index, candidate in enumerate(candidates, start=1):
+                repaired_candidate = output_dir / f"{request.job_id}_model_repaired_{candidate_index}.mid"
+                try:
+                    candidate_for_metrics = repair_model_midi(candidate, repaired_candidate, request)
+                except Exception as exc:
+                    invalid_reasons.append(f"{candidate.name}: model repair failed: {exc}")
+                    continue
+
+                metrics = compute_midi_metrics(candidate_for_metrics, generation_time_ms, fallback_used=False)
+                is_valid, reason = validate_metrics(metrics, request.density)
+                if not is_valid:
+                    invalid_reasons.append(f"{candidate.name}: {reason}")
+                    continue
+
+                score = candidate_quality_score(metrics, request.density)
+                if best_valid is None or score < best_valid[0]:
+                    best_valid = (score, candidate_for_metrics, metrics)
+
+            if best_valid is not None:
+                _, candidate_for_metrics, metrics = best_valid
+                generation_time_ms = int((time.perf_counter() - start) * 1000)
+                metrics.generation_time_ms = generation_time_ms
                 shutil.copyfile(candidate_for_metrics, final_midi_path)
                 result = GenerationResult(
                     job_id=request.job_id,
@@ -145,13 +181,14 @@ def generate_midi_phrase(
                     midi_path=str(final_midi_path),
                     metrics_path=str(metrics_path),
                     fallback_used=False,
-                    model_repaired=model_repaired,
+                    model_repaired=True,
                     conditioning_midi_path=str(resolved_conditioning_midi),
                     metrics=metrics,
                 )
                 write_json(metrics_path, result.to_dict())
                 return result
-            model_failure_reason = reason
+
+            model_failure_reason = "; ".join(invalid_reasons) if invalid_reasons else model_failure_reason
 
     fallback_used = True
     try:
@@ -232,6 +269,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--primer_max_tokens", type=int, default=64)
     parser.add_argument("--max_sequence", type=int, default=512)
+    parser.add_argument("--model_candidates", type=int, default=2)
     return parser
 
 
@@ -246,6 +284,7 @@ def main() -> int:
         conditioning_midi=args.conditioning_midi,
         primer_max_tokens=args.primer_max_tokens,
         max_sequence=args.max_sequence,
+        model_candidates=args.model_candidates,
     )
     print(json.dumps(result.to_dict(), ensure_ascii=True, indent=2))
     return 0 if result.status == "COMPLETED" else 1

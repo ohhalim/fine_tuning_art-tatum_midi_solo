@@ -151,6 +151,9 @@ def generate_once(
     primer: torch.Tensor,
     target_length: int,
     strip_primer: bool,
+    temperature: float,
+    top_k: int | None,
+    top_p: float | None,
 ) -> List[int]:
     device = get_device()
     primer = primer.to(device)
@@ -161,6 +164,9 @@ def generate_once(
             target_seq_length=target_length,
             beam=0,
             beam_chance=1.0,
+            temperature=temperature,
+            top_k=top_k,
+            top_p=top_p,
         )
 
     sequence = generated[0].detach().cpu().tolist()
@@ -197,6 +203,9 @@ def main():
     parser.add_argument("--length", type=int, default=512, help="Full generated length including primer")
     parser.add_argument("--num_samples", type=int, default=3)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--temperature", type=float, default=1.0)
+    parser.add_argument("--top_k", type=int, default=None)
+    parser.add_argument("--top_p", type=float, default=None)
 
     # Output
     parser.add_argument("--output", type=str, default="./samples")
@@ -247,6 +256,9 @@ def main():
             primer=primer,
             target_length=target_length,
             strip_primer=args.strip_primer_output,
+            temperature=args.temperature,
+            top_k=args.top_k,
+            top_p=args.top_p,
         )
         if not generated_tokens:
             print("No decodable tokens produced; skipping sample.")

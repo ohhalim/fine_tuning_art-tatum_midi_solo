@@ -3,11 +3,13 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 
 import pretty_midi
 
 from inference.app.conditioning import CONDITIONING_PITCH_MAX, build_request_conditioning_midi
 from inference.app.fallback import chord_for_time
+from inference.app.generator import candidate_quality_score
 from inference.app.schemas import GenerationRequest
 
 
@@ -45,6 +47,33 @@ class RequestConditioningTest(unittest.TestCase):
 
         starts = sorted({round(float(note.start), 1) for note in notes})
         self.assertEqual(starts, [0.0, 1.0, 2.0, 3.0])
+
+    def test_sampling_parameters_are_validated(self) -> None:
+        request = GenerationRequest(
+            bpm=120,
+            chord_progression=["Cm7"],
+            temperature=0.0,
+        )
+
+        with self.assertRaisesRegex(ValueError, "temperature"):
+            request.validate()
+
+    def test_candidate_score_penalizes_density_target_miss(self) -> None:
+        sparse_candidate = SimpleNamespace(
+            note_density=1.03,
+            dead_air_ratio=0.33,
+            repetition_score=0.0,
+        )
+        medium_candidate = SimpleNamespace(
+            note_density=2.84,
+            dead_air_ratio=0.50,
+            repetition_score=0.0,
+        )
+
+        self.assertLess(
+            candidate_quality_score(medium_candidate, "medium"),
+            candidate_quality_score(sparse_candidate, "medium"),
+        )
 
 
 if __name__ == "__main__":

@@ -75,6 +75,7 @@ def flatten_result(
         "status": result.status,
         "fallback_used": result.fallback_used,
         "model_repaired": result.model_repaired,
+        "conditioning_midi_path": result.conditioning_midi_path,
         "failure_reason": result.failure_reason,
         "model_failure_reason": result.model_failure_reason,
         "midi_path": result.midi_path,
@@ -193,6 +194,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--summary_md", type=str, default=str(PROJECT_ROOT / "outputs" / "sweeps" / "generation_contract_sweep.md"))
     parser.add_argument("--no_model", action="store_true", help="Skip Stage A model and measure fallback only")
     parser.add_argument("--lora_path", type=str, default=str(DEFAULT_LORA_PATH))
+    parser.add_argument("--temperature", type=float, default=None)
+    parser.add_argument("--top_k", type=int, default=None)
+    parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument(
         "--conditioning_midi",
         type=str,
@@ -201,6 +205,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--primer_max_tokens", type=int, default=64)
     parser.add_argument("--max_sequence", type=int, default=512)
+    parser.add_argument("--model_candidates", type=int, default=2)
     return parser
 
 
@@ -225,6 +230,9 @@ def main() -> int:
                     section=args.section,
                     energy=args.energy,
                     density=density,
+                    temperature=args.temperature,
+                    top_k=args.top_k,
+                    top_p=args.top_p,
                     seed=seed,
                 )
                 result = generate_midi_phrase(
@@ -235,6 +243,7 @@ def main() -> int:
                     conditioning_midi=args.conditioning_midi,
                     primer_max_tokens=args.primer_max_tokens,
                     max_sequence=args.max_sequence,
+                    model_candidates=args.model_candidates,
                 )
                 row = flatten_result(
                     result=result,
@@ -259,6 +268,10 @@ def main() -> int:
             "seeds": seeds,
             "chord_progressions": chord_sets,
             "use_model": not args.no_model,
+            "model_candidates": args.model_candidates,
+            "temperature": args.temperature,
+            "top_k": args.top_k,
+            "top_p": args.top_p,
         },
         "summary": summary,
         "rows": rows,

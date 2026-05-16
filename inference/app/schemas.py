@@ -40,6 +40,12 @@ class GenerationRequest:
             raise ValueError(f"energy must be one of {sorted(VALID_ENERGIES)}")
         if self.density not in VALID_DENSITIES:
             raise ValueError(f"density must be one of {sorted(VALID_DENSITIES)}")
+        if self.temperature is not None and not (0.05 <= float(self.temperature) <= 5.0):
+            raise ValueError("temperature must be between 0.05 and 5.0")
+        if self.top_k is not None and int(self.top_k) <= 0:
+            raise ValueError("top_k must be positive")
+        if self.top_p is not None and not (0.0 < float(self.top_p) <= 1.0):
+            raise ValueError("top_p must be between 0.0 and 1.0")
 
     @classmethod
     def from_cli_args(cls, args: Any) -> "GenerationRequest":
