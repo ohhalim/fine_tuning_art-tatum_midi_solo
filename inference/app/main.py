@@ -7,11 +7,13 @@ from uuid import uuid4
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
-from .generator import PROJECT_ROOT, generate_midi_phrase
+from .generator import DEFAULT_LORA_PATH, PROJECT_ROOT, generate_midi_phrase
+from .model_runner import StageAModelRunner
 from .schemas import GenerationRequest, VALID_DENSITIES, VALID_ENERGIES, VALID_SECTIONS
 
 
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs" / "generated"
+_MODEL_RUNNER: StageAModelRunner | None = None
 
 app = FastAPI(
     title="Personalized Live MIDI Improviser Inference API",
@@ -35,6 +37,7 @@ class MidiInferenceRequest(BaseModel):
     temperature: float | None = None
     top_k: int | None = Field(default=None, alias="topK")
     top_p: float | None = Field(default=None, alias="topP")
+    model_candidates: int = Field(default=2, alias="modelCandidates")
     seed: int = 42
     use_model: bool = Field(default=True, alias="useModel")
 
@@ -79,6 +82,7 @@ def result_to_response(result: Any) -> dict[str, Any]:
         "status": result.status,
         "midiPath": result.midi_path,
         "metricsPath": result.metrics_path,
+        "conditioningMidiPath": result.conditioning_midi_path,
         "fallbackUsed": result.fallback_used,
         "modelRepaired": result.model_repaired,
         "metrics": metrics_to_camel(result.metrics),
@@ -88,6 +92,15 @@ def result_to_response(result: Any) -> dict[str, Any]:
     if result.model_failure_reason:
         payload["modelFailureReason"] = result.model_failure_reason
     return payload
+
+
+def get_model_runner() -> StageAModelRunner:
+    global _MODEL_RUNNER
+    if _MODEL_RUNNER is None:
+        lora_path = os.environ.get("MIDI_LORA_PATH", str(DEFAULT_LORA_PATH))
+        max_sequence = int(os.environ.get("MIDI_MAX_SEQUENCE", "256"))
+        _MODEL_RUNNER = StageAModelRunner(lora_path=lora_path, max_sequence=max_sequence)
+    return _MODEL_RUNNER
 
 
 @app.get("/health")
@@ -114,6 +127,8 @@ def infer_midi(request: MidiInferenceRequest) -> dict[str, Any]:
             request=generation_request,
             output_dir=output_dir,
             use_model=request.use_model,
+            model_candidates=request.model_candidates,
+            model_runner=get_model_runner() if request.use_model else None,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

@@ -34,6 +34,7 @@ MVP generator 우선순위:
 - `primer_max_tokens=64` 기본.
 - `temperature`, `top_k`, `top_p`를 model sampling에 전달한다.
 - `model_candidates` 개수만큼 후보 MIDI를 생성하고, repair/metrics gate를 통과한 후보 중 dead-air, repetition, target density 이탈을 기준으로 가장 낮은 score의 후보를 최종 선택한다.
+- MVP inference 기본 `max_sequence`는 256이다. 기존 512-token 생성은 더 느린 Stage A 비교/실험값으로 유지한다.
 - LoRA checkpoint:
   - `checkpoints/jazz_lora_stage_a`
 

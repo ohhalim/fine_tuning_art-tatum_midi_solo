@@ -157,7 +157,8 @@ python -m inference.app.generator \
   --seed 11 \
   --temperature 0.9 \
   --top_p 0.95 \
-  --model_candidates 2
+  --model_candidates 2 \
+  --max_sequence 256
 ```
 
 ### 3-4. 평가
@@ -318,6 +319,7 @@ python -m inference.app.generator \
   --temperature 0.9 \
   --top_p 0.95 \
   --model_candidates 2 \
+  --max_sequence 256 \
   --output_dir outputs/generated
 ```
 
@@ -354,6 +356,10 @@ Model quality sweep:
 python scripts/eval_generation_contract_sweep.py \
   --seeds 11,13,17 \
   --densities medium \
+  --temperature 0.9 \
+  --top_p 0.95 \
+  --model_candidates 2 \
+  --max_sequence 256 \
   --summary_json outputs/sweeps/generation_contract_sweep.json \
   --summary_md outputs/sweeps/generation_contract_sweep.md
 ```

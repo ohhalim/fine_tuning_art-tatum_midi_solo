@@ -7,6 +7,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 from .conditioning import build_request_conditioning_midi
 from .fallback import generate_fallback_midi
@@ -44,11 +45,28 @@ def run_stage_a_model(
     primer_max_tokens: int,
     max_sequence: int,
     model_candidates: int,
+    model_runner: Any | None = None,
 ) -> tuple[list[Path], str | None]:
     if not (lora_path / "lora_weights.pt").exists():
         return [], f"missing LoRA weights: {lora_path / 'lora_weights.pt'}"
     if not conditioning_midi.exists():
         return [], f"missing conditioning MIDI: {conditioning_midi}"
+
+    if model_runner is not None:
+        try:
+            return (
+                model_runner.generate_candidates(
+                    request=request,
+                    output_dir=output_dir,
+                    conditioning_midi=conditioning_midi,
+                    primer_max_tokens=primer_max_tokens,
+                    max_sequence=max_sequence,
+                    model_candidates=model_candidates,
+                ),
+                None,
+            )
+        except Exception as exc:
+            return [], f"model runner generation failed: {exc}"
 
     model_output_dir = output_dir / f"{request.job_id}_model_raw"
     model_output_dir.mkdir(parents=True, exist_ok=True)
@@ -115,8 +133,9 @@ def generate_midi_phrase(
     lora_path: str | Path = DEFAULT_LORA_PATH,
     conditioning_midi: str | Path | None = None,
     primer_max_tokens: int = 64,
-    max_sequence: int = 512,
+    max_sequence: int = 256,
     model_candidates: int = 2,
+    model_runner: Any | None = None,
 ) -> GenerationResult:
     request.validate()
     output_dir = Path(output_dir)
@@ -146,6 +165,7 @@ def generate_midi_phrase(
             primer_max_tokens=primer_max_tokens,
             max_sequence=max_sequence,
             model_candidates=model_candidates,
+            model_runner=model_runner,
         )
         if candidates:
             best_valid = None
@@ -268,7 +288,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional explicit primer MIDI. Defaults to a request-derived chord conditioning MIDI.",
     )
     parser.add_argument("--primer_max_tokens", type=int, default=64)
-    parser.add_argument("--max_sequence", type=int, default=512)
+    parser.add_argument("--max_sequence", type=int, default=256)
     parser.add_argument("--model_candidates", type=int, default=2)
     return parser
 

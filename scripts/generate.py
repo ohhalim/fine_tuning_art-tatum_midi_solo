@@ -22,6 +22,7 @@ import torch
 
 # Add music_transformer to path
 SCRIPT_DIR = Path(__file__).parent.parent
+sys.path.insert(0, str(SCRIPT_DIR / "scripts"))
 sys.path.insert(0, str(SCRIPT_DIR / "music_transformer"))
 sys.path.insert(0, str(SCRIPT_DIR / "music_transformer" / "third_party"))
 

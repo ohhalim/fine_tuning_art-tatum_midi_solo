@@ -68,13 +68,16 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - sparse: `8/9`
   - 유일한 fallback: `sweep_model_p2_sparse_s17`, model candidate 2개 모두 dead-air `1.000 >= 0.900`.
   - 평균 generation time: 약 `31.3s/request`.
+- in-process runner + `max_sequence=256` smoke:
+  - 3개 chord progression x 1 seed x medium density에서 model success `3/3`, fallback `0/3`, 평균 약 `10.1s/request`.
+  - 3개 chord progression x 1 seed x 3 density에서 model success `9/9`, fallback `0/9`, 평균 약 `9.4s/request`.
 
 주의할 점:
 
 - `music_transformer/generate.py`는 원본 Music Transformer 계열의 legacy generator다.
 - 현재 Stage A에서 사용해야 하는 생성 엔트리포인트는 `scripts/generate.py`다.
 - MVP request contract 확인은 `python -m inference.app.generator`를 사용한다.
-- 다음 구현 우선순위는 모델을 매 요청마다 subprocess로 로드하지 않고, 한 번 로드한 runner에서 여러 request를 처리하는 구조다.
+- 현재 inference 기본값은 `max_sequence=256`이다. 512-token 생성은 더 느린 비교/실험용으로 유지한다.
 - 로컬 워크트리에는 추적되지 않은 데이터, 샘플, 문서가 많다. 문서/코드 작업 시 기존 산출물을 정리하거나 삭제하지 않는다.
 
 ## 3. 현재 로컬 산출물
@@ -186,7 +189,8 @@ python scripts/eval_offline_metrics.py \
 
 - 기본 sampling 후보값은 `temperature=0.9`, `top_p=0.95`, `model_candidates=2`로 둔다.
 - 27-case sweep 기준 model success는 `26/27`.
-- 남은 문제는 sparse 일부 케이스의 dead-air와 request당 약 31초가 걸리는 subprocess 병목이다.
+- inference 기본 `max_sequence`는 256으로 둔다.
+- 남은 문제는 sparse 일부 케이스의 dead-air와 request당 약 9~10초가 걸리는 autoregressive generation 병목이다.
 
 ### Phase 3. Conditioning 의미 강화
 

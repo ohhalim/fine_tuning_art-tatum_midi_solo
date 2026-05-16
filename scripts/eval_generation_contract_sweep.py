@@ -23,6 +23,7 @@ from inference.app.generator import (
     PROJECT_ROOT,
     generate_midi_phrase,
 )
+from inference.app.model_runner import StageAModelRunner
 from inference.app.schemas import GenerationMetrics, GenerationRequest
 
 
@@ -204,8 +205,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional explicit primer MIDI. Defaults to request-derived chord conditioning MIDI.",
     )
     parser.add_argument("--primer_max_tokens", type=int, default=64)
-    parser.add_argument("--max_sequence", type=int, default=512)
+    parser.add_argument("--max_sequence", type=int, default=256)
     parser.add_argument("--model_candidates", type=int, default=2)
+    parser.add_argument("--subprocess_model", action="store_true", help="Reload model via scripts/generate.py per request")
     return parser
 
 
@@ -214,6 +216,9 @@ def main() -> int:
     seeds = parse_int_csv(args.seeds)
     densities = parse_str_csv(args.densities)
     chord_sets = parse_chord_sets(args.chord_progressions)
+    model_runner = None
+    if not args.no_model and not args.subprocess_model:
+        model_runner = StageAModelRunner(lora_path=args.lora_path, max_sequence=args.max_sequence)
 
     rows: list[dict[str, Any]] = []
     for progression_index, chord_progression in enumerate(chord_sets):
@@ -244,6 +249,7 @@ def main() -> int:
                     primer_max_tokens=args.primer_max_tokens,
                     max_sequence=args.max_sequence,
                     model_candidates=args.model_candidates,
+                    model_runner=model_runner,
                 )
                 row = flatten_result(
                     result=result,
@@ -268,10 +274,13 @@ def main() -> int:
             "seeds": seeds,
             "chord_progressions": chord_sets,
             "use_model": not args.no_model,
+            "primer_max_tokens": args.primer_max_tokens,
+            "max_sequence": args.max_sequence,
             "model_candidates": args.model_candidates,
             "temperature": args.temperature,
             "top_k": args.top_k,
             "top_p": args.top_p,
+            "subprocess_model": args.subprocess_model,
         },
         "summary": summary,
         "rows": rows,

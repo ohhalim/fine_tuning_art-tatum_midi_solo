@@ -9,7 +9,7 @@ import pretty_midi
 
 from inference.app.conditioning import CONDITIONING_PITCH_MAX, build_request_conditioning_midi
 from inference.app.fallback import chord_for_time
-from inference.app.generator import candidate_quality_score
+from inference.app.generator import candidate_quality_score, generate_midi_phrase
 from inference.app.schemas import GenerationRequest
 
 
@@ -74,6 +74,64 @@ class RequestConditioningTest(unittest.TestCase):
             candidate_quality_score(medium_candidate, "medium"),
             candidate_quality_score(sparse_candidate, "medium"),
         )
+
+    def test_generation_can_use_in_process_model_runner(self) -> None:
+        class FakeRunner:
+            def __init__(self) -> None:
+                self.calls = 0
+
+            def generate_candidates(
+                self,
+                request: GenerationRequest,
+                output_dir: str | Path,
+                conditioning_midi: str | Path,
+                primer_max_tokens: int,
+                max_sequence: int,
+                model_candidates: int,
+            ) -> list[Path]:
+                self.calls += 1
+                raw_dir = Path(output_dir) / f"{request.job_id}_model_raw"
+                raw_dir.mkdir(parents=True, exist_ok=True)
+                output_path = raw_dir / "jazz_sample_1.mid"
+
+                pm = pretty_midi.PrettyMIDI(initial_tempo=float(request.bpm))
+                piano = pretty_midi.Instrument(program=0, is_drum=False)
+                for index in range(12):
+                    start = index * 0.1
+                    piano.notes.append(
+                        pretty_midi.Note(
+                            velocity=80,
+                            pitch=60 + (index % 5),
+                            start=start,
+                            end=start + 0.08,
+                        )
+                    )
+                pm.instruments.append(piano)
+                pm.write(str(output_path))
+                return [output_path]
+
+        request = GenerationRequest(
+            bpm=120,
+            chord_progression=["Cm7", "Fm7", "Bb7", "Ebmaj7"],
+            bars=2,
+            density="medium",
+            job_id="unit_runner_path",
+            seed=11,
+        )
+        runner = FakeRunner()
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            result = generate_midi_phrase(
+                request=request,
+                output_dir=Path(tmp_dir),
+                use_model=True,
+                model_runner=runner,
+            )
+
+        self.assertEqual(runner.calls, 1)
+        self.assertEqual(result.status, "COMPLETED")
+        self.assertFalse(result.fallback_used)
+        self.assertTrue(result.model_repaired)
 
 
 if __name__ == "__main__":

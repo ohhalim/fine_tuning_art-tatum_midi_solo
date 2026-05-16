@@ -82,6 +82,9 @@ Request:
   "energy": "high",
   "density": "medium",
   "style": "personal_jazz",
+  "temperature": 0.9,
+  "topP": 0.95,
+  "modelCandidates": 2,
   "useModel": true,
   "seed": 42
 }
@@ -95,6 +98,7 @@ Response:
   "status": "COMPLETED",
   "midiPath": "outputs/generated/6a9f6da7-0be5-4c99-a0bf-ff21696f6d6c.mid",
   "metricsPath": "outputs/metrics/6a9f6da7-0be5-4c99-a0bf-ff21696f6d6c.json",
+  "conditioningMidiPath": "outputs/generated/_conditioning/6a9f6da7-0be5-4c99-a0bf-ff21696f6d6c_conditioning.mid",
   "fallbackUsed": false,
   "modelRepaired": true,
   "metrics": {
