@@ -296,3 +296,23 @@ python -m inference.app.generator \
 - `outputs/metrics/<job_id>.json`
 
 모델 출력이 비어 있거나 품질 gate를 통과하지 못하면 fallback MIDI를 생성하고, `model_failure_reason`에 원인을 남깁니다.
+
+FastAPI inference server:
+
+```bash
+uvicorn inference.app.main:app --host 0.0.0.0 --port 8000
+```
+
+```bash
+curl -s -X POST http://localhost:8000/infer/midi \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "bpm": 124,
+    "chordProgression": ["Cm7", "Fm7", "Bb7", "Ebmaj7"],
+    "bars": 2,
+    "section": "drop",
+    "energy": "high",
+    "density": "medium",
+    "useModel": false
+  }'
+```
