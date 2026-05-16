@@ -316,3 +316,23 @@ curl -s -X POST http://localhost:8000/infer/midi \
     "useModel": false
   }'
 ```
+
+Model quality sweep:
+
+```bash
+python scripts/eval_generation_contract_sweep.py \
+  --seeds 11,13,17 \
+  --densities medium \
+  --summary_json outputs/sweeps/generation_contract_sweep.json \
+  --summary_md outputs/sweeps/generation_contract_sweep.md
+```
+
+빠른 fallback-only smoke check:
+
+```bash
+python scripts/eval_generation_contract_sweep.py \
+  --no_model \
+  --seeds 1 \
+  --chord_progressions "Cm7,Fm7,Bb7,Ebmaj7" \
+  --densities medium
+```

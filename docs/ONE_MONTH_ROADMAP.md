@@ -74,6 +74,7 @@
 산출물:
 
 - sweep metrics JSON.
+- sweep summary Markdown.
 - best generation settings.
 - 실패 유형 목록.
 
