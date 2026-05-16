@@ -64,16 +64,37 @@ class RequestConditioningTest(unittest.TestCase):
             note_density=1.03,
             dead_air_ratio=0.33,
             repetition_score=0.0,
+            chord_tone_ratio=None,
         )
         medium_candidate = SimpleNamespace(
             note_density=2.84,
             dead_air_ratio=0.50,
             repetition_score=0.0,
+            chord_tone_ratio=None,
         )
 
         self.assertLess(
             candidate_quality_score(medium_candidate, "medium"),
             candidate_quality_score(sparse_candidate, "medium"),
+        )
+
+    def test_candidate_score_prefers_higher_chord_tone_ratio_when_other_metrics_match(self) -> None:
+        low_chord_candidate = SimpleNamespace(
+            note_density=3.0,
+            dead_air_ratio=0.3,
+            repetition_score=0.0,
+            chord_tone_ratio=0.25,
+        )
+        high_chord_candidate = SimpleNamespace(
+            note_density=3.0,
+            dead_air_ratio=0.3,
+            repetition_score=0.0,
+            chord_tone_ratio=0.85,
+        )
+
+        self.assertLess(
+            candidate_quality_score(high_chord_candidate, "medium"),
+            candidate_quality_score(low_chord_candidate, "medium"),
         )
 
     def test_sparse_validation_allows_long_gaps_when_density_is_valid(self) -> None:

@@ -24,6 +24,8 @@ TARGET_DENSITY = {
     "medium": 3.0,
     "dense": 6.0,
 }
+CHORD_TONE_TARGET = 0.55
+CHORD_TONE_WEIGHT = 1.0
 
 
 def metrics_dir_for(output_dir: Path) -> Path:
@@ -123,7 +125,16 @@ def run_stage_a_model(
 def candidate_quality_score(metrics, density: str) -> float:
     target_density = TARGET_DENSITY.get(density, TARGET_DENSITY["medium"])
     density_penalty = abs(metrics.note_density - target_density) / max(1e-6, target_density)
-    return (metrics.dead_air_ratio * 2.0) + (metrics.repetition_score * 2.0) + (density_penalty * 3.0)
+    chord_tone_ratio = getattr(metrics, "chord_tone_ratio", None)
+    chord_tone_penalty = 0.0
+    if chord_tone_ratio is not None:
+        chord_tone_penalty = max(0.0, CHORD_TONE_TARGET - float(chord_tone_ratio)) * CHORD_TONE_WEIGHT
+    return (
+        (metrics.dead_air_ratio * 2.0)
+        + (metrics.repetition_score * 2.0)
+        + (density_penalty * 3.0)
+        + chord_tone_penalty
+    )
 
 
 def generate_midi_phrase(

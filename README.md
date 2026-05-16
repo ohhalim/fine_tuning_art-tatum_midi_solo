@@ -120,6 +120,7 @@ bash scripts/run_mvp_demo.sh
 - `outputs/demo/metrics/mvp_demo_medium_cminor.json`
 
 Demo metrics에는 MIDI validity 지표와 함께 request chord progression 기준 pitch-class hit ratio인 `chord_tone_ratio`가 포함됩니다. 이 값은 현재 gate가 아니라 코드 반응성을 관찰하기 위한 품질 지표입니다.
+Model candidate selection은 이 값을 약하게 반영합니다. `chord_tone_ratio`가 `0.55`보다 낮은 valid candidate에는 작은 penalty를 주지만, passing tone과 tension을 고려해 실패 gate로 쓰지는 않습니다.
 
 현재 기준선:
 - 256-token 27-case sweep: model success `27/27`
