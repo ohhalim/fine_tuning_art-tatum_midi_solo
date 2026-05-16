@@ -42,6 +42,10 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - 여러 model candidate를 생성한 뒤 repair/metrics gate 통과 후보 중 quality score가 가장 낮은 MIDI를 선택.
   - raw model output repair 후 gate 검증.
   - 실패 시 fallback MIDI 생성.
+- `inference/app/metrics.py`
+  - note density, dead-air, repetition, pitch range를 계산.
+  - request chord progression 기준 `chord_tone_count`, `non_chord_tone_count`, `chord_tone_ratio`를 계산.
+  - chord-tone metric은 현재 gate가 아니라 코드 반응성을 보기 위한 관측 지표다.
 - `inference/app/conditioning.py`
   - structured request를 low-register chord guide MIDI로 변환.
   - `--conditioning_midi` 명시값이 없을 때 기본 primer로 사용.
@@ -83,7 +87,7 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - 실행 명령: `bash scripts/run_mvp_demo.sh`
   - 산출물: `outputs/demo/demo_request.json`, `outputs/demo/generated.mid`, `outputs/demo/metrics.json`, `outputs/demo/result.json`.
   - 기본 demo seed는 `13`.
-  - 현재 demo 결과: `COMPLETED`, fallback `false`, model repaired `true`, note count `7`.
+  - 현재 demo 결과: `COMPLETED`, fallback `false`, model repaired `true`, note count `7`, chord-tone ratio 약 `0.43`.
 
 주의할 점:
 
@@ -206,6 +210,7 @@ python scripts/eval_offline_metrics.py \
 - sparse는 silence가 의도인 density mode이므로 dead-air 상한 gate를 적용하지 않는다. 단, note count, note density, pitch range gate는 유지한다.
 - 남은 문제는 request당 약 9~10초가 걸리는 autoregressive generation 병목과 실제 음악성/코드 적합성 평가다.
 - README의 MVP demo command는 `bash scripts/run_mvp_demo.sh`로 고정한다.
+- chord-tone ratio는 metrics JSON에 포함한다. 현재는 실패 기준으로 쓰지 않고, Stage B 또는 postprocess 개선 전후 비교 지표로 사용한다.
 
 ### Phase 3. Conditioning 의미 강화
 

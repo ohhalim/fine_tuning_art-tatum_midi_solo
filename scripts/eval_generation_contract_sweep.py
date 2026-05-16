@@ -124,6 +124,7 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "avg_note_density": avg("note_density"),
         "avg_dead_air_ratio": avg("dead_air_ratio"),
         "avg_repetition_score": avg("repetition_score"),
+        "avg_chord_tone_ratio": avg("chord_tone_ratio"),
         "by_density": by_density,
     }
 
@@ -142,17 +143,18 @@ def write_markdown(path: Path, summary: dict[str, Any], rows: list[dict[str, Any
         f"- model_repaired: {summary['model_repaired']}",
         f"- avg_note_density: {summary['avg_note_density']}",
         f"- avg_dead_air_ratio: {summary['avg_dead_air_ratio']}",
+        f"- avg_chord_tone_ratio: {summary['avg_chord_tone_ratio']}",
         "",
         "## Rows",
         "",
-        "| Job | Density | Seed | Status | Model Success | Repaired | Fallback | Notes | Density Metric | Dead-air |",
-        "|---|---|---:|---|---:|---:|---:|---:|---:|---:|",
+        "| Job | Density | Seed | Status | Model Success | Repaired | Fallback | Notes | Density Metric | Dead-air | Chord-tone |",
+        "|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for row in rows:
         model_success = row["status"] == "COMPLETED" and not row["fallback_used"]
         lines.append(
             "| {job} | {density} | {seed} | {status} | {model_success} | {repaired} | "
-            "{fallback} | {notes} | {density_metric} | {dead_air} |".format(
+            "{fallback} | {notes} | {density_metric} | {dead_air} | {chord_tone} |".format(
                 job=row["job_id"],
                 density=row["density"],
                 seed=row["seed"],
@@ -167,6 +169,11 @@ def write_markdown(path: Path, summary: dict[str, Any], rows: list[dict[str, Any
                 dead_air=(
                     f"{row['dead_air_ratio']:.3f}"
                     if isinstance(row.get("dead_air_ratio"), (int, float))
+                    else ""
+                ),
+                chord_tone=(
+                    f"{row['chord_tone_ratio']:.3f}"
+                    if isinstance(row.get("chord_tone_ratio"), (int, float))
                     else ""
                 ),
             )

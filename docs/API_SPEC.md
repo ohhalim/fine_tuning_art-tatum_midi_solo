@@ -195,7 +195,10 @@ Response:
     "repetitionScore": 0.08,
     "pitchMin": 48,
     "pitchMax": 84,
-    "durationSec": 3.87
+    "durationSec": 3.87,
+    "chordToneCount": 31,
+    "nonChordToneCount": 12,
+    "chordToneRatio": 0.72
   }
 }
 ```

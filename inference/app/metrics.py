@@ -5,7 +5,8 @@ from pathlib import Path
 
 import pretty_midi
 
-from .schemas import GenerationMetrics
+from .fallback import chord_for_time, parse_chord
+from .schemas import GenerationMetrics, GenerationRequest
 
 
 DENSITY_MIN = {
@@ -38,11 +39,35 @@ def repetition_score(pitches: list[int], n: int = 4) -> float:
     return repeated / max(1, len(grams))
 
 
+def chord_tone_metrics(
+    notes: list[pretty_midi.Note],
+    request: GenerationRequest | None,
+) -> tuple[int, int, float | None]:
+    if request is None or not notes:
+        return 0, 0, None
+
+    chord_tone_count = 0
+    non_chord_tone_count = 0
+    for note in notes:
+        chord = chord_for_time(request, float(note.start))
+        root_pc, intervals = parse_chord(chord)
+        chord_pitch_classes = {(root_pc + interval) % 12 for interval in intervals}
+        if int(note.pitch) % 12 in chord_pitch_classes:
+            chord_tone_count += 1
+        else:
+            non_chord_tone_count += 1
+
+    total = chord_tone_count + non_chord_tone_count
+    ratio = chord_tone_count / total if total else None
+    return chord_tone_count, non_chord_tone_count, ratio
+
+
 def compute_midi_metrics(
     midi_path: str | Path,
     generation_time_ms: int,
     fallback_used: bool,
     dead_air_threshold_ms: float = 180.0,
+    request: GenerationRequest | None = None,
 ) -> GenerationMetrics:
     notes = load_notes(midi_path)
     if not notes:
@@ -64,6 +89,7 @@ def compute_midi_metrics(
     gaps = [max(0.0, starts[i] - starts[i - 1]) for i in range(1, len(starts))]
     threshold = dead_air_threshold_ms / 1000.0
     dead_air_events = sum(1 for gap in gaps if gap >= threshold)
+    chord_tone_count, non_chord_tone_count, chord_tone_ratio = chord_tone_metrics(notes, request)
 
     return GenerationMetrics(
         generation_time_ms=generation_time_ms,
@@ -75,6 +101,9 @@ def compute_midi_metrics(
         pitch_min=min(pitches),
         pitch_max=max(pitches),
         fallback_used=fallback_used,
+        chord_tone_count=chord_tone_count,
+        non_chord_tone_count=non_chord_tone_count,
+        chord_tone_ratio=chord_tone_ratio,
     )
 
 

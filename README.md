@@ -119,6 +119,8 @@ bash scripts/run_mvp_demo.sh
 - `outputs/demo/generated/mvp_demo_medium_cminor.mid`
 - `outputs/demo/metrics/mvp_demo_medium_cminor.json`
 
+Demo metrics에는 MIDI validity 지표와 함께 request chord progression 기준 pitch-class hit ratio인 `chord_tone_ratio`가 포함됩니다. 이 값은 현재 gate가 아니라 코드 반응성을 관찰하기 위한 품질 지표입니다.
+
 현재 기준선:
 - 256-token 27-case sweep: model success `27/27`
 - fallback `0/27`
@@ -363,6 +365,12 @@ python -m inference.app.generator \
 - `outputs/generated/_conditioning/<job_id>_conditioning.mid`
 
 모델 출력은 먼저 pitch range와 phrase length를 repair한 뒤 gate를 통과시키고, 그래도 실패하면 fallback MIDI를 생성합니다. 결과 JSON의 `model_repaired`, `fallback_used`, `model_failure_reason`으로 어떤 경로를 탔는지 확인합니다.
+
+Metrics JSON에는 기본 validity 지표와 chord quality proxy가 함께 저장됩니다.
+
+- `note_count`, `note_density`, `dead_air_ratio`, `repetition_score`
+- `pitch_min`, `pitch_max`, `duration_sec`
+- `chord_tone_count`, `non_chord_tone_count`, `chord_tone_ratio`
 
 FastAPI inference server:
 

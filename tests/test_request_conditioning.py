@@ -10,7 +10,7 @@ import pretty_midi
 from inference.app.conditioning import CONDITIONING_PITCH_MAX, build_request_conditioning_midi
 from inference.app.fallback import chord_for_time
 from inference.app.generator import candidate_quality_score, generate_midi_phrase
-from inference.app.metrics import validate_metrics
+from inference.app.metrics import compute_midi_metrics, validate_metrics
 from inference.app.schemas import GenerationMetrics, GenerationRequest
 
 
@@ -111,6 +111,43 @@ class RequestConditioningTest(unittest.TestCase):
 
         self.assertFalse(valid)
         self.assertIn("dead-air ratio too high", str(reason))
+
+    def test_chord_tone_metric_uses_note_start_time_pitch_class(self) -> None:
+        request = GenerationRequest(
+            bpm=120,
+            chord_progression=["C7"],
+            bars=1,
+            density="medium",
+            seed=11,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            output_path = Path(tmp_dir) / "chord_tone_metric.mid"
+            pm = pretty_midi.PrettyMIDI(initial_tempo=float(request.bpm))
+            piano = pretty_midi.Instrument(program=0, is_drum=False)
+            for index, pitch in enumerate([60, 64, 67, 70, 61]):
+                start = index * 0.2
+                piano.notes.append(
+                    pretty_midi.Note(
+                        velocity=80,
+                        pitch=pitch,
+                        start=start,
+                        end=start + 0.1,
+                    )
+                )
+            pm.instruments.append(piano)
+            pm.write(str(output_path))
+
+            metrics = compute_midi_metrics(
+                output_path,
+                generation_time_ms=100,
+                fallback_used=False,
+                request=request,
+            )
+
+        self.assertEqual(metrics.chord_tone_count, 4)
+        self.assertEqual(metrics.non_chord_tone_count, 1)
+        self.assertAlmostEqual(metrics.chord_tone_ratio or 0.0, 0.8)
 
     def test_generation_can_use_in_process_model_runner(self) -> None:
         class FakeRunner:

@@ -82,6 +82,9 @@ class GenerationMetrics:
     pitch_min: int | None
     pitch_max: int | None
     fallback_used: bool
+    chord_tone_count: int = 0
+    non_chord_tone_count: int = 0
+    chord_tone_ratio: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

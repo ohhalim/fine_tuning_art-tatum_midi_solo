@@ -104,13 +104,17 @@ Required:
 - `pitchMin`
 - `pitchMax`
 - `fallbackUsed`
+- `chordToneRatio`
+- `chordToneCount`
+- `nonChordToneCount`
 
 Optional:
 
-- `chordToneRatio`
 - `scaleToneRatio`
 - `barBoundaryError`
 - `avgVelocity`
+
+`chordToneRatio` is computed as a pitch-class hit ratio against the request chord that is active at each note start time. It is an observation metric, not an acceptance gate in the current MVP.
 
 ## 9. Failure Detection
 

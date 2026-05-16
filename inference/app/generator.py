@@ -180,7 +180,12 @@ def generate_midi_phrase(
                     invalid_reasons.append(f"{candidate.name}: model repair failed: {exc}")
                     continue
 
-                metrics = compute_midi_metrics(candidate_for_metrics, generation_time_ms, fallback_used=False)
+                metrics = compute_midi_metrics(
+                    candidate_for_metrics,
+                    generation_time_ms,
+                    fallback_used=False,
+                    request=request,
+                )
                 is_valid, reason = validate_metrics(metrics, request.density)
                 if not is_valid:
                     invalid_reasons.append(f"{candidate.name}: {reason}")
@@ -214,7 +219,12 @@ def generate_midi_phrase(
     try:
         generate_fallback_midi(request, final_midi_path)
         generation_time_ms = int((time.perf_counter() - start) * 1000)
-        metrics = compute_midi_metrics(final_midi_path, generation_time_ms, fallback_used=True)
+        metrics = compute_midi_metrics(
+            final_midi_path,
+            generation_time_ms,
+            fallback_used=True,
+            request=request,
+        )
         is_valid, reason = validate_metrics(metrics, request.density)
         if not is_valid:
             result = GenerationResult(
