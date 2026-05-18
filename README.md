@@ -181,6 +181,17 @@ python scripts/run_stage_a_tiny_overfit.py \
 - `fallback_used=false`가 나오면 현재 tokenization/training path를 더 실험할 가치가 있다.
 - 계속 fallback이면 conditioning을 확장하지 말고, NOTE_ON/OFF tokenization 또는 학습 scope를 먼저 다시 봐야 한다.
 
+full-model tiny와 random-base LoRA-only를 같은 조건으로 비교할 때:
+
+```bash
+python scripts/compare_stage_a_tiny_modes.py \
+  --sample_count 3 \
+  --epochs 200 \
+  --lr 0.001 \
+  --max_sequence 128 \
+  --primer_max_tokens 24
+```
+
 ---
 
 ## 3) 단계별 실행 (문제 추적할 때 추천)

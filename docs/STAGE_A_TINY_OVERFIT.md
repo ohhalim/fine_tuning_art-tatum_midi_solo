@@ -35,6 +35,17 @@ python scripts/run_stage_a_tiny_overfit.py \
   --primer_max_tokens 16
 ```
 
+Compare full-model tiny training and random-base LoRA-only under identical settings:
+
+```bash
+python scripts/compare_stage_a_tiny_modes.py \
+  --sample_count 3 \
+  --epochs 200 \
+  --lr 0.001 \
+  --max_sequence 128 \
+  --primer_max_tokens 24
+```
+
 ## Outputs
 
 Each run writes to:
@@ -51,6 +62,14 @@ outputs/stage_a_tiny_overfit/<run_id>/
   tiny_dataset_manifest.json
   report.json
   report.md
+```
+
+Comparison runs write:
+
+```text
+outputs/stage_a_tiny_compare/<run_id>/
+  comparison.json
+  comparison.md
 ```
 
 ## Decision Rule

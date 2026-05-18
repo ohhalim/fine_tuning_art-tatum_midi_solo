@@ -9,10 +9,47 @@ import pretty_midi
 
 from inference.app.metrics import compute_midi_metrics, validate_metrics
 from inference.app.schemas import GenerationRequest
-from scripts.run_stage_a_tiny_overfit import prepare_tiny_dataset
+from scripts.compare_stage_a_tiny_modes import build_decision
+from scripts.run_stage_a_tiny_overfit import (
+    parse_best_validation_loss,
+    prepare_tiny_dataset,
+    summarize_report,
+)
 
 
 class StageATinyOverfitDatasetTest(unittest.TestCase):
+    def test_parse_best_validation_loss_uses_last_logged_value(self) -> None:
+        text = "Best validation loss: 4.8228\nother\nBest validation loss: 0.0568\n"
+
+        self.assertEqual(parse_best_validation_loss(text), 0.0568)
+
+    def test_summarize_report_extracts_gate_and_training_fields(self) -> None:
+        report = {
+            "training_mode": "full_model_tiny",
+            "train_result": {"stdout_tail": "Best validation loss: 0.0568"},
+            "raw_sample_metrics": [{"valid": True}, {"valid": False}],
+            "inference_result": {
+                "status": "COMPLETED",
+                "fallback_used": False,
+                "model_failure_reason": None,
+            },
+        }
+
+        summary = summarize_report(report)
+
+        self.assertTrue(summary["passed_mvp_gate"])
+        self.assertEqual(summary["best_validation_loss"], 0.0568)
+        self.assertEqual(summary["valid_raw_sample_count"], 1)
+        self.assertEqual(summary["raw_sample_count"], 2)
+
+    def test_compare_decision_rejects_random_base_lora_only_when_full_model_passes(self) -> None:
+        decision = build_decision(
+            {"passed_mvp_gate": True},
+            {"passed_mvp_gate": False},
+        )
+
+        self.assertIn("do not rely on random-base LoRA-only", decision)
+
     def test_prepare_tiny_dataset_writes_known_good_midi_and_tokens(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             manifest = prepare_tiny_dataset(Path(tmp_dir), sample_count=2, bpm=124)

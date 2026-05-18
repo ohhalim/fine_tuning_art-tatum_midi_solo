@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime
@@ -144,6 +145,32 @@ def run_command(cmd: list[str], cwd: Path) -> dict[str, Any]:
     }
 
 
+def parse_best_validation_loss(text: str) -> float | None:
+    matches = re.findall(r"Best validation loss:\s*([0-9]+(?:\.[0-9]+)?)", text)
+    return float(matches[-1]) if matches else None
+
+
+def summarize_report(report: dict[str, Any]) -> dict[str, Any]:
+    inference_result = report.get("inference_result") or {}
+    raw_rows = report.get("raw_sample_metrics") or []
+    train_result = report.get("train_result") or {}
+    stdout_tail = str(train_result.get("stdout_tail") or "")
+    stderr_tail = str(train_result.get("stderr_tail") or "")
+    best_validation_loss = parse_best_validation_loss(stdout_tail + "\n" + stderr_tail)
+    valid_raw_count = sum(1 for row in raw_rows if row.get("valid") is True)
+    passed = inference_result.get("status") == "COMPLETED" and inference_result.get("fallback_used") is False
+    return {
+        "training_mode": report.get("training_mode"),
+        "passed_mvp_gate": bool(passed),
+        "best_validation_loss": best_validation_loss,
+        "valid_raw_sample_count": int(valid_raw_count),
+        "raw_sample_count": int(len(raw_rows)),
+        "inference_status": inference_result.get("status"),
+        "fallback_used": inference_result.get("fallback_used"),
+        "model_failure_reason": inference_result.get("model_failure_reason"),
+    }
+
+
 def build_train_command(args: argparse.Namespace, data_dir: Path, checkpoint_dir: Path) -> list[str]:
     cmd = [
         sys.executable,
@@ -242,6 +269,7 @@ def evaluate_raw_samples(sample_dir: Path, request: GenerationRequest) -> list[d
 def write_markdown_report(report_path: Path, report: dict[str, Any]) -> None:
     inference_result = report.get("inference_result") or {}
     metrics = inference_result.get("metrics") or {}
+    summary = report.get("summary") or {}
     fallback_used = inference_result.get("fallback_used")
     passed = inference_result.get("status") == "COMPLETED" and fallback_used is False
     decision = (
@@ -254,6 +282,9 @@ def write_markdown_report(report_path: Path, report: dict[str, Any]) -> None:
         "# Stage A Tiny Overfit Report",
         "",
         f"- Result: {'PASS' if passed else 'FAIL'}",
+        f"- Training mode: `{summary.get('training_mode')}`",
+        f"- Best validation loss: {summary.get('best_validation_loss')}",
+        f"- Valid raw samples: {summary.get('valid_raw_sample_count')}/{summary.get('raw_sample_count')}",
         f"- Fallback used: {fallback_used}",
         f"- Checkpoint: `{report.get('checkpoint_path')}`",
         f"- Report JSON: `{report.get('report_json')}`",
@@ -337,6 +368,7 @@ def main() -> int:
         "run_id": run_id,
         "run_dir": str(run_dir),
         "manifest": manifest,
+        "training_mode": "lora_only" if args.lora_only else "full_model_tiny",
         "train_full_model": not args.lora_only,
     }
 
@@ -401,6 +433,7 @@ def main() -> int:
     report_md = run_dir / "report.md"
     report["report_json"] = str(report_json)
     report["report_md"] = str(report_md)
+    report["summary"] = summarize_report(report)
     write_json(report_json, report)
     write_markdown_report(report_md, report)
     print(json.dumps(report, ensure_ascii=True, indent=2))
