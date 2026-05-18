@@ -34,6 +34,14 @@ from midi_processor.processor import decode_midi, RANGE_NOTE_ON, RANGE_NOTE_OFF,
 
 # Import LoRA helper from train script
 from train_qlora import add_lora_to_model
+from checkpoint_utils import load_state_dict_with_token_resize
+from control_tokens import (
+    SEQUENCE_FORMAT_CONTROL_V1,
+    SEQUENCE_FORMAT_LEGACY_SEP,
+    SEQUENCE_FORMAT_CHOICES,
+    build_control_primer,
+    build_legacy_primer,
+)
 
 
 def _checkpoint_sort_key(path: Path) -> tuple[int, str]:
@@ -183,8 +191,10 @@ def load_model_with_lora(
     model, _ = add_lora_to_model(model, r=lora_r, alpha=lora_alpha)
 
     if full_checkpoint_path is not None:
-        model.load_state_dict(full_checkpoint_state, strict=True)
+        _, resized_keys = load_state_dict_with_token_resize(model, full_checkpoint_state, strict=True)
         print(f"Loaded full Stage A checkpoint from {full_checkpoint_path} (model_max_sequence={model_max_sequence})")
+        if resized_keys:
+            print(f"Resized checkpoint token layers for current vocab: {', '.join(resized_keys)}")
     else:
         lora_weights_path = Path(lora_path) / "lora_weights.pt"
         if not lora_weights_path.exists():
@@ -204,16 +214,31 @@ def build_primer(
     conditioning_midi: str | None,
     primer_max_tokens: int,
     append_sep_token: bool,
+    control_format: str = SEQUENCE_FORMAT_CONTROL_V1,
+    role: str = "lead",
+    tempo_bpm: float = 120.0,
 ) -> torch.Tensor:
     if conditioning_midi:
-        tokens = encode_midi_simple(conditioning_midi)
-        if not tokens:
+        conditioning_tokens = encode_midi_simple(conditioning_midi)
+        if not conditioning_tokens:
             raise ValueError(f"conditioning MIDI produced empty token list: {conditioning_midi}")
 
-        if append_sep_token:
-            tokens = tokens + [TOKEN_END]
-        if primer_max_tokens > 0:
-            tokens = tokens[-primer_max_tokens:]
+        if control_format == SEQUENCE_FORMAT_CONTROL_V1:
+            tokens = build_control_primer(
+                conditioning_tokens,
+                role=role,
+                tempo_bpm=tempo_bpm,
+                append_sep_token=append_sep_token,
+                primer_max_tokens=primer_max_tokens,
+            )
+        elif control_format == SEQUENCE_FORMAT_LEGACY_SEP:
+            tokens = build_legacy_primer(
+                conditioning_tokens,
+                append_sep_token=append_sep_token,
+                primer_max_tokens=primer_max_tokens,
+            )
+        else:
+            raise ValueError(f"Unsupported control_format: {control_format}")
         return torch.tensor(tokens, dtype=torch.long)
 
     # fallback primer: random short prefix
@@ -281,6 +306,14 @@ def main():
     # Generation
     parser.add_argument("--conditioning_midi", type=str, default=None)
     parser.add_argument(
+        "--control_format",
+        choices=SEQUENCE_FORMAT_CHOICES,
+        default=SEQUENCE_FORMAT_CONTROL_V1,
+        help="Primer format. Use legacy_sep only for old Stage A checkpoints/datasets.",
+    )
+    parser.add_argument("--role", type=str, default="lead")
+    parser.add_argument("--tempo_bpm", type=float, default=120.0)
+    parser.add_argument(
         "--primer_max_tokens",
         type=int,
         default=64,
@@ -323,6 +356,9 @@ def main():
         conditioning_midi=args.conditioning_midi,
         primer_max_tokens=args.primer_max_tokens,
         append_sep_token=args.append_sep_token,
+        control_format=args.control_format,
+        role=args.role,
+        tempo_bpm=args.tempo_bpm,
     )
     if len(primer) >= args.max_sequence:
         # Keep room for at least one generated token.

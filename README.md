@@ -51,6 +51,8 @@ scripts/
   agent_harness.sh                  # Codex/local validation harness
   runpod_train_stage_a.sh          # Stage A 일괄 실행(prepare/train/generate/eval)
   prepare_role_dataset.py          # role-conditioned 데이터셋 생성
+  control_tokens.py                # Stage A control_v1 token contract
+  checkpoint_utils.py              # vocab migration checkpoint loading helpers
   train_stage_a_full.py            # full-checkpoint/from-scratch 학습
   train_stage_a_adapter.py         # pretrained/base checkpoint adapter 학습
   train_qlora.py                   # lower-level training implementation
@@ -243,6 +245,14 @@ python scripts/prepare_role_dataset.py \
 - `data/roles/lead/tokenized/train/*.npy`
 - `data/roles/lead/tokenized/val/*.npy`
 
+기본 tokenized sequence format은 `control_v1`입니다.
+
+```text
+ROLE_LEAD + TEMPO_* + BAR + conditioning_tokens + COND_SEP + target_tokens + END
+```
+
+기존 실험 재현이 필요할 때만 `--sequence_format legacy_sep`를 사용합니다.
+
 ### 3-2. 학습
 
 pretrained symbolic MIDI base가 없다면 기본은 full-checkpoint/from-scratch 학습입니다.
@@ -288,12 +298,16 @@ Stage A 모델을 직접 호출하는 기본 생성 명령입니다.
 python scripts/generate.py \
   --lora_path ./checkpoints/jazz_lora_stage_a \
   --conditioning_midi ./data/roles/lead/000000/conditioning.mid \
+  --control_format control_v1 \
+  --tempo_bpm 124 \
   --primer_max_tokens 64 \
   --num_samples 10 \
   --length 512 \
   --max_sequence 512 \
   --output ./samples/stage_a_p64
 ```
+
+기존 `conditioning + END + target + END` 데이터로 학습한 checkpoint를 직접 확인할 때는 `--control_format legacy_sep`를 명시합니다.
 
 MVP inference contract를 검증할 때는 아래 CLI를 사용합니다. 이 경로는 `--conditioning_midi`를 생략하면 요청한 코드 진행으로 low-register conditioning MIDI를 임시 생성한 뒤 모델 primer로 사용합니다.
 

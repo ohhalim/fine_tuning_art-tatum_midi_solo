@@ -27,6 +27,7 @@ sys.path.insert(0, str(ROOT_DIR))
 sys.path.insert(0, str(ROOT_DIR / "scripts"))
 
 from generate import encode_midi_simple, resolve_full_checkpoint_path  # noqa: E402
+from control_tokens import SEQUENCE_FORMAT_LEGACY_SEP  # noqa: E402
 from inference.app.generator import generate_midi_phrase  # noqa: E402
 from inference.app.metrics import compute_midi_metrics, validate_metrics  # noqa: E402
 from inference.app.schemas import GenerationRequest  # noqa: E402
@@ -223,6 +224,8 @@ def build_generate_command(args: argparse.Namespace, checkpoint_dir: Path, condi
         str(checkpoint_dir),
         "--conditioning_midi",
         str(conditioning_midi),
+        "--control_format",
+        SEQUENCE_FORMAT_LEGACY_SEP,
         "--primer_max_tokens",
         str(args.primer_max_tokens),
         "--length",
@@ -426,6 +429,7 @@ def main() -> int:
             primer_max_tokens=args.primer_max_tokens,
             max_sequence=args.max_sequence,
             model_candidates=args.num_samples,
+            control_format=SEQUENCE_FORMAT_LEGACY_SEP,
         )
         report["inference_result"] = inference_result.to_dict()
 

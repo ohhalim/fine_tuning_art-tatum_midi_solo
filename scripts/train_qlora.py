@@ -34,6 +34,11 @@ from model.music_transformer import MusicTransformer
 from model.loss import SmoothCrossEntropyLoss
 from utilities.constants import TOKEN_PAD, VOCAB_SIZE
 
+try:
+    from checkpoint_utils import load_state_dict_with_token_resize
+except ModuleNotFoundError:
+    from scripts.checkpoint_utils import load_state_dict_with_token_resize
+
 
 # =============================================================================
 # LoRA Implementation for Music Transformer
@@ -458,7 +463,9 @@ def main():
     
     if checkpoint_state_dict is not None and not checkpoint_uses_lora_wrappers:
         print(f"Loading base checkpoint before LoRA: {args.checkpoint}")
-        model.load_state_dict(checkpoint_state_dict, strict=True)
+        _, resized_keys = load_state_dict_with_token_resize(model, checkpoint_state_dict, strict=True)
+        if resized_keys:
+            print(f"Resized checkpoint token layers for current vocab: {', '.join(resized_keys)}")
     
     # Add LoRA
     print("\n=== Adding LoRA Layers ===")
@@ -470,7 +477,9 @@ def main():
     )
     if checkpoint_state_dict is not None and checkpoint_uses_lora_wrappers:
         print(f"Loading LoRA-wrapped full checkpoint after LoRA: {args.checkpoint}")
-        model.load_state_dict(checkpoint_state_dict, strict=True)
+        _, resized_keys = load_state_dict_with_token_resize(model, checkpoint_state_dict, strict=True)
+        if resized_keys:
+            print(f"Resized checkpoint token layers for current vocab: {', '.join(resized_keys)}")
     if args.train_full_model:
         print("\n=== Tiny-overfit mode: unfreezing base model parameters ===")
         unfreeze_base_model(model)

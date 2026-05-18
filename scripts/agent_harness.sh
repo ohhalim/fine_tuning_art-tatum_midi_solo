@@ -52,6 +52,8 @@ run_quick() {
   print_header "Compile checks"
   "$PYTHON_BIN" -m compileall \
     scripts/generate.py \
+    scripts/control_tokens.py \
+    scripts/checkpoint_utils.py \
     scripts/train_qlora.py \
     scripts/run_stage_a_tiny_overfit.py \
     scripts/compare_stage_a_tiny_modes.py \

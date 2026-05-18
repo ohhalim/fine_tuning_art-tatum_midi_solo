@@ -26,7 +26,27 @@ sys.path.insert(0, str(SCRIPT_DIR / "music_transformer"))
 sys.path.insert(0, str(SCRIPT_DIR / "music_transformer" / "third_party"))
 
 from midi_processor.processor import RANGE_NOTE_ON, RANGE_NOTE_OFF, RANGE_TIME_SHIFT
-from utilities.constants import TOKEN_END
+
+try:
+    from control_tokens import (
+        SEQUENCE_FORMAT_CHOICES,
+        SEQUENCE_FORMAT_CONTROL_V1,
+        SEQUENCE_FORMAT_LEGACY_SEP,
+        build_control_sequence,
+        build_legacy_sequence,
+        control_prefix_tokens,
+        token_names,
+    )
+except ModuleNotFoundError:
+    from scripts.control_tokens import (
+        SEQUENCE_FORMAT_CHOICES,
+        SEQUENCE_FORMAT_CONTROL_V1,
+        SEQUENCE_FORMAT_LEGACY_SEP,
+        build_control_sequence,
+        build_legacy_sequence,
+        control_prefix_tokens,
+        token_names,
+    )
 
 
 def find_midi_files(input_dir: Path) -> List[Path]:
@@ -198,6 +218,58 @@ def encode_midi_simple(file_path: str) -> List[int]:
     return events
 
 
+def build_training_sequence(
+    cond_tokens: Sequence[int],
+    tgt_tokens: Sequence[int],
+    meta: dict,
+    sequence_format: str,
+    default_role: str,
+) -> list[int]:
+    if sequence_format == SEQUENCE_FORMAT_CONTROL_V1:
+        return build_control_sequence(
+            cond_tokens,
+            tgt_tokens,
+            role=str(meta.get("role", default_role)),
+            tempo_bpm=float(meta.get("tempo_bpm", 120.0)),
+        )
+    if sequence_format == SEQUENCE_FORMAT_LEGACY_SEP:
+        return build_legacy_sequence(cond_tokens, tgt_tokens)
+    raise ValueError(f"Unsupported sequence_format: {sequence_format}")
+
+
+def write_tokenized_records(
+    records: Sequence[dict],
+    split_name: str,
+    split_dir: Path,
+    sequence_format: str,
+    default_role: str,
+) -> int:
+    split_dir.mkdir(parents=True, exist_ok=True)
+    saved = 0
+    for i, record in enumerate(records):
+        try:
+            cond_tokens = encode_midi_simple(str(record["conditioning_path"]))
+            tgt_tokens = encode_midi_simple(str(record["target_path"]))
+        except Exception as e:
+            print(f"Tokenize skip ({split_name}): {record['sample_id']} ({e})")
+            continue
+
+        if not cond_tokens or not tgt_tokens:
+            continue
+
+        meta = json.loads(Path(record["meta_path"]).read_text())
+        seq = build_training_sequence(
+            cond_tokens,
+            tgt_tokens,
+            meta=meta,
+            sequence_format=sequence_format,
+            default_role=default_role,
+        )
+        np.save(split_dir / f"{i:06d}.npy", np.array(seq, dtype=np.int32))
+        saved += 1
+    return saved
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Prepare role-conditioned MIDI dataset")
     parser.add_argument("--input_dir", type=str, default="./midi_dataset/midi/studio/Brad Mehldau")
@@ -212,6 +284,12 @@ def main() -> None:
     parser.add_argument("--max_files", type=int, default=None)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument(
+        "--sequence_format",
+        choices=SEQUENCE_FORMAT_CHOICES,
+        default=SEQUENCE_FORMAT_CONTROL_V1,
+        help="Token sequence format for conditioning/target training examples.",
+    )
     args = parser.parse_args()
 
     random.seed(args.seed)
@@ -279,6 +357,7 @@ def main() -> None:
             notes_to_midi(conditioning, tempo).write(str(cond_path))
             notes_to_midi(target, tempo).write(str(tgt_path))
 
+            control_tokens = control_prefix_tokens(role=args.role, tempo_bpm=tempo)
             meta = {
                 "sample_id": sample_id,
                 "role": args.role,
@@ -288,6 +367,9 @@ def main() -> None:
                 "tempo_bpm": float(tempo),
                 "conditioning_notes": len(conditioning),
                 "target_notes": len(target),
+                "sequence_format": args.sequence_format,
+                "control_tokens": control_tokens,
+                "control_token_names": token_names(control_tokens),
             }
             meta_path.write_text(json.dumps(meta, ensure_ascii=True, indent=2))
 
@@ -321,27 +403,8 @@ def main() -> None:
     train_dir.mkdir(parents=True, exist_ok=True)
     val_dir.mkdir(parents=True, exist_ok=True)
 
-    def write_tokenized(records: Sequence[dict], split_name: str, split_dir: Path) -> int:
-        saved = 0
-        for i, record in enumerate(records):
-            try:
-                cond_tokens = encode_midi_simple(str(record["conditioning_path"]))
-                tgt_tokens = encode_midi_simple(str(record["target_path"]))
-            except Exception as e:
-                print(f"Tokenize skip ({split_name}): {record['sample_id']} ({e})")
-                continue
-
-            if not cond_tokens or not tgt_tokens:
-                continue
-
-            # Stage A conditioning format: conditioning + SEP + target + END
-            seq = cond_tokens + [TOKEN_END] + tgt_tokens + [TOKEN_END]
-            np.save(split_dir / f"{i:06d}.npy", np.array(seq, dtype=np.int32))
-            saved += 1
-        return saved
-
-    train_count = write_tokenized(train_records, "train", train_dir)
-    val_count = write_tokenized(val_records, "val", val_dir)
+    train_count = write_tokenized_records(train_records, "train", train_dir, args.sequence_format, args.role)
+    val_count = write_tokenized_records(val_records, "val", val_dir, args.sequence_format, args.role)
 
     summary = {
         "role": args.role,
@@ -354,6 +417,7 @@ def main() -> None:
         "tokenized_val": val_count,
         "transpose_all_keys": bool(args.transpose_all_keys),
         "transpose_range": int(args.transpose_range),
+        "sequence_format": args.sequence_format,
         "seed": int(args.seed),
     }
     (output_root / "dataset_summary.json").write_text(

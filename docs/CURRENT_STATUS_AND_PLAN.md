@@ -22,13 +22,20 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 
 ## 2. 현재 구현 상태
 
-현재 브랜치는 `feature/magenta-rt-jazz-finetuning`이다.
+현재 브랜치는 `issue-7-stage-a-tiny-overfit`이다.
 
 완료된 축:
 
 - `scripts/prepare_role_dataset.py`
   - `conditioning.mid`, `target.mid`, `meta.json` 생성.
-  - `conditioning + TOKEN_END + target + TOKEN_END` 형식으로 tokenized train/val 생성.
+  - 기본 `control_v1` 형식으로 tokenized train/val 생성.
+  - `control_v1`: `ROLE_LEAD + TEMPO_* + BAR + conditioning + COND_SEP + target + END`.
+  - 기존 재현이 필요하면 `--sequence_format legacy_sep`로 `conditioning + END + target + END`를 사용한다.
+- `scripts/control_tokens.py`
+  - Stage A control token contract를 한 곳에서 관리한다.
+  - 현재 control token은 `ROLE_LEAD`, `TEMPO_*`, `BAR`, `COND_SEP`까지만 둔다.
+- `scripts/checkpoint_utils.py`
+  - control token 추가로 vocab이 커져도 기존 checkpoint의 embedding/output head를 현재 vocab shape에 맞게 로드한다.
 - `scripts/train_qlora.py`
   - Music Transformer에 LoRA wrapper를 붙이는 lower-level training implementation.
   - `--train_full_model`이면 base transformer, embedding, output head, LoRA module을 모두 학습한다.
@@ -45,6 +52,7 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - full `checkpoint_epoch*.pt` 또는 legacy LoRA checkpoint와 conditioning MIDI를 받아 MIDI 샘플 생성.
   - `--lora_path` 아래 최신 `checkpoint_epoch*.pt`를 우선 로드한다.
   - checkpoint에 `model_config`가 있으면 tiny model 구조도 자동 복원한다.
+  - 기본 primer format은 `control_v1`이다. 기존 Stage A 재현은 `--control_format legacy_sep`를 명시한다.
   - Stage A 기본 primer 길이는 64 token.
   - `temperature`, `top_k`, `top_p` sampling 제어값 지원.
 - `scripts/run_stage_a_tiny_overfit.py`
@@ -311,18 +319,18 @@ python scripts/eval_offline_metrics.py \
 목표:
 
 - 현재 `TOKEN_END`를 separator처럼 쓰는 구조를 명시적인 control token 구조로 바꾼다.
-- 후보 토큰:
+- 현재 구현된 토큰:
   - `ROLE_LEAD`
   - `TEMPO_*`
   - `COND_SEP`
   - `BAR`
-- 학습 스크립트를 `train_role_lora.py`로 분리할지, 기존 `train_qlora.py`에 role mode를 둘지 결정한다.
+- `train_stage_a_full.py`, `train_stage_a_adapter.py`가 role-conditioned dataset을 받아 학습한다.
 
 완료 기준:
 
-- tokenized sequence format이 문서화됨.
-- 새 포맷으로 작은 데이터셋 학습 1회 성공.
-- 기존 Stage A 포맷과 새 포맷이 혼동되지 않음.
+- tokenized sequence format이 문서화됨. 완료.
+- 새 포맷으로 작은 데이터셋 학습 1회 성공. 다음 실행 대상.
+- 기존 Stage A 포맷과 새 포맷이 혼동되지 않음. `control_v1`/`legacy_sep`로 분리됨.
 
 ### Phase 4. Realtime 런타임 골격
 
@@ -382,6 +390,7 @@ python scripts/eval_offline_metrics.py \
 1. tiny overfit smoke는 full-model tiny mode에서 통과했고, LoRA-only random-base mode는 실패했다.
 2. 현재 Stage A의 public wording에서 "LoRA fine-tuned jazz model" 표현을 피하고, full checkpoint training 또는 pretrained base 확보를 우선한다.
 3. from-scratch full training path와 adapter training path는 `train_stage_a_full.py`, `train_stage_a_adapter.py`로 분리됐다.
-4. 다음 구현은 control token 기반 Conditioning 포맷이다. Duration 문제가 다시 나오면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어간다.
+4. control token 기반 Conditioning 포맷은 `control_v1`로 들어갔다.
+5. 다음 구현은 `control_v1` 작은 데이터셋 학습 결과를 보고, duration 문제가 다시 나오면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어가는 것이다.
 
 즉, 바로 realtime이나 API 확장으로 가지 않는다. 먼저 현재 생성 파이프라인의 디코딩/체크포인트/학습 구조를 바로잡고, 그다음 실시간 런타임으로 연결한다.
