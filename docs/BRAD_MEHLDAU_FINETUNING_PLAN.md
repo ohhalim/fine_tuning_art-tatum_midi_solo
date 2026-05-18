@@ -6,6 +6,13 @@ Fine-tune the Stage A symbolic MIDI model on the Brad Mehldau MIDI dataset.
 
 This branch is not about backend/API/realtime work. The goal is to determine whether the current `control_v1` symbolic training path can learn usable jazz piano solo MIDI from the Brad Mehldau dataset.
 
+Current strategy update:
+
+- Brad Mehldau-only from-scratch training is no longer the preferred first model goal.
+- The broader dataset strategy is generic jazz pianist base first, then Brad Mehldau style adaptation.
+- This document remains the Brad-specific adaptation probe plan.
+- See `docs/DATASET_STRATEGY.md` for the full corpus plan.
+
 ## Dataset Audit
 
 Command:

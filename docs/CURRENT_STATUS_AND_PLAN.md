@@ -4,7 +4,7 @@
 
 ## Current Focus
 
-현재 이 저장소의 우선순위는 Brad Mehldau MIDI dataset으로 Stage A symbolic MIDI model을 fine-tuning할 수 있는지 검증하는 것이다.
+현재 이 저장소의 우선순위는 전체 jazz piano MIDI corpus를 audit하고, generic jazz pianist base를 만든 뒤 Brad Mehldau style adaptation으로 좁힐 수 있는지 검증하는 것이다.
 
 현재 브랜치:
 
@@ -32,7 +32,32 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - solo-line으로 볼 수 없는 구조
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
-따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 작은 데이터와 명확한 gate로 model training path를 검증하는 것이다.
+따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Dataset Strategy
+
+현재 데이터셋은 Brad Mehldau-only fine-tuning보다 generic jazz pianist base 학습에 더 적합해 보인다.
+
+파일 시스템 기준:
+
+| Split | MIDI files |
+|---|---:|
+| physical MIDI paths under `midi_dataset` | 5554 |
+| active audit tree: `midi_dataset/midi` | 2777 |
+| duplicate mirror tree: `midi_dataset/midi_kong` | 2777 |
+| active studio | 1994 |
+| active live | 783 |
+| Brad Mehldau studio | 18 |
+| Brad Mehldau live | 54 |
+| Brad Mehldau total | 72 |
+
+Decision:
+
+- 전체 dataset은 generic jazz piano prior 후보로 본다.
+- Brad Mehldau subset은 style adaptation과 holdout evaluation에 사용한다.
+- `midi_dataset/midi_kong`는 `midi_dataset/midi`의 duplicate mirror로 보고 active training tree에서 제외한다.
+- 전체 dataset을 바로 train에 넣지 않고 audit 후 candidate manifest를 만든다.
+- 자세한 기준은 `docs/DATASET_STRATEGY.md`를 따른다.
 
 ## Implemented Foundation
 
@@ -50,6 +75,43 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - model generation and MIDI validity metrics
 - fallback/gate contract for invalid MIDI
 - Brad Mehldau dataset audit script
+- full jazz piano dataset audit script
+
+## Full Jazz Piano Dataset Audit
+
+Audit command:
+
+```bash
+python scripts/audit_jazz_piano_dataset.py
+```
+
+Fast smoke:
+
+```bash
+python scripts/audit_jazz_piano_dataset.py --max_files 100
+```
+
+Generated outputs:
+
+```text
+outputs/dataset_audit/jazz_piano_dataset_audit.json
+outputs/dataset_audit/jazz_piano_dataset_audit.md
+```
+
+These outputs are not committed.
+
+Current full audit result for `midi_dataset/midi`:
+
+| Metric | Value |
+|---|---:|
+| files | 2777 |
+| readable | 2777 |
+| candidate | 2775 |
+| candidate non-Brad | 2703 |
+| candidate Brad | 72 |
+| review too long | 1 |
+| reject too few notes | 1 |
+| exact duplicate hash groups | 0 |
 
 ## Brad Mehldau Dataset Audit
 
@@ -86,7 +148,27 @@ Decision:
 
 ## Next Execution Plan
 
-### 1. Prepare 2-file probe dataset
+### 1. Run full jazz piano dataset audit
+
+```bash
+python scripts/audit_jazz_piano_dataset.py
+```
+
+Expected result:
+
+- readable/unreadable counts
+- candidate/review/reject counts
+- artist/source distribution
+- Brad/non-Brad candidate counts
+- duplicate exact hash groups
+- duration/note-count/piano-program/sustain stats
+
+Status:
+
+- completed for `midi_dataset/midi`
+- generated outputs are under `outputs/dataset_audit/`
+
+### 2. Prepare 2-file control_v1 probe dataset
 
 ```bash
 python scripts/prepare_role_dataset.py \
@@ -104,7 +186,7 @@ Expected result:
 - `data/roles_probe2/lead/tokenized/train/*.npy`
 - `data/roles_probe2/lead/tokenized/val/*.npy`
 
-### 2. Train 2-file probe
+### 3. Train 2-file control_v1 probe
 
 ```bash
 python scripts/train_stage_a_full.py \
@@ -123,7 +205,7 @@ Goal:
 - generate a sample checkpoint
 - avoid spending GPU time before the local contract is clear
 
-### 3. Generate and inspect samples
+### 4. Generate and inspect samples
 
 Use the trained checkpoint with `scripts/generate.py` or the inference wrapper.
 
@@ -138,20 +220,22 @@ The sample is not valid unless it passes:
 - no long sustain block
 - no chord block pretending to be a solo line
 
-### 4. Review point
+### 5. Review point
 
 Pause for review after the 2-file probe generates MIDI.
 
 At that point decide:
 
 - continue to `max_files=5`
-- run full 18-file probe
+- run full 18-file Brad probe
+- build generic non-Brad manifest for jazz pianist base
 - change crop/windowing
 - move to duration-explicit tokenization
 
 ## Active References
 
 - `docs/BRAD_MEHLDAU_FINETUNING_PLAN.md`
+- `docs/DATASET_STRATEGY.md`
 - `docs/STAGE_A_TOKEN_FORMAT.md`
 - `docs/STAGE_A_TRAINING_MODES.md`
 - `docs/STAGE_A_TINY_OVERFIT.md`

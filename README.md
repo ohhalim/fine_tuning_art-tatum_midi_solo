@@ -1,16 +1,17 @@
-# Brad Mehldau MIDI Fine-Tuning Probe
+# Jazz Piano MIDI Fine-Tuning Probe
 
 This repository is currently focused on symbolic MIDI fine-tuning experiments for jazz piano solo generation.
 
 The active goal is narrow:
 
-> Test whether the current `control_v1` Stage A training path can learn usable solo-line MIDI behavior from the Brad Mehldau MIDI dataset.
+> Audit the full jazz piano MIDI corpus, validate the current `control_v1` Stage A path, and decide whether to build a generic jazz pianist base before Brad Mehldau style adaptation.
 
 This is not currently a Spring Boot/backend MVP, DAW plugin, SaaS product, or realtime performance system. Those ideas are archived until the model path produces reviewable MIDI.
 
 ## Current Scope
 
-- Audit the Brad Mehldau MIDI dataset.
+- Audit the full jazz piano MIDI dataset.
+- Keep Brad Mehldau data separate for style adaptation and holdout evaluation.
 - Prepare role-conditioned `control_v1` tokenized data.
 - Run tiny and small full-checkpoint training probes.
 - Generate MIDI samples from trained checkpoints.
@@ -23,6 +24,8 @@ This is not currently a Spring Boot/backend MVP, DAW plugin, SaaS product, or re
   - Current branch state and next execution order.
 - `docs/BRAD_MEHLDAU_FINETUNING_PLAN.md`
   - Dataset audit, probe order, and acceptance criteria.
+- `docs/DATASET_STRATEGY.md`
+  - Full jazz piano corpus audit, generic jazz pianist base, and Brad style adaptation plan.
 - `docs/STAGE_A_TOKEN_FORMAT.md`
   - `control_v1` sequence contract.
 - `docs/STAGE_A_TRAINING_MODES.md`
@@ -40,6 +43,7 @@ This is not currently a Spring Boot/backend MVP, DAW plugin, SaaS product, or re
 
 ```text
 scripts/
+  audit_jazz_piano_dataset.py     # Full corpus audit before broad training
   audit_brad_mehldau_dataset.py   # Dataset audit before training
   prepare_role_dataset.py         # conditioning.mid/target.mid + tokenized data
   control_tokens.py               # control_v1 token helpers
@@ -78,21 +82,24 @@ bash scripts/agent_harness.sh quick
 ## Dataset Audit
 
 ```bash
-python scripts/audit_brad_mehldau_dataset.py
+python scripts/audit_jazz_piano_dataset.py
 ```
 
 Current local audit result:
 
-- MIDI files: `18`
-- usable files: `18`
-- files exceeding `max_sequence=512`: `18`
-- mean `control_v1_token_count`: about `3931`
-- max `control_v1_token_count`: `10653`
+- active dataset tree: `midi_dataset/midi`
+- files: `2777`
+- readable files: `2777`
+- candidate files: `2775`
+- candidate non-Brad files: `2703`
+- candidate Brad files: `72`
+- exact duplicate hash groups: `0`
 
 Decision:
 
-- Do not train by blindly cropping full songs.
-- Use the current control-aware crop path or later build a phrase-window dataset.
+- Use the filtered non-Brad candidates for a generic jazz pianist base only after tokenizer sanity is validated.
+- Use Brad candidates for style adaptation and holdout evaluation.
+- Do not train both `midi_dataset/midi` and duplicate mirror `midi_dataset/midi_kong`.
 
 ## Prepare Data
 

@@ -2,7 +2,7 @@
 
 작성일: 2026-05-18
 
-이 디렉터리는 현재 Brad Mehldau MIDI fine-tuning probe를 진행하기 위한 기준 문서만 전면에 둔다. 백엔드/API/ERD/제품 MVP 문서는 `docs/archive/`로 이동했다.
+이 디렉터리는 현재 jazz piano MIDI fine-tuning probe를 진행하기 위한 기준 문서만 전면에 둔다. 백엔드/API/ERD/제품 MVP 문서는 `docs/archive/`로 이동했다.
 
 ## Active Docs
 
@@ -10,6 +10,8 @@
   - 현재 브랜치 상태, 결정 사항, 다음 실행 순서.
 - `BRAD_MEHLDAU_FINETUNING_PLAN.md`
   - Brad Mehldau MIDI dataset audit, training probe order, acceptance criteria.
+- `DATASET_STRATEGY.md`
+  - 전체 jazz piano corpus audit, generic jazz pianist base, Brad style adaptation 전략.
 - `STAGE_A_TOKEN_FORMAT.md`
   - `control_v1` token sequence, legacy format, checkpoint vocab migration 규칙.
 - `STAGE_A_TRAINING_MODES.md`
@@ -40,11 +42,11 @@
 
 ## Current Execution Order
 
-1. Brad Mehldau dataset audit 결과를 기준으로 데이터 품질을 확인한다.
-2. `max_files=2`로 `control_v1` prepare probe를 실행한다.
-3. `max_files=2` full-checkpoint training probe를 실행한다.
+1. Full jazz piano corpus audit 결과를 기준으로 generic base 후보 데이터를 확인한다.
+2. Brad Mehldau subset은 style adaptation과 holdout evaluation 용도로 분리한다.
+3. `max_files=2`로 `control_v1` prepare/training probe를 실행해 tokenizer와 training loop를 먼저 검증한다.
 4. 생성 MIDI를 note count, unique pitch, phrase coverage, max duration, simultaneous notes 기준으로 검증한다.
-5. MIDI가 여전히 sustain/chord block이면 duration-explicit tokenization으로 넘어간다.
+5. MIDI가 여전히 sustain/chord block이면 broad training 전에 duration-explicit tokenization으로 넘어간다.
 
 핵심 원칙:
 

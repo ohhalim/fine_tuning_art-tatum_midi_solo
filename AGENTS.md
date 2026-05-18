@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #8: Brad Mehldau `control_v1` dataset audit and small training probe.
+- Issue #8: Jazz piano dataset audit, generic pianist base strategy, and Brad Mehldau adaptation probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
