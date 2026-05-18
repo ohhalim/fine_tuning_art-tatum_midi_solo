@@ -30,6 +30,14 @@ MVP generator 우선순위:
 
 - `conditioning_midi`가 명시되면 기존 Stage A 방식으로 해당 MIDI를 primer로 사용.
 - `conditioning_midi`가 없으면 request의 `chord_progression`, `bpm`, `bars`, `time_signature`를 low-register chord guide MIDI로 변환해 primer로 사용.
+- 기본 primer format은 `control_v1`이다.
+- `control_v1` primer:
+  - `ROLE_LEAD`
+  - `TEMPO_*`
+  - `BAR`
+  - encoded conditioning MIDI tokens
+  - `COND_SEP`
+- legacy checkpoint/data 재현이 필요하면 `control_format=legacy_sep`를 사용한다.
 - chord progression은 전체 phrase duration에 균등 배치한다. 예를 들어 `bars=2`와 코드 4개가 들어오면 각 코드는 half-bar 구간을 담당한다.
 - `primer_max_tokens=64` 기본.
 - `temperature`, `top_k`, `top_p`를 model sampling에 전달한다.
@@ -192,14 +200,12 @@ Fallback if:
 
 After MVP works:
 
-- explicit control tokens:
+- additional explicit control tokens:
   - `STYLE`
   - `SECTION`
   - `ENERGY`
   - `DENSITY`
-  - `BPM`
   - `CHORD`
-  - `BAR`
   - `POSITION`
 - role-conditioned training format.
 - KV cache for lower latency.

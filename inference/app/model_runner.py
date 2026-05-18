@@ -51,6 +51,7 @@ class StageAModelRunner:
         primer_max_tokens: int,
         max_sequence: int,
         model_candidates: int,
+        control_format: str,
     ) -> list[Path]:
         import torch
         from scripts.generate import build_primer, decode_midi, generate_once
@@ -67,6 +68,9 @@ class StageAModelRunner:
             conditioning_midi=str(conditioning_midi),
             primer_max_tokens=primer_max_tokens,
             append_sep_token=True,
+            control_format=control_format,
+            role="lead",
+            tempo_bpm=float(request.bpm),
         )
         if len(primer) >= target_sequence:
             primer = primer[-(target_sequence - 1) :]

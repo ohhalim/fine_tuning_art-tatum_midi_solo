@@ -16,6 +16,7 @@ import argparse
 import math
 import random
 from pathlib import Path
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -31,7 +32,12 @@ sys.path.insert(0, str(SCRIPT_DIR / "music_transformer" / "third_party"))
 
 from model.music_transformer import MusicTransformer
 from model.loss import SmoothCrossEntropyLoss
-from utilities.constants import TOKEN_PAD, VOCAB_SIZE
+from utilities.constants import TOKEN_COND_SEP, TOKEN_PAD, VOCAB_SIZE
+
+try:
+    from checkpoint_utils import load_state_dict_with_token_resize
+except ModuleNotFoundError:
+    from scripts.checkpoint_utils import load_state_dict_with_token_resize
 
 
 # =============================================================================
@@ -186,9 +192,138 @@ def add_lora_to_model(model: MusicTransformer, r: int = 16, alpha: int = 32, dro
     return model, lora_modules
 
 
+def set_seed(seed: int) -> None:
+    random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
+def count_trainable_parameters(model: nn.Module) -> tuple[int, int]:
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total_params = sum(p.numel() for p in model.parameters())
+    return trainable_params, total_params
+
+
+def unfreeze_base_model(model: nn.Module) -> None:
+    for param in model.parameters():
+        param.requires_grad = True
+
+
+def model_config_from_args(args: argparse.Namespace) -> dict[str, Any]:
+    return {
+        "n_layers": int(args.n_layers),
+        "num_heads": int(args.num_heads),
+        "d_model": int(args.d_model),
+        "dim_feedforward": int(args.dim_feedforward),
+        "max_sequence": int(args.max_sequence),
+        "rpr": bool(args.rpr),
+        "lora_r": int(args.lora_r),
+        "lora_alpha": int(args.lora_alpha),
+        "lora_dropout": float(args.lora_dropout),
+    }
+
+
+def checkpoint_payload_state_dict(checkpoint: object) -> dict[str, torch.Tensor]:
+    if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+        state_dict = checkpoint["model_state_dict"]
+        if isinstance(state_dict, dict):
+            return state_dict
+        raise ValueError(f"Unsupported model_state_dict type: {type(state_dict)}")
+    if isinstance(checkpoint, dict):
+        return checkpoint
+    raise ValueError(f"Unsupported checkpoint payload type: {type(checkpoint)}")
+
+
+def checkpoint_model_config(checkpoint: object) -> dict[str, Any]:
+    if isinstance(checkpoint, dict) and isinstance(checkpoint.get("model_config"), dict):
+        return dict(checkpoint["model_config"])
+    return {}
+
+
+def state_dict_uses_lora_wrappers(state_dict: dict[str, torch.Tensor]) -> bool:
+    return any("lora_" in key.lower() or ".original_layer." in key for key in state_dict)
+
+
+def state_dict_is_lora_only(state_dict: dict[str, torch.Tensor]) -> bool:
+    return bool(state_dict) and all("lora_" in key.lower() for key in state_dict)
+
+
+def apply_checkpoint_model_config(args: argparse.Namespace, model_config: dict[str, Any]) -> None:
+    for name in [
+        "n_layers",
+        "num_heads",
+        "d_model",
+        "dim_feedforward",
+        "max_sequence",
+        "lora_r",
+        "lora_alpha",
+    ]:
+        if name in model_config:
+            setattr(args, name, int(model_config[name]))
+    if "rpr" in model_config:
+        args.rpr = bool(model_config["rpr"])
+    if "lora_dropout" in model_config:
+        args.lora_dropout = float(model_config["lora_dropout"])
+
+
+def training_mode_name(args: argparse.Namespace) -> str:
+    if args.train_full_model:
+        return "full_model"
+    if args.checkpoint:
+        return "adapter"
+    return "random_base_lora"
+
+
 # =============================================================================
 # Dataset
 # =============================================================================
+
+CONTROL_PREFIX_LEN = 3
+CONTROL_CONDITIONING_MAX_TOKENS = 64
+
+
+def crop_control_v1_sequence(
+    tokens: torch.Tensor,
+    max_seq: int,
+    conditioning_max_tokens: int = CONTROL_CONDITIONING_MAX_TOKENS,
+) -> torch.Tensor:
+    sep_positions = (tokens == TOKEN_COND_SEP).nonzero(as_tuple=False).flatten()
+    if len(sep_positions) == 0:
+        start = random.randint(0, len(tokens) - max_seq)
+        return tokens[start : start + max_seq]
+
+    sep_index = int(sep_positions[0].item())
+    prefix_len = min(CONTROL_PREFIX_LEN, sep_index)
+    prefix = tokens[:prefix_len]
+    conditioning = tokens[prefix_len:sep_index]
+    target = tokens[sep_index + 1 :]
+    if len(target) == 0:
+        return tokens[:max_seq]
+
+    max_conditioning = max(0, min(int(conditioning_max_tokens), max_seq - len(prefix) - 2))
+    conditioning_tail = conditioning[-max_conditioning:] if max_conditioning > 0 else conditioning[:0]
+    target_budget = max_seq - len(prefix) - len(conditioning_tail) - 1
+    if target_budget <= 0:
+        return tokens[:max_seq]
+
+    if len(target) > target_budget:
+        target_start = random.randint(0, len(target) - target_budget)
+        target = target[target_start : target_start + target_budget]
+
+    cropped = torch.cat(
+        [
+            prefix,
+            conditioning_tail,
+            tokens.new_tensor([TOKEN_COND_SEP]),
+            target,
+        ]
+    )
+    if len(cropped) < max_seq:
+        padding = torch.full((max_seq - len(cropped),), TOKEN_PAD, dtype=torch.long)
+        cropped = torch.cat([cropped, padding])
+    return cropped[:max_seq]
+
 
 class MidiDataset(Dataset):
     """Dataset for preprocessed MIDI token sequences"""
@@ -215,8 +350,7 @@ class MidiDataset(Dataset):
         
         # Truncate or pad
         if len(tokens) > self.max_seq:
-            start = random.randint(0, len(tokens) - self.max_seq)
-            tokens = tokens[start:start + self.max_seq]
+            tokens = crop_control_v1_sequence(tokens, self.max_seq)
         elif len(tokens) < self.max_seq:
             padding = torch.full((self.max_seq - len(tokens),), TOKEN_PAD, dtype=torch.long)
             tokens = torch.cat([tokens, padding])
@@ -315,6 +449,15 @@ def main():
     parser.add_argument("--lora_r", type=int, default=16, help="LoRA rank")
     parser.add_argument("--lora_alpha", type=int, default=32, help="LoRA alpha")
     parser.add_argument("--lora_dropout", type=float, default=0.05)
+    parser.add_argument(
+        "--train_full_model",
+        action="store_true",
+        help=(
+            "Keep LoRA modules in the checkpoint format, but unfreeze the base "
+            "Music Transformer too. Intended for tiny overfit smoke tests from "
+            "a random base."
+        ),
+    )
     
     # Training
     parser.add_argument("--epochs", type=int, default=3)
@@ -323,11 +466,13 @@ def main():
     parser.add_argument("--gradient_accumulation", type=int, default=4)
     parser.add_argument("--num_workers", type=int, default=0)
     parser.add_argument("--label_smoothing", type=float, default=0.1)
+    parser.add_argument("--seed", type=int, default=42)
     
     # Output
     parser.add_argument("--output_dir", type=str, default="./checkpoints/jazz_lora")
     
     args = parser.parse_args()
+    set_seed(args.seed)
     
     # Device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -335,6 +480,20 @@ def main():
     
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
+
+    checkpoint_state_dict = None
+    checkpoint_uses_lora_wrappers = False
+    if args.checkpoint:
+        print(f"Loading checkpoint metadata: {args.checkpoint}")
+        checkpoint_payload = torch.load(args.checkpoint, map_location=device)
+        checkpoint_state_dict = checkpoint_payload_state_dict(checkpoint_payload)
+        if state_dict_is_lora_only(checkpoint_state_dict):
+            raise ValueError(
+                "Adapter/full training requires a full checkpoint or base model checkpoint; "
+                f"got LoRA-only weights: {args.checkpoint}"
+            )
+        apply_checkpoint_model_config(args, checkpoint_model_config(checkpoint_payload))
+        checkpoint_uses_lora_wrappers = state_dict_uses_lora_wrappers(checkpoint_state_dict)
     
     # Initialize model
     print("\n=== Initializing Music Transformer ===")
@@ -347,11 +506,11 @@ def main():
         rpr=args.rpr
     )
     
-    # Load pretrained weights if provided
-    if args.checkpoint:
-        print(f"Loading checkpoint: {args.checkpoint}")
-        state_dict = torch.load(args.checkpoint, map_location=device)
-        model.load_state_dict(state_dict)
+    if checkpoint_state_dict is not None and not checkpoint_uses_lora_wrappers:
+        print(f"Loading base checkpoint before LoRA: {args.checkpoint}")
+        _, resized_keys = load_state_dict_with_token_resize(model, checkpoint_state_dict, strict=True)
+        if resized_keys:
+            print(f"Resized checkpoint token layers for current vocab: {', '.join(resized_keys)}")
     
     # Add LoRA
     print("\n=== Adding LoRA Layers ===")
@@ -361,6 +520,16 @@ def main():
         alpha=args.lora_alpha, 
         dropout=args.lora_dropout
     )
+    if checkpoint_state_dict is not None and checkpoint_uses_lora_wrappers:
+        print(f"Loading LoRA-wrapped full checkpoint after LoRA: {args.checkpoint}")
+        _, resized_keys = load_state_dict_with_token_resize(model, checkpoint_state_dict, strict=True)
+        if resized_keys:
+            print(f"Resized checkpoint token layers for current vocab: {', '.join(resized_keys)}")
+    if args.train_full_model:
+        print("\n=== Tiny-overfit mode: unfreezing base model parameters ===")
+        unfreeze_base_model(model)
+        trainable_params, total_params = count_trainable_parameters(model)
+        print(f"Trainable params: {trainable_params:,} / {total_params:,} ({100*trainable_params/total_params:.2f}%)")
     model = model.to(device)
     
     # Dataset
@@ -373,14 +542,14 @@ def main():
         batch_size=args.batch_size,
         shuffle=True,
         num_workers=max(0, args.num_workers),
-        pin_memory=True,
+        pin_memory=device.type == "cuda",
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=args.batch_size,
         shuffle=False,
         num_workers=max(0, args.num_workers),
-        pin_memory=True,
+        pin_memory=device.type == "cuda",
     )
     
     # Optimizer & Scheduler
@@ -399,6 +568,18 @@ def main():
     # Training loop
     print("\n=== Starting Training ===")
     best_val_loss = float("inf")
+    model_config = model_config_from_args(args)
+    training_config = {
+        "epochs": int(args.epochs),
+        "batch_size": int(args.batch_size),
+        "lr": float(args.lr),
+        "gradient_accumulation": int(args.gradient_accumulation),
+        "label_smoothing": float(args.label_smoothing),
+        "seed": int(args.seed),
+        "train_full_model": bool(args.train_full_model),
+        "training_mode": training_mode_name(args),
+        "checkpoint": args.checkpoint,
+    }
     
     for epoch in range(1, args.epochs + 1):
         train_loss = train_epoch(
@@ -427,6 +608,8 @@ def main():
         # Save checkpoint
         torch.save({
             "epoch": epoch,
+            "model_config": model_config,
+            "training_config": training_config,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
             "train_loss": train_loss,

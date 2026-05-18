@@ -18,13 +18,46 @@ FL Studio/MCP에서 받은 MIDI 조건 입력을 바탕으로, LoRA 파인튜닝
 
 ---
 
+## Agent Workflow
+
+이 repo는 Codex 작업 기준을 루트 `AGENTS.md`에 둡니다.
+
+로컬 검증 하네스:
+
+```bash
+bash scripts/agent_harness.sh quick
+```
+
+MVP inference demo까지 확인:
+
+```bash
+bash scripts/agent_harness.sh demo
+```
+
+Stage A tiny-overfit 비교:
+
+```bash
+bash scripts/agent_harness.sh tiny-compare
+```
+
+Codex는 issue 범위 안에서 로컬 커밋과 같은 브랜치 upstream push까지 자동으로 진행할 수 있습니다. 단, PR, GitHub issue, 배포/업로드, force push, 새 브랜치 push는 사용자 명시 허락 후에만 진행합니다.
+
+---
+
 ## 0) 프로젝트 구조 한눈에 보기
 
 ```text
 scripts/
+  agent_harness.sh                  # Codex/local validation harness
   runpod_train_stage_a.sh          # Stage A 일괄 실행(prepare/train/generate/eval)
   prepare_role_dataset.py          # role-conditioned 데이터셋 생성
-  train_qlora.py                   # LoRA 학습
+  control_tokens.py                # Stage A control_v1 token contract
+  checkpoint_utils.py              # vocab migration checkpoint loading helpers
+  train_stage_a_full.py            # full-checkpoint/from-scratch 학습
+  train_stage_a_adapter.py         # pretrained/base checkpoint adapter 학습
+  train_qlora.py                   # lower-level training implementation
+  run_stage_a_tiny_overfit.py      # 1-3개 MIDI tiny-overfit smoke
+  run_control_v1_tiny_overfit.py   # control_v1 prompt tiny-overfit smoke
   generate.py                      # 조건부 MIDI 생성
   eval_offline_metrics.py          # dead-air/반복률/밀도 평가
   run_dead_air_sweep.sh            # dead-air 개선 실험 자동화
@@ -144,6 +177,68 @@ Review-ready gate 기준선:
 
 ---
 
+## 2-2) Stage A Tiny Overfit Smoke
+
+현재 우선순위는 더 큰 기능을 붙이는 것이 아니라, 모델이 아주 작은 MIDI solo grammar를 배울 수 있는지 확인하는 것입니다.
+아래 명령은 1-3개의 deterministic MIDI solo phrase를 만들고, 작은 Music Transformer checkpoint를 overfit한 뒤, raw model sample과 MVP inference gate 결과를 리포트로 저장합니다.
+
+```bash
+python scripts/run_stage_a_tiny_overfit.py \
+  --sample_count 3 \
+  --epochs 200 \
+  --lr 0.001 \
+  --max_sequence 128 \
+  --primer_max_tokens 24
+```
+
+빠른 구조 확인만 할 때:
+
+```bash
+python scripts/run_stage_a_tiny_overfit.py \
+  --sample_count 1 \
+  --epochs 1 \
+  --max_sequence 96 \
+  --primer_max_tokens 16
+```
+
+산출물:
+- `outputs/stage_a_tiny_overfit/<run_id>/input_midi/*.mid`
+- `outputs/stage_a_tiny_overfit/<run_id>/tokenized/{train,val}/*.npy`
+- `outputs/stage_a_tiny_overfit/<run_id>/checkpoints/checkpoint_epoch*.pt`
+- `outputs/stage_a_tiny_overfit/<run_id>/raw_samples/jazz_sample_*.mid`
+- `outputs/stage_a_tiny_overfit/<run_id>/report.json`
+- `outputs/stage_a_tiny_overfit/<run_id>/report.md`
+
+판단 기준:
+- `fallback_used=false`가 나오면 현재 tokenization/training path를 더 실험할 가치가 있다.
+- 계속 fallback이면 conditioning을 확장하지 말고, NOTE_ON/OFF tokenization 또는 학습 scope를 먼저 다시 봐야 한다.
+
+full-model tiny와 random-base LoRA-only를 같은 조건으로 비교할 때:
+
+```bash
+python scripts/compare_stage_a_tiny_modes.py \
+  --sample_count 3 \
+  --epochs 200 \
+  --lr 0.001 \
+  --max_sequence 128 \
+  --primer_max_tokens 24
+```
+
+`control_v1` prompt가 실제로 학습/생성 경로에서 동작하는지 확인할 때:
+
+```bash
+python scripts/run_control_v1_tiny_overfit.py \
+  --sample_count 1 \
+  --epochs 200 \
+  --lr 0.001 \
+  --max_sequence 192 \
+  --primer_max_tokens 96
+```
+
+최근 local smoke에서는 `fallback_used=false`, raw sample `3/3` valid, best validation loss `0.0142`로 통과했습니다.
+
+---
+
 ## 3) 단계별 실행 (문제 추적할 때 추천)
 
 ### 3-1. 데이터 준비
@@ -164,10 +259,20 @@ python scripts/prepare_role_dataset.py \
 - `data/roles/lead/tokenized/train/*.npy`
 - `data/roles/lead/tokenized/val/*.npy`
 
+기본 tokenized sequence format은 `control_v1`입니다.
+
+```text
+ROLE_LEAD + TEMPO_* + BAR + conditioning_tokens + COND_SEP + target_tokens + END
+```
+
+기존 실험 재현이 필요할 때만 `--sequence_format legacy_sep`를 사용합니다.
+
 ### 3-2. 학습
 
+pretrained symbolic MIDI base가 없다면 기본은 full-checkpoint/from-scratch 학습입니다.
+
 ```bash
-python scripts/train_qlora.py \
+python scripts/train_stage_a_full.py \
   --data_dir ./data/roles/lead/tokenized \
   --epochs 3 \
   --batch_size 8 \
@@ -176,10 +281,27 @@ python scripts/train_qlora.py \
   --output_dir ./checkpoints/jazz_lora_stage_a
 ```
 
+pretrained/base checkpoint가 있을 때만 adapter 학습을 사용합니다.
+
+```bash
+python scripts/train_stage_a_adapter.py \
+  --checkpoint ./checkpoints/stage_a_full_scratch/checkpoint_epoch3.pt \
+  --data_dir ./data/roles/lead/tokenized \
+  --epochs 3 \
+  --batch_size 8 \
+  --num_workers 4 \
+  --max_sequence 512 \
+  --output_dir ./checkpoints/stage_a_adapter
+```
+
 로그에서 반드시 확인:
 - `Using device: cuda`
 - `Saved best LoRA weights`
 - `checkpoint_epoch*.pt` 저장
+
+주의:
+- `scripts/train_qlora.py` 직접 실행은 lower-level diagnostic path다.
+- random-base LoRA-only 학습은 tiny-overfit 비교에서 실패했으므로 기본 학습 전략으로 쓰지 않는다.
 
 ### 3-3. 생성
 
@@ -190,12 +312,16 @@ Stage A 모델을 직접 호출하는 기본 생성 명령입니다.
 python scripts/generate.py \
   --lora_path ./checkpoints/jazz_lora_stage_a \
   --conditioning_midi ./data/roles/lead/000000/conditioning.mid \
+  --control_format control_v1 \
+  --tempo_bpm 124 \
   --primer_max_tokens 64 \
   --num_samples 10 \
   --length 512 \
   --max_sequence 512 \
   --output ./samples/stage_a_p64
 ```
+
+기존 `conditioning + END + target + END` 데이터로 학습한 checkpoint를 직접 확인할 때는 `--control_format legacy_sep`를 명시합니다.
 
 MVP inference contract를 검증할 때는 아래 CLI를 사용합니다. 이 경로는 `--conditioning_midi`를 생략하면 요청한 코드 진행으로 low-register conditioning MIDI를 임시 생성한 뒤 모델 primer로 사용합니다.
 

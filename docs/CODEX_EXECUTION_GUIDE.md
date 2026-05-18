@@ -99,3 +99,38 @@ Codex 결과를 받을 때 확인:
 5. docs: add runnable MVP README and demo
 
 원격 push, PR 생성, 배포는 사용자 명시 허락 후에만 진행한다.
+
+## 10. 자동 진행 규칙
+
+루트 `AGENTS.md`가 현재 기준이다.
+
+Codex는 활성 issue 범위 안에서 다음을 자동으로 진행해도 된다.
+
+- 코드/문서 수정
+- 로컬 테스트 실행
+- 하네스 통과 후 로컬 커밋
+
+단, 아래 작업은 매번 사용자 명시 허락 후에만 진행한다.
+
+- `git push`
+- PR 생성/수정
+- GitHub issue 생성/수정
+- 배포 또는 외부 업로드
+
+로컬 커밋 전 기본 하네스:
+
+```bash
+bash scripts/agent_harness.sh quick
+```
+
+inference/generation/metrics/model-loading 변경 시:
+
+```bash
+bash scripts/agent_harness.sh demo
+```
+
+tiny-overfit/training-mode 변경 시:
+
+```bash
+bash scripts/agent_harness.sh tiny-compare
+```

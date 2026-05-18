@@ -14,6 +14,7 @@ from .fallback import generate_fallback_midi
 from .metrics import compute_midi_metrics, validate_metrics
 from .postprocess import repair_model_midi
 from .schemas import GenerationRequest, GenerationResult
+from scripts.control_tokens import SEQUENCE_FORMAT_CHOICES, SEQUENCE_FORMAT_CONTROL_V1
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -56,6 +57,7 @@ def run_stage_a_model(
     primer_max_tokens: int,
     max_sequence: int,
     model_candidates: int,
+    control_format: str = SEQUENCE_FORMAT_CONTROL_V1,
     model_runner: Any | None = None,
 ) -> tuple[list[Path], str | None]:
     if not has_stage_a_weights(lora_path, checkpoint_path):
@@ -74,6 +76,7 @@ def run_stage_a_model(
                     primer_max_tokens=primer_max_tokens,
                     max_sequence=max_sequence,
                     model_candidates=model_candidates,
+                    control_format=control_format,
                 ),
                 None,
             )
@@ -91,6 +94,12 @@ def run_stage_a_model(
         str(lora_path),
         "--conditioning_midi",
         str(conditioning_midi),
+        "--control_format",
+        control_format,
+        "--role",
+        "lead",
+        "--tempo_bpm",
+        str(request.bpm),
         "--primer_max_tokens",
         str(primer_max_tokens),
         "--num_samples",
@@ -159,6 +168,7 @@ def generate_midi_phrase(
     primer_max_tokens: int = 64,
     max_sequence: int = 256,
     model_candidates: int = 2,
+    control_format: str = SEQUENCE_FORMAT_CONTROL_V1,
     model_runner: Any | None = None,
 ) -> GenerationResult:
     request.validate()
@@ -190,6 +200,7 @@ def generate_midi_phrase(
             primer_max_tokens=primer_max_tokens,
             max_sequence=max_sequence,
             model_candidates=model_candidates,
+            control_format=control_format,
             model_runner=model_runner,
         )
         if candidates:
@@ -331,6 +342,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--primer_max_tokens", type=int, default=64)
     parser.add_argument("--max_sequence", type=int, default=256)
     parser.add_argument("--model_candidates", type=int, default=2)
+    parser.add_argument("--control_format", choices=SEQUENCE_FORMAT_CHOICES, default=SEQUENCE_FORMAT_CONTROL_V1)
     return parser
 
 
@@ -347,6 +359,7 @@ def main() -> int:
         primer_max_tokens=args.primer_max_tokens,
         max_sequence=args.max_sequence,
         model_candidates=args.model_candidates,
+        control_format=args.control_format,
     )
     print(json.dumps(result.to_dict(), ensure_ascii=True, indent=2))
     return 0 if result.status == "COMPLETED" else 1

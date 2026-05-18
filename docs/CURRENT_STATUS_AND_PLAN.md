@@ -22,21 +22,54 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 
 ## 2. 현재 구현 상태
 
-현재 브랜치는 `feature/magenta-rt-jazz-finetuning`이다.
+현재 브랜치는 `issue-7-stage-a-tiny-overfit`이다.
 
 완료된 축:
 
 - `scripts/prepare_role_dataset.py`
   - `conditioning.mid`, `target.mid`, `meta.json` 생성.
-  - `conditioning + TOKEN_END + target + TOKEN_END` 형식으로 tokenized train/val 생성.
+  - 기본 `control_v1` 형식으로 tokenized train/val 생성.
+  - `control_v1`: `ROLE_LEAD + TEMPO_* + BAR + conditioning + COND_SEP + target + END`.
+  - 기존 재현이 필요하면 `--sequence_format legacy_sep`로 `conditioning + END + target + END`를 사용한다.
+- `scripts/control_tokens.py`
+  - Stage A control token contract를 한 곳에서 관리한다.
+  - 현재 control token은 `ROLE_LEAD`, `TEMPO_*`, `BAR`, `COND_SEP`까지만 둔다.
+- `scripts/checkpoint_utils.py`
+  - control token 추가로 vocab이 커져도 기존 checkpoint의 embedding/output head를 현재 vocab shape에 맞게 로드한다.
 - `scripts/train_qlora.py`
-  - Music Transformer에 LoRA를 붙여 학습.
+  - Music Transformer에 LoRA wrapper를 붙이는 lower-level training implementation.
+  - `--train_full_model`이면 base transformer, embedding, output head, LoRA module을 모두 학습한다.
+  - `--checkpoint`가 있으면 full checkpoint/base checkpoint를 로드한 뒤 adapter training을 수행한다.
+  - LoRA-only `lora_weights.pt`를 adapter base로 쓰는 것은 거부한다.
+  - `control_v1` sequence가 `max_sequence`보다 길면 random crop 대신 `ROLE/TEMPO/BAR`, conditioning tail, `COND_SEP`, target window를 보존한다.
   - best validation 기준으로 `lora_weights.pt` 저장.
+- `scripts/train_stage_a_full.py`
+  - from-scratch full-checkpoint Stage A training entrypoint.
+  - 현재 pretrained symbolic MIDI base가 없을 때 사용하는 기본 학습 경로다.
+- `scripts/train_stage_a_adapter.py`
+  - pretrained/base checkpoint가 있을 때만 사용하는 adapter training entrypoint.
+  - `--checkpoint`를 필수로 요구해 random-base LoRA-only 학습을 기본 경로에서 제거한다.
 - `scripts/generate.py`
   - full `checkpoint_epoch*.pt` 또는 legacy LoRA checkpoint와 conditioning MIDI를 받아 MIDI 샘플 생성.
   - `--lora_path` 아래 최신 `checkpoint_epoch*.pt`를 우선 로드한다.
+  - checkpoint에 `model_config`가 있으면 tiny model 구조도 자동 복원한다.
+  - 기본 primer format은 `control_v1`이다. 기존 Stage A 재현은 `--control_format legacy_sep`를 명시한다.
   - Stage A 기본 primer 길이는 64 token.
   - `temperature`, `top_k`, `top_p` sampling 제어값 지원.
+- `scripts/run_stage_a_tiny_overfit.py`
+  - 1~3개 known-good MIDI phrase를 생성하고 tokenized train/val dataset을 만든다.
+  - 작은 Stage A checkpoint를 overfit하고 raw sample 및 MVP gate 결과를 report로 저장한다.
+  - 기본은 LoRA wrapper를 유지하되 base model까지 unfreeze하는 tiny-overfit mode다.
+  - 2026-05-18 local `dense_overfit_200` run에서 `fallback_used=false`로 MVP gate를 통과했다.
+  - 같은 조건의 `--lora_only` run은 best val loss `4.8228`, decoded raw notes `0`으로 실패했다.
+- `scripts/run_control_v1_tiny_overfit.py`
+  - `control_v1` prompt format 전용 tiny-overfit smoke다.
+  - low-register conditioning MIDI와 known-good target solo를 `ROLE_LEAD + TEMPO_* + BAR + conditioning + COND_SEP + target + END`로 학습한다.
+  - 2026-05-18 local `control_v1_auto` run에서 best val loss `0.0142`, raw sample valid `3/3`, MVP inference `fallback_used=false`로 통과했다.
+- role dataset `control_v1` prepare probe
+  - Brad Mehldau `max_files=2` probe에서 `sequence_format=control_v1`, tokenized train/val 생성이 성공했다.
+  - 첫 train sequence 길이는 `7079` token이라 기존 random crop은 control prompt를 잃을 수 있었다.
+  - `scripts/train_qlora.py` crop 로직을 control-aware로 수정했다.
 - `scripts/eval_offline_metrics.py`
   - note density, dead-air proxy, 4-gram repetition 평가.
 - `scripts/analyze_chord_tone_errors.py`
@@ -167,6 +200,7 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - MVP request contract 확인은 `python -m inference.app.generator`를 사용한다.
 - 현재 inference 기본값은 `max_sequence=256`이다. 512-token 생성은 더 느린 비교/실험용으로 유지한다.
 - full checkpoint loading path는 구현됐다. 현재 `scripts/generate.py`, inference CLI, FastAPI model runner는 `checkpoint_epoch*.pt`를 우선 로드하고, 없을 때만 legacy `lora_weights.pt`로 fallback한다.
+- 새 checkpoint는 `model_config`를 저장하므로, tiny overfit처럼 작은 architecture로 학습한 checkpoint도 generation loader가 자동 복원할 수 있다.
 - 다만 현재 checkpoint 자체는 작은 데이터/epoch 1 결과라서, Stage A 결과를 실사용 가능한 jazz solo model로 해석하면 안 된다.
 - `music_transformer/third_party/midi_processor/processor.py`의 decoder ghost sustain 문제는 수정됐다. 그래도 model output은 아직 note count 부족/긴 note 문제로 자주 fallback된다.
 - 로컬 워크트리에는 추적되지 않은 데이터, 샘플, 문서가 많다. 문서/코드 작업 시 기존 산출물을 정리하거나 삭제하지 않는다.
@@ -294,18 +328,18 @@ python scripts/eval_offline_metrics.py \
 목표:
 
 - 현재 `TOKEN_END`를 separator처럼 쓰는 구조를 명시적인 control token 구조로 바꾼다.
-- 후보 토큰:
+- 현재 구현된 토큰:
   - `ROLE_LEAD`
   - `TEMPO_*`
   - `COND_SEP`
   - `BAR`
-- 학습 스크립트를 `train_role_lora.py`로 분리할지, 기존 `train_qlora.py`에 role mode를 둘지 결정한다.
+- `train_stage_a_full.py`, `train_stage_a_adapter.py`가 role-conditioned dataset을 받아 학습한다.
 
 완료 기준:
 
-- tokenized sequence format이 문서화됨.
-- 새 포맷으로 작은 데이터셋 학습 1회 성공.
-- 기존 Stage A 포맷과 새 포맷이 혼동되지 않음.
+- tokenized sequence format이 문서화됨. 완료.
+- 새 포맷으로 작은 데이터셋 학습 1회 성공. 다음 실행 대상.
+- 기존 Stage A 포맷과 새 포맷이 혼동되지 않음. `control_v1`/`legacy_sep`로 분리됨.
 
 ### Phase 4. Realtime 런타임 골격
 
@@ -362,9 +396,12 @@ python scripts/eval_offline_metrics.py \
 
 가장 먼저 할 일:
 
-1. 1~3개 sample tiny overfit smoke를 만들어, 모델이 MIDI grammar를 배울 수 있는지 먼저 확인한다.
-2. tiny overfit 결과를 기준으로 full checkpoint generation이 note_on/note_off grammar를 유지하는지 검증한다.
-3. 그래도 duration 문제가 남으면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어간다.
-4. 그다음 control token 기반 Conditioning 포맷으로 넘어간다.
+1. tiny overfit smoke는 full-model tiny mode에서 통과했고, LoRA-only random-base mode는 실패했다.
+2. 현재 Stage A의 public wording에서 "LoRA fine-tuned jazz model" 표현을 피하고, full checkpoint training 또는 pretrained base 확보를 우선한다.
+3. from-scratch full training path와 adapter training path는 `train_stage_a_full.py`, `train_stage_a_adapter.py`로 분리됐다.
+4. control token 기반 Conditioning 포맷은 `control_v1`로 들어갔다.
+5. `control_v1` tiny-overfit smoke는 통과했다.
+6. 실제 role dataset `control_v1` prepare probe와 control-aware crop fix가 완료됐다.
+7. 다음 구현은 실제 role dataset을 `control_v1`로 재생성해 full Stage A 학습을 돌리고, duration 문제가 다시 나오면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어가는 것이다.
 
 즉, 바로 realtime이나 API 확장으로 가지 않는다. 먼저 현재 생성 파이프라인의 디코딩/체크포인트/학습 구조를 바로잡고, 그다음 실시간 런타임으로 연결한다.

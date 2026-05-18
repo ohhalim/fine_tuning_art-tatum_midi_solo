@@ -110,8 +110,8 @@ run_prepare() {
 }
 
 run_train() {
-  echo "[Stage A] Training LoRA model"
-  "$PYTHON_BIN" scripts/train_qlora.py \
+  echo "[Stage A] Training full symbolic model from scratch"
+  "$PYTHON_BIN" scripts/train_stage_a_full.py \
     --data_dir "$TOKENIZED_DIR" \
     --epochs "$TRAIN_EPOCHS" \
     --batch_size "$BATCH_SIZE" \

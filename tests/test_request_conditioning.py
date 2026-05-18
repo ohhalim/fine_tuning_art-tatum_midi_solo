@@ -296,6 +296,7 @@ class RequestConditioningTest(unittest.TestCase):
                 primer_max_tokens: int,
                 max_sequence: int,
                 model_candidates: int,
+                control_format: str = "control_v1",
             ) -> list[Path]:
                 self.calls += 1
                 raw_dir = Path(output_dir) / f"{request.job_id}_model_raw"

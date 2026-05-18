@@ -16,7 +16,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import List
+from typing import Any, List
 
 import pretty_midi
 import torch
@@ -34,6 +34,14 @@ from midi_processor.processor import decode_midi, RANGE_NOTE_ON, RANGE_NOTE_OFF,
 
 # Import LoRA helper from train script
 from train_qlora import add_lora_to_model
+from checkpoint_utils import load_state_dict_with_token_resize
+from control_tokens import (
+    SEQUENCE_FORMAT_CONTROL_V1,
+    SEQUENCE_FORMAT_LEGACY_SEP,
+    SEQUENCE_FORMAT_CHOICES,
+    build_control_primer,
+    build_legacy_primer,
+)
 
 
 def _checkpoint_sort_key(path: Path) -> tuple[int, str]:
@@ -66,6 +74,12 @@ def checkpoint_state_dict(checkpoint: object) -> dict:
     if isinstance(checkpoint, dict):
         return checkpoint
     raise ValueError(f"Unsupported checkpoint payload type: {type(checkpoint)}")
+
+
+def checkpoint_model_config(checkpoint: object) -> dict[str, Any]:
+    if isinstance(checkpoint, dict) and isinstance(checkpoint.get("model_config"), dict):
+        return dict(checkpoint["model_config"])
+    return {}
 
 
 def infer_checkpoint_max_sequence(state_dict: dict, fallback: int) -> int:
@@ -154,6 +168,15 @@ def load_model_with_lora(
     if full_checkpoint_path is not None:
         checkpoint = torch.load(full_checkpoint_path, map_location=device)
         full_checkpoint_state = checkpoint_state_dict(checkpoint)
+        model_config = checkpoint_model_config(checkpoint)
+        n_layers = int(model_config.get("n_layers", n_layers))
+        num_heads = int(model_config.get("num_heads", num_heads))
+        d_model = int(model_config.get("d_model", d_model))
+        dim_feedforward = int(model_config.get("dim_feedforward", dim_feedforward))
+        rpr = bool(model_config.get("rpr", rpr))
+        lora_r = int(model_config.get("lora_r", lora_r))
+        lora_alpha = int(model_config.get("lora_alpha", lora_alpha))
+        model_max_sequence = int(model_config.get("max_sequence", model_max_sequence))
         model_max_sequence = infer_checkpoint_max_sequence(full_checkpoint_state, model_max_sequence)
 
     model = MusicTransformer(
@@ -168,8 +191,10 @@ def load_model_with_lora(
     model, _ = add_lora_to_model(model, r=lora_r, alpha=lora_alpha)
 
     if full_checkpoint_path is not None:
-        model.load_state_dict(full_checkpoint_state, strict=True)
+        _, resized_keys = load_state_dict_with_token_resize(model, full_checkpoint_state, strict=True)
         print(f"Loaded full Stage A checkpoint from {full_checkpoint_path} (model_max_sequence={model_max_sequence})")
+        if resized_keys:
+            print(f"Resized checkpoint token layers for current vocab: {', '.join(resized_keys)}")
     else:
         lora_weights_path = Path(lora_path) / "lora_weights.pt"
         if not lora_weights_path.exists():
@@ -189,16 +214,31 @@ def build_primer(
     conditioning_midi: str | None,
     primer_max_tokens: int,
     append_sep_token: bool,
+    control_format: str = SEQUENCE_FORMAT_CONTROL_V1,
+    role: str = "lead",
+    tempo_bpm: float = 120.0,
 ) -> torch.Tensor:
     if conditioning_midi:
-        tokens = encode_midi_simple(conditioning_midi)
-        if not tokens:
+        conditioning_tokens = encode_midi_simple(conditioning_midi)
+        if not conditioning_tokens:
             raise ValueError(f"conditioning MIDI produced empty token list: {conditioning_midi}")
 
-        if append_sep_token:
-            tokens = tokens + [TOKEN_END]
-        if primer_max_tokens > 0:
-            tokens = tokens[-primer_max_tokens:]
+        if control_format == SEQUENCE_FORMAT_CONTROL_V1:
+            tokens = build_control_primer(
+                conditioning_tokens,
+                role=role,
+                tempo_bpm=tempo_bpm,
+                append_sep_token=append_sep_token,
+                primer_max_tokens=primer_max_tokens,
+            )
+        elif control_format == SEQUENCE_FORMAT_LEGACY_SEP:
+            tokens = build_legacy_primer(
+                conditioning_tokens,
+                append_sep_token=append_sep_token,
+                primer_max_tokens=primer_max_tokens,
+            )
+        else:
+            raise ValueError(f"Unsupported control_format: {control_format}")
         return torch.tensor(tokens, dtype=torch.long)
 
     # fallback primer: random short prefix
@@ -266,6 +306,14 @@ def main():
     # Generation
     parser.add_argument("--conditioning_midi", type=str, default=None)
     parser.add_argument(
+        "--control_format",
+        choices=SEQUENCE_FORMAT_CHOICES,
+        default=SEQUENCE_FORMAT_CONTROL_V1,
+        help="Primer format. Use legacy_sep only for old Stage A checkpoints/datasets.",
+    )
+    parser.add_argument("--role", type=str, default="lead")
+    parser.add_argument("--tempo_bpm", type=float, default=120.0)
+    parser.add_argument(
         "--primer_max_tokens",
         type=int,
         default=64,
@@ -308,6 +356,9 @@ def main():
         conditioning_midi=args.conditioning_midi,
         primer_max_tokens=args.primer_max_tokens,
         append_sep_token=args.append_sep_token,
+        control_format=args.control_format,
+        role=args.role,
+        tempo_bpm=args.tempo_bpm,
     )
     if len(primer) >= args.max_sequence:
         # Keep room for at least one generated token.
