@@ -219,6 +219,57 @@ def model_config_from_args(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
+def checkpoint_payload_state_dict(checkpoint: object) -> dict[str, torch.Tensor]:
+    if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+        state_dict = checkpoint["model_state_dict"]
+        if isinstance(state_dict, dict):
+            return state_dict
+        raise ValueError(f"Unsupported model_state_dict type: {type(state_dict)}")
+    if isinstance(checkpoint, dict):
+        return checkpoint
+    raise ValueError(f"Unsupported checkpoint payload type: {type(checkpoint)}")
+
+
+def checkpoint_model_config(checkpoint: object) -> dict[str, Any]:
+    if isinstance(checkpoint, dict) and isinstance(checkpoint.get("model_config"), dict):
+        return dict(checkpoint["model_config"])
+    return {}
+
+
+def state_dict_uses_lora_wrappers(state_dict: dict[str, torch.Tensor]) -> bool:
+    return any("lora_" in key.lower() or ".original_layer." in key for key in state_dict)
+
+
+def state_dict_is_lora_only(state_dict: dict[str, torch.Tensor]) -> bool:
+    return bool(state_dict) and all("lora_" in key.lower() for key in state_dict)
+
+
+def apply_checkpoint_model_config(args: argparse.Namespace, model_config: dict[str, Any]) -> None:
+    for name in [
+        "n_layers",
+        "num_heads",
+        "d_model",
+        "dim_feedforward",
+        "max_sequence",
+        "lora_r",
+        "lora_alpha",
+    ]:
+        if name in model_config:
+            setattr(args, name, int(model_config[name]))
+    if "rpr" in model_config:
+        args.rpr = bool(model_config["rpr"])
+    if "lora_dropout" in model_config:
+        args.lora_dropout = float(model_config["lora_dropout"])
+
+
+def training_mode_name(args: argparse.Namespace) -> str:
+    if args.train_full_model:
+        return "full_model"
+    if args.checkpoint:
+        return "adapter"
+    return "random_base_lora"
+
+
 # =============================================================================
 # Dataset
 # =============================================================================
@@ -379,6 +430,20 @@ def main():
     
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
+
+    checkpoint_state_dict = None
+    checkpoint_uses_lora_wrappers = False
+    if args.checkpoint:
+        print(f"Loading checkpoint metadata: {args.checkpoint}")
+        checkpoint_payload = torch.load(args.checkpoint, map_location=device)
+        checkpoint_state_dict = checkpoint_payload_state_dict(checkpoint_payload)
+        if state_dict_is_lora_only(checkpoint_state_dict):
+            raise ValueError(
+                "Adapter/full training requires a full checkpoint or base model checkpoint; "
+                f"got LoRA-only weights: {args.checkpoint}"
+            )
+        apply_checkpoint_model_config(args, checkpoint_model_config(checkpoint_payload))
+        checkpoint_uses_lora_wrappers = state_dict_uses_lora_wrappers(checkpoint_state_dict)
     
     # Initialize model
     print("\n=== Initializing Music Transformer ===")
@@ -391,11 +456,9 @@ def main():
         rpr=args.rpr
     )
     
-    # Load pretrained weights if provided
-    if args.checkpoint:
-        print(f"Loading checkpoint: {args.checkpoint}")
-        state_dict = torch.load(args.checkpoint, map_location=device)
-        model.load_state_dict(state_dict)
+    if checkpoint_state_dict is not None and not checkpoint_uses_lora_wrappers:
+        print(f"Loading base checkpoint before LoRA: {args.checkpoint}")
+        model.load_state_dict(checkpoint_state_dict, strict=True)
     
     # Add LoRA
     print("\n=== Adding LoRA Layers ===")
@@ -405,6 +468,9 @@ def main():
         alpha=args.lora_alpha, 
         dropout=args.lora_dropout
     )
+    if checkpoint_state_dict is not None and checkpoint_uses_lora_wrappers:
+        print(f"Loading LoRA-wrapped full checkpoint after LoRA: {args.checkpoint}")
+        model.load_state_dict(checkpoint_state_dict, strict=True)
     if args.train_full_model:
         print("\n=== Tiny-overfit mode: unfreezing base model parameters ===")
         unfreeze_base_model(model)
@@ -457,6 +523,8 @@ def main():
         "label_smoothing": float(args.label_smoothing),
         "seed": int(args.seed),
         "train_full_model": bool(args.train_full_model),
+        "training_mode": training_mode_name(args),
+        "checkpoint": args.checkpoint,
     }
     
     for epoch in range(1, args.epochs + 1):

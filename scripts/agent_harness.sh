@@ -55,6 +55,8 @@ run_quick() {
     scripts/train_qlora.py \
     scripts/run_stage_a_tiny_overfit.py \
     scripts/compare_stage_a_tiny_modes.py \
+    scripts/train_stage_a_full.py \
+    scripts/train_stage_a_adapter.py \
     inference/app \
     tests
 

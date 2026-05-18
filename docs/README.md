@@ -14,6 +14,8 @@
   - Stage A 모델 출력이 sustain block/엉성한 MIDI로 나오는 구조적 원인 분석과 다음 수정 순서.
 - `STAGE_A_TINY_OVERFIT.md`
   - 1~3개 MIDI tiny-overfit smoke 실행 방법과 통과/실패 판단 기준.
+- `STAGE_A_TRAINING_MODES.md`
+  - full checkpoint/from-scratch training과 adapter training을 분리하는 기준.
 - `JAMBOT_MIDI_REFACTOR_PLAN.md`
   - 초기 계획과 2026-02-20 dead-air sweep 기록.
 

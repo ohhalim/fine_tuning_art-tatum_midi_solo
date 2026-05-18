@@ -30,8 +30,17 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - `conditioning.mid`, `target.mid`, `meta.json` 생성.
   - `conditioning + TOKEN_END + target + TOKEN_END` 형식으로 tokenized train/val 생성.
 - `scripts/train_qlora.py`
-  - Music Transformer에 LoRA를 붙여 학습.
+  - Music Transformer에 LoRA wrapper를 붙이는 lower-level training implementation.
+  - `--train_full_model`이면 base transformer, embedding, output head, LoRA module을 모두 학습한다.
+  - `--checkpoint`가 있으면 full checkpoint/base checkpoint를 로드한 뒤 adapter training을 수행한다.
+  - LoRA-only `lora_weights.pt`를 adapter base로 쓰는 것은 거부한다.
   - best validation 기준으로 `lora_weights.pt` 저장.
+- `scripts/train_stage_a_full.py`
+  - from-scratch full-checkpoint Stage A training entrypoint.
+  - 현재 pretrained symbolic MIDI base가 없을 때 사용하는 기본 학습 경로다.
+- `scripts/train_stage_a_adapter.py`
+  - pretrained/base checkpoint가 있을 때만 사용하는 adapter training entrypoint.
+  - `--checkpoint`를 필수로 요구해 random-base LoRA-only 학습을 기본 경로에서 제거한다.
 - `scripts/generate.py`
   - full `checkpoint_epoch*.pt` 또는 legacy LoRA checkpoint와 conditioning MIDI를 받아 MIDI 샘플 생성.
   - `--lora_path` 아래 최신 `checkpoint_epoch*.pt`를 우선 로드한다.
@@ -372,7 +381,7 @@ python scripts/eval_offline_metrics.py \
 
 1. tiny overfit smoke는 full-model tiny mode에서 통과했고, LoRA-only random-base mode는 실패했다.
 2. 현재 Stage A의 public wording에서 "LoRA fine-tuned jazz model" 표현을 피하고, full checkpoint training 또는 pretrained base 확보를 우선한다.
-3. 다음 구현은 from-scratch full training path와 adapter training path를 명확히 분리하는 것이다.
-4. 그다음 control token 기반 Conditioning 포맷으로 넘어간다. Duration 문제가 다시 나오면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어간다.
+3. from-scratch full training path와 adapter training path는 `train_stage_a_full.py`, `train_stage_a_adapter.py`로 분리됐다.
+4. 다음 구현은 control token 기반 Conditioning 포맷이다. Duration 문제가 다시 나오면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어간다.
 
 즉, 바로 realtime이나 API 확장으로 가지 않는다. 먼저 현재 생성 파이프라인의 디코딩/체크포인트/학습 구조를 바로잡고, 그다음 실시간 런타임으로 연결한다.

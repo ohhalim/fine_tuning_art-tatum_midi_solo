@@ -51,7 +51,9 @@ scripts/
   agent_harness.sh                  # Codex/local validation harness
   runpod_train_stage_a.sh          # Stage A 일괄 실행(prepare/train/generate/eval)
   prepare_role_dataset.py          # role-conditioned 데이터셋 생성
-  train_qlora.py                   # LoRA 학습
+  train_stage_a_full.py            # full-checkpoint/from-scratch 학습
+  train_stage_a_adapter.py         # pretrained/base checkpoint adapter 학습
+  train_qlora.py                   # lower-level training implementation
   run_stage_a_tiny_overfit.py      # 1-3개 MIDI tiny-overfit smoke
   generate.py                      # 조건부 MIDI 생성
   eval_offline_metrics.py          # dead-air/반복률/밀도 평가
@@ -243,8 +245,10 @@ python scripts/prepare_role_dataset.py \
 
 ### 3-2. 학습
 
+pretrained symbolic MIDI base가 없다면 기본은 full-checkpoint/from-scratch 학습입니다.
+
 ```bash
-python scripts/train_qlora.py \
+python scripts/train_stage_a_full.py \
   --data_dir ./data/roles/lead/tokenized \
   --epochs 3 \
   --batch_size 8 \
@@ -253,10 +257,27 @@ python scripts/train_qlora.py \
   --output_dir ./checkpoints/jazz_lora_stage_a
 ```
 
+pretrained/base checkpoint가 있을 때만 adapter 학습을 사용합니다.
+
+```bash
+python scripts/train_stage_a_adapter.py \
+  --checkpoint ./checkpoints/stage_a_full_scratch/checkpoint_epoch3.pt \
+  --data_dir ./data/roles/lead/tokenized \
+  --epochs 3 \
+  --batch_size 8 \
+  --num_workers 4 \
+  --max_sequence 512 \
+  --output_dir ./checkpoints/stage_a_adapter
+```
+
 로그에서 반드시 확인:
 - `Using device: cuda`
 - `Saved best LoRA weights`
 - `checkpoint_epoch*.pt` 저장
+
+주의:
+- `scripts/train_qlora.py` 직접 실행은 lower-level diagnostic path다.
+- random-base LoRA-only 학습은 tiny-overfit 비교에서 실패했으므로 기본 학습 전략으로 쓰지 않는다.
 
 ### 3-3. 생성
 
