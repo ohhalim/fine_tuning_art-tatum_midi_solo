@@ -12,6 +12,8 @@
   - 현재 모델 MVP의 1차 리뷰, 위험, 결정 사항, 다음 7일 계획.
 - `STAGE_A_CODE_REVIEW_2026-05-18.md`
   - Stage A 모델 출력이 sustain block/엉성한 MIDI로 나오는 구조적 원인 분석과 다음 수정 순서.
+- `STAGE_A_TINY_OVERFIT.md`
+  - 1~3개 MIDI tiny-overfit smoke 실행 방법과 통과/실패 판단 기준.
 - `JAMBOT_MIDI_REFACTOR_PLAN.md`
   - 초기 계획과 2026-02-20 dead-air sweep 기록.
 
@@ -51,7 +53,7 @@
 2. 빈 MIDI, density 0, undecodable output을 실패로 처리하는 gate를 추가한다.
 3. Python CLI를 MVP 입력 형태로 안정화한다.
 4. 모델 output repair와 fallback을 안정화한다.
-5. 필요하면 FastAPI inference wrapper를 얇게 붙인다.
-6. README와 데모 산출물을 정리한다.
+5. `scripts/run_stage_a_tiny_overfit.py`로 현재 tokenization/training path가 MIDI grammar를 배울 수 있는지 확인한다.
+6. tiny-overfit 결과에 따라 duration-explicit tokenization 또는 control-token conditioning으로 넘어간다.
 
 핵심 원칙: backend 확장보다 먼저, 모델 입력에서 valid MIDI와 metrics가 안정적으로 나오는 end-to-end 경로를 완성한다.

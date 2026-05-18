@@ -266,6 +266,8 @@ Status: completed.
 
 ### Step 3. Tiny Overfit Test
 
+Status: runnable smoke path added.
+
 목표:
 
 - 1~3개 MIDI sample에 대해 모델이 target을 과적합할 수 있는지 확인한다.
@@ -275,6 +277,16 @@ Status: completed.
 - teacher-forced loss가 확실히 내려간다.
 - generation 결과가 최소한 note_on/note_off grammar를 유지한다.
 - FL Studio piano roll에서 sustain block이 아닌 phrase로 보인다.
+
+구현 결과:
+
+- `scripts/run_stage_a_tiny_overfit.py`가 deterministic known-good MIDI phrase 1~3개를 생성한다.
+- 같은 MIDI를 existing Music Transformer token stream으로 변환해 tiny train/val dataset을 만든다.
+- `scripts/train_qlora.py --train_full_model`로 LoRA wrapper는 유지하되 random base까지 unfreeze할 수 있다.
+- 새 full checkpoint에는 `model_config`가 저장되고, `scripts/generate.py`는 이 config로 작은 architecture를 자동 복원한다.
+- smoke report는 raw sample metrics와 MVP inference gate의 `fallback_used` 결과를 함께 기록한다.
+- 2026-05-18 `dense_overfit_200` local run은 `fallback_used=false`로 통과했다. 이는 current event token path가 full-model tiny training에서는 MIDI grammar를 배울 수 있음을 보여준다.
+- 같은 조건의 `--lora_only` run은 best val loss `4.8228`과 decoded raw `note_count=0`으로 실패했다. 따라서 random-base LoRA-only training은 Stage A 학습 전략으로 검증되지 않았다.
 
 ### Step 4. Stage B Tokenization Decision
 

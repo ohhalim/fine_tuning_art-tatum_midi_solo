@@ -4,7 +4,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.generate import infer_checkpoint_max_sequence, resolve_full_checkpoint_path
+from scripts.generate import (
+    checkpoint_model_config,
+    infer_checkpoint_max_sequence,
+    resolve_full_checkpoint_path,
+)
 
 
 class StageACheckpointLoadingTest(unittest.TestCase):
@@ -48,6 +52,22 @@ class StageACheckpointLoadingTest(unittest.TestCase):
         state_dict = {"positional_encoding.pe": FakeTensor()}
 
         self.assertEqual(infer_checkpoint_max_sequence(state_dict, fallback=256), 512)
+
+    def test_reads_model_config_from_training_checkpoint(self) -> None:
+        checkpoint = {
+            "model_config": {
+                "n_layers": 2,
+                "num_heads": 4,
+                "d_model": 128,
+                "max_sequence": 128,
+            },
+            "model_state_dict": {},
+        }
+
+        config = checkpoint_model_config(checkpoint)
+
+        self.assertEqual(config["n_layers"], 2)
+        self.assertEqual(config["d_model"], 128)
 
 
 if __name__ == "__main__":

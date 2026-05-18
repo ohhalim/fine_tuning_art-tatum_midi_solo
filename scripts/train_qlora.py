@@ -16,6 +16,7 @@ import argparse
 import math
 import random
 from pathlib import Path
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -186,6 +187,38 @@ def add_lora_to_model(model: MusicTransformer, r: int = 16, alpha: int = 32, dro
     return model, lora_modules
 
 
+def set_seed(seed: int) -> None:
+    random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
+def count_trainable_parameters(model: nn.Module) -> tuple[int, int]:
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total_params = sum(p.numel() for p in model.parameters())
+    return trainable_params, total_params
+
+
+def unfreeze_base_model(model: nn.Module) -> None:
+    for param in model.parameters():
+        param.requires_grad = True
+
+
+def model_config_from_args(args: argparse.Namespace) -> dict[str, Any]:
+    return {
+        "n_layers": int(args.n_layers),
+        "num_heads": int(args.num_heads),
+        "d_model": int(args.d_model),
+        "dim_feedforward": int(args.dim_feedforward),
+        "max_sequence": int(args.max_sequence),
+        "rpr": bool(args.rpr),
+        "lora_r": int(args.lora_r),
+        "lora_alpha": int(args.lora_alpha),
+        "lora_dropout": float(args.lora_dropout),
+    }
+
+
 # =============================================================================
 # Dataset
 # =============================================================================
@@ -315,6 +348,15 @@ def main():
     parser.add_argument("--lora_r", type=int, default=16, help="LoRA rank")
     parser.add_argument("--lora_alpha", type=int, default=32, help="LoRA alpha")
     parser.add_argument("--lora_dropout", type=float, default=0.05)
+    parser.add_argument(
+        "--train_full_model",
+        action="store_true",
+        help=(
+            "Keep LoRA modules in the checkpoint format, but unfreeze the base "
+            "Music Transformer too. Intended for tiny overfit smoke tests from "
+            "a random base."
+        ),
+    )
     
     # Training
     parser.add_argument("--epochs", type=int, default=3)
@@ -323,11 +365,13 @@ def main():
     parser.add_argument("--gradient_accumulation", type=int, default=4)
     parser.add_argument("--num_workers", type=int, default=0)
     parser.add_argument("--label_smoothing", type=float, default=0.1)
+    parser.add_argument("--seed", type=int, default=42)
     
     # Output
     parser.add_argument("--output_dir", type=str, default="./checkpoints/jazz_lora")
     
     args = parser.parse_args()
+    set_seed(args.seed)
     
     # Device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -361,6 +405,11 @@ def main():
         alpha=args.lora_alpha, 
         dropout=args.lora_dropout
     )
+    if args.train_full_model:
+        print("\n=== Tiny-overfit mode: unfreezing base model parameters ===")
+        unfreeze_base_model(model)
+        trainable_params, total_params = count_trainable_parameters(model)
+        print(f"Trainable params: {trainable_params:,} / {total_params:,} ({100*trainable_params/total_params:.2f}%)")
     model = model.to(device)
     
     # Dataset
@@ -373,14 +422,14 @@ def main():
         batch_size=args.batch_size,
         shuffle=True,
         num_workers=max(0, args.num_workers),
-        pin_memory=True,
+        pin_memory=device.type == "cuda",
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=args.batch_size,
         shuffle=False,
         num_workers=max(0, args.num_workers),
-        pin_memory=True,
+        pin_memory=device.type == "cuda",
     )
     
     # Optimizer & Scheduler
@@ -399,6 +448,16 @@ def main():
     # Training loop
     print("\n=== Starting Training ===")
     best_val_loss = float("inf")
+    model_config = model_config_from_args(args)
+    training_config = {
+        "epochs": int(args.epochs),
+        "batch_size": int(args.batch_size),
+        "lr": float(args.lr),
+        "gradient_accumulation": int(args.gradient_accumulation),
+        "label_smoothing": float(args.label_smoothing),
+        "seed": int(args.seed),
+        "train_full_model": bool(args.train_full_model),
+    }
     
     for epoch in range(1, args.epochs + 1):
         train_loss = train_epoch(
@@ -427,6 +486,8 @@ def main():
         # Save checkpoint
         torch.save({
             "epoch": epoch,
+            "model_config": model_config,
+            "training_config": training_config,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
             "train_loss": train_loss,

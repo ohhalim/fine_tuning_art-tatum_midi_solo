@@ -35,8 +35,15 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - `scripts/generate.py`
   - full `checkpoint_epoch*.pt` 또는 legacy LoRA checkpoint와 conditioning MIDI를 받아 MIDI 샘플 생성.
   - `--lora_path` 아래 최신 `checkpoint_epoch*.pt`를 우선 로드한다.
+  - checkpoint에 `model_config`가 있으면 tiny model 구조도 자동 복원한다.
   - Stage A 기본 primer 길이는 64 token.
   - `temperature`, `top_k`, `top_p` sampling 제어값 지원.
+- `scripts/run_stage_a_tiny_overfit.py`
+  - 1~3개 known-good MIDI phrase를 생성하고 tokenized train/val dataset을 만든다.
+  - 작은 Stage A checkpoint를 overfit하고 raw sample 및 MVP gate 결과를 report로 저장한다.
+  - 기본은 LoRA wrapper를 유지하되 base model까지 unfreeze하는 tiny-overfit mode다.
+  - 2026-05-18 local `dense_overfit_200` run에서 `fallback_used=false`로 MVP gate를 통과했다.
+  - 같은 조건의 `--lora_only` run은 best val loss `4.8228`, decoded raw notes `0`으로 실패했다.
 - `scripts/eval_offline_metrics.py`
   - note density, dead-air proxy, 4-gram repetition 평가.
 - `scripts/analyze_chord_tone_errors.py`
@@ -167,6 +174,7 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - MVP request contract 확인은 `python -m inference.app.generator`를 사용한다.
 - 현재 inference 기본값은 `max_sequence=256`이다. 512-token 생성은 더 느린 비교/실험용으로 유지한다.
 - full checkpoint loading path는 구현됐다. 현재 `scripts/generate.py`, inference CLI, FastAPI model runner는 `checkpoint_epoch*.pt`를 우선 로드하고, 없을 때만 legacy `lora_weights.pt`로 fallback한다.
+- 새 checkpoint는 `model_config`를 저장하므로, tiny overfit처럼 작은 architecture로 학습한 checkpoint도 generation loader가 자동 복원할 수 있다.
 - 다만 현재 checkpoint 자체는 작은 데이터/epoch 1 결과라서, Stage A 결과를 실사용 가능한 jazz solo model로 해석하면 안 된다.
 - `music_transformer/third_party/midi_processor/processor.py`의 decoder ghost sustain 문제는 수정됐다. 그래도 model output은 아직 note count 부족/긴 note 문제로 자주 fallback된다.
 - 로컬 워크트리에는 추적되지 않은 데이터, 샘플, 문서가 많다. 문서/코드 작업 시 기존 산출물을 정리하거나 삭제하지 않는다.
@@ -362,9 +370,9 @@ python scripts/eval_offline_metrics.py \
 
 가장 먼저 할 일:
 
-1. 1~3개 sample tiny overfit smoke를 만들어, 모델이 MIDI grammar를 배울 수 있는지 먼저 확인한다.
-2. tiny overfit 결과를 기준으로 full checkpoint generation이 note_on/note_off grammar를 유지하는지 검증한다.
-3. 그래도 duration 문제가 남으면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어간다.
-4. 그다음 control token 기반 Conditioning 포맷으로 넘어간다.
+1. tiny overfit smoke는 full-model tiny mode에서 통과했고, LoRA-only random-base mode는 실패했다.
+2. 현재 Stage A의 public wording에서 "LoRA fine-tuned jazz model" 표현을 피하고, full checkpoint training 또는 pretrained base 확보를 우선한다.
+3. 다음 구현은 from-scratch full training path와 adapter training path를 명확히 분리하는 것이다.
+4. 그다음 control token 기반 Conditioning 포맷으로 넘어간다. Duration 문제가 다시 나오면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어간다.
 
 즉, 바로 realtime이나 API 확장으로 가지 않는다. 먼저 현재 생성 파이프라인의 디코딩/체크포인트/학습 구조를 바로잡고, 그다음 실시간 런타임으로 연결한다.

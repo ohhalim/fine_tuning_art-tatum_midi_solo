@@ -25,6 +25,7 @@ scripts/
   runpod_train_stage_a.sh          # Stage A 일괄 실행(prepare/train/generate/eval)
   prepare_role_dataset.py          # role-conditioned 데이터셋 생성
   train_qlora.py                   # LoRA 학습
+  run_stage_a_tiny_overfit.py      # 1-3개 MIDI tiny-overfit smoke
   generate.py                      # 조건부 MIDI 생성
   eval_offline_metrics.py          # dead-air/반복률/밀도 평가
   run_dead_air_sweep.sh            # dead-air 개선 실험 자동화
@@ -141,6 +142,44 @@ Review-ready gate 기준선:
 - 따라서 다음 모델 작업은 chord-tone postprocess보다 duration/token/conditioning 구조를 고치는 Stage B 쪽이 우선이다.
 
 이 데모의 목적은 모델 연구 성능을 과장하는 것이 아니라, request-derived MIDI conditioning, model generation, repair, metrics gate, fallback contract가 하나의 재현 가능한 파이프라인으로 동작하는지 확인하는 것입니다.
+
+---
+
+## 2-2) Stage A Tiny Overfit Smoke
+
+현재 우선순위는 더 큰 기능을 붙이는 것이 아니라, 모델이 아주 작은 MIDI solo grammar를 배울 수 있는지 확인하는 것입니다.
+아래 명령은 1-3개의 deterministic MIDI solo phrase를 만들고, 작은 Music Transformer checkpoint를 overfit한 뒤, raw model sample과 MVP inference gate 결과를 리포트로 저장합니다.
+
+```bash
+python scripts/run_stage_a_tiny_overfit.py \
+  --sample_count 3 \
+  --epochs 200 \
+  --lr 0.001 \
+  --max_sequence 128 \
+  --primer_max_tokens 24
+```
+
+빠른 구조 확인만 할 때:
+
+```bash
+python scripts/run_stage_a_tiny_overfit.py \
+  --sample_count 1 \
+  --epochs 1 \
+  --max_sequence 96 \
+  --primer_max_tokens 16
+```
+
+산출물:
+- `outputs/stage_a_tiny_overfit/<run_id>/input_midi/*.mid`
+- `outputs/stage_a_tiny_overfit/<run_id>/tokenized/{train,val}/*.npy`
+- `outputs/stage_a_tiny_overfit/<run_id>/checkpoints/checkpoint_epoch*.pt`
+- `outputs/stage_a_tiny_overfit/<run_id>/raw_samples/jazz_sample_*.mid`
+- `outputs/stage_a_tiny_overfit/<run_id>/report.json`
+- `outputs/stage_a_tiny_overfit/<run_id>/report.md`
+
+판단 기준:
+- `fallback_used=false`가 나오면 현재 tokenization/training path를 더 실험할 가치가 있다.
+- 계속 fallback이면 conditioning을 확장하지 말고, NOTE_ON/OFF tokenization 또는 학습 scope를 먼저 다시 봐야 한다.
 
 ---
 

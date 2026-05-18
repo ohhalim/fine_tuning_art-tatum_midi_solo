@@ -16,7 +16,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import List
+from typing import Any, List
 
 import pretty_midi
 import torch
@@ -66,6 +66,12 @@ def checkpoint_state_dict(checkpoint: object) -> dict:
     if isinstance(checkpoint, dict):
         return checkpoint
     raise ValueError(f"Unsupported checkpoint payload type: {type(checkpoint)}")
+
+
+def checkpoint_model_config(checkpoint: object) -> dict[str, Any]:
+    if isinstance(checkpoint, dict) and isinstance(checkpoint.get("model_config"), dict):
+        return dict(checkpoint["model_config"])
+    return {}
 
 
 def infer_checkpoint_max_sequence(state_dict: dict, fallback: int) -> int:
@@ -154,6 +160,15 @@ def load_model_with_lora(
     if full_checkpoint_path is not None:
         checkpoint = torch.load(full_checkpoint_path, map_location=device)
         full_checkpoint_state = checkpoint_state_dict(checkpoint)
+        model_config = checkpoint_model_config(checkpoint)
+        n_layers = int(model_config.get("n_layers", n_layers))
+        num_heads = int(model_config.get("num_heads", num_heads))
+        d_model = int(model_config.get("d_model", d_model))
+        dim_feedforward = int(model_config.get("dim_feedforward", dim_feedforward))
+        rpr = bool(model_config.get("rpr", rpr))
+        lora_r = int(model_config.get("lora_r", lora_r))
+        lora_alpha = int(model_config.get("lora_alpha", lora_alpha))
+        model_max_sequence = int(model_config.get("max_sequence", model_max_sequence))
         model_max_sequence = infer_checkpoint_max_sequence(full_checkpoint_state, model_max_sequence)
 
     model = MusicTransformer(
