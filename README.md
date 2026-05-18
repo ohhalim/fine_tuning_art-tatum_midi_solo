@@ -18,10 +18,37 @@ FL Studio/MCP에서 받은 MIDI 조건 입력을 바탕으로, LoRA 파인튜닝
 
 ---
 
+## Agent Workflow
+
+이 repo는 Codex 작업 기준을 루트 `AGENTS.md`에 둡니다.
+
+로컬 검증 하네스:
+
+```bash
+bash scripts/agent_harness.sh quick
+```
+
+MVP inference demo까지 확인:
+
+```bash
+bash scripts/agent_harness.sh demo
+```
+
+Stage A tiny-overfit 비교:
+
+```bash
+bash scripts/agent_harness.sh tiny-compare
+```
+
+Codex는 issue 범위 안에서 로컬 커밋까지 자동으로 진행할 수 있습니다. 단, `git push`, PR, GitHub issue, 배포/업로드는 사용자 명시 허락 후에만 진행합니다.
+
+---
+
 ## 0) 프로젝트 구조 한눈에 보기
 
 ```text
 scripts/
+  agent_harness.sh                  # Codex/local validation harness
   runpod_train_stage_a.sh          # Stage A 일괄 실행(prepare/train/generate/eval)
   prepare_role_dataset.py          # role-conditioned 데이터셋 생성
   train_qlora.py                   # LoRA 학습
