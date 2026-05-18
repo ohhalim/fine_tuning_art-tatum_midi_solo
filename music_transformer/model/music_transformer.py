@@ -10,6 +10,31 @@ from .positional_encoding import PositionalEncoding
 from .rpr import TransformerEncoderRPR, TransformerEncoderLayerRPR
 
 
+def _sample_probs_from_logits(logits, temperature=1.0, top_k=None, top_p=None):
+    temperature = max(float(temperature or 1.0), 1e-6)
+    probs = torch.softmax(logits / temperature, dim=-1)
+
+    if top_k is not None and int(top_k) > 0:
+        k = min(int(top_k), probs.shape[-1])
+        threshold = torch.topk(probs, k, dim=-1).values[..., -1, None]
+        probs = probs.masked_fill(probs < threshold, 0.0)
+
+    if top_p is not None and 0.0 < float(top_p) < 1.0:
+        sorted_probs, sorted_indices = torch.sort(probs, descending=True, dim=-1)
+        cumulative_probs = torch.cumsum(sorted_probs, dim=-1)
+        sorted_remove = cumulative_probs > float(top_p)
+        sorted_remove[..., 1:] = sorted_remove[..., :-1].clone()
+        sorted_remove[..., 0] = False
+        remove = torch.zeros_like(probs, dtype=torch.bool)
+        remove.scatter_(dim=-1, index=sorted_indices, src=sorted_remove)
+        probs = probs.masked_fill(remove, 0.0)
+
+    total = probs.sum(dim=-1, keepdim=True)
+    if torch.any(total <= 0):
+        return torch.softmax(logits, dim=-1)
+    return probs / total
+
+
 # MusicTransformer
 class MusicTransformer(nn.Module):
     """
@@ -112,7 +137,16 @@ class MusicTransformer(nn.Module):
         return y
 
     # generate
-    def generate(self, primer=None, target_seq_length=1024, beam=0, beam_chance=1.0):
+    def generate(
+        self,
+        primer=None,
+        target_seq_length=1024,
+        beam=0,
+        beam_chance=1.0,
+        temperature=1.0,
+        top_k=None,
+        top_p=None,
+    ):
         """
         ----------
         Author: Damon Gwinn
@@ -137,8 +171,14 @@ class MusicTransformer(nn.Module):
         cur_i = num_primer
         while(cur_i < target_seq_length):
             # gen_seq_batch     = gen_seq.clone()
-            y = self.softmax(self.forward(gen_seq[..., :cur_i]))[..., :TOKEN_END]
-            token_probs = y[:, cur_i-1, :]
+            logits = self.forward(gen_seq[..., :cur_i])[..., :TOKEN_END]
+            token_logits = logits[:, cur_i - 1, :]
+            token_probs = _sample_probs_from_logits(
+                token_logits,
+                temperature=temperature,
+                top_k=top_k,
+                top_p=top_p,
+            )
 
             if(beam == 0):
                 beam_ran = 2.0

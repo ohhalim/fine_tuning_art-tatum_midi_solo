@@ -13,6 +13,7 @@ Stage A usage:
 
 import argparse
 import os
+import re
 import sys
 from pathlib import Path
 from typing import List
@@ -22,6 +23,7 @@ import torch
 
 # Add music_transformer to path
 SCRIPT_DIR = Path(__file__).parent.parent
+sys.path.insert(0, str(SCRIPT_DIR / "scripts"))
 sys.path.insert(0, str(SCRIPT_DIR / "music_transformer"))
 sys.path.insert(0, str(SCRIPT_DIR / "music_transformer" / "third_party"))
 
@@ -32,6 +34,45 @@ from midi_processor.processor import decode_midi, RANGE_NOTE_ON, RANGE_NOTE_OFF,
 
 # Import LoRA helper from train script
 from train_qlora import add_lora_to_model
+
+
+def _checkpoint_sort_key(path: Path) -> tuple[int, str]:
+    match = re.search(r"checkpoint_epoch(\d+)\.pt$", path.name)
+    epoch = int(match.group(1)) if match else -1
+    return epoch, path.name
+
+
+def resolve_full_checkpoint_path(
+    lora_path: str | Path,
+    checkpoint_path: str | Path | None = None,
+) -> Path | None:
+    if checkpoint_path is not None:
+        resolved = Path(checkpoint_path)
+        if not resolved.exists():
+            raise FileNotFoundError(f"Full checkpoint not found: {resolved}")
+        return resolved
+
+    root = Path(lora_path)
+    if root.is_file():
+        return root
+
+    candidates = sorted(root.glob("checkpoint_epoch*.pt"), key=_checkpoint_sort_key)
+    return candidates[-1] if candidates else None
+
+
+def checkpoint_state_dict(checkpoint: object) -> dict:
+    if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+        return checkpoint["model_state_dict"]
+    if isinstance(checkpoint, dict):
+        return checkpoint
+    raise ValueError(f"Unsupported checkpoint payload type: {type(checkpoint)}")
+
+
+def infer_checkpoint_max_sequence(state_dict: dict, fallback: int) -> int:
+    positional_encoding = state_dict.get("positional_encoding.pe")
+    if positional_encoding is not None and hasattr(positional_encoding, "shape") and len(positional_encoding.shape) > 0:
+        return int(positional_encoding.shape[0])
+    return int(fallback)
 
 
 def encode_midi_simple(file_path: str) -> List[int]:
@@ -85,6 +126,8 @@ def encode_midi_simple(file_path: str) -> List[int]:
 
 def load_model_with_lora(
     lora_path: str,
+    checkpoint_path: str | None = None,
+    prefer_full_checkpoint: bool = True,
     n_layers: int = 6,
     num_heads: int = 8,
     d_model: int = 512,
@@ -94,27 +137,48 @@ def load_model_with_lora(
     lora_r: int = 16,
     lora_alpha: int = 32,
 ):
-    """Load Music Transformer with LoRA weights."""
+    """Load Stage A Music Transformer.
+
+    Prefer a full checkpoint so embedding, output head, base transformer, and
+    LoRA weights are restored together. Falling back to lora_weights.pt keeps
+    older experiments runnable but should not be treated as a trained model
+    unless the matching pretrained base is also loaded.
+    """
     device = get_device()
+
+    full_checkpoint_path = (
+        resolve_full_checkpoint_path(lora_path, checkpoint_path) if prefer_full_checkpoint else None
+    )
+    full_checkpoint_state = None
+    model_max_sequence = int(max_sequence)
+    if full_checkpoint_path is not None:
+        checkpoint = torch.load(full_checkpoint_path, map_location=device)
+        full_checkpoint_state = checkpoint_state_dict(checkpoint)
+        model_max_sequence = infer_checkpoint_max_sequence(full_checkpoint_state, model_max_sequence)
 
     model = MusicTransformer(
         n_layers=n_layers,
         num_heads=num_heads,
         d_model=d_model,
         dim_feedforward=dim_feedforward,
-        max_sequence=max_sequence,
+        max_sequence=model_max_sequence,
         rpr=rpr,
     )
 
     model, _ = add_lora_to_model(model, r=lora_r, alpha=lora_alpha)
 
-    lora_weights_path = Path(lora_path) / "lora_weights.pt"
-    if lora_weights_path.exists():
+    if full_checkpoint_path is not None:
+        model.load_state_dict(full_checkpoint_state, strict=True)
+        print(f"Loaded full Stage A checkpoint from {full_checkpoint_path} (model_max_sequence={model_max_sequence})")
+    else:
+        lora_weights_path = Path(lora_path) / "lora_weights.pt"
+        if not lora_weights_path.exists():
+            raise FileNotFoundError(
+                f"No full checkpoint_epoch*.pt or lora_weights.pt found under: {lora_path}"
+            )
         lora_state = torch.load(lora_weights_path, map_location=device)
         model.load_state_dict(lora_state, strict=False)
-        print(f"Loaded LoRA weights from {lora_weights_path}")
-    else:
-        raise FileNotFoundError(f"LoRA weights not found: {lora_weights_path}")
+        print(f"Loaded LoRA-only weights from {lora_weights_path}")
 
     model = model.to(device)
     model.eval()
@@ -151,6 +215,9 @@ def generate_once(
     primer: torch.Tensor,
     target_length: int,
     strip_primer: bool,
+    temperature: float,
+    top_k: int | None,
+    top_p: float | None,
 ) -> List[int]:
     device = get_device()
     primer = primer.to(device)
@@ -161,6 +228,9 @@ def generate_once(
             target_seq_length=target_length,
             beam=0,
             beam_chance=1.0,
+            temperature=temperature,
+            top_k=top_k,
+            top_p=top_p,
         )
 
     sequence = generated[0].detach().cpu().tolist()
@@ -174,6 +244,17 @@ def main():
 
     # Model
     parser.add_argument("--lora_path", type=str, default="./checkpoints/jazz_lora")
+    parser.add_argument(
+        "--checkpoint_path",
+        type=str,
+        default=None,
+        help="Optional full checkpoint file. Defaults to latest checkpoint_epoch*.pt under --lora_path.",
+    )
+    parser.add_argument(
+        "--no_prefer_full_checkpoint",
+        action="store_true",
+        help="Disable full checkpoint auto-detection and load lora_weights.pt only.",
+    )
     parser.add_argument("--n_layers", type=int, default=6)
     parser.add_argument("--num_heads", type=int, default=8)
     parser.add_argument("--d_model", type=int, default=512)
@@ -197,6 +278,9 @@ def main():
     parser.add_argument("--length", type=int, default=512, help="Full generated length including primer")
     parser.add_argument("--num_samples", type=int, default=3)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--temperature", type=float, default=1.0)
+    parser.add_argument("--top_k", type=int, default=None)
+    parser.add_argument("--top_p", type=float, default=None)
 
     # Output
     parser.add_argument("--output", type=str, default="./samples")
@@ -209,6 +293,8 @@ def main():
     print("\n=== Loading Model with LoRA ===")
     model = load_model_with_lora(
         lora_path=args.lora_path,
+        checkpoint_path=args.checkpoint_path,
+        prefer_full_checkpoint=not args.no_prefer_full_checkpoint,
         n_layers=args.n_layers,
         num_heads=args.num_heads,
         d_model=args.d_model,
@@ -247,6 +333,9 @@ def main():
             primer=primer,
             target_length=target_length,
             strip_primer=args.strip_primer_output,
+            temperature=args.temperature,
+            top_k=args.top_k,
+            top_p=args.top_p,
         )
         if not generated_tokens:
             print("No decodable tokens produced; skipping sample.")

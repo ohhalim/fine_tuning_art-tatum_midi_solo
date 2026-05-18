@@ -111,13 +111,15 @@ def _merge_note(snote_sequence):
             note_on_dict[snote.value] = snote
         elif snote.type == 'note_off':
             try:
-                on = note_on_dict[snote.value]
+                # Consume the active note so stray later note_off events cannot
+                # reuse the same note_on and create ghost sustain notes.
+                on = note_on_dict.pop(snote.value)
                 off = snote
                 if off.time - on.time == 0:
                     continue
                 result = pretty_midi.Note(on.velocity, snote.value, on.time, off.time)
                 result_array.append(result)
-            except:
+            except KeyError:
                 print('info removed pitch: {}'.format(snote.value))
     return result_array
 
@@ -259,4 +261,3 @@ if __name__ == '__main__':
     for i in ins.instruments:
         print(i.control_changes)
         print(i.notes)
-

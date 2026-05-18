@@ -114,8 +114,8 @@ EOF
 echo "[Sweep] Base lora: $BASE_LORA"
 echo "[Sweep] Base conditioning: $BASE_COND"
 
-if [[ ! -f "${BASE_LORA}/lora_weights.pt" ]]; then
-  echo "Missing lora weights: ${BASE_LORA}/lora_weights.pt"
+if [[ ! -f "${BASE_LORA}/lora_weights.pt" ]] && ! compgen -G "${BASE_LORA}/checkpoint_epoch*.pt" >/dev/null; then
+  echo "Missing Stage A weights under: ${BASE_LORA}"
   exit 1
 fi
 if [[ ! -f "${BASE_COND}" ]]; then
