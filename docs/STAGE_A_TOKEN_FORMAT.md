@@ -56,3 +56,24 @@ Control tokens expand the model vocabulary. New loaders resize old checkpoint to
 - `Wout.bias`
 
 Old rows are copied into the new tensors and new control-token rows keep the model's fresh initialization. This keeps legacy checkpoints loadable, but they have not learned the new control tokens.
+
+## Tiny Smoke
+
+Use this before larger Stage A training:
+
+```bash
+python scripts/run_control_v1_tiny_overfit.py \
+  --sample_count 1 \
+  --epochs 200 \
+  --lr 0.001 \
+  --max_sequence 192 \
+  --primer_max_tokens 96
+```
+
+Current local smoke result:
+
+- run id: `control_v1_auto`
+- best validation loss: `0.0142`
+- raw valid samples: `3/3`
+- MVP inference: `COMPLETED`
+- fallback used: `false`

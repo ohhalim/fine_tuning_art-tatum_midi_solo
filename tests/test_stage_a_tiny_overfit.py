@@ -10,6 +10,8 @@ import pretty_midi
 from inference.app.metrics import compute_midi_metrics, validate_metrics
 from inference.app.schemas import GenerationRequest
 from scripts.compare_stage_a_tiny_modes import build_decision
+from scripts.control_tokens import SEQUENCE_FORMAT_CONTROL_V1, control_prefix_tokens
+from scripts.run_control_v1_tiny_overfit import prepare_control_v1_tiny_dataset
 from scripts.run_stage_a_tiny_overfit import (
     parse_best_validation_loss,
     prepare_tiny_dataset,
@@ -80,6 +82,18 @@ class StageATinyOverfitDatasetTest(unittest.TestCase):
             metrics = compute_midi_metrics(midi_paths[0], 0, False, request=request)
             valid, reason = validate_metrics(metrics, "medium", bars=2)
             self.assertTrue(valid, reason)
+
+    def test_prepare_control_v1_tiny_dataset_writes_control_prompt_tokens(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            manifest = prepare_control_v1_tiny_dataset(Path(tmp_dir), sample_count=1, bpm=124)
+            first_sample = manifest["samples"][0]
+            tokens = np.load(first_sample["train_tokens_path"])
+
+            self.assertEqual(manifest["sequence_format"], SEQUENCE_FORMAT_CONTROL_V1)
+            self.assertEqual(tokens[:3].tolist(), control_prefix_tokens("lead", 124))
+            self.assertGreater(first_sample["conditioning_token_count"], 0)
+            self.assertGreater(first_sample["target_token_count"], 0)
+            self.assertGreater(first_sample["token_count"], first_sample["target_token_count"])
 
 
 if __name__ == "__main__":

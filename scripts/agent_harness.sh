@@ -27,6 +27,7 @@ Modes:
   demo          Run quick checks plus the MVP demo.
   tiny-prepare  Verify tiny-overfit dataset preparation only.
   tiny-compare  Compare full-model tiny training with random-base LoRA-only.
+  control-tiny  Run control_v1 full-model tiny-overfit smoke.
   all           Run demo and tiny-compare.
 
 Environment:
@@ -57,6 +58,7 @@ run_quick() {
     scripts/train_qlora.py \
     scripts/run_stage_a_tiny_overfit.py \
     scripts/compare_stage_a_tiny_modes.py \
+    scripts/run_control_v1_tiny_overfit.py \
     scripts/train_stage_a_full.py \
     scripts/train_stage_a_adapter.py \
     inference/app \
@@ -96,6 +98,20 @@ run_tiny_compare() {
     --run_id "$run_id"
 }
 
+run_control_tiny() {
+  local run_id="${RUN_ID:-harness_control_v1}"
+  print_header "Stage A control_v1 tiny overfit"
+  "$PYTHON_BIN" scripts/run_control_v1_tiny_overfit.py \
+    --sample_count 1 \
+    --epochs 200 \
+    --lr 0.001 \
+    --max_sequence 192 \
+    --primer_max_tokens 96 \
+    --num_samples 3 \
+    --output_root outputs/stage_a_tiny_harness \
+    --run_id "$run_id"
+}
+
 case "$MODE" in
   status)
     run_status
@@ -112,9 +128,13 @@ case "$MODE" in
   tiny-compare)
     run_tiny_compare
     ;;
+  control-tiny)
+    run_control_tiny
+    ;;
   all)
     run_demo
     run_tiny_compare
+    run_control_tiny
     ;;
   -h|--help|help)
     usage

@@ -40,7 +40,7 @@ Stage A tiny-overfit 비교:
 bash scripts/agent_harness.sh tiny-compare
 ```
 
-Codex는 issue 범위 안에서 로컬 커밋까지 자동으로 진행할 수 있습니다. 단, `git push`, PR, GitHub issue, 배포/업로드는 사용자 명시 허락 후에만 진행합니다.
+Codex는 issue 범위 안에서 로컬 커밋과 같은 브랜치 upstream push까지 자동으로 진행할 수 있습니다. 단, PR, GitHub issue, 배포/업로드, force push, 새 브랜치 push는 사용자 명시 허락 후에만 진행합니다.
 
 ---
 
@@ -57,6 +57,7 @@ scripts/
   train_stage_a_adapter.py         # pretrained/base checkpoint adapter 학습
   train_qlora.py                   # lower-level training implementation
   run_stage_a_tiny_overfit.py      # 1-3개 MIDI tiny-overfit smoke
+  run_control_v1_tiny_overfit.py   # control_v1 prompt tiny-overfit smoke
   generate.py                      # 조건부 MIDI 생성
   eval_offline_metrics.py          # dead-air/반복률/밀도 평가
   run_dead_air_sweep.sh            # dead-air 개선 실험 자동화
@@ -222,6 +223,19 @@ python scripts/compare_stage_a_tiny_modes.py \
   --max_sequence 128 \
   --primer_max_tokens 24
 ```
+
+`control_v1` prompt가 실제로 학습/생성 경로에서 동작하는지 확인할 때:
+
+```bash
+python scripts/run_control_v1_tiny_overfit.py \
+  --sample_count 1 \
+  --epochs 200 \
+  --lr 0.001 \
+  --max_sequence 192 \
+  --primer_max_tokens 96
+```
+
+최근 local smoke에서는 `fallback_used=false`, raw sample `3/3` valid, best validation loss `0.0142`로 통과했습니다.
 
 ---
 

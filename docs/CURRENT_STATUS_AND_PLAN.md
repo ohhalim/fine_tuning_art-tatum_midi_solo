@@ -61,6 +61,10 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - 기본은 LoRA wrapper를 유지하되 base model까지 unfreeze하는 tiny-overfit mode다.
   - 2026-05-18 local `dense_overfit_200` run에서 `fallback_used=false`로 MVP gate를 통과했다.
   - 같은 조건의 `--lora_only` run은 best val loss `4.8228`, decoded raw notes `0`으로 실패했다.
+- `scripts/run_control_v1_tiny_overfit.py`
+  - `control_v1` prompt format 전용 tiny-overfit smoke다.
+  - low-register conditioning MIDI와 known-good target solo를 `ROLE_LEAD + TEMPO_* + BAR + conditioning + COND_SEP + target + END`로 학습한다.
+  - 2026-05-18 local `control_v1_auto` run에서 best val loss `0.0142`, raw sample valid `3/3`, MVP inference `fallback_used=false`로 통과했다.
 - `scripts/eval_offline_metrics.py`
   - note density, dead-air proxy, 4-gram repetition 평가.
 - `scripts/analyze_chord_tone_errors.py`
@@ -391,6 +395,7 @@ python scripts/eval_offline_metrics.py \
 2. 현재 Stage A의 public wording에서 "LoRA fine-tuned jazz model" 표현을 피하고, full checkpoint training 또는 pretrained base 확보를 우선한다.
 3. from-scratch full training path와 adapter training path는 `train_stage_a_full.py`, `train_stage_a_adapter.py`로 분리됐다.
 4. control token 기반 Conditioning 포맷은 `control_v1`로 들어갔다.
-5. 다음 구현은 `control_v1` 작은 데이터셋 학습 결과를 보고, duration 문제가 다시 나오면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어가는 것이다.
+5. `control_v1` tiny-overfit smoke는 통과했다.
+6. 다음 구현은 실제 role dataset을 `control_v1`로 재생성해 full Stage A 학습을 돌리고, duration 문제가 다시 나오면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어가는 것이다.
 
 즉, 바로 realtime이나 API 확장으로 가지 않는다. 먼저 현재 생성 파이프라인의 디코딩/체크포인트/학습 구조를 바로잡고, 그다음 실시간 런타임으로 연결한다.
