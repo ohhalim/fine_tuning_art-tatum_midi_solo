@@ -32,7 +32,7 @@ sys.path.insert(0, str(SCRIPT_DIR / "music_transformer" / "third_party"))
 
 from model.music_transformer import MusicTransformer
 from model.loss import SmoothCrossEntropyLoss
-from utilities.constants import TOKEN_PAD, VOCAB_SIZE
+from utilities.constants import TOKEN_COND_SEP, TOKEN_PAD, VOCAB_SIZE
 
 try:
     from checkpoint_utils import load_state_dict_with_token_resize
@@ -279,6 +279,52 @@ def training_mode_name(args: argparse.Namespace) -> str:
 # Dataset
 # =============================================================================
 
+CONTROL_PREFIX_LEN = 3
+CONTROL_CONDITIONING_MAX_TOKENS = 64
+
+
+def crop_control_v1_sequence(
+    tokens: torch.Tensor,
+    max_seq: int,
+    conditioning_max_tokens: int = CONTROL_CONDITIONING_MAX_TOKENS,
+) -> torch.Tensor:
+    sep_positions = (tokens == TOKEN_COND_SEP).nonzero(as_tuple=False).flatten()
+    if len(sep_positions) == 0:
+        start = random.randint(0, len(tokens) - max_seq)
+        return tokens[start : start + max_seq]
+
+    sep_index = int(sep_positions[0].item())
+    prefix_len = min(CONTROL_PREFIX_LEN, sep_index)
+    prefix = tokens[:prefix_len]
+    conditioning = tokens[prefix_len:sep_index]
+    target = tokens[sep_index + 1 :]
+    if len(target) == 0:
+        return tokens[:max_seq]
+
+    max_conditioning = max(0, min(int(conditioning_max_tokens), max_seq - len(prefix) - 2))
+    conditioning_tail = conditioning[-max_conditioning:] if max_conditioning > 0 else conditioning[:0]
+    target_budget = max_seq - len(prefix) - len(conditioning_tail) - 1
+    if target_budget <= 0:
+        return tokens[:max_seq]
+
+    if len(target) > target_budget:
+        target_start = random.randint(0, len(target) - target_budget)
+        target = target[target_start : target_start + target_budget]
+
+    cropped = torch.cat(
+        [
+            prefix,
+            conditioning_tail,
+            tokens.new_tensor([TOKEN_COND_SEP]),
+            target,
+        ]
+    )
+    if len(cropped) < max_seq:
+        padding = torch.full((max_seq - len(cropped),), TOKEN_PAD, dtype=torch.long)
+        cropped = torch.cat([cropped, padding])
+    return cropped[:max_seq]
+
+
 class MidiDataset(Dataset):
     """Dataset for preprocessed MIDI token sequences"""
     
@@ -304,8 +350,7 @@ class MidiDataset(Dataset):
         
         # Truncate or pad
         if len(tokens) > self.max_seq:
-            start = random.randint(0, len(tokens) - self.max_seq)
-            tokens = tokens[start:start + self.max_seq]
+            tokens = crop_control_v1_sequence(tokens, self.max_seq)
         elif len(tokens) < self.max_seq:
             padding = torch.full((self.max_seq - len(tokens),), TOKEN_PAD, dtype=torch.long)
             tokens = torch.cat([tokens, padding])

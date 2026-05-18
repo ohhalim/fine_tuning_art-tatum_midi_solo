@@ -5,13 +5,18 @@ from contextlib import redirect_stderr
 from io import StringIO
 from types import SimpleNamespace
 
+import torch
+
 from scripts import train_stage_a_adapter, train_stage_a_full
+from scripts.control_tokens import control_prefix_tokens
 from scripts.train_qlora import (
     apply_checkpoint_model_config,
+    crop_control_v1_sequence,
     state_dict_is_lora_only,
     state_dict_uses_lora_wrappers,
     training_mode_name,
 )
+from utilities.constants import TOKEN_COND_SEP, TOKEN_PAD
 
 
 def training_args(**overrides):
@@ -98,6 +103,34 @@ class StageATrainingModesTest(unittest.TestCase):
         self.assertEqual(training_mode_name(training_args(train_full_model=True)), "full_model")
         self.assertEqual(training_mode_name(training_args(checkpoint="./base.pt")), "adapter")
         self.assertEqual(training_mode_name(training_args(checkpoint=None)), "random_base_lora")
+
+    def test_control_v1_crop_preserves_prompt_separator_and_target_window(self) -> None:
+        prefix = control_prefix_tokens("lead", 124)
+        conditioning = list(range(20, 140))
+        target = list(range(200, 360))
+        tokens = torch.tensor(prefix + conditioning + [TOKEN_COND_SEP] + target, dtype=torch.long)
+
+        cropped = crop_control_v1_sequence(tokens, max_seq=96, conditioning_max_tokens=32)
+        sep_index = int((cropped == TOKEN_COND_SEP).nonzero(as_tuple=False)[0].item())
+
+        self.assertEqual(len(cropped), 96)
+        self.assertEqual(cropped[:3].tolist(), prefix)
+        self.assertEqual(sep_index, 35)
+        self.assertEqual(cropped[3:sep_index].tolist(), conditioning[-32:])
+        self.assertGreater(len(cropped[sep_index + 1 :]), 0)
+
+    def test_control_v1_crop_pads_when_target_window_is_short(self) -> None:
+        prefix = control_prefix_tokens("lead", 124)
+        conditioning = list(range(20, 140))
+        target = [200, 201]
+        tokens = torch.tensor(prefix + conditioning + [TOKEN_COND_SEP] + target, dtype=torch.long)
+
+        cropped = crop_control_v1_sequence(tokens, max_seq=96, conditioning_max_tokens=32)
+
+        self.assertEqual(len(cropped), 96)
+        self.assertEqual(cropped[:3].tolist(), prefix)
+        self.assertIn(TOKEN_COND_SEP, cropped.tolist())
+        self.assertEqual(cropped[-1].item(), TOKEN_PAD)
 
 
 if __name__ == "__main__":

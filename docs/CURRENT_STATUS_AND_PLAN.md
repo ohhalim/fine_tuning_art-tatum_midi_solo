@@ -41,6 +41,7 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - `--train_full_model`이면 base transformer, embedding, output head, LoRA module을 모두 학습한다.
   - `--checkpoint`가 있으면 full checkpoint/base checkpoint를 로드한 뒤 adapter training을 수행한다.
   - LoRA-only `lora_weights.pt`를 adapter base로 쓰는 것은 거부한다.
+  - `control_v1` sequence가 `max_sequence`보다 길면 random crop 대신 `ROLE/TEMPO/BAR`, conditioning tail, `COND_SEP`, target window를 보존한다.
   - best validation 기준으로 `lora_weights.pt` 저장.
 - `scripts/train_stage_a_full.py`
   - from-scratch full-checkpoint Stage A training entrypoint.
@@ -65,6 +66,10 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - `control_v1` prompt format 전용 tiny-overfit smoke다.
   - low-register conditioning MIDI와 known-good target solo를 `ROLE_LEAD + TEMPO_* + BAR + conditioning + COND_SEP + target + END`로 학습한다.
   - 2026-05-18 local `control_v1_auto` run에서 best val loss `0.0142`, raw sample valid `3/3`, MVP inference `fallback_used=false`로 통과했다.
+- role dataset `control_v1` prepare probe
+  - Brad Mehldau `max_files=2` probe에서 `sequence_format=control_v1`, tokenized train/val 생성이 성공했다.
+  - 첫 train sequence 길이는 `7079` token이라 기존 random crop은 control prompt를 잃을 수 있었다.
+  - `scripts/train_qlora.py` crop 로직을 control-aware로 수정했다.
 - `scripts/eval_offline_metrics.py`
   - note density, dead-air proxy, 4-gram repetition 평가.
 - `scripts/analyze_chord_tone_errors.py`
@@ -396,6 +401,7 @@ python scripts/eval_offline_metrics.py \
 3. from-scratch full training path와 adapter training path는 `train_stage_a_full.py`, `train_stage_a_adapter.py`로 분리됐다.
 4. control token 기반 Conditioning 포맷은 `control_v1`로 들어갔다.
 5. `control_v1` tiny-overfit smoke는 통과했다.
-6. 다음 구현은 실제 role dataset을 `control_v1`로 재생성해 full Stage A 학습을 돌리고, duration 문제가 다시 나오면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어가는 것이다.
+6. 실제 role dataset `control_v1` prepare probe와 control-aware crop fix가 완료됐다.
+7. 다음 구현은 실제 role dataset을 `control_v1`로 재생성해 full Stage A 학습을 돌리고, duration 문제가 다시 나오면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어가는 것이다.
 
 즉, 바로 realtime이나 API 확장으로 가지 않는다. 먼저 현재 생성 파이프라인의 디코딩/체크포인트/학습 구조를 바로잡고, 그다음 실시간 런타임으로 연결한다.

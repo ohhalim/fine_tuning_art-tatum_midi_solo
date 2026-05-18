@@ -57,6 +57,18 @@ Control tokens expand the model vocabulary. New loaders resize old checkpoint to
 
 Old rows are copied into the new tensors and new control-token rows keep the model's fresh initialization. This keeps legacy checkpoints loadable, but they have not learned the new control tokens.
 
+## Long Sequence Cropping
+
+Real role-conditioned MIDI files can be thousands of tokens long. A Brad Mehldau `max_files=2` prepare probe produced a first train sequence of `7079` tokens.
+
+For `control_v1`, training crop must not use plain random windows because most windows would drop the control prompt. `scripts/train_qlora.py` now preserves:
+
+```text
+ROLE_LEAD + TEMPO_* + BAR + conditioning_tail + COND_SEP + target_window
+```
+
+The default conditioning tail budget is `64` tokens. This keeps the prompt contract visible during training while still allowing random target windows.
+
 ## Tiny Smoke
 
 Use this before larger Stage A training:
