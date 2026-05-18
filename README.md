@@ -88,6 +88,7 @@ bash scripts/runpod_train_stage_a.sh \
 ```
 
 성공 기준:
+- `checkpoints/jazz_lora_stage_a/checkpoint_epoch*.pt` 생성
 - `checkpoints/jazz_lora_stage_a/lora_weights.pt` 생성
 - `samples/stage_a/jazz_sample_*.mid` 생성
 - `samples/stage_a/metrics.json` 생성
@@ -96,7 +97,7 @@ bash scripts/runpod_train_stage_a.sh \
 
 ## 2-1) MVP 데모 실행
 
-이미 `checkpoints/jazz_lora_stage_a/lora_weights.pt`가 있는 로컬 환경에서는 아래 명령으로 현재 MVP inference contract를 바로 확인합니다.
+이미 `checkpoints/jazz_lora_stage_a/checkpoint_epoch*.pt`가 있는 로컬 환경에서는 아래 명령으로 현재 MVP inference contract를 바로 확인합니다. `scripts/generate.py`와 inference runner는 full checkpoint를 우선 로드하고, 없을 때만 legacy `lora_weights.pt`로 fallback합니다.
 
 ```bash
 bash scripts/run_mvp_demo.sh
@@ -178,10 +179,12 @@ python scripts/train_qlora.py \
 로그에서 반드시 확인:
 - `Using device: cuda`
 - `Saved best LoRA weights`
+- `checkpoint_epoch*.pt` 저장
 
 ### 3-3. 생성
 
 Stage A 모델을 직접 호출하는 기본 생성 명령입니다.
+`--lora_path` 아래에 `checkpoint_epoch*.pt`가 있으면 가장 최신 epoch의 full `model_state_dict`를 우선 로드합니다.
 
 ```bash
 python scripts/generate.py \

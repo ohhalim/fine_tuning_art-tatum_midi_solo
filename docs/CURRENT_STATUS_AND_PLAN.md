@@ -33,7 +33,8 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - Music Transformer에 LoRA를 붙여 학습.
   - best validation 기준으로 `lora_weights.pt` 저장.
 - `scripts/generate.py`
-  - LoRA checkpoint와 conditioning MIDI를 받아 MIDI 샘플 생성.
+  - full `checkpoint_epoch*.pt` 또는 legacy LoRA checkpoint와 conditioning MIDI를 받아 MIDI 샘플 생성.
+  - `--lora_path` 아래 최신 `checkpoint_epoch*.pt`를 우선 로드한다.
   - Stage A 기본 primer 길이는 64 token.
   - `temperature`, `top_k`, `top_p` sampling 제어값 지원.
 - `scripts/eval_offline_metrics.py`
@@ -165,7 +166,8 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - 현재 Stage A에서 사용해야 하는 생성 엔트리포인트는 `scripts/generate.py`다.
 - MVP request contract 확인은 `python -m inference.app.generator`를 사용한다.
 - 현재 inference 기본값은 `max_sequence=256`이다. 512-token 생성은 더 느린 비교/실험용으로 유지한다.
-- 현재 `checkpoints/jazz_lora_stage_a/lora_weights.pt`만으로는 학습된 full model을 복원하지 못한다. base Music Transformer가 pretrained checkpoint 없이 랜덤 초기화되는 구조라서, Stage A 결과를 실사용 가능한 jazz solo model로 해석하면 안 된다.
+- full checkpoint loading path는 구현됐다. 현재 `scripts/generate.py`, inference CLI, FastAPI model runner는 `checkpoint_epoch*.pt`를 우선 로드하고, 없을 때만 legacy `lora_weights.pt`로 fallback한다.
+- 다만 현재 checkpoint 자체는 작은 데이터/epoch 1 결과라서, Stage A 결과를 실사용 가능한 jazz solo model로 해석하면 안 된다.
 - `music_transformer/third_party/midi_processor/processor.py`의 decoder ghost sustain 문제는 수정됐다. 그래도 model output은 아직 note count 부족/긴 note 문제로 자주 fallback된다.
 - 로컬 워크트리에는 추적되지 않은 데이터, 샘플, 문서가 많다. 문서/코드 작업 시 기존 산출물을 정리하거나 삭제하지 않는다.
 
@@ -186,7 +188,9 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 
 체크포인트:
 
+- `checkpoints/jazz_lora_stage_a/checkpoint_epoch1.pt`
 - `checkpoints/jazz_lora_stage_a/lora_weights.pt`
+- `checkpoints/jazz_lora_sp60/checkpoint_epoch1.pt`
 - `checkpoints/jazz_lora_sp60/lora_weights.pt`
 
 실험 기록:
@@ -358,9 +362,9 @@ python scripts/eval_offline_metrics.py \
 
 가장 먼저 할 일:
 
-1. `scripts/generate.py`가 full `model_state_dict` checkpoint를 로드할 수 있게 한다.
-2. `train_qlora.py`/generation path에서 random base + LoRA-only 구조를 끊는다.
-3. 1~3개 sample tiny overfit smoke를 만들어, 모델이 MIDI grammar를 배울 수 있는지 먼저 확인한다.
+1. 1~3개 sample tiny overfit smoke를 만들어, 모델이 MIDI grammar를 배울 수 있는지 먼저 확인한다.
+2. tiny overfit 결과를 기준으로 full checkpoint generation이 note_on/note_off grammar를 유지하는지 검증한다.
+3. 그래도 duration 문제가 남으면 NOTE_ON/OFF 대신 duration-explicit tokenization으로 넘어간다.
 4. 그다음 control token 기반 Conditioning 포맷으로 넘어간다.
 
 즉, 바로 realtime이나 API 확장으로 가지 않는다. 먼저 현재 생성 파이프라인의 디코딩/체크포인트/학습 구조를 바로잡고, 그다음 실시간 런타임으로 연결한다.

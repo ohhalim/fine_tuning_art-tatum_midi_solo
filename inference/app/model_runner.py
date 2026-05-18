@@ -16,6 +16,7 @@ class StageAModelRunner:
     def __init__(
         self,
         lora_path: str | Path,
+        checkpoint_path: str | Path | None = None,
         max_sequence: int = 256,
         n_layers: int = 6,
         num_heads: int = 8,
@@ -27,9 +28,12 @@ class StageAModelRunner:
         from scripts.generate import load_model_with_lora
 
         self.lora_path = Path(lora_path)
+        self.checkpoint_path = Path(checkpoint_path) if checkpoint_path is not None else None
         self.max_sequence = int(max_sequence)
         self.model = load_model_with_lora(
             lora_path=str(self.lora_path),
+            checkpoint_path=str(self.checkpoint_path) if self.checkpoint_path is not None else None,
+            prefer_full_checkpoint=True,
             n_layers=n_layers,
             num_heads=num_heads,
             d_model=d_model,

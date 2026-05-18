@@ -28,6 +28,14 @@ CHORD_TONE_TARGET = 0.55
 CHORD_TONE_WEIGHT = 1.0
 
 
+def has_stage_a_weights(lora_path: Path, checkpoint_path: Path | None = None) -> bool:
+    if checkpoint_path is not None:
+        return checkpoint_path.exists()
+    if lora_path.is_file():
+        return True
+    return (lora_path / "lora_weights.pt").exists() or any(lora_path.glob("checkpoint_epoch*.pt"))
+
+
 def metrics_dir_for(output_dir: Path) -> Path:
     if output_dir.name == "generated":
         return output_dir.parent / "metrics"
@@ -43,14 +51,16 @@ def run_stage_a_model(
     request: GenerationRequest,
     output_dir: Path,
     lora_path: Path,
+    checkpoint_path: Path | None,
     conditioning_midi: Path,
     primer_max_tokens: int,
     max_sequence: int,
     model_candidates: int,
     model_runner: Any | None = None,
 ) -> tuple[list[Path], str | None]:
-    if not (lora_path / "lora_weights.pt").exists():
-        return [], f"missing LoRA weights: {lora_path / 'lora_weights.pt'}"
+    if not has_stage_a_weights(lora_path, checkpoint_path):
+        expected = checkpoint_path if checkpoint_path is not None else f"{lora_path}/checkpoint_epoch*.pt or lora_weights.pt"
+        return [], f"missing Stage A weights: {expected}"
     if not conditioning_midi.exists():
         return [], f"missing conditioning MIDI: {conditioning_midi}"
 
@@ -94,6 +104,8 @@ def run_stage_a_model(
         "--output",
         str(model_output_dir),
     ]
+    if checkpoint_path is not None:
+        cmd.extend(["--checkpoint_path", str(checkpoint_path)])
     if request.temperature is not None:
         cmd.extend(["--temperature", str(request.temperature)])
     if request.top_k is not None:
@@ -142,6 +154,7 @@ def generate_midi_phrase(
     output_dir: str | Path = PROJECT_ROOT / "outputs" / "generated",
     use_model: bool = True,
     lora_path: str | Path = DEFAULT_LORA_PATH,
+    checkpoint_path: str | Path | None = None,
     conditioning_midi: str | Path | None = None,
     primer_max_tokens: int = 64,
     max_sequence: int = 256,
@@ -172,6 +185,7 @@ def generate_midi_phrase(
             request=request,
             output_dir=output_dir,
             lora_path=Path(lora_path),
+            checkpoint_path=Path(checkpoint_path) if checkpoint_path is not None else None,
             conditioning_midi=resolved_conditioning_midi,
             primer_max_tokens=primer_max_tokens,
             max_sequence=max_sequence,
@@ -303,6 +317,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no_model", action="store_true", help="Skip Stage A model and use fallback generator")
     parser.add_argument("--lora_path", type=str, default=str(DEFAULT_LORA_PATH))
     parser.add_argument(
+        "--checkpoint_path",
+        type=str,
+        default=None,
+        help="Optional full checkpoint file. Defaults to latest checkpoint_epoch*.pt under --lora_path.",
+    )
+    parser.add_argument(
         "--conditioning_midi",
         type=str,
         default=None,
@@ -322,6 +342,7 @@ def main() -> int:
         output_dir=args.output_dir,
         use_model=not args.no_model,
         lora_path=args.lora_path,
+        checkpoint_path=args.checkpoint_path,
         conditioning_midi=args.conditioning_midi,
         primer_max_tokens=args.primer_max_tokens,
         max_sequence=args.max_sequence,

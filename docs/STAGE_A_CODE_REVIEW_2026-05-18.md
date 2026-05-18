@@ -233,6 +233,8 @@ Status: completed.
 
 ### Step 2. Checkpoint Policy Fix
 
+Status: completed.
+
 목표:
 
 - "random base + LoRA only" 구조를 중단한다.
@@ -253,6 +255,14 @@ Status: completed.
 
 - 학습한 `checkpoint_epoch*.pt`의 full `model_state_dict`를 generation에서 로드한다.
 - 같은 checkpoint를 로드했을 때 embedding/Wout/base transformer weights가 복원된다.
+
+구현 결과:
+
+- `scripts/generate.py`는 `--lora_path` 아래 최신 `checkpoint_epoch*.pt`를 자동 선택한다.
+- `--checkpoint_path`로 explicit full checkpoint를 지정할 수 있다.
+- full checkpoint의 `positional_encoding.pe` shape로 model max sequence를 감지해 strict load한다.
+- inference CLI, `StageAModelRunner`, FastAPI model runner, generation sweep script가 full checkpoint path를 전달할 수 있다.
+- full checkpoint가 없을 때만 legacy `lora_weights.pt` fallback을 사용한다.
 
 ### Step 3. Tiny Overfit Test
 

@@ -202,6 +202,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--summary_md", type=str, default=str(PROJECT_ROOT / "outputs" / "sweeps" / "generation_contract_sweep.md"))
     parser.add_argument("--no_model", action="store_true", help="Skip Stage A model and measure fallback only")
     parser.add_argument("--lora_path", type=str, default=str(DEFAULT_LORA_PATH))
+    parser.add_argument(
+        "--checkpoint_path",
+        type=str,
+        default=None,
+        help="Optional full checkpoint file. Defaults to latest checkpoint_epoch*.pt under --lora_path.",
+    )
     parser.add_argument("--temperature", type=float, default=None)
     parser.add_argument("--top_k", type=int, default=None)
     parser.add_argument("--top_p", type=float, default=None)
@@ -225,7 +231,11 @@ def main() -> int:
     chord_sets = parse_chord_sets(args.chord_progressions)
     model_runner = None
     if not args.no_model and not args.subprocess_model:
-        model_runner = StageAModelRunner(lora_path=args.lora_path, max_sequence=args.max_sequence)
+        model_runner = StageAModelRunner(
+            lora_path=args.lora_path,
+            checkpoint_path=args.checkpoint_path,
+            max_sequence=args.max_sequence,
+        )
 
     rows: list[dict[str, Any]] = []
     for progression_index, chord_progression in enumerate(chord_sets):
@@ -252,6 +262,7 @@ def main() -> int:
                     output_dir=args.output_dir,
                     use_model=not args.no_model,
                     lora_path=args.lora_path,
+                    checkpoint_path=args.checkpoint_path,
                     conditioning_midi=args.conditioning_midi,
                     primer_max_tokens=args.primer_max_tokens,
                     max_sequence=args.max_sequence,
@@ -281,6 +292,7 @@ def main() -> int:
             "seeds": seeds,
             "chord_progressions": chord_sets,
             "use_model": not args.no_model,
+            "checkpoint_path": args.checkpoint_path,
             "primer_max_tokens": args.primer_max_tokens,
             "max_sequence": args.max_sequence,
             "model_candidates": args.model_candidates,

@@ -98,8 +98,13 @@ def get_model_runner() -> StageAModelRunner:
     global _MODEL_RUNNER
     if _MODEL_RUNNER is None:
         lora_path = os.environ.get("MIDI_LORA_PATH", str(DEFAULT_LORA_PATH))
+        checkpoint_path = os.environ.get("MIDI_CHECKPOINT_PATH")
         max_sequence = int(os.environ.get("MIDI_MAX_SEQUENCE", "256"))
-        _MODEL_RUNNER = StageAModelRunner(lora_path=lora_path, max_sequence=max_sequence)
+        _MODEL_RUNNER = StageAModelRunner(
+            lora_path=lora_path,
+            checkpoint_path=checkpoint_path,
+            max_sequence=max_sequence,
+        )
     return _MODEL_RUNNER
 
 
