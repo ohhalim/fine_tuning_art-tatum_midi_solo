@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #8: Jazz piano dataset audit, generic pianist base strategy, and Brad Mehldau adaptation probe.
+- Issue #9: Manifest-driven role dataset preparation for generic jazz and Brad adaptation splits.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
