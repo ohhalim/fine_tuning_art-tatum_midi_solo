@@ -77,6 +77,7 @@ Decision:
 - Brad Mehldau dataset audit script
 - full jazz piano dataset audit script
 - audit-based training manifest split builder
+- manifest-based role dataset preparation smoke
 
 ## Full Jazz Piano Dataset Audit
 
@@ -190,6 +191,19 @@ python scripts/prepare_role_dataset.py \
   --sequence_format control_v1 \
   --overwrite
 ```
+
+For a small local contract check before broad training:
+
+```bash
+bash scripts/agent_harness.sh manifest-dry-run
+```
+
+Current smoke result:
+
+- `audit_max_files`: 100
+- generated generic manifest split: train 57, val 10
+- smoke prepare subset: train 4, val 2
+- tokenized output: train 4, val 2
 
 ```bash
 python scripts/prepare_role_dataset.py \

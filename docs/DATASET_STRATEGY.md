@@ -196,6 +196,26 @@ python scripts/prepare_role_dataset.py \
 
 In manifest mode, `prepare_role_dataset.py` preserves the explicit train/val boundary and does not reshuffle all candidate files into a new split.
 
+Before broad training, run the small local contract check:
+
+```bash
+bash scripts/agent_harness.sh manifest-dry-run
+```
+
+This writes generated smoke artifacts under `outputs/manifest_prepare_smoke/` and should not be committed.
+
+Current smoke result:
+
+| Step | Result |
+|---|---:|
+| audit max files | 100 |
+| generic manifest train files | 57 |
+| generic manifest val files | 10 |
+| smoke prepare train files | 4 |
+| smoke prepare val files | 2 |
+| tokenized train records | 4 |
+| tokenized val records | 2 |
+
 ## Current Model Order
 
 1. Run full dataset audit. Completed for `midi_dataset/midi`.

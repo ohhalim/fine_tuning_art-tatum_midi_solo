@@ -28,6 +28,8 @@ Modes:
   tiny-prepare  Verify tiny-overfit dataset preparation only.
   tiny-compare  Compare full-model tiny training with random-base LoRA-only.
   control-tiny  Run control_v1 full-model tiny-overfit smoke.
+  manifest-dry-run
+                Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
 
 Environment:
@@ -62,6 +64,7 @@ run_quick() {
     scripts/audit_brad_mehldau_dataset.py \
     scripts/audit_jazz_piano_dataset.py \
     scripts/build_jazz_training_manifests.py \
+    scripts/run_manifest_prepare_smoke.py \
     scripts/train_stage_a_full.py \
     scripts/train_stage_a_adapter.py \
     inference/app \
@@ -115,6 +118,17 @@ run_control_tiny() {
     --run_id "$run_id"
 }
 
+run_manifest_dry_run() {
+  local run_id="${RUN_ID:-harness_manifest_prepare}"
+  print_header "Manifest prepare dry-run"
+  "$PYTHON_BIN" scripts/run_manifest_prepare_smoke.py \
+    --run_id "$run_id" \
+    --audit_max_files 100 \
+    --train_files 4 \
+    --val_files 2 \
+    --overwrite
+}
+
 case "$MODE" in
   status)
     run_status
@@ -133,6 +147,9 @@ case "$MODE" in
     ;;
   control-tiny)
     run_control_tiny
+    ;;
+  manifest-dry-run)
+    run_manifest_dry_run
     ;;
   all)
     run_demo
