@@ -59,6 +59,9 @@ run_quick() {
     scripts/run_stage_a_tiny_overfit.py \
     scripts/compare_stage_a_tiny_modes.py \
     scripts/run_control_v1_tiny_overfit.py \
+    scripts/audit_brad_mehldau_dataset.py \
+    scripts/audit_jazz_piano_dataset.py \
+    scripts/build_jazz_training_manifests.py \
     scripts/train_stage_a_full.py \
     scripts/train_stage_a_adapter.py \
     inference/app \

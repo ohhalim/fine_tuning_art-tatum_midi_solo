@@ -16,7 +16,7 @@ from scripts.control_tokens import (
     tempo_control_token,
     token_names,
 )
-from scripts.prepare_role_dataset import notes_to_midi, write_tokenized_records
+from scripts.prepare_role_dataset import infer_tempo, notes_to_midi, write_tokenized_records
 from utilities.constants import TOKEN_COND_SEP, TOKEN_END, TOKEN_TEMPO_DANCE, TOKEN_TEMPO_FAST
 
 
@@ -82,6 +82,11 @@ class ControlTokensTest(unittest.TestCase):
         self.assertEqual(count, 1)
         self.assertEqual(tokens[:3].tolist(), control_prefix_tokens("lead", 124))
         self.assertIn(TOKEN_COND_SEP, tokens.tolist())
+
+    def test_infer_tempo_reads_pretty_midi_tempo_values(self) -> None:
+        pm = pretty_midi.PrettyMIDI(initial_tempo=124)
+
+        self.assertAlmostEqual(infer_tempo(pm), 124.0)
 
 
 if __name__ == "__main__":

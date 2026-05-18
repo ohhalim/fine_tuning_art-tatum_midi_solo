@@ -148,7 +148,7 @@ def notes_to_midi(notes: Sequence[pretty_midi.Note], tempo_bpm: float) -> pretty
 
 def infer_tempo(pm: pretty_midi.PrettyMIDI) -> float:
     try:
-        tempi, _ = pm.get_tempo_changes()
+        _, tempi = pm.get_tempo_changes()
         if len(tempi) > 0:
             tempo = float(tempi[0])
             if tempo > 0:
