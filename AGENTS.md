@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #7: Stage A tiny-overfit smoke tests and training-mode comparison.
+- Issue #8: Brad Mehldau `control_v1` dataset audit and small training probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -29,17 +29,12 @@ Allowed without additional permission:
 
 Must ask first:
 
+- any `git push`, including same-branch upstream push
 - pull request creation or PR metadata updates
 - GitHub issue creation or issue metadata updates
 - deployment
 - external uploads
 - destructive cleanup of generated files, checkpoints, datasets, or user-created outputs
-
-Same-branch push automation:
-
-- After a validated local commit, the agent may run `git push` to the current branch's configured upstream without asking again.
-- This only applies when the push target is the same branch and same remote already configured for the current branch.
-- If the push would create a new remote branch, force-push, push tags, push another branch, or change remotes, ask first.
 
 If the user says "PR 올려", "이슈 만들어", "배포해", or equivalent, that counts as explicit permission for that requested remote action only.
 
