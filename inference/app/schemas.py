@@ -86,6 +86,11 @@ class GenerationMetrics:
     unique_pitch_class_count: int | None = None
     expected_duration_sec: float | None = None
     phrase_coverage_ratio: float | None = None
+    avg_note_duration_sec: float | None = None
+    max_note_duration_sec: float | None = None
+    max_note_duration_ratio: float | None = None
+    long_note_ratio: float | None = None
+    max_simultaneous_notes: int | None = None
     chord_tone_count: int = 0
     non_chord_tone_count: int = 0
     chord_tone_ratio: float | None = None

@@ -176,6 +176,58 @@ class RequestConditioningTest(unittest.TestCase):
         self.assertFalse(valid)
         self.assertIn("phrase coverage too low", str(reason))
 
+    def test_medium_validation_rejects_full_span_sustain_block(self) -> None:
+        metrics = GenerationMetrics(
+            generation_time_ms=100,
+            note_count=6,
+            duration_sec=4.0,
+            note_density=1.5,
+            dead_air_ratio=0.2,
+            repetition_score=0.0,
+            pitch_min=60,
+            pitch_max=76,
+            fallback_used=False,
+            unique_pitch_count=5,
+            unique_pitch_class_count=5,
+            expected_duration_sec=4.0,
+            phrase_coverage_ratio=1.0,
+            max_note_duration_sec=4.0,
+            max_note_duration_ratio=1.0,
+            long_note_ratio=0.2,
+            max_simultaneous_notes=1,
+        )
+
+        valid, reason = validate_metrics(metrics, "medium", bars=2)
+
+        self.assertFalse(valid)
+        self.assertIn("note duration too long", str(reason))
+
+    def test_medium_validation_rejects_chord_block_polyphony(self) -> None:
+        metrics = GenerationMetrics(
+            generation_time_ms=100,
+            note_count=8,
+            duration_sec=4.0,
+            note_density=2.0,
+            dead_air_ratio=0.2,
+            repetition_score=0.0,
+            pitch_min=60,
+            pitch_max=76,
+            fallback_used=False,
+            unique_pitch_count=6,
+            unique_pitch_class_count=6,
+            expected_duration_sec=4.0,
+            phrase_coverage_ratio=1.0,
+            max_note_duration_sec=1.0,
+            max_note_duration_ratio=0.25,
+            long_note_ratio=0.0,
+            max_simultaneous_notes=4,
+        )
+
+        valid, reason = validate_metrics(metrics, "medium", bars=2)
+
+        self.assertFalse(valid)
+        self.assertIn("too many simultaneous notes", str(reason))
+
     def test_medium_validation_rejects_dead_air_at_threshold(self) -> None:
         metrics = GenerationMetrics(
             generation_time_ms=100,

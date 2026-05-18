@@ -125,8 +125,11 @@ Density-specific review-ready gates are acceptance gates:
 - minimum note count for a 2-bar phrase: sparse `3`, medium `4`, dense `8`
 - minimum unique pitch count: sparse `2`, medium `3`, dense `4`
 - minimum phrase coverage ratio: sparse `0.25`, medium `0.35`, dense `0.45`
+- maximum note duration ratio: sparse `0.85`, medium `0.55`, dense `0.45`
+- maximum long-note ratio: sparse `0.50`, medium `0.25`, dense `0.20`
+- maximum simultaneous notes: sparse `2`, medium `2`, dense `3`
 
-Outputs below these floors are too underdeveloped to review musically and must fall through to another candidate or fallback. This specifically excludes one-note/two-note MIDI files, phrases trapped on one pitch, and phrases that are clustered into a tiny part of the requested bar span.
+Outputs outside these bounds are too underdeveloped to review musically and must fall through to another candidate or fallback. This specifically excludes one-note/two-note MIDI files, phrases trapped on one pitch, phrases clustered into a tiny part of the requested bar span, full-span sustain blocks, and chord blocks with too many overlapping notes.
 
 ## 9. Failure Detection
 
@@ -138,6 +141,9 @@ Fail if:
 - note count is below the density-specific minimum.
 - unique pitch count is below the density-specific minimum.
 - phrase coverage is below the density-specific minimum.
+- max note duration ratio is above the density-specific maximum.
+- too many notes are long relative to the requested phrase.
+- max simultaneous note count is above the density-specific maximum.
 - duration is 0.
 - medium/dense request has near-zero note density.
 - pitch range is invalid after post-processing.
@@ -172,6 +178,9 @@ Fallback if:
     "uniquePitchClassCount": 6,
     "expectedDurationSec": 3.87,
     "phraseCoverageRatio": 0.94,
+    "maxNoteDurationRatio": 0.18,
+    "longNoteRatio": 0.0,
+    "maxSimultaneousNotes": 2,
     "chordToneRatio": 0.62
   }
 }

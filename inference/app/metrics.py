@@ -34,6 +34,30 @@ MIN_PHRASE_COVERAGE = {
     "dense": 0.45,
 }
 
+MAX_NOTE_DURATION_RATIO = {
+    "sparse": 0.85,
+    "medium": 0.55,
+    "dense": 0.45,
+}
+
+LONG_NOTE_DURATION_RATIO = {
+    "sparse": 0.50,
+    "medium": 0.35,
+    "dense": 0.25,
+}
+
+MAX_LONG_NOTE_RATIO = {
+    "sparse": 0.50,
+    "medium": 0.25,
+    "dense": 0.20,
+}
+
+MAX_SIMULTANEOUS_NOTES = {
+    "sparse": 2,
+    "medium": 2,
+    "dense": 3,
+}
+
 DEAD_AIR_MAX = {
     "medium": 0.8,
     "dense": 0.7,
@@ -81,6 +105,19 @@ def chord_tone_metrics(
     return chord_tone_count, non_chord_tone_count, ratio
 
 
+def max_simultaneous_notes(notes: list[pretty_midi.Note]) -> int:
+    events: list[tuple[float, int]] = []
+    for note in notes:
+        events.append((float(note.start), 1))
+        events.append((float(note.end), -1))
+    active = 0
+    maximum = 0
+    for _time, delta in sorted(events, key=lambda item: (item[0], item[1])):
+        active = max(0, active + delta)
+        maximum = max(maximum, active)
+    return maximum
+
+
 def compute_midi_metrics(
     midi_path: str | Path,
     generation_time_ms: int,
@@ -104,10 +141,16 @@ def compute_midi_metrics(
             unique_pitch_class_count=0,
             expected_duration_sec=phrase_duration_sec(request) if request is not None else None,
             phrase_coverage_ratio=0.0 if request is not None else None,
+            avg_note_duration_sec=0.0,
+            max_note_duration_sec=0.0,
+            max_note_duration_ratio=0.0,
+            long_note_ratio=0.0,
+            max_simultaneous_notes=0,
         )
 
     starts = [note.start for note in notes]
     pitches = [note.pitch for note in notes]
+    note_durations = [max(0.0, float(note.end) - float(note.start)) for note in notes]
     phrase_start_sec = min(note.start for note in notes)
     phrase_end_sec = max(note.end for note in notes)
     duration_sec = max(1e-6, phrase_end_sec - phrase_start_sec)
@@ -115,6 +158,15 @@ def compute_midi_metrics(
     phrase_coverage_ratio = (
         min(1.0, duration_sec / max(1e-6, expected_duration_sec)) if expected_duration_sec is not None else None
     )
+    duration_reference_sec = expected_duration_sec if expected_duration_sec is not None else duration_sec
+    max_note_duration_sec = max(note_durations)
+    max_note_duration_ratio = max_note_duration_sec / max(1e-6, duration_reference_sec)
+    density = request.density if request is not None else "medium"
+    long_note_floor_sec = LONG_NOTE_DURATION_RATIO.get(density, LONG_NOTE_DURATION_RATIO["medium"]) * max(
+        1e-6,
+        duration_reference_sec,
+    )
+    long_note_count = sum(1 for duration in note_durations if duration >= long_note_floor_sec)
     gaps = [max(0.0, starts[i] - starts[i - 1]) for i in range(1, len(starts))]
     threshold = dead_air_threshold_ms / 1000.0
     dead_air_events = sum(1 for gap in gaps if gap >= threshold)
@@ -134,6 +186,11 @@ def compute_midi_metrics(
         unique_pitch_class_count=len({pitch % 12 for pitch in pitches}),
         expected_duration_sec=expected_duration_sec,
         phrase_coverage_ratio=phrase_coverage_ratio,
+        avg_note_duration_sec=sum(note_durations) / len(note_durations),
+        max_note_duration_sec=max_note_duration_sec,
+        max_note_duration_ratio=max_note_duration_ratio,
+        long_note_ratio=long_note_count / len(note_durations),
+        max_simultaneous_notes=max_simultaneous_notes(notes),
         chord_tone_count=chord_tone_count,
         non_chord_tone_count=non_chord_tone_count,
         chord_tone_ratio=chord_tone_ratio,
@@ -153,6 +210,18 @@ def minimum_phrase_coverage(density: str) -> float:
     return MIN_PHRASE_COVERAGE.get(density, MIN_PHRASE_COVERAGE["medium"])
 
 
+def maximum_note_duration_ratio(density: str) -> float:
+    return MAX_NOTE_DURATION_RATIO.get(density, MAX_NOTE_DURATION_RATIO["medium"])
+
+
+def maximum_long_note_ratio(density: str) -> float:
+    return MAX_LONG_NOTE_RATIO.get(density, MAX_LONG_NOTE_RATIO["medium"])
+
+
+def maximum_simultaneous_notes(density: str) -> int:
+    return MAX_SIMULTANEOUS_NOTES.get(density, MAX_SIMULTANEOUS_NOTES["medium"])
+
+
 def validate_metrics(metrics: GenerationMetrics, density: str, bars: int = 2) -> tuple[bool, str | None]:
     if metrics.note_count <= 0:
         return False, "generated MIDI has no notes"
@@ -165,6 +234,15 @@ def validate_metrics(metrics: GenerationMetrics, density: str, bars: int = 2) ->
     min_coverage = minimum_phrase_coverage(density)
     if metrics.phrase_coverage_ratio is not None and metrics.phrase_coverage_ratio < min_coverage:
         return False, f"phrase coverage too low: {metrics.phrase_coverage_ratio:.3f} < {min_coverage:.3f}"
+    max_duration_ratio = maximum_note_duration_ratio(density)
+    if metrics.max_note_duration_ratio is not None and metrics.max_note_duration_ratio > max_duration_ratio:
+        return False, f"note duration too long: {metrics.max_note_duration_ratio:.3f} > {max_duration_ratio:.3f}"
+    max_long_ratio = maximum_long_note_ratio(density)
+    if metrics.long_note_ratio is not None and metrics.long_note_ratio > max_long_ratio:
+        return False, f"too many long notes: {metrics.long_note_ratio:.3f} > {max_long_ratio:.3f}"
+    max_simultaneous = maximum_simultaneous_notes(density)
+    if metrics.max_simultaneous_notes is not None and metrics.max_simultaneous_notes > max_simultaneous:
+        return False, f"too many simultaneous notes: {metrics.max_simultaneous_notes} > {max_simultaneous}"
     if metrics.duration_sec <= 0:
         return False, "generated MIDI has zero duration"
     if metrics.pitch_min is None or metrics.pitch_max is None:
