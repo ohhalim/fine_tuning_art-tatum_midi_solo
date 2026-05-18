@@ -6,6 +6,11 @@
 
 MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 
+2026-05-18 코드 리뷰 기준 문서:
+
+- `docs/STAGE_A_CODE_REVIEW_2026-05-18.md`
+- 결론: 현재 Stage A 문제는 metric threshold보다 학습/로드/디코딩/conditioning 구조 문제다. 다음 구현은 decoder fix, full checkpoint loading, tiny overfit smoke 순서로 진행한다.
+
 ## 1. 현재 결정 사항
 
 - 메인 라인: Symbolic MIDI 기반 `Music Transformer + LoRA`.
@@ -159,6 +164,8 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 - 현재 Stage A에서 사용해야 하는 생성 엔트리포인트는 `scripts/generate.py`다.
 - MVP request contract 확인은 `python -m inference.app.generator`를 사용한다.
 - 현재 inference 기본값은 `max_sequence=256`이다. 512-token 생성은 더 느린 비교/실험용으로 유지한다.
+- 현재 `checkpoints/jazz_lora_stage_a/lora_weights.pt`만으로는 학습된 full model을 복원하지 못한다. base Music Transformer가 pretrained checkpoint 없이 랜덤 초기화되는 구조라서, Stage A 결과를 실사용 가능한 jazz solo model로 해석하면 안 된다.
+- `music_transformer/third_party/midi_processor/processor.py`의 decoder는 `note_off` 처리 후 active note를 삭제하지 않아 ghost sustain note를 만들 수 있다. 다음 코드 수정 1순위다.
 - 로컬 워크트리에는 추적되지 않은 데이터, 샘플, 문서가 많다. 문서/코드 작업 시 기존 산출물을 정리하거나 삭제하지 않는다.
 
 ## 3. 현재 로컬 산출물
@@ -350,9 +357,10 @@ python scripts/eval_offline_metrics.py \
 
 가장 먼저 할 일:
 
-1. 기존 checkpoint로 `scripts/generate.py`를 실행해 현재 로컬에서 Stage A 샘플이 정상 생성되는지 확인한다.
-2. `scripts/eval_offline_metrics.py`로 metrics를 재생성한다.
-3. 빈 MIDI 또는 density 0 샘플이 나오면 생성 실패 처리와 retry 정책부터 넣는다.
-4. 그다음 control token 기반 Conditioning 포맷으로 넘어간다.
+1. `processor.py` decoder의 `_merge_note()`에서 ghost sustain note가 생기지 않도록 수정한다.
+2. decoder roundtrip/stray note-off 테스트를 추가한다.
+3. `scripts/generate.py`가 full `model_state_dict` checkpoint를 로드할 수 있게 한다.
+4. 1~3개 sample tiny overfit smoke를 만들어, 모델이 MIDI grammar를 배울 수 있는지 먼저 확인한다.
+5. 그다음 control token 기반 Conditioning 포맷으로 넘어간다.
 
-즉, 바로 realtime으로 가지 않는다. 먼저 현재 생성 파이프라인의 실패 조건을 명확히 잡고, 그다음 실시간 런타임으로 연결한다.
+즉, 바로 realtime이나 API 확장으로 가지 않는다. 먼저 현재 생성 파이프라인의 디코딩/체크포인트/학습 구조를 바로잡고, 그다음 실시간 런타임으로 연결한다.

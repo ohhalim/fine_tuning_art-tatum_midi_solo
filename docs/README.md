@@ -10,6 +10,8 @@
   - 현재 레포 상태, 이미 구현된 Stage A 파이프라인, 다음 우선순위.
 - `REVIEW_2026-05-16.md`
   - 현재 모델 MVP의 1차 리뷰, 위험, 결정 사항, 다음 7일 계획.
+- `STAGE_A_CODE_REVIEW_2026-05-18.md`
+  - Stage A 모델 출력이 sustain block/엉성한 MIDI로 나오는 구조적 원인 분석과 다음 수정 순서.
 - `JAMBOT_MIDI_REFACTOR_PLAN.md`
   - 초기 계획과 2026-02-20 dead-air sweep 기록.
 
