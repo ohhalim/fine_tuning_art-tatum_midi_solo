@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+import json
+import contextlib
+import io
 from pathlib import Path
 
 import numpy as np
@@ -16,7 +19,13 @@ from scripts.control_tokens import (
     tempo_control_token,
     token_names,
 )
-from scripts.prepare_role_dataset import infer_tempo, notes_to_midi, write_tokenized_records
+from scripts.prepare_role_dataset import (
+    infer_tempo,
+    main as prepare_role_dataset_main,
+    notes_to_midi,
+    read_midi_manifest,
+    write_tokenized_records,
+)
 from utilities.constants import TOKEN_COND_SEP, TOKEN_END, TOKEN_TEMPO_DANCE, TOKEN_TEMPO_FAST
 
 
@@ -87,6 +96,79 @@ class ControlTokensTest(unittest.TestCase):
         pm = pretty_midi.PrettyMIDI(initial_tempo=124)
 
         self.assertAlmostEqual(infer_tempo(pm), 124.0)
+
+    def test_read_midi_manifest_ignores_blank_lines_and_comments(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            manifest = Path(tmp_dir) / "manifest.txt"
+            manifest.write_text(
+                """
+# comment
+/tmp/a.mid
+
+/tmp/b.midi
+""".strip()
+            )
+
+            paths = read_midi_manifest(manifest)
+
+        self.assertEqual(paths, [Path("/tmp/a.mid"), Path("/tmp/b.midi")])
+
+    def test_prepare_role_dataset_preserves_explicit_manifest_splits(self) -> None:
+        def source_notes() -> list[pretty_midi.Note]:
+            notes: list[pretty_midi.Note] = []
+            for i in range(3):
+                notes.append(pretty_midi.Note(velocity=80, pitch=48 + i, start=i * 0.25, end=i * 0.25 + 0.1))
+            for i in range(8):
+                notes.append(pretty_midi.Note(velocity=90, pitch=66 + i, start=1.0 + i * 0.25, end=1.1 + i * 0.25))
+            return notes
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            train_midi = root / "train.mid"
+            val_midi = root / "val.mid"
+            notes_to_midi(source_notes(), 124).write(str(train_midi))
+            notes_to_midi(source_notes(), 124).write(str(val_midi))
+
+            train_manifest = root / "train.txt"
+            val_manifest = root / "val.txt"
+            train_manifest.write_text(f"{train_midi}\n", encoding="utf-8")
+            val_manifest.write_text(f"{val_midi}\n", encoding="utf-8")
+
+            output_dir = root / "roles"
+            with contextlib.redirect_stdout(io.StringIO()):
+                prepare_role_dataset_main(
+                    [
+                        "--train_manifest",
+                        str(train_manifest),
+                        "--val_manifest",
+                        str(val_manifest),
+                        "--output_dir",
+                        str(output_dir),
+                        "--role",
+                        "lead",
+                        "--min_conditioning_notes",
+                        "2",
+                        "--min_target_notes",
+                        "8",
+                        "--sequence_format",
+                        SEQUENCE_FORMAT_CONTROL_V1,
+                        "--overwrite",
+                    ]
+                )
+
+            role_root = output_dir / "lead"
+            summary = json.loads((role_root / "dataset_summary.json").read_text(encoding="utf-8"))
+            train_tokens = sorted((role_root / "tokenized" / "train").glob("*.npy"))
+            val_tokens = sorted((role_root / "tokenized" / "val").glob("*.npy"))
+            metas = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(role_root.glob("*/meta.json"))]
+
+        self.assertEqual(summary["input_mode"], "manifest")
+        self.assertEqual(summary["input_split_file_counts"], {"train": 1, "val": 1})
+        self.assertEqual(summary["train_samples"], 1)
+        self.assertEqual(summary["val_samples"], 1)
+        self.assertEqual(len(train_tokens), 1)
+        self.assertEqual(len(val_tokens), 1)
+        self.assertEqual([meta["source_split"] for meta in metas], ["train", "val"])
 
 
 if __name__ == "__main__":

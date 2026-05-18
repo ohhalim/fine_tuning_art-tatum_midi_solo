@@ -182,6 +182,20 @@ data/manifests/rejected.txt
 
 These files are generated from the local audit JSON and should not be committed.
 
+Prepare a tokenized generic split from the manifest files:
+
+```bash
+python scripts/prepare_role_dataset.py \
+  --train_manifest ./data/manifests/generic_jazz_train.txt \
+  --val_manifest ./data/manifests/generic_jazz_val.txt \
+  --output_dir ./data/roles_generic_jazz \
+  --role lead \
+  --sequence_format control_v1 \
+  --overwrite
+```
+
+In manifest mode, `prepare_role_dataset.py` preserves the explicit train/val boundary and does not reshuffle all candidate files into a new split.
+
 ## Current Model Order
 
 1. Run full dataset audit. Completed for `midi_dataset/midi`.
