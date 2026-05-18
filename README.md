@@ -53,6 +53,7 @@ scripts/
   train_qlora.py                  # lower-level training implementation
   generate.py                     # checkpoint-based MIDI generation
   run_control_v1_tiny_overfit.py  # control_v1 tiny-overfit smoke
+  run_manifest_prepare_smoke.py   # audit -> manifest -> prepare dry-run
   agent_harness.sh                # local validation harness
 
 inference/app/
@@ -109,6 +110,12 @@ python scripts/build_jazz_training_manifests.py
 ```
 
 Generated manifest files are written under `data/manifests/` and are not committed.
+
+Run a small end-to-end dry-run:
+
+```bash
+bash scripts/agent_harness.sh manifest-dry-run
+```
 
 ## Prepare Data
 

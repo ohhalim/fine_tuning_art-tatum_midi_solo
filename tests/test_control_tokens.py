@@ -163,6 +163,7 @@ class ControlTokensTest(unittest.TestCase):
             metas = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(role_root.glob("*/meta.json"))]
 
         self.assertEqual(summary["input_mode"], "manifest")
+        self.assertIsNone(summary["input_dir"])
         self.assertEqual(summary["input_split_file_counts"], {"train": 1, "val": 1})
         self.assertEqual(summary["train_samples"], 1)
         self.assertEqual(summary["val_samples"], 1)

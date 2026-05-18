@@ -456,7 +456,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     summary = {
         "role": args.role,
         "input_mode": input_mode,
-        "input_dir": str(input_dir),
+        "input_dir": str(input_dir) if input_mode == "directory" else None,
         "train_manifest": args.train_manifest,
         "val_manifest": args.val_manifest,
         "input_file_count": total_input_files,

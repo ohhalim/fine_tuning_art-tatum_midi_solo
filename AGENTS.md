@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #9: Manifest-driven role dataset preparation for generic jazz and Brad adaptation splits.
+- Issue #12: Manifest dry-run and control_v1 preparation validation from latest main.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
