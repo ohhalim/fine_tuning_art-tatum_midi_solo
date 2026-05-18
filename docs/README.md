@@ -18,6 +18,8 @@
   - full checkpoint/from-scratch training과 adapter training을 분리하는 기준.
 - `STAGE_A_TOKEN_FORMAT.md`
   - `control_v1` token sequence, legacy format, checkpoint vocab migration 규칙.
+- `BRAD_MEHLDAU_FINETUNING_PLAN.md`
+  - Brad Mehldau MIDI dataset audit, fine-tuning probe order, acceptance criteria.
 - `JAMBOT_MIDI_REFACTOR_PLAN.md`
   - 초기 계획과 2026-02-20 dead-air sweep 기록.
 

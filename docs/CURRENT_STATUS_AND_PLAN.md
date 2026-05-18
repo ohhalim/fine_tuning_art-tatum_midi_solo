@@ -6,6 +6,10 @@
 
 MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
 
+Brad Mehldau fine-tuning 기준 문서:
+
+- `docs/BRAD_MEHLDAU_FINETUNING_PLAN.md`
+
 2026-05-18 코드 리뷰 기준 문서:
 
 - `docs/STAGE_A_CODE_REVIEW_2026-05-18.md`
@@ -70,6 +74,11 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - Brad Mehldau `max_files=2` probe에서 `sequence_format=control_v1`, tokenized train/val 생성이 성공했다.
   - 첫 train sequence 길이는 `7079` token이라 기존 random crop은 control prompt를 잃을 수 있었다.
   - `scripts/train_qlora.py` crop 로직을 control-aware로 수정했다.
+- Brad Mehldau dataset audit
+  - 전체 18개 MIDI 파일 모두 usable.
+  - `control_v1_token_count`: min `1136`, p50 `3241`, p90 `5663`, max `10653`, mean 약 `3931`.
+  - 18개 모두 `max_sequence=512`를 초과한다.
+  - 따라서 full-song random crop이 아니라 control-aware crop 또는 phrase-window dataset이 필수다.
 - `scripts/eval_offline_metrics.py`
   - note density, dead-air proxy, 4-gram repetition 평가.
 - `scripts/analyze_chord_tone_errors.py`
