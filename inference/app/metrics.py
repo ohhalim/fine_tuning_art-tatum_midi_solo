@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pretty_midi
 
-from .fallback import chord_for_time, parse_chord
+from .fallback import chord_for_time, parse_chord, phrase_duration_sec
 from .schemas import GenerationMetrics, GenerationRequest
 
 
@@ -20,6 +20,18 @@ MIN_NOTES_PER_BAR = {
     "sparse": 1.5,
     "medium": 2.0,
     "dense": 4.0,
+}
+
+MIN_UNIQUE_PITCHES = {
+    "sparse": 2,
+    "medium": 3,
+    "dense": 4,
+}
+
+MIN_PHRASE_COVERAGE = {
+    "sparse": 0.25,
+    "medium": 0.35,
+    "dense": 0.45,
 }
 
 DEAD_AIR_MAX = {
@@ -88,11 +100,21 @@ def compute_midi_metrics(
             pitch_min=None,
             pitch_max=None,
             fallback_used=fallback_used,
+            unique_pitch_count=0,
+            unique_pitch_class_count=0,
+            expected_duration_sec=phrase_duration_sec(request) if request is not None else None,
+            phrase_coverage_ratio=0.0 if request is not None else None,
         )
 
     starts = [note.start for note in notes]
     pitches = [note.pitch for note in notes]
-    duration_sec = max(1e-6, notes[-1].end - notes[0].start)
+    phrase_start_sec = min(note.start for note in notes)
+    phrase_end_sec = max(note.end for note in notes)
+    duration_sec = max(1e-6, phrase_end_sec - phrase_start_sec)
+    expected_duration_sec = phrase_duration_sec(request) if request is not None else None
+    phrase_coverage_ratio = (
+        min(1.0, duration_sec / max(1e-6, expected_duration_sec)) if expected_duration_sec is not None else None
+    )
     gaps = [max(0.0, starts[i] - starts[i - 1]) for i in range(1, len(starts))]
     threshold = dead_air_threshold_ms / 1000.0
     dead_air_events = sum(1 for gap in gaps if gap >= threshold)
@@ -108,6 +130,10 @@ def compute_midi_metrics(
         pitch_min=min(pitches),
         pitch_max=max(pitches),
         fallback_used=fallback_used,
+        unique_pitch_count=len(set(pitches)),
+        unique_pitch_class_count=len({pitch % 12 for pitch in pitches}),
+        expected_duration_sec=expected_duration_sec,
+        phrase_coverage_ratio=phrase_coverage_ratio,
         chord_tone_count=chord_tone_count,
         non_chord_tone_count=non_chord_tone_count,
         chord_tone_ratio=chord_tone_ratio,
@@ -119,12 +145,26 @@ def minimum_note_count(density: str, bars: int = 2) -> int:
     return max(1, ceil(notes_per_bar * max(1, int(bars))))
 
 
+def minimum_unique_pitch_count(density: str) -> int:
+    return MIN_UNIQUE_PITCHES.get(density, MIN_UNIQUE_PITCHES["medium"])
+
+
+def minimum_phrase_coverage(density: str) -> float:
+    return MIN_PHRASE_COVERAGE.get(density, MIN_PHRASE_COVERAGE["medium"])
+
+
 def validate_metrics(metrics: GenerationMetrics, density: str, bars: int = 2) -> tuple[bool, str | None]:
     if metrics.note_count <= 0:
         return False, "generated MIDI has no notes"
     min_notes = minimum_note_count(density, bars=bars)
     if metrics.note_count < min_notes:
         return False, f"note count too low: {metrics.note_count} < {min_notes}"
+    min_unique_pitches = minimum_unique_pitch_count(density)
+    if metrics.unique_pitch_count is not None and metrics.unique_pitch_count < min_unique_pitches:
+        return False, f"unique pitch count too low: {metrics.unique_pitch_count} < {min_unique_pitches}"
+    min_coverage = minimum_phrase_coverage(density)
+    if metrics.phrase_coverage_ratio is not None and metrics.phrase_coverage_ratio < min_coverage:
+        return False, f"phrase coverage too low: {metrics.phrase_coverage_ratio:.3f} < {min_coverage:.3f}"
     if metrics.duration_sec <= 0:
         return False, "generated MIDI has zero duration"
     if metrics.pitch_min is None or metrics.pitch_max is None:

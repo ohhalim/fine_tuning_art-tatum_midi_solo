@@ -82,6 +82,10 @@ class GenerationMetrics:
     pitch_min: int | None
     pitch_max: int | None
     fallback_used: bool
+    unique_pitch_count: int | None = None
+    unique_pitch_class_count: int | None = None
+    expected_duration_sec: float | None = None
+    phrase_coverage_ratio: float | None = None
     chord_tone_count: int = 0
     non_chord_tone_count: int = 0
     chord_tone_ratio: float | None = None

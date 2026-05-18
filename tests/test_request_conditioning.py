@@ -133,6 +133,49 @@ class RequestConditioningTest(unittest.TestCase):
         self.assertFalse(valid)
         self.assertIn("note count too low", str(reason))
 
+    def test_medium_validation_rejects_repeated_single_pitch_phrase(self) -> None:
+        metrics = GenerationMetrics(
+            generation_time_ms=100,
+            note_count=6,
+            duration_sec=2.0,
+            note_density=3.0,
+            dead_air_ratio=0.2,
+            repetition_score=0.0,
+            pitch_min=64,
+            pitch_max=64,
+            fallback_used=False,
+            unique_pitch_count=1,
+            unique_pitch_class_count=1,
+            phrase_coverage_ratio=0.6,
+        )
+
+        valid, reason = validate_metrics(metrics, "medium", bars=2)
+
+        self.assertFalse(valid)
+        self.assertIn("unique pitch count too low", str(reason))
+
+    def test_medium_validation_rejects_clustered_phrase_with_low_coverage(self) -> None:
+        metrics = GenerationMetrics(
+            generation_time_ms=100,
+            note_count=6,
+            duration_sec=0.3,
+            note_density=20.0,
+            dead_air_ratio=0.0,
+            repetition_score=0.0,
+            pitch_min=60,
+            pitch_max=67,
+            fallback_used=False,
+            unique_pitch_count=4,
+            unique_pitch_class_count=4,
+            expected_duration_sec=4.0,
+            phrase_coverage_ratio=0.075,
+        )
+
+        valid, reason = validate_metrics(metrics, "medium", bars=2)
+
+        self.assertFalse(valid)
+        self.assertIn("phrase coverage too low", str(reason))
+
     def test_medium_validation_rejects_dead_air_at_threshold(self) -> None:
         metrics = GenerationMetrics(
             generation_time_ms=100,
@@ -210,13 +253,13 @@ class RequestConditioningTest(unittest.TestCase):
                 pm = pretty_midi.PrettyMIDI(initial_tempo=float(request.bpm))
                 piano = pretty_midi.Instrument(program=0, is_drum=False)
                 for index in range(12):
-                    start = index * 0.1
+                    start = index * 0.16
                     piano.notes.append(
                         pretty_midi.Note(
                             velocity=80,
                             pitch=60 + (index % 5),
                             start=start,
-                            end=start + 0.08,
+                            end=start + 0.12,
                         )
                     )
                 pm.instruments.append(piano)

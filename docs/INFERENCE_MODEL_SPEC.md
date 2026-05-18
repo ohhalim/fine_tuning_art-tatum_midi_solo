@@ -104,6 +104,10 @@ Required:
 - `pitchMin`
 - `pitchMax`
 - `fallbackUsed`
+- `uniquePitchCount`
+- `uniquePitchClassCount`
+- `expectedDurationSec`
+- `phraseCoverageRatio`
 - `chordToneRatio`
 - `chordToneCount`
 - `nonChordToneCount`
@@ -116,7 +120,13 @@ Optional:
 
 `chordToneRatio` is computed as a pitch-class hit ratio against the request chord that is active at each note start time. It contributes a weak candidate-selection penalty below `0.55`, but it is not an acceptance gate in the current MVP.
 
-Density-specific minimum note count is an acceptance gate. For a 2-bar phrase the current minimums are sparse `3`, medium `4`, and dense `8`. Outputs below this floor are too underdeveloped to review musically and must fall through to another candidate or fallback.
+Density-specific review-ready gates are acceptance gates:
+
+- minimum note count for a 2-bar phrase: sparse `3`, medium `4`, dense `8`
+- minimum unique pitch count: sparse `2`, medium `3`, dense `4`
+- minimum phrase coverage ratio: sparse `0.25`, medium `0.35`, dense `0.45`
+
+Outputs below these floors are too underdeveloped to review musically and must fall through to another candidate or fallback. This specifically excludes one-note/two-note MIDI files, phrases trapped on one pitch, and phrases that are clustered into a tiny part of the requested bar span.
 
 ## 9. Failure Detection
 
@@ -126,6 +136,8 @@ Fail if:
 - MIDI cannot be read by `pretty_midi`.
 - note count is 0.
 - note count is below the density-specific minimum.
+- unique pitch count is below the density-specific minimum.
+- phrase coverage is below the density-specific minimum.
 - duration is 0.
 - medium/dense request has near-zero note density.
 - pitch range is invalid after post-processing.
@@ -155,7 +167,12 @@ Fallback if:
     "deadAirRatio": 0.12,
     "repetitionScore": 0.08,
     "pitchMin": 48,
-    "pitchMax": 84
+    "pitchMax": 84,
+    "uniquePitchCount": 8,
+    "uniquePitchClassCount": 6,
+    "expectedDurationSec": 3.87,
+    "phraseCoverageRatio": 0.94,
+    "chordToneRatio": 0.62
   }
 }
 ```

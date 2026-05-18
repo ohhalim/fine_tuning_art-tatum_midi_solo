@@ -49,9 +49,12 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - 실패 시 fallback MIDI 생성.
 - `inference/app/metrics.py`
   - note density, dead-air, repetition, pitch range를 계산.
+  - `unique_pitch_count`, `unique_pitch_class_count`, `expected_duration_sec`, `phrase_coverage_ratio`를 계산.
   - request chord progression 기준 `chord_tone_count`, `non_chord_tone_count`, `chord_tone_ratio`를 계산.
   - chord-tone metric은 현재 gate가 아니라 코드 반응성을 보기 위한 관측 지표다.
   - density별 최소 note count gate를 적용한다. 2-bar 기준 sparse `3`, medium `4`, dense `8`.
+  - density별 최소 unique pitch gate를 적용한다. sparse `2`, medium `3`, dense `4`.
+  - phrase coverage gate를 적용한다. sparse `0.25`, medium `0.35`, dense `0.45`.
 - `inference/app/conditioning.py`
   - structured request를 low-register chord guide MIDI로 변환.
   - `--conditioning_midi` 명시값이 없을 때 기본 primer로 사용.
@@ -119,6 +122,22 @@ MVP 구현을 위한 세부 문서는 `docs/README.md`에서 시작한다.
   - threshold `0.5` 이하 low sample: `8/27`.
   - low sample 평균 chord-tone ratio: 약 `0.23`.
   - low sample 분포: sparse `5`, medium `3`, dense `0`.
+- review-ready phrase gate sweep:
+  - 산출물: `outputs/sweeps/review_ready_gate_p256_27case.json`, `outputs/sweeps/review_ready_gate_p256_27case.md`.
+  - model success `24/27`, fallback `3/27`, failed `0/27`.
+  - fallback 전환 사유는 note count 부족 2건, unique pitch 부족 1건이다.
+  - 모든 completed output의 최소 note count는 `3`.
+  - 모든 completed output의 최소 unique pitch count는 `3`.
+  - 모든 completed output의 최소 phrase coverage ratio는 약 `0.76`.
+  - 평균 chord-tone ratio는 약 `0.61`.
+  - 해석: 1-note/2-note MIDI, 한 pitch만 반복하는 MIDI, 요청 길이 대비 앞부분에만 몰린 MIDI를 리뷰 대상에서 제외하는 기준이 들어갔다. fallback이 늘어난 것은 품질 기준이 올라간 결과다.
+- review-ready gate 이후 chord-tone error analysis:
+  - 산출물: `outputs/sweeps/review_ready_gate_chord_tone_error_analysis.json`, `outputs/sweeps/review_ready_gate_chord_tone_error_analysis.md`.
+  - threshold `0.5` 이하 low sample: `10/27`.
+  - low sample 평균 chord-tone ratio: 약 `0.35`.
+  - low sample 분포: sparse `7`, medium `3`, dense `0`.
+  - top non-chord pitch classes: `Eb`, `Ab`, `C`, `C#`, `E`.
+  - 해석: 낮은 chord-tone 문제는 더 이상 1-note/2-note 착시만은 아니다. sparse/medium에서 chord conditioning 자체가 약한 신호로 보고, 강한 postprocess보다 Stage B conditioning/token 설계 검토가 우선이다.
 
 주의할 점:
 
@@ -242,7 +261,7 @@ python scripts/eval_offline_metrics.py \
 - 남은 문제는 request당 약 9~10초가 걸리는 autoregressive generation 병목과 실제 음악성/코드 적합성 평가다.
 - README의 MVP demo command는 `bash scripts/run_mvp_demo.sh`로 고정한다.
 - chord-tone ratio는 metrics JSON에 포함하고 candidate score에 약하게 반영한다. 현재는 실패 기준으로 쓰지 않고, Stage B 또는 postprocess 개선 전후 비교 지표로 사용한다.
-- 다음 구현을 시작하기 전에 여기서 리뷰한다. 특히 low chord-tone sample이 단순 오류인지, approach note/tension으로 들리는지 먼저 판단한다. 단, 1-note/2-note phrase는 이제 리뷰 대상이 아니라 invalid candidate로 처리한다.
+- 다음 구현을 시작하기 전에 여기서 리뷰한다. 특히 low chord-tone sample이 단순 오류인지, approach note/tension으로 들리는지 먼저 판단한다. 단, 1-note/2-note phrase, 한 pitch 반복 phrase, 요청 길이 대비 너무 짧게 몰린 phrase는 이제 리뷰 대상이 아니라 invalid candidate로 처리한다.
 
 ### Phase 3. Conditioning 의미 강화
 
