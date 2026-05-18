@@ -124,6 +124,18 @@ python scripts/prepare_role_dataset.py \
   --overwrite
 ```
 
+Manifest-based generic split:
+
+```bash
+python scripts/prepare_role_dataset.py \
+  --train_manifest ./data/manifests/generic_jazz_train.txt \
+  --val_manifest ./data/manifests/generic_jazz_val.txt \
+  --output_dir ./data/roles_generic_jazz \
+  --role lead \
+  --sequence_format control_v1 \
+  --overwrite
+```
+
 Full 18-file dataset:
 
 ```bash

@@ -57,6 +57,43 @@ def find_midi_files(input_dir: Path) -> List[Path]:
     return sorted(files)
 
 
+def read_midi_manifest(manifest_path: Path) -> List[Path]:
+    files: List[Path] = []
+    for raw_line in manifest_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        files.append(Path(line))
+    return files
+
+
+def resolve_input_splits(args: argparse.Namespace) -> tuple[dict[str, List[Path]], str]:
+    if args.train_manifest or args.val_manifest:
+        if not args.train_manifest or not args.val_manifest:
+            raise ValueError("--train_manifest and --val_manifest must be provided together")
+        if args.max_files is not None:
+            raise ValueError("--max_files is not supported with explicit train/val manifests")
+
+        train_manifest = Path(args.train_manifest)
+        val_manifest = Path(args.val_manifest)
+        train_files = read_midi_manifest(train_manifest)
+        val_files = read_midi_manifest(val_manifest)
+        if not train_files:
+            raise ValueError(f"No MIDI paths found in train manifest: {train_manifest}")
+        if not val_files:
+            raise ValueError(f"No MIDI paths found in val manifest: {val_manifest}")
+        return {"train": train_files, "val": val_files}, "manifest"
+
+    input_dir = Path(args.input_dir)
+    midi_files = find_midi_files(input_dir)
+    if not midi_files:
+        raise ValueError(f"No MIDI files found under: {input_dir}")
+
+    if args.max_files is not None:
+        midi_files = midi_files[: max(0, args.max_files)]
+    return {"unsplit": midi_files}, "directory"
+
+
 def clone_note(note: pretty_midi.Note, pitch_shift: int = 0) -> pretty_midi.Note:
     pitch = note.pitch + pitch_shift
     return pretty_midi.Note(
@@ -270,9 +307,11 @@ def write_tokenized_records(
     return saved
 
 
-def main() -> None:
+def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Prepare role-conditioned MIDI dataset")
     parser.add_argument("--input_dir", type=str, default="./midi_dataset/midi/studio/Brad Mehldau")
+    parser.add_argument("--train_manifest", type=str, default=None)
+    parser.add_argument("--val_manifest", type=str, default=None)
     parser.add_argument("--output_dir", type=str, default="./data/roles")
     parser.add_argument("--role", type=str, default="lead")
     parser.add_argument("--split_pitch", type=int, default=60, help="conditioning uses <= split_pitch")
@@ -290,7 +329,7 @@ def main() -> None:
         default=SEQUENCE_FORMAT_CONTROL_V1,
         help="Token sequence format for conditioning/target training examples.",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     random.seed(args.seed)
 
@@ -301,101 +340,109 @@ def main() -> None:
         shutil.rmtree(output_root)
     output_root.mkdir(parents=True, exist_ok=True)
 
-    midi_files = find_midi_files(input_dir)
-    if not midi_files:
-        raise ValueError(f"No MIDI files found under: {input_dir}")
-
-    if args.max_files is not None:
-        midi_files = midi_files[: max(0, args.max_files)]
-
-    print(f"Found {len(midi_files)} MIDI files")
+    input_splits, input_mode = resolve_input_splits(args)
+    total_input_files = sum(len(files) for files in input_splits.values())
+    print(f"Found {total_input_files} MIDI files via {input_mode} input")
 
     sample_records: List[dict] = []
+    manifest_records: dict[str, List[dict]] = {"train": [], "val": []}
     sample_idx = 0
 
-    for midi_path in midi_files:
-        try:
-            pm = pretty_midi.PrettyMIDI(str(midi_path))
-        except Exception as e:
-            print(f"Skip unreadable MIDI: {midi_path} ({e})")
-            continue
-
-        all_notes: List[pretty_midi.Note] = []
-        for inst in pm.instruments:
-            if not inst.is_drum:
-                all_notes.extend(inst.notes)
-
-        if len(all_notes) < max(args.min_conditioning_notes, args.min_target_notes):
-            continue
-
-        all_notes = sorted(all_notes, key=lambda x: (x.start, x.pitch))
-        tempo = infer_tempo(pm)
-        base_conditioning, base_target = split_conditioning_target(
-            all_notes,
-            split_pitch=args.split_pitch,
-            min_conditioning_notes=args.min_conditioning_notes,
-            min_target_notes=args.min_target_notes,
-        )
-
-        if len(base_conditioning) < 2 or len(base_target) < 8:
-            continue
-
-        for semitones in iter_transpositions(args.transpose_all_keys, args.transpose_range):
-            conditioning = transpose_notes_if_valid(base_conditioning, semitones)
-            target = transpose_notes_if_valid(base_target, semitones)
-            if not conditioning or not target:
+    for source_split, midi_files in input_splits.items():
+        for midi_path in midi_files:
+            try:
+                pm = pretty_midi.PrettyMIDI(str(midi_path))
+            except Exception as e:
+                print(f"Skip unreadable MIDI: {midi_path} ({e})")
                 continue
 
-            sample_id = f"{sample_idx:06d}"
-            sample_dir = output_root / sample_id
-            sample_dir.mkdir(parents=True, exist_ok=True)
+            all_notes: List[pretty_midi.Note] = []
+            for inst in pm.instruments:
+                if not inst.is_drum:
+                    all_notes.extend(inst.notes)
 
-            cond_path = sample_dir / "conditioning.mid"
-            tgt_path = sample_dir / "target.mid"
-            meta_path = sample_dir / "meta.json"
+            if len(all_notes) < max(args.min_conditioning_notes, args.min_target_notes):
+                continue
 
-            notes_to_midi(conditioning, tempo).write(str(cond_path))
-            notes_to_midi(target, tempo).write(str(tgt_path))
+            all_notes = sorted(all_notes, key=lambda x: (x.start, x.pitch))
+            tempo = infer_tempo(pm)
+            base_conditioning, base_target = split_conditioning_target(
+                all_notes,
+                split_pitch=args.split_pitch,
+                min_conditioning_notes=args.min_conditioning_notes,
+                min_target_notes=args.min_target_notes,
+            )
 
-            control_tokens = control_prefix_tokens(role=args.role, tempo_bpm=tempo)
-            meta = {
-                "sample_id": sample_id,
-                "role": args.role,
-                "source_midi": str(midi_path),
-                "transpose": int(semitones),
-                "split_pitch": int(args.split_pitch),
-                "tempo_bpm": float(tempo),
-                "conditioning_notes": len(conditioning),
-                "target_notes": len(target),
-                "sequence_format": args.sequence_format,
-                "control_tokens": control_tokens,
-                "control_token_names": token_names(control_tokens),
-            }
-            meta_path.write_text(json.dumps(meta, ensure_ascii=True, indent=2))
+            if len(base_conditioning) < 2 or len(base_target) < 8:
+                continue
 
-            sample_records.append(
-                {
+            for semitones in iter_transpositions(args.transpose_all_keys, args.transpose_range):
+                conditioning = transpose_notes_if_valid(base_conditioning, semitones)
+                target = transpose_notes_if_valid(base_target, semitones)
+                if not conditioning or not target:
+                    continue
+
+                sample_id = f"{sample_idx:06d}"
+                sample_dir = output_root / sample_id
+                sample_dir.mkdir(parents=True, exist_ok=True)
+
+                cond_path = sample_dir / "conditioning.mid"
+                tgt_path = sample_dir / "target.mid"
+                meta_path = sample_dir / "meta.json"
+
+                notes_to_midi(conditioning, tempo).write(str(cond_path))
+                notes_to_midi(target, tempo).write(str(tgt_path))
+
+                control_tokens = control_prefix_tokens(role=args.role, tempo_bpm=tempo)
+                meta = {
+                    "sample_id": sample_id,
+                    "role": args.role,
+                    "source_midi": str(midi_path),
+                    "source_split": source_split if input_mode == "manifest" else None,
+                    "transpose": int(semitones),
+                    "split_pitch": int(args.split_pitch),
+                    "tempo_bpm": float(tempo),
+                    "conditioning_notes": len(conditioning),
+                    "target_notes": len(target),
+                    "sequence_format": args.sequence_format,
+                    "control_tokens": control_tokens,
+                    "control_token_names": token_names(control_tokens),
+                }
+                meta_path.write_text(json.dumps(meta, ensure_ascii=True, indent=2))
+
+                record = {
                     "sample_id": sample_id,
                     "conditioning_path": cond_path,
                     "target_path": tgt_path,
                     "meta_path": meta_path,
+                    "source_split": source_split,
                 }
-            )
-            sample_idx += 1
+                sample_records.append(record)
+                if input_mode == "manifest":
+                    manifest_records[source_split].append(record)
+                sample_idx += 1
 
     if not sample_records:
         raise ValueError("No usable samples generated. Try lowering split/threshold parameters.")
 
     print(f"Generated {len(sample_records)} role samples under {output_root}")
 
-    random.shuffle(sample_records)
-    split_idx = int(len(sample_records) * args.train_ratio)
-    train_records = sample_records[:split_idx]
-    val_records = sample_records[split_idx:]
-    if not val_records:
-        # Keep at least one sample for val for stable training scripts.
-        val_records = train_records[-1:]
-        train_records = train_records[:-1]
+    if input_mode == "manifest":
+        train_records = manifest_records["train"]
+        val_records = manifest_records["val"]
+        if not train_records:
+            raise ValueError("Train manifest produced no usable samples")
+        if not val_records:
+            raise ValueError("Val manifest produced no usable samples")
+    else:
+        random.shuffle(sample_records)
+        split_idx = int(len(sample_records) * args.train_ratio)
+        train_records = sample_records[:split_idx]
+        val_records = sample_records[split_idx:]
+        if not val_records:
+            # Keep at least one sample for val for stable training scripts.
+            val_records = train_records[-1:]
+            train_records = train_records[:-1]
 
     tokenized_root = output_root / "tokenized"
     train_dir = tokenized_root / "train"
@@ -408,7 +455,12 @@ def main() -> None:
 
     summary = {
         "role": args.role,
+        "input_mode": input_mode,
         "input_dir": str(input_dir),
+        "train_manifest": args.train_manifest,
+        "val_manifest": args.val_manifest,
+        "input_file_count": total_input_files,
+        "input_split_file_counts": {name: len(files) for name, files in input_splits.items()},
         "output_root": str(output_root),
         "num_samples": len(sample_records),
         "train_samples": len(train_records),

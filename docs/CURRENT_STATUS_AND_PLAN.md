@@ -179,6 +179,18 @@ python scripts/build_jazz_training_manifests.py
 
 This produces generic non-Brad train/val manifests plus Brad adaptation/holdout manifests under `data/manifests/`.
 
+Then prepare a tokenized generic split without reshuffling train/val:
+
+```bash
+python scripts/prepare_role_dataset.py \
+  --train_manifest ./data/manifests/generic_jazz_train.txt \
+  --val_manifest ./data/manifests/generic_jazz_val.txt \
+  --output_dir ./data/roles_generic_jazz \
+  --role lead \
+  --sequence_format control_v1 \
+  --overwrite
+```
+
 ```bash
 python scripts/prepare_role_dataset.py \
   --input_dir "./midi_dataset/midi/studio/Brad Mehldau" \
