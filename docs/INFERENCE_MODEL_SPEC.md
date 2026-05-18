@@ -116,6 +116,8 @@ Optional:
 
 `chordToneRatio` is computed as a pitch-class hit ratio against the request chord that is active at each note start time. It contributes a weak candidate-selection penalty below `0.55`, but it is not an acceptance gate in the current MVP.
 
+Density-specific minimum note count is an acceptance gate. For a 2-bar phrase the current minimums are sparse `3`, medium `4`, and dense `8`. Outputs below this floor are too underdeveloped to review musically and must fall through to another candidate or fallback.
+
 ## 9. Failure Detection
 
 Fail if:
@@ -123,6 +125,7 @@ Fail if:
 - MIDI file was not written.
 - MIDI cannot be read by `pretty_midi`.
 - note count is 0.
+- note count is below the density-specific minimum.
 - duration is 0.
 - medium/dense request has near-zero note density.
 - pitch range is invalid after post-processing.

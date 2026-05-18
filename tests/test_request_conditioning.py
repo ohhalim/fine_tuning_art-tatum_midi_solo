@@ -115,6 +115,24 @@ class RequestConditioningTest(unittest.TestCase):
         self.assertTrue(valid)
         self.assertIsNone(reason)
 
+    def test_sparse_validation_rejects_one_note_two_bar_phrase(self) -> None:
+        metrics = GenerationMetrics(
+            generation_time_ms=100,
+            note_count=1,
+            duration_sec=3.0,
+            note_density=0.33,
+            dead_air_ratio=0.0,
+            repetition_score=0.0,
+            pitch_min=64,
+            pitch_max=64,
+            fallback_used=False,
+        )
+
+        valid, reason = validate_metrics(metrics, "sparse", bars=2)
+
+        self.assertFalse(valid)
+        self.assertIn("note count too low", str(reason))
+
     def test_medium_validation_rejects_dead_air_at_threshold(self) -> None:
         metrics = GenerationMetrics(
             generation_time_ms=100,

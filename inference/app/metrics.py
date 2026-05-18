@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from math import ceil
 from pathlib import Path
 
 import pretty_midi
@@ -13,6 +14,12 @@ DENSITY_MIN = {
     "sparse": 0.2,
     "medium": 0.5,
     "dense": 1.0,
+}
+
+MIN_NOTES_PER_BAR = {
+    "sparse": 1.5,
+    "medium": 2.0,
+    "dense": 4.0,
 }
 
 DEAD_AIR_MAX = {
@@ -107,9 +114,17 @@ def compute_midi_metrics(
     )
 
 
-def validate_metrics(metrics: GenerationMetrics, density: str) -> tuple[bool, str | None]:
+def minimum_note_count(density: str, bars: int = 2) -> int:
+    notes_per_bar = MIN_NOTES_PER_BAR.get(density, MIN_NOTES_PER_BAR["medium"])
+    return max(1, ceil(notes_per_bar * max(1, int(bars))))
+
+
+def validate_metrics(metrics: GenerationMetrics, density: str, bars: int = 2) -> tuple[bool, str | None]:
     if metrics.note_count <= 0:
         return False, "generated MIDI has no notes"
+    min_notes = minimum_note_count(density, bars=bars)
+    if metrics.note_count < min_notes:
+        return False, f"note count too low: {metrics.note_count} < {min_notes}"
     if metrics.duration_sec <= 0:
         return False, "generated MIDI has zero duration"
     if metrics.pitch_min is None or metrics.pitch_max is None:

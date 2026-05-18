@@ -197,7 +197,7 @@ def generate_midi_phrase(
                     fallback_used=False,
                     request=request,
                 )
-                is_valid, reason = validate_metrics(metrics, request.density)
+                is_valid, reason = validate_metrics(metrics, request.density, bars=request.bars)
                 if not is_valid:
                     invalid_reasons.append(f"{candidate.name}: {reason}")
                     continue
@@ -236,7 +236,7 @@ def generate_midi_phrase(
             fallback_used=True,
             request=request,
         )
-        is_valid, reason = validate_metrics(metrics, request.density)
+        is_valid, reason = validate_metrics(metrics, request.density, bars=request.bars)
         if not is_valid:
             result = GenerationResult(
                 job_id=request.job_id,
