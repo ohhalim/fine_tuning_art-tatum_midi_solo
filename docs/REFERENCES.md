@@ -4,6 +4,11 @@
 
 이 문서는 논문 목록이 아니라, 현재 Brad Mehldau MIDI fine-tuning probe에 직접 영향을 주는 reference decision map이다.
 
+최신성 기준:
+
+- 2026-05-18 기준으로 2024-2026 symbolic MIDI generation, tokenization, dataset research를 반영한다.
+- 최신 논문이라도 현재 2-file probe를 건너뛰게 만들지는 않는다.
+
 현재 문제는 "Transformer를 쓸 수 있는가"가 아니다.
 
 현재 문제는 다음에 가깝다.
@@ -24,6 +29,95 @@
 3. 다음 설계는 REMI/Jazz Transformer 계열의 duration-explicit, bar-position-aware tokenization으로 간다.
 4. `control_v1` full-song training은 control-aware crop 없이는 의미가 없다.
 5. 긴 곡 전체를 한 sequence로 넣는 대신 phrase/window dataset을 준비해야 할 가능성이 높다.
+
+## Latest Research Synthesis
+
+2024-2026 흐름을 종합하면, 지금 repo의 다음 구현 방향은 크게 세 갈래다.
+
+### A. Keep Current Control V1 Only For The Probe
+
+`control_v1`은 현재 코드를 빨리 검증하기 위한 최소 format이다.
+
+Use it for:
+
+- Brad Mehldau `max_files=2` prepare
+- Brad Mehldau `max_files=2` training
+- loader/checkpoint/generation/gate smoke
+
+Do not extend it too far:
+
+- `control_v1` has no explicit note duration token.
+- `control_v1` has no explicit bar-position note onset.
+- `control_v1` uses conditioning MIDI as a primer rather than learned chord events.
+- `control_v1` full-song sequences are too long for naive `max_sequence=512` training.
+
+### B. If Control V1 Fails, Build Stage B Tokenization
+
+The strongest implementation signal comes from REMI, Jazz Transformer, BEAT, and MidiTok.
+
+Stage B should make these musical facts explicit:
+
+- bar boundary
+- onset position
+- chord at the current position
+- note pitch
+- note duration
+- velocity
+- tempo
+- optional phrase/window boundary
+
+This directly targets the current failure:
+
+- long sustain block from unstable NOTE_OFF prediction
+- chord block instead of solo-line phrase
+- weak chord conditioning
+- long sequence crop losing conditioning information
+
+### C. If From-Scratch Training Is Too Weak, Stop Training Tiny Models From Scratch
+
+Aria, Moonbeam, MIDI-LLM, Text2midi, and recent piano Transformer studies all point in the same direction:
+
+- large symbolic MIDI pretraining matters
+- small task-specific fine-tuning works better after a broad prior exists
+- 18 Brad Mehldau MIDI files are not enough to learn a style from scratch
+
+If the full 18-file probe still produces invalid MIDI, split a new issue for:
+
+- pretrained symbolic piano continuation model evaluation
+- broader jazz/piano MIDI pretraining data
+- small style adapter on top of a real symbolic base
+
+## Implementation Decision Matrix
+
+| Problem Observed | Reference Direction | Implementation Move |
+|---|---|---|
+| generated MIDI has very long notes | Jazz Transformer, REMI, MidiTok TSD/REMI | use explicit `NOTE_DURATION_*`; stop relying on NOTE_OFF |
+| generated MIDI ignores bar grid | REMI, BEAT | add `BAR` and `POSITION_*` or uniform time-step groups |
+| generated MIDI ignores chords | Jazz Transformer, AMT, Text2midi/MIDI-LLM control results | add symbolic chord events, not only low-register primer MIDI |
+| sequence length is too long | Compound Word, BEAT, PianoCoRe/Aria large-scale practice | phrase/window dataset; consider grouped/time-step representation |
+| tiny dataset cannot learn style | Aria, Moonbeam, PianoCoRe, piano Transformer scale study | use pretrained symbolic piano model or broader pretraining corpus |
+| need text/style controls later | Text2midi, MIDI-LLM, FIGARO-style control | defer; use structured tokens before natural language |
+| need live accompaniment later | AMT, BEAT, JAM_BOT line | defer until offline generation is valid |
+
+## Implementation Order Recommended By The Literature
+
+Do not jump directly to a new foundation model.
+
+Use this order:
+
+1. Finish current `control_v1` 2-file probe.
+2. If it fails musically, add Stage B tokenization docs/tests before training again.
+3. Implement a REMI-like tokenizer locally or through MidiTok.
+4. Rebuild Brad Mehldau phrase/window dataset with explicit duration and position.
+5. Run tiny-overfit on Stage B representation.
+6. Run 2-file Brad Mehldau Stage B probe.
+7. Only then evaluate pretrained symbolic models such as Aria/Moonbeam.
+
+Reason:
+
+- A pretrained model will not fix a broken evaluation gate.
+- A better tokenizer will not help if the pipeline cannot overfit a tiny sample.
+- More data will not help if decoding still produces invalid MIDI.
 
 ## Priority References
 
@@ -189,11 +283,15 @@ Implementation implication:
 Link:
 
 - https://github.com/EleutherAI/aria
+- https://arxiv.org/abs/2506.23869
+- https://arxiv.org/abs/2504.15071
 
 Why it matters:
 
 - pretrained autoregressive symbolic piano model과 large piano MIDI dataset 방향을 보여준다.
 - scratch training이 너무 약할 때 pretrained piano continuation model을 쓰는 대안이다.
+- Aria model line reports pretraining on roughly 60,000 hours of symbolic solo-piano transcriptions.
+- Aria-MIDI reports a much larger piano MIDI corpus built from transcribed piano audio.
 
 What it means for this repo:
 
@@ -204,6 +302,200 @@ Implementation implication:
 
 - 현재 branch에서는 Aria를 도입하지 않는다.
 - `control_v1` probe 결과가 나쁘면 "pretrained symbolic piano model migration"을 별도 issue로 분리한다.
+
+### 9. Moonbeam
+
+Link:
+
+- https://arxiv.org/abs/2505.15559
+- https://aim-qmul.github.io/moonbeam-midi-foundation-model/
+
+Why it matters:
+
+- large MIDI foundation model 방향이다.
+- absolute musical attributes and relative musical attributes를 모두 쓰는 tokenization/modeling을 강조한다.
+- conditional generation and infilling fine-tuning을 downstream task로 둔다.
+
+What it means for this repo:
+
+- jazz solo는 absolute pitch만이 아니라 interval/motif contour가 중요하다.
+- Brad Mehldau-like phrasing을 원하면 relative interval/melodic motion feature가 나중에 필요할 수 있다.
+
+Implementation implication:
+
+- 지금은 Moonbeam을 도입하지 않는다.
+- Stage B tokenizer naming은 나중에 relative interval features를 추가할 수 있게 열어둔다.
+- example future tokens:
+  - `INTERVAL_UP_2`
+  - `INTERVAL_DOWN_1`
+  - `CONTOUR_ASC`
+  - `MOTIF_REPEAT`
+
+### 10. BEAT
+
+Link:
+
+- https://arxiv.org/abs/2604.19532
+
+Why it matters:
+
+- 2026 tokenization reference다.
+- event-based sequence가 musical time regularity를 implicit하게 다루는 문제를 지적한다.
+- uniform time-step group을 basic unit으로 삼아 symbolic events를 묶는 방향이다.
+
+What it means for this repo:
+
+- 현재 출력이 sustain/chord block으로 무너지는 것은 time representation 문제가 섞여 있을 수 있다.
+- REMI-like event sequence가 실패하면 uniform time-step representation도 후보가 된다.
+
+Implementation implication:
+
+- Stage B first choice는 REMI-like duration/position tokens.
+- If REMI-like Stage B still has sequence/generation instability, Stage C can evaluate BEAT-like time-step grouping.
+
+Potential Stage C shape:
+
+```text
+BAR
+STEP_000 CHORD_C_MIN7 NOTE_60_DUR_2_VEL_72 NOTE_63_DUR_1_VEL_68
+STEP_001 REST
+STEP_002 NOTE_67_DUR_1_VEL_80
+...
+```
+
+### 11. PianoCoRe
+
+Link:
+
+- https://arxiv.org/abs/2605.06627
+- https://huggingface.co/datasets/SyMuPe/PianoCoRe
+- https://github.com/ilya16/PianoCoRe
+
+Why it matters:
+
+- 2026 large-scale refined piano MIDI dataset reference다.
+- Reports 250,046 performances, 5,625 pieces, and 21,763 hours of performed music.
+- Includes quality classification and alignment refinement concepts.
+
+What it means for this repo:
+
+- The dataset problem is not just "more MIDI".
+- Quality filtering matters before training.
+- Brad Mehldau 18-file style data should probably become a small adaptation layer after broader piano/jazz prior.
+
+Implementation implication:
+
+- Add dataset audit fields before expanding data:
+  - corrupted/unreadable
+  - score-like vs performance-like
+  - note density distribution
+  - tempo outliers
+  - duration outliers
+  - repeated identical files / duplicates
+- Do not add PianoCoRe dependency in this branch.
+
+### 12. MIDI-LLM
+
+Link:
+
+- https://arxiv.org/abs/2511.03942
+
+Why it matters:
+
+- LLM vocabulary expansion with MIDI tokens and two-stage training is a current text-to-MIDI direction.
+- It preserves the text LLM parameter structure and targets faster inference through existing LLM serving stacks.
+
+What it means for this repo:
+
+- Natural-language prompting is not needed yet.
+- But the "extend vocabulary with MIDI/control tokens" direction supports our current control-token approach.
+
+Implementation implication:
+
+- Defer text prompting.
+- Keep structured controls first:
+  - chord
+  - section
+  - density
+  - energy
+  - role
+- If adding text later, map text to structured controls first instead of training direct free-form text-to-MIDI.
+
+### 13. Text2midi
+
+Link:
+
+- https://arxiv.org/abs/2412.16526
+- https://github.com/AMAAI-Lab/Text2midi
+
+Why it matters:
+
+- Uses a pretrained LLM encoder plus autoregressive Transformer decoder to generate MIDI from captions.
+- Captions can include music-theory terms such as chords, keys, and tempo.
+
+What it means for this repo:
+
+- User-facing prompt control can come later, but it should not replace explicit symbolic conditioning now.
+
+Implementation implication:
+
+- Keep API/request fields structured.
+- Later, optional text prompt can be parsed into:
+  - `key`
+  - `chords`
+  - `tempo`
+  - `style`
+  - `density`
+
+### 14. PerTok / Expressive MIDI Performance Tokenization
+
+Link:
+
+- https://ismir2025program.ismir.net/lbd_392.html
+- https://researchtrend.ai/papers/2410.02060
+
+Why it matters:
+
+- PerTok focuses on expressive MIDI performance details such as micro-timing and duration nuance.
+- ISMIR 2025 ornament generation work uses PerTok with a domain-specific Transformer.
+
+What it means for this repo:
+
+- Brad Mehldau-like feel eventually needs microtiming and velocity nuance.
+- But current problem is more basic: valid solo-line notes first.
+
+Implementation implication:
+
+- Do not implement microtiming in Stage B.
+- Reserve Stage C/D for expressive performance rendering after note/duration/chord correctness is stable.
+
+### 15. Generating Piano Music With Transformers: Scale, Data, Metrics
+
+Link:
+
+- https://arxiv.org/abs/2511.07268
+
+Why it matters:
+
+- It explicitly compares datasets, model sizes, architectures, training strategies, and metrics for symbolic piano generation.
+- It emphasizes that quantitative metrics should be checked against human listening judgment.
+
+What it means for this repo:
+
+- Our current gate is necessary but not sufficient.
+- Metrics can prevent nonsense MIDI, but piano-roll/listening review remains required.
+
+Implementation implication:
+
+- Keep automatic gates:
+  - note count
+  - unique pitch
+  - phrase coverage
+  - max note duration ratio
+  - max simultaneous notes
+  - dead air
+- Add manual review checkpoints after each probe.
+- Do not claim improvement only from lower validation loss.
 
 ## Local References
 
@@ -237,7 +529,7 @@ Use:
 
 If the Brad Mehldau `control_v1` probe still generates invalid MIDI, create a new Stage B tokenization issue instead of adding more postprocess.
 
-Candidate Stage B representation:
+Candidate Stage B representation, REMI/Jazz-Transformer-like:
 
 ```text
 STYLE_PERSONAL_JAZZ
@@ -278,6 +570,69 @@ Acceptance criteria:
 - no long sustain block
 - no chord block pretending to be a solo line
 
+## Concrete Stage B Implementation Sketch
+
+If Stage B is opened, implement it in small files rather than rewriting the repo.
+
+Suggested files:
+
+```text
+scripts/stage_b_tokenizer.py
+scripts/prepare_stage_b_dataset.py
+scripts/run_stage_b_tiny_overfit.py
+tests/test_stage_b_tokenizer.py
+docs/STAGE_B_TOKENIZATION_PLAN.md
+```
+
+Minimum tokenizer API:
+
+```python
+def encode_midi_stage_b(
+    midi_path: str,
+    chord_progression: list[str] | None,
+    bpm: float,
+    bars_per_window: int = 2,
+) -> list[int]:
+    ...
+
+def decode_stage_b_tokens(tokens: list[int], output_path: str, bpm: float) -> None:
+    ...
+```
+
+Minimum generated token contract:
+
+```text
+STYLE_PERSONAL_JAZZ
+ROLE_LEAD
+TEMPO_120
+BAR
+CHORD_ROOT_C
+CHORD_QUALITY_MIN7
+POSITION_0
+NOTE_PITCH_60
+NOTE_DURATION_4
+VELOCITY_80
+POSITION_4
+NOTE_PITCH_62
+NOTE_DURATION_2
+VELOCITY_76
+END
+```
+
+Minimum tests:
+
+- round-trip one 2-bar phrase through encode/decode
+- duration tokens decode to bounded notes
+- no note can last beyond the requested phrase unless tied explicitly
+- chord tokens align to bar/position windows
+- token count is lower or at least more musically structured than current `control_v1`
+- tiny-overfit can produce non-fallback MIDI
+
+Consider MidiTok before custom implementation:
+
+- MidiTok supports REMI, TSD, CPWord, Octuple, MuMIDI, and other tokenizations.
+- REMI/TSD are better first candidates than CPWord/Octuple for a small model because CPWord/Octuple need multi-head output losses and more delicate decoding.
+
 ## Reading Order
 
 Use this order before changing tokenization:
@@ -286,9 +641,12 @@ Use this order before changing tokenization:
 2. `docs/BRAD_MEHLDAU_FINETUNING_PLAN.md`
 3. Jazz Transformer paper
 4. REMI / Pop Music Transformer
-5. Compound Word Transformer
-6. Anticipatory Music Transformer
-7. Aria only if scratch training remains too weak
+5. MidiTok docs for REMI/TSD implementation
+6. BEAT if time-step grouping is needed
+7. Compound Word Transformer if sequence length remains a blocker
+8. Anticipatory Music Transformer if control/infilling is needed
+9. Aria/Moonbeam only if scratch training remains too weak
+10. Text2midi/MIDI-LLM only when natural-language control becomes relevant
 
 ## Non-Goals
 

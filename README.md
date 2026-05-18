@@ -32,7 +32,7 @@ This is not currently a Spring Boot/backend MVP, DAW plugin, SaaS product, or re
 - `docs/STAGE_A_CODE_REVIEW_2026-05-18.md`
   - Review of why previous generated MIDI was not musically valid.
 - `docs/REFERENCES.md`
-  - Reference map for tokenization, conditioning, sequence length, and jazz-specific symbolic generation.
+  - 2024-2026 reference map for tokenization, conditioning, sequence length, datasets, and implementation choices.
 - `docs/archive/`
   - Deferred backend/API/ERD/realtime/product-planning documents.
 
