@@ -31,6 +31,8 @@ This is not currently a Spring Boot/backend MVP, DAW plugin, SaaS product, or re
   - Tiny-overfit smoke test criteria.
 - `docs/STAGE_A_CODE_REVIEW_2026-05-18.md`
   - Review of why previous generated MIDI was not musically valid.
+- `docs/REFERENCES.md`
+  - Reference map for tokenization, conditioning, sequence length, and jazz-specific symbolic generation.
 - `docs/archive/`
   - Deferred backend/API/ERD/realtime/product-planning documents.
 

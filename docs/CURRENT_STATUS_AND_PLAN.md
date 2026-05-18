@@ -156,6 +156,7 @@ At that point decide:
 - `docs/STAGE_A_TRAINING_MODES.md`
 - `docs/STAGE_A_TINY_OVERFIT.md`
 - `docs/STAGE_A_CODE_REVIEW_2026-05-18.md`
+- `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
 

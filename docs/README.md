@@ -18,6 +18,8 @@
   - tiny-overfit smoke 실행 방법과 통과/실패 판단 기준.
 - `STAGE_A_CODE_REVIEW_2026-05-18.md`
   - sustain block/chord block MIDI가 나온 원인과 다음 수정 방향.
+- `REFERENCES.md`
+  - Music Transformer, REMI, Jazz Transformer, AMT, Aria 등 현재 fine-tuning/tokenization 판단에 필요한 reference map.
 - `INFERENCE_MODEL_SPEC.md`
   - request-conditioned generation, fallback, metrics, post-processing contract.
 - `QA_ACCEPTANCE_PLAN.md`
