@@ -44,6 +44,7 @@ This is not currently a Spring Boot/backend MVP, DAW plugin, SaaS product, or re
 ```text
 scripts/
   audit_jazz_piano_dataset.py     # Full corpus audit before broad training
+  build_jazz_training_manifests.py # Audit-based train/val/holdout manifest builder
   audit_brad_mehldau_dataset.py   # Dataset audit before training
   prepare_role_dataset.py         # conditioning.mid/target.mid + tokenized data
   control_tokens.py               # control_v1 token helpers
@@ -100,6 +101,14 @@ Decision:
 - Use the filtered non-Brad candidates for a generic jazz pianist base only after tokenizer sanity is validated.
 - Use Brad candidates for style adaptation and holdout evaluation.
 - Do not train both `midi_dataset/midi` and duplicate mirror `midi_dataset/midi_kong`.
+
+Build training manifests from the audit JSON:
+
+```bash
+python scripts/build_jazz_training_manifests.py
+```
+
+Generated manifest files are written under `data/manifests/` and are not committed.
 
 ## Prepare Data
 

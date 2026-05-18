@@ -76,6 +76,7 @@ Decision:
 - fallback/gate contract for invalid MIDI
 - Brad Mehldau dataset audit script
 - full jazz piano dataset audit script
+- audit-based training manifest split builder
 
 ## Full Jazz Piano Dataset Audit
 
@@ -169,6 +170,14 @@ Status:
 - generated outputs are under `outputs/dataset_audit/`
 
 ### 2. Prepare 2-file control_v1 probe dataset
+
+Before broad training, build concrete candidate splits:
+
+```bash
+python scripts/build_jazz_training_manifests.py
+```
+
+This produces generic non-Brad train/val manifests plus Brad adaptation/holdout manifests under `data/manifests/`.
 
 ```bash
 python scripts/prepare_role_dataset.py \

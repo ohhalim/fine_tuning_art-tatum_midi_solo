@@ -160,6 +160,28 @@ Rules:
 - Brad holdout must stay unseen until evaluation
 - live and studio Brad files may need separate reporting
 
+Build the concrete split manifests with:
+
+```bash
+python scripts/build_jazz_training_manifests.py
+```
+
+Default outputs:
+
+```text
+data/manifests/jazz_training_manifests.json
+data/manifests/jazz_training_manifests.md
+data/manifests/generic_jazz_train.txt
+data/manifests/generic_jazz_val.txt
+data/manifests/brad_adaptation_train.txt
+data/manifests/brad_adaptation_val.txt
+data/manifests/brad_test_holdout.txt
+data/manifests/review.txt
+data/manifests/rejected.txt
+```
+
+These files are generated from the local audit JSON and should not be committed.
+
 ## Current Model Order
 
 1. Run full dataset audit. Completed for `midi_dataset/midi`.
