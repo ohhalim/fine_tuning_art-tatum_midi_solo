@@ -20,6 +20,8 @@
   - tiny-overfit smoke 실행 방법과 통과/실패 판단 기준.
 - `STAGE_A_CODE_REVIEW_2026-05-18.md`
   - sustain block/chord block MIDI가 나온 원인과 다음 수정 방향.
+- `STAGE_A_BRAD_PROBE2_2026-05-18.md`
+  - Brad 2-file `control_v1` training/generation probe 결과와 Stage B 전환 판단.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`
@@ -44,9 +46,9 @@
 
 1. Full jazz piano corpus audit 결과를 기준으로 generic base 후보 데이터를 확인한다.
 2. Brad Mehldau subset은 style adaptation과 holdout evaluation 용도로 분리한다.
-3. `max_files=2`로 `control_v1` prepare/training probe를 실행해 tokenizer와 training loop를 먼저 검증한다.
-4. 생성 MIDI를 note count, unique pitch, phrase coverage, max duration, simultaneous notes 기준으로 검증한다.
-5. MIDI가 여전히 sustain/chord block이면 broad training 전에 duration-explicit tokenization으로 넘어간다.
+3. `max_files=2` Brad `control_v1` probe 결과를 기준으로 Stage A 한계를 문서화한다.
+4. broad training 전에 duration-explicit Stage B tokenization과 phrase/window dataset을 설계한다.
+5. Stage B tiny-overfit와 2-file probe를 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
 
 핵심 원칙:
 

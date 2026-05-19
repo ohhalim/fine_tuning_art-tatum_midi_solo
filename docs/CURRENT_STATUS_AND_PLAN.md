@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-8-brad-mehldau-control-v1-training-probe`
+- `issue-13-control-v1-brad-probe2`
 
 현재 범위가 아닌 것:
 
@@ -33,6 +33,33 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Latest Probe Result
+
+Issue #13에서 Brad Mehldau real MIDI 2파일로 `control_v1` prepare/train/generate probe를 실행했다.
+
+Result:
+
+- dataset prepare 성공: train 1 sample, val 1 sample
+- 5 epoch full-checkpoint training 성공
+- 100 epoch full-checkpoint training 성공
+- best observed val loss: `4.1306` at epoch `70`
+- generation 실패:
+  - 5 epoch `top_k=1`: all 0 notes
+  - 5 epoch `top_k=32`: 0/1/2-note outputs
+  - 100 epoch `top_k=1`: repeated one-note outputs
+  - 100 epoch `top_k=32`: long sustain or only 5 notes
+
+Decision:
+
+- Stage A `control_v1`은 runnable pipeline으로는 검증됐다.
+- 하지만 reviewable jazz solo MIDI generator로는 실패했다.
+- broad generic jazz training으로 바로 넘어가지 않는다.
+- 다음은 Stage B duration-explicit, bar-position-aware tokenization과 phrase/window dataset 설계다.
+
+Detail:
+
+- `docs/STAGE_A_BRAD_PROBE2_2026-05-18.md`
 
 ## Dataset Strategy
 
@@ -150,6 +177,16 @@ Decision:
 
 ## Next Execution Plan
 
+### 0. Completed Issue #13 review point
+
+Brad 2-file `control_v1` probe는 완료됐다.
+
+Current conclusion:
+
+- 더 많은 postprocess로 해결할 단계가 아니다.
+- 현 `control_v1` full-song continuation은 solo-line generation representation으로 약하다.
+- next issue는 Stage B tokenization spec/tests로 잡는다.
+
 ### 1. Run full jazz piano dataset audit
 
 ```bash
@@ -215,11 +252,9 @@ python scripts/prepare_role_dataset.py \
   --overwrite
 ```
 
-Expected result:
+Status:
 
-- `data/roles_probe2/lead/dataset_summary.json`
-- `data/roles_probe2/lead/tokenized/train/*.npy`
-- `data/roles_probe2/lead/tokenized/val/*.npy`
+- completed in issue #13 under `outputs/issue13_control_v1_brad_probe2/roles_probe2`
 
 ### 3. Train 2-file control_v1 probe
 
@@ -233,16 +268,20 @@ python scripts/train_stage_a_full.py \
   --max_sequence 512
 ```
 
-Goal:
+Status:
 
-- verify loader/checkpoint path
-- verify control-aware crop does not crash
-- generate a sample checkpoint
-- avoid spending GPU time before the local contract is clear
+- completed in issue #13
+- e5 and e100 checkpoints generated locally under `outputs/issue13_control_v1_brad_probe2/`
+- generated artifacts are not committed
 
 ### 4. Generate and inspect samples
 
 Use the trained checkpoint with `scripts/generate.py` or the inference wrapper.
+
+Status:
+
+- completed in issue #13
+- all generated samples failed the review gate
 
 The sample is not valid unless it passes:
 
@@ -257,15 +296,15 @@ The sample is not valid unless it passes:
 
 ### 5. Review point
 
-Pause for review after the 2-file probe generates MIDI.
+Review completed after the 2-file probe generated MIDI.
 
-At that point decide:
+Decision:
 
-- continue to `max_files=5`
-- run full 18-file Brad probe
-- build generic non-Brad manifest for jazz pianist base
-- change crop/windowing
+- do not continue to `max_files=5` on current `control_v1`
+- do not run full 18-file Brad probe on current `control_v1`
+- do not start broad generic non-Brad training yet
 - move to duration-explicit tokenization
+- create phrase/window dataset before the next training run
 
 ## Active References
 

@@ -18,7 +18,7 @@ DENSITY_MIN = {
 
 MIN_NOTES_PER_BAR = {
     "sparse": 1.5,
-    "medium": 2.0,
+    "medium": 3.0,
     "dense": 4.0,
 }
 
