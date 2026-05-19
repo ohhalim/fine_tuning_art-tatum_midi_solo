@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #17: Stage B window tiny-overfit smoke.
+- Issue #18: Stage B decode/generation probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -81,6 +81,12 @@ For Stage B window dataset/model-vocab changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-window-prepare
+```
+
+For Stage B decode/generation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generation-probe
 ```
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.

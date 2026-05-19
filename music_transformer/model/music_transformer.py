@@ -146,6 +146,7 @@ class MusicTransformer(nn.Module):
         temperature=1.0,
         top_k=None,
         top_p=None,
+        sample_vocab_size=None,
     ):
         """
         ----------
@@ -157,6 +158,9 @@ class MusicTransformer(nn.Module):
         """
 
         assert (not self.training), "Cannot generate while in training mode"
+        sample_vocab_size = int(sample_vocab_size or TOKEN_END)
+        if sample_vocab_size <= 0 or sample_vocab_size > VOCAB_SIZE:
+            raise ValueError(f"sample_vocab_size out of range: {sample_vocab_size}")
 
         print("Generating sequence of max length:", target_seq_length)
 
@@ -171,7 +175,7 @@ class MusicTransformer(nn.Module):
         cur_i = num_primer
         while(cur_i < target_seq_length):
             # gen_seq_batch     = gen_seq.clone()
-            logits = self.forward(gen_seq[..., :cur_i])[..., :TOKEN_END]
+            logits = self.forward(gen_seq[..., :cur_i])[..., :sample_vocab_size]
             token_logits = logits[:, cur_i - 1, :]
             token_probs = _sample_probs_from_logits(
                 token_logits,
@@ -190,7 +194,7 @@ class MusicTransformer(nn.Module):
                 top_res, top_i = torch.topk(token_probs, beam)
 
                 beam_rows = top_i // VOCAB_SIZE
-                beam_cols = top_i % VOCAB_SIZE
+                beam_cols = top_i % sample_vocab_size
 
                 gen_seq = gen_seq[beam_rows, :]
                 gen_seq[..., cur_i] = beam_cols
