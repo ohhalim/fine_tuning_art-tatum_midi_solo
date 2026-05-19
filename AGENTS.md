@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #13: Brad 2-file control_v1 training probe and Stage A review decision.
+- Issue #14: Stage B duration-explicit tokenization spec and tokenizer contract.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

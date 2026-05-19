@@ -22,6 +22,8 @@
   - sustain block/chord block MIDI가 나온 원인과 다음 수정 방향.
 - `STAGE_A_BRAD_PROBE2_2026-05-18.md`
   - Brad 2-file `control_v1` training/generation probe 결과와 Stage B 전환 판단.
+- `STAGE_B_TOKENIZATION_SPEC.md`
+  - duration-explicit, bar-position-aware Stage B tokenization contract.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`
