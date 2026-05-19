@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #20: Stage B grammar-constrained tiny-overfit.
+- Issue #22: Stage B overlap/dedup gate.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -93,6 +93,12 @@ For Stage B constrained note-grammar changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-constrained-probe
+```
+
+For Stage B overlap/dedup gate changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-overlap-gate
 ```
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.

@@ -34,6 +34,8 @@ Modes:
                 Run a one-epoch Stage B decode/generation smoke.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
+  stage-b-overlap-gate
+                Run constrained Stage B generation with overlap postprocess gate.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -177,6 +179,31 @@ run_stage_b_constrained_probe() {
     --lora_alpha 8
 }
 
+run_stage_b_overlap_gate() {
+  local run_id="${RUN_ID:-harness_stage_b_overlap_gate}"
+  print_header "Stage B overlap gate"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$run_id" \
+    --max_files 1 \
+    --epochs 1 \
+    --batch_size 8 \
+    --max_sequence 96 \
+    --num_samples 1 \
+    --generation_mode constrained \
+    --constrained_note_groups_per_bar 4 \
+    --postprocess_overlap \
+    --max_simultaneous_notes 2 \
+    --top_k 1 \
+    --require_note_groups \
+    --require_valid_sample \
+    --n_layers 1 \
+    --num_heads 4 \
+    --d_model 64 \
+    --dim_feedforward 128 \
+    --lora_r 4 \
+    --lora_alpha 8
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -215,6 +242,9 @@ case "$MODE" in
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
+    ;;
+  stage-b-overlap-gate)
+    run_stage_b_overlap_gate
     ;;
   manifest-dry-run)
     run_manifest_dry_run

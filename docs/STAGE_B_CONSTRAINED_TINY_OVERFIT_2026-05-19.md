@@ -121,3 +121,5 @@ Next issue should reduce overlap and repeated-position artifacts before increasi
 - optionally sort or de-overlap constrained generated notes before metrics
 - add a `max_simultaneous_notes <= 2` constrained smoke gate
 - only then try a longer tiny-overfit or a 2-file Stage B probe
+
+Issue #22 implements this overlap gate. With overlap postprocess enabled, the same constrained smoke reduces max simultaneous notes from 3 to 2 and passes the local MIDI review gate.
