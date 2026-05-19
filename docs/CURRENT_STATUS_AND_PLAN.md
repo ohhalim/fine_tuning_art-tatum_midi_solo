@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-15-stage-b-role-dataset-prep`
+- `issue-16-stage-b-phrase-window-dataset`
 
 현재 범위가 아닌 것:
 
@@ -98,6 +98,30 @@ Current result:
 - unit tests pass
 - Brad 2-file dry run produced tokenized train/val records
 - detail: `docs/STAGE_B_ROLE_DATASET_PREP_2026-05-19.md`
+
+## Active Issue #16
+
+Current task:
+
+- split Stage B target continuations into short fixed-bar phrase windows
+- keep windowed records target-only for the first contract
+- prove Brad 2-file window dry run produces many short `.npy` records
+- do not start model training yet
+
+First implementation target:
+
+- `prepare_role_dataset.py --stage_b_window_bars`
+- `prepare_role_dataset.py --stage_b_window_stride_bars`
+- `prepare_role_dataset.py --stage_b_min_window_target_notes`
+- unit test with manifest train/val windows
+- local Brad 2-file window dry run under `outputs/`
+
+Current result:
+
+- 2-bar Stage B window path implemented
+- Brad 2-file dry run produced 137 role samples
+- token lengths: min `22`, p50 `77`, max `212`, mean `82.94`
+- detail: `docs/STAGE_B_PHRASE_WINDOW_DATASET_2026-05-19.md`
 
 ## Dataset Strategy
 
@@ -250,7 +274,7 @@ Acceptance:
 
 Status:
 
-- implemented on `issue-15-stage-b-role-dataset-prep`
+- completed and merged via PR #15
 
 Goal:
 
@@ -270,6 +294,34 @@ Dry run result:
 - output: `outputs/issue15_stage_b_probe2/roles_stage_b_probe2`
 - train tokens: `4430`
 - val tokens: `6482`
+
+### 0.7. Issue #16 Stage B phrase-window dataset
+
+Status:
+
+- implemented on `issue-16-stage-b-phrase-window-dataset`
+
+Goal:
+
+- split Stage B target MIDI into fixed-bar windows
+- normalize note times to the window start
+- keep windows only when they have enough target notes
+- keep generated token records short enough for tiny-overfit probes
+
+Acceptance:
+
+- unit test writes multiple Stage B windows from one train/val MIDI pair
+- local Brad 2-file dry run creates windowed tokenized train/val records
+- `bash scripts/agent_harness.sh quick` passes
+
+Dry run result:
+
+- output: `outputs/issue16_stage_b_window_probe2/roles_stage_b_window_probe2`
+- role samples: `137`
+- tokenized train: `123`
+- tokenized val: `14`
+- token length p50: `77`
+- token length max: `212`
 
 ### 1. Run full jazz piano dataset audit
 

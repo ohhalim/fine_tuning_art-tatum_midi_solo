@@ -10,6 +10,7 @@ Creates:
 
 import argparse
 import json
+import math
 import random
 import shutil
 from pathlib import Path
@@ -188,6 +189,63 @@ def notes_to_midi(notes: Sequence[pretty_midi.Note], tempo_bpm: float) -> pretty
     return midi
 
 
+def bar_duration_sec(tempo_bpm: float) -> float:
+    return 60.0 / max(1e-6, float(tempo_bpm)) * 4.0
+
+
+def slice_notes_to_window(
+    notes: Sequence[pretty_midi.Note],
+    window_start_sec: float,
+    window_end_sec: float,
+) -> List[pretty_midi.Note]:
+    sliced: List[pretty_midi.Note] = []
+    for note in notes:
+        if note.start < window_start_sec or note.start >= window_end_sec:
+            continue
+        start = float(note.start) - window_start_sec
+        end = min(float(note.end), window_end_sec) - window_start_sec
+        if end <= start:
+            continue
+        sliced.append(
+            pretty_midi.Note(
+                velocity=int(note.velocity),
+                pitch=int(note.pitch),
+                start=start,
+                end=end,
+            )
+        )
+    return sorted(sliced, key=lambda note: (note.start, note.pitch))
+
+
+def iter_stage_b_phrase_windows(
+    conditioning: Sequence[pretty_midi.Note],
+    target: Sequence[pretty_midi.Note],
+    tempo_bpm: float,
+    window_bars: int,
+    stride_bars: int,
+    min_window_target_notes: int,
+) -> Iterable[tuple[int, float, float, List[pretty_midi.Note], List[pretty_midi.Note]]]:
+    if window_bars <= 0:
+        yield 0, 0.0, 0.0, list(conditioning), list(target)
+        return
+
+    bar_sec = bar_duration_sec(tempo_bpm)
+    target_end = max((float(note.end) for note in target), default=0.0)
+    total_bars = max(1, int(math.ceil(target_end / bar_sec)))
+    stride = max(1, int(stride_bars))
+    window_index = 0
+    for start_bar in range(0, total_bars, stride):
+        end_bar = start_bar + max(1, int(window_bars))
+        window_start = start_bar * bar_sec
+        window_end = end_bar * bar_sec
+        window_target = slice_notes_to_window(target, window_start, window_end)
+        if len(window_target) < max(1, int(min_window_target_notes)):
+            continue
+        window_conditioning = slice_notes_to_window(conditioning, window_start, window_end)
+        yield window_index, window_start, window_end, window_conditioning, window_target
+        window_index += 1
+
+
 def infer_tempo(pm: pretty_midi.PrettyMIDI) -> float:
     try:
         _, tempi = pm.get_tempo_changes()
@@ -354,6 +412,24 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument(
+        "--stage_b_window_bars",
+        type=int,
+        default=0,
+        help="If >0 with stage_b_v1, split target MIDI into fixed bar windows.",
+    )
+    parser.add_argument(
+        "--stage_b_window_stride_bars",
+        type=int,
+        default=0,
+        help="Stride in bars for stage_b_v1 windows. Defaults to window length when <=0.",
+    )
+    parser.add_argument(
+        "--stage_b_min_window_target_notes",
+        type=int,
+        default=4,
+        help="Minimum target notes required to keep a stage_b_v1 phrase window.",
+    )
+    parser.add_argument(
         "--sequence_format",
         choices=SEQUENCE_FORMAT_CHOICES_WITH_STAGE_B,
         default=SEQUENCE_FORMAT_CONTROL_V1,
@@ -411,46 +487,68 @@ def main(argv: Sequence[str] | None = None) -> None:
                 target = transpose_notes_if_valid(base_target, semitones)
                 if not conditioning or not target:
                     continue
+                stage_b_window_bars = args.stage_b_window_bars if args.sequence_format == SEQUENCE_FORMAT_STAGE_B_V1 else 0
+                stage_b_stride_bars = (
+                    args.stage_b_window_stride_bars if args.stage_b_window_stride_bars > 0 else stage_b_window_bars
+                )
+                windows = iter_stage_b_phrase_windows(
+                    conditioning,
+                    target,
+                    tempo_bpm=tempo,
+                    window_bars=stage_b_window_bars,
+                    stride_bars=stage_b_stride_bars,
+                    min_window_target_notes=args.stage_b_min_window_target_notes,
+                )
+                for window_index, window_start, window_end, window_conditioning, window_target in windows:
+                    if not window_conditioning:
+                        window_conditioning = build_sparse_conditioning(window_target)
+                    if not window_conditioning or not window_target:
+                        continue
 
-                sample_id = f"{sample_idx:06d}"
-                sample_dir = output_root / sample_id
-                sample_dir.mkdir(parents=True, exist_ok=True)
+                    sample_id = f"{sample_idx:06d}"
+                    sample_dir = output_root / sample_id
+                    sample_dir.mkdir(parents=True, exist_ok=True)
 
-                cond_path = sample_dir / "conditioning.mid"
-                tgt_path = sample_dir / "target.mid"
-                meta_path = sample_dir / "meta.json"
+                    cond_path = sample_dir / "conditioning.mid"
+                    tgt_path = sample_dir / "target.mid"
+                    meta_path = sample_dir / "meta.json"
 
-                notes_to_midi(conditioning, tempo).write(str(cond_path))
-                notes_to_midi(target, tempo).write(str(tgt_path))
+                    notes_to_midi(window_conditioning, tempo).write(str(cond_path))
+                    notes_to_midi(window_target, tempo).write(str(tgt_path))
 
-                control_tokens = control_prefix_tokens(role=args.role, tempo_bpm=tempo)
-                meta = {
-                    "sample_id": sample_id,
-                    "role": args.role,
-                    "source_midi": str(midi_path),
-                    "source_split": source_split if input_mode == "manifest" else None,
-                    "transpose": int(semitones),
-                    "split_pitch": int(args.split_pitch),
-                    "tempo_bpm": float(tempo),
-                    "conditioning_notes": len(conditioning),
-                    "target_notes": len(target),
-                    "sequence_format": args.sequence_format,
-                    "control_tokens": control_tokens,
-                    "control_token_names": token_names(control_tokens),
-                }
-                meta_path.write_text(json.dumps(meta, ensure_ascii=True, indent=2))
+                    control_tokens = control_prefix_tokens(role=args.role, tempo_bpm=tempo)
+                    meta = {
+                        "sample_id": sample_id,
+                        "role": args.role,
+                        "source_midi": str(midi_path),
+                        "source_split": source_split if input_mode == "manifest" else None,
+                        "transpose": int(semitones),
+                        "split_pitch": int(args.split_pitch),
+                        "tempo_bpm": float(tempo),
+                        "conditioning_notes": len(window_conditioning),
+                        "target_notes": len(window_target),
+                        "sequence_format": args.sequence_format,
+                        "control_tokens": control_tokens,
+                        "control_token_names": token_names(control_tokens),
+                        "stage_b_window_bars": int(stage_b_window_bars),
+                        "stage_b_window_stride_bars": int(stage_b_stride_bars),
+                        "window_index": int(window_index),
+                        "window_start_sec": float(window_start),
+                        "window_end_sec": float(window_end),
+                    }
+                    meta_path.write_text(json.dumps(meta, ensure_ascii=True, indent=2))
 
-                record = {
-                    "sample_id": sample_id,
-                    "conditioning_path": cond_path,
-                    "target_path": tgt_path,
-                    "meta_path": meta_path,
-                    "source_split": source_split,
-                }
-                sample_records.append(record)
-                if input_mode == "manifest":
-                    manifest_records[source_split].append(record)
-                sample_idx += 1
+                    record = {
+                        "sample_id": sample_id,
+                        "conditioning_path": cond_path,
+                        "target_path": tgt_path,
+                        "meta_path": meta_path,
+                        "source_split": source_split,
+                    }
+                    sample_records.append(record)
+                    if input_mode == "manifest":
+                        manifest_records[source_split].append(record)
+                    sample_idx += 1
 
     if not sample_records:
         raise ValueError("No usable samples generated. Try lowering split/threshold parameters.")
@@ -500,6 +598,9 @@ def main(argv: Sequence[str] | None = None) -> None:
         "transpose_all_keys": bool(args.transpose_all_keys),
         "transpose_range": int(args.transpose_range),
         "sequence_format": args.sequence_format,
+        "stage_b_window_bars": int(args.stage_b_window_bars),
+        "stage_b_window_stride_bars": int(args.stage_b_window_stride_bars),
+        "stage_b_min_window_target_notes": int(args.stage_b_min_window_target_notes),
         "seed": int(args.seed),
     }
     (output_root / "dataset_summary.json").write_text(

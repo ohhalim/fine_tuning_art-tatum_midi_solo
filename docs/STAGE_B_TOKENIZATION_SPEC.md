@@ -178,11 +178,27 @@ The first dataset contract is target-only:
 - records do not include `COND_SEP`.
 - chord labels are `N/unknown` unless explicit chord metadata is added later.
 
+Phrase/window extraction:
+
+```bash
+python scripts/prepare_role_dataset.py \
+  --input_dir "./midi_dataset/midi/studio/Brad Mehldau" \
+  --output_dir outputs/issue16_stage_b_window_probe2/roles_stage_b_window_probe2 \
+  --role lead \
+  --sequence_format stage_b_v1 \
+  --stage_b_window_bars 2 \
+  --stage_b_window_stride_bars 2 \
+  --stage_b_min_window_target_notes 4 \
+  --max_files 2 \
+  --overwrite
+```
+
+This produces short tokenized phrase windows rather than full-song target continuations.
+
 ## Next Issue After Spec
 
-After the dataset preparation contract is merged, the next issue should build:
+After the phrase/window dataset contract is merged, the next issue should build:
 
-- phrase/window dataset extraction
 - target-only training loss if conditioning is prepended
 - Stage B tiny-overfit smoke
 - Brad 2-file Stage B probe
