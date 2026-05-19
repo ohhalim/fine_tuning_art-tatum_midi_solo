@@ -8,8 +8,10 @@ import pretty_midi
 import torch
 
 from scripts.run_stage_b_generation_probe import (
+    analyze_stage_b_note_grammar,
     build_stage_b_primer,
     decode_tokens_to_midi,
+    generate_stage_b_constrained_tokens,
     generate_stage_b_tokens,
 )
 from scripts.stage_b_tokens import (
@@ -30,6 +32,11 @@ class FakeStageBModel:
     def generate(self, **kwargs):
         self.sample_vocab_size = kwargs["sample_vocab_size"]
         return torch.tensor([self.returned_tokens], dtype=torch.long)
+
+
+class FakeConstrainedModel:
+    def __call__(self, tokens):
+        return torch.zeros((1, tokens.shape[1], VOCAB_SIZE), dtype=torch.float32)
 
 
 class StageBGenerationProbeTest(unittest.TestCase):
@@ -75,6 +82,56 @@ class StageBGenerationProbeTest(unittest.TestCase):
             self.assertEqual(notes[0].pitch, 60)
             self.assertAlmostEqual(notes[0].start, 0.0)
             self.assertAlmostEqual(notes[0].end, 0.25)
+
+    def test_analyze_stage_b_note_grammar_counts_complete_groups(self) -> None:
+        primer = build_stage_b_primer(["Cm7"], bpm=120)
+        tokens = primer + [
+            position_token(0),
+            note_velocity_token(4),
+            note_pitch_token(60),
+            note_duration_token(2),
+            TOKEN_END,
+        ]
+
+        report = analyze_stage_b_note_grammar(tokens, primer_size=len(primer))
+
+        self.assertEqual(report["complete_note_groups"], 1)
+        self.assertEqual(report["invalid_token_count"], 0)
+        self.assertTrue(report["grammar_valid"])
+
+    def test_analyze_stage_b_note_grammar_reports_incomplete_groups(self) -> None:
+        primer = build_stage_b_primer(["Cm7"], bpm=120)
+        tokens = primer + [position_token(0), note_pitch_token(60), TOKEN_END]
+
+        report = analyze_stage_b_note_grammar(tokens, primer_size=len(primer))
+
+        self.assertEqual(report["complete_note_groups"], 0)
+        self.assertGreater(report["invalid_token_count"], 0)
+        self.assertFalse(report["grammar_valid"])
+
+    def test_constrained_generation_creates_decodable_note_groups(self) -> None:
+        primer = build_stage_b_primer(["Cm7", "F7"], bpm=120)
+
+        tokens = generate_stage_b_constrained_tokens(
+            model=FakeConstrainedModel(),
+            primer_tokens=primer,
+            chords=["Cm7", "F7"],
+            bpm=120,
+            bars=2,
+            note_groups_per_bar=1,
+            max_sequence=64,
+            temperature=1.0,
+            top_k=1,
+        )
+
+        report = analyze_stage_b_note_grammar(tokens, primer_size=len(primer))
+        self.assertEqual(report["complete_note_groups"], 2)
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            midi_path = Path(tmp_dir) / "constrained.mid"
+            decode_tokens_to_midi(tokens, midi_path, bpm=120)
+            midi = pretty_midi.PrettyMIDI(str(midi_path))
+            self.assertEqual(len(midi.instruments[0].notes), 2)
 
 
 if __name__ == "__main__":
