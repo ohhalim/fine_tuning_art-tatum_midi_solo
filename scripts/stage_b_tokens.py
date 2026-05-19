@@ -19,7 +19,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(SCRIPT_DIR / "music_transformer"))
 sys.path.insert(0, str(SCRIPT_DIR / "music_transformer" / "third_party"))
 
-from utilities.constants import TOKEN_BAR, TOKEN_CONTROL_END, TOKEN_END  # noqa: E402
+from utilities.constants import CONTROL_TOKEN_NAMES, TOKEN_BAR, TOKEN_CONTROL_END, TOKEN_END  # noqa: E402
 
 try:
     from control_tokens import control_prefix_tokens
@@ -233,6 +233,8 @@ def chord_tokens(chord: str | None) -> list[int]:
 
 def stage_b_token_name(token: int) -> str:
     value = int(token)
+    if value in CONTROL_TOKEN_NAMES:
+        return CONTROL_TOKEN_NAMES[value]
     if value == TOKEN_END:
         return "END"
     if value == TOKEN_BAR:
@@ -258,15 +260,25 @@ def build_stage_b_sequence(
     chords: Sequence[str] | None = None,
     role: str | None = "lead",
     bars: int | None = None,
+    normalize_start: bool = True,
 ) -> list[int]:
     valid_notes = [
         note
         for note in notes
         if PIANO_PITCH_MIN <= int(note.pitch) <= PIANO_PITCH_MAX and float(note.end) > float(note.start)
     ]
-    quantized: list[tuple[int, int, pretty_midi.Note]] = [
-        (*quantize_note_position(float(note.start), tempo_bpm), note) for note in valid_notes
+    note_steps = [
+        (max(0, int(round(float(note.start) / step_duration_sec(tempo_bpm)))), note)
+        for note in valid_notes
     ]
+    first_bar_offset = 0
+    if normalize_start and note_steps:
+        first_step = min(step for step, _note in note_steps)
+        first_bar_offset = (first_step // POSITIONS_PER_BAR) * POSITIONS_PER_BAR
+    quantized: list[tuple[int, int, pretty_midi.Note]] = []
+    for absolute_step, note in note_steps:
+        relative_step = max(0, absolute_step - first_bar_offset)
+        quantized.append((relative_step // POSITIONS_PER_BAR, relative_step % POSITIONS_PER_BAR, note))
     max_note_bar = max((bar for bar, _pos, _note in quantized), default=0)
     total_bars = max(1, int(bars) if bars is not None else max_note_bar + 1)
 

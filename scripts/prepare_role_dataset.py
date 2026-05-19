@@ -37,6 +37,7 @@ try:
         control_prefix_tokens,
         token_names,
     )
+    from stage_b_tokens import SEQUENCE_FORMAT_STAGE_B_V1, build_stage_b_sequence
 except ModuleNotFoundError:
     from scripts.control_tokens import (
         SEQUENCE_FORMAT_CHOICES,
@@ -47,6 +48,10 @@ except ModuleNotFoundError:
         control_prefix_tokens,
         token_names,
     )
+    from scripts.stage_b_tokens import SEQUENCE_FORMAT_STAGE_B_V1, build_stage_b_sequence
+
+
+SEQUENCE_FORMAT_CHOICES_WITH_STAGE_B = SEQUENCE_FORMAT_CHOICES + (SEQUENCE_FORMAT_STAGE_B_V1,)
 
 
 def find_midi_files(input_dir: Path) -> List[Path]:
@@ -255,6 +260,15 @@ def encode_midi_simple(file_path: str) -> List[int]:
     return events
 
 
+def load_midi_notes(file_path: str | Path) -> List[pretty_midi.Note]:
+    midi = pretty_midi.PrettyMIDI(midi_file=str(file_path))
+    notes: List[pretty_midi.Note] = []
+    for inst in midi.instruments:
+        if not inst.is_drum:
+            notes.extend(inst.notes)
+    return sorted(notes, key=lambda note: (note.start, note.pitch))
+
+
 def build_training_sequence(
     cond_tokens: Sequence[int],
     tgt_tokens: Sequence[int],
@@ -274,6 +288,18 @@ def build_training_sequence(
     raise ValueError(f"Unsupported sequence_format: {sequence_format}")
 
 
+def build_stage_b_record_sequence(record: dict, meta: dict, default_role: str) -> list[int]:
+    target_notes = load_midi_notes(record["target_path"])
+    if not target_notes:
+        return []
+    return build_stage_b_sequence(
+        target_notes,
+        tempo_bpm=float(meta.get("tempo_bpm", 120.0)),
+        chords=meta.get("chord_progression"),
+        role=str(meta.get("role", default_role)),
+    )
+
+
 def write_tokenized_records(
     records: Sequence[dict],
     split_name: str,
@@ -285,23 +311,27 @@ def write_tokenized_records(
     saved = 0
     for i, record in enumerate(records):
         try:
-            cond_tokens = encode_midi_simple(str(record["conditioning_path"]))
-            tgt_tokens = encode_midi_simple(str(record["target_path"]))
+            meta = json.loads(Path(record["meta_path"]).read_text())
+            if sequence_format == SEQUENCE_FORMAT_STAGE_B_V1:
+                seq = build_stage_b_record_sequence(record, meta=meta, default_role=default_role)
+            else:
+                cond_tokens = encode_midi_simple(str(record["conditioning_path"]))
+                tgt_tokens = encode_midi_simple(str(record["target_path"]))
+                if not cond_tokens or not tgt_tokens:
+                    continue
+                seq = build_training_sequence(
+                    cond_tokens,
+                    tgt_tokens,
+                    meta=meta,
+                    sequence_format=sequence_format,
+                    default_role=default_role,
+                )
         except Exception as e:
             print(f"Tokenize skip ({split_name}): {record['sample_id']} ({e})")
             continue
 
-        if not cond_tokens or not tgt_tokens:
+        if not seq:
             continue
-
-        meta = json.loads(Path(record["meta_path"]).read_text())
-        seq = build_training_sequence(
-            cond_tokens,
-            tgt_tokens,
-            meta=meta,
-            sequence_format=sequence_format,
-            default_role=default_role,
-        )
         np.save(split_dir / f"{i:06d}.npy", np.array(seq, dtype=np.int32))
         saved += 1
     return saved
@@ -325,7 +355,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument(
         "--sequence_format",
-        choices=SEQUENCE_FORMAT_CHOICES,
+        choices=SEQUENCE_FORMAT_CHOICES_WITH_STAGE_B,
         default=SEQUENCE_FORMAT_CONTROL_V1,
         help="Token sequence format for conditioning/target training examples.",
     )
