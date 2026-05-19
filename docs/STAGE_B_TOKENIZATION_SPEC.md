@@ -155,12 +155,34 @@ Issue #14 is complete when:
 - A simple roundtrip test decodes quantized notes with correct pitch/start/end.
 - Current Stage A tests still pass.
 
+## Dataset Preparation
+
+Issue #15 wires `stage_b_v1` into the existing role dataset preparation entrypoint.
+
+Example:
+
+```bash
+python scripts/prepare_role_dataset.py \
+  --input_dir "./midi_dataset/midi/studio/Brad Mehldau" \
+  --output_dir outputs/issue15_stage_b_probe2/roles_stage_b_probe2 \
+  --role lead \
+  --sequence_format stage_b_v1 \
+  --max_files 2 \
+  --overwrite
+```
+
+The first dataset contract is target-only:
+
+- `conditioning.mid` is still written for compatibility with the role dataset folder shape.
+- tokenized `.npy` records contain `stage_b_v1` target-note tokens.
+- records do not include `COND_SEP`.
+- chord labels are `N/unknown` unless explicit chord metadata is added later.
+
 ## Next Issue After Spec
 
-After this spec and tokenizer contract are merged, the next issue should build:
+After the dataset preparation contract is merged, the next issue should build:
 
 - phrase/window dataset extraction
-- `prepare_role_dataset.py --sequence_format stage_b_v1`
 - target-only training loss if conditioning is prepended
 - Stage B tiny-overfit smoke
 - Brad 2-file Stage B probe

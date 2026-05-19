@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-14-stage-b-tokenization-spec`
+- `issue-15-stage-b-role-dataset-prep`
 
 현재 범위가 아닌 것:
 
@@ -76,6 +76,28 @@ First implementation target:
 - `docs/STAGE_B_TOKENIZATION_SPEC.md`
 
 Do not start broad training in this issue.
+
+## Active Issue #15
+
+Current task:
+
+- wire `stage_b_v1` into `scripts/prepare_role_dataset.py`
+- produce tokenized train/val records from existing role dataset preparation
+- keep Stage B tokenized records target-only for the first contract
+- do not start model training yet
+
+First implementation target:
+
+- `prepare_role_dataset.py --sequence_format stage_b_v1`
+- unit test with explicit train/val manifests
+- local Brad 2-file dry run under `outputs/`
+
+Current result:
+
+- `stage_b_v1` prepare path implemented
+- unit tests pass
+- Brad 2-file dry run produced tokenized train/val records
+- detail: `docs/STAGE_B_ROLE_DATASET_PREP_2026-05-19.md`
 
 ## Dataset Strategy
 
@@ -207,7 +229,7 @@ Current conclusion:
 
 Status:
 
-- initial tokenizer contract implemented on `issue-14-stage-b-tokenization-spec`
+- completed and merged via PR #14
 
 Goal:
 
@@ -223,6 +245,31 @@ Acceptance:
 - generated token sequence contains explicit duration tokens
 - roundtrip preserves quantized pitch/start/end on a small example
 - `bash scripts/agent_harness.sh quick` passes
+
+### 0.6. Issue #15 Stage B role dataset preparation
+
+Status:
+
+- implemented on `issue-15-stage-b-role-dataset-prep`
+
+Goal:
+
+- let `prepare_role_dataset.py` accept `--sequence_format stage_b_v1`
+- encode target MIDI notes with explicit `POSITION + VELOCITY + NOTE_PITCH + NOTE_DURATION`
+- preserve manifest train/val boundaries
+- avoid using `COND_SEP` or Stage A NOTE_ON/OFF tokens in Stage B records
+
+Acceptance:
+
+- unit test writes Stage B train/val `.npy` files from tiny MIDI manifests
+- a local Brad 2-file dry run writes tokenized Stage B train/val records
+- `bash scripts/agent_harness.sh quick` passes
+
+Dry run result:
+
+- output: `outputs/issue15_stage_b_probe2/roles_stage_b_probe2`
+- train tokens: `4430`
+- val tokens: `6482`
 
 ### 1. Run full jazz piano dataset audit
 

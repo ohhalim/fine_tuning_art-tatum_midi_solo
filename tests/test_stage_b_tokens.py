@@ -1,9 +1,16 @@
 from __future__ import annotations
 
+import contextlib
+import io
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
+import numpy as np
 import pretty_midi
 
+from scripts.prepare_role_dataset import main as prepare_role_dataset_main, notes_to_midi
 from scripts.stage_b_tokens import (
     CHORD_QUALITIES,
     CHORD_ROOTS,
@@ -14,7 +21,10 @@ from scripts.stage_b_tokens import (
     TOKEN_CHORD_QUALITY_START,
     TOKEN_CHORD_ROOT_START,
     TOKEN_NOTE_DURATION_START,
+    TOKEN_NOTE_DURATION_END,
     TOKEN_NOTE_PITCH_START,
+    TOKEN_NOTE_PITCH_END,
+    TOKEN_POSITION_END,
     TOKEN_POSITION_START,
     TOKEN_VELOCITY_START,
     build_stage_b_sequence,
@@ -29,7 +39,7 @@ from scripts.stage_b_tokens import (
     velocity_bin,
 )
 from scripts.control_tokens import tempo_control_token
-from utilities.constants import TOKEN_BAR, TOKEN_CONTROL_END, TOKEN_END, TOKEN_ROLE_LEAD
+from utilities.constants import TOKEN_BAR, TOKEN_COND_SEP, TOKEN_CONTROL_END, TOKEN_END, TOKEN_ROLE_LEAD
 
 
 class StageBTokensTest(unittest.TestCase):
@@ -86,14 +96,88 @@ class StageBTokensTest(unittest.TestCase):
         self.assertAlmostEqual(decoded[1].end, 0.75)
         self.assertTrue(all(note.velocity > 0 for note in decoded))
 
+    def test_stage_b_sequence_normalizes_to_first_bar_without_losing_position(self) -> None:
+        notes = [
+            pretty_midi.Note(velocity=84, pitch=60, start=4.5, end=4.75),
+        ]
+
+        tokens = build_stage_b_sequence(notes, tempo_bpm=120, chords=["Cm7"])
+        decoded = decode_stage_b_notes(tokens, tempo_bpm=120)
+
+        self.assertEqual(tokens[2], TOKEN_BAR)
+        self.assertIn(position_token(4), tokens)
+        self.assertAlmostEqual(decoded[0].start, 0.5)
+        self.assertAlmostEqual(decoded[0].end, 0.75)
+
     def test_duration_quantization_clamps_long_sustain(self) -> None:
         self.assertEqual(quantize_note_duration(99.0, tempo_bpm=120), MAX_DURATION_STEPS)
 
     def test_stage_b_token_names_are_debuggable(self) -> None:
+        self.assertEqual(stage_b_token_name(TOKEN_ROLE_LEAD), "ROLE_LEAD")
+        self.assertEqual(stage_b_token_name(TOKEN_BAR), "BAR")
         self.assertEqual(stage_b_token_name(TOKEN_POSITION_START), "POSITION_0")
         self.assertEqual(stage_b_token_name(TOKEN_NOTE_PITCH_START), "NOTE_PITCH_21")
         self.assertEqual(stage_b_token_name(TOKEN_NOTE_DURATION_START), "NOTE_DURATION_1")
         self.assertEqual(stage_b_token_name(TOKEN_VELOCITY_START), "VELOCITY_0")
+
+    def test_prepare_role_dataset_writes_stage_b_v1_tokens(self) -> None:
+        def source_notes() -> list[pretty_midi.Note]:
+            notes: list[pretty_midi.Note] = []
+            for index in range(3):
+                start = index * 0.25
+                notes.append(pretty_midi.Note(velocity=80, pitch=48 + index, start=start, end=start + 0.1))
+            for index in range(8):
+                start = 4.0 + index * 0.25
+                notes.append(pretty_midi.Note(velocity=90, pitch=66 + index, start=start, end=start + 0.125))
+            return notes
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            train_midi = root / "train.mid"
+            val_midi = root / "val.mid"
+            notes_to_midi(source_notes(), 124).write(str(train_midi))
+            notes_to_midi(source_notes(), 124).write(str(val_midi))
+
+            train_manifest = root / "train.txt"
+            val_manifest = root / "val.txt"
+            train_manifest.write_text(f"{train_midi}\n", encoding="utf-8")
+            val_manifest.write_text(f"{val_midi}\n", encoding="utf-8")
+
+            output_dir = root / "roles"
+            with contextlib.redirect_stdout(io.StringIO()):
+                prepare_role_dataset_main(
+                    [
+                        "--train_manifest",
+                        str(train_manifest),
+                        "--val_manifest",
+                        str(val_manifest),
+                        "--output_dir",
+                        str(output_dir),
+                        "--role",
+                        "lead",
+                        "--min_conditioning_notes",
+                        "2",
+                        "--min_target_notes",
+                        "8",
+                        "--sequence_format",
+                        SEQUENCE_FORMAT_STAGE_B_V1,
+                        "--overwrite",
+                    ]
+                )
+
+            role_root = output_dir / "lead"
+            summary = json.loads((role_root / "dataset_summary.json").read_text(encoding="utf-8"))
+            tokens = np.load(role_root / "tokenized" / "train" / "000000.npy")
+
+        self.assertEqual(summary["sequence_format"], SEQUENCE_FORMAT_STAGE_B_V1)
+        self.assertEqual(summary["tokenized_train"], 1)
+        self.assertEqual(summary["tokenized_val"], 1)
+        self.assertEqual(tokens[0], TOKEN_ROLE_LEAD)
+        self.assertEqual(tokens[2], TOKEN_BAR)
+        self.assertTrue(any(TOKEN_POSITION_START <= int(token) <= TOKEN_POSITION_END for token in tokens))
+        self.assertTrue(any(TOKEN_NOTE_PITCH_START <= int(token) <= TOKEN_NOTE_PITCH_END for token in tokens))
+        self.assertTrue(any(TOKEN_NOTE_DURATION_START <= int(token) <= TOKEN_NOTE_DURATION_END for token in tokens))
+        self.assertNotIn(TOKEN_COND_SEP, tokens.tolist())
 
 
 if __name__ == "__main__":

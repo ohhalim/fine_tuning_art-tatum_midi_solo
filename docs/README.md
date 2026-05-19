@@ -24,6 +24,8 @@
   - Brad 2-file `control_v1` training/generation probe 결과와 Stage B 전환 판단.
 - `STAGE_B_TOKENIZATION_SPEC.md`
   - duration-explicit, bar-position-aware Stage B tokenization contract.
+- `STAGE_B_ROLE_DATASET_PREP_2026-05-19.md`
+  - `prepare_role_dataset.py --sequence_format stage_b_v1` 연결 결과와 Brad 2-file dry run.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`
