@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-05-18
+작성일: 2026-05-19
 
 ## Current Focus
 
@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-13-control-v1-brad-probe2`
+- `issue-14-stage-b-tokenization-spec`
 
 현재 범위가 아닌 것:
 
@@ -60,6 +60,22 @@ Decision:
 Detail:
 
 - `docs/STAGE_A_BRAD_PROBE2_2026-05-18.md`
+
+## Active Issue #14
+
+Current task:
+
+- define Stage B duration-explicit tokenization
+- keep Stage B separate from Stage A `control_v1` until the tokenizer contract is tested
+- add unit tests for token ranges, chord parsing, quantized note encoding, and roundtrip decoding
+
+First implementation target:
+
+- `scripts/stage_b_tokens.py`
+- `tests/test_stage_b_tokens.py`
+- `docs/STAGE_B_TOKENIZATION_SPEC.md`
+
+Do not start broad training in this issue.
 
 ## Dataset Strategy
 
@@ -186,6 +202,27 @@ Current conclusion:
 - 더 많은 postprocess로 해결할 단계가 아니다.
 - 현 `control_v1` full-song continuation은 solo-line generation representation으로 약하다.
 - next issue는 Stage B tokenization spec/tests로 잡는다.
+
+### 0.5. Issue #14 Stage B tokenizer contract
+
+Status:
+
+- initial tokenizer contract implemented on `issue-14-stage-b-tokenization-spec`
+
+Goal:
+
+- define `stage_b_v1`
+- encode note events as explicit `POSITION + VELOCITY + NOTE_PITCH + NOTE_DURATION`
+- include bar-level chord context with `CHORD_ROOT + CHORD_QUALITY`
+- prove encode/decode roundtrip on tiny deterministic notes
+
+Acceptance:
+
+- Stage B token IDs start after existing Stage A control tokens
+- chord symbols such as `Cm7`, `F7`, `Bbmaj7`, `F#m7b5` parse into stable tokens
+- generated token sequence contains explicit duration tokens
+- roundtrip preserves quantized pitch/start/end on a small example
+- `bash scripts/agent_harness.sh quick` passes
 
 ### 1. Run full jazz piano dataset audit
 
