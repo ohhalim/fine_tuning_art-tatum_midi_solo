@@ -32,6 +32,8 @@ Modes:
                 Prepare Stage B phrase windows and verify token vocab fit.
   stage-b-generation-probe
                 Run a one-epoch Stage B decode/generation smoke.
+  stage-b-constrained-probe
+                Run a constrained Stage B note-group smoke.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -153,6 +155,28 @@ run_stage_b_generation_probe() {
     --lora_alpha 8
 }
 
+run_stage_b_constrained_probe() {
+  local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
+  print_header "Stage B constrained probe"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$run_id" \
+    --max_files 1 \
+    --epochs 1 \
+    --batch_size 8 \
+    --max_sequence 96 \
+    --num_samples 1 \
+    --generation_mode constrained \
+    --constrained_note_groups_per_bar 4 \
+    --top_k 1 \
+    --require_note_groups \
+    --n_layers 1 \
+    --num_heads 4 \
+    --d_model 64 \
+    --dim_feedforward 128 \
+    --lora_r 4 \
+    --lora_alpha 8
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -188,6 +212,9 @@ case "$MODE" in
     ;;
   stage-b-generation-probe)
     run_stage_b_generation_probe
+    ;;
+  stage-b-constrained-probe)
+    run_stage_b_constrained_probe
     ;;
   manifest-dry-run)
     run_manifest_dry_run

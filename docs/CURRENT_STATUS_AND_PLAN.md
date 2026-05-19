@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-18-stage-b-generation-probe`
+- `issue-20-stage-b-constrained-tiny-overfit`
 
 현재 범위가 아닌 것:
 
@@ -157,7 +157,11 @@ Current result:
 
 ## Active Issue #18
 
-Current task:
+Status:
+
+- completed and merged via PR #19
+
+Completed task:
 
 - add a Stage B token generation/decode probe
 - make `MusicTransformer.generate()` able to sample Stage B token IDs by using `sample_vocab_size=VOCAB_SIZE`
@@ -181,6 +185,31 @@ Current result:
 - generated sample failed the review gate with `generated MIDI has no notes`
 - `passed_generation_gate=false`
 - detail: `docs/STAGE_B_GENERATION_PROBE_2026-05-19.md`
+
+## Active Issue #20
+
+Current task:
+
+- add a grammar-constrained Stage B generation mode
+- analyze generated tokens for complete `POSITION + VELOCITY + NOTE_PITCH + NOTE_DURATION` groups
+- separate grammar-gate success from full musical review-gate success
+- require at least one decoded MIDI note before expanding training scope
+
+First implementation target:
+
+- `scripts/run_stage_b_generation_probe.py`
+- `scripts/agent_harness.sh stage-b-constrained-probe`
+- `tests/test_stage_b_generation_probe.py`
+- `docs/STAGE_B_CONSTRAINED_TINY_OVERFIT_2026-05-19.md`
+
+Current result:
+
+- constrained generation produced 8 complete Stage B note groups
+- decoded MIDI note count: `8`
+- grammar gate passed: `true`
+- full review gate passed: `false`
+- full gate failure reason: `too many simultaneous notes: 3 > 2`
+- decision: Stage B note grammar can now be forced through the model logits, but musical validity still needs overlap/deduplication control
 
 ## Dataset Strategy
 
@@ -420,7 +449,7 @@ Smoke result:
 
 Status:
 
-- implemented on `issue-18-stage-b-generation-probe`
+- completed and merged via PR #19
 
 Goal:
 
@@ -449,6 +478,38 @@ Smoke result:
 - valid sample count: `0`
 - failure reason: `generated MIDI has no notes`
 - decision: data/model/decode plumbing works, but generation quality is still not validated
+
+### 0.10. Issue #20 Stage B grammar-constrained tiny-overfit
+
+Status:
+
+- implemented on `issue-20-stage-b-constrained-tiny-overfit`
+
+Goal:
+
+- constrain generated token families into complete Stage B note groups
+- verify decoded MIDI has real notes before broad training
+- record grammar success separately from musical review success
+
+Acceptance:
+
+- grammar analyzer counts complete note groups
+- constrained generation creates `POSITION + VELOCITY + NOTE_PITCH + NOTE_DURATION` groups
+- decoded MIDI has non-zero notes
+- `bash scripts/agent_harness.sh quick` passes
+- `bash scripts/agent_harness.sh stage-b-constrained-probe` passes
+
+Smoke result:
+
+- output: `outputs/stage_b_generation_probe/harness_stage_b_constrained_probe`
+- role samples: `70`
+- generated sample count: `1`
+- complete note groups: `8`
+- decoded note count: `8`
+- grammar gate sample count: `1`
+- valid sample count: `0`
+- full gate failure reason: `too many simultaneous notes: 3 > 2`
+- decision: next issue should reduce repeated same-position/same-pitch overlaps before broad training
 
 ### 1. Run full jazz piano dataset audit
 
@@ -582,6 +643,7 @@ Decision:
 - `docs/STAGE_B_PHRASE_WINDOW_DATASET_2026-05-19.md`
 - `docs/STAGE_B_WINDOW_TINY_OVERFIT_2026-05-19.md`
 - `docs/STAGE_B_GENERATION_PROBE_2026-05-19.md`
+- `docs/STAGE_B_CONSTRAINED_TINY_OVERFIT_2026-05-19.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
@@ -616,4 +678,10 @@ For Stage B decode/generation changes:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-generation-probe
+```
+
+For Stage B constrained note-grammar changes:
+
+```bash
+bash scripts/agent_harness.sh stage-b-constrained-probe
 ```

@@ -127,3 +127,5 @@ Next issue should make the Stage B tiny-overfit probe stricter:
 - use deterministic or constrained token sampling for the first grammar check
 - verify generated tokens contain complete `POSITION + VELOCITY + NOTE_PITCH + NOTE_DURATION` groups
 - require at least one decoded MIDI sample to pass the review gate before expanding data size
+
+Issue #20 implements the constrained grammar check. It produces complete note groups and non-zero decoded notes, but the full review gate still fails because overlapping notes exceed the current max-simultaneous-notes threshold.

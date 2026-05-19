@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #18: Stage B decode/generation probe.
+- Issue #20: Stage B grammar-constrained tiny-overfit.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -87,6 +87,12 @@ For Stage B decode/generation changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-generation-probe
+```
+
+For Stage B constrained note-grammar changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-constrained-probe
 ```
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.

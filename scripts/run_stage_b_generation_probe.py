@@ -31,12 +31,28 @@ from scripts.generate import load_model_with_lora  # noqa: E402
 from scripts.run_stage_a_tiny_overfit import build_train_command, run_command, write_json  # noqa: E402
 from scripts.run_stage_b_window_tiny_overfit import read_json, run_prepare_command, token_stats  # noqa: E402
 from scripts.stage_b_tokens import (  # noqa: E402
+    TOKEN_NOTE_DURATION_END,
+    TOKEN_NOTE_DURATION_START,
+    TOKEN_NOTE_PITCH_END,
+    TOKEN_NOTE_PITCH_START,
+    TOKEN_POSITION_END,
+    TOKEN_POSITION_START,
+    TOKEN_VELOCITY_END,
+    TOKEN_VELOCITY_START,
+    TOKEN_CHORD_QUALITY_END,
+    TOKEN_CHORD_QUALITY_START,
+    TOKEN_CHORD_ROOT_END,
+    TOKEN_CHORD_ROOT_START,
     SEQUENCE_FORMAT_STAGE_B_V1,
     chord_tokens,
     decode_stage_b_midi,
+    is_note_duration_token,
+    is_note_pitch_token,
+    is_position_token,
+    is_velocity_token,
     stage_b_token_name,
 )
-from utilities.constants import TOKEN_END, VOCAB_SIZE  # noqa: E402
+from utilities.constants import TOKEN_BAR, TOKEN_END, VOCAB_SIZE  # noqa: E402
 from utilities.device import get_device  # noqa: E402
 
 
@@ -72,6 +88,151 @@ def generate_stage_b_tokens(
     return [int(token) for token in generated[0].detach().cpu().tolist()]
 
 
+def token_family(token: int) -> str:
+    if int(token) == TOKEN_END:
+        return "end"
+    if int(token) == TOKEN_BAR:
+        return "bar"
+    if TOKEN_CHORD_ROOT_START <= int(token) <= TOKEN_CHORD_ROOT_END:
+        return "chord"
+    if TOKEN_CHORD_QUALITY_START <= int(token) <= TOKEN_CHORD_QUALITY_END:
+        return "chord"
+    if is_position_token(token):
+        return "position"
+    if is_velocity_token(token):
+        return "velocity"
+    if is_note_pitch_token(token):
+        return "pitch"
+    if is_note_duration_token(token):
+        return "duration"
+    return "other"
+
+
+def analyze_stage_b_note_grammar(tokens: Sequence[int], primer_size: int = 0) -> dict[str, Any]:
+    generated = [int(token) for token in tokens[int(primer_size) :]]
+    expected = ["position", "velocity", "pitch", "duration"]
+    expected_index = 0
+    complete_groups = 0
+    invalid_tokens: list[dict[str, Any]] = []
+    family_counts: dict[str, int] = {}
+
+    for offset, token in enumerate(generated):
+        family = token_family(token)
+        family_counts[family] = family_counts.get(family, 0) + 1
+        if family == "end":
+            break
+        if family in {"bar", "chord"}:
+            expected_index = 0
+            continue
+        expected_family = expected[expected_index]
+        if family == expected_family:
+            expected_index += 1
+            if expected_index == len(expected):
+                complete_groups += 1
+                expected_index = 0
+            continue
+        invalid_tokens.append(
+            {
+                "offset": int(offset),
+                "token": int(token),
+                "token_name": stage_b_token_name(token),
+                "family": family,
+                "expected": expected_family,
+            }
+        )
+        expected_index = 1 if family == "position" else 0
+
+    return {
+        "complete_note_groups": int(complete_groups),
+        "incomplete_group_position": int(expected_index),
+        "invalid_token_count": int(len(invalid_tokens)),
+        "family_counts": family_counts,
+        "invalid_tokens_head": invalid_tokens[:12],
+        "grammar_valid": bool(complete_groups > 0 and not invalid_tokens and expected_index == 0),
+    }
+
+
+def choose_allowed_token(
+    logits: torch.Tensor,
+    allowed_tokens: Sequence[int],
+    temperature: float,
+    top_k: int | None,
+) -> int:
+    allowed = torch.tensor([int(token) for token in allowed_tokens], dtype=torch.long, device=logits.device)
+    allowed_logits = logits.index_select(0, allowed)
+    if float(temperature) <= 0.0:
+        raise ValueError("temperature must be positive")
+    allowed_logits = allowed_logits / float(temperature)
+    if top_k is not None and int(top_k) > 0:
+        k = min(int(top_k), int(allowed_logits.numel()))
+        top_values, top_indices = torch.topk(allowed_logits, k=k)
+        if k == 1:
+            return int(allowed[int(top_indices[0])].item())
+        probs = torch.softmax(top_values, dim=-1)
+        sampled = torch.multinomial(probs, num_samples=1)
+        return int(allowed[int(top_indices[int(sampled.item())])].item())
+    probs = torch.softmax(allowed_logits, dim=-1)
+    sampled = torch.multinomial(probs, num_samples=1)
+    return int(allowed[int(sampled.item())].item())
+
+
+def next_token_from_model(
+    model: Any,
+    tokens: Sequence[int],
+    allowed_tokens: Sequence[int],
+    temperature: float,
+    top_k: int | None,
+) -> int:
+    device = get_device()
+    input_tokens = torch.tensor([[int(token) for token in tokens]], dtype=torch.long, device=device)
+    with torch.no_grad():
+        logits = model(input_tokens)[0, -1, :]
+    return choose_allowed_token(logits, allowed_tokens, temperature=temperature, top_k=top_k)
+
+
+def generate_stage_b_constrained_tokens(
+    model: Any,
+    primer_tokens: Sequence[int],
+    chords: Sequence[str],
+    bpm: float | int,
+    bars: int,
+    note_groups_per_bar: int,
+    max_sequence: int,
+    temperature: float,
+    top_k: int | None,
+) -> list[int]:
+    tokens = [int(token) for token in primer_tokens]
+    families = [
+        range(TOKEN_POSITION_START, TOKEN_POSITION_END + 1),
+        range(TOKEN_VELOCITY_START, TOKEN_VELOCITY_END + 1),
+        range(TOKEN_NOTE_PITCH_START, TOKEN_NOTE_PITCH_END + 1),
+        range(TOKEN_NOTE_DURATION_START, TOKEN_NOTE_DURATION_END + 1),
+    ]
+
+    for bar_index in range(max(1, int(bars))):
+        if bar_index > 0:
+            chord = chords[bar_index % len(chords)] if chords else None
+            tokens.append(TOKEN_BAR)
+            tokens.extend(chord_tokens(chord))
+        for _group_index in range(max(1, int(note_groups_per_bar))):
+            for allowed_tokens in families:
+                if len(tokens) >= int(max_sequence) - 1:
+                    tokens.append(TOKEN_END)
+                    return tokens
+                tokens.append(
+                    next_token_from_model(
+                        model,
+                        tokens=tokens,
+                        allowed_tokens=list(allowed_tokens),
+                        temperature=temperature,
+                        top_k=top_k,
+                    )
+                )
+
+    tokens.append(TOKEN_END)
+    return tokens[: int(max_sequence)]
+
+
 def decode_tokens_to_midi(tokens: Sequence[int], output_path: Path, bpm: float | int) -> Path:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     midi = decode_stage_b_midi(tokens, tempo_bpm=bpm)
@@ -88,8 +249,10 @@ def sample_report(
     request: GenerationRequest,
 ) -> dict[str, Any]:
     raw_generated_tokens = [int(token) for token in tokens[primer_size:]]
+    grammar = analyze_stage_b_note_grammar(tokens, primer_size=primer_size)
     metrics = compute_midi_metrics(midi_path, 0, False, request=request)
     valid, reason = validate_metrics(metrics, request.density, bars=request.bars)
+    grammar_gate_passed = bool(grammar["complete_note_groups"] > 0 and metrics.note_count > 0)
     return {
         "sample_index": int(sample_index),
         "midi_path": str(midi_path),
@@ -98,7 +261,9 @@ def sample_report(
         "ended_early": bool(len(tokens) < int(target_length)),
         "hit_end_token": bool(TOKEN_END in raw_generated_tokens),
         "valid": bool(valid),
+        "grammar_gate_passed": grammar_gate_passed,
         "failure_reason": reason,
+        "grammar": grammar,
         "metrics": metrics.to_dict(),
         "generated_token_names_head": [stage_b_token_name(token) for token in raw_generated_tokens[:48]],
     }
@@ -136,6 +301,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--temperature", type=float, default=0.9)
     parser.add_argument("--top_k", type=int, default=32)
     parser.add_argument("--top_p", type=float, default=None)
+    parser.add_argument("--generation_mode", choices=("unconstrained", "constrained"), default="unconstrained")
+    parser.add_argument("--constrained_note_groups_per_bar", type=int, default=4)
+    parser.add_argument("--require_note_groups", action="store_true")
     parser.add_argument("--require_valid_sample", action="store_true")
     parser.set_defaults(lora_only=False)
     return parser
@@ -170,11 +338,12 @@ def main() -> int:
     report: dict[str, Any] = {
         "run_id": run_id,
         "run_dir": str(run_dir),
-        "issue": 18,
+        "issue": 20 if args.generation_mode == "constrained" else 18,
         "sequence_format": SEQUENCE_FORMAT_STAGE_B_V1,
         "request": request.to_dict(),
         "checkpoint_dir": str(checkpoint_dir),
         "sample_vocab_size": int(VOCAB_SIZE),
+        "generation_mode": args.generation_mode,
     }
 
     if not args.skip_prepare:
@@ -218,14 +387,27 @@ def main() -> int:
 
     sample_rows: list[dict[str, Any]] = []
     for index in range(1, int(args.num_samples) + 1):
-        generated_tokens = generate_stage_b_tokens(
-            model=model,
-            primer_tokens=primer_tokens,
-            target_length=args.max_sequence,
-            temperature=args.temperature,
-            top_k=args.top_k,
-            top_p=args.top_p,
-        )
+        if args.generation_mode == "constrained":
+            generated_tokens = generate_stage_b_constrained_tokens(
+                model=model,
+                primer_tokens=primer_tokens,
+                chords=chords,
+                bpm=args.bpm,
+                bars=args.bars,
+                note_groups_per_bar=args.constrained_note_groups_per_bar,
+                max_sequence=args.max_sequence,
+                temperature=args.temperature,
+                top_k=args.top_k,
+            )
+        else:
+            generated_tokens = generate_stage_b_tokens(
+                model=model,
+                primer_tokens=primer_tokens,
+                target_length=args.max_sequence,
+                temperature=args.temperature,
+                top_k=args.top_k,
+                top_p=args.top_p,
+            )
         midi_path = samples_dir / f"stage_b_sample_{index}.mid"
         decode_tokens_to_midi(generated_tokens, midi_path, bpm=args.bpm)
         sample_rows.append(
@@ -241,13 +423,17 @@ def main() -> int:
 
     report["samples"] = sample_rows
     report["valid_sample_count"] = sum(1 for row in sample_rows if row["valid"])
+    report["grammar_gate_sample_count"] = sum(1 for row in sample_rows if row["grammar_gate_passed"])
     report["sample_count"] = len(sample_rows)
     report["passed_generation_gate"] = bool(report["valid_sample_count"] > 0)
+    report["passed_grammar_gate"] = bool(report["grammar_gate_sample_count"] > 0)
     if not report["passed_generation_gate"]:
         report["failure_reason"] = "No Stage B generated sample passed the MIDI review gate"
 
     write_json(run_dir / "report.json", report)
     print(json.dumps(report, ensure_ascii=True, indent=2))
+    if args.require_note_groups and not report["passed_grammar_gate"]:
+        return 4
     if args.require_valid_sample and not report["passed_generation_gate"]:
         return 3
     return 0
