@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #15: Stage B role dataset preparation path.
+- Issue #16: Stage B phrase-window dataset extraction.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

@@ -179,6 +179,84 @@ class StageBTokensTest(unittest.TestCase):
         self.assertTrue(any(TOKEN_NOTE_DURATION_START <= int(token) <= TOKEN_NOTE_DURATION_END for token in tokens))
         self.assertNotIn(TOKEN_COND_SEP, tokens.tolist())
 
+    def test_prepare_role_dataset_splits_stage_b_phrase_windows(self) -> None:
+        def source_notes() -> list[pretty_midi.Note]:
+            notes: list[pretty_midi.Note] = []
+            for bar_index in range(4):
+                bar_start = bar_index * 2.0
+                notes.append(pretty_midi.Note(velocity=70, pitch=48 + bar_index, start=bar_start, end=bar_start + 0.25))
+                notes.append(pretty_midi.Note(velocity=90, pitch=66 + bar_index, start=bar_start, end=bar_start + 0.25))
+                notes.append(
+                    pretty_midi.Note(
+                        velocity=92,
+                        pitch=70 + bar_index,
+                        start=bar_start + 0.5,
+                        end=bar_start + 0.75,
+                    )
+                )
+            return notes
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            train_midi = root / "train.mid"
+            val_midi = root / "val.mid"
+            notes_to_midi(source_notes(), 120).write(str(train_midi))
+            notes_to_midi(source_notes(), 120).write(str(val_midi))
+
+            train_manifest = root / "train.txt"
+            val_manifest = root / "val.txt"
+            train_manifest.write_text(f"{train_midi}\n", encoding="utf-8")
+            val_manifest.write_text(f"{val_midi}\n", encoding="utf-8")
+
+            output_dir = root / "roles"
+            with contextlib.redirect_stdout(io.StringIO()):
+                prepare_role_dataset_main(
+                    [
+                        "--train_manifest",
+                        str(train_manifest),
+                        "--val_manifest",
+                        str(val_manifest),
+                        "--output_dir",
+                        str(output_dir),
+                        "--role",
+                        "lead",
+                        "--min_conditioning_notes",
+                        "2",
+                        "--min_target_notes",
+                        "4",
+                        "--sequence_format",
+                        SEQUENCE_FORMAT_STAGE_B_V1,
+                        "--stage_b_window_bars",
+                        "1",
+                        "--stage_b_window_stride_bars",
+                        "1",
+                        "--stage_b_min_window_target_notes",
+                        "2",
+                        "--overwrite",
+                    ]
+                )
+
+            role_root = output_dir / "lead"
+            summary = json.loads((role_root / "dataset_summary.json").read_text(encoding="utf-8"))
+            train_tokens = sorted((role_root / "tokenized" / "train").glob("*.npy"))
+            val_tokens = sorted((role_root / "tokenized" / "val").glob("*.npy"))
+            train_token_lengths = [len(np.load(path)) for path in train_tokens]
+            train_metas = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(role_root.glob("*/meta.json"))[:3]]
+            target_pm = pretty_midi.PrettyMIDI(str(role_root / "000001" / "target.mid"))
+            target_notes = target_pm.instruments[0].notes
+
+        self.assertEqual(summary["sequence_format"], SEQUENCE_FORMAT_STAGE_B_V1)
+        self.assertEqual(summary["stage_b_window_bars"], 1)
+        self.assertEqual(summary["stage_b_window_stride_bars"], 1)
+        self.assertEqual(summary["train_samples"], 4)
+        self.assertEqual(summary["val_samples"], 4)
+        self.assertEqual(len(train_tokens), 4)
+        self.assertEqual(len(val_tokens), 4)
+        self.assertEqual([meta["window_index"] for meta in train_metas], [0, 1, 2])
+        self.assertEqual([meta["target_notes"] for meta in train_metas], [2, 2, 2])
+        self.assertTrue(all(0.0 <= note.start < 2.0 for note in target_notes))
+        self.assertTrue(all(length < 24 for length in train_token_lengths))
+
 
 if __name__ == "__main__":
     unittest.main()
