@@ -28,6 +28,8 @@ Modes:
   tiny-prepare  Verify tiny-overfit dataset preparation only.
   tiny-compare  Compare full-model tiny training with random-base LoRA-only.
   control-tiny  Run control_v1 full-model tiny-overfit smoke.
+  stage-b-window-prepare
+                Prepare Stage B phrase windows and verify token vocab fit.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -61,6 +63,9 @@ run_quick() {
     scripts/run_stage_a_tiny_overfit.py \
     scripts/compare_stage_a_tiny_modes.py \
     scripts/run_control_v1_tiny_overfit.py \
+    scripts/stage_b_tokens.py \
+    scripts/prepare_role_dataset.py \
+    scripts/run_stage_b_window_tiny_overfit.py \
     scripts/audit_brad_mehldau_dataset.py \
     scripts/audit_jazz_piano_dataset.py \
     scripts/build_jazz_training_manifests.py \
@@ -118,6 +123,15 @@ run_control_tiny() {
     --run_id "$run_id"
 }
 
+run_stage_b_window_prepare() {
+  local run_id="${RUN_ID:-harness_stage_b_window_prepare}"
+  print_header "Stage B window prepare"
+  "$PYTHON_BIN" scripts/run_stage_b_window_tiny_overfit.py \
+    --run_id "$run_id" \
+    --max_files 1 \
+    --prepare_only
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -147,6 +161,9 @@ case "$MODE" in
     ;;
   control-tiny)
     run_control_tiny
+    ;;
+  stage-b-window-prepare)
+    run_stage_b_window_prepare
     ;;
   manifest-dry-run)
     run_manifest_dry_run

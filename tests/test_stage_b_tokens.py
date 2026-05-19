@@ -39,7 +39,7 @@ from scripts.stage_b_tokens import (
     velocity_bin,
 )
 from scripts.control_tokens import tempo_control_token
-from utilities.constants import TOKEN_BAR, TOKEN_COND_SEP, TOKEN_CONTROL_END, TOKEN_END, TOKEN_ROLE_LEAD
+from utilities.constants import TOKEN_BAR, TOKEN_COND_SEP, TOKEN_CONTROL_END, TOKEN_END, TOKEN_ROLE_LEAD, VOCAB_SIZE
 
 
 class StageBTokensTest(unittest.TestCase):
@@ -47,6 +47,7 @@ class StageBTokensTest(unittest.TestCase):
         self.assertEqual(SEQUENCE_FORMAT_STAGE_B_V1, "stage_b_v1")
         self.assertEqual(STAGE_B_TOKEN_START, TOKEN_CONTROL_END + 1)
         self.assertGreater(STAGE_B_VOCAB_SIZE, TOKEN_CONTROL_END + 1)
+        self.assertEqual(STAGE_B_VOCAB_SIZE, VOCAB_SIZE)
 
     def test_chord_symbol_parser_normalizes_common_jazz_chords(self) -> None:
         self.assertEqual(parse_chord_symbol("Cm7"), ("C", "min7"))
