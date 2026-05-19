@@ -10,9 +10,11 @@ import torch
 from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_note_grammar,
     build_stage_b_primer,
+    dedupe_and_limit_notes,
     decode_tokens_to_midi,
     generate_stage_b_constrained_tokens,
     generate_stage_b_tokens,
+    postprocess_stage_b_midi,
 )
 from scripts.stage_b_tokens import (
     chord_tokens,
@@ -132,6 +134,40 @@ class StageBGenerationProbeTest(unittest.TestCase):
             decode_tokens_to_midi(tokens, midi_path, bpm=120)
             midi = pretty_midi.PrettyMIDI(str(midi_path))
             self.assertEqual(len(midi.instruments[0].notes), 2)
+
+    def test_dedupe_and_limit_notes_removes_same_onset_pitch_duplicates(self) -> None:
+        notes = [
+            pretty_midi.Note(velocity=64, pitch=60, start=0.0, end=0.25),
+            pretty_midi.Note(velocity=96, pitch=60, start=0.0, end=0.5),
+            pretty_midi.Note(velocity=80, pitch=64, start=0.0, end=0.25),
+        ]
+
+        processed = dedupe_and_limit_notes(notes, simultaneous_limit=2)
+
+        self.assertEqual(len(processed), 2)
+        self.assertEqual([note.pitch for note in processed], [60, 64])
+        self.assertEqual(processed[0].velocity, 96)
+
+    def test_postprocess_stage_b_midi_limits_simultaneous_notes(self) -> None:
+        midi = pretty_midi.PrettyMIDI(initial_tempo=120)
+        piano = pretty_midi.Instrument(program=0, is_drum=False)
+        piano.notes.extend(
+            [
+                pretty_midi.Note(velocity=80, pitch=60, start=0.0, end=0.5),
+                pretty_midi.Note(velocity=82, pitch=64, start=0.0, end=0.5),
+                pretty_midi.Note(velocity=84, pitch=67, start=0.0, end=0.5),
+                pretty_midi.Note(velocity=86, pitch=72, start=0.5, end=0.75),
+            ]
+        )
+        midi.instruments.append(piano)
+
+        report = postprocess_stage_b_midi(midi, simultaneous_limit=2)
+
+        self.assertEqual(report["before_note_count"], 4)
+        self.assertEqual(report["after_note_count"], 3)
+        self.assertEqual(report["before_max_simultaneous_notes"], 3)
+        self.assertEqual(report["after_max_simultaneous_notes"], 2)
+        self.assertEqual(len(midi.instruments[0].notes), 3)
 
 
 if __name__ == "__main__":

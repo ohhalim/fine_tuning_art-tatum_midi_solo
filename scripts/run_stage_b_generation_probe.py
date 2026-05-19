@@ -16,6 +16,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Sequence
 
+import pretty_midi
 import torch
 
 
@@ -24,7 +25,7 @@ sys.path.insert(0, str(ROOT_DIR))
 sys.path.insert(0, str(ROOT_DIR / "scripts"))
 sys.path.insert(0, str(ROOT_DIR / "music_transformer"))
 
-from inference.app.metrics import compute_midi_metrics, validate_metrics  # noqa: E402
+from inference.app.metrics import compute_midi_metrics, max_simultaneous_notes, validate_metrics  # noqa: E402
 from inference.app.schemas import GenerationRequest  # noqa: E402
 from scripts.control_tokens import control_prefix_tokens  # noqa: E402
 from scripts.generate import load_model_with_lora  # noqa: E402
@@ -233,6 +234,59 @@ def generate_stage_b_constrained_tokens(
     return tokens[: int(max_sequence)]
 
 
+def dedupe_and_limit_notes(
+    notes: Sequence[pretty_midi.Note],
+    simultaneous_limit: int = 2,
+    time_precision: int = 6,
+) -> list[pretty_midi.Note]:
+    best_by_onset_pitch: dict[tuple[float, int], pretty_midi.Note] = {}
+    for note in notes:
+        if float(note.end) <= float(note.start):
+            continue
+        key = (round(float(note.start), int(time_precision)), int(note.pitch))
+        current = best_by_onset_pitch.get(key)
+        if current is None:
+            best_by_onset_pitch[key] = note
+            continue
+        current_score = (int(current.velocity), float(current.end) - float(current.start))
+        note_score = (int(note.velocity), float(note.end) - float(note.start))
+        if note_score > current_score:
+            best_by_onset_pitch[key] = note
+
+    selected: list[pretty_midi.Note] = []
+    for note in sorted(best_by_onset_pitch.values(), key=lambda n: (float(n.start), -int(n.velocity), int(n.pitch))):
+        active = [chosen for chosen in selected if float(chosen.end) > float(note.start)]
+        if len(active) >= int(simultaneous_limit):
+            continue
+        selected.append(note)
+    return sorted(selected, key=lambda n: (float(n.start), int(n.pitch)))
+
+
+def postprocess_stage_b_midi(
+    midi: pretty_midi.PrettyMIDI,
+    simultaneous_limit: int = 2,
+) -> dict[str, Any]:
+    before_notes: list[pretty_midi.Note] = []
+    after_notes: list[pretty_midi.Note] = []
+
+    for instrument in midi.instruments:
+        if instrument.is_drum:
+            continue
+        before_notes.extend(instrument.notes)
+        instrument.notes = dedupe_and_limit_notes(instrument.notes, simultaneous_limit=simultaneous_limit)
+        after_notes.extend(instrument.notes)
+
+    return {
+        "enabled": True,
+        "simultaneous_limit": int(simultaneous_limit),
+        "before_note_count": int(len(before_notes)),
+        "after_note_count": int(len(after_notes)),
+        "removed_note_count": int(max(0, len(before_notes) - len(after_notes))),
+        "before_max_simultaneous_notes": int(max_simultaneous_notes(before_notes)) if before_notes else 0,
+        "after_max_simultaneous_notes": int(max_simultaneous_notes(after_notes)) if after_notes else 0,
+    }
+
+
 def decode_tokens_to_midi(tokens: Sequence[int], output_path: Path, bpm: float | int) -> Path:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     midi = decode_stage_b_midi(tokens, tempo_bpm=bpm)
@@ -247,6 +301,7 @@ def sample_report(
     target_length: int,
     midi_path: Path,
     request: GenerationRequest,
+    postprocess_report: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     raw_generated_tokens = [int(token) for token in tokens[primer_size:]]
     grammar = analyze_stage_b_note_grammar(tokens, primer_size=primer_size)
@@ -264,6 +319,7 @@ def sample_report(
         "grammar_gate_passed": grammar_gate_passed,
         "failure_reason": reason,
         "grammar": grammar,
+        "postprocess": postprocess_report or {"enabled": False},
         "metrics": metrics.to_dict(),
         "generated_token_names_head": [stage_b_token_name(token) for token in raw_generated_tokens[:48]],
     }
@@ -303,6 +359,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--generation_mode", choices=("unconstrained", "constrained"), default="unconstrained")
     parser.add_argument("--constrained_note_groups_per_bar", type=int, default=4)
+    parser.add_argument("--postprocess_overlap", action="store_true")
+    parser.add_argument("--max_simultaneous_notes", type=int, default=2)
     parser.add_argument("--require_note_groups", action="store_true")
     parser.add_argument("--require_valid_sample", action="store_true")
     parser.set_defaults(lora_only=False)
@@ -338,12 +396,13 @@ def main() -> int:
     report: dict[str, Any] = {
         "run_id": run_id,
         "run_dir": str(run_dir),
-        "issue": 20 if args.generation_mode == "constrained" else 18,
+        "issue": 22 if args.postprocess_overlap else 20 if args.generation_mode == "constrained" else 18,
         "sequence_format": SEQUENCE_FORMAT_STAGE_B_V1,
         "request": request.to_dict(),
         "checkpoint_dir": str(checkpoint_dir),
         "sample_vocab_size": int(VOCAB_SIZE),
         "generation_mode": args.generation_mode,
+        "postprocess_overlap": bool(args.postprocess_overlap),
     }
 
     if not args.skip_prepare:
@@ -409,7 +468,15 @@ def main() -> int:
                 top_p=args.top_p,
             )
         midi_path = samples_dir / f"stage_b_sample_{index}.mid"
-        decode_tokens_to_midi(generated_tokens, midi_path, bpm=args.bpm)
+        midi_path.parent.mkdir(parents=True, exist_ok=True)
+        midi = decode_stage_b_midi(generated_tokens, tempo_bpm=args.bpm)
+        postprocess_report = None
+        if args.postprocess_overlap:
+            postprocess_report = postprocess_stage_b_midi(
+                midi,
+                simultaneous_limit=args.max_simultaneous_notes,
+            )
+        midi.write(str(midi_path))
         sample_rows.append(
             sample_report(
                 sample_index=index,
@@ -418,6 +485,7 @@ def main() -> int:
                 target_length=args.max_sequence,
                 midi_path=midi_path,
                 request=request,
+                postprocess_report=postprocess_report,
             )
         )
 

@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-20-stage-b-constrained-tiny-overfit`
+- `issue-22-stage-b-overlap-gate`
 
 현재 범위가 아닌 것:
 
@@ -188,7 +188,11 @@ Current result:
 
 ## Active Issue #20
 
-Current task:
+Status:
+
+- completed and merged via PR #21
+
+Completed task:
 
 - add a grammar-constrained Stage B generation mode
 - analyze generated tokens for complete `POSITION + VELOCITY + NOTE_PITCH + NOTE_DURATION` groups
@@ -210,6 +214,31 @@ Current result:
 - full review gate passed: `false`
 - full gate failure reason: `too many simultaneous notes: 3 > 2`
 - decision: Stage B note grammar can now be forced through the model logits, but musical validity still needs overlap/deduplication control
+
+## Active Issue #22
+
+Current task:
+
+- remove duplicate same-onset/same-pitch notes after Stage B decode
+- limit excessive overlapping notes before metrics
+- keep decoded MIDI note count non-zero
+- get constrained Stage B smoke through the full review gate
+
+First implementation target:
+
+- `scripts/run_stage_b_generation_probe.py`
+- `scripts/agent_harness.sh stage-b-overlap-gate`
+- `tests/test_stage_b_generation_probe.py`
+- `docs/STAGE_B_OVERLAP_GATE_2026-05-19.md`
+
+Current result:
+
+- constrained generation still produced 8 complete Stage B note groups
+- postprocess reduced notes from `8` to `6`
+- max simultaneous notes reduced from `3` to `2`
+- grammar gate passed: `true`
+- full review gate passed: `true`
+- detail: `docs/STAGE_B_OVERLAP_GATE_2026-05-19.md`
 
 ## Dataset Strategy
 
@@ -483,7 +512,7 @@ Smoke result:
 
 Status:
 
-- implemented on `issue-20-stage-b-constrained-tiny-overfit`
+- completed and merged via PR #21
 
 Goal:
 
@@ -510,6 +539,40 @@ Smoke result:
 - valid sample count: `0`
 - full gate failure reason: `too many simultaneous notes: 3 > 2`
 - decision: next issue should reduce repeated same-position/same-pitch overlaps before broad training
+
+### 0.11. Issue #22 Stage B overlap/dedup gate
+
+Status:
+
+- implemented on `issue-22-stage-b-overlap-gate`
+
+Goal:
+
+- remove duplicate notes at the same onset/pitch
+- limit active overlapping notes to `max_simultaneous_notes <= 2`
+- verify constrained Stage B decoded MIDI can pass the full review gate
+
+Acceptance:
+
+- overlap/dedup unit tests pass
+- constrained smoke keeps decoded note count above zero
+- constrained smoke reduces max simultaneous notes to `2`
+- constrained smoke passes `validate_metrics`
+- `bash scripts/agent_harness.sh quick` passes
+- `bash scripts/agent_harness.sh stage-b-overlap-gate` passes
+
+Smoke result:
+
+- output: `outputs/stage_b_generation_probe/harness_stage_b_overlap_gate`
+- role samples: `70`
+- complete note groups: `8`
+- before note count: `8`
+- after note count: `6`
+- before max simultaneous notes: `3`
+- after max simultaneous notes: `2`
+- valid sample count: `1`
+- passed generation gate: `true`
+- decision: this is the first Stage B constrained smoke to pass the local review gate, but it is still a constrained/postprocessed diagnostic rather than unconstrained musical generation
 
 ### 1. Run full jazz piano dataset audit
 
@@ -644,6 +707,7 @@ Decision:
 - `docs/STAGE_B_WINDOW_TINY_OVERFIT_2026-05-19.md`
 - `docs/STAGE_B_GENERATION_PROBE_2026-05-19.md`
 - `docs/STAGE_B_CONSTRAINED_TINY_OVERFIT_2026-05-19.md`
+- `docs/STAGE_B_OVERLAP_GATE_2026-05-19.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
@@ -684,4 +748,10 @@ For Stage B constrained note-grammar changes:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-constrained-probe
+```
+
+For Stage B overlap/dedup gate changes:
+
+```bash
+bash scripts/agent_harness.sh stage-b-overlap-gate
 ```
