@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-17-stage-b-window-tiny-overfit`
+- `issue-18-stage-b-generation-probe`
 
 현재 범위가 아닌 것:
 
@@ -125,7 +125,11 @@ Current result:
 
 ## Active Issue #17
 
-Current task:
+Status:
+
+- completed and merged via PR #17
+
+Completed task:
 
 - connect Stage B phrase/window records to the model training path
 - move Stage B token ranges into shared model constants
@@ -150,6 +154,33 @@ Current result:
 - train loss: `6.1135`
 - val loss: `5.8195`
 - detail: `docs/STAGE_B_WINDOW_TINY_OVERFIT_2026-05-19.md`
+
+## Active Issue #18
+
+Current task:
+
+- add a Stage B token generation/decode probe
+- make `MusicTransformer.generate()` able to sample Stage B token IDs by using `sample_vocab_size=VOCAB_SIZE`
+- decode generated Stage B tokens back to MIDI
+- run existing MIDI metrics/gates on decoded output
+- report invalid outputs honestly instead of treating MIDI file creation as success
+
+First implementation target:
+
+- `music_transformer/model/music_transformer.py`
+- `scripts/run_stage_b_generation_probe.py`
+- `scripts/agent_harness.sh stage-b-generation-probe`
+- tests for Stage B primer, full-vocab sampling, and MIDI decode
+
+Current result:
+
+- one Brad file Stage B window prepare succeeded
+- one-epoch tiny training succeeded
+- generation sampled with `sample_vocab_size=547`
+- decoded MIDI file was created
+- generated sample failed the review gate with `generated MIDI has no notes`
+- `passed_generation_gate=false`
+- detail: `docs/STAGE_B_GENERATION_PROBE_2026-05-19.md`
 
 ## Dataset Strategy
 
@@ -355,7 +386,7 @@ Dry run result:
 
 Status:
 
-- implemented on `issue-17-stage-b-window-tiny-overfit`
+- completed and merged via PR #17
 
 Goal:
 
@@ -384,6 +415,40 @@ Smoke result:
 - vocab size: `547`
 - epoch 1 train loss: `6.1135`
 - epoch 1 val loss: `5.8195`
+
+### 0.9. Issue #18 Stage B decode/generation probe
+
+Status:
+
+- implemented on `issue-18-stage-b-generation-probe`
+
+Goal:
+
+- make generation capable of emitting Stage B token IDs above `TOKEN_END`
+- decode generated Stage B tokens into MIDI
+- apply the same metrics gate used after the Stage A failure
+- document whether the first Stage B generation smoke is musically valid
+
+Acceptance:
+
+- `MusicTransformer.generate(..., sample_vocab_size=VOCAB_SIZE)` can sample the full Stage B vocabulary
+- generated Stage B tokens can be decoded into a MIDI file
+- invalid output is reported as invalid, not as a successful sample
+- `bash scripts/agent_harness.sh quick` passes
+- `bash scripts/agent_harness.sh stage-b-generation-probe` passes
+
+Smoke result:
+
+- output: `outputs/stage_b_generation_probe/harness_stage_b_generation_probe`
+- role samples: `70`
+- max token id in prepared records: `544`
+- sample vocab size: `547`
+- epoch 1 train loss: `6.2115`
+- epoch 1 val loss: `5.9441`
+- generated sample count: `1`
+- valid sample count: `0`
+- failure reason: `generated MIDI has no notes`
+- decision: data/model/decode plumbing works, but generation quality is still not validated
 
 ### 1. Run full jazz piano dataset audit
 
@@ -516,6 +581,7 @@ Decision:
 - `docs/STAGE_B_ROLE_DATASET_PREP_2026-05-19.md`
 - `docs/STAGE_B_PHRASE_WINDOW_DATASET_2026-05-19.md`
 - `docs/STAGE_B_WINDOW_TINY_OVERFIT_2026-05-19.md`
+- `docs/STAGE_B_GENERATION_PROBE_2026-05-19.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
@@ -544,4 +610,10 @@ For Stage B window dataset/model-vocab changes:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-window-prepare
+```
+
+For Stage B decode/generation changes:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generation-probe
 ```

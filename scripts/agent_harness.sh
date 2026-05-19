@@ -30,6 +30,8 @@ Modes:
   control-tiny  Run control_v1 full-model tiny-overfit smoke.
   stage-b-window-prepare
                 Prepare Stage B phrase windows and verify token vocab fit.
+  stage-b-generation-probe
+                Run a one-epoch Stage B decode/generation smoke.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -66,6 +68,7 @@ run_quick() {
     scripts/stage_b_tokens.py \
     scripts/prepare_role_dataset.py \
     scripts/run_stage_b_window_tiny_overfit.py \
+    scripts/run_stage_b_generation_probe.py \
     scripts/audit_brad_mehldau_dataset.py \
     scripts/audit_jazz_piano_dataset.py \
     scripts/build_jazz_training_manifests.py \
@@ -132,6 +135,24 @@ run_stage_b_window_prepare() {
     --prepare_only
 }
 
+run_stage_b_generation_probe() {
+  local run_id="${RUN_ID:-harness_stage_b_generation_probe}"
+  print_header "Stage B generation probe"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$run_id" \
+    --max_files 1 \
+    --epochs 1 \
+    --batch_size 8 \
+    --max_sequence 96 \
+    --num_samples 1 \
+    --n_layers 1 \
+    --num_heads 4 \
+    --d_model 64 \
+    --dim_feedforward 128 \
+    --lora_r 4 \
+    --lora_alpha 8
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -164,6 +185,9 @@ case "$MODE" in
     ;;
   stage-b-window-prepare)
     run_stage_b_window_prepare
+    ;;
+  stage-b-generation-probe)
+    run_stage_b_generation_probe
     ;;
   manifest-dry-run)
     run_manifest_dry_run

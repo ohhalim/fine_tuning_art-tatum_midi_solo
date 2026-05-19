@@ -214,3 +214,5 @@ After the tiny-overfit smoke proves model-vocab compatibility, the next issue sh
 - train a tiny Stage B checkpoint long enough to overfit a short window set
 - decode Stage B tokens back to MIDI
 - apply the same invalid-output gates used after the Stage A failure
+
+Issue #18 adds this first decode/generation probe. It validates the plumbing, but the first one-epoch smoke still generates an invalid empty MIDI sample. The next step is not broad training. The next step is a stricter Stage B tiny-overfit grammar probe that forces or learns complete note groups before dataset size increases.

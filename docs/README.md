@@ -30,6 +30,8 @@
   - Stage B 2-bar phrase/window dataset extraction and Brad 2-file dry run.
 - `STAGE_B_WINDOW_TINY_OVERFIT_2026-05-19.md`
   - Stage B phrase windows가 model vocab/training path에 연결되는지 확인한 tiny-overfit smoke.
+- `STAGE_B_GENERATION_PROBE_2026-05-19.md`
+  - Stage B token generation, MIDI decode, and review-gate probe result.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`

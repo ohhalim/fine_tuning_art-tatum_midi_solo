@@ -107,9 +107,11 @@ Stage B window records now fit the model vocabulary, and the training entrypoint
 
 This only validates the data/model plumbing. It does not prove that the model can generate reviewable jazz MIDI yet.
 
-Next issue should add a Stage B decode/generation probe:
+Follow-up issue #18 adds a Stage B decode/generation probe:
 
 - train a tiny Stage B checkpoint for enough epochs to overfit a tiny window set
 - decode generated Stage B tokens back to MIDI
 - reject one-note, two-note, long-sustain, and chord-block outputs
 - compare generated MIDI against the same review gates used after the Stage A failure
+
+The first Issue #18 smoke validates the decode/generation plumbing, but it still produces no valid MIDI notes after one epoch.

@@ -258,6 +258,7 @@ def generate_once(
     temperature: float,
     top_k: int | None,
     top_p: float | None,
+    sample_vocab_size: int | None = None,
 ) -> List[int]:
     device = get_device()
     primer = primer.to(device)
@@ -271,6 +272,7 @@ def generate_once(
             temperature=temperature,
             top_k=top_k,
             top_p=top_p,
+            sample_vocab_size=sample_vocab_size,
         )
 
     sequence = generated[0].detach().cpu().tolist()
