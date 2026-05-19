@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-16-stage-b-phrase-window-dataset`
+- `issue-17-stage-b-window-tiny-overfit`
 
 현재 범위가 아닌 것:
 
@@ -122,6 +122,34 @@ Current result:
 - Brad 2-file dry run produced 137 role samples
 - token lengths: min `22`, p50 `77`, max `212`, mean `82.94`
 - detail: `docs/STAGE_B_PHRASE_WINDOW_DATASET_2026-05-19.md`
+
+## Active Issue #17
+
+Current task:
+
+- connect Stage B phrase/window records to the model training path
+- move Stage B token ranges into shared model constants
+- ensure model `VOCAB_SIZE` covers Stage B tokens
+- add a Stage B window tiny-overfit smoke script
+- fail fast if the prepared dataset has no token records or token IDs exceed model vocab
+
+First implementation target:
+
+- `music_transformer/utilities/constants.py`
+- `scripts/stage_b_tokens.py`
+- `scripts/run_stage_b_window_tiny_overfit.py`
+- `scripts/agent_harness.sh stage-b-window-prepare`
+- tests for Stage B vocab compatibility and empty dataset rejection
+
+Current result:
+
+- one Brad file prepare-only smoke produced 70 Stage B window records
+- max Stage B token id: `544`
+- model vocab size: `547`
+- one-epoch tiny training smoke completed
+- train loss: `6.1135`
+- val loss: `5.8195`
+- detail: `docs/STAGE_B_WINDOW_TINY_OVERFIT_2026-05-19.md`
 
 ## Dataset Strategy
 
@@ -299,7 +327,7 @@ Dry run result:
 
 Status:
 
-- implemented on `issue-16-stage-b-phrase-window-dataset`
+- completed and merged via PR #16
 
 Goal:
 
@@ -322,6 +350,40 @@ Dry run result:
 - tokenized val: `14`
 - token length p50: `77`
 - token length max: `212`
+
+### 0.8. Issue #17 Stage B window tiny-overfit smoke
+
+Status:
+
+- implemented on `issue-17-stage-b-window-tiny-overfit`
+
+Goal:
+
+- prove Stage B phrase/window token records fit the Music Transformer vocabulary
+- prepare a small Brad window dataset through the normal dataset entrypoint
+- run a minimal full-model tiny training smoke against Stage B records
+- avoid treating empty tokenized datasets as successful
+
+Acceptance:
+
+- `STAGE_B_VOCAB_SIZE == VOCAB_SIZE`
+- local prepare-only smoke creates non-empty tokenized Stage B windows
+- max token id is lower than model `VOCAB_SIZE`
+- one-epoch training smoke exits successfully
+- `bash scripts/agent_harness.sh quick` passes
+- `bash scripts/agent_harness.sh stage-b-window-prepare` passes
+
+Smoke result:
+
+- prepare-only output: `outputs/stage_b_window_tiny_overfit/harness_stage_b_window_prepare`
+- training output: `outputs/stage_b_window_tiny_overfit/harness_stage_b_window_train_e1`
+- role samples: `70`
+- token length p50: `89`
+- token length max: `212`
+- max token id: `544`
+- vocab size: `547`
+- epoch 1 train loss: `6.1135`
+- epoch 1 val loss: `5.8195`
 
 ### 1. Run full jazz piano dataset audit
 
@@ -450,6 +512,10 @@ Decision:
 - `docs/STAGE_A_TRAINING_MODES.md`
 - `docs/STAGE_A_TINY_OVERFIT.md`
 - `docs/STAGE_A_CODE_REVIEW_2026-05-18.md`
+- `docs/STAGE_B_TOKENIZATION_SPEC.md`
+- `docs/STAGE_B_ROLE_DATASET_PREP_2026-05-19.md`
+- `docs/STAGE_B_PHRASE_WINDOW_DATASET_2026-05-19.md`
+- `docs/STAGE_B_WINDOW_TINY_OVERFIT_2026-05-19.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
@@ -472,4 +538,10 @@ For training-mode or tiny-overfit changes:
 
 ```bash
 bash scripts/agent_harness.sh tiny-compare
+```
+
+For Stage B window dataset/model-vocab changes:
+
+```bash
+bash scripts/agent_harness.sh stage-b-window-prepare
 ```

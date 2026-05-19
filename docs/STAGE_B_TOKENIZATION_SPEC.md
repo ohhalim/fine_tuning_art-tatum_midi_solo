@@ -46,6 +46,13 @@ Current implementation file:
 scripts/stage_b_tokens.py
 ```
 
+Model vocabulary integration:
+
+- shared Stage B token ranges live in `music_transformer/utilities/constants.py`
+- `scripts/stage_b_tokens.py` imports those ranges instead of defining an independent vocabulary
+- `VOCAB_SIZE` is `TOKEN_STAGE_B_END + 1`, so the Music Transformer embedding/output layers cover Stage B tokens
+- tests assert `STAGE_B_VOCAB_SIZE == VOCAB_SIZE`
+
 Core families:
 
 | Family | Meaning |
@@ -199,6 +206,11 @@ This produces short tokenized phrase windows rather than full-song target contin
 
 After the phrase/window dataset contract is merged, the next issue should build:
 
-- target-only training loss if conditioning is prepended
 - Stage B tiny-overfit smoke
 - Brad 2-file Stage B probe
+
+After the tiny-overfit smoke proves model-vocab compatibility, the next issue should add Stage B decode/generation:
+
+- train a tiny Stage B checkpoint long enough to overfit a short window set
+- decode Stage B tokens back to MIDI
+- apply the same invalid-output gates used after the Stage A failure

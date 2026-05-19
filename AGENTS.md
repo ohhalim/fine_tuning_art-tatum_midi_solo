@@ -2,7 +2,7 @@
 
 ## Project Focus
 
-This repository is currently focused on Stage A symbolic MIDI generation.
+This repository is currently focused on Stage B symbolic MIDI generation probes.
 
 Primary goal:
 
@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #16: Stage B phrase-window dataset extraction.
+- Issue #17: Stage B window tiny-overfit smoke.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -71,10 +71,16 @@ For changes that touch inference behavior, metrics, generation, or model loading
 bash scripts/agent_harness.sh demo
 ```
 
-For tiny-overfit or Stage A training-mode changes, run:
+For Stage A training-mode changes, run:
 
 ```bash
 bash scripts/agent_harness.sh tiny-compare
+```
+
+For Stage B window dataset/model-vocab changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-window-prepare
 ```
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
