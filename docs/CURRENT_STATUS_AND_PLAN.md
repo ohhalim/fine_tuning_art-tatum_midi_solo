@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-31-stage-b-strict-collapse-gate`
+- `issue-33-stage-b-2file-brad-probe`
 
 현재 범위가 아닌 것:
 
@@ -735,6 +735,54 @@ Smoke result:
 - passed strict sweep gate: `true`
 - decision: strict gate still preserves one valid candidate, so the next issue can move to a Stage B 2-file Brad probe
 - detail: `docs/STAGE_B_STRICT_COLLAPSE_GATE_2026-05-20.md`
+
+### 0.15. Issue #33 Stage B 2-file Brad generation probe
+
+Status:
+
+- implemented on `issue-33-stage-b-2file-brad-probe`
+
+Goal:
+
+- move from one-file tiny smoke to Brad 2-file Stage B generation probe
+- verify whether grammar/basic/strict pass-rate survives a larger train/val setup
+- decide whether to move toward generic jazz base training or fix another local generation bottleneck
+
+Probe setup:
+
+- input: `./midi_dataset/midi/studio/Brad Mehldau`
+- max files: `2`
+- generated Stage B windows: `137`
+- train samples: `123`
+- val samples: `14`
+- max token id: `544`
+- vocab size: `547`
+- training: 3 epochs, full tiny model path, CPU
+- best observed val loss: `4.0892`
+- generation: constrained, `top_k=2`, temperature `0.9`, 3 samples
+
+Smoke result:
+
+- output: `outputs/stage_b_generation_probe/harness_stage_b_2file_brad_probe`
+- grammar gate: `3/3`
+- basic valid: `0/3`
+- strict valid: `0/3`
+- collapse warning: `0/3`
+- avg repeated position/pitch pair ratio: `0.375`
+- avg postprocess removal ratio: `0.208`
+- failure reason: all samples failed on dead-air ratio near or above `0.800`
+
+Decision:
+
+- Stage B grammar is now stable in this probe.
+- The prior collapse issue is not the immediate failure mode in the 2-file probe.
+- The current bottleneck is temporal coverage/dead-air, especially generated note positions failing to cover the 2-bar phrase densely enough.
+- Do not start generic jazz base training yet.
+- Next issue should add position/dead-air coverage diagnostics and a coverage-aware constrained generation probe.
+
+Detail:
+
+- `docs/STAGE_B_2FILE_BRAD_PROBE_2026-05-20.md`
 
 ### 1. Run full jazz piano dataset audit
 

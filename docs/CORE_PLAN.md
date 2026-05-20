@@ -299,29 +299,30 @@ Stage B에서 명시하는 것:
 
 완료된 바로 전 작업:
 
-- `Stage B stricter collapse-aware review gate 추가`
-- 결과: `top_k=1`은 collapse warning `3/3`, valid `0/3`
-- 결과: `top_k=2`는 collapse warning `1/3`, basic valid `1/3`, strict valid `1/3`
-- 결론: Stage B grammar가 아니라 note distribution collapse가 현재 병목이지만, strict gate에서도 최소 후보 1개는 유지된다.
+- `Stage B 2-file Brad generation probe 추가`
+- 결과: 2-file Brad Stage B window dataset은 `137` samples, train `123`, val `14`로 정상 생성됐다.
+- 결과: generated samples는 grammar gate `3/3`, collapse warning `0/3`이었다.
+- 결과: basic valid `0/3`, strict valid `0/3`이었다.
+- 결론: Stage B grammar와 collapse는 2-file probe에서 즉시 병목이 아니며, 현재 병목은 dead-air/temporal coverage다.
 
 다음 issue는 다음 이름이 적절하다.
 
 ```text
-Stage B 2-file Brad generation probe 추가
+Stage B temporal coverage diagnostics 추가
 ```
 
 작업 범위:
 
-- one-file tiny smoke를 넘어 Brad 2-file Stage B window dataset으로 generation probe를 실행한다.
-- train/val split과 window count를 report에 남긴다.
-- basic gate와 strict collapse-aware gate를 모두 보고한다.
-- one-file 결과보다 pass-rate가 유지되는지 확인한다.
-- 실패하면 broad training으로 가지 않고 tokenization/model/loss/pretrained-base 후보를 재검토한다.
+- generated Stage B note positions가 2-bar phrase를 얼마나 덮는지 token/MIDI 양쪽에서 측정한다.
+- per-bar occupied position count, earliest/latest position, phrase coverage, longest empty span을 report에 남긴다.
+- dead-air failure가 position sampling 문제인지 duration/postprocess 문제인지 분리한다.
+- coverage-aware constrained generation 실험을 추가하되, 모델 성공처럼 보이게 하는 과한 postprocess는 피한다.
+- 2-file Brad probe에서 basic/strict valid sample을 회복할 수 있는지 확인한다.
 
 이 작업이 끝난 뒤 판단:
 
-- 2-file Brad strict gate에서도 최소 pass-rate가 유지되면 generic jazz base 후보 학습 설계로 간다.
-- 2-file Brad strict gate가 전부 실패하면 sampling/postprocess 문제가 아니라 data scale, representation, loss, pretrained-base 쪽으로 재검토한다.
+- coverage-aware constrained probe로 basic/strict valid sample이 회복되면 Stage B 2-file Brad probe를 다시 고정하고 generic jazz base 후보 학습 설계로 간다.
+- coverage-aware constrained probe에서도 실패하면 data scale, representation, loss, pretrained-base 쪽으로 재검토한다.
 
 ## 10. 한 문장 요약
 
