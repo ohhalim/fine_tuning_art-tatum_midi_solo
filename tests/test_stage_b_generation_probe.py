@@ -10,6 +10,7 @@ import torch
 from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_collapse,
     analyze_stage_b_note_grammar,
+    analyze_stage_b_temporal_coverage,
     build_probe_summary,
     build_stage_b_primer,
     dedupe_and_limit_notes,
@@ -233,6 +234,38 @@ class StageBGenerationProbeTest(unittest.TestCase):
         self.assertTrue(report["collapse_warning"])
         self.assertIn("repeated_position_pitch", report["collapse_reasons"])
         self.assertIn("postprocess_removed_majority", report["collapse_reasons"])
+
+    def test_analyze_stage_b_temporal_coverage_reports_empty_spans(self) -> None:
+        primer = build_stage_b_primer(["Cm7", "F7"], bpm=120)
+        tokens = primer + [
+            position_token(0),
+            note_velocity_token(4),
+            note_pitch_token(60),
+            note_duration_token(2),
+            position_token(8),
+            note_velocity_token(4),
+            note_pitch_token(64),
+            note_duration_token(2),
+            TOKEN_BAR,
+            *chord_tokens("F7"),
+            position_token(12),
+            note_velocity_token(4),
+            note_pitch_token(67),
+            note_duration_token(4),
+            TOKEN_END,
+        ]
+
+        report = analyze_stage_b_temporal_coverage(tokens, primer_size=len(primer), bars=2)
+
+        self.assertEqual(report["note_group_count"], 3)
+        self.assertEqual(report["unique_onset_position_count"], 3)
+        self.assertAlmostEqual(report["onset_coverage_ratio"], 3 / 32)
+        self.assertAlmostEqual(report["sustained_coverage_ratio"], 8 / 32)
+        self.assertEqual(report["earliest_absolute_position"], 0)
+        self.assertEqual(report["latest_absolute_position"], 28)
+        self.assertEqual(report["position_span_steps"], 29)
+        self.assertEqual(report["tail_empty_steps"], 3)
+        self.assertEqual(report["per_bar_unique_onset_positions"], {"0": 2, "1": 1})
 
     def test_build_probe_summary_aggregates_collapse_diagnostics(self) -> None:
         rows = [
