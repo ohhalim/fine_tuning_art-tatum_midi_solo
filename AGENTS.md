@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #37: Stage B coverage-aware constrained generation.
+- Issue #39: Stage B coverage-aware A/B sweep.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -186,6 +186,15 @@ bash scripts/agent_harness.sh stage-b-coverage-aware-probe
 
 This probe tests whether constrained `POSITION` selection can improve temporal coverage without
 claiming unconstrained model quality.
+
+For Stage B coverage-aware A/B sweep changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-coverage-ab-sweep
+```
+
+This probe compares plain constrained generation against coverage-aware constrained generation
+across note-group density settings.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

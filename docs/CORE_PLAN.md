@@ -121,13 +121,16 @@ Stage B에서 명시하는 것:
 15. Stage B 2-file Brad generation probe
 16. Stage B temporal coverage diagnostics
 17. Stage B coverage-aware constrained generation probe
+18. Stage B coverage-aware A/B sweep
 
 가장 최근 의미 있는 결과:
 
-- coverage-aware constrained `POSITION` selection: 3 samples 중 3 samples가 grammar/basic/strict review gate 통과
-- 이전 2-file Brad probe 실패 원인은 pitch collapse보다 sparse onset/dead-air 쪽에 가까움
-- avg onset coverage ratio가 `0.167`에서 `0.250`으로 개선됨
-- max longest sustained empty run이 `11` steps에서 `6` steps로 감소함
+- coverage-aware constrained A/B sweep: coverage mode가 groups/bar `4`, `6`, `8` 모두에서 strict `3/3` 통과
+- plain constrained mode는 groups/bar `4`, `6`, `8`에서 각각 strict `0/3`, `1/3`, `2/3`
+- best config는 coverage groups/bar `8`
+- best avg onset coverage ratio: `0.500`
+- best avg sustained coverage ratio: `0.865`
+- best max longest sustained empty run: `1` step
 - 하지만 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않음
 
 중요한 해석:
@@ -146,7 +149,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-다음 단계는 coverage-aware constrained generation을 A/B sweep으로 검증하고, note density/coverage/chord-tone tradeoff를 숫자로 잡는 것이다.
+다음 단계는 strict pass/fail 하나가 아니라 temporal coverage, chord-tone ratio, repetition, density를 함께 보는 candidate ranking/report를 만드는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -227,9 +230,9 @@ Stage B에서 명시하는 것:
 
 다음 통과 기준:
 
-- plain constrained vs coverage-aware constrained A/B sweep을 같은 checkpoint 조건에서 비교한다.
-- `note_groups_per_bar=4/6/8`을 비교한다.
-- pass-rate가 좋아져도 이것을 style learning 성공으로 표현하지 않는다.
+- completed: plain constrained vs coverage-aware constrained A/B sweep을 같은 checkpoint 조건에서 비교했다.
+- completed: `note_groups_per_bar=4/6/8`을 비교했다.
+- next: pass-rate가 좋아져도 이것을 style learning 성공으로 표현하지 않고 candidate ranking 기준을 추가한다.
 
 ### Phase 4. Generic Jazz Base 후보 학습
 

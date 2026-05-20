@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-37-stage-b-coverage-aware-generation`
+- `issue-39-stage-b-coverage-ab-sweep`
 
 현재 범위가 아닌 것:
 
@@ -36,33 +36,35 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #37에서 Brad Mehldau real MIDI 2파일 Stage B setup으로 coverage-aware constrained generation probe를 실행했다.
+Issue #39에서 Brad Mehldau real MIDI 2파일 Stage B setup으로 plain constrained vs coverage-aware constrained A/B sweep을 실행했다.
 
 Result:
 
-- dataset prepare 성공: Brad 2-file Stage B windows `137`, train `123`, val `14`
-- 3 epoch full tiny model training 성공
-- best observed val loss: `4.0892`
-- generation mode: constrained + coverage-aware `POSITION`
-- grammar gate: `3/3`
-- basic valid: `3/3`
-- strict valid: `3/3`
-- collapse warning: `0/3`
-- avg onset coverage ratio: `0.250`
-- avg sustained coverage ratio: `0.427`
-- avg position span ratio: `0.813`
-- max longest sustained empty run: `6` steps
+- compared configs: `plain/coverage` x groups/bar `4/6/8`
+- all configs grammar gate: `3/3`
+- plain strict valid:
+  - groups/bar `4`: `0/3`
+  - groups/bar `6`: `1/3`
+  - groups/bar `8`: `2/3`
+- coverage strict valid:
+  - groups/bar `4`: `3/3`
+  - groups/bar `6`: `3/3`
+  - groups/bar `8`: `3/3`
+- best config: coverage groups/bar `8`
+- best avg onset coverage ratio: `0.500`
+- best avg sustained coverage ratio: `0.865`
+- best max longest sustained empty run: `1` step
 
 Decision:
 
-- coverage-aware constrained `POSITION` selection은 2-file Brad dead-air failure를 줄이는 데 효과가 있었다.
-- 이전 #35의 basic/strict `0/3`에서 #37은 basic/strict `3/3`으로 개선됐다.
+- coverage-aware constrained `POSITION` selection은 plain constrained보다 안정적으로 temporal coverage를 개선한다.
+- `groups/bar=8`이 temporal coverage는 가장 좋지만 chord-tone ratio는 낮아질 수 있다.
 - 하지만 이것은 unconstrained model quality나 Brad style adaptation 성공이 아니다.
-- 다음은 plain constrained vs coverage-aware constrained A/B sweep으로 안정성을 확인한다.
+- 다음은 strict pass/fail만 보지 말고 coverage, chord-tone ratio, repetition, density를 함께 보는 candidate ranking/report를 만든다.
 
 Detail:
 
-- `docs/STAGE_B_COVERAGE_AWARE_GENERATION_2026-05-20.md`
+- `docs/STAGE_B_COVERAGE_AB_SWEEP_2026-05-20.md`
 
 ## Active Issue #14
 
@@ -881,6 +883,40 @@ Detail:
 
 - `docs/STAGE_B_COVERAGE_AWARE_GENERATION_2026-05-20.md`
 
+### 0.18. Issue #39 Stage B coverage-aware A/B sweep
+
+Status:
+
+- implemented on `issue-39-stage-b-coverage-ab-sweep`
+
+Goal:
+
+- compare plain constrained generation with coverage-aware constrained generation
+- test note group density values `4`, `6`, and `8`
+- record pass-rate and temporal coverage tradeoffs in JSON/Markdown reports
+
+Smoke result:
+
+- output: `outputs/stage_b_coverage_ab_sweep/harness_stage_b_coverage_ab_sweep`
+- configs: `6`
+- all configs grammar gate: `3/3`
+- plain strict valid: `0/3`, `1/3`, `2/3` for groups/bar `4`, `6`, `8`
+- coverage strict valid: `3/3`, `3/3`, `3/3` for groups/bar `4`, `6`, `8`
+- best config: coverage groups/bar `8`
+- best avg onset coverage ratio: `0.500`
+- best avg sustained coverage ratio: `0.865`
+- best max longest sustained empty run: `1` step
+
+Decision:
+
+- coverage-aware `POSITION` selection is consistently better than plain constrained generation for this 2-file Brad setup.
+- More note groups improve temporal coverage, but lower chord-tone ratio can become the next musical-quality issue.
+- Next issue should rank candidate samples/configs with multiple metrics rather than only strict pass/fail.
+
+Detail:
+
+- `docs/STAGE_B_COVERAGE_AB_SWEEP_2026-05-20.md`
+
 ### 1. Run full jazz piano dataset audit
 
 ```bash
@@ -1021,6 +1057,7 @@ Decision:
 - `docs/STAGE_B_2FILE_BRAD_PROBE_2026-05-20.md`
 - `docs/STAGE_B_TEMPORAL_COVERAGE_DIAGNOSTICS_2026-05-20.md`
 - `docs/STAGE_B_COVERAGE_AWARE_GENERATION_2026-05-20.md`
+- `docs/STAGE_B_COVERAGE_AB_SWEEP_2026-05-20.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
@@ -1091,4 +1128,10 @@ For Stage B coverage-aware constrained generation changes:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-coverage-aware-probe
+```
+
+For Stage B coverage-aware A/B sweep changes:
+
+```bash
+bash scripts/agent_harness.sh stage-b-coverage-ab-sweep
 ```
