@@ -450,6 +450,22 @@ def next_token_from_model(
     return choose_allowed_token(logits, allowed_tokens, temperature=temperature, top_k=top_k)
 
 
+def coverage_aware_position_tokens(
+    group_index: int,
+    note_groups_per_bar: int,
+    position_window: int = 0,
+) -> list[int]:
+    groups_per_bar = max(1, int(note_groups_per_bar))
+    cluster_count = max(1, (groups_per_bar + 1) // 2)
+    cluster_index = int(group_index) // 2
+    pair_offset = int(group_index) % 2
+    anchor = int(round(cluster_index * int(POSITIONS_PER_BAR) / cluster_count))
+    target = min(int(POSITIONS_PER_BAR) - 1, anchor + pair_offset)
+    window = max(0, int(position_window))
+    positions = range(max(0, target - window), min(int(POSITIONS_PER_BAR), target + window + 1))
+    return [TOKEN_POSITION_START + int(position) for position in positions]
+
+
 def generate_stage_b_constrained_tokens(
     model: Any,
     primer_tokens: Sequence[int],
