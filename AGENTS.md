@@ -32,11 +32,42 @@ Must ask first:
 - any `git push`, including same-branch upstream push
 - pull request creation or PR metadata updates
 - GitHub issue creation or issue metadata updates
+- merging pull requests that were not created by Codex in the current task flow
 - deployment
 - external uploads
 - destructive cleanup of generated files, checkpoints, datasets, or user-created outputs
 
 If the user says "PR 올려", "이슈 만들어", "배포해", or equivalent, that counts as explicit permission for that requested remote action only.
+
+## Conditional Auto-Merge Policy
+
+Codex may merge a pull request without asking again only when all of the following are true:
+
+- the user explicitly asked Codex to continue through PR completion for the current issue, or explicitly allowed automatic merge behavior
+- the pull request was created by Codex for the current issue branch
+- the pull request targets `main`
+- the PR is marked mergeable by GitHub
+- the working branch contains only changes scoped to the current issue
+- all relevant local validation commands passed, or the only failures are documented environment/tooling issues that do not affect the change
+- the PR has no unresolved requested changes or review blockers known to Codex
+- the merge method is the repository default merge method unless the user specified another method
+
+Codex must not auto-merge when any of the following are true:
+
+- the user says "내가 머지할게", "머지 전에는 불러", "merge는 내가 할게", or equivalent
+- the PR includes deployment, credentials, destructive cleanup, raw dataset/checkpoint uploads, or external publishing
+- GitHub reports merge conflicts or an unknown/unmergeable state after a reasonable refresh
+- validation failed for reasons related to the changed code
+- the diff includes unrelated user changes
+- the PR was opened by someone else or predates the current Codex task flow
+
+After an automatic merge, Codex should report:
+
+- issue number
+- PR number and URL
+- merge commit SHA when available
+- validation commands run
+- next recommended issue or branch boundary
 
 ## Local Commit Policy
 
