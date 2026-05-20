@@ -44,6 +44,8 @@ Modes:
                 Run a two-file Brad Stage B generation probe with strict reporting.
   stage-b-coverage-aware-probe
                 Run a two-file Brad Stage B coverage-aware generation probe.
+  stage-b-coverage-ab-sweep
+                Run plain vs coverage-aware Stage B constrained generation sweep.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -82,6 +84,7 @@ run_quick() {
     scripts/run_stage_b_window_tiny_overfit.py \
     scripts/run_stage_b_generation_probe.py \
     scripts/run_stage_b_sampling_sweep.py \
+    scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/audit_brad_mehldau_dataset.py \
     scripts/audit_jazz_piano_dataset.py \
     scripts/build_jazz_training_manifests.py \
@@ -331,6 +334,36 @@ run_stage_b_coverage_aware_probe() {
     --lora_alpha 8
 }
 
+run_stage_b_coverage_ab_sweep() {
+  local run_id="${RUN_ID:-harness_stage_b_coverage_ab_sweep}"
+  print_header "Stage B coverage-aware A/B sweep"
+  "$PYTHON_BIN" scripts/run_stage_b_coverage_ab_sweep.py \
+    --run_id "$run_id" \
+    --issue_number 39 \
+    --max_files 2 \
+    --epochs 3 \
+    --batch_size 8 \
+    --max_sequence 96 \
+    --num_samples 3 \
+    --modes plain,coverage \
+    --note_groups_per_bar_values 4,6,8 \
+    --coverage_position_window 0 \
+    --max_simultaneous_notes 2 \
+    --temperature 0.9 \
+    --top_k 2 \
+    --min_valid_samples 1 \
+    --min_strict_valid_samples 1 \
+    --min_best_strict_valid_samples 1 \
+    --max_collapse_warning_sample_rate 0.34 \
+    --require_all_grammar_samples \
+    --n_layers 1 \
+    --num_heads 4 \
+    --d_model 64 \
+    --dim_feedforward 128 \
+    --lora_r 4 \
+    --lora_alpha 8
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -384,6 +417,9 @@ case "$MODE" in
     ;;
   stage-b-coverage-aware-probe)
     run_stage_b_coverage_aware_probe
+    ;;
+  stage-b-coverage-ab-sweep)
+    run_stage_b_coverage_ab_sweep
     ;;
   manifest-dry-run)
     run_manifest_dry_run

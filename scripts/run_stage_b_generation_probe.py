@@ -872,6 +872,7 @@ def main() -> int:
         "checkpoint_dir": str(checkpoint_dir),
         "sample_vocab_size": int(VOCAB_SIZE),
         "generation_mode": args.generation_mode,
+        "constrained_note_groups_per_bar": int(args.constrained_note_groups_per_bar),
         "coverage_aware_positions": bool(args.coverage_aware_positions),
         "coverage_position_window": int(args.coverage_position_window),
         "postprocess_overlap": bool(args.postprocess_overlap),

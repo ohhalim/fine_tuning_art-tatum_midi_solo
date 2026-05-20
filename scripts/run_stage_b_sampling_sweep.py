@@ -124,10 +124,25 @@ def probe_command(
 
 def row_from_probe_report(top_k: int, temperature: float, run_id: str, report: dict[str, Any]) -> dict[str, Any]:
     summary = report.get("summary", {})
+    samples = report.get("samples", [])
+    dead_air_ratios = [
+        float(sample.get("metrics", {}).get("dead_air_ratio", 0.0) or 0.0)
+        for sample in samples
+        if isinstance(sample, dict)
+    ]
+    chord_tone_ratios = [
+        float(sample.get("metrics", {}).get("chord_tone_ratio", 0.0) or 0.0)
+        for sample in samples
+        if isinstance(sample, dict)
+    ]
     return {
         "run_id": run_id,
         "top_k": int(top_k),
         "temperature": float(temperature),
+        "generation_mode": str(report.get("generation_mode", "")),
+        "coverage_aware_positions": bool(report.get("coverage_aware_positions", False)),
+        "coverage_position_window": int(report.get("coverage_position_window", 0) or 0),
+        "constrained_note_groups_per_bar": int(report.get("constrained_note_groups_per_bar", 0) or 0),
         "sample_count": int(summary.get("sample_count", 0)),
         "grammar_gate_sample_count": int(summary.get("grammar_gate_sample_count", 0)),
         "valid_sample_count": int(summary.get("valid_sample_count", 0)),
@@ -149,6 +164,19 @@ def row_from_probe_report(top_k: int, temperature: float, run_id: str, report: d
         ),
         "avg_postprocess_removal_ratio": float(summary.get("avg_postprocess_removal_ratio", 0.0)),
         "max_postprocess_removal_ratio": float(summary.get("max_postprocess_removal_ratio", 0.0)),
+        "avg_onset_coverage_ratio": float(summary.get("avg_onset_coverage_ratio", 0.0)),
+        "avg_sustained_coverage_ratio": float(summary.get("avg_sustained_coverage_ratio", 0.0)),
+        "avg_position_span_ratio": float(summary.get("avg_position_span_ratio", 0.0)),
+        "max_longest_sustained_empty_run_steps": int(
+            summary.get("max_longest_sustained_empty_run_steps", 0) or 0
+        ),
+        "avg_dead_air_ratio": (
+            float(sum(dead_air_ratios) / len(dead_air_ratios)) if dead_air_ratios else 0.0
+        ),
+        "max_dead_air_ratio": max(dead_air_ratios) if dead_air_ratios else 0.0,
+        "avg_chord_tone_ratio": (
+            float(sum(chord_tone_ratios) / len(chord_tone_ratios)) if chord_tone_ratios else 0.0
+        ),
         "failure_reasons": summary.get("failure_reasons", {}),
         "diagnostic_failure_reasons": summary.get("diagnostic_failure_reasons", {}),
         "strict_failure_reasons": summary.get("strict_failure_reasons", {}),
