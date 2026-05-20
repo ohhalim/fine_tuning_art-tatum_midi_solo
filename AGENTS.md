@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #39: Stage B coverage-aware A/B sweep.
+- Issue #41: Stage B candidate ranking report.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -195,6 +195,14 @@ bash scripts/agent_harness.sh stage-b-coverage-ab-sweep
 
 This probe compares plain constrained generation against coverage-aware constrained generation
 across note-group density settings.
+
+For Stage B candidate ranking changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-candidate-ranking
+```
+
+This harness generates an A/B sweep and ranks generated MIDI candidates for listening/review priority.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
