@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #31: Stage B stricter collapse-aware review gate.
+- Issue #33: Stage B 2-file Brad generation probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -168,6 +168,15 @@ bash scripts/agent_harness.sh stage-b-collapse-sweep
 
 For Stage B strict collapse-aware review-gate changes, use the same sweep harness and verify
 `passed_strict_sweep_gate` in the generated report.
+
+For Stage B 2-file Brad generation probe changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-2file-brad-probe
+```
+
+This probe records basic/strict pass-rate. A musical quality failure is a report outcome, not
+automatically a harness failure, unless the script itself crashes or produces no grammar-valid samples.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
