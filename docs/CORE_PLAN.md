@@ -299,29 +299,29 @@ Stage B에서 명시하는 것:
 
 완료된 바로 전 작업:
 
-- `Stage B collapse diagnostics and sampling sweep 추가`
+- `Stage B stricter collapse-aware review gate 추가`
 - 결과: `top_k=1`은 collapse warning `3/3`, valid `0/3`
-- 결과: `top_k=2`는 collapse warning `1/3`, valid `1/3`
-- 결론: Stage B grammar가 아니라 note distribution collapse가 현재 병목이다.
+- 결과: `top_k=2`는 collapse warning `1/3`, basic valid `1/3`, strict valid `1/3`
+- 결론: Stage B grammar가 아니라 note distribution collapse가 현재 병목이지만, strict gate에서도 최소 후보 1개는 유지된다.
 
 다음 issue는 다음 이름이 적절하다.
 
 ```text
-Stage B stricter collapse-aware review gate 추가
+Stage B 2-file Brad generation probe 추가
 ```
 
 작업 범위:
 
-- review gate에 collapse-aware 기준을 추가한다.
-- minimum unique pitch/position/pair 기준을 정한다.
-- collapse warning sample rate 상한을 정한다.
-- sampling sweep이 stricter gate 기준으로 통과/실패를 보고하게 한다.
-- broad training 전 Stage B 2-file Brad probe로 갈 수 있는지 판단한다.
+- one-file tiny smoke를 넘어 Brad 2-file Stage B window dataset으로 generation probe를 실행한다.
+- train/val split과 window count를 report에 남긴다.
+- basic gate와 strict collapse-aware gate를 모두 보고한다.
+- one-file 결과보다 pass-rate가 유지되는지 확인한다.
+- 실패하면 broad training으로 가지 않고 tokenization/model/loss/pretrained-base 후보를 재검토한다.
 
 이 작업이 끝난 뒤 판단:
 
-- stricter gate에서도 최소 pass-rate가 유지되면 Stage B 2-file Brad probe로 간다.
-- stricter gate에서 전부 실패하면 sampling/postprocess 문제가 아니라 tokenization/model/loss/pretrained-base 쪽으로 재검토한다.
+- 2-file Brad strict gate에서도 최소 pass-rate가 유지되면 generic jazz base 후보 학습 설계로 간다.
+- 2-file Brad strict gate가 전부 실패하면 sampling/postprocess 문제가 아니라 data scale, representation, loss, pretrained-base 쪽으로 재검토한다.
 
 ## 10. 한 문장 요약
 

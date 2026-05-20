@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #29: Stage B collapse diagnostics and sampling sweep.
+- Issue #31: Stage B stricter collapse-aware review gate.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -26,18 +26,26 @@ Allowed without additional permission:
 - run local tests and local scripts
 - create local commits after a coherent validated change
 - update docs that describe the current implementation or experiment result
+- create GitHub issues that follow `docs/CORE_PLAN.md`
+- create focused issue branches from latest `main`
+- push Codex-created issue branches
+- create PRs for Codex-created issue branches
+- merge Codex-created PRs when the Conditional Auto-Merge Policy is satisfied
 
 Must ask first:
 
-- any `git push`, including same-branch upstream push
-- pull request creation or PR metadata updates
-- GitHub issue creation or issue metadata updates
 - merging pull requests that were not created by Codex in the current task flow
 - deployment
 - external uploads
 - destructive cleanup of generated files, checkpoints, datasets, or user-created outputs
+- raw dataset, checkpoint, or generated artifact upload
+- cloud/GPU spend
+- secrets, credentials, or repository settings changes
+- merge conflict resolution that rewrites or discards user work
 
-If the user says "PR 올려", "이슈 만들어", "배포해", or equivalent, that counts as explicit permission for that requested remote action only.
+If the user says "자동으로 진행해", "플랜대로 계속해", or equivalent, that counts as permission to repeat the issue -> branch -> commit -> push -> PR -> safe auto-merge loop within `docs/CORE_PLAN.md` until a critical blocker appears.
+
+If the Codex host UI still asks for tool approval, that is a runtime permission gate outside this repo policy. Within this repository policy, plan-scoped GitHub issue/branch/PR/merge work is already allowed without re-asking the user.
 
 ## Conditional Auto-Merge Policy
 
@@ -77,6 +85,20 @@ Local commits are allowed when all are true:
 - the working tree does not include unrelated user changes
 - relevant validation commands pass, or failures are documented in the final response
 - the commit message is specific and conventional
+
+Commit cadence:
+
+- Prefer frequent commits at small validated boundaries instead of one large end-of-issue commit.
+- Commit after each coherent unit such as tests added, implementation wired, docs updated, or harness result recorded.
+- Do not create noisy checkpoint commits for broken or unvalidated work unless the user explicitly asks for a work-in-progress snapshot.
+- When a PR is already open, push additional focused commits to the same issue branch rather than amending or squashing history.
+
+Commit messages:
+
+- Write commit messages in Korean unless the user asks otherwise.
+- Keep the prefix conventional, but make the subject specific enough to explain the change.
+- Prefer messages like `feat: Stage B strict gate 결과를 sweep summary에 연결` over vague messages like `update` or `fix`.
+- For larger changes, use a multi-line commit body that records why the change was needed and which validation was run.
 
 Preferred commit prefixes:
 
@@ -143,6 +165,9 @@ For Stage B collapse/sampling-sweep changes, run:
 ```bash
 bash scripts/agent_harness.sh stage-b-collapse-sweep
 ```
+
+For Stage B strict collapse-aware review-gate changes, use the same sweep harness and verify
+`passed_strict_sweep_gate` in the generated report.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

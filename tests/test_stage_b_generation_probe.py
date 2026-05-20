@@ -14,6 +14,7 @@ from scripts.run_stage_b_generation_probe import (
     build_stage_b_primer,
     dedupe_and_limit_notes,
     decode_tokens_to_midi,
+    evaluate_collapse_gate,
     generate_stage_b_constrained_tokens,
     generate_stage_b_tokens,
     postprocess_stage_b_midi,
@@ -268,6 +269,69 @@ class StageBGenerationProbeTest(unittest.TestCase):
         self.assertEqual(
             summary["diagnostic_failure_reasons"],
             {"note count too low; collapse=repeated_position_pitch": 1},
+        )
+
+    def test_evaluate_collapse_gate_reports_strict_failures(self) -> None:
+        collapse = {
+            "unique_pitch_count": 1,
+            "unique_position_count": 1,
+            "unique_position_pitch_pair_count": 1,
+            "repeated_position_pitch_pair_ratio": 0.75,
+            "postprocess_removal_ratio": 0.5,
+        }
+
+        gate = evaluate_collapse_gate(collapse)
+
+        self.assertFalse(gate["passed"])
+        self.assertIn("unique pitch count too low: 1 < 3", gate["failure_reasons"])
+        self.assertIn(
+            "repeated position/pitch pair ratio too high: 0.750 > 0.490",
+            gate["failure_reasons"],
+        )
+
+    def test_build_probe_summary_tracks_strict_review_gate(self) -> None:
+        rows = [
+            {
+                "sample_index": 1,
+                "valid": True,
+                "strict_valid": True,
+                "grammar_gate_passed": True,
+                "collapse": {
+                    "collapse_warning": False,
+                    "repeated_position_pitch_pair_ratio": 0.25,
+                    "postprocess_removal_ratio": 0.0,
+                },
+            },
+            {
+                "sample_index": 2,
+                "valid": False,
+                "strict_valid": False,
+                "grammar_gate_passed": True,
+                "failure_reason": "note count too low",
+                "collapse": {
+                    "collapse_warning": True,
+                    "repeated_position_pitch_pair_ratio": 0.75,
+                    "postprocess_removal_ratio": 0.5,
+                },
+            },
+        ]
+
+        summary = build_probe_summary(
+            rows,
+            min_valid_samples=1,
+            min_strict_valid_samples=1,
+            require_all_grammar_samples=True,
+            max_collapse_warning_sample_rate=0.5,
+        )
+
+        self.assertEqual(summary["strict_valid_sample_count"], 1)
+        self.assertEqual(summary["strict_valid_sample_indices"], [1])
+        self.assertTrue(summary["passed_strict_generation_gate"])
+        self.assertTrue(summary["passed_collapse_rate_gate"])
+        self.assertTrue(summary["passed_strict_review_gate"])
+        self.assertEqual(
+            summary["strict_failure_reasons"],
+            {"midi_review_gate_failed: note count too low": 1},
         )
 
 

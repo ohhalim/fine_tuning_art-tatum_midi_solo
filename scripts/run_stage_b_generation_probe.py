@@ -59,6 +59,14 @@ from utilities.constants import TOKEN_BAR, TOKEN_END, VOCAB_SIZE  # noqa: E402
 from utilities.device import get_device  # noqa: E402
 
 
+DEFAULT_STRICT_MIN_UNIQUE_PITCHES = 3
+DEFAULT_STRICT_MIN_UNIQUE_POSITIONS = 3
+DEFAULT_STRICT_MIN_UNIQUE_POSITION_PITCH_PAIRS = 4
+DEFAULT_STRICT_MAX_REPEATED_POSITION_PITCH_PAIR_RATIO = 0.49
+DEFAULT_STRICT_MAX_POSTPROCESS_REMOVAL_RATIO = 0.49
+DEFAULT_STRICT_MAX_COLLAPSE_WARNING_SAMPLE_RATE = 0.34
+
+
 def parse_chords(raw_chords: str) -> list[str]:
     return [chord.strip() for chord in raw_chords.split(",") if chord.strip()]
 
@@ -279,6 +287,54 @@ def analyze_stage_b_collapse(
     }
 
 
+def evaluate_collapse_gate(
+    collapse: dict[str, Any],
+    min_unique_pitches: int = DEFAULT_STRICT_MIN_UNIQUE_PITCHES,
+    min_unique_positions: int = DEFAULT_STRICT_MIN_UNIQUE_POSITIONS,
+    min_unique_position_pitch_pairs: int = DEFAULT_STRICT_MIN_UNIQUE_POSITION_PITCH_PAIRS,
+    max_repeated_position_pitch_pair_ratio: float = DEFAULT_STRICT_MAX_REPEATED_POSITION_PITCH_PAIR_RATIO,
+    max_postprocess_removal_ratio: float = DEFAULT_STRICT_MAX_POSTPROCESS_REMOVAL_RATIO,
+) -> dict[str, Any]:
+    reasons: list[str] = []
+    unique_pitch_count = int(collapse.get("unique_pitch_count", 0) or 0)
+    unique_position_count = int(collapse.get("unique_position_count", 0) or 0)
+    unique_pair_count = int(collapse.get("unique_position_pitch_pair_count", 0) or 0)
+    repeated_pair_ratio = float(collapse.get("repeated_position_pitch_pair_ratio", 0.0) or 0.0)
+    postprocess_removal_ratio = float(collapse.get("postprocess_removal_ratio", 0.0) or 0.0)
+
+    if unique_pitch_count < int(min_unique_pitches):
+        reasons.append(f"unique pitch count too low: {unique_pitch_count} < {int(min_unique_pitches)}")
+    if unique_position_count < int(min_unique_positions):
+        reasons.append(f"unique position count too low: {unique_position_count} < {int(min_unique_positions)}")
+    if unique_pair_count < int(min_unique_position_pitch_pairs):
+        reasons.append(
+            f"unique position/pitch pair count too low: {unique_pair_count} < "
+            f"{int(min_unique_position_pitch_pairs)}"
+        )
+    if repeated_pair_ratio > float(max_repeated_position_pitch_pair_ratio):
+        reasons.append(
+            "repeated position/pitch pair ratio too high: "
+            f"{repeated_pair_ratio:.3f} > {float(max_repeated_position_pitch_pair_ratio):.3f}"
+        )
+    if postprocess_removal_ratio > float(max_postprocess_removal_ratio):
+        reasons.append(
+            "postprocess removal ratio too high: "
+            f"{postprocess_removal_ratio:.3f} > {float(max_postprocess_removal_ratio):.3f}"
+        )
+
+    return {
+        "passed": not reasons,
+        "failure_reasons": reasons,
+        "thresholds": {
+            "min_unique_pitches": int(min_unique_pitches),
+            "min_unique_positions": int(min_unique_positions),
+            "min_unique_position_pitch_pairs": int(min_unique_position_pitch_pairs),
+            "max_repeated_position_pitch_pair_ratio": float(max_repeated_position_pitch_pair_ratio),
+            "max_postprocess_removal_ratio": float(max_postprocess_removal_ratio),
+        },
+    }
+
+
 def choose_allowed_token(
     logits: torch.Tensor,
     allowed_tokens: Sequence[int],
@@ -429,18 +485,34 @@ def sample_report(
     midi_path: Path,
     request: GenerationRequest,
     postprocess_report: dict[str, Any] | None = None,
+    strict_min_unique_pitches: int = DEFAULT_STRICT_MIN_UNIQUE_PITCHES,
+    strict_min_unique_positions: int = DEFAULT_STRICT_MIN_UNIQUE_POSITIONS,
+    strict_min_unique_position_pitch_pairs: int = DEFAULT_STRICT_MIN_UNIQUE_POSITION_PITCH_PAIRS,
+    strict_max_repeated_position_pitch_pair_ratio: float = DEFAULT_STRICT_MAX_REPEATED_POSITION_PITCH_PAIR_RATIO,
+    strict_max_postprocess_removal_ratio: float = DEFAULT_STRICT_MAX_POSTPROCESS_REMOVAL_RATIO,
 ) -> dict[str, Any]:
     raw_generated_tokens = [int(token) for token in tokens[primer_size:]]
     grammar = analyze_stage_b_note_grammar(tokens, primer_size=primer_size)
     collapse = analyze_stage_b_collapse(tokens, primer_size=primer_size, postprocess_report=postprocess_report)
+    collapse_gate = evaluate_collapse_gate(
+        collapse,
+        min_unique_pitches=strict_min_unique_pitches,
+        min_unique_positions=strict_min_unique_positions,
+        min_unique_position_pitch_pairs=strict_min_unique_position_pitch_pairs,
+        max_repeated_position_pitch_pair_ratio=strict_max_repeated_position_pitch_pair_ratio,
+        max_postprocess_removal_ratio=strict_max_postprocess_removal_ratio,
+    )
     metrics = compute_midi_metrics(midi_path, 0, False, request=request)
     valid, reason = validate_metrics(metrics, request.density, bars=request.bars)
     grammar_gate_passed = bool(grammar["complete_note_groups"] > 0 and metrics.note_count > 0)
+    strict_valid = bool(valid and grammar_gate_passed and collapse_gate["passed"])
     diagnostic_failure_reason = reason
     if not valid and collapse["collapse_warning"]:
         diagnostic_failure_reason = (
             f"{reason}; collapse={','.join(collapse['collapse_reasons'])}" if reason else ",".join(collapse["collapse_reasons"])
         )
+    if valid and not collapse_gate["passed"]:
+        diagnostic_failure_reason = "; ".join(collapse_gate["failure_reasons"])
     return {
         "sample_index": int(sample_index),
         "sample_seed": int(sample_seed),
@@ -450,11 +522,13 @@ def sample_report(
         "ended_early": bool(len(tokens) < int(target_length)),
         "hit_end_token": bool(TOKEN_END in raw_generated_tokens),
         "valid": bool(valid),
+        "strict_valid": strict_valid,
         "grammar_gate_passed": grammar_gate_passed,
         "failure_reason": reason,
         "diagnostic_failure_reason": diagnostic_failure_reason,
         "grammar": grammar,
         "collapse": collapse,
+        "collapse_gate": collapse_gate,
         "postprocess": postprocess_report or {"enabled": False},
         "metrics": metrics.to_dict(),
         "generated_token_names_head": [stage_b_token_name(token) for token in raw_generated_tokens[:48]],
@@ -464,12 +538,16 @@ def sample_report(
 def build_probe_summary(
     sample_rows: Sequence[dict[str, Any]],
     min_valid_samples: int = 1,
+    min_strict_valid_samples: int = 1,
     require_all_grammar_samples: bool = False,
+    max_collapse_warning_sample_rate: float = DEFAULT_STRICT_MAX_COLLAPSE_WARNING_SAMPLE_RATE,
 ) -> dict[str, Any]:
     sample_count = int(len(sample_rows))
     valid_indices = [int(row["sample_index"]) for row in sample_rows if row["valid"]]
+    strict_valid_indices = [int(row["sample_index"]) for row in sample_rows if row.get("strict_valid")]
     grammar_indices = [int(row["sample_index"]) for row in sample_rows if row["grammar_gate_passed"]]
     valid_sample_count = int(len(valid_indices))
+    strict_valid_sample_count = int(len(strict_valid_indices))
     grammar_gate_sample_count = int(len(grammar_indices))
 
     if require_all_grammar_samples:
@@ -479,6 +557,7 @@ def build_probe_summary(
 
     failure_reasons: dict[str, int] = {}
     diagnostic_failure_reasons: dict[str, int] = {}
+    strict_failure_reasons: dict[str, int] = {}
     collapse_warning_count = 0
     repeated_pair_ratios: list[float] = []
     postprocess_removal_ratios: list[float] = []
@@ -486,6 +565,16 @@ def build_probe_summary(
         collapse = row.get("collapse", {})
         if collapse.get("collapse_warning"):
             collapse_warning_count += 1
+        if not row.get("strict_valid", False):
+            if not row.get("valid", False):
+                strict_reason = f"midi_review_gate_failed: {row.get('failure_reason') or 'unknown'}"
+                strict_failure_reasons[strict_reason] = strict_failure_reasons.get(strict_reason, 0) + 1
+            if not row.get("grammar_gate_passed", False):
+                strict_failure_reasons["grammar_gate_failed"] = (
+                    strict_failure_reasons.get("grammar_gate_failed", 0) + 1
+                )
+            for strict_reason in row.get("collapse_gate", {}).get("failure_reasons", []):
+                strict_failure_reasons[str(strict_reason)] = strict_failure_reasons.get(str(strict_reason), 0) + 1
         repeated_pair_ratios.append(float(collapse.get("repeated_position_pitch_pair_ratio", 0.0) or 0.0))
         postprocess_removal_ratios.append(float(collapse.get("postprocess_removal_ratio", 0.0) or 0.0))
         if not row["valid"]:
@@ -494,22 +583,43 @@ def build_probe_summary(
             failure_reasons[reason] = failure_reasons.get(reason, 0) + 1
             diagnostic_failure_reasons[diagnostic_reason] = diagnostic_failure_reasons.get(diagnostic_reason, 0) + 1
 
+    collapse_warning_rate = float(collapse_warning_count / sample_count) if sample_count else 0.0
+    passed_generation_gate = bool(valid_sample_count >= int(min_valid_samples))
+    passed_strict_generation_gate = bool(strict_valid_sample_count >= int(min_strict_valid_samples))
+    passed_collapse_rate_gate = bool(
+        sample_count > 0 and collapse_warning_rate <= float(max_collapse_warning_sample_rate)
+    )
+
     return {
         "sample_count": sample_count,
         "valid_sample_count": valid_sample_count,
+        "strict_valid_sample_count": strict_valid_sample_count,
         "grammar_gate_sample_count": grammar_gate_sample_count,
         "valid_sample_rate": float(valid_sample_count / sample_count) if sample_count else 0.0,
+        "strict_valid_sample_rate": float(strict_valid_sample_count / sample_count) if sample_count else 0.0,
         "grammar_gate_sample_rate": float(grammar_gate_sample_count / sample_count) if sample_count else 0.0,
         "valid_sample_indices": valid_indices,
+        "strict_valid_sample_indices": strict_valid_indices,
         "grammar_gate_sample_indices": grammar_indices,
         "min_valid_samples": int(min_valid_samples),
+        "min_strict_valid_samples": int(min_strict_valid_samples),
+        "max_collapse_warning_sample_rate": float(max_collapse_warning_sample_rate),
         "require_all_grammar_samples": bool(require_all_grammar_samples),
-        "passed_generation_gate": bool(valid_sample_count >= int(min_valid_samples)),
+        "passed_generation_gate": passed_generation_gate,
+        "passed_strict_generation_gate": passed_strict_generation_gate,
         "passed_grammar_gate": passed_grammar_gate,
+        "passed_strict_review_gate": bool(
+            passed_generation_gate
+            and passed_strict_generation_gate
+            and passed_grammar_gate
+            and passed_collapse_rate_gate
+        ),
         "failure_reasons": failure_reasons,
         "diagnostic_failure_reasons": diagnostic_failure_reasons,
+        "strict_failure_reasons": strict_failure_reasons,
         "collapse_warning_sample_count": int(collapse_warning_count),
-        "collapse_warning_sample_rate": float(collapse_warning_count / sample_count) if sample_count else 0.0,
+        "collapse_warning_sample_rate": collapse_warning_rate,
+        "passed_collapse_rate_gate": passed_collapse_rate_gate,
         "avg_repeated_position_pitch_pair_ratio": (
             float(sum(repeated_pair_ratios) / len(repeated_pair_ratios)) if repeated_pair_ratios else 0.0
         ),
@@ -561,9 +671,33 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--postprocess_overlap", action="store_true")
     parser.add_argument("--max_simultaneous_notes", type=int, default=2)
     parser.add_argument("--min_valid_samples", type=int, default=1)
+    parser.add_argument("--min_strict_valid_samples", type=int, default=1)
+    parser.add_argument("--strict_min_unique_pitches", type=int, default=DEFAULT_STRICT_MIN_UNIQUE_PITCHES)
+    parser.add_argument("--strict_min_unique_positions", type=int, default=DEFAULT_STRICT_MIN_UNIQUE_POSITIONS)
+    parser.add_argument(
+        "--strict_min_unique_position_pitch_pairs",
+        type=int,
+        default=DEFAULT_STRICT_MIN_UNIQUE_POSITION_PITCH_PAIRS,
+    )
+    parser.add_argument(
+        "--strict_max_repeated_position_pitch_pair_ratio",
+        type=float,
+        default=DEFAULT_STRICT_MAX_REPEATED_POSITION_PITCH_PAIR_RATIO,
+    )
+    parser.add_argument(
+        "--strict_max_postprocess_removal_ratio",
+        type=float,
+        default=DEFAULT_STRICT_MAX_POSTPROCESS_REMOVAL_RATIO,
+    )
+    parser.add_argument(
+        "--max_collapse_warning_sample_rate",
+        type=float,
+        default=DEFAULT_STRICT_MAX_COLLAPSE_WARNING_SAMPLE_RATE,
+    )
     parser.add_argument("--require_all_grammar_samples", action="store_true")
     parser.add_argument("--require_note_groups", action="store_true")
     parser.add_argument("--require_valid_sample", action="store_true")
+    parser.add_argument("--require_strict_valid_sample", action="store_true")
     parser.set_defaults(lora_only=False)
     return parser
 
@@ -694,6 +828,11 @@ def main() -> int:
                 midi_path=midi_path,
                 request=request,
                 postprocess_report=postprocess_report,
+                strict_min_unique_pitches=args.strict_min_unique_pitches,
+                strict_min_unique_positions=args.strict_min_unique_positions,
+                strict_min_unique_position_pitch_pairs=args.strict_min_unique_position_pitch_pairs,
+                strict_max_repeated_position_pitch_pair_ratio=args.strict_max_repeated_position_pitch_pair_ratio,
+                strict_max_postprocess_removal_ratio=args.strict_max_postprocess_removal_ratio,
             )
         )
 
@@ -701,7 +840,9 @@ def main() -> int:
     summary = build_probe_summary(
         sample_rows,
         min_valid_samples=args.min_valid_samples,
+        min_strict_valid_samples=args.min_strict_valid_samples,
         require_all_grammar_samples=args.require_all_grammar_samples,
+        max_collapse_warning_sample_rate=args.max_collapse_warning_sample_rate,
     )
     report["summary"] = summary
     report["valid_sample_count"] = summary["valid_sample_count"]
@@ -709,10 +850,21 @@ def main() -> int:
     report["sample_count"] = summary["sample_count"]
     report["passed_generation_gate"] = summary["passed_generation_gate"]
     report["passed_grammar_gate"] = summary["passed_grammar_gate"]
+    report["passed_strict_review_gate"] = summary["passed_strict_review_gate"]
     if not report["passed_generation_gate"]:
         report["failure_reason"] = (
             f"Only {summary['valid_sample_count']} Stage B generated samples passed the MIDI review gate; "
             f"required {summary['min_valid_samples']}"
+        )
+    if not summary["passed_strict_generation_gate"]:
+        report["strict_failure_reason"] = (
+            f"Only {summary['strict_valid_sample_count']} Stage B generated samples passed the strict collapse gate; "
+            f"required {summary['min_strict_valid_samples']}"
+        )
+    if not summary["passed_collapse_rate_gate"]:
+        report["strict_failure_reason"] = (
+            f"Collapse warning sample rate {summary['collapse_warning_sample_rate']:.3f} exceeded "
+            f"{summary['max_collapse_warning_sample_rate']:.3f}"
         )
     if not report["passed_grammar_gate"]:
         report["failure_reason"] = "Stage B generated samples did not satisfy the configured grammar gate"
@@ -723,6 +875,8 @@ def main() -> int:
         return 4
     if args.require_valid_sample and not report["passed_generation_gate"]:
         return 3
+    if args.require_strict_valid_sample and not report["passed_strict_review_gate"]:
+        return 5
     return 0
 
 

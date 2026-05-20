@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-29-stage-b-collapse-sampling-sweep`
+- `issue-31-stage-b-strict-collapse-gate`
 
 현재 범위가 아닌 것:
 
@@ -696,6 +696,45 @@ Smoke result:
 - best config: `top_k=2`, `temperature=0.9`
 - decision: grammar is no longer the immediate bottleneck; note distribution collapse is
 - detail: `docs/STAGE_B_COLLAPSE_SWEEP_2026-05-20.md`
+
+### 0.14. Issue #31 Stage B stricter collapse-aware review gate
+
+Status:
+
+- implemented on `issue-31-stage-b-strict-collapse-gate`
+
+Goal:
+
+- separate basic MIDI validity from stricter collapse-aware sample validity
+- require minimum unique pitch, position, and position/pitch pair diversity
+- cap collapse warning sample rate during sampling sweep
+- prevent one-note, repeated same-position/pitch, or postprocess-heavy outputs from being counted as strong progress
+
+Strict gate defaults:
+
+- minimum unique pitches: `3`
+- minimum unique positions: `3`
+- minimum unique position/pitch pairs: `4`
+- max repeated position/pitch pair ratio: `0.49`
+- max postprocess removal ratio: `0.49`
+- max collapse warning sample rate: `0.34`
+
+Acceptance:
+
+- strict collapse gate unit tests pass
+- sampling sweep summary distinguishes basic and strict gate pass/fail
+- `bash scripts/agent_harness.sh stage-b-collapse-sweep` passes
+- `bash scripts/agent_harness.sh quick` passes
+
+Smoke result:
+
+- output: `outputs/stage_b_sampling_sweep/harness_stage_b_collapse_sweep`
+- `top_k=1`: basic valid `0/3`, strict valid `0/3`, collapse warning `3/3`
+- `top_k=2`: basic valid `1/3`, strict valid `1/3`, collapse warning `1/3`
+- best config: `top_k=2`, `temperature=0.9`
+- passed strict sweep gate: `true`
+- decision: strict gate still preserves one valid candidate, so the next issue can move to a Stage B 2-file Brad probe
+- detail: `docs/STAGE_B_STRICT_COLLAPSE_GATE_2026-05-20.md`
 
 ### 1. Run full jazz piano dataset audit
 
