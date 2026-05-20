@@ -303,7 +303,8 @@ Stage B에서 명시하는 것:
 - 결과: 2-file Brad Stage B window dataset은 `137` samples, train `123`, val `14`로 정상 생성됐다.
 - 결과: generated samples는 grammar gate `3/3`, collapse warning `0/3`이었다.
 - 결과: basic valid `0/3`, strict valid `0/3`이었다.
-- 결론: Stage B grammar와 collapse는 2-file probe에서 즉시 병목이 아니며, 현재 병목은 dead-air/temporal coverage다.
+- 결과: avg onset coverage `0.167`, avg sustained coverage `0.417`, max longest sustained empty run `11` steps였다.
+- 결론: Stage B grammar와 collapse는 2-file probe에서 즉시 병목이 아니며, 현재 병목은 sparse onset과 long empty span으로 인한 dead-air/temporal coverage다.
 
 다음 issue는 다음 이름이 적절하다.
 

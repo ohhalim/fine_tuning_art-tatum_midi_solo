@@ -770,13 +770,17 @@ Smoke result:
 - collapse warning: `0/3`
 - avg repeated position/pitch pair ratio: `0.375`
 - avg postprocess removal ratio: `0.208`
+- avg onset coverage ratio: `0.167`
+- avg sustained coverage ratio: `0.417`
+- avg position span ratio: `0.740`
+- max longest sustained empty run: `11` steps
 - failure reason: all samples failed on dead-air ratio near or above `0.800`
 
 Decision:
 
 - Stage B grammar is now stable in this probe.
 - The prior collapse issue is not the immediate failure mode in the 2-file probe.
-- The current bottleneck is temporal coverage/dead-air, especially generated note positions failing to cover the 2-bar phrase densely enough.
+- The current bottleneck is temporal coverage/dead-air, especially sparse onsets and long empty spans inside the 2-bar phrase.
 - Do not start generic jazz base training yet.
 - Next issue should add position/dead-air coverage diagnostics and a coverage-aware constrained generation probe.
 
