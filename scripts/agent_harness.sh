@@ -242,7 +242,7 @@ run_stage_b_collapse_sweep() {
   print_header "Stage B collapse sampling sweep"
   "$PYTHON_BIN" scripts/run_stage_b_sampling_sweep.py \
     --run_id "$run_id" \
-    --issue_number 29 \
+    --issue_number 31 \
     --top_ks 1,2 \
     --temperatures 0.9 \
     --train_top_k 2 \
@@ -255,6 +255,8 @@ run_stage_b_collapse_sweep() {
     --max_simultaneous_notes 2 \
     --require_all_grammar_samples \
     --min_best_valid_samples 1 \
+    --min_best_strict_valid_samples 1 \
+    --max_collapse_warning_sample_rate 0.34 \
     --n_layers 1 \
     --num_heads 4 \
     --d_model 64 \

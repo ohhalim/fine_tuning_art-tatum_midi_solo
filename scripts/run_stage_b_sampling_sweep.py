@@ -86,6 +86,20 @@ def probe_command(
         str(top_k),
         "--min_valid_samples",
         str(args.min_valid_samples),
+        "--min_strict_valid_samples",
+        str(args.min_strict_valid_samples),
+        "--max_collapse_warning_sample_rate",
+        str(args.max_collapse_warning_sample_rate),
+        "--strict_min_unique_pitches",
+        str(args.strict_min_unique_pitches),
+        "--strict_min_unique_positions",
+        str(args.strict_min_unique_positions),
+        "--strict_min_unique_position_pitch_pairs",
+        str(args.strict_min_unique_position_pitch_pairs),
+        "--strict_max_repeated_position_pitch_pair_ratio",
+        str(args.strict_max_repeated_position_pitch_pair_ratio),
+        "--strict_max_postprocess_removal_ratio",
+        str(args.strict_max_postprocess_removal_ratio),
         "--n_layers",
         str(args.n_layers),
         "--num_heads",
@@ -117,10 +131,16 @@ def row_from_probe_report(top_k: int, temperature: float, run_id: str, report: d
         "sample_count": int(summary.get("sample_count", 0)),
         "grammar_gate_sample_count": int(summary.get("grammar_gate_sample_count", 0)),
         "valid_sample_count": int(summary.get("valid_sample_count", 0)),
+        "strict_valid_sample_count": int(summary.get("strict_valid_sample_count", 0)),
         "grammar_gate_sample_rate": float(summary.get("grammar_gate_sample_rate", 0.0)),
         "valid_sample_rate": float(summary.get("valid_sample_rate", 0.0)),
+        "strict_valid_sample_rate": float(summary.get("strict_valid_sample_rate", 0.0)),
         "collapse_warning_sample_count": int(summary.get("collapse_warning_sample_count", 0)),
         "collapse_warning_sample_rate": float(summary.get("collapse_warning_sample_rate", 0.0)),
+        "max_collapse_warning_sample_rate": float(summary.get("max_collapse_warning_sample_rate", 0.0)),
+        "passed_collapse_rate_gate": bool(summary.get("passed_collapse_rate_gate", False)),
+        "passed_strict_generation_gate": bool(summary.get("passed_strict_generation_gate", False)),
+        "passed_strict_review_gate": bool(summary.get("passed_strict_review_gate", False)),
         "avg_repeated_position_pitch_pair_ratio": float(
             summary.get("avg_repeated_position_pitch_pair_ratio", 0.0)
         ),
@@ -131,16 +151,39 @@ def row_from_probe_report(top_k: int, temperature: float, run_id: str, report: d
         "max_postprocess_removal_ratio": float(summary.get("max_postprocess_removal_ratio", 0.0)),
         "failure_reasons": summary.get("failure_reasons", {}),
         "diagnostic_failure_reasons": summary.get("diagnostic_failure_reasons", {}),
+        "strict_failure_reasons": summary.get("strict_failure_reasons", {}),
         "report_path": str(Path(report["run_dir"]) / "report.json"),
     }
 
 
-def build_sweep_summary(rows: list[dict[str, Any]], min_best_valid_samples: int = 1) -> dict[str, Any]:
-    best_row = max(rows, key=lambda row: (row["valid_sample_count"], row["valid_sample_rate"]), default=None)
+def build_sweep_summary(
+    rows: list[dict[str, Any]],
+    min_best_valid_samples: int = 1,
+    min_best_strict_valid_samples: int = 1,
+    max_collapse_warning_sample_rate: float = 0.34,
+) -> dict[str, Any]:
+    best_row = max(
+        rows,
+        key=lambda row: (
+            row["strict_valid_sample_count"],
+            row["valid_sample_count"],
+            -row["collapse_warning_sample_rate"],
+            row["valid_sample_rate"],
+        ),
+        default=None,
+    )
+    passed_basic = bool(best_row and int(best_row["valid_sample_count"]) >= int(min_best_valid_samples))
+    passed_strict = bool(
+        best_row
+        and int(best_row["strict_valid_sample_count"]) >= int(min_best_strict_valid_samples)
+        and float(best_row["collapse_warning_sample_rate"]) <= float(max_collapse_warning_sample_rate)
+    )
     return {
         "config_count": int(len(rows)),
         "best_valid_sample_count": int(best_row["valid_sample_count"]) if best_row else 0,
         "best_valid_sample_rate": float(best_row["valid_sample_rate"]) if best_row else 0.0,
+        "best_strict_valid_sample_count": int(best_row["strict_valid_sample_count"]) if best_row else 0,
+        "best_strict_valid_sample_rate": float(best_row["strict_valid_sample_rate"]) if best_row else 0.0,
         "best_config": {
             "top_k": int(best_row["top_k"]),
             "temperature": float(best_row["temperature"]),
@@ -149,7 +192,11 @@ def build_sweep_summary(rows: list[dict[str, Any]], min_best_valid_samples: int 
         if best_row
         else None,
         "min_best_valid_samples": int(min_best_valid_samples),
-        "passed_sweep_gate": bool(best_row and int(best_row["valid_sample_count"]) >= int(min_best_valid_samples)),
+        "min_best_strict_valid_samples": int(min_best_strict_valid_samples),
+        "max_collapse_warning_sample_rate": float(max_collapse_warning_sample_rate),
+        "passed_basic_sweep_gate": passed_basic,
+        "passed_strict_sweep_gate": passed_strict,
+        "passed_sweep_gate": passed_strict,
     }
 
 
@@ -158,15 +205,19 @@ def markdown_table(rows: list[dict[str, Any]], summary: dict[str, Any]) -> str:
         "# Stage B Sampling Sweep",
         "",
         f"- passed sweep gate: `{str(summary['passed_sweep_gate']).lower()}`",
+        f"- passed basic sweep gate: `{str(summary['passed_basic_sweep_gate']).lower()}`",
+        f"- passed strict sweep gate: `{str(summary['passed_strict_sweep_gate']).lower()}`",
         f"- best config: `{summary['best_config']}`",
         "",
-        "| top_k | temp | samples | grammar | valid | valid_rate | collapse_rate | avg_pair_repeat | max_remove |",
-        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| top_k | temp | samples | grammar | valid | strict_valid | valid_rate | strict_rate | collapse_rate | strict_pass | avg_pair_repeat | max_remove |",
+        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|---:|---:|",
     ]
     for row in rows:
         lines.append(
             "| {top_k} | {temperature:.3f} | {sample_count} | {grammar_gate_sample_count} | "
-            "{valid_sample_count} | {valid_sample_rate:.3f} | {collapse_warning_sample_rate:.3f} | "
+            "{valid_sample_count} | {strict_valid_sample_count} | {valid_sample_rate:.3f} | "
+            "{strict_valid_sample_rate:.3f} | {collapse_warning_sample_rate:.3f} | "
+            "{passed_strict_review_gate} | "
             "{avg_repeated_position_pitch_pair_ratio:.3f} | {max_postprocess_removal_ratio:.3f} |".format(**row)
         )
     lines.append("")
@@ -174,6 +225,11 @@ def markdown_table(rows: list[dict[str, Any]], summary: dict[str, Any]) -> str:
     lines.append("")
     for row in rows:
         lines.append(f"- `top_k={row['top_k']}`, `temperature={row['temperature']}`: {row['diagnostic_failure_reasons']}")
+    lines.append("")
+    lines.append("## Strict Gate Failures")
+    lines.append("")
+    for row in rows:
+        lines.append(f"- `top_k={row['top_k']}`, `temperature={row['temperature']}`: {row['strict_failure_reasons']}")
     return "\n".join(lines) + "\n"
 
 
@@ -194,6 +250,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max_simultaneous_notes", type=int, default=2)
     parser.add_argument("--min_valid_samples", type=int, default=1)
     parser.add_argument("--min_best_valid_samples", type=int, default=1)
+    parser.add_argument("--min_strict_valid_samples", type=int, default=1)
+    parser.add_argument("--min_best_strict_valid_samples", type=int, default=1)
+    parser.add_argument("--max_collapse_warning_sample_rate", type=float, default=0.34)
+    parser.add_argument("--strict_min_unique_pitches", type=int, default=3)
+    parser.add_argument("--strict_min_unique_positions", type=int, default=3)
+    parser.add_argument("--strict_min_unique_position_pitch_pairs", type=int, default=4)
+    parser.add_argument("--strict_max_repeated_position_pitch_pair_ratio", type=float, default=0.49)
+    parser.add_argument("--strict_max_postprocess_removal_ratio", type=float, default=0.49)
     parser.add_argument("--require_all_grammar_samples", action="store_true")
     parser.add_argument("--n_layers", type=int, default=1)
     parser.add_argument("--num_heads", type=int, default=4)
@@ -254,7 +318,12 @@ def main() -> int:
                 completed_configs.add(config)
 
     rows = sorted(rows, key=lambda row: (row["temperature"], row["top_k"]))
-    summary = build_sweep_summary(rows, min_best_valid_samples=args.min_best_valid_samples)
+    summary = build_sweep_summary(
+        rows,
+        min_best_valid_samples=args.min_best_valid_samples,
+        min_best_strict_valid_samples=args.min_best_strict_valid_samples,
+        max_collapse_warning_sample_rate=args.max_collapse_warning_sample_rate,
+    )
     report = {
         "run_id": run_id,
         "run_dir": str(sweep_dir),
