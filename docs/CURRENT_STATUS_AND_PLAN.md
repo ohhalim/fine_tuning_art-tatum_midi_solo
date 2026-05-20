@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-24-stage-b-stronger-multisample-probe`
+- `issue-29-stage-b-collapse-sampling-sweep`
 
 현재 범위가 아닌 것:
 
@@ -244,9 +244,13 @@ Current result:
 - full review gate passed: `true`
 - detail: `docs/STAGE_B_OVERLAP_GATE_2026-05-19.md`
 
-## Active Issue #24
+## Completed Issue #24
 
-Current task:
+Status:
+
+- completed and merged via PR #25
+
+Completed task:
 
 - strengthen the Stage B local generation probe from one sample to multiple samples
 - keep the probe honest by reporting sample-level failures
@@ -266,6 +270,32 @@ Current result:
 - all `3/3` samples passed the Stage B grammar gate
 - `top_k=1` negative control collapsed to `0/3` valid samples
 - detail: `docs/STAGE_B_STRONGER_MULTISAMPLE_PROBE_2026-05-20.md`
+
+## Active Issue #29
+
+Current task:
+
+- add collapse diagnostics to Stage B generated token reports
+- explain invalid samples with repeated position/pitch metrics
+- add a sampling sweep over `top_k` settings
+- compare `top_k=1` collapse against `top_k=2`
+
+First implementation target:
+
+- `scripts/run_stage_b_generation_probe.py`
+- `scripts/run_stage_b_sampling_sweep.py`
+- `scripts/agent_harness.sh stage-b-collapse-sweep`
+- `tests/test_stage_b_generation_probe.py`
+- `tests/test_stage_b_sampling_sweep.py`
+- `docs/STAGE_B_COLLAPSE_SWEEP_2026-05-20.md`
+
+Current result:
+
+- `top_k=1`: valid `0/3`, collapse warning `3/3`, avg repeated position/pitch pair ratio `0.875`
+- `top_k=2`: valid `1/3`, collapse warning `1/3`, avg repeated position/pitch pair ratio `0.292`
+- best config: `top_k=2`, `temperature=0.9`
+- decision: grammar is no longer the immediate bottleneck; note distribution collapse is
+- detail: `docs/STAGE_B_COLLAPSE_SWEEP_2026-05-20.md`
 
 ## Dataset Strategy
 
@@ -605,7 +635,7 @@ Smoke result:
 
 Status:
 
-- implemented on `issue-24-stage-b-stronger-multisample-probe`
+- completed and merged via PR #25
 
 Goal:
 
@@ -636,6 +666,36 @@ Smoke result:
 - passed generation gate: `true`
 - negative control: `top_k=1` collapsed to `0/3` valid samples with `note count too low: 2 < 6`
 - detail: `docs/STAGE_B_STRONGER_MULTISAMPLE_PROBE_2026-05-20.md`
+
+### 0.13. Issue #29 Stage B collapse diagnostics and sampling sweep
+
+Status:
+
+- implemented on `issue-29-stage-b-collapse-sampling-sweep`
+
+Goal:
+
+- detect repeated position/pitch collapse before scaling training
+- report collapse diagnostics per generated sample
+- compare sampling configs by pass-rate, not by one hand-picked MIDI
+
+Acceptance:
+
+- collapse diagnostics unit tests pass
+- sampling sweep summary tests pass
+- `bash scripts/agent_harness.sh quick` passes
+- `bash scripts/agent_harness.sh stage-b-collapse-sweep` passes
+- `report.json` includes collapse warnings and diagnostic failure reasons
+- `sweep_report.json` and `sweep_report.md` compare `top_k=1` and `top_k=2`
+
+Smoke result:
+
+- output: `outputs/stage_b_sampling_sweep/harness_stage_b_collapse_sweep`
+- `top_k=1`: valid `0/3`, collapse warning `3/3`, avg repeated position/pitch pair ratio `0.875`
+- `top_k=2`: valid `1/3`, collapse warning `1/3`, avg repeated position/pitch pair ratio `0.292`
+- best config: `top_k=2`, `temperature=0.9`
+- decision: grammar is no longer the immediate bottleneck; note distribution collapse is
+- detail: `docs/STAGE_B_COLLAPSE_SWEEP_2026-05-20.md`
 
 ### 1. Run full jazz piano dataset audit
 
@@ -772,6 +832,7 @@ Decision:
 - `docs/STAGE_B_CONSTRAINED_TINY_OVERFIT_2026-05-19.md`
 - `docs/STAGE_B_OVERLAP_GATE_2026-05-19.md`
 - `docs/STAGE_B_STRONGER_MULTISAMPLE_PROBE_2026-05-20.md`
+- `docs/STAGE_B_COLLAPSE_SWEEP_2026-05-20.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
@@ -824,4 +885,10 @@ For Stage B multi-sample review-gate changes:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-stronger-probe
+```
+
+For Stage B collapse/sampling-sweep changes:
+
+```bash
+bash scripts/agent_harness.sh stage-b-collapse-sweep
 ```

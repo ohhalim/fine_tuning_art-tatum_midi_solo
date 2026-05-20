@@ -8,6 +8,7 @@ import pretty_midi
 import torch
 
 from scripts.run_stage_b_generation_probe import (
+    analyze_stage_b_collapse,
     analyze_stage_b_note_grammar,
     build_probe_summary,
     build_stage_b_primer,
@@ -197,6 +198,77 @@ class StageBGenerationProbeTest(unittest.TestCase):
 
         self.assertTrue(summary["passed_generation_gate"])
         self.assertFalse(summary["passed_grammar_gate"])
+
+    def test_analyze_stage_b_collapse_flags_repeated_position_pitch_pairs(self) -> None:
+        primer = build_stage_b_primer(["Cm7"], bpm=120)
+        tokens = primer + [
+            position_token(2),
+            note_velocity_token(4),
+            note_pitch_token(68),
+            note_duration_token(2),
+            position_token(2),
+            note_velocity_token(4),
+            note_pitch_token(68),
+            note_duration_token(2),
+            position_token(2),
+            note_velocity_token(4),
+            note_pitch_token(68),
+            note_duration_token(2),
+            TOKEN_END,
+        ]
+
+        report = analyze_stage_b_collapse(
+            tokens,
+            primer_size=len(primer),
+            postprocess_report={"before_note_count": 3, "removed_note_count": 2},
+        )
+
+        self.assertEqual(report["note_group_count"], 3)
+        self.assertEqual(report["unique_pitch_count"], 1)
+        self.assertEqual(report["unique_position_count"], 1)
+        self.assertEqual(report["unique_position_pitch_pair_count"], 1)
+        self.assertAlmostEqual(report["repeated_position_pitch_pair_ratio"], 2 / 3)
+        self.assertAlmostEqual(report["postprocess_removal_ratio"], 2 / 3)
+        self.assertTrue(report["collapse_warning"])
+        self.assertIn("repeated_position_pitch", report["collapse_reasons"])
+        self.assertIn("postprocess_removed_majority", report["collapse_reasons"])
+
+    def test_build_probe_summary_aggregates_collapse_diagnostics(self) -> None:
+        rows = [
+            {
+                "sample_index": 1,
+                "valid": False,
+                "grammar_gate_passed": True,
+                "failure_reason": "note count too low",
+                "diagnostic_failure_reason": "note count too low; collapse=repeated_position_pitch",
+                "collapse": {
+                    "collapse_warning": True,
+                    "repeated_position_pitch_pair_ratio": 0.75,
+                    "postprocess_removal_ratio": 0.5,
+                },
+            },
+            {
+                "sample_index": 2,
+                "valid": True,
+                "grammar_gate_passed": True,
+                "collapse": {
+                    "collapse_warning": False,
+                    "repeated_position_pitch_pair_ratio": 0.25,
+                    "postprocess_removal_ratio": 0.0,
+                },
+            },
+        ]
+
+        summary = build_probe_summary(rows, min_valid_samples=1, require_all_grammar_samples=True)
+
+        self.assertEqual(summary["collapse_warning_sample_count"], 1)
+        self.assertAlmostEqual(summary["collapse_warning_sample_rate"], 0.5)
+        self.assertAlmostEqual(summary["avg_repeated_position_pitch_pair_ratio"], 0.5)
+        self.assertAlmostEqual(summary["max_postprocess_removal_ratio"], 0.5)
+        self.assertEqual(
+            summary["diagnostic_failure_reasons"],
+            {"note count too low; collapse=repeated_position_pitch": 1},
+        )
 
 
 if __name__ == "__main__":
