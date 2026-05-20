@@ -1,6 +1,6 @@
 # Docs Index
 
-작성일: 2026-05-18
+작성일: 2026-05-20
 
 이 디렉터리는 현재 jazz piano MIDI fine-tuning probe를 진행하기 위한 기준 문서만 전면에 둔다. 백엔드/API/ERD/제품 MVP 문서는 `docs/archive/`로 이동했다.
 
@@ -36,6 +36,8 @@
   - Stage B constrained note-group generation and grammar-gate result.
 - `STAGE_B_OVERLAP_GATE_2026-05-19.md`
   - Stage B constrained output overlap/dedup postprocess and first local review-gate pass.
+- `STAGE_B_STRONGER_MULTISAMPLE_PROBE_2026-05-20.md`
+  - Stage B multi-sample constrained probe, pass-rate reporting, and sampling collapse negative control.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`
@@ -62,7 +64,7 @@
 2. Brad Mehldau subset은 style adaptation과 holdout evaluation 용도로 분리한다.
 3. `max_files=2` Brad `control_v1` probe 결과를 기준으로 Stage A 한계를 문서화한다.
 4. broad training 전에 duration-explicit Stage B tokenization과 phrase/window dataset을 설계한다.
-5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, and 2-file generation probe를 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
+5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, multi-sample probe, and 2-file generation probe를 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
 
 핵심 원칙:
 

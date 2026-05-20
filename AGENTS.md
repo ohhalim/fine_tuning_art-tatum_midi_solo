@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #22: Stage B overlap/dedup gate.
+- Issue #24: Stage B stronger multi-sample generation probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -99,6 +99,12 @@ For Stage B overlap/dedup gate changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-overlap-gate
+```
+
+For Stage B multi-sample review-gate changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-stronger-probe
 ```
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
