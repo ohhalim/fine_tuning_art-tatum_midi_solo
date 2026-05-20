@@ -9,6 +9,7 @@ import torch
 
 from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_note_grammar,
+    build_probe_summary,
     build_stage_b_primer,
     dedupe_and_limit_notes,
     decode_tokens_to_midi,
@@ -168,6 +169,34 @@ class StageBGenerationProbeTest(unittest.TestCase):
         self.assertEqual(report["before_max_simultaneous_notes"], 3)
         self.assertEqual(report["after_max_simultaneous_notes"], 2)
         self.assertEqual(len(midi.instruments[0].notes), 3)
+
+    def test_build_probe_summary_tracks_multisample_thresholds(self) -> None:
+        rows = [
+            {"sample_index": 1, "valid": True, "grammar_gate_passed": True},
+            {"sample_index": 2, "valid": False, "grammar_gate_passed": True, "failure_reason": "too sparse"},
+            {"sample_index": 3, "valid": True, "grammar_gate_passed": True},
+        ]
+
+        summary = build_probe_summary(rows, min_valid_samples=2, require_all_grammar_samples=True)
+
+        self.assertEqual(summary["sample_count"], 3)
+        self.assertEqual(summary["valid_sample_count"], 2)
+        self.assertEqual(summary["grammar_gate_sample_count"], 3)
+        self.assertEqual(summary["valid_sample_indices"], [1, 3])
+        self.assertTrue(summary["passed_generation_gate"])
+        self.assertTrue(summary["passed_grammar_gate"])
+        self.assertEqual(summary["failure_reasons"], {"too sparse": 1})
+
+    def test_build_probe_summary_can_require_all_grammar_samples(self) -> None:
+        rows = [
+            {"sample_index": 1, "valid": True, "grammar_gate_passed": True},
+            {"sample_index": 2, "valid": True, "grammar_gate_passed": False},
+        ]
+
+        summary = build_probe_summary(rows, min_valid_samples=1, require_all_grammar_samples=True)
+
+        self.assertTrue(summary["passed_generation_gate"])
+        self.assertFalse(summary["passed_grammar_gate"])
 
 
 if __name__ == "__main__":

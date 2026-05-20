@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-05-19
+작성일: 2026-05-20
 
 ## Current Focus
 
@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-22-stage-b-overlap-gate`
+- `issue-24-stage-b-stronger-multisample-probe`
 
 현재 범위가 아닌 것:
 
@@ -215,9 +215,13 @@ Current result:
 - full gate failure reason: `too many simultaneous notes: 3 > 2`
 - decision: Stage B note grammar can now be forced through the model logits, but musical validity still needs overlap/deduplication control
 
-## Active Issue #22
+## Completed Issue #22
 
-Current task:
+Status:
+
+- completed and merged via PR #23
+
+Completed task:
 
 - remove duplicate same-onset/same-pitch notes after Stage B decode
 - limit excessive overlapping notes before metrics
@@ -239,6 +243,29 @@ Current result:
 - grammar gate passed: `true`
 - full review gate passed: `true`
 - detail: `docs/STAGE_B_OVERLAP_GATE_2026-05-19.md`
+
+## Active Issue #24
+
+Current task:
+
+- strengthen the Stage B local generation probe from one sample to multiple samples
+- keep the probe honest by reporting sample-level failures
+- compare deterministic `top_k=1` collapse against `top_k=2`
+- do not claim musical quality from a single passing MIDI file
+
+First implementation target:
+
+- `scripts/run_stage_b_generation_probe.py`
+- `scripts/agent_harness.sh stage-b-stronger-probe`
+- `tests/test_stage_b_generation_probe.py`
+- `docs/STAGE_B_STRONGER_MULTISAMPLE_PROBE_2026-05-20.md`
+
+Current result:
+
+- `top_k=2`: `1/3` samples passed the full MIDI review gate
+- all `3/3` samples passed the Stage B grammar gate
+- `top_k=1` negative control collapsed to `0/3` valid samples
+- detail: `docs/STAGE_B_STRONGER_MULTISAMPLE_PROBE_2026-05-20.md`
 
 ## Dataset Strategy
 
@@ -544,7 +571,7 @@ Smoke result:
 
 Status:
 
-- implemented on `issue-22-stage-b-overlap-gate`
+- completed and merged via PR #23
 
 Goal:
 
@@ -573,6 +600,42 @@ Smoke result:
 - valid sample count: `1`
 - passed generation gate: `true`
 - decision: this is the first Stage B constrained smoke to pass the local review gate, but it is still a constrained/postprocessed diagnostic rather than unconstrained musical generation
+
+### 0.12. Issue #24 Stage B stronger multi-sample probe
+
+Status:
+
+- implemented on `issue-24-stage-b-stronger-multisample-probe`
+
+Goal:
+
+- strengthen the single-sample Stage B overlap gate
+- record sample-level seeds
+- report grammar and full review pass rates
+- require all samples to pass grammar gate
+- require at least one sample to pass the full MIDI review gate
+
+Acceptance:
+
+- multi-sample summary unit tests pass
+- `bash scripts/agent_harness.sh quick` passes
+- `bash scripts/agent_harness.sh stage-b-stronger-probe` passes
+- report includes `sample_count`, `valid_sample_rate`, `grammar_gate_sample_rate`, and failure reason counts
+
+Smoke result:
+
+- output: `outputs/stage_b_generation_probe/harness_stage_b_stronger_probe`
+- role samples: `70`
+- epoch 3 val loss: `5.0104`
+- generated samples: `3`
+- grammar gate sample count: `3`
+- valid sample count: `1`
+- valid sample rate: `0.333`
+- grammar gate sample rate: `1.000`
+- passed grammar gate: `true`
+- passed generation gate: `true`
+- negative control: `top_k=1` collapsed to `0/3` valid samples with `note count too low: 2 < 6`
+- detail: `docs/STAGE_B_STRONGER_MULTISAMPLE_PROBE_2026-05-20.md`
 
 ### 1. Run full jazz piano dataset audit
 
@@ -708,6 +771,7 @@ Decision:
 - `docs/STAGE_B_GENERATION_PROBE_2026-05-19.md`
 - `docs/STAGE_B_CONSTRAINED_TINY_OVERFIT_2026-05-19.md`
 - `docs/STAGE_B_OVERLAP_GATE_2026-05-19.md`
+- `docs/STAGE_B_STRONGER_MULTISAMPLE_PROBE_2026-05-20.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
@@ -754,4 +818,10 @@ For Stage B overlap/dedup gate changes:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-overlap-gate
+```
+
+For Stage B multi-sample review-gate changes:
+
+```bash
+bash scripts/agent_harness.sh stage-b-stronger-probe
 ```

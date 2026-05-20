@@ -296,6 +296,7 @@ def decode_tokens_to_midi(tokens: Sequence[int], output_path: Path, bpm: float |
 
 def sample_report(
     sample_index: int,
+    sample_seed: int,
     tokens: Sequence[int],
     primer_size: int,
     target_length: int,
@@ -310,6 +311,7 @@ def sample_report(
     grammar_gate_passed = bool(grammar["complete_note_groups"] > 0 and metrics.note_count > 0)
     return {
         "sample_index": int(sample_index),
+        "sample_seed": int(sample_seed),
         "midi_path": str(midi_path),
         "token_count": int(len(tokens)),
         "generated_token_count": int(len(raw_generated_tokens)),
@@ -322,6 +324,45 @@ def sample_report(
         "postprocess": postprocess_report or {"enabled": False},
         "metrics": metrics.to_dict(),
         "generated_token_names_head": [stage_b_token_name(token) for token in raw_generated_tokens[:48]],
+    }
+
+
+def build_probe_summary(
+    sample_rows: Sequence[dict[str, Any]],
+    min_valid_samples: int = 1,
+    require_all_grammar_samples: bool = False,
+) -> dict[str, Any]:
+    sample_count = int(len(sample_rows))
+    valid_indices = [int(row["sample_index"]) for row in sample_rows if row["valid"]]
+    grammar_indices = [int(row["sample_index"]) for row in sample_rows if row["grammar_gate_passed"]]
+    valid_sample_count = int(len(valid_indices))
+    grammar_gate_sample_count = int(len(grammar_indices))
+
+    if require_all_grammar_samples:
+        passed_grammar_gate = bool(sample_count > 0 and grammar_gate_sample_count == sample_count)
+    else:
+        passed_grammar_gate = bool(grammar_gate_sample_count > 0)
+
+    failure_reasons: dict[str, int] = {}
+    for row in sample_rows:
+        if row["valid"]:
+            continue
+        reason = str(row.get("failure_reason") or "unknown")
+        failure_reasons[reason] = failure_reasons.get(reason, 0) + 1
+
+    return {
+        "sample_count": sample_count,
+        "valid_sample_count": valid_sample_count,
+        "grammar_gate_sample_count": grammar_gate_sample_count,
+        "valid_sample_rate": float(valid_sample_count / sample_count) if sample_count else 0.0,
+        "grammar_gate_sample_rate": float(grammar_gate_sample_count / sample_count) if sample_count else 0.0,
+        "valid_sample_indices": valid_indices,
+        "grammar_gate_sample_indices": grammar_indices,
+        "min_valid_samples": int(min_valid_samples),
+        "require_all_grammar_samples": bool(require_all_grammar_samples),
+        "passed_generation_gate": bool(valid_sample_count >= int(min_valid_samples)),
+        "passed_grammar_gate": passed_grammar_gate,
+        "failure_reasons": failure_reasons,
     }
 
 
@@ -348,6 +389,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--lora_alpha", type=int, default=8)
     parser.add_argument("--skip_prepare", action="store_true")
     parser.add_argument("--skip_train", action="store_true")
+    parser.add_argument("--issue_number", type=int, default=None)
     parser.add_argument("--num_samples", type=int, default=2)
     parser.add_argument("--bpm", type=int, default=124)
     parser.add_argument("--bars", type=int, default=2)
@@ -361,6 +403,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--constrained_note_groups_per_bar", type=int, default=4)
     parser.add_argument("--postprocess_overlap", action="store_true")
     parser.add_argument("--max_simultaneous_notes", type=int, default=2)
+    parser.add_argument("--min_valid_samples", type=int, default=1)
+    parser.add_argument("--require_all_grammar_samples", action="store_true")
     parser.add_argument("--require_note_groups", action="store_true")
     parser.add_argument("--require_valid_sample", action="store_true")
     parser.set_defaults(lora_only=False)
@@ -393,10 +437,14 @@ def main() -> int:
     )
     request.validate()
 
+    issue_number = args.issue_number
+    if issue_number is None:
+        issue_number = 22 if args.postprocess_overlap else 20 if args.generation_mode == "constrained" else 18
+
     report: dict[str, Any] = {
         "run_id": run_id,
         "run_dir": str(run_dir),
-        "issue": 22 if args.postprocess_overlap else 20 if args.generation_mode == "constrained" else 18,
+        "issue": int(issue_number),
         "sequence_format": SEQUENCE_FORMAT_STAGE_B_V1,
         "request": request.to_dict(),
         "checkpoint_dir": str(checkpoint_dir),
@@ -446,6 +494,8 @@ def main() -> int:
 
     sample_rows: list[dict[str, Any]] = []
     for index in range(1, int(args.num_samples) + 1):
+        sample_seed = int(args.seed) + index - 1
+        torch.manual_seed(sample_seed)
         if args.generation_mode == "constrained":
             generated_tokens = generate_stage_b_constrained_tokens(
                 model=model,
@@ -480,6 +530,7 @@ def main() -> int:
         sample_rows.append(
             sample_report(
                 sample_index=index,
+                sample_seed=sample_seed,
                 tokens=generated_tokens,
                 primer_size=len(primer_tokens),
                 target_length=args.max_sequence,
@@ -490,13 +541,24 @@ def main() -> int:
         )
 
     report["samples"] = sample_rows
-    report["valid_sample_count"] = sum(1 for row in sample_rows if row["valid"])
-    report["grammar_gate_sample_count"] = sum(1 for row in sample_rows if row["grammar_gate_passed"])
-    report["sample_count"] = len(sample_rows)
-    report["passed_generation_gate"] = bool(report["valid_sample_count"] > 0)
-    report["passed_grammar_gate"] = bool(report["grammar_gate_sample_count"] > 0)
+    summary = build_probe_summary(
+        sample_rows,
+        min_valid_samples=args.min_valid_samples,
+        require_all_grammar_samples=args.require_all_grammar_samples,
+    )
+    report["summary"] = summary
+    report["valid_sample_count"] = summary["valid_sample_count"]
+    report["grammar_gate_sample_count"] = summary["grammar_gate_sample_count"]
+    report["sample_count"] = summary["sample_count"]
+    report["passed_generation_gate"] = summary["passed_generation_gate"]
+    report["passed_grammar_gate"] = summary["passed_grammar_gate"]
     if not report["passed_generation_gate"]:
-        report["failure_reason"] = "No Stage B generated sample passed the MIDI review gate"
+        report["failure_reason"] = (
+            f"Only {summary['valid_sample_count']} Stage B generated samples passed the MIDI review gate; "
+            f"required {summary['min_valid_samples']}"
+        )
+    if not report["passed_grammar_gate"]:
+        report["failure_reason"] = "Stage B generated samples did not satisfy the configured grammar gate"
 
     write_json(run_dir / "report.json", report)
     print(json.dumps(report, ensure_ascii=True, indent=2))
