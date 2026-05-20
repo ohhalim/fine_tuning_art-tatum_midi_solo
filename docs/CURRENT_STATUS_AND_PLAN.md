@@ -788,6 +788,52 @@ Detail:
 
 - `docs/STAGE_B_2FILE_BRAD_PROBE_2026-05-20.md`
 
+### 0.16. Issue #35 Stage B temporal coverage diagnostics
+
+Status:
+
+- implemented on `issue-35-stage-b-temporal-coverage-diagnostics`
+
+Goal:
+
+- explain why the 2-file Brad probe fails dead-air despite passing grammar and collapse checks
+- add token-level temporal coverage diagnostics to each sample report
+- aggregate coverage summary fields across samples
+
+Implemented diagnostics:
+
+- unique onset position count
+- onset coverage ratio
+- sustained coverage ratio
+- earliest/latest absolute position
+- position span ratio
+- head/tail empty steps
+- longest onset empty run
+- longest sustained empty run
+- per-bar unique onset positions
+- per-bar onset coverage ratio
+
+Smoke result:
+
+- output: `outputs/stage_b_generation_probe/harness_stage_b_2file_brad_probe`
+- grammar gate: `3/3`
+- basic valid: `0/3`
+- strict valid: `0/3`
+- avg onset coverage ratio: `0.167`
+- avg sustained coverage ratio: `0.417`
+- avg position span ratio: `0.740`
+- max longest sustained empty run: `11` steps
+
+Decision:
+
+- dead-air failure is explained by sparse onset coverage and long empty spans.
+- MIDI phrase coverage alone is not enough because notes can span much of the phrase while onsets remain sparse.
+- Next issue should test coverage-aware constrained generation, not broad training.
+
+Detail:
+
+- `docs/STAGE_B_TEMPORAL_COVERAGE_DIAGNOSTICS_2026-05-20.md`
+
 ### 1. Run full jazz piano dataset audit
 
 ```bash

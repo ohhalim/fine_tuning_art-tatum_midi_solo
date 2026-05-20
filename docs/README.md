@@ -44,6 +44,8 @@
   - Stage B strict collapse-aware review gate and basic-vs-strict sweep result.
 - `STAGE_B_2FILE_BRAD_PROBE_2026-05-20.md`
   - Stage B Brad 2-file generation probe and dead-air/temporal coverage failure result.
+- `STAGE_B_TEMPORAL_COVERAGE_DIAGNOSTICS_2026-05-20.md`
+  - Stage B token-level temporal coverage diagnostics and next coverage-aware generation boundary.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`

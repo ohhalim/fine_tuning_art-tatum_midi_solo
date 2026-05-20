@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #33: Stage B 2-file Brad generation probe.
+- Issue #35: Stage B temporal coverage diagnostics.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

@@ -299,7 +299,7 @@ Stage B에서 명시하는 것:
 
 완료된 바로 전 작업:
 
-- `Stage B 2-file Brad generation probe 추가`
+- `Stage B temporal coverage diagnostics 추가`
 - 결과: 2-file Brad Stage B window dataset은 `137` samples, train `123`, val `14`로 정상 생성됐다.
 - 결과: generated samples는 grammar gate `3/3`, collapse warning `0/3`이었다.
 - 결과: basic valid `0/3`, strict valid `0/3`이었다.
@@ -309,16 +309,16 @@ Stage B에서 명시하는 것:
 다음 issue는 다음 이름이 적절하다.
 
 ```text
-Stage B temporal coverage diagnostics 추가
+Stage B coverage-aware constrained generation 추가
 ```
 
 작업 범위:
 
-- generated Stage B note positions가 2-bar phrase를 얼마나 덮는지 token/MIDI 양쪽에서 측정한다.
-- per-bar occupied position count, earliest/latest position, phrase coverage, longest empty span을 report에 남긴다.
-- dead-air failure가 position sampling 문제인지 duration/postprocess 문제인지 분리한다.
-- coverage-aware constrained generation 실험을 추가하되, 모델 성공처럼 보이게 하는 과한 postprocess는 피한다.
-- 2-file Brad probe에서 basic/strict valid sample을 회복할 수 있는지 확인한다.
+- constrained generation에서 position family만 coverage-aware 후보군을 줄 수 있는지 실험한다.
+- 각 bar에 최소 onset position 수를 강제하거나 권장하는 옵션을 만든다.
+- duration/pitch/velocity는 여전히 model logits에서 뽑아 model behavior를 유지한다.
+- dead-air ratio와 onset/sustained coverage가 개선되는지 2-file Brad probe에서 비교한다.
+- 과한 postprocess로 모델 성공처럼 보이게 만들지 않는다.
 
 이 작업이 끝난 뒤 판단:
 
