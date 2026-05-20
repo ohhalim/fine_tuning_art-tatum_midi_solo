@@ -280,6 +280,12 @@ class StageBGenerationProbeTest(unittest.TestCase):
                     "repeated_position_pitch_pair_ratio": 0.75,
                     "postprocess_removal_ratio": 0.5,
                 },
+                "temporal_coverage": {
+                    "onset_coverage_ratio": 0.10,
+                    "sustained_coverage_ratio": 0.20,
+                    "position_span_ratio": 0.50,
+                    "longest_sustained_empty_run_steps": 8,
+                },
             },
             {
                 "sample_index": 2,
@@ -290,6 +296,12 @@ class StageBGenerationProbeTest(unittest.TestCase):
                     "repeated_position_pitch_pair_ratio": 0.25,
                     "postprocess_removal_ratio": 0.0,
                 },
+                "temporal_coverage": {
+                    "onset_coverage_ratio": 0.20,
+                    "sustained_coverage_ratio": 0.30,
+                    "position_span_ratio": 0.75,
+                    "longest_sustained_empty_run_steps": 4,
+                },
             },
         ]
 
@@ -299,6 +311,10 @@ class StageBGenerationProbeTest(unittest.TestCase):
         self.assertAlmostEqual(summary["collapse_warning_sample_rate"], 0.5)
         self.assertAlmostEqual(summary["avg_repeated_position_pitch_pair_ratio"], 0.5)
         self.assertAlmostEqual(summary["max_postprocess_removal_ratio"], 0.5)
+        self.assertAlmostEqual(summary["avg_onset_coverage_ratio"], 0.15)
+        self.assertAlmostEqual(summary["avg_sustained_coverage_ratio"], 0.25)
+        self.assertAlmostEqual(summary["avg_position_span_ratio"], 0.625)
+        self.assertEqual(summary["max_longest_sustained_empty_run_steps"], 8)
         self.assertEqual(
             summary["diagnostic_failure_reasons"],
             {"note count too low; collapse=repeated_position_pitch": 1},

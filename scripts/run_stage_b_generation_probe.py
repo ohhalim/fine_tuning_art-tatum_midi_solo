@@ -571,6 +571,7 @@ def sample_report(
     raw_generated_tokens = [int(token) for token in tokens[primer_size:]]
     grammar = analyze_stage_b_note_grammar(tokens, primer_size=primer_size)
     collapse = analyze_stage_b_collapse(tokens, primer_size=primer_size, postprocess_report=postprocess_report)
+    temporal_coverage = analyze_stage_b_temporal_coverage(tokens, primer_size=primer_size, bars=request.bars)
     collapse_gate = evaluate_collapse_gate(
         collapse,
         min_unique_pitches=strict_min_unique_pitches,
@@ -605,6 +606,7 @@ def sample_report(
         "diagnostic_failure_reason": diagnostic_failure_reason,
         "grammar": grammar,
         "collapse": collapse,
+        "temporal_coverage": temporal_coverage,
         "collapse_gate": collapse_gate,
         "postprocess": postprocess_report or {"enabled": False},
         "metrics": metrics.to_dict(),
@@ -638,8 +640,13 @@ def build_probe_summary(
     collapse_warning_count = 0
     repeated_pair_ratios: list[float] = []
     postprocess_removal_ratios: list[float] = []
+    onset_coverage_ratios: list[float] = []
+    sustained_coverage_ratios: list[float] = []
+    position_span_ratios: list[float] = []
+    longest_sustained_empty_runs: list[int] = []
     for row in sample_rows:
         collapse = row.get("collapse", {})
+        temporal_coverage = row.get("temporal_coverage", {})
         if collapse.get("collapse_warning"):
             collapse_warning_count += 1
         if not row.get("strict_valid", False):
@@ -654,6 +661,12 @@ def build_probe_summary(
                 strict_failure_reasons[str(strict_reason)] = strict_failure_reasons.get(str(strict_reason), 0) + 1
         repeated_pair_ratios.append(float(collapse.get("repeated_position_pitch_pair_ratio", 0.0) or 0.0))
         postprocess_removal_ratios.append(float(collapse.get("postprocess_removal_ratio", 0.0) or 0.0))
+        onset_coverage_ratios.append(float(temporal_coverage.get("onset_coverage_ratio", 0.0) or 0.0))
+        sustained_coverage_ratios.append(float(temporal_coverage.get("sustained_coverage_ratio", 0.0) or 0.0))
+        position_span_ratios.append(float(temporal_coverage.get("position_span_ratio", 0.0) or 0.0))
+        longest_sustained_empty_runs.append(
+            int(temporal_coverage.get("longest_sustained_empty_run_steps", 0) or 0)
+        )
         if not row["valid"]:
             reason = str(row.get("failure_reason") or "unknown")
             diagnostic_reason = str(row.get("diagnostic_failure_reason") or reason)
@@ -707,6 +720,20 @@ def build_probe_summary(
             else 0.0
         ),
         "max_postprocess_removal_ratio": max(postprocess_removal_ratios) if postprocess_removal_ratios else 0.0,
+        "avg_onset_coverage_ratio": (
+            float(sum(onset_coverage_ratios) / len(onset_coverage_ratios)) if onset_coverage_ratios else 0.0
+        ),
+        "avg_sustained_coverage_ratio": (
+            float(sum(sustained_coverage_ratios) / len(sustained_coverage_ratios))
+            if sustained_coverage_ratios
+            else 0.0
+        ),
+        "avg_position_span_ratio": (
+            float(sum(position_span_ratios) / len(position_span_ratios)) if position_span_ratios else 0.0
+        ),
+        "max_longest_sustained_empty_run_steps": (
+            max(longest_sustained_empty_runs) if longest_sustained_empty_runs else 0
+        ),
     }
 
 
