@@ -51,6 +51,8 @@ from scripts.stage_b_tokens import (  # noqa: E402
     is_note_pitch_token,
     is_position_token,
     is_velocity_token,
+    pitch_from_token,
+    position_from_token,
     stage_b_token_name,
 )
 from utilities.constants import TOKEN_BAR, TOKEN_END, VOCAB_SIZE  # noqa: E402
@@ -150,6 +152,130 @@ def analyze_stage_b_note_grammar(tokens: Sequence[int], primer_size: int = 0) ->
         "family_counts": family_counts,
         "invalid_tokens_head": invalid_tokens[:12],
         "grammar_valid": bool(complete_groups > 0 and not invalid_tokens and expected_index == 0),
+    }
+
+
+def extract_stage_b_note_groups(tokens: Sequence[int], primer_size: int = 0) -> list[dict[str, int]]:
+    generated = [int(token) for token in tokens[int(primer_size) :]]
+    note_groups: list[dict[str, int]] = []
+    bar_index = 0
+    current_position: int | None = None
+    current_velocity: int | None = None
+    current_pitch: int | None = None
+
+    for token in generated:
+        if int(token) == TOKEN_END:
+            break
+        if int(token) == TOKEN_BAR:
+            bar_index += 1
+            current_position = None
+            current_velocity = None
+            current_pitch = None
+            continue
+        if token_family(token) == "chord":
+            continue
+        if is_position_token(token):
+            current_position = position_from_token(token)
+            current_velocity = None
+            current_pitch = None
+            continue
+        if is_velocity_token(token):
+            current_velocity = int(token)
+            continue
+        if is_note_pitch_token(token):
+            current_pitch = pitch_from_token(token)
+            continue
+        if is_note_duration_token(token) and current_position is not None and current_pitch is not None:
+            note_groups.append(
+                {
+                    "bar": int(bar_index),
+                    "position": int(current_position),
+                    "pitch": int(current_pitch),
+                    "velocity_token": int(current_velocity) if current_velocity is not None else -1,
+                    "duration_token": int(token),
+                }
+            )
+            current_position = None
+            current_velocity = None
+            current_pitch = None
+
+    return note_groups
+
+
+def _counter(values: Sequence[Any]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for value in values:
+        key = str(value)
+        counts[key] = counts.get(key, 0) + 1
+    return counts
+
+
+def analyze_stage_b_collapse(
+    tokens: Sequence[int],
+    primer_size: int = 0,
+    postprocess_report: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    groups = extract_stage_b_note_groups(tokens, primer_size=primer_size)
+    group_count = int(len(groups))
+    pitches = [group["pitch"] for group in groups]
+    positions = [group["position"] for group in groups]
+    relative_pairs = [(group["position"], group["pitch"]) for group in groups]
+    absolute_pairs = [(group["bar"], group["position"], group["pitch"]) for group in groups]
+    bar_counts = _counter([group["bar"] for group in groups])
+    pitch_counts = _counter(pitches)
+    pair_counts = _counter(relative_pairs)
+
+    unique_pitch_count = len(set(pitches))
+    unique_position_count = len(set(positions))
+    unique_relative_pair_count = len(set(relative_pairs))
+    unique_absolute_pair_count = len(set(absolute_pairs))
+    repeated_pitch_count = max(0, group_count - unique_pitch_count)
+    repeated_position_pitch_pair_count = max(0, group_count - unique_relative_pair_count)
+    repeated_absolute_position_pitch_pair_count = max(0, group_count - unique_absolute_pair_count)
+
+    postprocess = postprocess_report or {}
+    before_note_count = int(postprocess.get("before_note_count", 0) or 0)
+    removed_note_count = int(postprocess.get("removed_note_count", 0) or 0)
+    postprocess_removal_ratio = float(removed_note_count / before_note_count) if before_note_count else 0.0
+
+    repeated_pair_ratio = float(repeated_position_pitch_pair_count / group_count) if group_count else 0.0
+    repeated_pitch_ratio = float(repeated_pitch_count / group_count) if group_count else 0.0
+    repeated_absolute_pair_ratio = (
+        float(repeated_absolute_position_pitch_pair_count / group_count) if group_count else 0.0
+    )
+    max_same_pair_repeats = max(pair_counts.values()) if pair_counts else 0
+    max_same_pitch_repeats = max(pitch_counts.values()) if pitch_counts else 0
+
+    collapse_reasons: list[str] = []
+    if group_count > 0 and unique_pitch_count <= 1:
+        collapse_reasons.append("single_pitch")
+    if group_count > 0 and unique_position_count <= 1:
+        collapse_reasons.append("single_position")
+    if repeated_pair_ratio >= 0.5:
+        collapse_reasons.append("repeated_position_pitch")
+    if postprocess_removal_ratio >= 0.5:
+        collapse_reasons.append("postprocess_removed_majority")
+
+    return {
+        "note_group_count": group_count,
+        "unique_pitch_count": int(unique_pitch_count),
+        "unique_position_count": int(unique_position_count),
+        "unique_position_pitch_pair_count": int(unique_relative_pair_count),
+        "unique_absolute_position_pitch_pair_count": int(unique_absolute_pair_count),
+        "repeated_pitch_count": int(repeated_pitch_count),
+        "repeated_position_pitch_pair_count": int(repeated_position_pitch_pair_count),
+        "repeated_absolute_position_pitch_pair_count": int(repeated_absolute_position_pitch_pair_count),
+        "repeated_pitch_ratio": repeated_pitch_ratio,
+        "repeated_position_pitch_pair_ratio": repeated_pair_ratio,
+        "repeated_absolute_position_pitch_pair_ratio": repeated_absolute_pair_ratio,
+        "max_same_pitch_repeats": int(max_same_pitch_repeats),
+        "max_same_position_pitch_pair_repeats": int(max_same_pair_repeats),
+        "postprocess_removal_ratio": postprocess_removal_ratio,
+        "per_bar_note_counts": {str(key): int(value) for key, value in bar_counts.items()},
+        "pitch_counts_head": dict(sorted(pitch_counts.items(), key=lambda item: (-item[1], item[0]))[:8]),
+        "position_pitch_pair_counts_head": dict(sorted(pair_counts.items(), key=lambda item: (-item[1], item[0]))[:8]),
+        "collapse_warning": bool(collapse_reasons),
+        "collapse_reasons": collapse_reasons,
     }
 
 
@@ -306,9 +432,15 @@ def sample_report(
 ) -> dict[str, Any]:
     raw_generated_tokens = [int(token) for token in tokens[primer_size:]]
     grammar = analyze_stage_b_note_grammar(tokens, primer_size=primer_size)
+    collapse = analyze_stage_b_collapse(tokens, primer_size=primer_size, postprocess_report=postprocess_report)
     metrics = compute_midi_metrics(midi_path, 0, False, request=request)
     valid, reason = validate_metrics(metrics, request.density, bars=request.bars)
     grammar_gate_passed = bool(grammar["complete_note_groups"] > 0 and metrics.note_count > 0)
+    diagnostic_failure_reason = reason
+    if not valid and collapse["collapse_warning"]:
+        diagnostic_failure_reason = (
+            f"{reason}; collapse={','.join(collapse['collapse_reasons'])}" if reason else ",".join(collapse["collapse_reasons"])
+        )
     return {
         "sample_index": int(sample_index),
         "sample_seed": int(sample_seed),
@@ -320,7 +452,9 @@ def sample_report(
         "valid": bool(valid),
         "grammar_gate_passed": grammar_gate_passed,
         "failure_reason": reason,
+        "diagnostic_failure_reason": diagnostic_failure_reason,
         "grammar": grammar,
+        "collapse": collapse,
         "postprocess": postprocess_report or {"enabled": False},
         "metrics": metrics.to_dict(),
         "generated_token_names_head": [stage_b_token_name(token) for token in raw_generated_tokens[:48]],
@@ -344,11 +478,21 @@ def build_probe_summary(
         passed_grammar_gate = bool(grammar_gate_sample_count > 0)
 
     failure_reasons: dict[str, int] = {}
+    diagnostic_failure_reasons: dict[str, int] = {}
+    collapse_warning_count = 0
+    repeated_pair_ratios: list[float] = []
+    postprocess_removal_ratios: list[float] = []
     for row in sample_rows:
-        if row["valid"]:
-            continue
-        reason = str(row.get("failure_reason") or "unknown")
-        failure_reasons[reason] = failure_reasons.get(reason, 0) + 1
+        collapse = row.get("collapse", {})
+        if collapse.get("collapse_warning"):
+            collapse_warning_count += 1
+        repeated_pair_ratios.append(float(collapse.get("repeated_position_pitch_pair_ratio", 0.0) or 0.0))
+        postprocess_removal_ratios.append(float(collapse.get("postprocess_removal_ratio", 0.0) or 0.0))
+        if not row["valid"]:
+            reason = str(row.get("failure_reason") or "unknown")
+            diagnostic_reason = str(row.get("diagnostic_failure_reason") or reason)
+            failure_reasons[reason] = failure_reasons.get(reason, 0) + 1
+            diagnostic_failure_reasons[diagnostic_reason] = diagnostic_failure_reasons.get(diagnostic_reason, 0) + 1
 
     return {
         "sample_count": sample_count,
@@ -363,6 +507,19 @@ def build_probe_summary(
         "passed_generation_gate": bool(valid_sample_count >= int(min_valid_samples)),
         "passed_grammar_gate": passed_grammar_gate,
         "failure_reasons": failure_reasons,
+        "diagnostic_failure_reasons": diagnostic_failure_reasons,
+        "collapse_warning_sample_count": int(collapse_warning_count),
+        "collapse_warning_sample_rate": float(collapse_warning_count / sample_count) if sample_count else 0.0,
+        "avg_repeated_position_pitch_pair_ratio": (
+            float(sum(repeated_pair_ratios) / len(repeated_pair_ratios)) if repeated_pair_ratios else 0.0
+        ),
+        "max_repeated_position_pitch_pair_ratio": max(repeated_pair_ratios) if repeated_pair_ratios else 0.0,
+        "avg_postprocess_removal_ratio": (
+            float(sum(postprocess_removal_ratios) / len(postprocess_removal_ratios))
+            if postprocess_removal_ratios
+            else 0.0
+        ),
+        "max_postprocess_removal_ratio": max(postprocess_removal_ratios) if postprocess_removal_ratios else 0.0,
     }
 
 

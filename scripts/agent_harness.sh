@@ -38,6 +38,8 @@ Modes:
                 Run constrained Stage B generation with overlap postprocess gate.
   stage-b-stronger-probe
                 Run a multi-sample constrained Stage B review-gate probe.
+  stage-b-collapse-sweep
+                Run Stage B top-k sampling sweep with collapse diagnostics.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -75,6 +77,7 @@ run_quick() {
     scripts/prepare_role_dataset.py \
     scripts/run_stage_b_window_tiny_overfit.py \
     scripts/run_stage_b_generation_probe.py \
+    scripts/run_stage_b_sampling_sweep.py \
     scripts/audit_brad_mehldau_dataset.py \
     scripts/audit_jazz_piano_dataset.py \
     scripts/build_jazz_training_manifests.py \
@@ -234,6 +237,32 @@ run_stage_b_stronger_probe() {
     --lora_alpha 8
 }
 
+run_stage_b_collapse_sweep() {
+  local run_id="${RUN_ID:-harness_stage_b_collapse_sweep}"
+  print_header "Stage B collapse sampling sweep"
+  "$PYTHON_BIN" scripts/run_stage_b_sampling_sweep.py \
+    --run_id "$run_id" \
+    --issue_number 29 \
+    --top_ks 1,2 \
+    --temperatures 0.9 \
+    --train_top_k 2 \
+    --max_files 1 \
+    --epochs 3 \
+    --batch_size 8 \
+    --max_sequence 96 \
+    --num_samples 3 \
+    --constrained_note_groups_per_bar 4 \
+    --max_simultaneous_notes 2 \
+    --require_all_grammar_samples \
+    --min_best_valid_samples 1 \
+    --n_layers 1 \
+    --num_heads 4 \
+    --d_model 64 \
+    --dim_feedforward 128 \
+    --lora_r 4 \
+    --lora_alpha 8
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -278,6 +307,9 @@ case "$MODE" in
     ;;
   stage-b-stronger-probe)
     run_stage_b_stronger_probe
+    ;;
+  stage-b-collapse-sweep)
+    run_stage_b_collapse_sweep
     ;;
   manifest-dry-run)
     run_manifest_dry_run

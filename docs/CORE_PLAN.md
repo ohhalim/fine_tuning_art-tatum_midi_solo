@@ -297,24 +297,31 @@ Stage B에서 명시하는 것:
 
 ## 9. 다음 바로 할 일
 
+완료된 바로 전 작업:
+
+- `Stage B collapse diagnostics and sampling sweep 추가`
+- 결과: `top_k=1`은 collapse warning `3/3`, valid `0/3`
+- 결과: `top_k=2`는 collapse warning `1/3`, valid `1/3`
+- 결론: Stage B grammar가 아니라 note distribution collapse가 현재 병목이다.
+
 다음 issue는 다음 이름이 적절하다.
 
 ```text
-Stage B collapse diagnostics and sampling sweep 추가
+Stage B stricter collapse-aware review gate 추가
 ```
 
 작업 범위:
 
-- current `stage-b-stronger-probe` 결과를 기반으로 collapse metric 추가
-- `report.json`에 collapse diagnostics 추가
-- `top_k`/temperature sweep script 또는 harness mode 추가
-- sample table을 markdown/JSON으로 저장
-- 다음 단계로 갈지 판단하는 pass-rate 기준 정의
+- review gate에 collapse-aware 기준을 추가한다.
+- minimum unique pitch/position/pair 기준을 정한다.
+- collapse warning sample rate 상한을 정한다.
+- sampling sweep이 stricter gate 기준으로 통과/실패를 보고하게 한다.
+- broad training 전 Stage B 2-file Brad probe로 갈 수 있는지 판단한다.
 
 이 작업이 끝난 뒤 판단:
 
-- collapse가 줄고 pass-rate가 안정되면 Stage B 2-file Brad probe로 간다.
-- collapse가 계속되면 tokenization/model/loss/pretrained-base 쪽으로 재검토한다.
+- stricter gate에서도 최소 pass-rate가 유지되면 Stage B 2-file Brad probe로 간다.
+- stricter gate에서 전부 실패하면 sampling/postprocess 문제가 아니라 tokenization/model/loss/pretrained-base 쪽으로 재검토한다.
 
 ## 10. 한 문장 요약
 
