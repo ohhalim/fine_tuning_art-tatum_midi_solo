@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #35: Stage B temporal coverage diagnostics.
+- Issue #37: Stage B coverage-aware constrained generation.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -177,6 +177,15 @@ bash scripts/agent_harness.sh stage-b-2file-brad-probe
 
 This probe records basic/strict pass-rate. A musical quality failure is a report outcome, not
 automatically a harness failure, unless the script itself crashes or produces no grammar-valid samples.
+
+For Stage B coverage-aware constrained generation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-coverage-aware-probe
+```
+
+This probe tests whether constrained `POSITION` selection can improve temporal coverage without
+claiming unconstrained model quality.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

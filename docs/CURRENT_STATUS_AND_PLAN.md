@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-33-stage-b-2file-brad-probe`
+- `issue-37-stage-b-coverage-aware-generation`
 
 현재 범위가 아닌 것:
 
@@ -36,30 +36,33 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #13에서 Brad Mehldau real MIDI 2파일로 `control_v1` prepare/train/generate probe를 실행했다.
+Issue #37에서 Brad Mehldau real MIDI 2파일 Stage B setup으로 coverage-aware constrained generation probe를 실행했다.
 
 Result:
 
-- dataset prepare 성공: train 1 sample, val 1 sample
-- 5 epoch full-checkpoint training 성공
-- 100 epoch full-checkpoint training 성공
-- best observed val loss: `4.1306` at epoch `70`
-- generation 실패:
-  - 5 epoch `top_k=1`: all 0 notes
-  - 5 epoch `top_k=32`: 0/1/2-note outputs
-  - 100 epoch `top_k=1`: repeated one-note outputs
-  - 100 epoch `top_k=32`: long sustain or only 5 notes
+- dataset prepare 성공: Brad 2-file Stage B windows `137`, train `123`, val `14`
+- 3 epoch full tiny model training 성공
+- best observed val loss: `4.0892`
+- generation mode: constrained + coverage-aware `POSITION`
+- grammar gate: `3/3`
+- basic valid: `3/3`
+- strict valid: `3/3`
+- collapse warning: `0/3`
+- avg onset coverage ratio: `0.250`
+- avg sustained coverage ratio: `0.427`
+- avg position span ratio: `0.813`
+- max longest sustained empty run: `6` steps
 
 Decision:
 
-- Stage A `control_v1`은 runnable pipeline으로는 검증됐다.
-- 하지만 reviewable jazz solo MIDI generator로는 실패했다.
-- broad generic jazz training으로 바로 넘어가지 않는다.
-- 다음은 Stage B duration-explicit, bar-position-aware tokenization과 phrase/window dataset 설계다.
+- coverage-aware constrained `POSITION` selection은 2-file Brad dead-air failure를 줄이는 데 효과가 있었다.
+- 이전 #35의 basic/strict `0/3`에서 #37은 basic/strict `3/3`으로 개선됐다.
+- 하지만 이것은 unconstrained model quality나 Brad style adaptation 성공이 아니다.
+- 다음은 plain constrained vs coverage-aware constrained A/B sweep으로 안정성을 확인한다.
 
 Detail:
 
-- `docs/STAGE_A_BRAD_PROBE2_2026-05-18.md`
+- `docs/STAGE_B_COVERAGE_AWARE_GENERATION_2026-05-20.md`
 
 ## Active Issue #14
 
@@ -671,7 +674,7 @@ Smoke result:
 
 Status:
 
-- implemented on `issue-29-stage-b-collapse-sampling-sweep`
+- completed and merged via PR #30
 
 Goal:
 
@@ -701,7 +704,7 @@ Smoke result:
 
 Status:
 
-- implemented on `issue-31-stage-b-strict-collapse-gate`
+- completed and merged via PR #32
 
 Goal:
 
@@ -740,7 +743,7 @@ Smoke result:
 
 Status:
 
-- implemented on `issue-33-stage-b-2file-brad-probe`
+- completed and merged via PR #34
 
 Goal:
 
@@ -792,7 +795,7 @@ Detail:
 
 Status:
 
-- implemented on `issue-35-stage-b-temporal-coverage-diagnostics`
+- completed and merged via PR #36
 
 Goal:
 
@@ -833,6 +836,50 @@ Decision:
 Detail:
 
 - `docs/STAGE_B_TEMPORAL_COVERAGE_DIAGNOSTICS_2026-05-20.md`
+
+### 0.17. Issue #37 Stage B coverage-aware constrained generation
+
+Status:
+
+- implemented on `issue-37-stage-b-coverage-aware-generation`
+
+Goal:
+
+- reduce the Stage B 2-file Brad dead-air failure without broad training
+- make only constrained `POSITION` selection coverage-aware
+- keep pitch, duration, and velocity sampled from model logits
+- compare the result against #35 temporal coverage diagnostics
+
+Implementation:
+
+- added coverage-aware position helper for constrained note groups
+- added `--coverage_aware_positions`
+- added `--coverage_position_window`
+- added harness mode `stage-b-coverage-aware-probe`
+
+Smoke result:
+
+- output: `outputs/stage_b_generation_probe/harness_stage_b_coverage_aware_probe`
+- grammar gate: `3/3`
+- basic valid: `3/3`
+- strict valid: `3/3`
+- collapse warning: `0/3`
+- avg onset coverage ratio: `0.250`
+- avg sustained coverage ratio: `0.427`
+- avg position span ratio: `0.813`
+- max longest sustained empty run: `6` steps
+- avg postprocess removal ratio: `0.000`
+
+Decision:
+
+- coverage-aware constrained `POSITION` selection is a useful local generation constraint.
+- It fixes the current 2-file Brad probe's dead-air gate failure under this harness.
+- It still does not prove unconstrained generation or personalized Brad style.
+- Next issue should run an A/B sweep: plain constrained vs coverage-aware constrained, with `note_groups_per_bar` variants.
+
+Detail:
+
+- `docs/STAGE_B_COVERAGE_AWARE_GENERATION_2026-05-20.md`
 
 ### 1. Run full jazz piano dataset audit
 
@@ -970,6 +1017,10 @@ Decision:
 - `docs/STAGE_B_OVERLAP_GATE_2026-05-19.md`
 - `docs/STAGE_B_STRONGER_MULTISAMPLE_PROBE_2026-05-20.md`
 - `docs/STAGE_B_COLLAPSE_SWEEP_2026-05-20.md`
+- `docs/STAGE_B_STRICT_COLLAPSE_GATE_2026-05-20.md`
+- `docs/STAGE_B_2FILE_BRAD_PROBE_2026-05-20.md`
+- `docs/STAGE_B_TEMPORAL_COVERAGE_DIAGNOSTICS_2026-05-20.md`
+- `docs/STAGE_B_COVERAGE_AWARE_GENERATION_2026-05-20.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
@@ -1028,4 +1079,16 @@ For Stage B collapse/sampling-sweep changes:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-collapse-sweep
+```
+
+For Stage B 2-file Brad generation changes:
+
+```bash
+bash scripts/agent_harness.sh stage-b-2file-brad-probe
+```
+
+For Stage B coverage-aware constrained generation changes:
+
+```bash
+bash scripts/agent_harness.sh stage-b-coverage-aware-probe
 ```
