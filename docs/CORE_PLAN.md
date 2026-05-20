@@ -122,15 +122,17 @@ Stage B에서 명시하는 것:
 16. Stage B temporal coverage diagnostics
 17. Stage B coverage-aware constrained generation probe
 18. Stage B coverage-aware A/B sweep
+19. Stage B candidate ranking report
 
 가장 최근 의미 있는 결과:
 
-- coverage-aware constrained A/B sweep: coverage mode가 groups/bar `4`, `6`, `8` 모두에서 strict `3/3` 통과
-- plain constrained mode는 groups/bar `4`, `6`, `8`에서 각각 strict `0/3`, `1/3`, `2/3`
-- best config는 coverage groups/bar `8`
-- best avg onset coverage ratio: `0.500`
-- best avg sustained coverage ratio: `0.865`
-- best max longest sustained empty run: `1` step
+- candidate ranking report가 A/B sweep의 sample-level MIDI 후보를 score로 정렬함
+- top candidate: coverage groups/bar `8`, sample `1`
+- top candidate score: `91.080`
+- top candidate onset coverage: `0.500`
+- top candidate sustained coverage: `0.906`
+- top candidate dead-air ratio: `0.467`
+- top candidate chord-tone ratio: `0.313`
 - 하지만 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않음
 
 중요한 해석:
@@ -149,7 +151,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-다음 단계는 strict pass/fail 하나가 아니라 temporal coverage, chord-tone ratio, repetition, density를 함께 보는 candidate ranking/report를 만드는 것이다.
+다음 단계는 top ranked MIDI 후보를 실제로 듣고 piano roll로 확인하는 것이다. 귀로도 약하면 chord-aware pitch filtering 또는 chord-tone/tension-aware ranking을 먼저 한다.
 
 ## 6. 다음 단계 로드맵
 

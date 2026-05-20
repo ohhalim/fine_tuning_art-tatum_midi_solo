@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-39-stage-b-coverage-ab-sweep`
+- `issue-41-stage-b-candidate-ranking`
 
 현재 범위가 아닌 것:
 
@@ -36,35 +36,32 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #39에서 Brad Mehldau real MIDI 2파일 Stage B setup으로 plain constrained vs coverage-aware constrained A/B sweep을 실행했다.
+Issue #41에서 Stage B A/B sweep 결과를 기반으로 generated MIDI candidate ranking report를 만들었다.
 
 Result:
 
-- compared configs: `plain/coverage` x groups/bar `4/6/8`
-- all configs grammar gate: `3/3`
-- plain strict valid:
-  - groups/bar `4`: `0/3`
-  - groups/bar `6`: `1/3`
-  - groups/bar `8`: `2/3`
-- coverage strict valid:
-  - groups/bar `4`: `3/3`
-  - groups/bar `6`: `3/3`
-  - groups/bar `8`: `3/3`
-- best config: coverage groups/bar `8`
-- best avg onset coverage ratio: `0.500`
-- best avg sustained coverage ratio: `0.865`
-- best max longest sustained empty run: `1` step
+- candidate ranking harness 실행 성공
+- ranking input: coverage A/B sweep report
+- top candidate: coverage groups/bar `8`, sample `1`
+- top candidate score: `91.080`
+- top candidate strict valid: `true`
+- top candidate note count: `16`
+- top candidate onset coverage ratio: `0.500`
+- top candidate sustained coverage ratio: `0.906`
+- top candidate dead-air ratio: `0.467`
+- top candidate chord-tone ratio: `0.313`
 
 Decision:
 
-- coverage-aware constrained `POSITION` selection은 plain constrained보다 안정적으로 temporal coverage를 개선한다.
-- `groups/bar=8`이 temporal coverage는 가장 좋지만 chord-tone ratio는 낮아질 수 있다.
+- candidate ranking은 listening/piano-roll review 우선순위를 정하는 데 쓸 수 있다.
+- top ranked candidates는 coverage groups/bar `8`에 집중된다.
 - 하지만 이것은 unconstrained model quality나 Brad style adaptation 성공이 아니다.
-- 다음은 strict pass/fail만 보지 말고 coverage, chord-tone ratio, repetition, density를 함께 보는 candidate ranking/report를 만든다.
+- 다음은 top ranked MIDI 후보를 실제로 듣고 piano roll로 확인한다.
+- 만약 화성감이 약하면 chord-aware pitch filtering 또는 chord-tone/tension-aware ranking을 먼저 한다.
 
 Detail:
 
-- `docs/STAGE_B_COVERAGE_AB_SWEEP_2026-05-20.md`
+- `docs/STAGE_B_CANDIDATE_RANKING_2026-05-20.md`
 
 ## Active Issue #14
 
@@ -917,6 +914,42 @@ Detail:
 
 - `docs/STAGE_B_COVERAGE_AB_SWEEP_2026-05-20.md`
 
+### 0.19. Issue #41 Stage B candidate ranking report
+
+Status:
+
+- implemented on `issue-41-stage-b-candidate-ranking`
+
+Goal:
+
+- rank generated MIDI candidates from A/B sweep reports
+- include strict validity, temporal coverage, dead-air, chord-tone ratio, repetition, pitch diversity, and collapse warning in the score
+- produce JSON/Markdown reports for listening/review priority
+
+Smoke result:
+
+- output: `outputs/stage_b_candidate_ranking/harness_stage_b_candidate_ranking`
+- top candidate: coverage groups/bar `8`, sample `1`
+- score: `91.080`
+- strict valid: `true`
+- note count: `16`
+- onset coverage ratio: `0.500`
+- sustained coverage ratio: `0.906`
+- dead-air ratio: `0.467`
+- chord-tone ratio: `0.313`
+
+Decision:
+
+- Use this report to choose which generated MIDI files to inspect by ear and piano roll.
+- The score is a review-prioritization heuristic, not a musical-quality claim.
+- Next issue depends on listening review:
+  - if rhythm/shape is acceptable but harmony is weak, add chord-aware pitch filtering/ranking
+  - if the line is still mechanically patterned, revisit generation constraints before broad training
+
+Detail:
+
+- `docs/STAGE_B_CANDIDATE_RANKING_2026-05-20.md`
+
 ### 1. Run full jazz piano dataset audit
 
 ```bash
@@ -1058,6 +1091,7 @@ Decision:
 - `docs/STAGE_B_TEMPORAL_COVERAGE_DIAGNOSTICS_2026-05-20.md`
 - `docs/STAGE_B_COVERAGE_AWARE_GENERATION_2026-05-20.md`
 - `docs/STAGE_B_COVERAGE_AB_SWEEP_2026-05-20.md`
+- `docs/STAGE_B_CANDIDATE_RANKING_2026-05-20.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
@@ -1134,4 +1168,10 @@ For Stage B coverage-aware A/B sweep changes:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-coverage-ab-sweep
+```
+
+For Stage B candidate ranking changes:
+
+```bash
+bash scripts/agent_harness.sh stage-b-candidate-ranking
 ```
