@@ -45,8 +45,10 @@ from scripts.stage_b_tokens import (  # noqa: E402
     TOKEN_CHORD_ROOT_END,
     TOKEN_CHORD_ROOT_START,
     SEQUENCE_FORMAT_STAGE_B_V1,
+    POSITIONS_PER_BAR,
     chord_tokens,
     decode_stage_b_midi,
+    duration_steps_from_token,
     is_note_duration_token,
     is_note_pitch_token,
     is_position_token,
@@ -201,6 +203,7 @@ def extract_stage_b_note_groups(tokens: Sequence[int], primer_size: int = 0) -> 
                     "pitch": int(current_pitch),
                     "velocity_token": int(current_velocity) if current_velocity is not None else -1,
                     "duration_token": int(token),
+                    "duration_steps": int(duration_steps_from_token(token)),
                 }
             )
             current_position = None
@@ -216,6 +219,80 @@ def _counter(values: Sequence[Any]) -> dict[str, int]:
         key = str(value)
         counts[key] = counts.get(key, 0) + 1
     return counts
+
+
+def _longest_false_run(values: Sequence[bool]) -> int:
+    longest = 0
+    current = 0
+    for value in values:
+        if value:
+            current = 0
+            continue
+        current += 1
+        longest = max(longest, current)
+    return longest
+
+
+def analyze_stage_b_temporal_coverage(
+    tokens: Sequence[int],
+    primer_size: int = 0,
+    bars: int = 2,
+) -> dict[str, Any]:
+    groups = extract_stage_b_note_groups(tokens, primer_size=primer_size)
+    total_bars = max(1, int(bars))
+    total_positions = total_bars * int(POSITIONS_PER_BAR)
+    onset_occupied = [False] * total_positions
+    sustained_occupied = [False] * total_positions
+    per_bar_positions: dict[int, set[int]] = {bar: set() for bar in range(total_bars)}
+    absolute_positions: list[int] = []
+
+    for group in groups:
+        bar = int(group["bar"])
+        position = int(group["position"])
+        if bar < 0 or bar >= total_bars:
+            continue
+        absolute_position = bar * int(POSITIONS_PER_BAR) + position
+        absolute_positions.append(absolute_position)
+        per_bar_positions.setdefault(bar, set()).add(position)
+        if 0 <= absolute_position < total_positions:
+            onset_occupied[absolute_position] = True
+            duration_steps = max(1, int(group.get("duration_steps", 1)))
+            for step in range(absolute_position, min(total_positions, absolute_position + duration_steps)):
+                sustained_occupied[step] = True
+
+    unique_absolute_positions = sorted(set(absolute_positions))
+    earliest_position = unique_absolute_positions[0] if unique_absolute_positions else None
+    latest_position = unique_absolute_positions[-1] if unique_absolute_positions else None
+    span_steps = (
+        int(latest_position - earliest_position + 1)
+        if earliest_position is not None and latest_position is not None
+        else 0
+    )
+
+    return {
+        "bars": total_bars,
+        "positions_per_bar": int(POSITIONS_PER_BAR),
+        "total_positions": int(total_positions),
+        "note_group_count": int(len(groups)),
+        "unique_onset_position_count": int(len(unique_absolute_positions)),
+        "onset_coverage_ratio": float(len(unique_absolute_positions) / total_positions),
+        "sustained_coverage_ratio": float(sum(1 for value in sustained_occupied if value) / total_positions),
+        "earliest_absolute_position": earliest_position,
+        "latest_absolute_position": latest_position,
+        "position_span_steps": span_steps,
+        "position_span_ratio": float(span_steps / total_positions) if total_positions else 0.0,
+        "head_empty_steps": int(earliest_position) if earliest_position is not None else total_positions,
+        "tail_empty_steps": int(total_positions - latest_position - 1) if latest_position is not None else total_positions,
+        "longest_onset_empty_run_steps": int(_longest_false_run(onset_occupied)),
+        "longest_sustained_empty_run_steps": int(_longest_false_run(sustained_occupied)),
+        "per_bar_unique_onset_positions": {
+            str(bar): int(len(per_bar_positions.get(bar, set()))) for bar in range(total_bars)
+        },
+        "per_bar_onset_coverage_ratio": {
+            str(bar): float(len(per_bar_positions.get(bar, set())) / int(POSITIONS_PER_BAR))
+            for bar in range(total_bars)
+        },
+    }
 
 
 def analyze_stage_b_collapse(
@@ -494,6 +571,7 @@ def sample_report(
     raw_generated_tokens = [int(token) for token in tokens[primer_size:]]
     grammar = analyze_stage_b_note_grammar(tokens, primer_size=primer_size)
     collapse = analyze_stage_b_collapse(tokens, primer_size=primer_size, postprocess_report=postprocess_report)
+    temporal_coverage = analyze_stage_b_temporal_coverage(tokens, primer_size=primer_size, bars=request.bars)
     collapse_gate = evaluate_collapse_gate(
         collapse,
         min_unique_pitches=strict_min_unique_pitches,
@@ -528,6 +606,7 @@ def sample_report(
         "diagnostic_failure_reason": diagnostic_failure_reason,
         "grammar": grammar,
         "collapse": collapse,
+        "temporal_coverage": temporal_coverage,
         "collapse_gate": collapse_gate,
         "postprocess": postprocess_report or {"enabled": False},
         "metrics": metrics.to_dict(),
@@ -561,8 +640,13 @@ def build_probe_summary(
     collapse_warning_count = 0
     repeated_pair_ratios: list[float] = []
     postprocess_removal_ratios: list[float] = []
+    onset_coverage_ratios: list[float] = []
+    sustained_coverage_ratios: list[float] = []
+    position_span_ratios: list[float] = []
+    longest_sustained_empty_runs: list[int] = []
     for row in sample_rows:
         collapse = row.get("collapse", {})
+        temporal_coverage = row.get("temporal_coverage", {})
         if collapse.get("collapse_warning"):
             collapse_warning_count += 1
         if not row.get("strict_valid", False):
@@ -577,6 +661,12 @@ def build_probe_summary(
                 strict_failure_reasons[str(strict_reason)] = strict_failure_reasons.get(str(strict_reason), 0) + 1
         repeated_pair_ratios.append(float(collapse.get("repeated_position_pitch_pair_ratio", 0.0) or 0.0))
         postprocess_removal_ratios.append(float(collapse.get("postprocess_removal_ratio", 0.0) or 0.0))
+        onset_coverage_ratios.append(float(temporal_coverage.get("onset_coverage_ratio", 0.0) or 0.0))
+        sustained_coverage_ratios.append(float(temporal_coverage.get("sustained_coverage_ratio", 0.0) or 0.0))
+        position_span_ratios.append(float(temporal_coverage.get("position_span_ratio", 0.0) or 0.0))
+        longest_sustained_empty_runs.append(
+            int(temporal_coverage.get("longest_sustained_empty_run_steps", 0) or 0)
+        )
         if not row["valid"]:
             reason = str(row.get("failure_reason") or "unknown")
             diagnostic_reason = str(row.get("diagnostic_failure_reason") or reason)
@@ -630,6 +720,20 @@ def build_probe_summary(
             else 0.0
         ),
         "max_postprocess_removal_ratio": max(postprocess_removal_ratios) if postprocess_removal_ratios else 0.0,
+        "avg_onset_coverage_ratio": (
+            float(sum(onset_coverage_ratios) / len(onset_coverage_ratios)) if onset_coverage_ratios else 0.0
+        ),
+        "avg_sustained_coverage_ratio": (
+            float(sum(sustained_coverage_ratios) / len(sustained_coverage_ratios))
+            if sustained_coverage_ratios
+            else 0.0
+        ),
+        "avg_position_span_ratio": (
+            float(sum(position_span_ratios) / len(position_span_ratios)) if position_span_ratios else 0.0
+        ),
+        "max_longest_sustained_empty_run_steps": (
+            max(longest_sustained_empty_runs) if longest_sustained_empty_runs else 0
+        ),
     }
 
 

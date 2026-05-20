@@ -75,6 +75,10 @@ The dataset and model-vocab path are valid.
 | collapse warning | 0/3 |
 | avg repeated position/pitch pair ratio | 0.375 |
 | avg postprocess removal ratio | 0.208 |
+| avg onset coverage ratio | 0.167 |
+| avg sustained coverage ratio | 0.417 |
+| avg position span ratio | 0.740 |
+| max longest sustained empty run | 11 steps |
 
 Failure reasons:
 
@@ -97,7 +101,34 @@ What failed:
 
 - All samples still fail the MIDI review gate.
 - The failure is temporal coverage/dead-air, not grammar or collapse.
-- Generated positions are too clustered or do not cover enough of the 2-bar phrase.
+- Generated onsets cover only about `16.7%` of the 32 available 16th-note positions.
+- Sustained-note coverage improves to about `41.7%`, but the longest empty sustained gap still reaches `11` steps.
+- One sample reaches only `0.625` position span ratio because the second bar tail is mostly empty.
+- Generated positions are too clustered or do not cover enough of the 2-bar phrase, even when pitch/pair collapse is not flagged.
+
+## Temporal Coverage Detail
+
+The issue #35 diagnostics added token-level coverage fields to each sample:
+
+- `unique_onset_position_count`
+- `onset_coverage_ratio`
+- `sustained_coverage_ratio`
+- `position_span_ratio`
+- `head_empty_steps`
+- `tail_empty_steps`
+- `longest_onset_empty_run_steps`
+- `longest_sustained_empty_run_steps`
+- `per_bar_unique_onset_positions`
+
+Observed summary:
+
+| sample | onset coverage | sustained coverage | position span | longest sustained empty run |
+|---:|---:|---:|---:|---:|
+| 1 | 0.156 | 0.344 | 0.844 | 11 |
+| 2 | 0.188 | 0.469 | 0.625 | 9 |
+| 3 | 0.156 | 0.438 | 0.750 | 5 |
+
+This explains why MIDI phrase coverage can look moderate while dead-air still fails: the notes span much of the phrase, but onset placement is sparse and leaves long gaps.
 
 ## Decision
 
@@ -110,6 +141,8 @@ The next bottleneck to isolate is temporal coverage:
 - longest empty span
 - MIDI phrase coverage
 - whether dead-air comes from position sampling, duration choice, or postprocess removal
+
+Based on the coverage diagnostics, the next implementation should test coverage-aware constrained generation rather than increasing dataset scale immediately.
 
 ## Next Issue
 
