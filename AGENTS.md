@@ -86,6 +86,20 @@ Local commits are allowed when all are true:
 - relevant validation commands pass, or failures are documented in the final response
 - the commit message is specific and conventional
 
+Commit cadence:
+
+- Prefer frequent commits at small validated boundaries instead of one large end-of-issue commit.
+- Commit after each coherent unit such as tests added, implementation wired, docs updated, or harness result recorded.
+- Do not create noisy checkpoint commits for broken or unvalidated work unless the user explicitly asks for a work-in-progress snapshot.
+- When a PR is already open, push additional focused commits to the same issue branch rather than amending or squashing history.
+
+Commit messages:
+
+- Write commit messages in Korean unless the user asks otherwise.
+- Keep the prefix conventional, but make the subject specific enough to explain the change.
+- Prefer messages like `feat: Stage B strict gate 결과를 sweep summary에 연결` over vague messages like `update` or `fix`.
+- For larger changes, use a multi-line commit body that records why the change was needed and which validation was run.
+
 Preferred commit prefixes:
 
 - `docs:`
