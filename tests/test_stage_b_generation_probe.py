@@ -13,6 +13,7 @@ from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_temporal_coverage,
     build_probe_summary,
     build_stage_b_primer,
+    coverage_aware_position_tokens,
     dedupe_and_limit_notes,
     decode_tokens_to_midi,
     evaluate_collapse_gate,
@@ -26,6 +27,7 @@ from scripts.stage_b_tokens import (
     note_pitch_token,
     note_velocity_token,
     position_token,
+    position_from_token,
 )
 from utilities.constants import TOKEN_BAR, TOKEN_END, TOKEN_ROLE_LEAD, VOCAB_SIZE
 
@@ -138,6 +140,44 @@ class StageBGenerationProbeTest(unittest.TestCase):
             decode_tokens_to_midi(tokens, midi_path, bpm=120)
             midi = pretty_midi.PrettyMIDI(str(midi_path))
             self.assertEqual(len(midi.instruments[0].notes), 2)
+
+    def test_coverage_aware_constrained_generation_spreads_positions(self) -> None:
+        primer = build_stage_b_primer(["Cm7"], bpm=120)
+
+        tokens = generate_stage_b_constrained_tokens(
+            model=FakeConstrainedModel(),
+            primer_tokens=primer,
+            chords=["Cm7"],
+            bpm=120,
+            bars=1,
+            note_groups_per_bar=4,
+            max_sequence=64,
+            temperature=1.0,
+            top_k=1,
+            coverage_aware_positions=True,
+        )
+
+        coverage = analyze_stage_b_temporal_coverage(tokens, primer_size=len(primer), bars=1)
+
+        self.assertEqual(coverage["per_bar_unique_onset_positions"], {"0": 4})
+        self.assertEqual(coverage["earliest_absolute_position"], 0)
+        self.assertEqual(coverage["latest_absolute_position"], 9)
+
+    def test_coverage_aware_position_tokens_spread_onset_pairs(self) -> None:
+        positions = [
+            position_from_token(coverage_aware_position_tokens(index, note_groups_per_bar=4)[0])
+            for index in range(4)
+        ]
+
+        self.assertEqual(positions, [0, 1, 8, 9])
+
+    def test_coverage_aware_position_tokens_can_include_small_window(self) -> None:
+        positions = [
+            position_from_token(token)
+            for token in coverage_aware_position_tokens(2, note_groups_per_bar=4, position_window=1)
+        ]
+
+        self.assertEqual(positions, [7, 8, 9])
 
     def test_dedupe_and_limit_notes_removes_same_onset_pitch_duplicates(self) -> None:
         notes = [

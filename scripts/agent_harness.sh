@@ -42,6 +42,8 @@ Modes:
                 Run Stage B top-k sampling sweep with collapse diagnostics.
   stage-b-2file-brad-probe
                 Run a two-file Brad Stage B generation probe with strict reporting.
+  stage-b-coverage-aware-probe
+                Run a two-file Brad Stage B coverage-aware generation probe.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -297,6 +299,38 @@ run_stage_b_2file_brad_probe() {
     --lora_alpha 8
 }
 
+run_stage_b_coverage_aware_probe() {
+  local run_id="${RUN_ID:-harness_stage_b_coverage_aware_probe}"
+  print_header "Stage B coverage-aware generation probe"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$run_id" \
+    --issue_number 37 \
+    --max_files 2 \
+    --epochs 3 \
+    --batch_size 8 \
+    --max_sequence 96 \
+    --num_samples 3 \
+    --generation_mode constrained \
+    --coverage_aware_positions \
+    --coverage_position_window 0 \
+    --constrained_note_groups_per_bar 4 \
+    --postprocess_overlap \
+    --max_simultaneous_notes 2 \
+    --temperature 0.9 \
+    --top_k 2 \
+    --min_valid_samples 1 \
+    --min_strict_valid_samples 1 \
+    --max_collapse_warning_sample_rate 0.34 \
+    --require_all_grammar_samples \
+    --require_note_groups \
+    --n_layers 1 \
+    --num_heads 4 \
+    --d_model 64 \
+    --dim_feedforward 128 \
+    --lora_r 4 \
+    --lora_alpha 8
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -347,6 +381,9 @@ case "$MODE" in
     ;;
   stage-b-2file-brad-probe)
     run_stage_b_2file_brad_probe
+    ;;
+  stage-b-coverage-aware-probe)
+    run_stage_b_coverage_aware_probe
     ;;
   manifest-dry-run)
     run_manifest_dry_run

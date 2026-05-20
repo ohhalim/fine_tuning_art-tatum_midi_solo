@@ -450,6 +450,22 @@ def next_token_from_model(
     return choose_allowed_token(logits, allowed_tokens, temperature=temperature, top_k=top_k)
 
 
+def coverage_aware_position_tokens(
+    group_index: int,
+    note_groups_per_bar: int,
+    position_window: int = 0,
+) -> list[int]:
+    groups_per_bar = max(1, int(note_groups_per_bar))
+    cluster_count = max(1, (groups_per_bar + 1) // 2)
+    cluster_index = int(group_index) // 2
+    pair_offset = int(group_index) % 2
+    anchor = int(round(cluster_index * int(POSITIONS_PER_BAR) / cluster_count))
+    target = min(int(POSITIONS_PER_BAR) - 1, anchor + pair_offset)
+    window = max(0, int(position_window))
+    positions = range(max(0, target - window), min(int(POSITIONS_PER_BAR), target + window + 1))
+    return [TOKEN_POSITION_START + int(position) for position in positions]
+
+
 def generate_stage_b_constrained_tokens(
     model: Any,
     primer_tokens: Sequence[int],
@@ -460,6 +476,8 @@ def generate_stage_b_constrained_tokens(
     max_sequence: int,
     temperature: float,
     top_k: int | None,
+    coverage_aware_positions: bool = False,
+    coverage_position_window: int = 0,
 ) -> list[int]:
     tokens = [int(token) for token in primer_tokens]
     families = [
@@ -474,16 +492,23 @@ def generate_stage_b_constrained_tokens(
             chord = chords[bar_index % len(chords)] if chords else None
             tokens.append(TOKEN_BAR)
             tokens.extend(chord_tokens(chord))
-        for _group_index in range(max(1, int(note_groups_per_bar))):
-            for allowed_tokens in families:
+        for group_index in range(max(1, int(note_groups_per_bar))):
+            for family_index, allowed_tokens in enumerate(families):
                 if len(tokens) >= int(max_sequence) - 1:
                     tokens.append(TOKEN_END)
                     return tokens
+                allowed = list(allowed_tokens)
+                if coverage_aware_positions and family_index == 0:
+                    allowed = coverage_aware_position_tokens(
+                        group_index,
+                        note_groups_per_bar=note_groups_per_bar,
+                        position_window=coverage_position_window,
+                    )
                 tokens.append(
                     next_token_from_model(
                         model,
                         tokens=tokens,
-                        allowed_tokens=list(allowed_tokens),
+                        allowed_tokens=allowed,
                         temperature=temperature,
                         top_k=top_k,
                     )
@@ -772,6 +797,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--generation_mode", choices=("unconstrained", "constrained"), default="unconstrained")
     parser.add_argument("--constrained_note_groups_per_bar", type=int, default=4)
+    parser.add_argument("--coverage_aware_positions", action="store_true")
+    parser.add_argument("--coverage_position_window", type=int, default=0)
     parser.add_argument("--postprocess_overlap", action="store_true")
     parser.add_argument("--max_simultaneous_notes", type=int, default=2)
     parser.add_argument("--min_valid_samples", type=int, default=1)
@@ -845,6 +872,8 @@ def main() -> int:
         "checkpoint_dir": str(checkpoint_dir),
         "sample_vocab_size": int(VOCAB_SIZE),
         "generation_mode": args.generation_mode,
+        "coverage_aware_positions": bool(args.coverage_aware_positions),
+        "coverage_position_window": int(args.coverage_position_window),
         "postprocess_overlap": bool(args.postprocess_overlap),
     }
 
@@ -902,6 +931,8 @@ def main() -> int:
                 max_sequence=args.max_sequence,
                 temperature=args.temperature,
                 top_k=args.top_k,
+                coverage_aware_positions=args.coverage_aware_positions,
+                coverage_position_window=args.coverage_position_window,
             )
         else:
             generated_tokens = generate_stage_b_tokens(

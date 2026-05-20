@@ -116,17 +116,23 @@ Stage B에서 명시하는 것:
 10. Stage B grammar-constrained generation
 11. Stage B overlap/dedup postprocess gate
 12. Stage B multi-sample review-gate probe
+13. Stage B collapse diagnostics and sampling sweep
+14. Stage B strict collapse-aware review gate
+15. Stage B 2-file Brad generation probe
+16. Stage B temporal coverage diagnostics
+17. Stage B coverage-aware constrained generation probe
 
 가장 최근 의미 있는 결과:
 
-- `top_k=2`: 3 samples 중 1 sample이 full MIDI review gate 통과
-- `top_k=1`: 3 samples 모두 grammar는 맞지만 note count가 낮아 실패
-- Stage B grammar는 강제 가능함
-- 하지만 musical solo-line 품질은 아직 안정적이지 않음
+- coverage-aware constrained `POSITION` selection: 3 samples 중 3 samples가 grammar/basic/strict review gate 통과
+- 이전 2-file Brad probe 실패 원인은 pitch collapse보다 sparse onset/dead-air 쪽에 가까움
+- avg onset coverage ratio가 `0.167`에서 `0.250`으로 개선됨
+- max longest sustained empty run이 `11` steps에서 `6` steps로 감소함
+- 하지만 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않음
 
 중요한 해석:
 
-> 지금은 "모델이 된다"가 아니라 "어떤 조건에서 무너지는지 측정할 수 있게 됐다"가 성과다.
+> 지금은 "모델이 된다"가 아니라 "어떤 representation/generation constraint에서 reviewable MIDI가 되는지 측정할 수 있게 됐다"가 성과다.
 
 ## 5. 현재 가장 큰 위험
 
@@ -139,8 +145,8 @@ Stage B에서 명시하는 것:
 - overlap postprocess 후 review gate를 일부 통과한다.
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
-따라서 다음 단계는 broad training이 아니다.
-다음 단계는 collapse를 숫자로 잡는 것이다.
+따라서 다음 단계도 곧바로 broad training이 아니다.
+다음 단계는 coverage-aware constrained generation을 A/B sweep으로 검증하고, note density/coverage/chord-tone tradeoff를 숫자로 잡는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -205,6 +211,25 @@ Stage B에서 명시하는 것:
 
 - postprocess를 더 세게 하지 않는다.
 - tokenization 또는 model/data scale 문제로 본다.
+
+### Phase 3.5. Temporal Coverage and Coverage-Aware Generation
+
+목표:
+
+- 2-file Brad probe의 dead-air failure를 token-level temporal coverage로 설명한다.
+- sparse onset, tail/head empty span, sustained empty run을 sample report에 기록한다.
+- constrained generation의 `POSITION` 선택만 coverage-aware로 바꿔 review gate 통과 가능성을 검증한다.
+
+현재 결과:
+
+- temporal diagnostics: grammar `3/3`, basic `0/3`, strict `0/3`, max longest sustained empty run `11`
+- coverage-aware constrained generation: grammar `3/3`, basic `3/3`, strict `3/3`, max longest sustained empty run `6`
+
+다음 통과 기준:
+
+- plain constrained vs coverage-aware constrained A/B sweep을 같은 checkpoint 조건에서 비교한다.
+- `note_groups_per_bar=4/6/8`을 비교한다.
+- pass-rate가 좋아져도 이것을 style learning 성공으로 표현하지 않는다.
 
 ### Phase 4. Generic Jazz Base 후보 학습
 
