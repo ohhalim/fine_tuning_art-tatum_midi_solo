@@ -8,6 +8,7 @@ from uuid import uuid4
 VALID_SECTIONS = {"intro", "build", "breakdown", "drop"}
 VALID_ENERGIES = {"low", "mid", "high"}
 VALID_DENSITIES = {"sparse", "medium", "dense"}
+MAX_REQUEST_BARS = 8
 
 
 @dataclass
@@ -30,8 +31,8 @@ class GenerationRequest:
     def validate(self) -> None:
         if not (40 <= int(self.bpm) <= 240):
             raise ValueError("bpm must be between 40 and 240")
-        if not (1 <= int(self.bars) <= 4):
-            raise ValueError("bars must be between 1 and 4 for MVP")
+        if not (1 <= int(self.bars) <= MAX_REQUEST_BARS):
+            raise ValueError(f"bars must be between 1 and {MAX_REQUEST_BARS} for local phrase probes")
         if not self.chord_progression:
             raise ValueError("chord_progression must not be empty")
         if self.section not in VALID_SECTIONS:

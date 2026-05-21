@@ -27,6 +27,8 @@ def row(
         "avg_chord_tone_ratio": 1.0 - tension,
         "avg_root_tone_ratio": root,
         "avg_tension_ratio": tension,
+        "avg_approach_candidate_ratio": tension,
+        "avg_approach_resolution_ratio": 0.5 if tension else 0.0,
         "avg_onset_coverage_ratio": 0.5,
         "avg_sustained_coverage_ratio": 0.75,
         "collapse_warning_sample_rate": 0.0,
@@ -42,7 +44,10 @@ class StageBPitchModeCompareTest(unittest.TestCase):
             parse_pitch_modes("tones,chromatic")
 
     def test_parse_pitch_modes_accepts_expected_modes(self) -> None:
-        self.assertEqual(parse_pitch_modes("tones,tones_tensions"), ["tones", "tones_tensions"])
+        self.assertEqual(
+            parse_pitch_modes("tones,tones_tensions,approach_tensions"),
+            ["tones", "tones_tensions", "approach_tensions"],
+        )
 
     def test_config_run_id_is_stable(self) -> None:
         self.assertEqual(
@@ -54,6 +59,7 @@ class StageBPitchModeCompareTest(unittest.TestCase):
         rows = [
             row("tones", strict=3, valid=3, root=0.28, tension=0.0),
             row("tones_tensions", strict=3, valid=3, root=0.20, tension=0.22),
+            row("approach_tensions", strict=3, valid=3, root=0.18, tension=0.25),
         ]
 
         summary = build_pitch_mode_summary(rows, min_best_strict_valid_samples=1)
@@ -62,6 +68,7 @@ class StageBPitchModeCompareTest(unittest.TestCase):
         self.assertAlmostEqual(summary["root_tone_ratio_delta_tensions_minus_tones"], -0.08)
         self.assertAlmostEqual(summary["tension_ratio_delta_tensions_minus_tones"], 0.22)
         self.assertEqual(summary["best_tones_tensions_config"]["avg_tension_ratio"], 0.22)
+        self.assertEqual(summary["best_approach_tensions_config"]["pitch_mode"], "approach_tensions")
 
     def test_build_pitch_mode_summary_fails_without_tension_mode(self) -> None:
         summary = build_pitch_mode_summary([row("tones", strict=3, valid=3, root=0.28, tension=0.0)])

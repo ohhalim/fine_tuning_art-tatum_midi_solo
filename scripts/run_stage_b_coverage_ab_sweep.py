@@ -162,7 +162,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--modes", type=str, default="plain,coverage")
     parser.add_argument("--note_groups_per_bar_values", type=str, default="4,6,8")
     parser.add_argument("--coverage_position_window", type=int, default=0)
-    parser.add_argument("--chord_pitch_mode", choices=("tones", "tones_tensions"), default="tones")
+    parser.add_argument("--chord_pitch_mode", choices=("tones", "tones_tensions", "approach_tensions"), default="tones")
     parser.add_argument("--chord_pitch_repeat_window", type=int, default=2)
     parser.add_argument("--top_k", type=int, default=2)
     parser.add_argument("--temperature", type=float, default=0.9)

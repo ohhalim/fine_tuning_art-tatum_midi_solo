@@ -10,6 +10,7 @@ import torch
 from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_collapse,
     analyze_stage_b_note_grammar,
+    analyze_stage_b_approach_resolution,
     analyze_stage_b_phrase_contour,
     analyze_stage_b_pitch_roles,
     analyze_stage_b_temporal_coverage,
@@ -257,6 +258,44 @@ class StageBGenerationProbeTest(unittest.TestCase):
     def test_chord_pitch_classes_can_include_tensions(self) -> None:
         self.assertEqual(chord_pitch_classes("Cmaj7", pitch_mode="tones"), {0, 4, 7, 11})
         self.assertIn(2, chord_pitch_classes("Cmaj7", pitch_mode="tones_tensions"))
+
+    def test_approach_tension_pitch_tokens_pair_approach_and_resolution(self) -> None:
+        approach_tokens = chord_aware_pitch_tokens("Cmaj7", pitch_mode="approach_tensions", group_index=0)
+        approach_pitch_classes = {pitch_from_token(token) % 12 for token in approach_tokens}
+
+        self.assertNotIn(4, approach_pitch_classes)
+        self.assertIn(3, approach_pitch_classes)
+
+        resolution_tokens = chord_aware_pitch_tokens(
+            "Cmaj7",
+            pitch_mode="approach_tensions",
+            recent_pitches=[63],
+            repeat_window=0,
+            group_index=1,
+        )
+        resolution_pitches = {pitch_from_token(token) for token in resolution_tokens}
+
+        self.assertEqual(resolution_pitches, {64})
+
+    def test_analyze_stage_b_approach_resolution_counts_resolved_approach(self) -> None:
+        primer = build_stage_b_primer(["Cmaj7"], bpm=120)
+        tokens = primer + [
+            position_token(0),
+            note_velocity_token(4),
+            note_pitch_token(63),
+            note_duration_token(1),
+            position_token(1),
+            note_velocity_token(4),
+            note_pitch_token(64),
+            note_duration_token(1),
+            TOKEN_END,
+        ]
+
+        report = analyze_stage_b_approach_resolution(tokens, chords=["Cmaj7"], primer_size=len(primer))
+
+        self.assertEqual(report["approach_candidate_count"], 1)
+        self.assertEqual(report["resolved_approach_count"], 1)
+        self.assertAlmostEqual(report["approach_resolution_ratio"], 1.0)
 
     def test_analyze_stage_b_pitch_roles_counts_root_and_tensions(self) -> None:
         primer = build_stage_b_primer(["Cm7", "F7"], bpm=120)

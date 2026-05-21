@@ -186,6 +186,8 @@ def row_from_probe_report(top_k: int, temperature: float, run_id: str, report: d
         ),
         "avg_root_tone_ratio": float(summary.get("avg_root_tone_ratio", 0.0) or 0.0),
         "avg_tension_ratio": float(summary.get("avg_tension_ratio", 0.0) or 0.0),
+        "avg_approach_candidate_ratio": float(summary.get("avg_approach_candidate_ratio", 0.0) or 0.0),
+        "avg_approach_resolution_ratio": float(summary.get("avg_approach_resolution_ratio", 0.0) or 0.0),
         "failure_reasons": summary.get("failure_reasons", {}),
         "diagnostic_failure_reasons": summary.get("diagnostic_failure_reasons", {}),
         "strict_failure_reasons": summary.get("strict_failure_reasons", {}),

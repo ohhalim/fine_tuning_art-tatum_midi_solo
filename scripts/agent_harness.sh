@@ -54,6 +54,8 @@ Modes:
                 Run a 4-bar coverage/chord-aware Stage B probe and export review MIDI.
   stage-b-pitch-mode-compare
                 Compare 4-bar tones vs tones_tensions Stage B pitch modes.
+  stage-b-8bar-approach-phrase
+                Compare 8-bar tones/tensions/approach Stage B phrase candidates.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -531,6 +533,42 @@ run_stage_b_pitch_mode_compare() {
     --lora_alpha 8
 }
 
+run_stage_b_8bar_approach_phrase() {
+  local run_id="${RUN_ID:-harness_stage_b_8bar_approach_phrase}"
+  print_header "Stage B 8-bar approach phrase comparison"
+  "$PYTHON_BIN" scripts/run_stage_b_pitch_mode_compare.py \
+    --run_id "$run_id" \
+    --issue_number 57 \
+    --max_files 2 \
+    --window_bars 8 \
+    --window_stride_bars 4 \
+    --min_window_target_notes 16 \
+    --epochs 3 \
+    --batch_size 8 \
+    --max_sequence 384 \
+    --num_samples 3 \
+    --bars 8 \
+    --pitch_modes tones,tones_tensions,approach_tensions \
+    --coverage_position_window 0 \
+    --chord_pitch_repeat_window 2 \
+    --note_groups_per_bar 8 \
+    --max_simultaneous_notes 2 \
+    --temperature 0.9 \
+    --top_k 2 \
+    --min_valid_samples 1 \
+    --min_strict_valid_samples 1 \
+    --min_best_strict_valid_samples 1 \
+    --max_collapse_warning_sample_rate 0.34 \
+    --require_all_grammar_samples \
+    --copy_review_midi \
+    --n_layers 1 \
+    --num_heads 4 \
+    --d_model 64 \
+    --dim_feedforward 128 \
+    --lora_r 4 \
+    --lora_alpha 8
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -599,6 +637,9 @@ case "$MODE" in
     ;;
   stage-b-pitch-mode-compare)
     run_stage_b_pitch_mode_compare
+    ;;
+  stage-b-8bar-approach-phrase)
+    run_stage_b_8bar_approach_phrase
     ;;
   manifest-dry-run)
     run_manifest_dry_run

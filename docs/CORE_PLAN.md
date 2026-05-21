@@ -130,6 +130,7 @@ Stage B에서 명시하는 것:
 24. Stage B phrase contour/repeated-pitch diagnostics
 25. Stage B root bias diagnostics
 26. Stage B `tones` vs `tones_tensions` pitch-mode comparison
+27. Stage B 8-bar approach phrase probe
 
 가장 최근 의미 있는 결과:
 
@@ -329,13 +330,16 @@ Stage B에서 명시하는 것:
 - latest result: tension ratio는 `0.000`이다.
 - Issue #55 result: `tones_tensions`는 root tone ratio를 약 `0.271`에서 `0.135`로 낮췄고, tension ratio를 `0.000`에서 `0.313`으로 올렸다.
 - Issue #55 result: 양쪽 모두 strict valid `3/3`이지만, `tones_tensions` 후보는 repeated/dominant pitch risk가 여전히 높다.
+- Issue #57 result: 8-bar `approach_tensions`는 strict valid `3/3`, root ratio `0.000`, approach resolution ratio `1.000`을 만들었다.
+- Issue #57 review premise: 이전보다 나아졌지만 아직 jazz solo가 아니라 다이아토닉 코드톤/근음 기반 초급 melodic exercise처럼 들린다.
 
 해석:
 
 - 현재 후보는 root-only collapse가 아니다.
 - 오히려 `chord_pitch_mode=tones` 때문에 tension이 전혀 없는 안전한 chord-tone-only line이다.
 - `tones_tensions`는 no-tension 문제를 줄였지만, 더 좋은 solo phrase라고 바로 판단할 단계는 아니다.
-- 다음 비교는 unrestricted tension보다 passing/approach pitch policy 또는 motif/contour constraint 쪽이 맞다.
+- `approach_tensions`는 pitch-level resolution을 만들지만, 이 또한 jazz vocabulary 자체는 아니다.
+- 다음 비교는 pitch filter보다 rhythm/motif/swing-aware phrase grammar 쪽이 맞다.
 
 ### Phase 4. Generic Jazz Base 후보 학습
 
