@@ -93,6 +93,11 @@ class StageBReviewExportTest(unittest.TestCase):
                         "contour_warning": False,
                         "contour_warning_reasons": [],
                     },
+                    "pitch_roles": {
+                        "root_tone_ratio": 0.5,
+                        "non_root_chord_tone_ratio": 0.40625,
+                        "tension_ratio": 0.0,
+                    },
                 },
                 {
                     "sample_index": 2,
@@ -114,6 +119,8 @@ class StageBReviewExportTest(unittest.TestCase):
         self.assertEqual(selected[0]["note_groups_per_bar"], 8)
         self.assertEqual(selected[0]["note_count"], 32)
         self.assertIn("high_repeated_pitch_ratio", selected[0]["risk_flags"])
+        self.assertIn("high_root_tone_ratio", selected[0]["risk_flags"])
+        self.assertAlmostEqual(selected[0]["root_tone_ratio"], 0.5)
         self.assertGreater(selected[0]["score"], 80.0)
 
     def test_build_review_manifest_copies_midi(self) -> None:
@@ -176,6 +183,8 @@ class StageBReviewExportTest(unittest.TestCase):
                     "repeated_pitch_ratio": 0.25,
                     "adjacent_repeated_pitch_ratio": 0.0,
                     "direction_change_ratio": 0.0,
+                    "root_tone_ratio": 0.0,
+                    "tension_ratio": 0.0,
                     "risk_flags": [],
                     "midi_path": "sample.mid",
                 }

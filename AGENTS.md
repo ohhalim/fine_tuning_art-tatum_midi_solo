@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #51: Stage B phrase contour/repeated-pitch diagnostics.
+- Issue #53: Stage B root bias diagnostics and tension pitch comparison.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

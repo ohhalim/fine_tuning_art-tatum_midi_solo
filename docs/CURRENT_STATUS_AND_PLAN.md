@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-51-stage-b-phrase-contour-diagnostics`
+- `issue-53-stage-b-root-bias-diagnostics`
 
 현재 범위가 아닌 것:
 
@@ -36,16 +36,16 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #51은 Issue #49 이후 남은 repeated-pitch risk를 더 구체적으로 설명한다.
+Issue #53은 manual listening/piano-roll review에서 나온 "멜로디 같긴 하지만 근음을 계속 치는 느낌"을 root bias로 수치화한다.
 
-Issue #49는 manual piano-roll review에서 나온 "유효하긴 하지만 너무 짧고 만들다 만 단어처럼 느껴진다"는 피드백을 반영해 `4` bar phrase 후보를 만들었다.
-
-그 결과 길이 문제는 구조적으로 해결됐지만, repeated pitch ratio가 `0.719`로 높게 남았다. Issue #51은 이것이 인접 반복 실패인지, 제한된 pitch set 재사용인지 구분한다.
+Issue #51에서 이미 adjacent same-note collapse는 아니라는 것을 확인했다. Issue #53은 실제로 root tone을 얼마나 치는지, non-root chord tone과 tension 비율이 어떤지 기록한다.
 
 Implemented:
 
 - `scripts/run_stage_b_generation_probe.py` phrase contour diagnostics
+- `scripts/run_stage_b_generation_probe.py` pitch-role diagnostics
 - `scripts/export_stage_b_review_candidates.py` repeated-pitch/contour risk flags
+- `scripts/export_stage_b_review_candidates.py` root/tension columns
 - `tests/test_stage_b_generation_probe.py` phrase contour tests
 - `tests/test_stage_b_review_export.py` risk flag tests
 - `scripts/agent_harness.sh stage-b-longer-phrase-probe`
@@ -68,6 +68,9 @@ Result:
 - adjacent repeated pitch ratio: `0.000`
 - average direction change ratio: around `0.689`
 - max longest same pitch run: `1`
+- average root tone ratio: around `0.271`
+- top candidate root tone ratio: around `0.219`
+- tension ratio: `0.000`
 
 Decision:
 
@@ -75,7 +78,7 @@ Decision:
 - 다음 review는 4-bar exported candidates를 기준으로 한다.
 - 4-bar 후보가 여전히 단편적이면 broad training으로 가지 않고 phrase/motif-level constraint 또는 pretrained symbolic base를 검토한다.
 - 4-bar 후보가 최소한 solo-line phrase sketch로 들리면 generic jazz base 후보 학습 설계로 넘어갈 수 있다.
-- 현재 남은 핵심 리스크는 adjacent same-note collapse가 아니라 제한된 pitch set을 과하게 재사용하는 느낌이다.
+- "근음을 계속 치는 느낌"은 실제 root-only collapse라기보다 chord-tone-only, no-tension 라인의 안전한 inside sound일 가능성이 높다.
 
 Detail:
 
@@ -85,6 +88,7 @@ Detail:
 - `docs/STAGE_B_CANDIDATE_REVIEW_EXPORT_2026-05-21.md`
 - `docs/STAGE_B_LONGER_PHRASE_PROBE_2026-05-21.md`
 - `docs/STAGE_B_PHRASE_CONTOUR_DIAGNOSTICS_2026-05-21.md`
+- `docs/STAGE_B_ROOT_BIAS_DIAGNOSTICS_2026-05-21.md`
 
 ## Active Issue #14
 
@@ -1190,6 +1194,42 @@ Detail:
 
 - `docs/STAGE_B_PHRASE_CONTOUR_DIAGNOSTICS_2026-05-21.md`
 
+### 0.25. Issue #53 Stage B root bias diagnostics
+
+Status:
+
+- implemented on `issue-53-stage-b-root-bias-diagnostics`
+
+Review trigger:
+
+- Manual review said the 4-bar candidates are melody-like.
+- The main concern was that it feels like it keeps hitting root notes.
+- Before changing generation, this needs to be measured.
+
+Goal:
+
+- add pitch-role diagnostics to generated sample reports
+- expose root tone ratio, non-root chord tone ratio, and tension ratio in review export
+- decide whether the perceived root bias is actual root overuse or broader chord-tone-only behavior
+
+Latest local result:
+
+- average root tone ratio: around `0.271`
+- top review candidate root tone ratio: around `0.219`
+- chord tone ratio: around `0.938-1.000`
+- tension ratio: `0.000`
+- adjacent repeated pitch ratio: `0.000`
+
+Decision:
+
+- The current issue is not pure root collapse.
+- The stronger diagnosis is "safe chord-tone-only line with no tensions."
+- Next generation comparison should test `chord_pitch_mode=tones_tensions` against current `tones`.
+
+Detail:
+
+- `docs/STAGE_B_ROOT_BIAS_DIAGNOSTICS_2026-05-21.md`
+
 ### 1. Run full jazz piano dataset audit
 
 ```bash
@@ -1337,6 +1377,7 @@ Decision:
 - `docs/STAGE_B_CANDIDATE_REVIEW_EXPORT_2026-05-21.md`
 - `docs/STAGE_B_LONGER_PHRASE_PROBE_2026-05-21.md`
 - `docs/STAGE_B_PHRASE_CONTOUR_DIAGNOSTICS_2026-05-21.md`
+- `docs/STAGE_B_ROOT_BIAS_DIAGNOSTICS_2026-05-21.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`

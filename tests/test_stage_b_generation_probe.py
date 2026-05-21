@@ -11,6 +11,7 @@ from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_collapse,
     analyze_stage_b_note_grammar,
     analyze_stage_b_phrase_contour,
+    analyze_stage_b_pitch_roles,
     analyze_stage_b_temporal_coverage,
     build_probe_summary,
     build_stage_b_primer,
@@ -256,6 +257,39 @@ class StageBGenerationProbeTest(unittest.TestCase):
     def test_chord_pitch_classes_can_include_tensions(self) -> None:
         self.assertEqual(chord_pitch_classes("Cmaj7", pitch_mode="tones"), {0, 4, 7, 11})
         self.assertIn(2, chord_pitch_classes("Cmaj7", pitch_mode="tones_tensions"))
+
+    def test_analyze_stage_b_pitch_roles_counts_root_and_tensions(self) -> None:
+        primer = build_stage_b_primer(["Cm7", "F7"], bpm=120)
+        tokens = primer + [
+            position_token(0),
+            note_velocity_token(4),
+            note_pitch_token(60),
+            note_duration_token(1),
+            position_token(1),
+            note_velocity_token(4),
+            note_pitch_token(63),
+            note_duration_token(1),
+            TOKEN_BAR,
+            *chord_tokens("F7"),
+            position_token(0),
+            note_velocity_token(4),
+            note_pitch_token(65),
+            note_duration_token(1),
+            position_token(1),
+            note_velocity_token(4),
+            note_pitch_token(67),
+            note_duration_token(1),
+            TOKEN_END,
+        ]
+
+        report = analyze_stage_b_pitch_roles(tokens, chords=["Cm7", "F7"], primer_size=len(primer))
+
+        self.assertEqual(report["note_group_count"], 4)
+        self.assertEqual(report["root_tone_count"], 2)
+        self.assertAlmostEqual(report["root_tone_ratio"], 0.5)
+        self.assertEqual(report["non_root_chord_tone_count"], 1)
+        self.assertEqual(report["tension_count"], 1)
+        self.assertEqual(report["per_bar_root_tone_ratio"], {"0": 0.5, "1": 0.5})
 
     def test_chord_aware_constrained_generation_limits_pitch_by_bar_chord(self) -> None:
         primer = build_stage_b_primer(["Cm7", "F7"], bpm=120)

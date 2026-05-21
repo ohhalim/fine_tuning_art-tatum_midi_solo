@@ -573,6 +573,63 @@ def chord_pitch_classes(chord: str | None, pitch_mode: str = "tones_tensions") -
     return {(root_pc + interval) % 12 for interval in intervals}
 
 
+def chord_root_pitch_class(chord: str | None) -> int | None:
+    root, _quality = parse_chord_symbol(chord)
+    return ROOT_TO_PC.get(root)
+
+
+def analyze_stage_b_pitch_roles(
+    tokens: Sequence[int],
+    chords: Sequence[str],
+    primer_size: int = 0,
+) -> dict[str, Any]:
+    groups = extract_stage_b_note_groups(tokens, primer_size=primer_size)
+    group_count = int(len(groups))
+    root_hits = 0
+    chord_tone_hits = 0
+    tension_hits = 0
+    non_chord_hits = 0
+    per_bar_counts: dict[int, int] = {}
+    per_bar_root_hits: dict[int, int] = {}
+
+    for group in groups:
+        bar = int(group["bar"])
+        pitch_class = int(group["pitch"]) % 12
+        chord = chords[bar % len(chords)] if chords else None
+        root_pc = chord_root_pitch_class(chord)
+        chord_tones = chord_pitch_classes(chord, pitch_mode="tones")
+        tones_with_tensions = chord_pitch_classes(chord, pitch_mode="tones_tensions")
+        per_bar_counts[bar] = per_bar_counts.get(bar, 0) + 1
+        if root_pc is not None and pitch_class == root_pc:
+            root_hits += 1
+            per_bar_root_hits[bar] = per_bar_root_hits.get(bar, 0) + 1
+        if pitch_class in chord_tones:
+            chord_tone_hits += 1
+        elif pitch_class in tones_with_tensions:
+            tension_hits += 1
+        else:
+            non_chord_hits += 1
+
+    non_root_chord_tone_hits = max(0, chord_tone_hits - root_hits)
+    return {
+        "note_group_count": group_count,
+        "root_tone_count": int(root_hits),
+        "root_tone_ratio": float(root_hits / group_count) if group_count else 0.0,
+        "chord_tone_count": int(chord_tone_hits),
+        "chord_tone_ratio": float(chord_tone_hits / group_count) if group_count else 0.0,
+        "non_root_chord_tone_count": int(non_root_chord_tone_hits),
+        "non_root_chord_tone_ratio": float(non_root_chord_tone_hits / group_count) if group_count else 0.0,
+        "tension_count": int(tension_hits),
+        "tension_ratio": float(tension_hits / group_count) if group_count else 0.0,
+        "non_chord_tone_count": int(non_chord_hits),
+        "non_chord_tone_ratio": float(non_chord_hits / group_count) if group_count else 0.0,
+        "per_bar_root_tone_ratio": {
+            str(bar): float(per_bar_root_hits.get(bar, 0) / count if count else 0.0)
+            for bar, count in sorted(per_bar_counts.items())
+        },
+    }
+
+
 def chord_aware_pitch_tokens(
     chord: str | None,
     pitch_mode: str = "tones_tensions",
@@ -741,6 +798,7 @@ def sample_report(
     collapse = analyze_stage_b_collapse(tokens, primer_size=primer_size, postprocess_report=postprocess_report)
     temporal_coverage = analyze_stage_b_temporal_coverage(tokens, primer_size=primer_size, bars=request.bars)
     phrase_contour = analyze_stage_b_phrase_contour(tokens, primer_size=primer_size)
+    pitch_roles = analyze_stage_b_pitch_roles(tokens, chords=request.chord_progression, primer_size=primer_size)
     collapse_gate = evaluate_collapse_gate(
         collapse,
         min_unique_pitches=strict_min_unique_pitches,
@@ -777,6 +835,7 @@ def sample_report(
         "collapse": collapse,
         "temporal_coverage": temporal_coverage,
         "phrase_contour": phrase_contour,
+        "pitch_roles": pitch_roles,
         "collapse_gate": collapse_gate,
         "postprocess": postprocess_report or {"enabled": False},
         "metrics": metrics.to_dict(),
@@ -817,10 +876,13 @@ def build_probe_summary(
     adjacent_repeated_pitch_ratios: list[float] = []
     direction_change_ratios: list[float] = []
     longest_same_pitch_runs: list[int] = []
+    root_tone_ratios: list[float] = []
+    tension_ratios: list[float] = []
     for row in sample_rows:
         collapse = row.get("collapse", {})
         temporal_coverage = row.get("temporal_coverage", {})
         phrase_contour = row.get("phrase_contour", {})
+        pitch_roles = row.get("pitch_roles", {})
         if collapse.get("collapse_warning"):
             collapse_warning_count += 1
         if not row.get("strict_valid", False):
@@ -846,6 +908,8 @@ def build_probe_summary(
         )
         direction_change_ratios.append(float(phrase_contour.get("direction_change_ratio", 0.0) or 0.0))
         longest_same_pitch_runs.append(int(phrase_contour.get("longest_same_pitch_run", 0) or 0))
+        root_tone_ratios.append(float(pitch_roles.get("root_tone_ratio", 0.0) or 0.0))
+        tension_ratios.append(float(pitch_roles.get("tension_ratio", 0.0) or 0.0))
         if not row["valid"]:
             reason = str(row.get("failure_reason") or "unknown")
             diagnostic_reason = str(row.get("diagnostic_failure_reason") or reason)
@@ -922,6 +986,10 @@ def build_probe_summary(
             float(sum(direction_change_ratios) / len(direction_change_ratios)) if direction_change_ratios else 0.0
         ),
         "max_longest_same_pitch_run": max(longest_same_pitch_runs) if longest_same_pitch_runs else 0,
+        "avg_root_tone_ratio": (
+            float(sum(root_tone_ratios) / len(root_tone_ratios)) if root_tone_ratios else 0.0
+        ),
+        "avg_tension_ratio": float(sum(tension_ratios) / len(tension_ratios)) if tension_ratios else 0.0,
     }
 
 
