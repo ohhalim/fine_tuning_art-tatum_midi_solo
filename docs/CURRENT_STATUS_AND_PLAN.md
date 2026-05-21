@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-45-stage-b-chord-aware-pitch`
+- `issue-47-stage-b-review-package`
 
 현재 범위가 아닌 것:
 
@@ -36,57 +36,47 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #45에서 Stage B constrained generation에 chord-aware pitch 후보군을 추가했다.
+Issue #47에서 Issue #45의 `coverage_chord` top candidates를 manual listening review용 package로 export하는 도구를 추가했다.
 
-Issue #43은 이전 top candidate가 strict-valid였어도 solo-line으로 보기 어렵다는 점을 확인했다.
+Issue #45는 chord-aware pitch 후보군으로 viable unflagged candidates를 `9`개 만들었다.
 
-Issue #45는 ranking을 더 꾸미지 않고 generation-side pitch 후보군을 고쳤다.
+Issue #47은 이 후보들을 실제로 들어볼 수 있게 review manifest/markdown과 복사된 MIDI 목록을 만든다.
 
 Implemented:
 
-- `--chord_aware_pitches`
-- `--chord_pitch_mode tones|tones_tensions`
-- `--chord_pitch_repeat_window`
-- A/B mode: `coverage_chord`
-- harness: `bash scripts/agent_harness.sh stage-b-chord-aware-probe`
+- `scripts/export_stage_b_review_candidates.py`
+- `tests/test_stage_b_review_export.py`
+- output files:
+  - `review_manifest.json`
+  - `review_candidates.md`
+  - copied review MIDI files under `midi/`
 
 Result:
 
-- candidate count: `27`
-- strict candidates: `21`
-- viable unflagged candidates: `9`
-- flagged candidates: `18`
-- top candidate mode: `coverage_chord`
-- top candidate groups/bar: `4`
-- top candidate note count: `8`
-- top candidate unique pitches: `6`
-- top candidate chord-tone ratio: `0.750`
-- top candidate bar chord-tone ratio: `0.875`
-- top candidate min bar chord-tone ratio: `0.800`
-- top candidate dominant pitch ratio: `0.375`
-- top candidate repeated pitch ratio: `0.250`
-- top candidate review flags: `[]`
-
-Important comparison:
-
-- coverage g8 avg chord-tone ratio: `0.229`
-- coverage_chord g8 avg chord-tone ratio: `0.646`
-- coverage g8 avg repeated position/pitch ratio: `0.167`
-- coverage_chord g8 avg repeated position/pitch ratio: `0.021`
+- source ranking report: `outputs/stage_b_candidate_ranking/harness_stage_b_chord_aware_probe/candidate_rank_report.json`
+- review output: `outputs/stage_b_review_candidates/harness_stage_b_chord_aware_probe`
+- selected candidates: `6`
+- copied MIDI files:
+  - `midi/rank_01_coverage_chord_g4_s2.mid`
+  - `midi/rank_02_coverage_chord_g6_s1.mid`
+  - `midi/rank_03_coverage_chord_g8_s1.mid`
+  - `midi/rank_04_coverage_chord_g6_s2.mid`
+  - `midi/rank_05_coverage_chord_g8_s3.mid`
+  - `midi/rank_06_coverage_chord_g8_s2.mid`
 
 Decision:
 
-- chord-aware pitch constraint는 #43의 harmonic/repetition failure를 크게 줄였다.
-- 이것은 아직 Brad style learning 성공이 아니다.
-- 다음은 top `coverage_chord` MIDI를 실제로 듣고 piano roll로 확인하는 review point다.
-- 귀로도 구조가 괜찮으면 generic jazz base 후보 학습 설계로 넘어갈 수 있다.
-- 귀로 여전히 기계적이면 rhythm/motif-level constraint 또는 pretrained symbolic base 검토가 먼저다.
+- 이제 자동 metric 단계에서 할 일은 충분하다.
+- 다음 판단은 사람이 들어야 한다.
+- top review MIDI가 solo-line으로 들리면 generic jazz base 후보 학습 설계로 넘어갈 수 있다.
+- 여전히 기계적이면 rhythm/motif-level constraint 또는 pretrained symbolic base 검토가 먼저다.
 
 Detail:
 
 - `docs/STAGE_B_CANDIDATE_RANKING_2026-05-20.md`
 - `docs/STAGE_B_RANKING_HARMONIC_GATE_2026-05-21.md`
 - `docs/STAGE_B_CHORD_AWARE_PITCH_2026-05-21.md`
+- `docs/STAGE_B_CANDIDATE_REVIEW_EXPORT_2026-05-21.md`
 
 ## Active Issue #14
 
@@ -1058,6 +1048,42 @@ Decision:
 Detail:
 
 - `docs/STAGE_B_CHORD_AWARE_PITCH_2026-05-21.md`
+
+### 0.22. Issue #47 Stage B coverage_chord candidate review package
+
+Status:
+
+- implemented on `issue-47-stage-b-review-package`
+
+Goal:
+
+- export top `coverage_chord` ranked candidates for manual listening review
+- keep generated MIDI artifacts out of git
+- make the next decision about broad training based on actual listening/piano-roll review
+
+Output:
+
+- `outputs/stage_b_review_candidates/harness_stage_b_chord_aware_probe/review_manifest.json`
+- `outputs/stage_b_review_candidates/harness_stage_b_chord_aware_probe/review_candidates.md`
+- copied MIDI files under `outputs/stage_b_review_candidates/harness_stage_b_chord_aware_probe/midi/`
+
+Selected candidates:
+
+- `rank_01_coverage_chord_g4_s2.mid`
+- `rank_02_coverage_chord_g6_s1.mid`
+- `rank_03_coverage_chord_g8_s1.mid`
+- `rank_04_coverage_chord_g6_s2.mid`
+- `rank_05_coverage_chord_g8_s3.mid`
+- `rank_06_coverage_chord_g8_s2.mid`
+
+Decision:
+
+- This is now a manual review boundary.
+- The next technical issue should wait until these MIDI files are heard or inspected in piano roll.
+
+Detail:
+
+- `docs/STAGE_B_CANDIDATE_REVIEW_EXPORT_2026-05-21.md`
 
 ### 1. Run full jazz piano dataset audit
 

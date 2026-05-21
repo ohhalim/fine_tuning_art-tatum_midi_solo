@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #45: Stage B chord-aware pitch constrained generation.
+- Issue #47: Stage B coverage_chord candidate review package.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

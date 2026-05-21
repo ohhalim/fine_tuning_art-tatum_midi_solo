@@ -125,6 +125,7 @@ Stage B에서 명시하는 것:
 19. Stage B candidate ranking report
 20. Stage B ranking harmonic/repetition gate
 21. Stage B chord-aware pitch constrained generation
+22. Stage B coverage_chord candidate review export
 
 가장 최근 의미 있는 결과:
 
@@ -134,6 +135,7 @@ Stage B에서 명시하는 것:
 - Issue #45 result: candidates `27`, strict candidates `21`, viable unflagged candidates `9`, flagged candidates `18`
 - top candidate: `coverage_chord`, groups/bar `4`, sample `2`, score `96.6964`
 - top candidate harmonic diagnostics: chord-tone `0.750`, bar chord-tone `0.875`, min bar chord-tone `0.800`, dominant pitch `0.375`, repeated pitch `0.250`
+- Issue #47 exported the top 6 `coverage_chord` MIDI candidates to `outputs/stage_b_review_candidates/harness_stage_b_chord_aware_probe`
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -152,7 +154,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-다음 단계는 manual listening/piano-roll review다. `coverage_chord` top candidates가 귀로도 solo-line 후보라면 generic jazz base 후보 학습 설계로 넘어가고, 아니면 rhythm/motif-level constraint 또는 pretrained symbolic base를 먼저 검토한다.
+다음 단계는 manual listening/piano-roll review다. `outputs/stage_b_review_candidates/harness_stage_b_chord_aware_probe/midi/`의 top candidates가 귀로도 solo-line 후보라면 generic jazz base 후보 학습 설계로 넘어가고, 아니면 rhythm/motif-level constraint 또는 pretrained symbolic base를 먼저 검토한다.
 
 ## 6. 다음 단계 로드맵
 
