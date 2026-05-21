@@ -124,14 +124,16 @@ Stage B에서 명시하는 것:
 18. Stage B coverage-aware A/B sweep
 19. Stage B candidate ranking report
 20. Stage B ranking harmonic/repetition gate
+21. Stage B chord-aware pitch constrained generation
 
 가장 최근 의미 있는 결과:
 
-- Issue #41 ranking은 coverage groups/bar `8`, sample `1`을 top candidate로 올렸다.
-- piano-roll review 결과, 이 sample은 solo-line으로 보기 어려웠다.
 - Issue #43은 candidate MIDI를 직접 읽어 harmonic/repetition diagnostics를 추가했다.
-- latest ranking result: candidates `18`, strict candidates `12`, viable unflagged candidates `0`, flagged candidates `18`
-- 현재 결과는 "좋은 MIDI 후보를 찾았다"가 아니라 "기존 strict/ranking 기준이 아직 너무 관대했다"는 증거다.
+- Issue #43 result: candidates `18`, strict candidates `12`, viable unflagged candidates `0`, flagged candidates `18`
+- Issue #45는 constrained generation에서 `NOTE_PITCH` 후보군을 current bar chord 기준으로 제한했다.
+- Issue #45 result: candidates `27`, strict candidates `21`, viable unflagged candidates `9`, flagged candidates `18`
+- top candidate: `coverage_chord`, groups/bar `4`, sample `2`, score `96.6964`
+- top candidate harmonic diagnostics: chord-tone `0.750`, bar chord-tone `0.875`, min bar chord-tone `0.800`, dominant pitch `0.375`, repeated pitch `0.250`
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -150,7 +152,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-다음 단계는 generation-side harmony control이다. 우선 chord-aware pitch constrained generation 또는 chord-tone/tension-aware pitch candidate filter를 검증한다.
+다음 단계는 manual listening/piano-roll review다. `coverage_chord` top candidates가 귀로도 solo-line 후보라면 generic jazz base 후보 학습 설계로 넘어가고, 아니면 rhythm/motif-level constraint 또는 pretrained symbolic base를 먼저 검토한다.
 
 ## 6. 다음 단계 로드맵
 
@@ -248,11 +250,13 @@ Stage B에서 명시하는 것:
 - completed: ranking이 candidate MIDI를 직접 읽어 harmonic/repetition diagnostics를 계산한다.
 - completed: low chord-tone/repeated pitch/mechanical template 후보에 review flags를 붙인다.
 - latest result: `18` candidates 중 viable unflagged candidate `0`.
+- completed: chord-aware pitch constrained generation을 추가했다.
+- latest chord-aware result: `27` candidates 중 viable unflagged candidate `9`.
 
 다음 통과 기준:
 
-- chord-aware pitch constrained generation에서 viable unflagged candidate가 최소 1개 이상 나온다.
-- 그 후보는 piano roll에서 one-note/two-note/chord-block/long-sustain/repeated-template 실패가 없어야 한다.
+- generated top candidate를 실제로 듣고 piano roll로 확인한다.
+- 그 후보가 one-note/two-note/chord-block/long-sustain/repeated-template 실패가 없어야 한다.
 
 ### Phase 4. Generic Jazz Base 후보 학습
 
@@ -354,7 +358,7 @@ Stage B에서 명시하는 것:
 - 결과: avg onset coverage `0.167`, avg sustained coverage `0.417`, max longest sustained empty run `11` steps였다.
 - 결론: Stage B grammar와 collapse는 2-file probe에서 즉시 병목이 아니며, 현재 병목은 sparse onset과 long empty span으로 인한 dead-air/temporal coverage다.
 
-다음 issue는 다음 이름이 적절하다.
+완료된 바로 전 작업:
 
 ```text
 Stage B chord-aware pitch constrained generation 추가
@@ -370,8 +374,10 @@ Stage B chord-aware pitch constrained generation 추가
 
 이 작업이 끝난 뒤 판단:
 
-- chord-aware pitch probe에서 viable unflagged candidate가 나오면 Stage B 2-file Brad probe를 다시 고정하고 generic jazz base 후보 학습 설계로 간다.
-- chord-aware pitch probe에서도 실패하면 data scale, representation, loss, pretrained-base 쪽으로 재검토한다.
+- chord-aware pitch probe에서 viable unflagged candidate가 `9`개 나왔다.
+- 바로 broad training으로 가지 않고 top `coverage_chord` MIDI를 귀와 piano roll로 리뷰한다.
+- 리뷰가 괜찮으면 generic jazz base 후보 학습 설계로 넘어간다.
+- 리뷰가 여전히 기계적이면 rhythm/motif-level constraint 또는 pretrained symbolic base를 먼저 검토한다.
 
 ## 10. 한 문장 요약
 

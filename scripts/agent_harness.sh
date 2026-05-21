@@ -48,6 +48,8 @@ Modes:
                 Run plain vs coverage-aware Stage B constrained generation sweep.
   stage-b-candidate-ranking
                 Run coverage A/B sweep and rank generated MIDI candidates.
+  stage-b-chord-aware-probe
+                Run coverage/chord-aware Stage B sweep and rank candidates.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -404,6 +406,45 @@ run_stage_b_candidate_ranking() {
     --min_top_strict_candidates 1
 }
 
+run_stage_b_chord_aware_probe() {
+  local run_id="${RUN_ID:-harness_stage_b_chord_aware_probe}"
+  local sweep_run_id="${run_id}_ab_sweep"
+  print_header "Stage B chord-aware pitch probe"
+  "$PYTHON_BIN" scripts/run_stage_b_coverage_ab_sweep.py \
+    --run_id "$sweep_run_id" \
+    --issue_number 45 \
+    --max_files 2 \
+    --epochs 3 \
+    --batch_size 8 \
+    --max_sequence 96 \
+    --num_samples 3 \
+    --modes plain,coverage,coverage_chord \
+    --note_groups_per_bar_values 4,6,8 \
+    --coverage_position_window 0 \
+    --chord_pitch_mode tones \
+    --chord_pitch_repeat_window 2 \
+    --max_simultaneous_notes 2 \
+    --temperature 0.9 \
+    --top_k 2 \
+    --min_valid_samples 1 \
+    --min_strict_valid_samples 1 \
+    --min_best_strict_valid_samples 1 \
+    --max_collapse_warning_sample_rate 0.34 \
+    --require_all_grammar_samples \
+    --n_layers 1 \
+    --num_heads 4 \
+    --d_model 64 \
+    --dim_feedforward 128 \
+    --lora_r 4 \
+    --lora_alpha 8
+  "$PYTHON_BIN" scripts/rank_stage_b_candidates.py \
+    --run_id "$run_id" \
+    --issue_number 45 \
+    --ab_sweep_report "outputs/stage_b_coverage_ab_sweep/${sweep_run_id}/ab_sweep_report.json" \
+    --top_n 12 \
+    --min_top_strict_candidates 1
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -463,6 +504,9 @@ case "$MODE" in
     ;;
   stage-b-candidate-ranking)
     run_stage_b_candidate_ranking
+    ;;
+  stage-b-chord-aware-probe)
+    run_stage_b_chord_aware_probe
     ;;
   manifest-dry-run)
     run_manifest_dry_run

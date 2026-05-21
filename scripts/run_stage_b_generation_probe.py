@@ -46,6 +46,9 @@ from scripts.stage_b_tokens import (  # noqa: E402
     TOKEN_CHORD_ROOT_START,
     SEQUENCE_FORMAT_STAGE_B_V1,
     POSITIONS_PER_BAR,
+    PIANO_PITCH_MAX,
+    PIANO_PITCH_MIN,
+    ROOT_TO_PC,
     chord_tokens,
     decode_stage_b_midi,
     duration_steps_from_token,
@@ -53,6 +56,8 @@ from scripts.stage_b_tokens import (  # noqa: E402
     is_note_pitch_token,
     is_position_token,
     is_velocity_token,
+    note_pitch_token,
+    parse_chord_symbol,
     pitch_from_token,
     position_from_token,
     stage_b_token_name,
@@ -67,6 +72,30 @@ DEFAULT_STRICT_MIN_UNIQUE_POSITION_PITCH_PAIRS = 4
 DEFAULT_STRICT_MAX_REPEATED_POSITION_PITCH_PAIR_RATIO = 0.49
 DEFAULT_STRICT_MAX_POSTPROCESS_REMOVAL_RATIO = 0.49
 DEFAULT_STRICT_MAX_COLLAPSE_WARNING_SAMPLE_RATE = 0.34
+
+CHORD_TONE_INTERVALS = {
+    "maj": {0, 4, 7},
+    "maj7": {0, 4, 7, 11},
+    "min": {0, 3, 7},
+    "min7": {0, 3, 7, 10},
+    "dom7": {0, 4, 7, 10},
+    "dim": {0, 3, 6},
+    "halfdim": {0, 3, 6, 10},
+    "sus": {0, 5, 7},
+    "unknown": {0, 4, 7},
+}
+
+TENSION_INTERVALS = {
+    "maj": {2, 9},
+    "maj7": {2, 6, 9},
+    "min": {2, 5, 10},
+    "min7": {2, 5},
+    "dom7": {2, 5, 9},
+    "dim": {9},
+    "halfdim": {2, 5},
+    "sus": {2, 10},
+    "unknown": set(),
+}
 
 
 def parse_chords(raw_chords: str) -> list[str]:
@@ -466,6 +495,43 @@ def coverage_aware_position_tokens(
     return [TOKEN_POSITION_START + int(position) for position in positions]
 
 
+def chord_pitch_classes(chord: str | None, pitch_mode: str = "tones_tensions") -> set[int]:
+    root, quality = parse_chord_symbol(chord)
+    root_pc = ROOT_TO_PC.get(root)
+    if root_pc is None:
+        return set(range(12))
+    intervals = set(CHORD_TONE_INTERVALS.get(quality, CHORD_TONE_INTERVALS["unknown"]))
+    if pitch_mode == "tones_tensions":
+        intervals.update(TENSION_INTERVALS.get(quality, set()))
+    elif pitch_mode != "tones":
+        raise ValueError(f"unknown chord pitch mode: {pitch_mode}")
+    return {(root_pc + interval) % 12 for interval in intervals}
+
+
+def chord_aware_pitch_tokens(
+    chord: str | None,
+    pitch_mode: str = "tones_tensions",
+    recent_pitches: Sequence[int] | None = None,
+    repeat_window: int = 2,
+) -> list[int]:
+    pitch_classes = chord_pitch_classes(chord, pitch_mode=pitch_mode)
+    tokens = [
+        note_pitch_token(pitch)
+        for pitch in range(int(PIANO_PITCH_MIN), int(PIANO_PITCH_MAX) + 1)
+        if pitch % 12 in pitch_classes
+    ]
+    if not tokens:
+        return list(range(TOKEN_NOTE_PITCH_START, TOKEN_NOTE_PITCH_END + 1))
+
+    window = max(0, int(repeat_window))
+    if not recent_pitches or window == 0:
+        return tokens
+
+    blocked = set(int(pitch) for pitch in list(recent_pitches)[-window:])
+    filtered = [token for token in tokens if pitch_from_token(token) not in blocked]
+    return filtered or tokens
+
+
 def generate_stage_b_constrained_tokens(
     model: Any,
     primer_tokens: Sequence[int],
@@ -478,8 +544,12 @@ def generate_stage_b_constrained_tokens(
     top_k: int | None,
     coverage_aware_positions: bool = False,
     coverage_position_window: int = 0,
+    chord_aware_pitches: bool = False,
+    chord_pitch_mode: str = "tones_tensions",
+    chord_pitch_repeat_window: int = 2,
 ) -> list[int]:
     tokens = [int(token) for token in primer_tokens]
+    recent_pitches: list[int] = []
     families = [
         range(TOKEN_POSITION_START, TOKEN_POSITION_END + 1),
         range(TOKEN_VELOCITY_START, TOKEN_VELOCITY_END + 1),
@@ -488,8 +558,8 @@ def generate_stage_b_constrained_tokens(
     ]
 
     for bar_index in range(max(1, int(bars))):
+        chord = chords[bar_index % len(chords)] if chords else None
         if bar_index > 0:
-            chord = chords[bar_index % len(chords)] if chords else None
             tokens.append(TOKEN_BAR)
             tokens.extend(chord_tokens(chord))
         for group_index in range(max(1, int(note_groups_per_bar))):
@@ -504,15 +574,23 @@ def generate_stage_b_constrained_tokens(
                         note_groups_per_bar=note_groups_per_bar,
                         position_window=coverage_position_window,
                     )
-                tokens.append(
-                    next_token_from_model(
-                        model,
-                        tokens=tokens,
-                        allowed_tokens=allowed,
-                        temperature=temperature,
-                        top_k=top_k,
+                if chord_aware_pitches and family_index == 2:
+                    allowed = chord_aware_pitch_tokens(
+                        chord,
+                        pitch_mode=chord_pitch_mode,
+                        recent_pitches=recent_pitches,
+                        repeat_window=chord_pitch_repeat_window,
                     )
+                token = next_token_from_model(
+                    model,
+                    tokens=tokens,
+                    allowed_tokens=allowed,
+                    temperature=temperature,
+                    top_k=top_k,
                 )
+                tokens.append(token)
+                if family_index == 2 and is_note_pitch_token(token):
+                    recent_pitches.append(pitch_from_token(token))
 
     tokens.append(TOKEN_END)
     return tokens[: int(max_sequence)]
@@ -799,6 +877,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--constrained_note_groups_per_bar", type=int, default=4)
     parser.add_argument("--coverage_aware_positions", action="store_true")
     parser.add_argument("--coverage_position_window", type=int, default=0)
+    parser.add_argument("--chord_aware_pitches", action="store_true")
+    parser.add_argument("--chord_pitch_mode", choices=("tones", "tones_tensions"), default="tones_tensions")
+    parser.add_argument("--chord_pitch_repeat_window", type=int, default=2)
     parser.add_argument("--postprocess_overlap", action="store_true")
     parser.add_argument("--max_simultaneous_notes", type=int, default=2)
     parser.add_argument("--min_valid_samples", type=int, default=1)
@@ -875,6 +956,9 @@ def main() -> int:
         "constrained_note_groups_per_bar": int(args.constrained_note_groups_per_bar),
         "coverage_aware_positions": bool(args.coverage_aware_positions),
         "coverage_position_window": int(args.coverage_position_window),
+        "chord_aware_pitches": bool(args.chord_aware_pitches),
+        "chord_pitch_mode": args.chord_pitch_mode,
+        "chord_pitch_repeat_window": int(args.chord_pitch_repeat_window),
         "postprocess_overlap": bool(args.postprocess_overlap),
     }
 
@@ -934,6 +1018,9 @@ def main() -> int:
                 top_k=args.top_k,
                 coverage_aware_positions=args.coverage_aware_positions,
                 coverage_position_window=args.coverage_position_window,
+                chord_aware_pitches=args.chord_aware_pitches,
+                chord_pitch_mode=args.chord_pitch_mode,
+                chord_pitch_repeat_window=args.chord_pitch_repeat_window,
             )
         else:
             generated_tokens = generate_stage_b_tokens(

@@ -54,6 +54,8 @@
   - Stage B generated MIDI candidate ranking report for listening/review priority.
 - `STAGE_B_RANKING_HARMONIC_GATE_2026-05-21.md`
   - Stage B ranking이 low chord-tone/repeated pitch/mechanical pattern MIDI를 좋은 후보로 올리지 않도록 고친 결과.
+- `STAGE_B_CHORD_AWARE_PITCH_2026-05-21.md`
+  - Stage B constrained generation에서 chord-aware pitch 후보군을 적용한 결과와 reviewable candidate 회복.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`
@@ -80,7 +82,7 @@
 2. Brad Mehldau subset은 style adaptation과 holdout evaluation 용도로 분리한다.
 3. `max_files=2` Brad `control_v1` probe 결과를 기준으로 Stage A 한계를 문서화한다.
 4. broad training 전에 duration-explicit Stage B tokenization과 phrase/window dataset을 설계한다.
-5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, multi-sample probe, collapse sweep, strict collapse gate, 2-file generation probe, temporal coverage probe, coverage-aware constrained probe, coverage-aware A/B sweep, candidate ranking, and harmonic/repetition gate를 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
+5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, multi-sample probe, collapse sweep, strict collapse gate, 2-file generation probe, temporal coverage probe, coverage-aware constrained probe, coverage-aware A/B sweep, candidate ranking, harmonic/repetition gate, and chord-aware pitch probe를 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
 
 핵심 원칙:
 

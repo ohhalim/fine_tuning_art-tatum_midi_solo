@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-43-stage-b-ranking-harmonic-gate`
+- `issue-45-stage-b-chord-aware-pitch`
 
 현재 범위가 아닌 것:
 
@@ -36,53 +36,57 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #43에서 Stage B candidate ranking을 다시 검토했다.
+Issue #45에서 Stage B constrained generation에 chord-aware pitch 후보군을 추가했다.
 
-Issue #41의 top candidate는 숫자상 strict valid였지만, piano roll 확인 결과 solo-line으로 보기 어려웠다.
+Issue #43은 이전 top candidate가 strict-valid였어도 solo-line으로 보기 어렵다는 점을 확인했다.
 
-Observed top-candidate failure:
+Issue #45는 ranking을 더 꾸미지 않고 generation-side pitch 후보군을 고쳤다.
 
-- note count는 `16`이지만 unique pitches는 `3`뿐이었다.
-- `G#4`, `F#4`, `D5` 중심의 반복 패턴이었다.
-- onset template이 bar마다 기계적으로 반복됐다.
-- bar-level chord-tone ratio가 낮은 구간이 있었다.
-- 따라서 "strict valid"와 "ranking score high"만으로 listening candidate라고 볼 수 없다.
+Implemented:
+
+- `--chord_aware_pitches`
+- `--chord_pitch_mode tones|tones_tensions`
+- `--chord_pitch_repeat_window`
+- A/B mode: `coverage_chord`
+- harness: `bash scripts/agent_harness.sh stage-b-chord-aware-probe`
 
 Result:
 
-- ranking script가 MIDI 파일을 직접 읽어 harmonic/repetition diagnostics를 계산한다.
-- 새 diagnostics:
-  - bar-level chord-tone ratio
-  - minimum per-bar chord-tone ratio
-  - dominant pitch ratio
-  - repeated pitch ratio
-  - repeated onset-template ratio
-- review flags:
-  - `low_chord_tone_ratio`
-  - `low_bar_chord_tone_ratio`
-  - `dominant_pitch_repetition`
-  - `low_pitch_variety`
-  - `repeated_onset_template`
-- latest harness result:
-  - candidates: `18`
-  - strict candidates: `12`
-  - viable unflagged candidates: `0`
-  - flagged candidates: `18`
+- candidate count: `27`
+- strict candidates: `21`
+- viable unflagged candidates: `9`
+- flagged candidates: `18`
+- top candidate mode: `coverage_chord`
+- top candidate groups/bar: `4`
+- top candidate note count: `8`
+- top candidate unique pitches: `6`
+- top candidate chord-tone ratio: `0.750`
+- top candidate bar chord-tone ratio: `0.875`
+- top candidate min bar chord-tone ratio: `0.800`
+- top candidate dominant pitch ratio: `0.375`
+- top candidate repeated pitch ratio: `0.250`
+- top candidate review flags: `[]`
+
+Important comparison:
+
+- coverage g8 avg chord-tone ratio: `0.229`
+- coverage_chord g8 avg chord-tone ratio: `0.646`
+- coverage g8 avg repeated position/pitch ratio: `0.167`
+- coverage_chord g8 avg repeated position/pitch ratio: `0.021`
 
 Decision:
 
-- 현재 Stage B generated MIDI는 아직 좋은 listening candidate가 아니다.
-- ranking은 "좋은 샘플을 찾았다"가 아니라 "현재 샘플들이 왜 아직 탈락인지 설명한다"는 용도다.
-- 다음 작업은 ranking을 더 꾸미는 것이 아니라 generation-side fix다.
-- 우선 후보:
-  - chord-aware pitch constrained generation
-  - chord-tone/tension-aware pitch candidate filter
-  - bar-level harmonic coverage gate
+- chord-aware pitch constraint는 #43의 harmonic/repetition failure를 크게 줄였다.
+- 이것은 아직 Brad style learning 성공이 아니다.
+- 다음은 top `coverage_chord` MIDI를 실제로 듣고 piano roll로 확인하는 review point다.
+- 귀로도 구조가 괜찮으면 generic jazz base 후보 학습 설계로 넘어갈 수 있다.
+- 귀로 여전히 기계적이면 rhythm/motif-level constraint 또는 pretrained symbolic base 검토가 먼저다.
 
 Detail:
 
 - `docs/STAGE_B_CANDIDATE_RANKING_2026-05-20.md`
 - `docs/STAGE_B_RANKING_HARMONIC_GATE_2026-05-21.md`
+- `docs/STAGE_B_CHORD_AWARE_PITCH_2026-05-21.md`
 
 ## Active Issue #14
 
@@ -1006,6 +1010,54 @@ Decision:
 Detail:
 
 - `docs/STAGE_B_RANKING_HARMONIC_GATE_2026-05-21.md`
+
+### 0.21. Issue #45 Stage B chord-aware pitch constrained generation
+
+Status:
+
+- implemented on `issue-45-stage-b-chord-aware-pitch`
+
+Goal:
+
+- fix the generation-side pitch/harmony failure revealed by Issue #43
+- constrain `NOTE_PITCH` candidates by current bar chord
+- preserve coverage-aware `POSITION` generation
+- reduce repeated pitch and low bar-level chord-tone failures
+
+Latest harness result:
+
+- command: `bash scripts/agent_harness.sh stage-b-chord-aware-probe`
+- candidate count: `27`
+- strict candidates: `21`
+- viable candidates without review flags: `9`
+- flagged candidates: `18`
+- best mode: `coverage_chord`
+- best candidate score: `96.6964`
+- best candidate reviewable: `true`
+
+Best candidate:
+
+- mode: `coverage_chord`
+- groups/bar: `4`
+- sample index: `2`
+- note count: `8`
+- unique pitch count: `6`
+- chord-tone ratio: `0.750`
+- bar chord-tone ratio: `0.875`
+- min bar chord-tone ratio: `0.800`
+- dominant pitch ratio: `0.375`
+- repeated pitch ratio: `0.250`
+- MIDI path: `outputs/stage_b_coverage_ab_sweep/harness_stage_b_chord_aware_probe_ab_sweep_coverage_chord_g4_k2_t0p9/samples/stage_b_sample_2.mid`
+
+Decision:
+
+- This is the first Stage B probe where candidate ranking finds unflagged reviewable MIDI candidates.
+- Do not call this a personalized jazz model yet.
+- Next step is manual listening/piano-roll review of top `coverage_chord` candidates.
+
+Detail:
+
+- `docs/STAGE_B_CHORD_AWARE_PITCH_2026-05-21.md`
 
 ### 1. Run full jazz piano dataset audit
 

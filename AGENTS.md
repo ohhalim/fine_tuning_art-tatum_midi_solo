@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #43: Stage B candidate ranking harmonic/repetition gate.
+- Issue #45: Stage B chord-aware pitch constrained generation.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -203,6 +203,14 @@ bash scripts/agent_harness.sh stage-b-candidate-ranking
 ```
 
 This harness generates an A/B sweep and ranks generated MIDI candidates for listening/review priority.
+
+For Stage B chord-aware pitch constrained generation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-chord-aware-probe
+```
+
+This harness compares plain, coverage-aware, and coverage+chord-aware constrained generation, then ranks the generated MIDI candidates.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
