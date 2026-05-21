@@ -117,6 +117,14 @@ Do not start broad generic jazz training yet unless the top ranked candidates ar
 
 If the top candidates still sound harmonically weak, the next issue should be chord-aware pitch candidate filtering or chord-tone/tension-aware ranking.
 
+## Follow-up Correction
+
+Issue #43 performed that piano-roll review and found the top ranked candidate was not a usable solo-line candidate.
+
+The original ranking over-weighted temporal coverage and did not penalize repeated pitch, repeated bar templates, or low per-bar chord-tone coverage strongly enough.
+
+Use `docs/STAGE_B_RANKING_HARMONIC_GATE_2026-05-21.md` as the current interpretation of this result.
+
 ## Validation
 
 Commands run:

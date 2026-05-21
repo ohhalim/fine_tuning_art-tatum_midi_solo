@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-05-20
+작성일: 2026-05-21
 
 ## Current Focus
 
@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-41-stage-b-candidate-ranking`
+- `issue-43-stage-b-ranking-harmonic-gate`
 
 현재 범위가 아닌 것:
 
@@ -36,32 +36,53 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #41에서 Stage B A/B sweep 결과를 기반으로 generated MIDI candidate ranking report를 만들었다.
+Issue #43에서 Stage B candidate ranking을 다시 검토했다.
+
+Issue #41의 top candidate는 숫자상 strict valid였지만, piano roll 확인 결과 solo-line으로 보기 어려웠다.
+
+Observed top-candidate failure:
+
+- note count는 `16`이지만 unique pitches는 `3`뿐이었다.
+- `G#4`, `F#4`, `D5` 중심의 반복 패턴이었다.
+- onset template이 bar마다 기계적으로 반복됐다.
+- bar-level chord-tone ratio가 낮은 구간이 있었다.
+- 따라서 "strict valid"와 "ranking score high"만으로 listening candidate라고 볼 수 없다.
 
 Result:
 
-- candidate ranking harness 실행 성공
-- ranking input: coverage A/B sweep report
-- top candidate: coverage groups/bar `8`, sample `1`
-- top candidate score: `91.080`
-- top candidate strict valid: `true`
-- top candidate note count: `16`
-- top candidate onset coverage ratio: `0.500`
-- top candidate sustained coverage ratio: `0.906`
-- top candidate dead-air ratio: `0.467`
-- top candidate chord-tone ratio: `0.313`
+- ranking script가 MIDI 파일을 직접 읽어 harmonic/repetition diagnostics를 계산한다.
+- 새 diagnostics:
+  - bar-level chord-tone ratio
+  - minimum per-bar chord-tone ratio
+  - dominant pitch ratio
+  - repeated pitch ratio
+  - repeated onset-template ratio
+- review flags:
+  - `low_chord_tone_ratio`
+  - `low_bar_chord_tone_ratio`
+  - `dominant_pitch_repetition`
+  - `low_pitch_variety`
+  - `repeated_onset_template`
+- latest harness result:
+  - candidates: `18`
+  - strict candidates: `12`
+  - viable unflagged candidates: `0`
+  - flagged candidates: `18`
 
 Decision:
 
-- candidate ranking은 listening/piano-roll review 우선순위를 정하는 데 쓸 수 있다.
-- top ranked candidates는 coverage groups/bar `8`에 집중된다.
-- 하지만 이것은 unconstrained model quality나 Brad style adaptation 성공이 아니다.
-- 다음은 top ranked MIDI 후보를 실제로 듣고 piano roll로 확인한다.
-- 만약 화성감이 약하면 chord-aware pitch filtering 또는 chord-tone/tension-aware ranking을 먼저 한다.
+- 현재 Stage B generated MIDI는 아직 좋은 listening candidate가 아니다.
+- ranking은 "좋은 샘플을 찾았다"가 아니라 "현재 샘플들이 왜 아직 탈락인지 설명한다"는 용도다.
+- 다음 작업은 ranking을 더 꾸미는 것이 아니라 generation-side fix다.
+- 우선 후보:
+  - chord-aware pitch constrained generation
+  - chord-tone/tension-aware pitch candidate filter
+  - bar-level harmonic coverage gate
 
 Detail:
 
 - `docs/STAGE_B_CANDIDATE_RANKING_2026-05-20.md`
+- `docs/STAGE_B_RANKING_HARMONIC_GATE_2026-05-21.md`
 
 ## Active Issue #14
 
@@ -949,6 +970,42 @@ Decision:
 Detail:
 
 - `docs/STAGE_B_CANDIDATE_RANKING_2026-05-20.md`
+
+### 0.20. Issue #43 Stage B ranking harmonic/repetition gate
+
+Status:
+
+- implemented on `issue-43-stage-b-ranking-harmonic-gate`
+
+Goal:
+
+- stop ranking from promoting MIDI that only looks good by temporal coverage
+- read each candidate MIDI directly before scoring
+- flag low chord-tone, repeated pitch, and repeated bar-template failures
+
+Review trigger:
+
+- Issue #41 ranked coverage groups/bar `8`, sample `1` as top candidate.
+- Piano-roll review showed it was not a usable solo-line candidate.
+- The sample had too little pitch variety and too much repeated mechanical structure.
+
+Latest harness result:
+
+- candidate count: `18`
+- valid candidates: `12`
+- strict candidates: `12`
+- viable candidates without review flags: `0`
+- flagged candidates: `18`
+
+Decision:
+
+- Do not treat any current Stage B candidate as a good listening sample.
+- The ranking report is now honest: strict-valid MIDI can still be musically invalid.
+- Next issue should fix generation-side pitch/harmony behavior, not just ranking.
+
+Detail:
+
+- `docs/STAGE_B_RANKING_HARMONIC_GATE_2026-05-21.md`
 
 ### 1. Run full jazz piano dataset audit
 
