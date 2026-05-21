@@ -13,10 +13,13 @@ from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_temporal_coverage,
     build_probe_summary,
     build_stage_b_primer,
+    chord_aware_pitch_tokens,
+    chord_pitch_classes,
     coverage_aware_position_tokens,
     dedupe_and_limit_notes,
     decode_tokens_to_midi,
     evaluate_collapse_gate,
+    extract_stage_b_note_groups,
     generate_stage_b_constrained_tokens,
     generate_stage_b_tokens,
     postprocess_stage_b_midi,
@@ -26,6 +29,7 @@ from scripts.stage_b_tokens import (
     note_duration_token,
     note_pitch_token,
     note_velocity_token,
+    pitch_from_token,
     position_token,
     position_from_token,
 )
@@ -178,6 +182,51 @@ class StageBGenerationProbeTest(unittest.TestCase):
         ]
 
         self.assertEqual(positions, [7, 8, 9])
+
+    def test_chord_aware_pitch_tokens_limit_to_chord_tones(self) -> None:
+        tokens = chord_aware_pitch_tokens("Cm7", pitch_mode="tones", repeat_window=0)
+        pitch_classes = {pitch_from_token(token) % 12 for token in tokens}
+
+        self.assertEqual(pitch_classes, {0, 3, 7, 10})
+
+    def test_chord_aware_pitch_tokens_can_avoid_recent_exact_pitches(self) -> None:
+        tokens = chord_aware_pitch_tokens("Cm7", pitch_mode="tones", recent_pitches=[72], repeat_window=2)
+
+        self.assertNotIn(note_pitch_token(72), tokens)
+        self.assertIn(note_pitch_token(60), tokens)
+
+    def test_chord_pitch_classes_can_include_tensions(self) -> None:
+        self.assertEqual(chord_pitch_classes("Cmaj7", pitch_mode="tones"), {0, 4, 7, 11})
+        self.assertIn(2, chord_pitch_classes("Cmaj7", pitch_mode="tones_tensions"))
+
+    def test_chord_aware_constrained_generation_limits_pitch_by_bar_chord(self) -> None:
+        primer = build_stage_b_primer(["Cm7", "F7"], bpm=120)
+
+        tokens = generate_stage_b_constrained_tokens(
+            model=FakeConstrainedModel(),
+            primer_tokens=primer,
+            chords=["Cm7", "F7"],
+            bpm=120,
+            bars=2,
+            note_groups_per_bar=3,
+            max_sequence=96,
+            temperature=1.0,
+            top_k=1,
+            coverage_aware_positions=True,
+            chord_aware_pitches=True,
+            chord_pitch_mode="tones",
+            chord_pitch_repeat_window=2,
+        )
+
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+        allowed_by_bar = {
+            0: chord_pitch_classes("Cm7", pitch_mode="tones"),
+            1: chord_pitch_classes("F7", pitch_mode="tones"),
+        }
+
+        self.assertGreaterEqual(len(groups), 6)
+        for group in groups:
+            self.assertIn(group["pitch"] % 12, allowed_by_bar[group["bar"]])
 
     def test_dedupe_and_limit_notes_removes_same_onset_pitch_duplicates(self) -> None:
         notes = [
