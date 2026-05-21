@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #65: Stage B data-derived motif baseline generation.
+- Issue #67: Stage B data motif review export.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -188,6 +188,12 @@ For Stage B data-derived motif baseline generation changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-data-motif-compare
+```
+
+For Stage B data motif review export changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-data-motif-review-export
 ```
 
 For Stage B collapse/sampling-sweep changes, run:

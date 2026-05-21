@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-65-stage-b-data-derived-motif-generation`
+- `issue-67-stage-b-data-motif-review-export`
 
 현재 범위가 아닌 것:
 
@@ -36,25 +36,30 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #65는 Issue #63에서 추출한 motif catalog를 generation-side baseline으로 연결하는 단계다.
+Issue #67은 Issue #65에서 만든 `hand_written_swing` vs `data_motif` baseline을 실제 review package로 export하는 단계다.
 
-Issue #63은 실제 Stage B phrase window에서 rhythm/contour/full motif templates를 추출했다. 이번에는 그 catalog를 사용해 hand-written `swing_motif_approach`와 data-derived motif baseline을 같은 8-bar 조건에서 비교한다.
+Issue #65에서 `data_motif`는 strict gate를 통과했고 bar-pattern variation과 duration repetition은 좋아졌지만, syncopation은 낮아졌다. 이제 mode가 명확히 드러나는 MIDI 파일로 piano-roll/listening review를 해야 한다.
 
 Implemented:
 
-- `scripts/run_stage_b_data_motif_generation_compare.py`
-- `tests/test_stage_b_data_motif_generation_compare.py`
-- `scripts/agent_harness.sh stage-b-data-motif-compare`
+- `scripts/run_stage_b_data_motif_generation_compare.py` review export
+- `tests/test_stage_b_data_motif_generation_compare.py` review export test
+- `scripts/agent_harness.sh stage-b-data-motif-review-export`
 - output files:
   - `data_motif_compare_report.json`
   - `data_motif_compare_report.md`
+  - `review_manifest.json`
+  - `review_candidates.md`
+  - `named_midi/*.mid`
 
 Result:
 
-- source report: `outputs/stage_b_data_motif_compare/harness_stage_b_data_motif_compare/data_motif_compare_report.json`
+- source report: `outputs/stage_b_data_motif_compare/harness_stage_b_data_motif_review_export/data_motif_compare_report.json`
 - setup: `./midi_dataset/midi/studio`, max files `4`, `8`-bar windows, stride `4`, min notes `16`
 - `hand_written_swing`: strict `3/3`
 - `data_motif`: strict `3/3`
+- review candidates: `6`
+- review output: `outputs/stage_b_data_motif_review/harness_stage_b_data_motif_review_export`
 - data minus hand duration diversity delta: `+0.016`
 - data minus hand IOI diversity delta: `+0.016`
 - data minus hand bar-pattern delta: `+0.500`
@@ -64,9 +69,9 @@ Result:
 
 Decision:
 
-- data-derived motif baseline은 strict gate를 통과하고, hand-written baseline보다 bar variation과 duration repetition 면에서 낫다.
-- syncopation은 낮아졌으므로 곧바로 더 좋은 jazz phrase라고 말하면 안 된다.
-- 다음은 generated MIDI review export로 실제 piano roll/listening 비교를 해야 한다.
+- review package가 만들어졌으므로 이제 실제 piano roll/listening 비교가 가능하다.
+- 다음 판단은 수치가 아니라 named MIDI 후보를 직접 확인한 결과로 해야 한다.
+- 들어보고 나서 model constrained generation에 연결할지, cadence/ending extraction을 먼저 강화할지 결정한다.
 
 Detail:
 
@@ -83,6 +88,7 @@ Detail:
 - `docs/STAGE_B_REFERENCE_PHRASE_STATS_2026-05-21.md`
 - `docs/STAGE_B_MOTIF_TEMPLATE_EXTRACTION_2026-05-21.md`
 - `docs/STAGE_B_DATA_MOTIF_GENERATION_2026-05-21.md`
+- `docs/STAGE_B_DATA_MOTIF_REVIEW_EXPORT_2026-05-21.md`
 
 ## Active Issue #14
 

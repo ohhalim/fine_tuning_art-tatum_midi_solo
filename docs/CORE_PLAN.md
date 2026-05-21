@@ -135,6 +135,7 @@ Stage B에서 명시하는 것:
 29. Stage B real phrase reference statistics
 30. Stage B data-derived motif template extraction
 31. Stage B data-derived motif baseline generation
+32. Stage B data motif review export
 
 가장 최근 의미 있는 결과:
 
@@ -344,6 +345,7 @@ Stage B에서 명시하는 것:
 - Issue #63 result: top rhythm support는 `0.009`, top contour support는 `0.012`, top full motif support는 `0.002`라서 one best motif 복붙이 아니라 distribution sampling이 필요하다.
 - Issue #65 result: data-derived motif baseline도 strict `3/3`을 통과했다.
 - Issue #65 result: hand-written swing 대비 bar-position variation은 `+0.500`, duration diversity는 `+0.016`, IOI diversity는 `+0.016` 개선됐지만 syncopation은 `-0.125` 낮아졌다.
+- Issue #67 result: `data_motif`와 `hand_written_swing` 후보를 mode/sample/rank가 드러나는 named MIDI review package로 export했다.
 
 해석:
 
@@ -474,6 +476,32 @@ Stage B에서 명시하는 것:
 - 실제 piano roll에서 phrase contour가 초급 scale exercise보다 나은지 확인한다.
 - data_motif가 review 가치가 있으면 model constrained generation 쪽에 연결하고, 아니면 contour/cadence extraction을 더 강화한다.
 
+### Phase 3.14. Data Motif Review Export
+
+목표:
+
+- `data_motif`와 `hand_written_swing` 후보를 mode/sample/rank 기준으로 구분한다.
+- piano-roll/listening review가 가능하도록 named MIDI package를 만든다.
+- review markdown에 핵심 metric을 같이 남긴다.
+
+현재 결과:
+
+- completed: `review_manifest.json`과 `review_candidates.md`를 생성한다.
+- completed: `named_midi/` 아래에 mode가 드러나는 MIDI 파일명을 만든다.
+- latest result: review candidates `6`.
+- latest result: `data_motif` strict `3/3`, `hand_written_swing` strict `3/3`.
+
+해석:
+
+- 이제 숫자 비교가 아니라 실제 청취 리뷰가 가능하다.
+- syncopation 하락이 체감상 나쁜지, duration repetition 감소가 실제로 더 나은지 확인해야 한다.
+
+다음 통과 기준:
+
+- named MIDI 후보를 직접 듣고 piano roll로 확인한다.
+- data_motif가 더 자연스러우면 motif sampling을 model constrained generation에 연결한다.
+- 둘 다 초급 scale exercise면 cadence/phrase-ending extraction을 먼저 강화한다.
+
 ### Phase 4. Generic Jazz Base 후보 학습
 
 목표:
@@ -568,7 +596,7 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B data-derived motif baseline generation 추가
+Stage B data motif review export 추가
 ```
 
 결과:
@@ -578,10 +606,10 @@ Stage B data-derived motif baseline generation 추가
 - duration repetition ratio는 `0.750`에서 `0.375`로 낮췄다.
 - duration diversity와 IOI diversity는 소폭 올랐다.
 - syncopation은 `0.750`에서 `0.625`로 낮아졌다.
+- review candidates `6`개와 named MIDI package를 만들었다.
 
 다음 작업:
 
-- generated data_motif MIDI를 review export 대상으로 분리한다.
 - hand_written_swing 후보와 data_motif 후보를 piano roll/listening으로 비교한다.
 - syncopation 하락이 groove 약화로 들리는지 확인한다.
 - contour가 초급 코드톤 나열을 넘어 phrase motion으로 들리는지 본다.
