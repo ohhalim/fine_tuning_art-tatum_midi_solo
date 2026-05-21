@@ -134,6 +134,7 @@ Stage B에서 명시하는 것:
 28. Stage B swing/motif phrase grammar probe
 29. Stage B real phrase reference statistics
 30. Stage B data-derived motif template extraction
+31. Stage B data-derived motif baseline generation
 
 가장 최근 의미 있는 결과:
 
@@ -167,7 +168,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 data-derived motif catalog를 generation-side constraint로 연결하는 것이다. Manual review에서 8-bar 후보는 이전보다 나아졌지만 아직 초급 다이아토닉 코드톤 나열처럼 들렸고, Issue #61 reference stats에서도 hand-written rhythm diversity가 부족하다고 나왔다. 따라서 generic jazz base 학습 전에 real phrase motif distribution을 사용한 baseline을 먼저 비교한다.
+이제 다음 단계는 data-derived motif baseline을 실제 MIDI review 대상으로 내보내는 것이다. Issue #65에서 motif baseline은 strict gate를 통과했고 hand-written rhythm보다 pattern variation은 좋아졌지만, syncopation은 낮아졌다. 따라서 generic jazz base 학습 전에 piano-roll/listening review로 musical value를 확인한다.
 
 ## 6. 다음 단계 로드맵
 
@@ -341,6 +342,8 @@ Stage B에서 명시하는 것:
 - Issue #61 result: `swing_motif_approach`는 syncopation은 reference에 가까우나 bar-position variation, duration diversity, IOI diversity가 아직 크게 부족하다.
 - Issue #63 result: real Stage B windows에서 `803`개 strictly-increasing solo-line motif를 추출했고, rhythm templates `520`, contour templates `328`, full templates `526`개를 만들었다.
 - Issue #63 result: top rhythm support는 `0.009`, top contour support는 `0.012`, top full motif support는 `0.002`라서 one best motif 복붙이 아니라 distribution sampling이 필요하다.
+- Issue #65 result: data-derived motif baseline도 strict `3/3`을 통과했다.
+- Issue #65 result: hand-written swing 대비 bar-position variation은 `+0.500`, duration diversity는 `+0.016`, IOI diversity는 `+0.016` 개선됐지만 syncopation은 `-0.125` 낮아졌다.
 
 해석:
 
@@ -440,6 +443,37 @@ Stage B에서 명시하는 것:
 - reference p25-p75 범위에 가까워지는 metric을 늘린다.
 - piano roll에서 chord-tone 나열이 아니라 phrase contour로 들리는지 review export로 확인한다.
 
+### Phase 3.13. Data-Derived Motif Baseline Generation
+
+목표:
+
+- Issue #63 motif catalog를 실제 8-bar generation baseline에 연결한다.
+- hand-written `swing_motif_approach`와 data-derived motif baseline을 같은 조건에서 비교한다.
+- 생성이 strict gate를 통과하는지, rhythm diversity가 나아지는지 본다.
+
+현재 결과:
+
+- completed: `scripts/run_stage_b_data_motif_generation_compare.py`를 추가했다.
+- completed: extracted rhythm template을 position/duration 후보로 사용한다.
+- completed: extracted contour template을 pitch interval 후보로 사용한다.
+- completed: duration을 다음 onset 전까지 제한해 overlap/postprocess removal을 막는다.
+- latest result: `hand_written_swing` strict `3/3`, `data_motif` strict `3/3`.
+- latest result: data-derived baseline은 bar-position variation을 `0.500`에서 `1.000`으로 올렸다.
+- latest result: duration repetition ratio를 `0.750`에서 `0.375`로 낮췄다.
+- latest result: syncopation은 `0.750`에서 `0.625`로 낮아졌다.
+
+해석:
+
+- data-derived motif baseline은 hand-written baseline보다 pattern variation 면에서 낫다.
+- 하지만 syncopation 하락과 낮은 diversity 상승폭 때문에 바로 더 좋은 jazz solo라고 말할 수 없다.
+- 다음은 MIDI review export와 listening/piano-roll 비교가 필요하다.
+
+다음 통과 기준:
+
+- data_motif 후보를 hand_written_swing 후보와 파일명으로 구분해 review export한다.
+- 실제 piano roll에서 phrase contour가 초급 scale exercise보다 나은지 확인한다.
+- data_motif가 review 가치가 있으면 model constrained generation 쪽에 연결하고, 아니면 contour/cadence extraction을 더 강화한다.
+
 ### Phase 4. Generic Jazz Base 후보 학습
 
 목표:
@@ -534,23 +568,23 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B data-derived motif template extraction 추가
+Stage B data-derived motif baseline generation 추가
 ```
 
 결과:
 
-- real Stage B phrase windows에서 `803`개 solo-line motif를 추출했다.
-- rhythm templates `520`, contour templates `328`, full templates `526`개를 만들었다.
-- top full motif support가 `0.002`라서 하나의 motif를 복사하는 방식은 맞지 않다.
-- same-onset chord/block motif는 기본 필터로 제외했다.
+- `hand_written_swing`과 `data_motif` 모두 strict `3/3`을 통과했다.
+- data-derived baseline은 bar-pattern variation을 `0.500`에서 `1.000`으로 올렸다.
+- duration repetition ratio는 `0.750`에서 `0.375`로 낮췄다.
+- duration diversity와 IOI diversity는 소폭 올랐다.
+- syncopation은 `0.750`에서 `0.625`로 낮아졌다.
 
 다음 작업:
 
-- extracted rhythm templates를 position/duration 후보로 연결한다.
-- extracted contour templates를 pitch interval 후보로 연결한다.
-- current chord/tension pitch set 위에 contour를 transpose한다.
-- `swing_motif_approach`와 data-derived motif baseline을 같은 8-bar 조건에서 비교한다.
-- duration diversity, IOI diversity, bar-position variation이 reference range에 가까워지는지 본다.
+- generated data_motif MIDI를 review export 대상으로 분리한다.
+- hand_written_swing 후보와 data_motif 후보를 piano roll/listening으로 비교한다.
+- syncopation 하락이 groove 약화로 들리는지 확인한다.
+- contour가 초급 코드톤 나열을 넘어 phrase motion으로 들리는지 본다.
 
 ## 10. 한 문장 요약
 

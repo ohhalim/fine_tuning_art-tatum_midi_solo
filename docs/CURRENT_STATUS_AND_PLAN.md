@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-63-stage-b-motif-template-extraction`
+- `issue-65-stage-b-data-derived-motif-generation`
 
 현재 범위가 아닌 것:
 
@@ -36,38 +36,37 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #63은 Issue #61의 reference statistics 이후 단계다.
+Issue #65는 Issue #63에서 추출한 motif catalog를 generation-side baseline으로 연결하는 단계다.
 
-Issue #61에서 hand-written `swing_motif_approach`는 syncopation은 실제 jazz window와 가까웠지만, bar-position variation, duration diversity, IOI diversity가 부족했다. 그래서 이번에는 rule을 더 쓰는 대신 실제 Stage B phrase window에서 motif templates를 추출한다.
+Issue #63은 실제 Stage B phrase window에서 rhythm/contour/full motif templates를 추출했다. 이번에는 그 catalog를 사용해 hand-written `swing_motif_approach`와 data-derived motif baseline을 같은 8-bar 조건에서 비교한다.
 
 Implemented:
 
-- `scripts/run_stage_b_motif_template_extraction.py`
-- `tests/test_stage_b_motif_template_extraction.py`
-- `scripts/agent_harness.sh stage-b-motif-templates`
+- `scripts/run_stage_b_data_motif_generation_compare.py`
+- `tests/test_stage_b_data_motif_generation_compare.py`
+- `scripts/agent_harness.sh stage-b-data-motif-compare`
 - output files:
-  - `motif_template_report.json`
-  - `motif_template_report.md`
+  - `data_motif_compare_report.json`
+  - `data_motif_compare_report.md`
 
 Result:
 
-- source report: `outputs/stage_b_motif_templates/harness_stage_b_motif_templates/motif_template_report.json`
+- source report: `outputs/stage_b_data_motif_compare/harness_stage_b_data_motif_compare/data_motif_compare_report.json`
 - setup: `./midi_dataset/midi/studio`, max files `4`, `8`-bar windows, stride `4`, min notes `16`
-- source records: `56`
-- motif count: `803`
-- unique rhythm templates: `520`
-- unique contour templates: `328`
-- unique full templates: `526`
-- top rhythm support: `0.009`
-- top contour support: `0.012`
-- top full support: `0.002`
-- default extraction filters same-onset motifs so chord blocks do not dominate solo-line material
+- `hand_written_swing`: strict `3/3`
+- `data_motif`: strict `3/3`
+- data minus hand duration diversity delta: `+0.016`
+- data minus hand IOI diversity delta: `+0.016`
+- data minus hand bar-pattern delta: `+0.500`
+- data minus hand syncopation delta: `-0.125`
+- `data_motif` duration repetition ratio: `0.375`
+- `hand_written_swing` duration repetition ratio: `0.750`
 
 Decision:
 
-- 실제 phrase material은 매우 다양해서 top template 하나를 hardcode하면 안 된다.
-- 다음 generator는 data-derived rhythm/contour templates를 distribution으로 sampling해야 한다.
-- 이것은 생성기 자체가 아니라 다음 data-derived generation constraint를 만들기 위한 reference catalog다.
+- data-derived motif baseline은 strict gate를 통과하고, hand-written baseline보다 bar variation과 duration repetition 면에서 낫다.
+- syncopation은 낮아졌으므로 곧바로 더 좋은 jazz phrase라고 말하면 안 된다.
+- 다음은 generated MIDI review export로 실제 piano roll/listening 비교를 해야 한다.
 
 Detail:
 
@@ -83,6 +82,7 @@ Detail:
 - `docs/STAGE_B_SWING_MOTIF_PHRASE_2026-05-21.md`
 - `docs/STAGE_B_REFERENCE_PHRASE_STATS_2026-05-21.md`
 - `docs/STAGE_B_MOTIF_TEMPLATE_EXTRACTION_2026-05-21.md`
+- `docs/STAGE_B_DATA_MOTIF_GENERATION_2026-05-21.md`
 
 ## Active Issue #14
 

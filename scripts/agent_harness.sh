@@ -62,6 +62,8 @@ Modes:
                 Build real Stage B phrase-window reference statistics.
   stage-b-motif-templates
                 Extract data-derived Stage B motif/rhythm templates.
+  stage-b-data-motif-compare
+                Compare hand-written swing against data-derived motif baseline.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -105,6 +107,7 @@ run_quick() {
     scripts/run_stage_b_phrase_grammar_compare.py \
     scripts/run_stage_b_reference_stats.py \
     scripts/run_stage_b_motif_template_extraction.py \
+    scripts/run_stage_b_data_motif_generation_compare.py \
     scripts/rank_stage_b_candidates.py \
     scripts/audit_brad_mehldau_dataset.py \
     scripts/audit_jazz_piano_dataset.py \
@@ -644,6 +647,25 @@ run_stage_b_motif_templates() {
     --top_n 20
 }
 
+run_stage_b_data_motif_compare() {
+  local run_id="${RUN_ID:-harness_stage_b_data_motif_compare}"
+  print_header "Stage B data-derived motif generation compare"
+  "$PYTHON_BIN" scripts/run_stage_b_data_motif_generation_compare.py \
+    --run_id "$run_id" \
+    --input_dir ./midi_dataset/midi/studio \
+    --max_files 4 \
+    --window_bars 8 \
+    --window_stride_bars 4 \
+    --min_window_target_notes 16 \
+    --motif_length 4 \
+    --max_bar_span 2 \
+    --max_records 64 \
+    --template_top_n 32 \
+    --num_samples 3 \
+    --bars 8 \
+    --note_groups_per_bar 8
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -724,6 +746,9 @@ case "$MODE" in
     ;;
   stage-b-motif-templates)
     run_stage_b_motif_templates
+    ;;
+  stage-b-data-motif-compare)
+    run_stage_b_data_motif_compare
     ;;
   manifest-dry-run)
     run_manifest_dry_run
