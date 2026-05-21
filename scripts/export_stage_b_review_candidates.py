@@ -73,6 +73,7 @@ def score_probe_sample(sample: dict[str, Any]) -> float:
     collapse = sample.get("collapse", {})
     temporal = sample.get("temporal_coverage", {})
     contour = sample.get("phrase_contour", {})
+    pitch_roles = sample.get("pitch_roles", {})
     return round(
         (30.0 if sample.get("strict_valid") else 0.0)
         + (15.0 if sample.get("valid") else 0.0)
@@ -85,6 +86,8 @@ def score_probe_sample(sample: dict[str, Any]) -> float:
         - _float(collapse.get("repeated_position_pitch_pair_ratio")) * 15.0
         - _float(collapse.get("repeated_pitch_ratio")) * 10.0
         - _float(contour.get("adjacent_repeated_pitch_ratio")) * 8.0
+        - _float(pitch_roles.get("root_tone_ratio")) * 8.0
+        + _float(pitch_roles.get("tension_ratio")) * 4.0
         + _float(contour.get("direction_change_ratio")) * 3.0,
         4,
     )
@@ -93,10 +96,12 @@ def score_probe_sample(sample: dict[str, Any]) -> float:
 def risk_flags_from_generation_sample(sample: dict[str, Any]) -> list[str]:
     collapse = sample.get("collapse", {})
     contour = sample.get("phrase_contour", {})
+    pitch_roles = sample.get("pitch_roles", {})
     note_group_count = max(1, _int(collapse.get("note_group_count")))
     dominant_pitch_ratio = _float(collapse.get("max_same_pitch_repeats")) / note_group_count
     repeated_pitch_ratio = _float(collapse.get("repeated_pitch_ratio"))
     adjacent_repeated_pitch_ratio = _float(contour.get("adjacent_repeated_pitch_ratio"))
+    root_tone_ratio = _float(pitch_roles.get("root_tone_ratio"))
 
     flags: list[str] = []
     if repeated_pitch_ratio >= 0.65:
@@ -105,6 +110,8 @@ def risk_flags_from_generation_sample(sample: dict[str, Any]) -> list[str]:
         flags.append("high_dominant_pitch_ratio")
     if adjacent_repeated_pitch_ratio >= 0.40:
         flags.append("adjacent_pitch_repetition")
+    if root_tone_ratio >= 0.35:
+        flags.append("high_root_tone_ratio")
     for reason in contour.get("contour_warning_reasons", []) or []:
         flags.append(f"contour:{reason}")
     return flags
@@ -121,6 +128,7 @@ def candidates_from_generation_probe(report: dict[str, Any]) -> list[dict[str, A
         collapse = sample.get("collapse", {})
         temporal = sample.get("temporal_coverage", {})
         contour = sample.get("phrase_contour", {})
+        pitch_roles = sample.get("pitch_roles", {})
         review_flags: list[str] = []
         if not sample.get("strict_valid"):
             reason = sample.get("failure_reason") or sample.get("diagnostic_failure_reason") or "not_strict_valid"
@@ -153,6 +161,9 @@ def candidates_from_generation_probe(report: dict[str, Any]) -> list[dict[str, A
                 "adjacent_repeated_pitch_ratio": _float(contour.get("adjacent_repeated_pitch_ratio")),
                 "direction_change_ratio": _float(contour.get("direction_change_ratio")),
                 "longest_same_pitch_run": _int(contour.get("longest_same_pitch_run")),
+                "root_tone_ratio": _float(pitch_roles.get("root_tone_ratio")),
+                "non_root_chord_tone_ratio": _float(pitch_roles.get("non_root_chord_tone_ratio")),
+                "tension_ratio": _float(pitch_roles.get("tension_ratio")),
                 "onset_coverage_ratio": _float(temporal.get("onset_coverage_ratio")),
                 "sustained_coverage_ratio": _float(temporal.get("sustained_coverage_ratio")),
             }
@@ -205,6 +216,9 @@ def compact_candidate(candidate: dict[str, Any], rank: int) -> dict[str, Any]:
         "adjacent_repeated_pitch_ratio": _float(candidate.get("adjacent_repeated_pitch_ratio")),
         "direction_change_ratio": _float(candidate.get("direction_change_ratio")),
         "longest_same_pitch_run": _int(candidate.get("longest_same_pitch_run")),
+        "root_tone_ratio": _float(candidate.get("root_tone_ratio")),
+        "non_root_chord_tone_ratio": _float(candidate.get("non_root_chord_tone_ratio")),
+        "tension_ratio": _float(candidate.get("tension_ratio")),
         "onset_coverage_ratio": _float(candidate.get("onset_coverage_ratio")),
         "sustained_coverage_ratio": _float(candidate.get("sustained_coverage_ratio")),
     }
@@ -248,8 +262,8 @@ def markdown_report(manifest: dict[str, Any]) -> str:
         f"- reviewable only: `{str(manifest['reviewable_only']).lower()}`",
         f"- selected candidates: `{len(manifest['candidates'])}`",
         "",
-        "| review | source rank | mode | groups/bar | sample | score | notes | pitches | chord | dominant | repeat | adjacent repeat | direction | risk | midi |",
-        "|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
+        "| review | source rank | mode | groups/bar | sample | score | notes | pitches | chord | root | tension | dominant | repeat | direction | risk | midi |",
+        "|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
     ]
     for candidate in manifest["candidates"]:
         midi_path = candidate.get("review_midi_relative_path") or candidate.get("midi_path")
@@ -258,11 +272,13 @@ def markdown_report(manifest: dict[str, Any]) -> str:
         table_candidate["risk_flags_text"] = ", ".join(candidate.get("risk_flags", []) or [])
         table_candidate.setdefault("adjacent_repeated_pitch_ratio", 0.0)
         table_candidate.setdefault("direction_change_ratio", 0.0)
+        table_candidate.setdefault("root_tone_ratio", 0.0)
+        table_candidate.setdefault("tension_ratio", 0.0)
         lines.append(
             "| {review_rank} | {source_rank} | {mode} | {note_groups_per_bar} | {sample_index} | "
             "{score:.4f} | {note_count} | {unique_pitch_count} | {chord_tone_ratio:.3f} | "
-            "{dominant_pitch_ratio:.3f} | {repeated_pitch_ratio:.3f} | "
-            "{adjacent_repeated_pitch_ratio:.3f} | {direction_change_ratio:.3f} | "
+            "{root_tone_ratio:.3f} | {tension_ratio:.3f} | "
+            "{dominant_pitch_ratio:.3f} | {repeated_pitch_ratio:.3f} | {direction_change_ratio:.3f} | "
             "`{risk_flags_text}` | `{display_midi_path}` |".format(
                 **table_candidate
             )

@@ -62,6 +62,8 @@
   - 2-bar 후보가 너무 짧다는 piano-roll review를 반영해 4-bar `coverage_chord` phrase 후보를 생성/export하는 probe.
 - `STAGE_B_PHRASE_CONTOUR_DIAGNOSTICS_2026-05-21.md`
   - 4-bar 후보의 repeated-pitch risk가 adjacent collapse인지 제한된 pitch-set 재사용인지 구분하는 contour diagnostics.
+- `STAGE_B_ROOT_BIAS_DIAGNOSTICS_2026-05-21.md`
+  - "근음을 계속 치는 느낌"을 root-tone ratio와 tension ratio로 분리해 진단하는 문서.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`
@@ -88,7 +90,7 @@
 2. Brad Mehldau subset은 style adaptation과 holdout evaluation 용도로 분리한다.
 3. `max_files=2` Brad `control_v1` probe 결과를 기준으로 Stage A 한계를 문서화한다.
 4. broad training 전에 duration-explicit Stage B tokenization과 phrase/window dataset을 설계한다.
-5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, multi-sample probe, collapse sweep, strict collapse gate, 2-file generation probe, temporal coverage probe, coverage-aware constrained probe, coverage-aware A/B sweep, candidate ranking, harmonic/repetition gate, chord-aware pitch probe, candidate review export, longer 4-bar phrase probe, and phrase contour diagnostics를 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
+5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, multi-sample probe, collapse sweep, strict collapse gate, 2-file generation probe, temporal coverage probe, coverage-aware constrained probe, coverage-aware A/B sweep, candidate ranking, harmonic/repetition gate, chord-aware pitch probe, candidate review export, longer 4-bar phrase probe, phrase contour diagnostics, and root-bias diagnostics를 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
 
 핵심 원칙:
 

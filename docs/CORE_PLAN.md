@@ -128,6 +128,7 @@ Stage B에서 명시하는 것:
 22. Stage B coverage_chord candidate review export
 23. Stage B longer 4-bar coverage_chord phrase probe
 24. Stage B phrase contour/repeated-pitch diagnostics
+25. Stage B root bias diagnostics
 
 가장 최근 의미 있는 결과:
 
@@ -142,6 +143,7 @@ Stage B에서 명시하는 것:
 - Issue #49 extends the same coverage+chord-aware setup to a `4` bar probe with `32` note groups per sample and exports direct review candidates from the generation probe report.
 - Issue #49 fixes the length problem structurally, but repeated-pitch dependence remains a listening-review risk.
 - Issue #51 shows this is not adjacent same-note collapse: adjacent repeated pitch ratio is `0.000`, average direction change ratio is around `0.689`, and max longest same pitch run is `1`.
+- Issue #53 shows the perceived "root-heavy" line is not pure root collapse: average root tone ratio is around `0.271`, top candidate root ratio is around `0.219`, but tension ratio is `0.000`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -308,6 +310,28 @@ Stage B에서 명시하는 것:
 - 현재 후보는 한 음을 길게 반복하는 collapse가 아니다.
 - 제한된 chord-tone pitch set을 많이 재사용하는 상태다.
 - 다음 manual review는 이 pitch reuse가 motif로 들리는지, constrained cycling으로 들리는지 판단해야 한다.
+
+### Phase 3.9. Root Bias and Tension Diagnostics
+
+목표:
+
+- "근음을 계속 친다"는 청취 피드백을 수치화한다.
+- root tone, non-root chord tone, tension, non-chord tone 비율을 분리해서 본다.
+- root collapse인지, chord-tone-only 안전함인지 판단한다.
+
+현재 결과:
+
+- completed: generated sample report에 `pitch_roles`를 추가했다.
+- completed: review export에 `root`, `tension` columns를 추가했다.
+- latest result: average root tone ratio는 약 `0.271`이다.
+- latest result: top candidate root tone ratio는 약 `0.219`이다.
+- latest result: tension ratio는 `0.000`이다.
+
+해석:
+
+- 현재 후보는 root-only collapse가 아니다.
+- 오히려 `chord_pitch_mode=tones` 때문에 tension이 전혀 없는 안전한 chord-tone-only line이다.
+- 다음 비교는 `tones` vs `tones_tensions`가 맞다.
 
 ### Phase 4. Generic Jazz Base 후보 학습
 
