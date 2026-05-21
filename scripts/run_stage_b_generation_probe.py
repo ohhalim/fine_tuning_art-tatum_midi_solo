@@ -393,6 +393,71 @@ def analyze_stage_b_collapse(
     }
 
 
+def _sign(value: int) -> int:
+    if value > 0:
+        return 1
+    if value < 0:
+        return -1
+    return 0
+
+
+def analyze_stage_b_phrase_contour(
+    tokens: Sequence[int],
+    primer_size: int = 0,
+) -> dict[str, Any]:
+    groups = sorted(
+        extract_stage_b_note_groups(tokens, primer_size=primer_size),
+        key=lambda group: (int(group["bar"]), int(group["position"])),
+    )
+    pitches = [int(group["pitch"]) for group in groups]
+    intervals = [pitches[index + 1] - pitches[index] for index in range(max(0, len(pitches) - 1))]
+    interval_count = len(intervals)
+    nonzero_intervals = [interval for interval in intervals if interval != 0]
+    signs = [_sign(interval) for interval in nonzero_intervals]
+    direction_changes = sum(1 for index in range(1, len(signs)) if signs[index] != signs[index - 1])
+
+    longest_same_pitch_run = 0
+    current_same_pitch_run = 0
+    previous_pitch: int | None = None
+    for pitch in pitches:
+        current_same_pitch_run = current_same_pitch_run + 1 if pitch == previous_pitch else 1
+        longest_same_pitch_run = max(longest_same_pitch_run, current_same_pitch_run)
+        previous_pitch = pitch
+
+    adjacent_repeated_pitch_count = sum(1 for interval in intervals if interval == 0)
+    stepwise_count = sum(1 for interval in nonzero_intervals if abs(interval) <= 2)
+    leap_count = sum(1 for interval in nonzero_intervals if abs(interval) >= 5)
+
+    warning_reasons: list[str] = []
+    if interval_count > 0 and adjacent_repeated_pitch_count / interval_count >= 0.4:
+        warning_reasons.append("adjacent_pitch_repetition")
+    if longest_same_pitch_run >= 4:
+        warning_reasons.append("long_same_pitch_run")
+    if interval_count >= 8 and len(set(nonzero_intervals)) <= 2:
+        warning_reasons.append("low_interval_variety")
+    if len(signs) >= 8 and direction_changes / max(1, len(signs) - 1) <= 0.15:
+        warning_reasons.append("low_direction_change")
+
+    return {
+        "note_group_count": int(len(groups)),
+        "interval_count": int(interval_count),
+        "unique_interval_count": int(len(set(nonzero_intervals))),
+        "pitch_span": int(max(pitches) - min(pitches)) if pitches else 0,
+        "adjacent_repeated_pitch_count": int(adjacent_repeated_pitch_count),
+        "adjacent_repeated_pitch_ratio": (
+            float(adjacent_repeated_pitch_count / interval_count) if interval_count else 0.0
+        ),
+        "nonzero_interval_ratio": float(len(nonzero_intervals) / interval_count) if interval_count else 0.0,
+        "direction_change_count": int(direction_changes),
+        "direction_change_ratio": float(direction_changes / max(1, len(signs) - 1)) if signs else 0.0,
+        "stepwise_motion_ratio": float(stepwise_count / interval_count) if interval_count else 0.0,
+        "leap_motion_ratio": float(leap_count / interval_count) if interval_count else 0.0,
+        "longest_same_pitch_run": int(longest_same_pitch_run),
+        "contour_warning": bool(warning_reasons),
+        "contour_warning_reasons": warning_reasons,
+    }
+
+
 def evaluate_collapse_gate(
     collapse: dict[str, Any],
     min_unique_pitches: int = DEFAULT_STRICT_MIN_UNIQUE_PITCHES,
@@ -675,6 +740,7 @@ def sample_report(
     grammar = analyze_stage_b_note_grammar(tokens, primer_size=primer_size)
     collapse = analyze_stage_b_collapse(tokens, primer_size=primer_size, postprocess_report=postprocess_report)
     temporal_coverage = analyze_stage_b_temporal_coverage(tokens, primer_size=primer_size, bars=request.bars)
+    phrase_contour = analyze_stage_b_phrase_contour(tokens, primer_size=primer_size)
     collapse_gate = evaluate_collapse_gate(
         collapse,
         min_unique_pitches=strict_min_unique_pitches,
@@ -710,6 +776,7 @@ def sample_report(
         "grammar": grammar,
         "collapse": collapse,
         "temporal_coverage": temporal_coverage,
+        "phrase_contour": phrase_contour,
         "collapse_gate": collapse_gate,
         "postprocess": postprocess_report or {"enabled": False},
         "metrics": metrics.to_dict(),
@@ -747,9 +814,13 @@ def build_probe_summary(
     sustained_coverage_ratios: list[float] = []
     position_span_ratios: list[float] = []
     longest_sustained_empty_runs: list[int] = []
+    adjacent_repeated_pitch_ratios: list[float] = []
+    direction_change_ratios: list[float] = []
+    longest_same_pitch_runs: list[int] = []
     for row in sample_rows:
         collapse = row.get("collapse", {})
         temporal_coverage = row.get("temporal_coverage", {})
+        phrase_contour = row.get("phrase_contour", {})
         if collapse.get("collapse_warning"):
             collapse_warning_count += 1
         if not row.get("strict_valid", False):
@@ -770,6 +841,11 @@ def build_probe_summary(
         longest_sustained_empty_runs.append(
             int(temporal_coverage.get("longest_sustained_empty_run_steps", 0) or 0)
         )
+        adjacent_repeated_pitch_ratios.append(
+            float(phrase_contour.get("adjacent_repeated_pitch_ratio", 0.0) or 0.0)
+        )
+        direction_change_ratios.append(float(phrase_contour.get("direction_change_ratio", 0.0) or 0.0))
+        longest_same_pitch_runs.append(int(phrase_contour.get("longest_same_pitch_run", 0) or 0))
         if not row["valid"]:
             reason = str(row.get("failure_reason") or "unknown")
             diagnostic_reason = str(row.get("diagnostic_failure_reason") or reason)
@@ -837,6 +913,15 @@ def build_probe_summary(
         "max_longest_sustained_empty_run_steps": (
             max(longest_sustained_empty_runs) if longest_sustained_empty_runs else 0
         ),
+        "avg_adjacent_repeated_pitch_ratio": (
+            float(sum(adjacent_repeated_pitch_ratios) / len(adjacent_repeated_pitch_ratios))
+            if adjacent_repeated_pitch_ratios
+            else 0.0
+        ),
+        "avg_direction_change_ratio": (
+            float(sum(direction_change_ratios) / len(direction_change_ratios)) if direction_change_ratios else 0.0
+        ),
+        "max_longest_same_pitch_run": max(longest_same_pitch_runs) if longest_same_pitch_runs else 0,
     }
 
 

@@ -86,6 +86,13 @@ class StageBReviewExportTest(unittest.TestCase):
                         "onset_coverage_ratio": 0.5,
                         "sustained_coverage_ratio": 0.6875,
                     },
+                    "phrase_contour": {
+                        "adjacent_repeated_pitch_ratio": 0.05,
+                        "direction_change_ratio": 0.4,
+                        "longest_same_pitch_run": 2,
+                        "contour_warning": False,
+                        "contour_warning_reasons": [],
+                    },
                 },
                 {
                     "sample_index": 2,
@@ -106,6 +113,7 @@ class StageBReviewExportTest(unittest.TestCase):
         self.assertEqual(selected[0]["mode"], "coverage_chord")
         self.assertEqual(selected[0]["note_groups_per_bar"], 8)
         self.assertEqual(selected[0]["note_count"], 32)
+        self.assertIn("high_repeated_pitch_ratio", selected[0]["risk_flags"])
         self.assertGreater(selected[0]["score"], 80.0)
 
     def test_build_review_manifest_copies_midi(self) -> None:
@@ -166,6 +174,9 @@ class StageBReviewExportTest(unittest.TestCase):
                     "min_bar_chord_tone_ratio": 0.8,
                     "dominant_pitch_ratio": 0.375,
                     "repeated_pitch_ratio": 0.25,
+                    "adjacent_repeated_pitch_ratio": 0.0,
+                    "direction_change_ratio": 0.0,
+                    "risk_flags": [],
                     "midi_path": "sample.mid",
                 }
             ],

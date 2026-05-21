@@ -10,6 +10,7 @@ import torch
 from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_collapse,
     analyze_stage_b_note_grammar,
+    analyze_stage_b_phrase_contour,
     analyze_stage_b_temporal_coverage,
     build_probe_summary,
     build_stage_b_primer,
@@ -120,6 +121,63 @@ class StageBGenerationProbeTest(unittest.TestCase):
         self.assertEqual(report["complete_note_groups"], 0)
         self.assertGreater(report["invalid_token_count"], 0)
         self.assertFalse(report["grammar_valid"])
+
+    def test_analyze_stage_b_phrase_contour_reports_repeated_pitch_risk(self) -> None:
+        primer = build_stage_b_primer(["Cm7"], bpm=120)
+        tokens = primer + [
+            position_token(0),
+            note_velocity_token(4),
+            note_pitch_token(60),
+            note_duration_token(1),
+            position_token(1),
+            note_velocity_token(4),
+            note_pitch_token(60),
+            note_duration_token(1),
+            position_token(2),
+            note_velocity_token(4),
+            note_pitch_token(60),
+            note_duration_token(1),
+            position_token(3),
+            note_velocity_token(4),
+            note_pitch_token(60),
+            note_duration_token(1),
+            TOKEN_END,
+        ]
+
+        report = analyze_stage_b_phrase_contour(tokens, primer_size=len(primer))
+
+        self.assertEqual(report["longest_same_pitch_run"], 4)
+        self.assertEqual(report["adjacent_repeated_pitch_count"], 3)
+        self.assertTrue(report["contour_warning"])
+        self.assertIn("long_same_pitch_run", report["contour_warning_reasons"])
+
+    def test_analyze_stage_b_phrase_contour_reports_direction_changes(self) -> None:
+        primer = build_stage_b_primer(["Cm7"], bpm=120)
+        tokens = primer + [
+            position_token(0),
+            note_velocity_token(4),
+            note_pitch_token(60),
+            note_duration_token(1),
+            position_token(1),
+            note_velocity_token(4),
+            note_pitch_token(64),
+            note_duration_token(1),
+            position_token(2),
+            note_velocity_token(4),
+            note_pitch_token(62),
+            note_duration_token(1),
+            position_token(3),
+            note_velocity_token(4),
+            note_pitch_token(67),
+            note_duration_token(1),
+            TOKEN_END,
+        ]
+
+        report = analyze_stage_b_phrase_contour(tokens, primer_size=len(primer))
+
+        self.assertEqual(report["pitch_span"], 7)
+        self.assertEqual(report["direction_change_count"], 2)
+        self.assertGreater(report["direction_change_ratio"], 0.0)
 
     def test_constrained_generation_creates_decodable_note_groups(self) -> None:
         primer = build_stage_b_primer(["Cm7", "F7"], bpm=120)
