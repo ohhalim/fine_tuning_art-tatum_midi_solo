@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-53-stage-b-root-bias-diagnostics`
+- `issue-55-stage-b-tension-compare`
 
 현재 범위가 아닌 것:
 
@@ -36,49 +36,45 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #53은 manual listening/piano-roll review에서 나온 "멜로디 같긴 하지만 근음을 계속 치는 느낌"을 root bias로 수치화한다.
+Issue #55는 manual listening/piano-roll review에서 나온 "멜로디 같긴 하지만 근음/코드음에 너무 안전하게 붙어있는 느낌"을 `tones` vs `tones_tensions` 비교로 검증한다.
 
-Issue #51에서 이미 adjacent same-note collapse는 아니라는 것을 확인했다. Issue #53은 실제로 root tone을 얼마나 치는지, non-root chord tone과 tension 비율이 어떤지 기록한다.
+Issue #51에서 이미 adjacent same-note collapse는 아니라는 것을 확인했다. Issue #53에서는 실제 root tone, non-root chord tone, tension 비율을 기록했다. Issue #55는 같은 4-bar 조건에서 `tones_tensions`가 tension을 실제로 늘리고 root bias를 줄이는지 확인한다.
 
 Implemented:
 
-- `scripts/run_stage_b_generation_probe.py` phrase contour diagnostics
-- `scripts/run_stage_b_generation_probe.py` pitch-role diagnostics
-- `scripts/export_stage_b_review_candidates.py` repeated-pitch/contour risk flags
-- `scripts/export_stage_b_review_candidates.py` root/tension columns
-- `tests/test_stage_b_generation_probe.py` phrase contour tests
-- `tests/test_stage_b_review_export.py` risk flag tests
-- `scripts/agent_harness.sh stage-b-longer-phrase-probe`
+- `scripts/run_stage_b_pitch_mode_compare.py`
+- `tests/test_stage_b_pitch_mode_compare.py`
+- `scripts/run_stage_b_sampling_sweep.py` root/tension summary fields
+- `scripts/agent_harness.sh stage-b-pitch-mode-compare`
 - output files:
-  - `review_manifest.json`
-  - `review_candidates.md`
-  - copied review MIDI files under `midi/`
+  - `pitch_mode_compare_report.json`
+  - `pitch_mode_compare_report.md`
+  - mode-specific `review_manifest.json`
+  - mode-specific copied review MIDI files under `midi/`
 
 Result:
 
-- source generation report: `outputs/stage_b_generation_probe/harness_stage_b_longer_phrase_probe/report.json`
-- review output: `outputs/stage_b_review_candidates/harness_stage_b_longer_phrase_probe`
+- source comparison report: `outputs/stage_b_pitch_mode_compare/harness_stage_b_pitch_mode_compare/pitch_mode_compare_report.json`
+- tones review output: `outputs/stage_b_review_candidates/harness_stage_b_pitch_mode_compare/tones`
+- tones+tensions review output: `outputs/stage_b_review_candidates/harness_stage_b_pitch_mode_compare/tones_tensions`
 - setup: `4` bars, `8` note groups per bar, `32` note groups per sample
-- generated samples: `3`
-- strict valid samples: `3`
-- grammar-valid samples: `3`
-- average onset coverage ratio: around `0.500`
-- average sustained coverage ratio: around `0.680`
-- repeated pitch ratio: around `0.719`
-- adjacent repeated pitch ratio: `0.000`
-- average direction change ratio: around `0.689`
-- max longest same pitch run: `1`
-- average root tone ratio: around `0.271`
-- top candidate root tone ratio: around `0.219`
-- tension ratio: `0.000`
+- `tones` strict valid samples: `3/3`
+- `tones_tensions` strict valid samples: `3/3`
+- `tones` average root tone ratio: around `0.271`
+- `tones_tensions` average root tone ratio: around `0.135`
+- `tones` average tension ratio: `0.000`
+- `tones_tensions` average tension ratio: around `0.313`
+- `tones` average chord-tone ratio: around `0.927`
+- `tones_tensions` average chord-tone ratio: around `0.667`
+- both modes average onset coverage ratio: around `0.500`
 
 Decision:
 
 - 2-bar candidates가 너무 짧았다는 판단은 타당하다.
-- 다음 review는 4-bar exported candidates를 기준으로 한다.
-- 4-bar 후보가 여전히 단편적이면 broad training으로 가지 않고 phrase/motif-level constraint 또는 pretrained symbolic base를 검토한다.
-- 4-bar 후보가 최소한 solo-line phrase sketch로 들리면 generic jazz base 후보 학습 설계로 넘어갈 수 있다.
-- "근음을 계속 치는 느낌"은 실제 root-only collapse라기보다 chord-tone-only, no-tension 라인의 안전한 inside sound일 가능성이 높다.
+- 4-bar 후보는 one-note/two-note failure가 아니라 melody-like sketch로 볼 수 있다.
+- "근음을 계속 치는 느낌"은 실제 root-only collapse라기보다 chord-tone-only, no-tension 라인의 안전한 inside sound에 가깝다.
+- `tones_tensions`는 no-tension 문제를 줄였지만, repeated/dominant pitch risk가 남아 있어 broad training 전 phrase-shape control이 먼저다.
+- 다음 issue는 passing/approach pitch policy 또는 motif/contour constraint 비교가 맞다.
 
 Detail:
 
@@ -89,6 +85,7 @@ Detail:
 - `docs/STAGE_B_LONGER_PHRASE_PROBE_2026-05-21.md`
 - `docs/STAGE_B_PHRASE_CONTOUR_DIAGNOSTICS_2026-05-21.md`
 - `docs/STAGE_B_ROOT_BIAS_DIAGNOSTICS_2026-05-21.md`
+- `docs/STAGE_B_PITCH_MODE_COMPARE_2026-05-21.md`
 
 ## Active Issue #14
 
@@ -1219,16 +1216,22 @@ Latest local result:
 - chord tone ratio: around `0.938-1.000`
 - tension ratio: `0.000`
 - adjacent repeated pitch ratio: `0.000`
+- `tones_tensions` comparison result:
+  - root tone ratio: around `0.135`
+  - tension ratio: around `0.313`
+  - strict valid samples: `3/3`
 
 Decision:
 
 - The current issue is not pure root collapse.
 - The stronger diagnosis is "safe chord-tone-only line with no tensions."
-- Next generation comparison should test `chord_pitch_mode=tones_tensions` against current `tones`.
+- `chord_pitch_mode=tones_tensions` reduces root/no-tension stiffness, but repeated pitch-set behavior remains.
+- Next generation comparison should test passing/approach pitch or contour/motif constraints against the current `tones_tensions` baseline.
 
 Detail:
 
 - `docs/STAGE_B_ROOT_BIAS_DIAGNOSTICS_2026-05-21.md`
+- `docs/STAGE_B_PITCH_MODE_COMPARE_2026-05-21.md`
 
 ### 1. Run full jazz piano dataset audit
 

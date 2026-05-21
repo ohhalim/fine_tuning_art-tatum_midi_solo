@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #53: Stage B root bias diagnostics and tension pitch comparison.
+- Issue #55: Stage B tones vs tones_tensions pitch-mode comparison.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
