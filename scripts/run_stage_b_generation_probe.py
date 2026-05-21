@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Sequence
@@ -45,6 +46,7 @@ from scripts.stage_b_tokens import (  # noqa: E402
     TOKEN_CHORD_ROOT_END,
     TOKEN_CHORD_ROOT_START,
     SEQUENCE_FORMAT_STAGE_B_V1,
+    MAX_DURATION_STEPS,
     POSITIONS_PER_BAR,
     PIANO_PITCH_MAX,
     PIANO_PITCH_MIN,
@@ -56,6 +58,7 @@ from scripts.stage_b_tokens import (  # noqa: E402
     is_note_pitch_token,
     is_position_token,
     is_velocity_token,
+    note_duration_token,
     note_pitch_token,
     parse_chord_symbol,
     pitch_from_token,
@@ -560,6 +563,64 @@ def coverage_aware_position_tokens(
     return [TOKEN_POSITION_START + int(position) for position in positions]
 
 
+JAZZ_RHYTHM_POSITION_PATTERNS = {
+    "swing_motif": [
+        [0, 3, 5, 7, 10, 11, 13, 15],
+        [1, 3, 4, 7, 9, 12, 14, 15],
+        [0, 2, 5, 6, 8, 11, 13, 14],
+        [2, 4, 5, 8, 10, 12, 13, 15],
+    ],
+}
+
+JAZZ_RHYTHM_DURATION_PATTERNS = {
+    "swing_motif": [
+        [2, 1, 3, 1, 2, 2, 1, 4],
+        [1, 3, 1, 2, 2, 1, 3, 2],
+        [3, 1, 2, 1, 4, 1, 2, 2],
+        [1, 2, 2, 3, 1, 2, 1, 4],
+    ],
+}
+
+
+def _pattern_value(pattern: Sequence[int], group_index: int, note_groups_per_bar: int) -> int:
+    if not pattern:
+        return 0
+    groups_per_bar = max(1, int(note_groups_per_bar))
+    if groups_per_bar == len(pattern):
+        index = int(group_index) % len(pattern)
+    else:
+        index = min(len(pattern) - 1, int(round(int(group_index) * (len(pattern) - 1) / max(1, groups_per_bar - 1))))
+    return int(pattern[index])
+
+
+def jazz_rhythm_position_tokens(
+    bar_index: int,
+    group_index: int,
+    note_groups_per_bar: int,
+    profile: str = "swing_motif",
+    position_window: int = 0,
+) -> list[int]:
+    patterns = JAZZ_RHYTHM_POSITION_PATTERNS.get(profile, JAZZ_RHYTHM_POSITION_PATTERNS["swing_motif"])
+    pattern = patterns[int(bar_index) % len(patterns)]
+    target = max(0, min(int(POSITIONS_PER_BAR) - 1, _pattern_value(pattern, group_index, note_groups_per_bar)))
+    window = max(0, int(position_window))
+    positions = range(max(0, target - window), min(int(POSITIONS_PER_BAR), target + window + 1))
+    return [TOKEN_POSITION_START + int(position) for position in positions]
+
+
+def jazz_rhythm_duration_tokens(
+    bar_index: int,
+    group_index: int,
+    note_groups_per_bar: int,
+    profile: str = "swing_motif",
+) -> list[int]:
+    patterns = JAZZ_RHYTHM_DURATION_PATTERNS.get(profile, JAZZ_RHYTHM_DURATION_PATTERNS["swing_motif"])
+    pattern = patterns[int(bar_index) % len(patterns)]
+    target = max(1, min(int(MAX_DURATION_STEPS), _pattern_value(pattern, group_index, note_groups_per_bar)))
+    duration_steps = sorted({max(1, min(int(MAX_DURATION_STEPS), target + offset)) for offset in (-1, 0, 1)})
+    return [note_duration_token(step) for step in duration_steps]
+
+
 def chord_pitch_classes(chord: str | None, pitch_mode: str = "tones_tensions") -> set[int]:
     root, quality = parse_chord_symbol(chord)
     root_pc = ROOT_TO_PC.get(root)
@@ -712,6 +773,75 @@ def analyze_stage_b_approach_resolution(
     }
 
 
+def analyze_stage_b_rhythm_profile(
+    tokens: Sequence[int],
+    primer_size: int = 0,
+) -> dict[str, Any]:
+    groups = extract_stage_b_note_groups(tokens, primer_size=primer_size)
+    group_count = int(len(groups))
+    if not groups:
+        return {
+            "note_group_count": 0,
+            "unique_position_count": 0,
+            "unique_position_ratio": 0.0,
+            "syncopated_onset_ratio": 0.0,
+            "unique_bar_position_pattern_count": 0,
+            "unique_bar_position_pattern_ratio": 0.0,
+            "duration_diversity_ratio": 0.0,
+            "most_common_duration_ratio": 0.0,
+            "ioi_diversity_ratio": 0.0,
+            "most_common_ioi_ratio": 0.0,
+            "bar_position_patterns": {},
+        }
+
+    positions = [int(group["position"]) for group in groups]
+    durations = [int(group["duration_steps"]) for group in groups]
+    absolute_positions = [
+        int(group["bar"]) * int(POSITIONS_PER_BAR) + int(group["position"])
+        for group in groups
+    ]
+    ioi_steps = [
+        max(0, absolute_positions[index + 1] - absolute_positions[index])
+        for index in range(len(absolute_positions) - 1)
+    ]
+    strong_positions = {0, 4, 8, 12}
+    syncopated_count = sum(1 for position in positions if position not in strong_positions)
+
+    per_bar_positions: dict[int, list[int]] = {}
+    for group in groups:
+        per_bar_positions.setdefault(int(group["bar"]), []).append(int(group["position"]))
+    bar_patterns = {
+        str(bar): tuple(sorted(values))
+        for bar, values in sorted(per_bar_positions.items())
+    }
+    unique_bar_patterns = set(bar_patterns.values())
+    duration_counts = Counter(durations)
+    ioi_counts = Counter(ioi_steps)
+
+    return {
+        "note_group_count": group_count,
+        "unique_position_count": int(len(set(positions))),
+        "unique_position_ratio": float(len(set(positions)) / group_count),
+        "syncopated_onset_ratio": float(syncopated_count / group_count),
+        "unique_bar_position_pattern_count": int(len(unique_bar_patterns)),
+        "unique_bar_position_pattern_ratio": (
+            float(len(unique_bar_patterns) / len(bar_patterns)) if bar_patterns else 0.0
+        ),
+        "duration_diversity_ratio": float(len(duration_counts) / group_count),
+        "most_common_duration_ratio": (
+            float(max(duration_counts.values()) / group_count) if duration_counts else 0.0
+        ),
+        "ioi_diversity_ratio": float(len(ioi_counts) / max(1, len(ioi_steps))),
+        "most_common_ioi_ratio": (
+            float(max(ioi_counts.values()) / max(1, len(ioi_steps))) if ioi_counts else 0.0
+        ),
+        "bar_position_patterns": {
+            bar: list(pattern)
+            for bar, pattern in bar_patterns.items()
+        },
+    }
+
+
 def chord_aware_pitch_tokens(
     chord: str | None,
     pitch_mode: str = "tones_tensions",
@@ -767,6 +897,9 @@ def generate_stage_b_constrained_tokens(
     chord_aware_pitches: bool = False,
     chord_pitch_mode: str = "tones_tensions",
     chord_pitch_repeat_window: int = 2,
+    jazz_rhythm_positions: bool = False,
+    jazz_duration_tokens: bool = False,
+    jazz_rhythm_profile: str = "swing_motif",
 ) -> list[int]:
     tokens = [int(token) for token in primer_tokens]
     recent_pitches: list[int] = []
@@ -788,7 +921,15 @@ def generate_stage_b_constrained_tokens(
                     tokens.append(TOKEN_END)
                     return tokens
                 allowed = list(allowed_tokens)
-                if coverage_aware_positions and family_index == 0:
+                if jazz_rhythm_positions and family_index == 0:
+                    allowed = jazz_rhythm_position_tokens(
+                        bar_index=bar_index,
+                        group_index=group_index,
+                        note_groups_per_bar=note_groups_per_bar,
+                        profile=jazz_rhythm_profile,
+                        position_window=coverage_position_window,
+                    )
+                elif coverage_aware_positions and family_index == 0:
                     allowed = coverage_aware_position_tokens(
                         group_index,
                         note_groups_per_bar=note_groups_per_bar,
@@ -801,6 +942,13 @@ def generate_stage_b_constrained_tokens(
                         recent_pitches=recent_pitches,
                         repeat_window=chord_pitch_repeat_window,
                         group_index=group_index,
+                    )
+                if jazz_duration_tokens and family_index == 3:
+                    allowed = jazz_rhythm_duration_tokens(
+                        bar_index=bar_index,
+                        group_index=group_index,
+                        note_groups_per_bar=note_groups_per_bar,
+                        profile=jazz_rhythm_profile,
                     )
                 token = next_token_from_model(
                     model,
@@ -903,6 +1051,7 @@ def sample_report(
         chords=request.chord_progression,
         primer_size=primer_size,
     )
+    rhythm_profile = analyze_stage_b_rhythm_profile(tokens, primer_size=primer_size)
     collapse_gate = evaluate_collapse_gate(
         collapse,
         min_unique_pitches=strict_min_unique_pitches,
@@ -941,6 +1090,7 @@ def sample_report(
         "phrase_contour": phrase_contour,
         "pitch_roles": pitch_roles,
         "approach_resolution": approach_resolution,
+        "rhythm_profile": rhythm_profile,
         "collapse_gate": collapse_gate,
         "postprocess": postprocess_report or {"enabled": False},
         "metrics": metrics.to_dict(),
@@ -985,12 +1135,19 @@ def build_probe_summary(
     tension_ratios: list[float] = []
     approach_candidate_ratios: list[float] = []
     approach_resolution_ratios: list[float] = []
+    syncopated_onset_ratios: list[float] = []
+    unique_bar_pattern_ratios: list[float] = []
+    duration_diversity_ratios: list[float] = []
+    most_common_duration_ratios: list[float] = []
+    ioi_diversity_ratios: list[float] = []
+    most_common_ioi_ratios: list[float] = []
     for row in sample_rows:
         collapse = row.get("collapse", {})
         temporal_coverage = row.get("temporal_coverage", {})
         phrase_contour = row.get("phrase_contour", {})
         pitch_roles = row.get("pitch_roles", {})
         approach_resolution = row.get("approach_resolution", {})
+        rhythm_profile = row.get("rhythm_profile", {})
         if collapse.get("collapse_warning"):
             collapse_warning_count += 1
         if not row.get("strict_valid", False):
@@ -1024,6 +1181,14 @@ def build_probe_summary(
         approach_resolution_ratios.append(
             float(approach_resolution.get("approach_resolution_ratio", 0.0) or 0.0)
         )
+        syncopated_onset_ratios.append(float(rhythm_profile.get("syncopated_onset_ratio", 0.0) or 0.0))
+        unique_bar_pattern_ratios.append(
+            float(rhythm_profile.get("unique_bar_position_pattern_ratio", 0.0) or 0.0)
+        )
+        duration_diversity_ratios.append(float(rhythm_profile.get("duration_diversity_ratio", 0.0) or 0.0))
+        most_common_duration_ratios.append(float(rhythm_profile.get("most_common_duration_ratio", 0.0) or 0.0))
+        ioi_diversity_ratios.append(float(rhythm_profile.get("ioi_diversity_ratio", 0.0) or 0.0))
+        most_common_ioi_ratios.append(float(rhythm_profile.get("most_common_ioi_ratio", 0.0) or 0.0))
         if not row["valid"]:
             reason = str(row.get("failure_reason") or "unknown")
             diagnostic_reason = str(row.get("diagnostic_failure_reason") or reason)
@@ -1114,6 +1279,36 @@ def build_probe_summary(
             if approach_resolution_ratios
             else 0.0
         ),
+        "avg_syncopated_onset_ratio": (
+            float(sum(syncopated_onset_ratios) / len(syncopated_onset_ratios))
+            if syncopated_onset_ratios
+            else 0.0
+        ),
+        "avg_unique_bar_position_pattern_ratio": (
+            float(sum(unique_bar_pattern_ratios) / len(unique_bar_pattern_ratios))
+            if unique_bar_pattern_ratios
+            else 0.0
+        ),
+        "avg_duration_diversity_ratio": (
+            float(sum(duration_diversity_ratios) / len(duration_diversity_ratios))
+            if duration_diversity_ratios
+            else 0.0
+        ),
+        "avg_most_common_duration_ratio": (
+            float(sum(most_common_duration_ratios) / len(most_common_duration_ratios))
+            if most_common_duration_ratios
+            else 0.0
+        ),
+        "avg_ioi_diversity_ratio": (
+            float(sum(ioi_diversity_ratios) / len(ioi_diversity_ratios))
+            if ioi_diversity_ratios
+            else 0.0
+        ),
+        "avg_most_common_ioi_ratio": (
+            float(sum(most_common_ioi_ratios) / len(most_common_ioi_ratios))
+            if most_common_ioi_ratios
+            else 0.0
+        ),
     }
 
 
@@ -1161,6 +1356,9 @@ def build_parser() -> argparse.ArgumentParser:
         default="tones_tensions",
     )
     parser.add_argument("--chord_pitch_repeat_window", type=int, default=2)
+    parser.add_argument("--jazz_rhythm_positions", action="store_true")
+    parser.add_argument("--jazz_duration_tokens", action="store_true")
+    parser.add_argument("--jazz_rhythm_profile", choices=("swing_motif",), default="swing_motif")
     parser.add_argument("--postprocess_overlap", action="store_true")
     parser.add_argument("--max_simultaneous_notes", type=int, default=2)
     parser.add_argument("--min_valid_samples", type=int, default=1)
@@ -1240,6 +1438,9 @@ def main() -> int:
         "chord_aware_pitches": bool(args.chord_aware_pitches),
         "chord_pitch_mode": args.chord_pitch_mode,
         "chord_pitch_repeat_window": int(args.chord_pitch_repeat_window),
+        "jazz_rhythm_positions": bool(args.jazz_rhythm_positions),
+        "jazz_duration_tokens": bool(args.jazz_duration_tokens),
+        "jazz_rhythm_profile": args.jazz_rhythm_profile,
         "postprocess_overlap": bool(args.postprocess_overlap),
     }
 
@@ -1302,6 +1503,9 @@ def main() -> int:
                 chord_aware_pitches=args.chord_aware_pitches,
                 chord_pitch_mode=args.chord_pitch_mode,
                 chord_pitch_repeat_window=args.chord_pitch_repeat_window,
+                jazz_rhythm_positions=args.jazz_rhythm_positions,
+                jazz_duration_tokens=args.jazz_duration_tokens,
+                jazz_rhythm_profile=args.jazz_rhythm_profile,
             )
         else:
             generated_tokens = generate_stage_b_tokens(

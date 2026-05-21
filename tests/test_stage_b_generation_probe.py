@@ -13,6 +13,7 @@ from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_approach_resolution,
     analyze_stage_b_phrase_contour,
     analyze_stage_b_pitch_roles,
+    analyze_stage_b_rhythm_profile,
     analyze_stage_b_temporal_coverage,
     build_probe_summary,
     build_stage_b_primer,
@@ -25,10 +26,13 @@ from scripts.run_stage_b_generation_probe import (
     extract_stage_b_note_groups,
     generate_stage_b_constrained_tokens,
     generate_stage_b_tokens,
+    jazz_rhythm_duration_tokens,
+    jazz_rhythm_position_tokens,
     postprocess_stage_b_midi,
 )
 from scripts.stage_b_tokens import (
     chord_tokens,
+    duration_steps_from_token,
     note_duration_token,
     note_pitch_token,
     note_velocity_token,
@@ -243,6 +247,24 @@ class StageBGenerationProbeTest(unittest.TestCase):
 
         self.assertEqual(positions, [7, 8, 9])
 
+    def test_jazz_rhythm_position_tokens_use_syncopated_patterns(self) -> None:
+        positions = [
+            position_from_token(jazz_rhythm_position_tokens(0, index, note_groups_per_bar=8)[0])
+            for index in range(8)
+        ]
+
+        self.assertEqual(positions, [0, 3, 5, 7, 10, 11, 13, 15])
+
+    def test_jazz_rhythm_duration_tokens_vary_by_group(self) -> None:
+        durations = [
+            [duration_steps_from_token(token) for token in jazz_rhythm_duration_tokens(0, index, note_groups_per_bar=8)]
+            for index in range(8)
+        ]
+
+        for expected, allowed in zip([2, 1, 3, 1, 2, 2, 1, 4], durations, strict=True):
+            self.assertIn(expected, allowed)
+        self.assertGreater(len({tuple(allowed) for allowed in durations}), 1)
+
     def test_chord_aware_pitch_tokens_limit_to_chord_tones(self) -> None:
         tokens = chord_aware_pitch_tokens("Cm7", pitch_mode="tones", repeat_window=0)
         pitch_classes = {pitch_from_token(token) % 12 for token in tokens}
@@ -296,6 +318,36 @@ class StageBGenerationProbeTest(unittest.TestCase):
         self.assertEqual(report["approach_candidate_count"], 1)
         self.assertEqual(report["resolved_approach_count"], 1)
         self.assertAlmostEqual(report["approach_resolution_ratio"], 1.0)
+
+    def test_analyze_stage_b_rhythm_profile_reports_syncopation_and_variation(self) -> None:
+        primer = build_stage_b_primer(["Cmaj7"], bpm=120)
+        tokens = primer + [
+            position_token(0),
+            note_velocity_token(4),
+            note_pitch_token(60),
+            note_duration_token(2),
+            position_token(3),
+            note_velocity_token(4),
+            note_pitch_token(62),
+            note_duration_token(1),
+            TOKEN_BAR,
+            *chord_tokens("Cmaj7"),
+            position_token(1),
+            note_velocity_token(4),
+            note_pitch_token(64),
+            note_duration_token(3),
+            position_token(7),
+            note_velocity_token(4),
+            note_pitch_token(65),
+            note_duration_token(1),
+            TOKEN_END,
+        ]
+
+        report = analyze_stage_b_rhythm_profile(tokens, primer_size=len(primer))
+
+        self.assertEqual(report["note_group_count"], 4)
+        self.assertGreater(report["syncopated_onset_ratio"], 0.5)
+        self.assertEqual(report["unique_bar_position_pattern_count"], 2)
 
     def test_analyze_stage_b_pitch_roles_counts_root_and_tensions(self) -> None:
         primer = build_stage_b_primer(["Cm7", "F7"], bpm=120)

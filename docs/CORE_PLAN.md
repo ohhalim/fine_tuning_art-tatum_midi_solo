@@ -131,6 +131,7 @@ Stage B에서 명시하는 것:
 25. Stage B root bias diagnostics
 26. Stage B `tones` vs `tones_tensions` pitch-mode comparison
 27. Stage B 8-bar approach phrase probe
+28. Stage B swing/motif phrase grammar probe
 
 가장 최근 의미 있는 결과:
 
@@ -332,6 +333,8 @@ Stage B에서 명시하는 것:
 - Issue #55 result: 양쪽 모두 strict valid `3/3`이지만, `tones_tensions` 후보는 repeated/dominant pitch risk가 여전히 높다.
 - Issue #57 result: 8-bar `approach_tensions`는 strict valid `3/3`, root ratio `0.000`, approach resolution ratio `1.000`을 만들었다.
 - Issue #57 review premise: 이전보다 나아졌지만 아직 jazz solo가 아니라 다이아토닉 코드톤/근음 기반 초급 melodic exercise처럼 들린다.
+- Issue #59 result: `swing_motif_approach`는 strict valid `3/3`을 유지하면서 syncopated onset ratio를 `0.500`에서 `0.750`으로 올렸다.
+- Issue #59 result: unique bar-position pattern ratio는 `0.125`에서 `0.500`으로 올랐고, most-common duration ratio는 `0.552`에서 `0.380`으로 낮아졌다.
 
 해석:
 
@@ -339,7 +342,37 @@ Stage B에서 명시하는 것:
 - 오히려 `chord_pitch_mode=tones` 때문에 tension이 전혀 없는 안전한 chord-tone-only line이다.
 - `tones_tensions`는 no-tension 문제를 줄였지만, 더 좋은 solo phrase라고 바로 판단할 단계는 아니다.
 - `approach_tensions`는 pitch-level resolution을 만들지만, 이 또한 jazz vocabulary 자체는 아니다.
-- 다음 비교는 pitch filter보다 rhythm/motif/swing-aware phrase grammar 쪽이 맞다.
+- `swing_motif_approach`는 기계적인 grid 반복을 줄였지만, 이 또한 jazz vocabulary 자체는 아니다.
+- 다음 비교는 pitch/rhythm rule을 더 늘리는 것보다 real jazz MIDI phrase statistics와 motif/cadence control 쪽이 맞다.
+
+### Phase 3.10. Swing/Motif Phrase Grammar
+
+목표:
+
+- pitch-only approach/tension constraint의 한계를 확인한다.
+- 같은 checkpoint에서 baseline approach grammar와 swing/motif rhythm grammar를 비교한다.
+- rhythm profile을 candidate ranking과 review export에 넣는다.
+
+현재 결과:
+
+- completed: `jazz_rhythm_position_tokens()`와 `jazz_rhythm_duration_tokens()`를 추가했다.
+- completed: `approach_baseline`과 `swing_motif_approach`를 같은 checkpoint에서 비교했다.
+- latest result: 두 grammar 모두 strict valid `3/3`이다.
+- latest result: syncopated onset ratio는 `0.500`에서 `0.750`으로 좋아졌다.
+- latest result: unique bar-position pattern ratio는 `0.125`에서 `0.500`으로 좋아졌다.
+- latest result: direct MIDI inspection에서 baseline의 반복 IOI/template 문제가 확인됐다.
+
+해석:
+
+- 현재 후보는 one-note/two-note/chord-block failure가 아니다.
+- rhythmic template 반복은 줄었다.
+- 하지만 아직 실제 jazz solo vocabulary라고 볼 근거는 부족하다.
+
+다음 통과 기준:
+
+- generated rhythm profile을 real jazz MIDI window 통계와 비교한다.
+- pitch motif cell, cadence/landing, phrase memory 중 하나를 다음 issue로 분리한다.
+- rule이 아니라 data-derived constraint로 넘어갈지 판단한다.
 
 ### Phase 4. Generic Jazz Base 후보 학습
 

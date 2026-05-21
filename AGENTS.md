@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #57: Stage B 8-bar approach phrase probe.
+- Issue #59: Stage B swing/motif phrase grammar probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -164,6 +164,12 @@ For Stage B 8-bar approach/passing-note phrase changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-8bar-approach-phrase
+```
+
+For Stage B swing/motif rhythm phrase changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-swing-motif-phrase
 ```
 
 For Stage B collapse/sampling-sweep changes, run:

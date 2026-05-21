@@ -119,6 +119,12 @@ def probe_command(
         cmd.append("--chord_aware_pitches")
         cmd.extend(["--chord_pitch_mode", str(getattr(args, "chord_pitch_mode", "tones_tensions"))])
         cmd.extend(["--chord_pitch_repeat_window", str(getattr(args, "chord_pitch_repeat_window", 2))])
+    if getattr(args, "jazz_rhythm_positions", False):
+        cmd.append("--jazz_rhythm_positions")
+    if getattr(args, "jazz_duration_tokens", False):
+        cmd.append("--jazz_duration_tokens")
+    if getattr(args, "jazz_rhythm_positions", False) or getattr(args, "jazz_duration_tokens", False):
+        cmd.extend(["--jazz_rhythm_profile", str(getattr(args, "jazz_rhythm_profile", "swing_motif"))])
     if skip_prepare_train:
         cmd.extend(["--skip_prepare", "--skip_train"])
     if checkpoint_dir is not None:
@@ -188,6 +194,14 @@ def row_from_probe_report(top_k: int, temperature: float, run_id: str, report: d
         "avg_tension_ratio": float(summary.get("avg_tension_ratio", 0.0) or 0.0),
         "avg_approach_candidate_ratio": float(summary.get("avg_approach_candidate_ratio", 0.0) or 0.0),
         "avg_approach_resolution_ratio": float(summary.get("avg_approach_resolution_ratio", 0.0) or 0.0),
+        "avg_syncopated_onset_ratio": float(summary.get("avg_syncopated_onset_ratio", 0.0) or 0.0),
+        "avg_unique_bar_position_pattern_ratio": float(
+            summary.get("avg_unique_bar_position_pattern_ratio", 0.0) or 0.0
+        ),
+        "avg_duration_diversity_ratio": float(summary.get("avg_duration_diversity_ratio", 0.0) or 0.0),
+        "avg_most_common_duration_ratio": float(summary.get("avg_most_common_duration_ratio", 0.0) or 0.0),
+        "avg_ioi_diversity_ratio": float(summary.get("avg_ioi_diversity_ratio", 0.0) or 0.0),
+        "avg_most_common_ioi_ratio": float(summary.get("avg_most_common_ioi_ratio", 0.0) or 0.0),
         "failure_reasons": summary.get("failure_reasons", {}),
         "diagnostic_failure_reasons": summary.get("diagnostic_failure_reasons", {}),
         "strict_failure_reasons": summary.get("strict_failure_reasons", {}),
