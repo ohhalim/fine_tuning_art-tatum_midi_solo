@@ -132,6 +132,7 @@ Stage B에서 명시하는 것:
 26. Stage B `tones` vs `tones_tensions` pitch-mode comparison
 27. Stage B 8-bar approach phrase probe
 28. Stage B swing/motif phrase grammar probe
+29. Stage B real phrase reference statistics
 
 가장 최근 의미 있는 결과:
 
@@ -335,6 +336,8 @@ Stage B에서 명시하는 것:
 - Issue #57 review premise: 이전보다 나아졌지만 아직 jazz solo가 아니라 다이아토닉 코드톤/근음 기반 초급 melodic exercise처럼 들린다.
 - Issue #59 result: `swing_motif_approach`는 strict valid `3/3`을 유지하면서 syncopated onset ratio를 `0.500`에서 `0.750`으로 올렸다.
 - Issue #59 result: unique bar-position pattern ratio는 `0.125`에서 `0.500`으로 올랐고, most-common duration ratio는 `0.552`에서 `0.380`으로 낮아졌다.
+- Issue #61 result: real jazz phrase windows `57`개 기준 syncopation mean은 `0.736`, unique bar-position pattern mean은 `0.996`, duration diversity mean은 `0.379`, IOI diversity mean은 `0.341`이다.
+- Issue #61 result: `swing_motif_approach`는 syncopation은 reference에 가까우나 bar-position variation, duration diversity, IOI diversity가 아직 크게 부족하다.
 
 해석:
 
@@ -343,7 +346,7 @@ Stage B에서 명시하는 것:
 - `tones_tensions`는 no-tension 문제를 줄였지만, 더 좋은 solo phrase라고 바로 판단할 단계는 아니다.
 - `approach_tensions`는 pitch-level resolution을 만들지만, 이 또한 jazz vocabulary 자체는 아니다.
 - `swing_motif_approach`는 기계적인 grid 반복을 줄였지만, 이 또한 jazz vocabulary 자체는 아니다.
-- 다음 비교는 pitch/rhythm rule을 더 늘리는 것보다 real jazz MIDI phrase statistics와 motif/cadence control 쪽이 맞다.
+- real phrase reference stats 기준으로 보면 다음은 hand-written rhythm rule 확장이 아니라 data-derived motif/cadence control 쪽이 맞다.
 
 ### Phase 3.10. Swing/Motif Phrase Grammar
 
@@ -373,6 +376,36 @@ Stage B에서 명시하는 것:
 - generated rhythm profile을 real jazz MIDI window 통계와 비교한다.
 - pitch motif cell, cadence/landing, phrase memory 중 하나를 다음 issue로 분리한다.
 - rule이 아니라 data-derived constraint로 넘어갈지 판단한다.
+
+### Phase 3.11. Real Phrase Reference Statistics
+
+목표:
+
+- generated MIDI가 "이전보다 나음"인지 "실제 jazz phrase 통계에 가까움"인지 분리한다.
+- real Stage B phrase windows에서 rhythm/contour reference metrics를 만든다.
+- generated candidate report와 comparable metric key를 맞춘다.
+
+현재 결과:
+
+- completed: `scripts/run_stage_b_reference_stats.py`를 추가했다.
+- completed: `4`개 MIDI 파일에서 `57`개 8-bar real phrase windows를 분석했다.
+- latest result: real syncopated onset ratio mean은 `0.736`이다.
+- latest result: real unique bar-position pattern ratio mean은 `0.996`이다.
+- latest result: real duration diversity ratio mean은 `0.379`이다.
+- latest result: real IOI diversity ratio mean은 `0.341`이다.
+- latest result: Issue #59 `swing_motif_approach`는 syncopation은 reference와 거의 맞지만 bar-position/duration/IOI diversity는 부족하다.
+
+해석:
+
+- Issue #59는 baseline보다 나아졌지만 아직 real jazz window 통계에는 미달한다.
+- 특히 every-bar pattern variation이 부족하다.
+- 다음 단계는 hand-written swing pattern을 더 추가하기보다 dataset에서 phrase motif templates를 추출하는 것이다.
+
+다음 통과 기준:
+
+- real window에서 rhythm/motif templates를 추출한다.
+- generated candidate가 reference p25-p75 범위 안에 들어오는 metric을 늘린다.
+- phrase ending/cadence도 reference 기반으로 비교한다.
 
 ### Phase 4. Generic Jazz Base 후보 학습
 

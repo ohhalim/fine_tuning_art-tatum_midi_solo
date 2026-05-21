@@ -58,6 +58,8 @@ Modes:
                 Compare 8-bar tones/tensions/approach Stage B phrase candidates.
   stage-b-swing-motif-phrase
                 Compare 8-bar baseline approach with swing/motif phrase grammar.
+  stage-b-reference-stats
+                Build real Stage B phrase-window reference statistics.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -99,6 +101,7 @@ run_quick() {
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
     scripts/run_stage_b_phrase_grammar_compare.py \
+    scripts/run_stage_b_reference_stats.py \
     scripts/rank_stage_b_candidates.py \
     scripts/audit_brad_mehldau_dataset.py \
     scripts/audit_jazz_piano_dataset.py \
@@ -608,6 +611,20 @@ run_stage_b_swing_motif_phrase() {
     --lora_alpha 8
 }
 
+run_stage_b_reference_stats() {
+  local run_id="${RUN_ID:-harness_stage_b_reference_stats}"
+  print_header "Stage B reference phrase statistics"
+  "$PYTHON_BIN" scripts/run_stage_b_reference_stats.py \
+    --run_id "$run_id" \
+    --input_dir ./midi_dataset/midi/studio \
+    --max_files 4 \
+    --window_bars 8 \
+    --window_stride_bars 4 \
+    --min_window_target_notes 16 \
+    --max_records 64 \
+    --generated_report outputs/stage_b_phrase_grammar_compare/harness_stage_b_swing_motif_phrase/phrase_grammar_compare_report.json
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -682,6 +699,9 @@ case "$MODE" in
     ;;
   stage-b-swing-motif-phrase)
     run_stage_b_swing_motif_phrase
+    ;;
+  stage-b-reference-stats)
+    run_stage_b_reference_stats
     ;;
   manifest-dry-run)
     run_manifest_dry_run
