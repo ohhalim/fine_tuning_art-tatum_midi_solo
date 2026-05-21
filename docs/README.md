@@ -74,6 +74,8 @@
   - 실제 Stage B jazz MIDI phrase window 통계를 만들어 generated rhythm/motif 후보와 비교한 결과.
 - `STAGE_B_MOTIF_TEMPLATE_EXTRACTION_2026-05-21.md`
   - 실제 Stage B phrase window에서 rhythm/contour/full motif templates를 추출해 다음 data-derived generation constraint로 넘기기 위한 결과.
+- `STAGE_B_DATA_MOTIF_GENERATION_2026-05-21.md`
+  - 추출된 motif catalog를 8-bar generation baseline에 연결해 hand-written swing grammar와 비교한 결과.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`
@@ -100,7 +102,7 @@
 2. Brad Mehldau subset은 style adaptation과 holdout evaluation 용도로 분리한다.
 3. `max_files=2` Brad `control_v1` probe 결과를 기준으로 Stage A 한계를 문서화한다.
 4. broad training 전에 duration-explicit Stage B tokenization과 phrase/window dataset을 설계한다.
-5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, multi-sample probe, collapse sweep, strict collapse gate, 2-file generation probe, temporal coverage probe, coverage-aware constrained probe, coverage-aware A/B sweep, candidate ranking, harmonic/repetition gate, chord-aware pitch probe, candidate review export, longer 4-bar phrase probe, phrase contour diagnostics, root-bias diagnostics, pitch-mode comparison, 8-bar approach phrase probe, swing/motif phrase grammar probe, real phrase reference statistics, and motif template extraction을 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
+5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, multi-sample probe, collapse sweep, strict collapse gate, 2-file generation probe, temporal coverage probe, coverage-aware constrained probe, coverage-aware A/B sweep, candidate ranking, harmonic/repetition gate, chord-aware pitch probe, candidate review export, longer 4-bar phrase probe, phrase contour diagnostics, root-bias diagnostics, pitch-mode comparison, 8-bar approach phrase probe, swing/motif phrase grammar probe, real phrase reference statistics, motif template extraction, and data-derived motif baseline generation을 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
 
 핵심 원칙:
 
