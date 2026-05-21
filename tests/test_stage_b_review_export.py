@@ -56,6 +56,58 @@ class StageBReviewExportTest(unittest.TestCase):
         self.assertEqual(len(selected), 1)
         self.assertEqual(selected[0]["rank"], 3)
 
+    def test_select_review_candidates_accepts_generation_probe_report(self) -> None:
+        report = {
+            "coverage_aware_positions": True,
+            "chord_aware_pitches": True,
+            "constrained_note_groups_per_bar": 8,
+            "samples": [
+                {
+                    "sample_index": 1,
+                    "valid": True,
+                    "strict_valid": True,
+                    "grammar_gate_passed": True,
+                    "midi_path": "outputs/stage_b_generation_probe/run/samples/stage_b_sample_1.mid",
+                    "metrics": {
+                        "note_count": 32,
+                        "unique_pitch_count": 9,
+                        "chord_tone_ratio": 0.90625,
+                        "dead_air_ratio": 0.48,
+                    },
+                    "collapse": {
+                        "collapse_warning": False,
+                        "collapse_reasons": [],
+                        "note_group_count": 32,
+                        "max_same_pitch_repeats": 7,
+                        "repeated_pitch_ratio": 0.71875,
+                        "repeated_position_pitch_pair_ratio": 0.125,
+                    },
+                    "temporal_coverage": {
+                        "onset_coverage_ratio": 0.5,
+                        "sustained_coverage_ratio": 0.6875,
+                    },
+                },
+                {
+                    "sample_index": 2,
+                    "valid": False,
+                    "strict_valid": False,
+                    "grammar_gate_passed": True,
+                    "failure_reason": "note count too low",
+                    "metrics": {"note_count": 2},
+                    "collapse": {"collapse_warning": False, "collapse_reasons": []},
+                    "temporal_coverage": {},
+                },
+            ],
+        }
+
+        selected = select_review_candidates(report, top_n=3)
+
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]["mode"], "coverage_chord")
+        self.assertEqual(selected[0]["note_groups_per_bar"], 8)
+        self.assertEqual(selected[0]["note_count"], 32)
+        self.assertGreater(selected[0]["score"], 80.0)
+
     def test_build_review_manifest_copies_midi(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -94,6 +146,7 @@ class StageBReviewExportTest(unittest.TestCase):
 
     def test_markdown_report_contains_review_checklist(self) -> None:
         manifest = {
+            "source_report": "report.json",
             "source_ranking_report": "report.json",
             "generated_at": "2026-05-21T00:00:00Z",
             "mode_filter": "coverage_chord",

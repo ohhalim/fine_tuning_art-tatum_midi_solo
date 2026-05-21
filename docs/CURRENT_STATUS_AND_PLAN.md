@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-47-stage-b-review-package`
+- `issue-49-stage-b-longer-phrase-probe`
 
 현재 범위가 아닌 것:
 
@@ -36,16 +36,17 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #47에서 Issue #45의 `coverage_chord` top candidates를 manual listening review용 package로 export하는 도구를 추가했다.
+Issue #49는 manual piano-roll review에서 나온 "유효하긴 하지만 너무 짧고 만들다 만 단어처럼 느껴진다"는 피드백을 반영한다.
 
-Issue #45는 chord-aware pitch 후보군으로 viable unflagged candidates를 `9`개 만들었다.
+Issue #45는 chord-aware pitch 후보군으로 viable unflagged candidates를 `9`개 만들었고, Issue #47은 그 후보들을 review package로 export했다. 하지만 exported candidates는 `2` bar 기준이고, 일부 후보는 solo-line fragment처럼 보일 수 있어도 phrase로는 짧았다.
 
-Issue #47은 이 후보들을 실제로 들어볼 수 있게 review manifest/markdown과 복사된 MIDI 목록을 만든다.
+Issue #49는 같은 coverage+chord-aware 방향을 `4` bar phrase probe로 늘린다.
 
 Implemented:
 
-- `scripts/export_stage_b_review_candidates.py`
-- `tests/test_stage_b_review_export.py`
+- `scripts/export_stage_b_review_candidates.py` generation probe report input support
+- `tests/test_stage_b_review_export.py` generation probe report selection test
+- `scripts/agent_harness.sh stage-b-longer-phrase-probe`
 - output files:
   - `review_manifest.json`
   - `review_candidates.md`
@@ -53,23 +54,23 @@ Implemented:
 
 Result:
 
-- source ranking report: `outputs/stage_b_candidate_ranking/harness_stage_b_chord_aware_probe/candidate_rank_report.json`
-- review output: `outputs/stage_b_review_candidates/harness_stage_b_chord_aware_probe`
-- selected candidates: `6`
-- copied MIDI files:
-  - `midi/rank_01_coverage_chord_g4_s2.mid`
-  - `midi/rank_02_coverage_chord_g6_s1.mid`
-  - `midi/rank_03_coverage_chord_g8_s1.mid`
-  - `midi/rank_04_coverage_chord_g6_s2.mid`
-  - `midi/rank_05_coverage_chord_g8_s3.mid`
-  - `midi/rank_06_coverage_chord_g8_s2.mid`
+- source generation report: `outputs/stage_b_generation_probe/harness_stage_b_longer_phrase_probe/report.json`
+- review output: `outputs/stage_b_review_candidates/harness_stage_b_longer_phrase_probe`
+- setup: `4` bars, `8` note groups per bar, `32` note groups per sample
+- generated samples: `3`
+- strict valid samples: `3`
+- grammar-valid samples: `3`
+- average onset coverage ratio: around `0.500`
+- average sustained coverage ratio: around `0.680`
+- repeated pitch ratio: around `0.719`
 
 Decision:
 
-- 이제 자동 metric 단계에서 할 일은 충분하다.
-- 다음 판단은 사람이 들어야 한다.
-- top review MIDI가 solo-line으로 들리면 generic jazz base 후보 학습 설계로 넘어갈 수 있다.
-- 여전히 기계적이면 rhythm/motif-level constraint 또는 pretrained symbolic base 검토가 먼저다.
+- 2-bar candidates가 너무 짧았다는 판단은 타당하다.
+- 다음 review는 4-bar exported candidates를 기준으로 한다.
+- 4-bar 후보가 여전히 단편적이면 broad training으로 가지 않고 phrase/motif-level constraint 또는 pretrained symbolic base를 검토한다.
+- 4-bar 후보가 최소한 solo-line phrase sketch로 들리면 generic jazz base 후보 학습 설계로 넘어갈 수 있다.
+- 현재 남은 핵심 리스크는 길이가 아니라 repeated-pitch dependence가 motif처럼 들리는지, 기계적 반복처럼 들리는지다.
 
 Detail:
 
@@ -77,6 +78,7 @@ Detail:
 - `docs/STAGE_B_RANKING_HARMONIC_GATE_2026-05-21.md`
 - `docs/STAGE_B_CHORD_AWARE_PITCH_2026-05-21.md`
 - `docs/STAGE_B_CANDIDATE_REVIEW_EXPORT_2026-05-21.md`
+- `docs/STAGE_B_LONGER_PHRASE_PROBE_2026-05-21.md`
 
 ## Active Issue #14
 
@@ -1085,6 +1087,57 @@ Detail:
 
 - `docs/STAGE_B_CANDIDATE_REVIEW_EXPORT_2026-05-21.md`
 
+### 0.23. Issue #49 Stage B longer coverage_chord phrase probe
+
+Status:
+
+- implemented on `issue-49-stage-b-longer-phrase-probe`
+
+Review trigger:
+
+- Issue #47 review candidates were valid enough to inspect, but too short.
+- Piano-roll review showed fragments that may be melodic, but felt unfinished as phrases.
+- The next probe should not ask whether a MIDI file exists; it should ask whether the candidate has enough phrase length to review.
+
+Goal:
+
+- run a `4` bar coverage+chord-aware constrained probe
+- increase generated note groups from `8-16` notes to `32` note groups per sample
+- export the generated samples directly from the generation probe report
+- keep the claim limited to "longer review candidates", not "finished jazz solo model"
+
+Probe setup:
+
+- max files: `2`
+- window bars: `4`
+- window stride bars: `2`
+- minimum window target notes: `8`
+- generation bars: `4`
+- constrained note groups per bar: `8`
+- pitch mode: chord tones
+- position mode: coverage-aware
+- samples: `3`
+
+Latest local result:
+
+- generated samples: `3`
+- strict valid samples: `3`
+- grammar valid samples: `3`
+- note groups per sample: `32`
+- average onset coverage ratio: around `0.500`
+- average sustained coverage ratio: around `0.680`
+- max longest sustained empty run: `2` steps
+
+Decision:
+
+- This directly addresses the "too short / unfinished word" failure mode.
+- The next manual review should open the exported 4-bar MIDI candidates, not the previous 2-bar package.
+- If these still feel like fragments, the next issue should move to phrase/motif-level structure rather than simply adding more notes.
+
+Detail:
+
+- `docs/STAGE_B_LONGER_PHRASE_PROBE_2026-05-21.md`
+
 ### 1. Run full jazz piano dataset audit
 
 ```bash
@@ -1227,6 +1280,10 @@ Decision:
 - `docs/STAGE_B_COVERAGE_AWARE_GENERATION_2026-05-20.md`
 - `docs/STAGE_B_COVERAGE_AB_SWEEP_2026-05-20.md`
 - `docs/STAGE_B_CANDIDATE_RANKING_2026-05-20.md`
+- `docs/STAGE_B_RANKING_HARMONIC_GATE_2026-05-21.md`
+- `docs/STAGE_B_CHORD_AWARE_PITCH_2026-05-21.md`
+- `docs/STAGE_B_CANDIDATE_REVIEW_EXPORT_2026-05-21.md`
+- `docs/STAGE_B_LONGER_PHRASE_PROBE_2026-05-21.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
@@ -1309,4 +1366,10 @@ For Stage B candidate ranking changes:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-candidate-ranking
+```
+
+For Stage B longer phrase review candidates:
+
+```bash
+bash scripts/agent_harness.sh stage-b-longer-phrase-probe
 ```

@@ -126,6 +126,7 @@ Stage B에서 명시하는 것:
 20. Stage B ranking harmonic/repetition gate
 21. Stage B chord-aware pitch constrained generation
 22. Stage B coverage_chord candidate review export
+23. Stage B longer 4-bar coverage_chord phrase probe
 
 가장 최근 의미 있는 결과:
 
@@ -136,6 +137,9 @@ Stage B에서 명시하는 것:
 - top candidate: `coverage_chord`, groups/bar `4`, sample `2`, score `96.6964`
 - top candidate harmonic diagnostics: chord-tone `0.750`, bar chord-tone `0.875`, min bar chord-tone `0.800`, dominant pitch `0.375`, repeated pitch `0.250`
 - Issue #47 exported the top 6 `coverage_chord` MIDI candidates to `outputs/stage_b_review_candidates/harness_stage_b_chord_aware_probe`
+- Manual piano-roll review found that these candidates can look like melodic fragments, but are still too short and feel unfinished.
+- Issue #49 extends the same coverage+chord-aware setup to a `4` bar probe with `32` note groups per sample and exports direct review candidates from the generation probe report.
+- Issue #49 fixes the length problem structurally, but repeated-pitch dependence remains a listening-review risk.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -154,7 +158,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-다음 단계는 manual listening/piano-roll review다. `outputs/stage_b_review_candidates/harness_stage_b_chord_aware_probe/midi/`의 top candidates가 귀로도 solo-line 후보라면 generic jazz base 후보 학습 설계로 넘어가고, 아니면 rhythm/motif-level constraint 또는 pretrained symbolic base를 먼저 검토한다.
+다음 단계는 manual listening/piano-roll review다. 이제 우선순위 review 대상은 짧은 2-bar package가 아니라 `outputs/stage_b_review_candidates/harness_stage_b_longer_phrase_probe/midi/`의 4-bar candidates다. 이 후보가 귀로도 solo-line phrase sketch라면 generic jazz base 후보 학습 설계로 넘어가고, 아니면 phrase/motif-level constraint 또는 pretrained symbolic base를 먼저 검토한다.
 
 ## 6. 다음 단계 로드맵
 
@@ -259,6 +263,28 @@ Stage B에서 명시하는 것:
 
 - generated top candidate를 실제로 듣고 piano roll로 확인한다.
 - 그 후보가 one-note/two-note/chord-block/long-sustain/repeated-template 실패가 없어야 한다.
+
+### Phase 3.7. Longer Phrase Review
+
+목표:
+
+- 2-bar 후보가 "만들다 만 단어"처럼 들리는 문제를 직접 검증한다.
+- 같은 coverage+chord-aware 제약을 유지하되, review 후보를 `4` bar로 늘린다.
+- 단순 note count 증가가 아니라 phrase로 들을 수 있는 길이와 coverage를 확보한다.
+
+현재 결과:
+
+- completed: `4` bar generation probe를 실행했다.
+- completed: sample마다 `32` complete note groups를 생성했다.
+- completed: `3/3` samples가 grammar/basic/strict gate를 통과했다.
+- completed: generation probe report를 review export 입력으로 직접 사용할 수 있게 했다.
+- current risk: repeated pitch ratio가 높기 때문에 motif로 들리는지 기계적 재사용으로 들리는지 확인해야 한다.
+
+다음 통과 기준:
+
+- exported 4-bar candidates를 piano roll과 귀로 확인한다.
+- 단편이 아니라 최소한 call/continuation/landing 느낌의 phrase sketch인지 본다.
+- 여전히 짧거나 기계적이면 broad generic training 전 phrase/motif-level constraint를 먼저 설계한다.
 
 ### Phase 4. Generic Jazz Base 후보 학습
 
@@ -377,7 +403,9 @@ Stage B chord-aware pitch constrained generation 추가
 이 작업이 끝난 뒤 판단:
 
 - chord-aware pitch probe에서 viable unflagged candidate가 `9`개 나왔다.
-- 바로 broad training으로 가지 않고 top `coverage_chord` MIDI를 귀와 piano roll로 리뷰한다.
+- 바로 broad training으로 가지 않고 top `coverage_chord` MIDI를 귀와 piano roll로 리뷰했다.
+- 2-bar 후보는 melodic fragment일 수는 있어도 너무 짧고 미완성처럼 느껴졌다.
+- 그래서 다음 작업은 4-bar longer phrase probe로 잡았다.
 - 리뷰가 괜찮으면 generic jazz base 후보 학습 설계로 넘어간다.
 - 리뷰가 여전히 기계적이면 rhythm/motif-level constraint 또는 pretrained symbolic base를 먼저 검토한다.
 

@@ -50,6 +50,8 @@ Modes:
                 Run coverage A/B sweep and rank generated MIDI candidates.
   stage-b-chord-aware-probe
                 Run coverage/chord-aware Stage B sweep and rank candidates.
+  stage-b-longer-phrase-probe
+                Run a 4-bar coverage/chord-aware Stage B probe and export review MIDI.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -445,6 +447,51 @@ run_stage_b_chord_aware_probe() {
     --min_top_strict_candidates 1
 }
 
+run_stage_b_longer_phrase_probe() {
+  local run_id="${RUN_ID:-harness_stage_b_longer_phrase_probe}"
+  print_header "Stage B longer coverage/chord-aware phrase probe"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$run_id" \
+    --issue_number 49 \
+    --max_files 2 \
+    --window_bars 4 \
+    --window_stride_bars 2 \
+    --min_window_target_notes 8 \
+    --epochs 3 \
+    --batch_size 8 \
+    --max_sequence 192 \
+    --num_samples 3 \
+    --bars 4 \
+    --generation_mode constrained \
+    --coverage_aware_positions \
+    --coverage_position_window 0 \
+    --chord_aware_pitches \
+    --chord_pitch_mode tones \
+    --chord_pitch_repeat_window 2 \
+    --constrained_note_groups_per_bar 8 \
+    --postprocess_overlap \
+    --max_simultaneous_notes 2 \
+    --temperature 0.9 \
+    --top_k 2 \
+    --min_valid_samples 1 \
+    --min_strict_valid_samples 1 \
+    --max_collapse_warning_sample_rate 0.34 \
+    --require_all_grammar_samples \
+    --require_note_groups \
+    --n_layers 1 \
+    --num_heads 4 \
+    --d_model 64 \
+    --dim_feedforward 128 \
+    --lora_r 4 \
+    --lora_alpha 8
+  "$PYTHON_BIN" scripts/export_stage_b_review_candidates.py \
+    --source_report "outputs/stage_b_generation_probe/${run_id}/report.json" \
+    --run_id "$run_id" \
+    --top_n 3 \
+    --mode coverage_chord \
+    --copy_midi
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -507,6 +554,9 @@ case "$MODE" in
     ;;
   stage-b-chord-aware-probe)
     run_stage_b_chord_aware_probe
+    ;;
+  stage-b-longer-phrase-probe)
+    run_stage_b_longer_phrase_probe
     ;;
   manifest-dry-run)
     run_manifest_dry_run

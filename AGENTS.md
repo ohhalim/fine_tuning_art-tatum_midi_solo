@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #47: Stage B coverage_chord candidate review package.
+- Issue #49: Stage B longer coverage_chord phrase probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -211,6 +211,14 @@ bash scripts/agent_harness.sh stage-b-chord-aware-probe
 ```
 
 This harness compares plain, coverage-aware, and coverage+chord-aware constrained generation, then ranks the generated MIDI candidates.
+
+For Stage B longer phrase-generation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-longer-phrase-probe
+```
+
+This harness tests a 4-bar coverage+chord-aware constrained phrase and exports the top review MIDI candidates. It exists because short 2-bar candidates can be valid but still feel unfinished.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
