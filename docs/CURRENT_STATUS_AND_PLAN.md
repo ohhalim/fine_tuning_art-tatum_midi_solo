@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-59-stage-b-swing-motif-phrase`
+- `issue-61-stage-b-reference-phrase-stats`
 
 현재 범위가 아닌 것:
 
@@ -36,48 +36,39 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #59는 manual listening/piano-roll review에서 나온 "이전보다 나아졌지만 아직 재즈가 아니라 초등학교 음악/다이아토닉 코드톤 나열처럼 들린다"는 피드백을 rhythm/motif grammar 관점에서 검증한다.
+Issue #61은 Issue #59의 swing/motif grammar가 실제 jazz MIDI phrase window 기준선과 얼마나 가까운지 검증한다.
 
-Issue #51에서 이미 adjacent same-note collapse는 아니라는 것을 확인했다. Issue #53에서는 실제 root tone, non-root chord tone, tension 비율을 기록했다. Issue #55는 같은 4-bar 조건에서 `tones_tensions`가 tension을 실제로 늘리고 root bias를 줄이는지 확인했다. Issue #57은 8-bar 길이와 approach/resolution 정책을 추가했다. Issue #59는 같은 8-bar approach setup에서 position/duration rhythm pattern을 swing/motif template으로 바꿔 비교한다.
+Issue #59는 same 8-bar approach setup에서 position/duration rhythm pattern을 swing/motif template으로 바꿔 mechanical rhythm-grid 반복을 줄였다. 하지만 그 rule이 실제 jazz window 통계와 가까운지는 별도로 봐야 한다.
 
 Implemented:
 
-- `scripts/run_stage_b_generation_probe.py` jazz rhythm position/duration constraints
-- `scripts/run_stage_b_generation_probe.py` rhythm profile diagnostics
-- `scripts/run_stage_b_phrase_grammar_compare.py`
-- `scripts/export_stage_b_review_candidates.py` rhythm-aware ranking fields
-- `tests/test_stage_b_generation_probe.py`
-- `tests/test_stage_b_phrase_grammar_compare.py`
-- `scripts/run_stage_b_sampling_sweep.py` rhythm summary fields
-- `scripts/agent_harness.sh stage-b-swing-motif-phrase`
+- `scripts/run_stage_b_reference_stats.py`
+- `tests/test_stage_b_reference_stats.py`
+- `scripts/agent_harness.sh stage-b-reference-stats`
 - output files:
-  - `phrase_grammar_compare_report.json`
-  - `phrase_grammar_compare_report.md`
-  - mode-specific `review_manifest.json`
-  - named comparison MIDI files under `compare_named_midi/`
+  - `reference_stats_report.json`
+  - `reference_stats_report.md`
 
 Result:
 
-- source comparison report: `outputs/stage_b_phrase_grammar_compare/harness_stage_b_swing_motif_phrase/phrase_grammar_compare_report.json`
-- named review output: `outputs/stage_b_review_candidates/harness_stage_b_swing_motif_phrase/compare_named_midi/`
-- setup: `8` bars, `8` note groups per bar, `64` note groups per sample
-- `approach_baseline` strict valid samples: `3/3`
-- `swing_motif_approach` strict valid samples: `3/3`
-- `approach_baseline` average syncopated onset ratio: `0.500`
-- `swing_motif_approach` average syncopated onset ratio: `0.750`
-- `approach_baseline` average unique bar-position pattern ratio: `0.125`
-- `swing_motif_approach` average unique bar-position pattern ratio: `0.500`
-- `approach_baseline` average most-common duration ratio: `0.552`
-- `swing_motif_approach` average most-common duration ratio: `0.380`
-- `approach_baseline` average most-common IOI ratio: `0.508`
-- `swing_motif_approach` average most-common IOI ratio: `0.476`
+- source report: `outputs/stage_b_reference_stats/harness_stage_b_reference_stats/reference_stats_report.json`
+- setup: `./midi_dataset/midi/studio`, max files `4`, `8`-bar windows, stride `4`, min notes `16`
+- analyzed real phrase windows: `57`
+- reference syncopated onset ratio mean: `0.736`
+- reference unique bar-position pattern ratio mean: `0.996`
+- reference duration diversity ratio mean: `0.379`
+- reference most-common duration ratio mean: `0.260`
+- reference IOI diversity ratio mean: `0.341`
+- reference most-common IOI ratio mean: `0.339`
+- Issue #59 `swing_motif_approach` syncopation is close to reference mean: delta `+0.014`
+- Issue #59 `swing_motif_approach` bar-pattern variation is still far below reference: delta `-0.496`
+- Issue #59 `swing_motif_approach` duration and IOI diversity are still far below reference: deltas around `-0.307` and `-0.278`
 
 Decision:
 
-- direct MIDI inspection상 baseline은 bar별 position template과 IOI가 거의 반복된다.
-- `swing_motif_approach`는 syncopation과 bar-to-bar rhythm variation을 올렸다.
-- 이것은 "재즈가 됐다"가 아니라 "mechanical rhythm-grid 문제를 줄였다"는 결과다.
-- 현재 병목은 MIDI validity보다 jazz vocabulary, motif development, phrase ending이다.
+- `swing_motif_approach`는 baseline보다 좋아졌지만, 실제 jazz phrase window의 다양성에는 아직 못 미친다.
+- 특히 bar-to-bar position pattern, duration diversity, IOI diversity가 부족하다.
+- 다음은 hand-written rule을 더 늘리는 것보다 real window에서 motif/rhythm template을 뽑는 방향이 맞다.
 
 Detail:
 
@@ -91,6 +82,7 @@ Detail:
 - `docs/STAGE_B_PITCH_MODE_COMPARE_2026-05-21.md`
 - `docs/STAGE_B_8BAR_APPROACH_PHRASE_2026-05-21.md`
 - `docs/STAGE_B_SWING_MOTIF_PHRASE_2026-05-21.md`
+- `docs/STAGE_B_REFERENCE_PHRASE_STATS_2026-05-21.md`
 
 ## Active Issue #14
 
