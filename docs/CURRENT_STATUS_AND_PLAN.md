@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-61-stage-b-reference-phrase-stats`
+- `issue-63-stage-b-motif-template-extraction`
 
 현재 범위가 아닌 것:
 
@@ -36,39 +36,38 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #61은 Issue #59의 swing/motif grammar가 실제 jazz MIDI phrase window 기준선과 얼마나 가까운지 검증한다.
+Issue #63은 Issue #61의 reference statistics 이후 단계다.
 
-Issue #59는 same 8-bar approach setup에서 position/duration rhythm pattern을 swing/motif template으로 바꿔 mechanical rhythm-grid 반복을 줄였다. 하지만 그 rule이 실제 jazz window 통계와 가까운지는 별도로 봐야 한다.
+Issue #61에서 hand-written `swing_motif_approach`는 syncopation은 실제 jazz window와 가까웠지만, bar-position variation, duration diversity, IOI diversity가 부족했다. 그래서 이번에는 rule을 더 쓰는 대신 실제 Stage B phrase window에서 motif templates를 추출한다.
 
 Implemented:
 
-- `scripts/run_stage_b_reference_stats.py`
-- `tests/test_stage_b_reference_stats.py`
-- `scripts/agent_harness.sh stage-b-reference-stats`
+- `scripts/run_stage_b_motif_template_extraction.py`
+- `tests/test_stage_b_motif_template_extraction.py`
+- `scripts/agent_harness.sh stage-b-motif-templates`
 - output files:
-  - `reference_stats_report.json`
-  - `reference_stats_report.md`
+  - `motif_template_report.json`
+  - `motif_template_report.md`
 
 Result:
 
-- source report: `outputs/stage_b_reference_stats/harness_stage_b_reference_stats/reference_stats_report.json`
+- source report: `outputs/stage_b_motif_templates/harness_stage_b_motif_templates/motif_template_report.json`
 - setup: `./midi_dataset/midi/studio`, max files `4`, `8`-bar windows, stride `4`, min notes `16`
-- analyzed real phrase windows: `57`
-- reference syncopated onset ratio mean: `0.736`
-- reference unique bar-position pattern ratio mean: `0.996`
-- reference duration diversity ratio mean: `0.379`
-- reference most-common duration ratio mean: `0.260`
-- reference IOI diversity ratio mean: `0.341`
-- reference most-common IOI ratio mean: `0.339`
-- Issue #59 `swing_motif_approach` syncopation is close to reference mean: delta `+0.014`
-- Issue #59 `swing_motif_approach` bar-pattern variation is still far below reference: delta `-0.496`
-- Issue #59 `swing_motif_approach` duration and IOI diversity are still far below reference: deltas around `-0.307` and `-0.278`
+- source records: `56`
+- motif count: `803`
+- unique rhythm templates: `520`
+- unique contour templates: `328`
+- unique full templates: `526`
+- top rhythm support: `0.009`
+- top contour support: `0.012`
+- top full support: `0.002`
+- default extraction filters same-onset motifs so chord blocks do not dominate solo-line material
 
 Decision:
 
-- `swing_motif_approach`는 baseline보다 좋아졌지만, 실제 jazz phrase window의 다양성에는 아직 못 미친다.
-- 특히 bar-to-bar position pattern, duration diversity, IOI diversity가 부족하다.
-- 다음은 hand-written rule을 더 늘리는 것보다 real window에서 motif/rhythm template을 뽑는 방향이 맞다.
+- 실제 phrase material은 매우 다양해서 top template 하나를 hardcode하면 안 된다.
+- 다음 generator는 data-derived rhythm/contour templates를 distribution으로 sampling해야 한다.
+- 이것은 생성기 자체가 아니라 다음 data-derived generation constraint를 만들기 위한 reference catalog다.
 
 Detail:
 
@@ -83,6 +82,7 @@ Detail:
 - `docs/STAGE_B_8BAR_APPROACH_PHRASE_2026-05-21.md`
 - `docs/STAGE_B_SWING_MOTIF_PHRASE_2026-05-21.md`
 - `docs/STAGE_B_REFERENCE_PHRASE_STATS_2026-05-21.md`
+- `docs/STAGE_B_MOTIF_TEMPLATE_EXTRACTION_2026-05-21.md`
 
 ## Active Issue #14
 

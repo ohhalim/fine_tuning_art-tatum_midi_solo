@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #61: Stage B real jazz phrase reference statistics.
+- Issue #63: Stage B data-derived phrase motif template extraction.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -176,6 +176,12 @@ For Stage B real phrase reference statistics changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-reference-stats
+```
+
+For Stage B data-derived motif template extraction changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-motif-templates
 ```
 
 For Stage B collapse/sampling-sweep changes, run:

@@ -133,6 +133,7 @@ Stage B에서 명시하는 것:
 27. Stage B 8-bar approach phrase probe
 28. Stage B swing/motif phrase grammar probe
 29. Stage B real phrase reference statistics
+30. Stage B data-derived motif template extraction
 
 가장 최근 의미 있는 결과:
 
@@ -166,7 +167,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-다음 단계는 manual listening/piano-roll review다. 이제 우선순위 review 대상은 짧은 2-bar package가 아니라 `outputs/stage_b_review_candidates/harness_stage_b_longer_phrase_probe/midi/`의 4-bar candidates다. 이 후보가 귀로도 solo-line phrase sketch라면 generic jazz base 후보 학습 설계로 넘어가고, 아니면 phrase/motif-level constraint 또는 pretrained symbolic base를 먼저 검토한다.
+이제 다음 단계는 data-derived motif catalog를 generation-side constraint로 연결하는 것이다. Manual review에서 8-bar 후보는 이전보다 나아졌지만 아직 초급 다이아토닉 코드톤 나열처럼 들렸고, Issue #61 reference stats에서도 hand-written rhythm diversity가 부족하다고 나왔다. 따라서 generic jazz base 학습 전에 real phrase motif distribution을 사용한 baseline을 먼저 비교한다.
 
 ## 6. 다음 단계 로드맵
 
@@ -338,6 +339,8 @@ Stage B에서 명시하는 것:
 - Issue #59 result: unique bar-position pattern ratio는 `0.125`에서 `0.500`으로 올랐고, most-common duration ratio는 `0.552`에서 `0.380`으로 낮아졌다.
 - Issue #61 result: real jazz phrase windows `57`개 기준 syncopation mean은 `0.736`, unique bar-position pattern mean은 `0.996`, duration diversity mean은 `0.379`, IOI diversity mean은 `0.341`이다.
 - Issue #61 result: `swing_motif_approach`는 syncopation은 reference에 가까우나 bar-position variation, duration diversity, IOI diversity가 아직 크게 부족하다.
+- Issue #63 result: real Stage B windows에서 `803`개 strictly-increasing solo-line motif를 추출했고, rhythm templates `520`, contour templates `328`, full templates `526`개를 만들었다.
+- Issue #63 result: top rhythm support는 `0.009`, top contour support는 `0.012`, top full motif support는 `0.002`라서 one best motif 복붙이 아니라 distribution sampling이 필요하다.
 
 해석:
 
@@ -346,7 +349,7 @@ Stage B에서 명시하는 것:
 - `tones_tensions`는 no-tension 문제를 줄였지만, 더 좋은 solo phrase라고 바로 판단할 단계는 아니다.
 - `approach_tensions`는 pitch-level resolution을 만들지만, 이 또한 jazz vocabulary 자체는 아니다.
 - `swing_motif_approach`는 기계적인 grid 반복을 줄였지만, 이 또한 jazz vocabulary 자체는 아니다.
-- real phrase reference stats 기준으로 보면 다음은 hand-written rhythm rule 확장이 아니라 data-derived motif/cadence control 쪽이 맞다.
+- real phrase reference stats와 motif extraction 기준으로 보면 다음은 hand-written rhythm rule 확장이 아니라 data-derived motif/cadence control 쪽이 맞다.
 
 ### Phase 3.10. Swing/Motif Phrase Grammar
 
@@ -406,6 +409,36 @@ Stage B에서 명시하는 것:
 - real window에서 rhythm/motif templates를 추출한다.
 - generated candidate가 reference p25-p75 범위 안에 들어오는 metric을 늘린다.
 - phrase ending/cadence도 reference 기반으로 비교한다.
+
+### Phase 3.12. Data-Derived Motif Template Extraction
+
+목표:
+
+- hand-written swing/motif rule을 더 늘리지 않는다.
+- real Stage B phrase windows에서 rhythm, contour, full motif templates를 추출한다.
+- chord-block 또는 same-onset voicing이 solo-line motif catalog를 오염시키지 않도록 기본 필터를 둔다.
+- 다음 generation probe가 data-derived rhythm/contour distribution을 사용할 수 있게 만든다.
+
+현재 결과:
+
+- completed: `scripts/run_stage_b_motif_template_extraction.py`를 추가했다.
+- completed: same-onset/non-increasing onset motif를 기본적으로 제외한다.
+- completed: `4`개 MIDI 파일에서 만든 Stage B 8-bar windows 기준 `803`개 motif를 추출했다.
+- latest result: source records `56`, rhythm templates `520`, contour templates `328`, full templates `526`.
+- latest result: top full motif support가 `0.002`라서 full motif를 그대로 복사하는 방식은 맞지 않다.
+
+해석:
+
+- 실제 jazz phrase material은 매우 분산되어 있다.
+- 다음 단계는 top motif 하나를 쓰는 것이 아니라 rhythm template과 contour template을 분리해서 sampling하는 것이다.
+- 이 단계는 생성 품질을 바로 올리는 작업이 아니라, beginner-like hand-written line에서 data-derived phrase material로 넘어가는 준비다.
+
+다음 통과 기준:
+
+- data-derived motif catalog를 constrained generation의 position/duration/contour 후보로 연결한다.
+- generated candidate의 duration diversity와 IOI diversity가 Issue #59보다 좋아지는지 본다.
+- reference p25-p75 범위에 가까워지는 metric을 늘린다.
+- piano roll에서 chord-tone 나열이 아니라 phrase contour로 들리는지 review export로 확인한다.
 
 ### Phase 4. Generic Jazz Base 후보 학습
 
@@ -500,35 +533,24 @@ Stage B에서 명시하는 것:
 
 완료된 바로 전 작업:
 
-- `Stage B temporal coverage diagnostics 추가`
-- 결과: 2-file Brad Stage B window dataset은 `137` samples, train `123`, val `14`로 정상 생성됐다.
-- 결과: generated samples는 grammar gate `3/3`, collapse warning `0/3`이었다.
-- 결과: basic valid `0/3`, strict valid `0/3`이었다.
-- 결과: avg onset coverage `0.167`, avg sustained coverage `0.417`, max longest sustained empty run `11` steps였다.
-- 결론: Stage B grammar와 collapse는 2-file probe에서 즉시 병목이 아니며, 현재 병목은 sparse onset과 long empty span으로 인한 dead-air/temporal coverage다.
-
-완료된 바로 전 작업:
-
 ```text
-Stage B chord-aware pitch constrained generation 추가
+Stage B data-derived motif template extraction 추가
 ```
 
-작업 범위:
+결과:
 
-- constrained generation에서 pitch 후보군을 현재 bar chord에 맞게 제한하거나 가중한다.
-- chord tones와 허용 tension을 구분한다.
-- dominant pitch repetition과 low pitch variety를 동시에 줄인다.
-- temporal coverage는 유지하면서 bar-level chord-tone ratio가 개선되는지 비교한다.
-- 과한 postprocess로 모델 성공처럼 보이게 만들지 않는다.
+- real Stage B phrase windows에서 `803`개 solo-line motif를 추출했다.
+- rhythm templates `520`, contour templates `328`, full templates `526`개를 만들었다.
+- top full motif support가 `0.002`라서 하나의 motif를 복사하는 방식은 맞지 않다.
+- same-onset chord/block motif는 기본 필터로 제외했다.
 
-이 작업이 끝난 뒤 판단:
+다음 작업:
 
-- chord-aware pitch probe에서 viable unflagged candidate가 `9`개 나왔다.
-- 바로 broad training으로 가지 않고 top `coverage_chord` MIDI를 귀와 piano roll로 리뷰했다.
-- 2-bar 후보는 melodic fragment일 수는 있어도 너무 짧고 미완성처럼 느껴졌다.
-- 그래서 다음 작업은 4-bar longer phrase probe로 잡았다.
-- 리뷰가 괜찮으면 generic jazz base 후보 학습 설계로 넘어간다.
-- 리뷰가 여전히 기계적이면 rhythm/motif-level constraint 또는 pretrained symbolic base를 먼저 검토한다.
+- extracted rhythm templates를 position/duration 후보로 연결한다.
+- extracted contour templates를 pitch interval 후보로 연결한다.
+- current chord/tension pitch set 위에 contour를 transpose한다.
+- `swing_motif_approach`와 data-derived motif baseline을 같은 8-bar 조건에서 비교한다.
+- duration diversity, IOI diversity, bar-position variation이 reference range에 가까워지는지 본다.
 
 ## 10. 한 문장 요약
 
