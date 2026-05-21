@@ -184,6 +184,8 @@ def row_from_probe_report(top_k: int, temperature: float, run_id: str, report: d
         "avg_chord_tone_ratio": (
             float(sum(chord_tone_ratios) / len(chord_tone_ratios)) if chord_tone_ratios else 0.0
         ),
+        "avg_root_tone_ratio": float(summary.get("avg_root_tone_ratio", 0.0) or 0.0),
+        "avg_tension_ratio": float(summary.get("avg_tension_ratio", 0.0) or 0.0),
         "failure_reasons": summary.get("failure_reasons", {}),
         "diagnostic_failure_reasons": summary.get("diagnostic_failure_reasons", {}),
         "strict_failure_reasons": summary.get("strict_failure_reasons", {}),
