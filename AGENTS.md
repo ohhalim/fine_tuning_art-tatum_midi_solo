@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #41: Stage B candidate ranking report.
+- Issue #43: Stage B candidate ranking harmonic/repetition gate.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

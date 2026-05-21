@@ -373,7 +373,7 @@ run_stage_b_candidate_ranking() {
   print_header "Stage B candidate ranking"
   "$PYTHON_BIN" scripts/run_stage_b_coverage_ab_sweep.py \
     --run_id "$sweep_run_id" \
-    --issue_number 41 \
+    --issue_number 43 \
     --max_files 2 \
     --epochs 3 \
     --batch_size 8 \
@@ -398,7 +398,7 @@ run_stage_b_candidate_ranking() {
     --lora_alpha 8
   "$PYTHON_BIN" scripts/rank_stage_b_candidates.py \
     --run_id "$run_id" \
-    --issue_number 41 \
+    --issue_number 43 \
     --ab_sweep_report "outputs/stage_b_coverage_ab_sweep/${sweep_run_id}/ab_sweep_report.json" \
     --top_n 12 \
     --min_top_strict_candidates 1
