@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from scripts.run_stage_b_data_motif_generation_compare import (
+    build_review_export,
     data_motif_tokens,
     duration_tokens_from_steps,
     fit_duration_tokens_to_positions,
@@ -116,6 +119,53 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         for positions in positions_by_bar.values():
             self.assertEqual(positions, sorted(positions))
             self.assertEqual(len(positions), len(set(positions)))
+
+    def test_build_review_export_copies_named_mode_files(self) -> None:
+        with TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            source_midi = tmp_path / "source.mid"
+            source_midi.write_bytes(b"MThd")
+            samples = {
+                "data_motif": [
+                    {
+                        "sample_index": 1,
+                        "sample_seed": 17,
+                        "valid": True,
+                        "strict_valid": True,
+                        "midi_path": str(source_midi),
+                        "metrics": {
+                            "note_count": 8,
+                            "unique_pitch_count": 4,
+                            "dead_air_ratio": 0.1,
+                        },
+                        "rhythm_profile": {
+                            "syncopated_onset_ratio": 0.6,
+                            "unique_bar_position_pattern_ratio": 1.0,
+                            "duration_diversity_ratio": 0.2,
+                            "most_common_duration_ratio": 0.4,
+                            "ioi_diversity_ratio": 0.2,
+                            "most_common_ioi_ratio": 0.4,
+                        },
+                        "pitch_roles": {
+                            "tension_ratio": 0.2,
+                            "root_tone_ratio": 0.0,
+                        },
+                    }
+                ]
+            }
+
+            manifest = build_review_export(
+                samples,
+                output_dir=tmp_path / "review",
+                top_n=1,
+                copy_midi=True,
+            )
+
+            copied = Path(manifest["candidates"][0]["review_midi_path"])
+            self.assertTrue(copied.exists())
+            self.assertIn("data_motif", copied.name)
+            self.assertTrue((tmp_path / "review" / "review_manifest.json").exists())
+            self.assertTrue((tmp_path / "review" / "review_candidates.md").exists())
 
 
 if __name__ == "__main__":

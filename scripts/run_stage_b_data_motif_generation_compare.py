@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import shutil
 import subprocess
 import sys
 from datetime import datetime
@@ -452,6 +453,126 @@ def markdown_report(report: dict[str, Any]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def candidate_sort_key(row: dict[str, Any]) -> tuple[int, int, float, float, float]:
+    rhythm = row.get("rhythm_profile", {})
+    return (
+        int(bool(row.get("strict_valid"))),
+        int(bool(row.get("valid"))),
+        float(rhythm.get("unique_bar_position_pattern_ratio", 0.0) or 0.0),
+        float(rhythm.get("duration_diversity_ratio", 0.0) or 0.0),
+        -float(rhythm.get("most_common_duration_ratio", 0.0) or 0.0),
+    )
+
+
+def compact_review_candidate(
+    mode: str,
+    row: dict[str, Any],
+    *,
+    review_rank: int,
+    review_midi_path: Path | None,
+) -> dict[str, Any]:
+    rhythm = row.get("rhythm_profile", {})
+    pitch_roles = row.get("pitch_roles", {})
+    metrics = row.get("metrics", {})
+    return {
+        "mode": mode,
+        "review_rank": int(review_rank),
+        "sample_index": int(row["sample_index"]),
+        "sample_seed": int(row["sample_seed"]),
+        "valid": bool(row["valid"]),
+        "strict_valid": bool(row["strict_valid"]),
+        "midi_path": row["midi_path"],
+        "review_midi_path": str(review_midi_path) if review_midi_path else None,
+        "note_count": int(metrics.get("note_count", 0) or 0),
+        "unique_pitch_count": int(metrics.get("unique_pitch_count", 0) or 0),
+        "dead_air_ratio": float(metrics.get("dead_air_ratio", 0.0) or 0.0),
+        "syncopated_onset_ratio": float(rhythm.get("syncopated_onset_ratio", 0.0) or 0.0),
+        "unique_bar_position_pattern_ratio": float(
+            rhythm.get("unique_bar_position_pattern_ratio", 0.0) or 0.0
+        ),
+        "duration_diversity_ratio": float(rhythm.get("duration_diversity_ratio", 0.0) or 0.0),
+        "most_common_duration_ratio": float(rhythm.get("most_common_duration_ratio", 0.0) or 0.0),
+        "ioi_diversity_ratio": float(rhythm.get("ioi_diversity_ratio", 0.0) or 0.0),
+        "most_common_ioi_ratio": float(rhythm.get("most_common_ioi_ratio", 0.0) or 0.0),
+        "tension_ratio": float(pitch_roles.get("tension_ratio", 0.0) or 0.0),
+        "root_tone_ratio": float(pitch_roles.get("root_tone_ratio", 0.0) or 0.0),
+        "diagnostic_failure_reason": row.get("diagnostic_failure_reason"),
+    }
+
+
+def review_markdown_report(manifest: dict[str, Any]) -> str:
+    lines = [
+        "# Stage B Data Motif Review Candidates",
+        "",
+        f"- candidate count: `{manifest['candidate_count']}`",
+        f"- copy midi: `{str(manifest['copy_midi']).lower()}`",
+        "",
+        "| mode | rank | sample | strict | notes | pitches | sync | bar-var | dur-var | dur-rep | ioi-var | ioi-rep | tension | midi |",
+        "|---|---:|---:|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+    ]
+    for row in manifest["candidates"]:
+        midi_path = row.get("review_midi_path") or row.get("midi_path")
+        format_row = dict(row)
+        format_row["display_midi_path"] = midi_path
+        lines.append(
+            "| {mode} | {review_rank} | {sample_index} | {strict_valid} | {note_count} | "
+            "{unique_pitch_count} | {syncopated_onset_ratio:.3f} | "
+            "{unique_bar_position_pattern_ratio:.3f} | {duration_diversity_ratio:.3f} | "
+            "{most_common_duration_ratio:.3f} | {ioi_diversity_ratio:.3f} | "
+            "{most_common_ioi_ratio:.3f} | {tension_ratio:.3f} | `{display_midi_path}` |".format(**format_row)
+        )
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def build_review_export(
+    samples_by_mode: dict[str, list[dict[str, Any]]],
+    *,
+    output_dir: Path,
+    top_n: int,
+    copy_midi: bool,
+) -> dict[str, Any]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    named_dir = output_dir / "named_midi"
+    if copy_midi:
+        named_dir.mkdir(parents=True, exist_ok=True)
+
+    candidates: list[dict[str, Any]] = []
+    for mode_index, mode in enumerate(sorted(samples_by_mode), start=1):
+        rows = sorted(samples_by_mode[mode], key=candidate_sort_key, reverse=True)
+        for review_rank, row in enumerate(rows[: int(top_n)], start=1):
+            review_midi_path: Path | None = None
+            if copy_midi:
+                source = Path(str(row["midi_path"]))
+                if not source.is_absolute():
+                    source = ROOT_DIR / source
+                target = named_dir / (
+                    f"{mode_index:02d}_{mode}_rank_{review_rank:02d}_"
+                    f"sample_{int(row['sample_index']):02d}.mid"
+                )
+                if source.exists():
+                    shutil.copy2(source, target)
+                    review_midi_path = target
+            candidates.append(
+                compact_review_candidate(
+                    mode,
+                    row,
+                    review_rank=review_rank,
+                    review_midi_path=review_midi_path,
+                )
+            )
+
+    manifest = {
+        "output_dir": str(output_dir),
+        "copy_midi": bool(copy_midi),
+        "top_n": int(top_n),
+        "candidate_count": int(len(candidates)),
+        "candidates": candidates,
+    }
+    write_json(output_dir / "review_manifest.json", manifest)
+    (output_dir / "review_candidates.md").write_text(review_markdown_report(manifest), encoding="utf-8")
+    return manifest
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run Stage B data-derived motif baseline generation compare")
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "outputs" / "stage_b_data_motif_compare"))
@@ -480,6 +601,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max_sequence", type=int, default=384)
     parser.add_argument("--max_simultaneous_notes", type=int, default=2)
     parser.add_argument("--min_strict_valid_samples", type=int, default=1)
+    parser.add_argument("--review_top_n", type=int, default=3)
+    parser.add_argument("--review_output_root", type=str, default=str(ROOT_DIR / "outputs" / "stage_b_data_motif_review"))
+    parser.add_argument("--copy_review_midi", action="store_true")
     return parser
 
 
@@ -524,6 +648,7 @@ def main() -> int:
     template_report = read_json(template_report_path)
     primer_tokens = build_stage_b_primer(chords, args.bpm)
     mode_summaries: dict[str, dict[str, Any]] = {}
+    samples_by_mode: dict[str, list[dict[str, Any]]] = {}
     for mode in modes:
         rows: list[dict[str, Any]] = []
         for index in range(1, int(args.num_samples) + 1):
@@ -564,11 +689,18 @@ def main() -> int:
             require_all_grammar_samples=True,
         )
         report["samples"][mode] = rows
+        samples_by_mode[mode] = rows
         mode_summaries[mode] = summary
 
     report["summary"] = build_compare_summary(
         mode_summaries,
         min_strict_valid_samples=int(args.min_strict_valid_samples),
+    )
+    report["review_export"] = build_review_export(
+        samples_by_mode,
+        output_dir=Path(args.review_output_root) / args.run_id,
+        top_n=int(args.review_top_n),
+        copy_midi=bool(args.copy_review_midi),
     )
     write_json(run_dir / "data_motif_compare_report.json", report)
     (run_dir / "data_motif_compare_report.md").write_text(markdown_report(report), encoding="utf-8")
