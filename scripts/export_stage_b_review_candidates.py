@@ -75,6 +75,7 @@ def score_probe_sample(sample: dict[str, Any]) -> float:
     contour = sample.get("phrase_contour", {})
     pitch_roles = sample.get("pitch_roles", {})
     approach = sample.get("approach_resolution", {})
+    rhythm = sample.get("rhythm_profile", {})
     return round(
         (30.0 if sample.get("strict_valid") else 0.0)
         + (15.0 if sample.get("valid") else 0.0)
@@ -90,6 +91,9 @@ def score_probe_sample(sample: dict[str, Any]) -> float:
         - _float(pitch_roles.get("root_tone_ratio")) * 8.0
         + _float(pitch_roles.get("tension_ratio")) * 4.0
         + _float(approach.get("approach_resolution_ratio")) * 4.0
+        + _float(rhythm.get("syncopated_onset_ratio")) * 4.0
+        + _float(rhythm.get("unique_bar_position_pattern_ratio")) * 4.0
+        - _float(rhythm.get("most_common_ioi_ratio")) * 4.0
         + _float(contour.get("direction_change_ratio")) * 3.0,
         4,
     )
@@ -132,6 +136,7 @@ def candidates_from_generation_probe(report: dict[str, Any]) -> list[dict[str, A
         contour = sample.get("phrase_contour", {})
         pitch_roles = sample.get("pitch_roles", {})
         approach = sample.get("approach_resolution", {})
+        rhythm = sample.get("rhythm_profile", {})
         review_flags: list[str] = []
         if not sample.get("strict_valid"):
             reason = sample.get("failure_reason") or sample.get("diagnostic_failure_reason") or "not_strict_valid"
@@ -169,6 +174,12 @@ def candidates_from_generation_probe(report: dict[str, Any]) -> list[dict[str, A
                 "tension_ratio": _float(pitch_roles.get("tension_ratio")),
                 "approach_candidate_ratio": _float(approach.get("approach_candidate_ratio")),
                 "approach_resolution_ratio": _float(approach.get("approach_resolution_ratio")),
+                "syncopated_onset_ratio": _float(rhythm.get("syncopated_onset_ratio")),
+                "unique_bar_position_pattern_ratio": _float(rhythm.get("unique_bar_position_pattern_ratio")),
+                "duration_diversity_ratio": _float(rhythm.get("duration_diversity_ratio")),
+                "most_common_duration_ratio": _float(rhythm.get("most_common_duration_ratio")),
+                "ioi_diversity_ratio": _float(rhythm.get("ioi_diversity_ratio")),
+                "most_common_ioi_ratio": _float(rhythm.get("most_common_ioi_ratio")),
                 "onset_coverage_ratio": _float(temporal.get("onset_coverage_ratio")),
                 "sustained_coverage_ratio": _float(temporal.get("sustained_coverage_ratio")),
             }
@@ -226,6 +237,12 @@ def compact_candidate(candidate: dict[str, Any], rank: int) -> dict[str, Any]:
         "tension_ratio": _float(candidate.get("tension_ratio")),
         "approach_candidate_ratio": _float(candidate.get("approach_candidate_ratio")),
         "approach_resolution_ratio": _float(candidate.get("approach_resolution_ratio")),
+        "syncopated_onset_ratio": _float(candidate.get("syncopated_onset_ratio")),
+        "unique_bar_position_pattern_ratio": _float(candidate.get("unique_bar_position_pattern_ratio")),
+        "duration_diversity_ratio": _float(candidate.get("duration_diversity_ratio")),
+        "most_common_duration_ratio": _float(candidate.get("most_common_duration_ratio")),
+        "ioi_diversity_ratio": _float(candidate.get("ioi_diversity_ratio")),
+        "most_common_ioi_ratio": _float(candidate.get("most_common_ioi_ratio")),
         "onset_coverage_ratio": _float(candidate.get("onset_coverage_ratio")),
         "sustained_coverage_ratio": _float(candidate.get("sustained_coverage_ratio")),
     }
@@ -269,8 +286,8 @@ def markdown_report(manifest: dict[str, Any]) -> str:
         f"- reviewable only: `{str(manifest['reviewable_only']).lower()}`",
         f"- selected candidates: `{len(manifest['candidates'])}`",
         "",
-        "| review | source rank | mode | groups/bar | sample | score | notes | pitches | chord | root | tension | approach | resolved | dominant | repeat | direction | risk | midi |",
-        "|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
+        "| review | source rank | mode | groups/bar | sample | score | notes | pitches | chord | root | tension | approach | resolved | sync | bar-var | ioi-rep | dominant | repeat | direction | risk | midi |",
+        "|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
     ]
     for candidate in manifest["candidates"]:
         midi_path = candidate.get("review_midi_relative_path") or candidate.get("midi_path")
@@ -283,11 +300,16 @@ def markdown_report(manifest: dict[str, Any]) -> str:
         table_candidate.setdefault("tension_ratio", 0.0)
         table_candidate.setdefault("approach_candidate_ratio", 0.0)
         table_candidate.setdefault("approach_resolution_ratio", 0.0)
+        table_candidate.setdefault("syncopated_onset_ratio", 0.0)
+        table_candidate.setdefault("unique_bar_position_pattern_ratio", 0.0)
+        table_candidate.setdefault("most_common_ioi_ratio", 0.0)
         lines.append(
             "| {review_rank} | {source_rank} | {mode} | {note_groups_per_bar} | {sample_index} | "
             "{score:.4f} | {note_count} | {unique_pitch_count} | {chord_tone_ratio:.3f} | "
             "{root_tone_ratio:.3f} | {tension_ratio:.3f} | "
             "{approach_candidate_ratio:.3f} | {approach_resolution_ratio:.3f} | "
+            "{syncopated_onset_ratio:.3f} | {unique_bar_position_pattern_ratio:.3f} | "
+            "{most_common_ioi_ratio:.3f} | "
             "{dominant_pitch_ratio:.3f} | {repeated_pitch_ratio:.3f} | {direction_change_ratio:.3f} | "
             "`{risk_flags_text}` | `{display_midi_path}` |".format(
                 **table_candidate
