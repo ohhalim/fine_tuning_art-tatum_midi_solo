@@ -115,6 +115,10 @@ def probe_command(
     ]
     if args.require_all_grammar_samples:
         cmd.append("--require_all_grammar_samples")
+    if getattr(args, "chord_aware_pitches", False):
+        cmd.append("--chord_aware_pitches")
+        cmd.extend(["--chord_pitch_mode", str(getattr(args, "chord_pitch_mode", "tones_tensions"))])
+        cmd.extend(["--chord_pitch_repeat_window", str(getattr(args, "chord_pitch_repeat_window", 2))])
     if skip_prepare_train:
         cmd.extend(["--skip_prepare", "--skip_train"])
     if checkpoint_dir is not None:
@@ -142,6 +146,9 @@ def row_from_probe_report(top_k: int, temperature: float, run_id: str, report: d
         "generation_mode": str(report.get("generation_mode", "")),
         "coverage_aware_positions": bool(report.get("coverage_aware_positions", False)),
         "coverage_position_window": int(report.get("coverage_position_window", 0) or 0),
+        "chord_aware_pitches": bool(report.get("chord_aware_pitches", False)),
+        "chord_pitch_mode": str(report.get("chord_pitch_mode", "")),
+        "chord_pitch_repeat_window": int(report.get("chord_pitch_repeat_window", 0) or 0),
         "constrained_note_groups_per_bar": int(report.get("constrained_note_groups_per_bar", 0) or 0),
         "sample_count": int(summary.get("sample_count", 0)),
         "grammar_gate_sample_count": int(summary.get("grammar_gate_sample_count", 0)),

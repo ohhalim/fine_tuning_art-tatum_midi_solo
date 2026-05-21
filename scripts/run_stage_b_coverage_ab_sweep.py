@@ -23,13 +23,23 @@ from scripts.run_stage_b_sampling_sweep import (  # noqa: E402
     write_json,
 )
 
+VALID_MODES = {"plain", "coverage", "chord", "coverage_chord"}
+
 
 def parse_modes(raw: str) -> list[str]:
     modes = [mode.strip().lower() for mode in raw.split(",") if mode.strip()]
-    invalid = [mode for mode in modes if mode not in {"plain", "coverage"}]
+    invalid = [mode for mode in modes if mode not in VALID_MODES]
     if invalid:
         raise ValueError(f"Unknown coverage sweep modes: {invalid}")
     return modes
+
+
+def mode_has_coverage(mode: str) -> bool:
+    return mode in {"coverage", "coverage_chord"}
+
+
+def mode_has_chord_aware_pitches(mode: str) -> bool:
+    return mode in {"chord", "coverage_chord"}
 
 
 def config_run_id(base_run_id: str, mode: str, note_groups_per_bar: int, top_k: int, temperature: float) -> str:
@@ -75,28 +85,36 @@ def build_ab_summary(
     min_best_strict_valid_samples: int = 1,
     max_collapse_warning_sample_rate: float = 0.34,
 ) -> dict[str, Any]:
-    mode_rows = {
-        "plain": [row for row in rows if row["mode"] == "plain"],
-        "coverage": [row for row in rows if row["mode"] == "coverage"],
-    }
+    mode_names = sorted(VALID_MODES | {str(row.get("mode", "")) for row in rows if row.get("mode")})
+    mode_rows = {mode: [row for row in rows if row["mode"] == mode] for mode in mode_names}
     best = best_row(rows)
     best_plain = best_row(mode_rows["plain"])
     best_coverage = best_row(mode_rows["coverage"])
+    best_chord = best_row([row for row in rows if mode_has_chord_aware_pitches(str(row["mode"]))])
+    best_coverage_chord = best_row(mode_rows["coverage_chord"])
     passed_coverage = bool(
         best_coverage
         and int(best_coverage["strict_valid_sample_count"]) >= int(min_best_strict_valid_samples)
         and float(best_coverage["collapse_warning_sample_rate"]) <= float(max_collapse_warning_sample_rate)
     )
+    passed_chord = bool(
+        best_chord
+        and int(best_chord["strict_valid_sample_count"]) >= int(min_best_strict_valid_samples)
+        and float(best_chord["collapse_warning_sample_rate"]) <= float(max_collapse_warning_sample_rate)
+    )
     passed_comparison = bool(best_plain is not None and best_coverage is not None)
     return {
         "config_count": int(len(rows)),
-        "mode_counts": {mode: int(len(mode_rows[mode])) for mode in sorted(mode_rows)},
+        "mode_counts": {mode: int(len(mode_rows[mode])) for mode in mode_names},
         "best_config": compact_config(best),
         "best_plain_config": compact_config(best_plain),
         "best_coverage_config": compact_config(best_coverage),
+        "best_chord_config": compact_config(best_chord),
+        "best_coverage_chord_config": compact_config(best_coverage_chord),
         "min_best_strict_valid_samples": int(min_best_strict_valid_samples),
         "max_collapse_warning_sample_rate": float(max_collapse_warning_sample_rate),
         "passed_coverage_gate": passed_coverage,
+        "passed_chord_gate": passed_chord,
         "passed_comparison_gate": passed_comparison,
         "passed_ab_sweep_gate": bool(passed_coverage and passed_comparison),
     }
@@ -109,17 +127,21 @@ def markdown_table(rows: list[dict[str, Any]], summary: dict[str, Any]) -> str:
         f"- passed A/B sweep gate: `{str(summary['passed_ab_sweep_gate']).lower()}`",
         f"- best plain config: `{summary['best_plain_config']}`",
         f"- best coverage config: `{summary['best_coverage_config']}`",
+        f"- best chord-aware config: `{summary.get('best_chord_config')}`",
+        f"- best coverage+chord config: `{summary.get('best_coverage_chord_config')}`",
         "",
-        "| mode | groups/bar | samples | grammar | valid | strict | onset | sustained | span | max empty | dead air | collapse | strict pass |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|",
+        "| mode | groups/bar | chord | samples | grammar | valid | strict | onset | sustained | span | max empty | dead air | collapse | strict pass |",
+        "|---|---:|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|",
     ]
     for row in rows:
+        table_row = dict(row)
+        table_row["chord_aware_pitches"] = bool(row.get("chord_aware_pitches", False))
         lines.append(
-            "| {mode} | {note_groups_per_bar} | {sample_count} | {grammar_gate_sample_count} | "
+            "| {mode} | {note_groups_per_bar} | {chord_aware_pitches} | {sample_count} | {grammar_gate_sample_count} | "
             "{valid_sample_count} | {strict_valid_sample_count} | {avg_onset_coverage_ratio:.3f} | "
             "{avg_sustained_coverage_ratio:.3f} | {avg_position_span_ratio:.3f} | "
             "{max_longest_sustained_empty_run_steps} | {avg_dead_air_ratio:.3f} | "
-            "{collapse_warning_sample_rate:.3f} | {passed_strict_review_gate} |".format(**row)
+            "{collapse_warning_sample_rate:.3f} | {passed_strict_review_gate} |".format(**table_row)
         )
     lines.append("")
     lines.append("## Failure Reasons")
@@ -140,6 +162,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--modes", type=str, default="plain,coverage")
     parser.add_argument("--note_groups_per_bar_values", type=str, default="4,6,8")
     parser.add_argument("--coverage_position_window", type=int, default=0)
+    parser.add_argument("--chord_pitch_mode", choices=("tones", "tones_tensions"), default="tones")
+    parser.add_argument("--chord_pitch_repeat_window", type=int, default=2)
     parser.add_argument("--top_k", type=int, default=2)
     parser.add_argument("--temperature", type=float, default=0.9)
     parser.add_argument("--max_files", type=int, default=2)
@@ -195,8 +219,11 @@ def main() -> int:
             probe_args.top_ks = str(args.top_k)
             probe_args.temperatures = str(args.temperature)
             probe_args.constrained_note_groups_per_bar = int(note_groups_per_bar)
-            probe_args.coverage_aware_positions = mode == "coverage"
+            probe_args.coverage_aware_positions = mode_has_coverage(mode)
             probe_args.coverage_position_window = int(args.coverage_position_window)
+            probe_args.chord_aware_pitches = mode_has_chord_aware_pitches(mode)
+            probe_args.chord_pitch_mode = args.chord_pitch_mode
+            probe_args.chord_pitch_repeat_window = int(args.chord_pitch_repeat_window)
             cmd = probe_command(
                 probe_args,
                 run_id=config_id,
@@ -205,7 +232,7 @@ def main() -> int:
                 checkpoint_dir=checkpoint_dir,
                 skip_prepare_train=not first_config,
             )
-            if mode == "coverage":
+            if mode_has_coverage(mode):
                 cmd.extend(["--coverage_aware_positions", "--coverage_position_window", str(args.coverage_position_window)])
             result = run_command(cmd)
             command_results.append(result)

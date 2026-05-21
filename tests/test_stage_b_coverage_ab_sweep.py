@@ -6,6 +6,8 @@ from scripts.run_stage_b_coverage_ab_sweep import (
     build_ab_summary,
     config_run_id,
     markdown_table,
+    mode_has_chord_aware_pitches,
+    mode_has_coverage,
     parse_modes,
 )
 
@@ -14,6 +16,11 @@ class StageBCoverageAbSweepTest(unittest.TestCase):
     def test_parse_modes_rejects_unknown_mode(self) -> None:
         with self.assertRaises(ValueError):
             parse_modes("plain,random")
+
+    def test_parse_modes_accepts_chord_aware_modes(self) -> None:
+        self.assertEqual(parse_modes("plain,coverage_chord"), ["plain", "coverage_chord"])
+        self.assertTrue(mode_has_coverage("coverage_chord"))
+        self.assertTrue(mode_has_chord_aware_pitches("coverage_chord"))
 
     def test_config_run_id_is_stable(self) -> None:
         self.assertEqual(
@@ -49,12 +56,27 @@ class StageBCoverageAbSweepTest(unittest.TestCase):
                 "collapse_warning_sample_rate": 0.0,
                 "max_longest_sustained_empty_run_steps": 6,
             },
+            {
+                "mode": "coverage_chord",
+                "note_groups_per_bar": 4,
+                "run_id": "coverage_chord",
+                "top_k": 2,
+                "temperature": 0.9,
+                "valid_sample_count": 2,
+                "strict_valid_sample_count": 2,
+                "avg_onset_coverage_ratio": 0.25,
+                "avg_sustained_coverage_ratio": 0.5,
+                "collapse_warning_sample_rate": 0.0,
+                "max_longest_sustained_empty_run_steps": 5,
+            },
         ]
 
         summary = build_ab_summary(rows, min_best_strict_valid_samples=1)
 
         self.assertTrue(summary["passed_ab_sweep_gate"])
+        self.assertTrue(summary["passed_chord_gate"])
         self.assertEqual(summary["best_coverage_config"]["strict_valid_sample_count"], 3)
+        self.assertEqual(summary["best_coverage_chord_config"]["strict_valid_sample_count"], 2)
         self.assertEqual(summary["best_plain_config"]["strict_valid_sample_count"], 0)
 
     def test_build_ab_summary_fails_without_plain_comparison(self) -> None:
@@ -96,12 +118,15 @@ class StageBCoverageAbSweepTest(unittest.TestCase):
                 "collapse_warning_sample_rate": 0.0,
                 "passed_strict_review_gate": True,
                 "diagnostic_failure_reasons": {},
+                "chord_aware_pitches": True,
             }
         ]
         summary = {
             "passed_ab_sweep_gate": True,
             "best_plain_config": None,
             "best_coverage_config": {"mode": "coverage", "note_groups_per_bar": 4},
+            "best_chord_config": {"mode": "coverage", "note_groups_per_bar": 4},
+            "best_coverage_chord_config": None,
         }
 
         markdown = markdown_table(rows, summary)
@@ -109,6 +134,7 @@ class StageBCoverageAbSweepTest(unittest.TestCase):
         self.assertIn("groups/bar", markdown)
         self.assertIn("dead air", markdown)
         self.assertIn("coverage", markdown)
+        self.assertIn("chord", markdown)
 
 
 if __name__ == "__main__":
