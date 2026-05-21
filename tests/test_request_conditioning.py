@@ -59,6 +59,15 @@ class RequestConditioningTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "temperature"):
             request.validate()
 
+    def test_eight_bar_phrase_probe_request_is_allowed(self) -> None:
+        request = GenerationRequest(
+            bpm=120,
+            chord_progression=["Cm7", "Fm7", "Bb7", "Ebmaj7"],
+            bars=8,
+        )
+
+        request.validate()
+
     def test_candidate_score_penalizes_density_target_miss(self) -> None:
         sparse_candidate = SimpleNamespace(
             note_density=1.03,

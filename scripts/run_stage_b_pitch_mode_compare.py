@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -27,7 +28,7 @@ from scripts.run_stage_b_sampling_sweep import (  # noqa: E402
     write_json,
 )
 
-VALID_PITCH_MODES = {"tones", "tones_tensions"}
+VALID_PITCH_MODES = {"tones", "tones_tensions", "approach_tensions"}
 
 
 def parse_pitch_modes(raw: str) -> list[str]:
@@ -76,6 +77,8 @@ def compact_row(row: dict[str, Any] | None) -> dict[str, Any] | None:
         "avg_chord_tone_ratio": float(row["avg_chord_tone_ratio"]),
         "avg_root_tone_ratio": float(row["avg_root_tone_ratio"]),
         "avg_tension_ratio": float(row["avg_tension_ratio"]),
+        "avg_approach_candidate_ratio": float(row.get("avg_approach_candidate_ratio", 0.0)),
+        "avg_approach_resolution_ratio": float(row.get("avg_approach_resolution_ratio", 0.0)),
         "avg_onset_coverage_ratio": float(row["avg_onset_coverage_ratio"]),
         "avg_sustained_coverage_ratio": float(row["avg_sustained_coverage_ratio"]),
     }
@@ -88,6 +91,7 @@ def build_pitch_mode_summary(
     mode_rows = {mode: [row for row in rows if row.get("pitch_mode") == mode] for mode in sorted(VALID_PITCH_MODES)}
     best_tones = best_row(mode_rows["tones"])
     best_tensions = best_row(mode_rows["tones_tensions"])
+    best_approach = best_row(mode_rows["approach_tensions"])
     best = best_row(rows)
     comparison_ready = bool(best_tones and best_tensions)
     tones_root = float(best_tones.get("avg_root_tone_ratio", 0.0)) if best_tones else 0.0
@@ -102,17 +106,28 @@ def build_pitch_mode_summary(
         best_tensions
         and int(best_tensions["strict_valid_sample_count"]) >= int(min_best_strict_valid_samples)
     )
+    passed_approach = bool(
+        best_approach
+        and int(best_approach["strict_valid_sample_count"]) >= int(min_best_strict_valid_samples)
+    )
     return {
         "config_count": int(len(rows)),
         "mode_counts": {mode: int(len(mode_rows[mode])) for mode in sorted(VALID_PITCH_MODES)},
         "best_config": compact_row(best),
         "best_tones_config": compact_row(best_tones),
         "best_tones_tensions_config": compact_row(best_tensions),
+        "best_approach_tensions_config": compact_row(best_approach),
         "min_best_strict_valid_samples": int(min_best_strict_valid_samples),
         "comparison_ready": comparison_ready,
         "passed_tones_gate": passed_tones,
         "passed_tones_tensions_gate": passed_tensions,
-        "passed_compare_gate": bool(comparison_ready and passed_tones and passed_tensions),
+        "passed_approach_tensions_gate": passed_approach,
+        "passed_compare_gate": bool(
+            comparison_ready
+            and passed_tones
+            and passed_tensions
+            and (not mode_rows["approach_tensions"] or passed_approach)
+        ),
         "root_tone_ratio_delta_tensions_minus_tones": float(tensions_root - tones_root),
         "tension_ratio_delta_tensions_minus_tones": float(tensions_tension - tones_tension),
     }
@@ -125,16 +140,18 @@ def markdown_table(rows: list[dict[str, Any]], summary: dict[str, Any]) -> str:
         f"- passed compare gate: `{str(summary['passed_compare_gate']).lower()}`",
         f"- best tones config: `{summary['best_tones_config']}`",
         f"- best tones+tensions config: `{summary['best_tones_tensions_config']}`",
+        f"- best approach+tensions config: `{summary['best_approach_tensions_config']}`",
         f"- root delta, tensions minus tones: `{summary['root_tone_ratio_delta_tensions_minus_tones']:.3f}`",
         f"- tension delta, tensions minus tones: `{summary['tension_ratio_delta_tensions_minus_tones']:.3f}`",
         "",
-        "| pitch mode | samples | valid | strict | chord | root | tension | onset | sustained | collapse | strict pass | report |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|---|",
+        "| pitch mode | samples | valid | strict | chord | root | tension | approach | resolved | onset | sustained | collapse | strict pass | report |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|---|",
     ]
     for row in rows:
         lines.append(
             "| {pitch_mode} | {sample_count} | {valid_sample_count} | {strict_valid_sample_count} | "
             "{avg_chord_tone_ratio:.3f} | {avg_root_tone_ratio:.3f} | {avg_tension_ratio:.3f} | "
+            "{avg_approach_candidate_ratio:.3f} | {avg_approach_resolution_ratio:.3f} | "
             "{avg_onset_coverage_ratio:.3f} | {avg_sustained_coverage_ratio:.3f} | "
             "{collapse_warning_sample_rate:.3f} | {passed_strict_review_gate} | `{report_path}` |".format(**row)
         )
@@ -163,6 +180,38 @@ def export_review_candidates(
     write_review_json(output_dir / "review_manifest.json", manifest)
     (output_dir / "review_candidates.md").write_text(review_markdown_report(manifest), encoding="utf-8")
     return manifest
+
+
+def export_named_comparison_midis(review_exports: dict[str, dict[str, Any]], output_dir: Path) -> list[dict[str, Any]]:
+    named_dir = output_dir / "compare_named_midi"
+    named_dir.mkdir(parents=True, exist_ok=True)
+    copied: list[dict[str, Any]] = []
+    for mode_index, mode in enumerate(sorted(review_exports), start=1):
+        manifest = review_exports[mode]
+        for candidate in manifest.get("candidates", []):
+            source = candidate.get("review_midi_path") or candidate.get("midi_path")
+            if not source:
+                continue
+            source_path = Path(str(source))
+            if not source_path.is_absolute():
+                source_path = ROOT_DIR / source_path
+            if not source_path.exists():
+                continue
+            target_name = (
+                f"{mode_index:02d}_{mode}_rank_{int(candidate['review_rank']):02d}_"
+                f"sample_{int(candidate['sample_index'])}.mid"
+            )
+            target_path = named_dir / target_name
+            shutil.copy2(source_path, target_path)
+            copied.append(
+                {
+                    "mode": mode,
+                    "review_rank": int(candidate["review_rank"]),
+                    "source_path": str(source_path),
+                    "named_midi_path": str(target_path),
+                }
+            )
+    return copied
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -305,6 +354,12 @@ def main() -> int:
         "summary": summary,
         "rows": rows,
         "review_exports": review_exports,
+        "named_comparison_midis": export_named_comparison_midis(
+            review_exports,
+            output_dir=Path(args.review_output_root) / run_id,
+        )
+        if args.copy_review_midi
+        else [],
         "command_results": command_results,
     }
     write_json(compare_dir / "pitch_mode_compare_report.json", report)

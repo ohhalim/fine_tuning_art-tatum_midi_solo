@@ -566,7 +566,7 @@ def chord_pitch_classes(chord: str | None, pitch_mode: str = "tones_tensions") -
     if root_pc is None:
         return set(range(12))
     intervals = set(CHORD_TONE_INTERVALS.get(quality, CHORD_TONE_INTERVALS["unknown"]))
-    if pitch_mode == "tones_tensions":
+    if pitch_mode in {"tones_tensions", "approach_tensions"}:
         intervals.update(TENSION_INTERVALS.get(quality, set()))
     elif pitch_mode != "tones":
         raise ValueError(f"unknown chord pitch mode: {pitch_mode}")
@@ -576,6 +576,24 @@ def chord_pitch_classes(chord: str | None, pitch_mode: str = "tones_tensions") -
 def chord_root_pitch_class(chord: str | None) -> int | None:
     root, _quality = parse_chord_symbol(chord)
     return ROOT_TO_PC.get(root)
+
+
+def non_root_chord_pitch_classes(chord: str | None) -> set[int]:
+    chord_tones = set(chord_pitch_classes(chord, pitch_mode="tones"))
+    root_pc = chord_root_pitch_class(chord)
+    if root_pc is not None and len(chord_tones) > 1:
+        chord_tones.discard(root_pc)
+    return chord_tones
+
+
+def chord_approach_pitch_classes(chord: str | None) -> set[int]:
+    target_pitch_classes = non_root_chord_pitch_classes(chord)
+    approach_pitch_classes: set[int] = set()
+    for pitch_class in target_pitch_classes:
+        for step in (-2, -1, 1, 2):
+            approach_pitch_classes.add((pitch_class + step) % 12)
+    approach_pitch_classes.difference_update(chord_pitch_classes(chord, pitch_mode="tones"))
+    return approach_pitch_classes or (chord_pitch_classes(chord, pitch_mode="tones_tensions") - chord_pitch_classes(chord, pitch_mode="tones"))
 
 
 def analyze_stage_b_pitch_roles(
@@ -630,13 +648,85 @@ def analyze_stage_b_pitch_roles(
     }
 
 
+def analyze_stage_b_approach_resolution(
+    tokens: Sequence[int],
+    chords: Sequence[str],
+    primer_size: int = 0,
+    max_resolution_step: int = 2,
+) -> dict[str, Any]:
+    groups = extract_stage_b_note_groups(tokens, primer_size=primer_size)
+    approach_candidates = 0
+    resolved_approaches = 0
+    unresolved_approaches = 0
+    resolution_distances: list[int] = []
+
+    for index, group in enumerate(groups[:-1]):
+        pitch = int(group["pitch"])
+        pitch_class = pitch % 12
+        bar = int(group["bar"])
+        chord = chords[bar % len(chords)] if chords else None
+        chord_tones = chord_pitch_classes(chord, pitch_mode="tones")
+        if pitch_class in chord_tones:
+            continue
+
+        next_group = groups[index + 1]
+        next_pitch = int(next_group["pitch"])
+        next_bar = int(next_group["bar"])
+        next_chord = chords[next_bar % len(chords)] if chords else None
+        next_chord_tones = chord_pitch_classes(next_chord, pitch_mode="tones")
+        distance = abs(next_pitch - pitch)
+        is_near_resolution = 1 <= distance <= int(max_resolution_step)
+        is_resolved = is_near_resolution and (next_pitch % 12) in next_chord_tones
+
+        near_current_tone = any(
+            min((pitch_class - target) % 12, (target - pitch_class) % 12) <= int(max_resolution_step)
+            for target in chord_tones
+        )
+        near_next_tone = any(
+            min((pitch_class - target) % 12, (target - pitch_class) % 12) <= int(max_resolution_step)
+            for target in next_chord_tones
+        )
+        if not (near_current_tone or near_next_tone):
+            continue
+
+        approach_candidates += 1
+        if is_resolved:
+            resolved_approaches += 1
+            resolution_distances.append(distance)
+        else:
+            unresolved_approaches += 1
+
+    group_count = int(len(groups))
+    return {
+        "note_group_count": group_count,
+        "approach_candidate_count": int(approach_candidates),
+        "approach_candidate_ratio": float(approach_candidates / group_count) if group_count else 0.0,
+        "resolved_approach_count": int(resolved_approaches),
+        "unresolved_approach_count": int(unresolved_approaches),
+        "approach_resolution_ratio": (
+            float(resolved_approaches / approach_candidates) if approach_candidates else 0.0
+        ),
+        "avg_resolution_distance": (
+            float(sum(resolution_distances) / len(resolution_distances)) if resolution_distances else 0.0
+        ),
+    }
+
+
 def chord_aware_pitch_tokens(
     chord: str | None,
     pitch_mode: str = "tones_tensions",
     recent_pitches: Sequence[int] | None = None,
     repeat_window: int = 2,
+    group_index: int | None = None,
 ) -> list[int]:
-    pitch_classes = chord_pitch_classes(chord, pitch_mode=pitch_mode)
+    if pitch_mode == "approach_tensions":
+        resolving_group = bool(group_index is not None and int(group_index) % 2 == 1)
+        if resolving_group:
+            pitch_classes = non_root_chord_pitch_classes(chord)
+        else:
+            pitch_classes = chord_approach_pitch_classes(chord)
+    else:
+        pitch_classes = chord_pitch_classes(chord, pitch_mode=pitch_mode)
     tokens = [
         note_pitch_token(pitch)
         for pitch in range(int(PIANO_PITCH_MIN), int(PIANO_PITCH_MAX) + 1)
@@ -644,6 +734,14 @@ def chord_aware_pitch_tokens(
     ]
     if not tokens:
         return list(range(TOKEN_NOTE_PITCH_START, TOKEN_NOTE_PITCH_END + 1))
+
+    if pitch_mode == "approach_tensions" and recent_pitches and group_index is not None and int(group_index) % 2 == 1:
+        last_pitch = int(list(recent_pitches)[-1])
+        near_resolution_tokens = [
+            token for token in tokens if 1 <= abs(pitch_from_token(token) - last_pitch) <= 2
+        ]
+        if near_resolution_tokens:
+            tokens = near_resolution_tokens
 
     window = max(0, int(repeat_window))
     if not recent_pitches or window == 0:
@@ -702,6 +800,7 @@ def generate_stage_b_constrained_tokens(
                         pitch_mode=chord_pitch_mode,
                         recent_pitches=recent_pitches,
                         repeat_window=chord_pitch_repeat_window,
+                        group_index=group_index,
                     )
                 token = next_token_from_model(
                     model,
@@ -799,6 +898,11 @@ def sample_report(
     temporal_coverage = analyze_stage_b_temporal_coverage(tokens, primer_size=primer_size, bars=request.bars)
     phrase_contour = analyze_stage_b_phrase_contour(tokens, primer_size=primer_size)
     pitch_roles = analyze_stage_b_pitch_roles(tokens, chords=request.chord_progression, primer_size=primer_size)
+    approach_resolution = analyze_stage_b_approach_resolution(
+        tokens,
+        chords=request.chord_progression,
+        primer_size=primer_size,
+    )
     collapse_gate = evaluate_collapse_gate(
         collapse,
         min_unique_pitches=strict_min_unique_pitches,
@@ -836,6 +940,7 @@ def sample_report(
         "temporal_coverage": temporal_coverage,
         "phrase_contour": phrase_contour,
         "pitch_roles": pitch_roles,
+        "approach_resolution": approach_resolution,
         "collapse_gate": collapse_gate,
         "postprocess": postprocess_report or {"enabled": False},
         "metrics": metrics.to_dict(),
@@ -878,11 +983,14 @@ def build_probe_summary(
     longest_same_pitch_runs: list[int] = []
     root_tone_ratios: list[float] = []
     tension_ratios: list[float] = []
+    approach_candidate_ratios: list[float] = []
+    approach_resolution_ratios: list[float] = []
     for row in sample_rows:
         collapse = row.get("collapse", {})
         temporal_coverage = row.get("temporal_coverage", {})
         phrase_contour = row.get("phrase_contour", {})
         pitch_roles = row.get("pitch_roles", {})
+        approach_resolution = row.get("approach_resolution", {})
         if collapse.get("collapse_warning"):
             collapse_warning_count += 1
         if not row.get("strict_valid", False):
@@ -910,6 +1018,12 @@ def build_probe_summary(
         longest_same_pitch_runs.append(int(phrase_contour.get("longest_same_pitch_run", 0) or 0))
         root_tone_ratios.append(float(pitch_roles.get("root_tone_ratio", 0.0) or 0.0))
         tension_ratios.append(float(pitch_roles.get("tension_ratio", 0.0) or 0.0))
+        approach_candidate_ratios.append(
+            float(approach_resolution.get("approach_candidate_ratio", 0.0) or 0.0)
+        )
+        approach_resolution_ratios.append(
+            float(approach_resolution.get("approach_resolution_ratio", 0.0) or 0.0)
+        )
         if not row["valid"]:
             reason = str(row.get("failure_reason") or "unknown")
             diagnostic_reason = str(row.get("diagnostic_failure_reason") or reason)
@@ -990,6 +1104,16 @@ def build_probe_summary(
             float(sum(root_tone_ratios) / len(root_tone_ratios)) if root_tone_ratios else 0.0
         ),
         "avg_tension_ratio": float(sum(tension_ratios) / len(tension_ratios)) if tension_ratios else 0.0,
+        "avg_approach_candidate_ratio": (
+            float(sum(approach_candidate_ratios) / len(approach_candidate_ratios))
+            if approach_candidate_ratios
+            else 0.0
+        ),
+        "avg_approach_resolution_ratio": (
+            float(sum(approach_resolution_ratios) / len(approach_resolution_ratios))
+            if approach_resolution_ratios
+            else 0.0
+        ),
     }
 
 
@@ -1031,7 +1155,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--coverage_aware_positions", action="store_true")
     parser.add_argument("--coverage_position_window", type=int, default=0)
     parser.add_argument("--chord_aware_pitches", action="store_true")
-    parser.add_argument("--chord_pitch_mode", choices=("tones", "tones_tensions"), default="tones_tensions")
+    parser.add_argument(
+        "--chord_pitch_mode",
+        choices=("tones", "tones_tensions", "approach_tensions"),
+        default="tones_tensions",
+    )
     parser.add_argument("--chord_pitch_repeat_window", type=int, default=2)
     parser.add_argument("--postprocess_overlap", action="store_true")
     parser.add_argument("--max_simultaneous_notes", type=int, default=2)

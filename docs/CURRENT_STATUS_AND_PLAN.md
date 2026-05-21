@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-55-stage-b-tension-compare`
+- `issue-57-stage-b-8bar-approach-phrase`
 
 현재 범위가 아닌 것:
 
@@ -36,36 +36,47 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #55는 manual listening/piano-roll review에서 나온 "멜로디 같긴 하지만 근음/코드음에 너무 안전하게 붙어있는 느낌"을 `tones` vs `tones_tensions` 비교로 검증한다.
+Issue #57은 manual listening/piano-roll review에서 나온 "이전보다 나아졌지만 아직 재즈가 아니라 초등학교 음악/다이아토닉 코드톤 나열처럼 들린다"는 피드백을 8-bar approach phrase probe로 검증한다.
 
-Issue #51에서 이미 adjacent same-note collapse는 아니라는 것을 확인했다. Issue #53에서는 실제 root tone, non-root chord tone, tension 비율을 기록했다. Issue #55는 같은 4-bar 조건에서 `tones_tensions`가 tension을 실제로 늘리고 root bias를 줄이는지 확인한다.
+Issue #51에서 이미 adjacent same-note collapse는 아니라는 것을 확인했다. Issue #53에서는 실제 root tone, non-root chord tone, tension 비율을 기록했다. Issue #55는 같은 4-bar 조건에서 `tones_tensions`가 tension을 실제로 늘리고 root bias를 줄이는지 확인했다. Issue #57은 8-bar 길이와 approach/resolution 정책을 추가한다.
 
 Implemented:
 
+- `inference/app/schemas.py` local phrase probe bars limit `8`
+- `scripts/run_stage_b_generation_probe.py` `approach_tensions` pitch mode
+- `scripts/run_stage_b_generation_probe.py` approach resolution diagnostics
 - `scripts/run_stage_b_pitch_mode_compare.py`
+- `scripts/run_stage_b_pitch_mode_compare.py` named comparison MIDI export
+- `tests/test_request_conditioning.py`
+- `tests/test_stage_b_generation_probe.py`
 - `tests/test_stage_b_pitch_mode_compare.py`
 - `scripts/run_stage_b_sampling_sweep.py` root/tension summary fields
-- `scripts/agent_harness.sh stage-b-pitch-mode-compare`
+- `scripts/agent_harness.sh stage-b-8bar-approach-phrase`
 - output files:
   - `pitch_mode_compare_report.json`
   - `pitch_mode_compare_report.md`
   - mode-specific `review_manifest.json`
-  - mode-specific copied review MIDI files under `midi/`
+  - named comparison MIDI files under `compare_named_midi/`
 
 Result:
 
-- source comparison report: `outputs/stage_b_pitch_mode_compare/harness_stage_b_pitch_mode_compare/pitch_mode_compare_report.json`
-- tones review output: `outputs/stage_b_review_candidates/harness_stage_b_pitch_mode_compare/tones`
-- tones+tensions review output: `outputs/stage_b_review_candidates/harness_stage_b_pitch_mode_compare/tones_tensions`
-- setup: `4` bars, `8` note groups per bar, `32` note groups per sample
+- source comparison report: `outputs/stage_b_pitch_mode_compare/harness_stage_b_8bar_approach_phrase/pitch_mode_compare_report.json`
+- named review output: `outputs/stage_b_review_candidates/harness_stage_b_8bar_approach_phrase/compare_named_midi/`
+- setup: `8` bars, `8` note groups per bar, `64` note groups per sample
 - `tones` strict valid samples: `3/3`
 - `tones_tensions` strict valid samples: `3/3`
-- `tones` average root tone ratio: around `0.271`
-- `tones_tensions` average root tone ratio: around `0.135`
+- `approach_tensions` strict valid samples: `3/3`
+- `tones` average root tone ratio: around `0.260`
+- `tones_tensions` average root tone ratio: around `0.198`
+- `approach_tensions` average root tone ratio: `0.000`
 - `tones` average tension ratio: `0.000`
-- `tones_tensions` average tension ratio: around `0.313`
-- `tones` average chord-tone ratio: around `0.927`
-- `tones_tensions` average chord-tone ratio: around `0.667`
+- `tones_tensions` average tension ratio: around `0.328`
+- `approach_tensions` average tension ratio: around `0.161`
+- `approach_tensions` average approach candidate ratio: around `0.500`
+- `approach_tensions` average approach resolution ratio: `1.000`
+- `tones` average chord-tone ratio: around `0.616`
+- `tones_tensions` average chord-tone ratio: around `0.557`
+- `approach_tensions` average chord-tone ratio: around `0.419`
 - both modes average onset coverage ratio: around `0.500`
 
 Decision:
@@ -73,8 +84,9 @@ Decision:
 - 2-bar candidates가 너무 짧았다는 판단은 타당하다.
 - 4-bar 후보는 one-note/two-note failure가 아니라 melody-like sketch로 볼 수 있다.
 - "근음을 계속 치는 느낌"은 실제 root-only collapse라기보다 chord-tone-only, no-tension 라인의 안전한 inside sound에 가깝다.
-- `tones_tensions`는 no-tension 문제를 줄였지만, repeated/dominant pitch risk가 남아 있어 broad training 전 phrase-shape control이 먼저다.
-- 다음 issue는 passing/approach pitch policy 또는 motif/contour constraint 비교가 맞다.
+- 8-bar `approach_tensions`는 pitch-level resolution을 만들지만, 이것만으로 jazz vocabulary가 생기지는 않는다.
+- 현재 단계는 "broken MIDI"에서 "valid but beginner-like melodic exercise"로 올라온 상태다.
+- 다음 issue는 pitch filter보다 rhythm/motif/swing-aware phrase grammar 비교가 맞다.
 
 Detail:
 
@@ -86,6 +98,7 @@ Detail:
 - `docs/STAGE_B_PHRASE_CONTOUR_DIAGNOSTICS_2026-05-21.md`
 - `docs/STAGE_B_ROOT_BIAS_DIAGNOSTICS_2026-05-21.md`
 - `docs/STAGE_B_PITCH_MODE_COMPARE_2026-05-21.md`
+- `docs/STAGE_B_8BAR_APPROACH_PHRASE_2026-05-21.md`
 
 ## Active Issue #14
 

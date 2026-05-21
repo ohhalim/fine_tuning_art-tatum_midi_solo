@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #55: Stage B tones vs tones_tensions pitch-mode comparison.
+- Issue #57: Stage B 8-bar approach phrase probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -158,6 +158,12 @@ For Stage B multi-sample review-gate changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-stronger-probe
+```
+
+For Stage B 8-bar approach/passing-note phrase changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-8bar-approach-phrase
 ```
 
 For Stage B collapse/sampling-sweep changes, run:
