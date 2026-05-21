@@ -72,6 +72,7 @@ def score_probe_sample(sample: dict[str, Any]) -> float:
     metrics = sample.get("metrics", {})
     collapse = sample.get("collapse", {})
     temporal = sample.get("temporal_coverage", {})
+    contour = sample.get("phrase_contour", {})
     return round(
         (30.0 if sample.get("strict_valid") else 0.0)
         + (15.0 if sample.get("valid") else 0.0)
@@ -82,9 +83,31 @@ def score_probe_sample(sample: dict[str, Any]) -> float:
         + min(_int(metrics.get("unique_pitch_count")), 8) * 2.0
         - _float(metrics.get("dead_air_ratio")) * 10.0
         - _float(collapse.get("repeated_position_pitch_pair_ratio")) * 15.0
-        - _float(collapse.get("repeated_pitch_ratio")) * 10.0,
+        - _float(collapse.get("repeated_pitch_ratio")) * 10.0
+        - _float(contour.get("adjacent_repeated_pitch_ratio")) * 8.0
+        + _float(contour.get("direction_change_ratio")) * 3.0,
         4,
     )
+
+
+def risk_flags_from_generation_sample(sample: dict[str, Any]) -> list[str]:
+    collapse = sample.get("collapse", {})
+    contour = sample.get("phrase_contour", {})
+    note_group_count = max(1, _int(collapse.get("note_group_count")))
+    dominant_pitch_ratio = _float(collapse.get("max_same_pitch_repeats")) / note_group_count
+    repeated_pitch_ratio = _float(collapse.get("repeated_pitch_ratio"))
+    adjacent_repeated_pitch_ratio = _float(contour.get("adjacent_repeated_pitch_ratio"))
+
+    flags: list[str] = []
+    if repeated_pitch_ratio >= 0.65:
+        flags.append("high_repeated_pitch_ratio")
+    if dominant_pitch_ratio >= 0.25:
+        flags.append("high_dominant_pitch_ratio")
+    if adjacent_repeated_pitch_ratio >= 0.40:
+        flags.append("adjacent_pitch_repetition")
+    for reason in contour.get("contour_warning_reasons", []) or []:
+        flags.append(f"contour:{reason}")
+    return flags
 
 
 def candidates_from_generation_probe(report: dict[str, Any]) -> list[dict[str, Any]]:
@@ -97,12 +120,17 @@ def candidates_from_generation_probe(report: dict[str, Any]) -> list[dict[str, A
         metrics = sample.get("metrics", {})
         collapse = sample.get("collapse", {})
         temporal = sample.get("temporal_coverage", {})
+        contour = sample.get("phrase_contour", {})
         review_flags: list[str] = []
         if not sample.get("strict_valid"):
             reason = sample.get("failure_reason") or sample.get("diagnostic_failure_reason") or "not_strict_valid"
             review_flags.append(str(reason))
         if collapse.get("collapse_warning"):
             review_flags.extend(str(reason) for reason in collapse.get("collapse_reasons", []))
+        risk_flags = risk_flags_from_generation_sample(sample)
+        dominant_pitch_ratio = _float(collapse.get("max_same_pitch_repeats")) / max(
+            1, _int(collapse.get("note_group_count"))
+        )
         candidates.append(
             {
                 "rank": _int(sample.get("sample_index")),
@@ -112,6 +140,7 @@ def candidates_from_generation_probe(report: dict[str, Any]) -> list[dict[str, A
                 "score": score_probe_sample(sample),
                 "reviewable": bool(sample.get("strict_valid")) and not review_flags,
                 "review_flags": review_flags,
+                "risk_flags": risk_flags,
                 "midi_path": sample.get("midi_path"),
                 "strict_valid": bool(sample.get("strict_valid")),
                 "note_count": _int(metrics.get("note_count")),
@@ -119,9 +148,11 @@ def candidates_from_generation_probe(report: dict[str, Any]) -> list[dict[str, A
                 "chord_tone_ratio": _float(metrics.get("chord_tone_ratio")),
                 "bar_chord_tone_ratio": _float(metrics.get("chord_tone_ratio")),
                 "min_bar_chord_tone_ratio": _float(metrics.get("chord_tone_ratio")),
-                "dominant_pitch_ratio": _float(collapse.get("max_same_pitch_repeats"))
-                / max(1, _int(collapse.get("note_group_count"))),
+                "dominant_pitch_ratio": dominant_pitch_ratio,
                 "repeated_pitch_ratio": _float(collapse.get("repeated_pitch_ratio")),
+                "adjacent_repeated_pitch_ratio": _float(contour.get("adjacent_repeated_pitch_ratio")),
+                "direction_change_ratio": _float(contour.get("direction_change_ratio")),
+                "longest_same_pitch_run": _int(contour.get("longest_same_pitch_run")),
                 "onset_coverage_ratio": _float(temporal.get("onset_coverage_ratio")),
                 "sustained_coverage_ratio": _float(temporal.get("sustained_coverage_ratio")),
             }
@@ -162,6 +193,7 @@ def compact_candidate(candidate: dict[str, Any], rank: int) -> dict[str, Any]:
         "score": _float(candidate.get("score")),
         "reviewable": bool(candidate.get("reviewable")),
         "review_flags": list(candidate.get("review_flags", []) or []),
+        "risk_flags": list(candidate.get("risk_flags", []) or []),
         "midi_path": candidate.get("midi_path"),
         "note_count": _int(candidate.get("note_count")),
         "unique_pitch_count": _int(candidate.get("unique_pitch_count")),
@@ -170,6 +202,9 @@ def compact_candidate(candidate: dict[str, Any], rank: int) -> dict[str, Any]:
         "min_bar_chord_tone_ratio": _float(candidate.get("min_bar_chord_tone_ratio")),
         "dominant_pitch_ratio": _float(candidate.get("dominant_pitch_ratio")),
         "repeated_pitch_ratio": _float(candidate.get("repeated_pitch_ratio")),
+        "adjacent_repeated_pitch_ratio": _float(candidate.get("adjacent_repeated_pitch_ratio")),
+        "direction_change_ratio": _float(candidate.get("direction_change_ratio")),
+        "longest_same_pitch_run": _int(candidate.get("longest_same_pitch_run")),
         "onset_coverage_ratio": _float(candidate.get("onset_coverage_ratio")),
         "sustained_coverage_ratio": _float(candidate.get("sustained_coverage_ratio")),
     }
@@ -213,18 +248,22 @@ def markdown_report(manifest: dict[str, Any]) -> str:
         f"- reviewable only: `{str(manifest['reviewable_only']).lower()}`",
         f"- selected candidates: `{len(manifest['candidates'])}`",
         "",
-        "| review | source rank | mode | groups/bar | sample | score | notes | pitches | chord | bar chord | min bar | dominant | repeat | midi |",
-        "|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        "| review | source rank | mode | groups/bar | sample | score | notes | pitches | chord | dominant | repeat | adjacent repeat | direction | risk | midi |",
+        "|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
     ]
     for candidate in manifest["candidates"]:
         midi_path = candidate.get("review_midi_relative_path") or candidate.get("midi_path")
         table_candidate = dict(candidate)
         table_candidate["display_midi_path"] = midi_path
+        table_candidate["risk_flags_text"] = ", ".join(candidate.get("risk_flags", []) or [])
+        table_candidate.setdefault("adjacent_repeated_pitch_ratio", 0.0)
+        table_candidate.setdefault("direction_change_ratio", 0.0)
         lines.append(
             "| {review_rank} | {source_rank} | {mode} | {note_groups_per_bar} | {sample_index} | "
             "{score:.4f} | {note_count} | {unique_pitch_count} | {chord_tone_ratio:.3f} | "
-            "{bar_chord_tone_ratio:.3f} | {min_bar_chord_tone_ratio:.3f} | "
-            "{dominant_pitch_ratio:.3f} | {repeated_pitch_ratio:.3f} | `{display_midi_path}` |".format(
+            "{dominant_pitch_ratio:.3f} | {repeated_pitch_ratio:.3f} | "
+            "{adjacent_repeated_pitch_ratio:.3f} | {direction_change_ratio:.3f} | "
+            "`{risk_flags_text}` | `{display_midi_path}` |".format(
                 **table_candidate
             )
         )

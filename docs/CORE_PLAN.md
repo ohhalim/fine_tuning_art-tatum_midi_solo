@@ -127,6 +127,7 @@ Stage B에서 명시하는 것:
 21. Stage B chord-aware pitch constrained generation
 22. Stage B coverage_chord candidate review export
 23. Stage B longer 4-bar coverage_chord phrase probe
+24. Stage B phrase contour/repeated-pitch diagnostics
 
 가장 최근 의미 있는 결과:
 
@@ -140,6 +141,7 @@ Stage B에서 명시하는 것:
 - Manual piano-roll review found that these candidates can look like melodic fragments, but are still too short and feel unfinished.
 - Issue #49 extends the same coverage+chord-aware setup to a `4` bar probe with `32` note groups per sample and exports direct review candidates from the generation probe report.
 - Issue #49 fixes the length problem structurally, but repeated-pitch dependence remains a listening-review risk.
+- Issue #51 shows this is not adjacent same-note collapse: adjacent repeated pitch ratio is `0.000`, average direction change ratio is around `0.689`, and max longest same pitch run is `1`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -285,6 +287,27 @@ Stage B에서 명시하는 것:
 - exported 4-bar candidates를 piano roll과 귀로 확인한다.
 - 단편이 아니라 최소한 call/continuation/landing 느낌의 phrase sketch인지 본다.
 - 여전히 짧거나 기계적이면 broad generic training 전 phrase/motif-level constraint를 먼저 설계한다.
+
+### Phase 3.8. Phrase Contour Diagnostics
+
+목표:
+
+- repeated pitch ratio 하나만 보고 샘플을 오판하지 않는다.
+- adjacent same-note collapse, long same-pitch run, low direction change, low interval variety를 분리해서 본다.
+- 후보를 자동 탈락시키기보다 review export에서 risk flag로 표시한다.
+
+현재 결과:
+
+- completed: generated sample report에 `phrase_contour`를 추가했다.
+- completed: review export에 `risk_flags`를 추가했다.
+- latest result: repeated pitch ratio는 높지만 adjacent repeated pitch ratio는 `0.000`이다.
+- latest result: direction change ratio는 약 `0.689`이고 longest same pitch run은 `1`이다.
+
+해석:
+
+- 현재 후보는 한 음을 길게 반복하는 collapse가 아니다.
+- 제한된 chord-tone pitch set을 많이 재사용하는 상태다.
+- 다음 manual review는 이 pitch reuse가 motif로 들리는지, constrained cycling으로 들리는지 판단해야 한다.
 
 ### Phase 4. Generic Jazz Base 후보 학습
 

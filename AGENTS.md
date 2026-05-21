@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #49: Stage B longer coverage_chord phrase probe.
+- Issue #51: Stage B phrase contour/repeated-pitch diagnostics.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

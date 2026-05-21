@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-49-stage-b-longer-phrase-probe`
+- `issue-51-stage-b-phrase-contour-diagnostics`
 
 현재 범위가 아닌 것:
 
@@ -36,16 +36,18 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #49는 manual piano-roll review에서 나온 "유효하긴 하지만 너무 짧고 만들다 만 단어처럼 느껴진다"는 피드백을 반영한다.
+Issue #51은 Issue #49 이후 남은 repeated-pitch risk를 더 구체적으로 설명한다.
 
-Issue #45는 chord-aware pitch 후보군으로 viable unflagged candidates를 `9`개 만들었고, Issue #47은 그 후보들을 review package로 export했다. 하지만 exported candidates는 `2` bar 기준이고, 일부 후보는 solo-line fragment처럼 보일 수 있어도 phrase로는 짧았다.
+Issue #49는 manual piano-roll review에서 나온 "유효하긴 하지만 너무 짧고 만들다 만 단어처럼 느껴진다"는 피드백을 반영해 `4` bar phrase 후보를 만들었다.
 
-Issue #49는 같은 coverage+chord-aware 방향을 `4` bar phrase probe로 늘린다.
+그 결과 길이 문제는 구조적으로 해결됐지만, repeated pitch ratio가 `0.719`로 높게 남았다. Issue #51은 이것이 인접 반복 실패인지, 제한된 pitch set 재사용인지 구분한다.
 
 Implemented:
 
-- `scripts/export_stage_b_review_candidates.py` generation probe report input support
-- `tests/test_stage_b_review_export.py` generation probe report selection test
+- `scripts/run_stage_b_generation_probe.py` phrase contour diagnostics
+- `scripts/export_stage_b_review_candidates.py` repeated-pitch/contour risk flags
+- `tests/test_stage_b_generation_probe.py` phrase contour tests
+- `tests/test_stage_b_review_export.py` risk flag tests
 - `scripts/agent_harness.sh stage-b-longer-phrase-probe`
 - output files:
   - `review_manifest.json`
@@ -63,6 +65,9 @@ Result:
 - average onset coverage ratio: around `0.500`
 - average sustained coverage ratio: around `0.680`
 - repeated pitch ratio: around `0.719`
+- adjacent repeated pitch ratio: `0.000`
+- average direction change ratio: around `0.689`
+- max longest same pitch run: `1`
 
 Decision:
 
@@ -70,7 +75,7 @@ Decision:
 - 다음 review는 4-bar exported candidates를 기준으로 한다.
 - 4-bar 후보가 여전히 단편적이면 broad training으로 가지 않고 phrase/motif-level constraint 또는 pretrained symbolic base를 검토한다.
 - 4-bar 후보가 최소한 solo-line phrase sketch로 들리면 generic jazz base 후보 학습 설계로 넘어갈 수 있다.
-- 현재 남은 핵심 리스크는 길이가 아니라 repeated-pitch dependence가 motif처럼 들리는지, 기계적 반복처럼 들리는지다.
+- 현재 남은 핵심 리스크는 adjacent same-note collapse가 아니라 제한된 pitch set을 과하게 재사용하는 느낌이다.
 
 Detail:
 
@@ -79,6 +84,7 @@ Detail:
 - `docs/STAGE_B_CHORD_AWARE_PITCH_2026-05-21.md`
 - `docs/STAGE_B_CANDIDATE_REVIEW_EXPORT_2026-05-21.md`
 - `docs/STAGE_B_LONGER_PHRASE_PROBE_2026-05-21.md`
+- `docs/STAGE_B_PHRASE_CONTOUR_DIAGNOSTICS_2026-05-21.md`
 
 ## Active Issue #14
 
@@ -1138,6 +1144,52 @@ Detail:
 
 - `docs/STAGE_B_LONGER_PHRASE_PROBE_2026-05-21.md`
 
+### 0.24. Issue #51 Stage B phrase contour/repeated-pitch diagnostics
+
+Status:
+
+- implemented on `issue-51-stage-b-phrase-contour-diagnostics`
+
+Review trigger:
+
+- Issue #49 fixed the phrase length problem structurally.
+- However, exported 4-bar candidates still had repeated pitch ratio around `0.719`.
+- That number alone did not say whether the sample was adjacent same-note collapse, motif reuse, or chord-tone set reuse.
+
+Goal:
+
+- add phrase contour diagnostics to each Stage B generated sample
+- expose repeated-pitch risk in review export without dropping the candidate
+- make the manual review question more precise
+
+Implemented diagnostics:
+
+- adjacent repeated pitch ratio
+- direction change ratio
+- longest same pitch run
+- unique interval count
+- stepwise/leap motion ratio
+- contour warning reasons
+- review export `risk_flags`
+
+Latest local result:
+
+- repeated pitch ratio: around `0.719`
+- adjacent repeated pitch ratio: `0.000`
+- average direction change ratio: around `0.689`
+- max longest same pitch run: `1`
+- risk flags: `high_repeated_pitch_ratio`, plus `high_dominant_pitch_ratio` for one sample
+
+Decision:
+
+- The current 4-bar candidates are not adjacent same-note collapse.
+- They still reuse a limited pitch set heavily.
+- The next listening review should judge whether that reuse sounds like motif/inside playing or like constrained mechanical pitch cycling.
+
+Detail:
+
+- `docs/STAGE_B_PHRASE_CONTOUR_DIAGNOSTICS_2026-05-21.md`
+
 ### 1. Run full jazz piano dataset audit
 
 ```bash
@@ -1284,6 +1336,7 @@ Decision:
 - `docs/STAGE_B_CHORD_AWARE_PITCH_2026-05-21.md`
 - `docs/STAGE_B_CANDIDATE_REVIEW_EXPORT_2026-05-21.md`
 - `docs/STAGE_B_LONGER_PHRASE_PROBE_2026-05-21.md`
+- `docs/STAGE_B_PHRASE_CONTOUR_DIAGNOSTICS_2026-05-21.md`
 - `docs/REFERENCES.md`
 - `docs/INFERENCE_MODEL_SPEC.md`
 - `docs/QA_ACCEPTANCE_PLAN.md`
