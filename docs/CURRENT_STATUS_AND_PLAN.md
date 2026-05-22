@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-79-stage-b-chord-labeled-eval-subset`
+- `issue-81-stage-b-generated-chord-eval-bridge`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,43 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #81은 Issue #79의 chord-labeled evaluator를 generated candidate report와 연결한 단계다.
+
+중요한 전제:
+
+- generated candidate report가 chord progression metadata를 알고 있을 때만 평가한다.
+- solo-only MIDI에서 chord를 추측하지 않는다.
+- real Brad/reference chord label 문제는 아직 해결되지 않았다.
+
+Implemented:
+
+- generated review/candidate report bridge
+- `chord_progression`, `chords`, `request.chord_progression`, `source_report.request.chord_progression` fallback
+- generated MIDI candidate `review_midi_path` / `midi_path` support
+- harness-local tiny generated-candidate fixture
+- `scripts/evaluate_generated_candidate_chords.py`
+- `scripts/agent_harness.sh stage-b-generated-chord-eval`
+- docs:
+  - `docs/STAGE_B_GENERATED_CHORD_EVAL_2026-05-22.md`
+
+Result:
+
+- fixture sample count: `1`
+- fixture note count: `16`
+- chord-tone ratio: `1.000`
+- tension ratio: `0.000`
+- approach ratio: `0.000`
+- outside ratio: `0.000`
+- report: `outputs/stage_b_generated_chord_eval/harness_stage_b_generated_chord_eval/generated_chord_eval_report.md`
+
+Decision:
+
+- generated candidate report에 known chord progression metadata가 있으면 pitch-role evaluator로 연결할 수 있다.
+- fixture score는 model quality가 아니라 bridge smoke result다.
+- 다음 작업은 실제 `stage-b-data-guide-hybrid` review manifest 같은 generated review package에 이 bridge를 적용하는 것이다.
+
+## Previous Probe Result
 
 Issue #79는 Issue #77의 결론을 받아, 작은 chord-labeled evaluation subset contract를 만든 단계다.
 
