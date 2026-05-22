@@ -76,14 +76,16 @@ outputs/chord_coverage_audit/harness_chord_coverage_audit/chord_coverage_audit.m
 |---|---:|---:|---:|
 | role meta | 2812 | 0 | 0.000 |
 | sidecars | 0 | 0 | 0.000 |
-| MIDI text events | 120 | 0 | 0.000 |
+| MIDI files scanned for text events | 120 | 0 | 0.000 |
 
 추가 정보:
 
 - role meta unique source MIDI count: `28`
 - role meta chord fields: `0`
 - sidecar files found: `0`
+- MIDI files scanned for text events: `120`
 - MIDI files with any text event: `0`
+- MIDI chord-text candidate files: `0`
 - usable chord annotation candidate: `false`
 
 ## 판단

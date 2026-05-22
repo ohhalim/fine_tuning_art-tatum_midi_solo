@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import unittest
+import zipfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -49,6 +50,17 @@ class ChordProgressionCoverageAuditTest(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             sidecar = Path(tmp) / "changes.txt"
             sidecar.write_text("Cm7 F7 Bbmaj7 Ebmaj7\n", encoding="utf-8")
+
+            report = audit_sidecar_files([sidecar])
+
+            self.assertEqual(report["candidate_file_count"], 1)
+
+    def test_audit_sidecar_files_reads_mxl_container(self) -> None:
+        with TemporaryDirectory() as tmp:
+            sidecar = Path(tmp) / "changes.mxl"
+            with zipfile.ZipFile(sidecar, mode="w") as archive:
+                archive.writestr("META-INF/container.xml", "<container />")
+                archive.writestr("score.musicxml", "<credit-words>Cm7 F7 Bbmaj7 Ebmaj7</credit-words>")
 
             report = audit_sidecar_files([sidecar])
 

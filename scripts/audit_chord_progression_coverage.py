@@ -7,6 +7,7 @@ import csv
 import json
 import re
 import sys
+import zipfile
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
@@ -177,7 +178,24 @@ def iter_sidecar_files(input_dir: Path, limit: int | None = None) -> list[Path]:
     return iter_limited(files, limit)
 
 
+def read_mxl_text(path: Path, max_chars: int = 200_000) -> str:
+    with zipfile.ZipFile(path) as archive:
+        names = [
+            name
+            for name in archive.namelist()
+            if name.lower().endswith((".xml", ".musicxml")) and "meta-inf/" not in name.lower()
+        ]
+        if not names:
+            names = [name for name in archive.namelist() if name.lower().endswith((".xml", ".musicxml"))]
+        if not names:
+            return ""
+        data = archive.read(sorted(names)[0])[:max_chars]
+    return data.decode("utf-8", errors="ignore")
+
+
 def read_text_lossy(path: Path, max_chars: int = 200_000) -> str:
+    if path.suffix.lower() == ".mxl":
+        return read_mxl_text(path, max_chars=max_chars)
     data = path.read_bytes()[:max_chars]
     return data.decode("utf-8", errors="ignore")
 
@@ -260,6 +278,7 @@ def audit_midi_text_events(paths: Sequence[Path]) -> dict[str, Any]:
     return {
         "scanned_file_count": int(len(rows)),
         "readable_file_count": int(sum(1 for row in rows if row.get("readable"))),
+        "total_text_event_count": int(sum(int(row.get("text_event_count", 0) or 0) for row in rows)),
         "with_text_event_count": int(len(with_text)),
         "with_text_event_ratio": float(len(with_text) / len(rows)) if rows else 0.0,
         "candidate_file_count": int(len(candidates)),
@@ -309,7 +328,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         "| sidecars | {scanned_file_count} | {candidate_file_count} | {candidate_file_ratio:.3f} |".format(
             **report["sidecars"]
         ),
-        "| MIDI text events | {scanned_file_count} | {candidate_file_count} | {candidate_file_ratio:.3f} |".format(
+        "| MIDI files scanned for text events | {scanned_file_count} | {candidate_file_count} | {candidate_file_ratio:.3f} |".format(
             **report["midi_text_events"]
         ),
         "",
@@ -325,6 +344,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         "## MIDI Text Events",
         "",
+        f"- scanned MIDI files: `{report['midi_text_events']['scanned_file_count']}`",
+        f"- total text event occurrences: `{report['midi_text_events']['total_text_event_count']}`",
         f"- files with any text event: `{report['midi_text_events']['with_text_event_count']}`",
         f"- chord candidates: `{report['midi_text_events']['candidate_file_count']}`",
         "",

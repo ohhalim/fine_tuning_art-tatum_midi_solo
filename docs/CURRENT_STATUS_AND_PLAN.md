@@ -63,8 +63,9 @@ Result:
 - role meta chord hits: `0`
 - role meta unique source MIDI count: `28`
 - sidecar files found: `0`
-- MIDI text events scanned: `120`
-- MIDI chord text hits: `0`
+- MIDI files scanned for text events: `120`
+- MIDI files with any text event: `0`
+- MIDI chord-text candidate files: `0`
 - usable chord annotation candidate: `false`
 - report: `outputs/chord_coverage_audit/harness_chord_coverage_audit/chord_coverage_audit.md`
 
