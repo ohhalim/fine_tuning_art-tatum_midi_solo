@@ -69,6 +69,61 @@ def build_candidate_note(sample: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _candidate_id_from_review_manifest(sample: dict[str, Any]) -> str:
+    mode = str(sample.get("mode") or "candidate").strip() or "candidate"
+    rank = int(sample.get("review_rank", 0) or 0)
+    sample_index = int(sample.get("sample_index", 0) or 0)
+    if rank and sample_index:
+        return f"{mode}_rank_{rank}_sample_{sample_index}"
+    return str(sample.get("sample_id") or sample.get("review_midi_path") or mode)
+
+
+def build_candidate_note_from_review_manifest(sample: dict[str, Any]) -> dict[str, Any]:
+    ratios = sample.get("role_ratios", {})
+    source_metrics = {
+        "note_count": int(sample.get("note_count", 0) or 0),
+        "unique_pitch_count": int(sample.get("unique_pitch_count", 0) or 0),
+        "chord_tone_ratio": float(sample.get("chord_tone_ratio", ratios.get("chord_tone_ratio", 0.0)) or 0.0),
+        "tension_ratio": float(sample.get("tension_ratio", ratios.get("tension_ratio", 0.0)) or 0.0),
+        "approach_ratio": float(sample.get("approach_ratio", ratios.get("approach_ratio", 0.0)) or 0.0),
+        "outside_ratio": float(sample.get("outside_ratio", ratios.get("outside_ratio", 0.0)) or 0.0),
+        "root_tone_ratio": float(sample.get("root_tone_ratio", 0.0) or 0.0),
+        "dead_air_ratio": float(sample.get("dead_air_ratio", 0.0) or 0.0),
+        "syncopated_onset_ratio": float(sample.get("syncopated_onset_ratio", 0.0) or 0.0),
+        "unique_bar_position_pattern_ratio": float(sample.get("unique_bar_position_pattern_ratio", 0.0) or 0.0),
+        "duration_diversity_ratio": float(sample.get("duration_diversity_ratio", 0.0) or 0.0),
+        "most_common_duration_ratio": float(sample.get("most_common_duration_ratio", 0.0) or 0.0),
+        "ioi_diversity_ratio": float(sample.get("ioi_diversity_ratio", 0.0) or 0.0),
+        "most_common_ioi_ratio": float(sample.get("most_common_ioi_ratio", 0.0) or 0.0),
+    }
+    return {
+        "candidate_id": _candidate_id_from_review_manifest(sample),
+        "review_metadata": {
+            "mode": str(sample.get("mode", "")),
+            "review_rank": int(sample.get("review_rank", 0) or 0),
+            "sample_index": int(sample.get("sample_index", 0) or 0),
+            "sample_seed": sample.get("sample_seed"),
+            "valid": bool(sample.get("valid", False)),
+            "strict_valid": bool(sample.get("strict_valid", False)),
+        },
+        "review_files": {
+            "midi_path": str(sample.get("review_midi_path") or sample.get("midi_path") or ""),
+            "source_midi_path": str(sample.get("midi_path") or ""),
+            "context_midi_path": str(sample.get("context_midi_path") or ""),
+        },
+        "source_metrics": source_metrics,
+        "listening": {
+            "status": "pending",
+            "phrase_quality": "pending",
+            "timing": "pending",
+            "chord_fit": "pending",
+            "issues": [],
+            "decision": "pending",
+            "notes": "",
+        },
+    }
+
+
 def build_review_notes_template(
     generated_chord_eval_report: dict[str, Any],
     source_review_markdown: str | None = None,
@@ -88,6 +143,29 @@ def build_review_notes_template(
             "do_not_infer_real_reference_chords": True,
         },
         "candidates": [build_candidate_note(sample) for sample in samples],
+    }
+
+
+def build_review_notes_from_review_manifest(
+    review_manifest: dict[str, Any],
+    source_review_markdown: str | None = None,
+) -> dict[str, Any]:
+    candidates = review_manifest.get("candidates")
+    if not isinstance(candidates, list) or not candidates:
+        raise ReviewNotesError("review manifest must contain non-empty candidates")
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
+        "source_review_manifest": str(review_manifest.get("source_manifest_path", "")),
+        "source_review_markdown": source_review_markdown,
+        "reviewer": "",
+        "review_context": {
+            "listen_with_context_midi": True,
+            "compare_solo_and_context": True,
+            "do_not_infer_real_reference_chords": True,
+        },
+        "chord_progression": review_manifest.get("chord_progression", []),
+        "candidates": [build_candidate_note_from_review_manifest(sample) for sample in candidates],
     }
 
 
@@ -159,6 +237,7 @@ def markdown_summary(summary: dict[str, Any], output_path: Path) -> str:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build or validate Stage B listening review notes")
     parser.add_argument("--generated_chord_eval_report", type=str, default=None)
+    parser.add_argument("--review_manifest", type=str, default=None)
     parser.add_argument("--source_review_markdown", type=str, default=None)
     parser.add_argument("--review_notes", type=str, default=None)
     parser.add_argument(
@@ -178,10 +257,21 @@ def main() -> int:
         notes_path = Path(args.review_notes)
         notes = read_json(notes_path)
     else:
-        if not args.generated_chord_eval_report:
-            raise ReviewNotesError("--generated_chord_eval_report is required when --review_notes is not provided")
-        generated_report = read_json(Path(args.generated_chord_eval_report))
-        notes = build_review_notes_template(generated_report, source_review_markdown=args.source_review_markdown)
+        if args.review_manifest:
+            review_manifest_path = Path(args.review_manifest)
+            review_manifest = read_json(review_manifest_path)
+            review_manifest["source_manifest_path"] = str(review_manifest_path)
+            notes = build_review_notes_from_review_manifest(
+                review_manifest,
+                source_review_markdown=args.source_review_markdown,
+            )
+        else:
+            if not args.generated_chord_eval_report:
+                raise ReviewNotesError(
+                    "--generated_chord_eval_report or --review_manifest is required when --review_notes is not provided"
+                )
+            generated_report = read_json(Path(args.generated_chord_eval_report))
+            notes = build_review_notes_template(generated_report, source_review_markdown=args.source_review_markdown)
         notes_path = run_dir / "review_notes_template.json"
         write_json(notes_path, notes)
     summary = validate_review_notes(notes)
