@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-77-stage-b-chord-coverage-audit`
+- `issue-79-stage-b-chord-labeled-eval-subset`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,45 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #79는 Issue #77의 결론을 받아, 작은 chord-labeled evaluation subset contract를 만든 단계다.
+
+중요한 전제:
+
+- 실제 Brad/reference 곡에 코드를 임의로 붙이지 않는다.
+- 현재 committed fixture는 `inline_notes` 기반 tiny contract test다.
+- 실제 phrase는 chord label이 확실하거나 수동 검증된 경우에만 manifest에 추가한다.
+
+Implemented:
+
+- chord-labeled eval manifest schema
+- tiny inline-note fixture:
+  - `data/eval/stage_b_chord_labeled_tiny/manifest.json`
+- manifest validator
+- bar-level chord label 기반 pitch-role summary
+- MIDI path sample support without committing raw MIDI
+- `scripts/evaluate_chord_labeled_subset.py`
+- `scripts/agent_harness.sh stage-b-chord-labeled-eval`
+- docs:
+  - `docs/STAGE_B_CHORD_LABELED_EVAL_2026-05-22.md`
+
+Result:
+
+- fixture sample count: `2`
+- fixture note count: `32`
+- chord-tone ratio: `0.844`
+- tension ratio: `0.156`
+- approach ratio: `0.000`
+- outside ratio: `0.000`
+- report: `outputs/stage_b_chord_labeled_eval/harness_stage_b_chord_labeled_eval/chord_labeled_eval_report.md`
+
+Decision:
+
+- pitch-role evaluator는 known chord labels를 받으면 정상 동작한다.
+- 아직 real reference phrase가 라벨링된 것은 아니다.
+- 다음 작업은 코드가 확실한 3-5개 phrase를 manifest에 추가하거나, generated candidate metadata를 이 evaluator와 연결하는 것이다.
+
+## Previous Probe Result
 
 Issue #77은 Issue #75에서 드러난 chord annotation blocker를 실제 dataset 기준으로 확인한 단계다.
 

@@ -78,6 +78,8 @@ Modes:
                 Run audit -> manifest -> prepare_role_dataset smoke.
   chord-coverage-audit
                 Audit chord annotation coverage in role metadata, sidecars, and MIDI text events.
+  stage-b-chord-labeled-eval
+                Evaluate the tiny chord-labeled subset manifest and pitch-role summary contract.
   all           Run demo and tiny-compare.
 
 Environment:
@@ -126,6 +128,7 @@ run_quick() {
     scripts/build_jazz_training_manifests.py \
     scripts/run_manifest_prepare_smoke.py \
     scripts/audit_chord_progression_coverage.py \
+    scripts/evaluate_chord_labeled_subset.py \
     scripts/train_stage_a_full.py \
     scripts/train_stage_a_adapter.py \
     inference/app \
@@ -804,6 +807,16 @@ run_chord_coverage_audit() {
     --max_midi_files 120
 }
 
+run_stage_b_chord_labeled_eval() {
+  local run_id="${RUN_ID:-harness_stage_b_chord_labeled_eval}"
+  print_header "Stage B chord-labeled evaluation subset"
+  "$PYTHON_BIN" scripts/evaluate_chord_labeled_subset.py \
+    --run_id "$run_id" \
+    --manifest data/eval/stage_b_chord_labeled_tiny/manifest.json \
+    --min_samples 2 \
+    --min_notes 16
+}
+
 case "$MODE" in
   status)
     run_status
@@ -897,6 +910,9 @@ case "$MODE" in
     ;;
   chord-coverage-audit)
     run_chord_coverage_audit
+    ;;
+  stage-b-chord-labeled-eval)
+    run_stage_b_chord_labeled_eval
     ;;
   all)
     run_demo

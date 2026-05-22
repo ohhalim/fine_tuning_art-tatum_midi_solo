@@ -1,0 +1,58 @@
+{
+  "schema_version": "stage_b_chord_labeled_eval_v1",
+  "description": "Tiny inline-note fixture for validating the chord-labeled evaluation contract. This is not a real Brad/reference label set.",
+  "samples": [
+    {
+      "sample_id": "tiny_ii_v_i_inline_01",
+      "source_type": "inline_notes",
+      "bar_count": 4,
+      "beats_per_bar": 4,
+      "positions_per_bar": 16,
+      "chords": ["Dm7", "G7", "Cmaj7", "Cmaj7"],
+      "notes": [
+        {"bar": 0, "position": 0, "pitch": 62},
+        {"bar": 0, "position": 3, "pitch": 65},
+        {"bar": 0, "position": 6, "pitch": 69},
+        {"bar": 0, "position": 10, "pitch": 72},
+        {"bar": 1, "position": 0, "pitch": 71},
+        {"bar": 1, "position": 4, "pitch": 67},
+        {"bar": 1, "position": 7, "pitch": 69},
+        {"bar": 1, "position": 12, "pitch": 65},
+        {"bar": 2, "position": 0, "pitch": 72},
+        {"bar": 2, "position": 4, "pitch": 76},
+        {"bar": 2, "position": 8, "pitch": 79},
+        {"bar": 2, "position": 13, "pitch": 74},
+        {"bar": 3, "position": 0, "pitch": 71},
+        {"bar": 3, "position": 5, "pitch": 69},
+        {"bar": 3, "position": 9, "pitch": 67},
+        {"bar": 3, "position": 14, "pitch": 72}
+      ]
+    },
+    {
+      "sample_id": "tiny_minor_turnaround_inline_01",
+      "source_type": "inline_notes",
+      "bar_count": 4,
+      "beats_per_bar": 4,
+      "positions_per_bar": 16,
+      "chords": ["Cm7", "F7", "Bbmaj7", "G7"],
+      "notes": [
+        {"bar": 0, "position": 0, "pitch": 63},
+        {"bar": 0, "position": 2, "pitch": 67},
+        {"bar": 0, "position": 6, "pitch": 70},
+        {"bar": 0, "position": 11, "pitch": 72},
+        {"bar": 1, "position": 0, "pitch": 69},
+        {"bar": 1, "position": 4, "pitch": 75},
+        {"bar": 1, "position": 9, "pitch": 72},
+        {"bar": 1, "position": 13, "pitch": 70},
+        {"bar": 2, "position": 0, "pitch": 70},
+        {"bar": 2, "position": 3, "pitch": 74},
+        {"bar": 2, "position": 8, "pitch": 77},
+        {"bar": 2, "position": 12, "pitch": 81},
+        {"bar": 3, "position": 0, "pitch": 71},
+        {"bar": 3, "position": 5, "pitch": 74},
+        {"bar": 3, "position": 10, "pitch": 77},
+        {"bar": 3, "position": 15, "pitch": 72}
+      ]
+    }
+  ]
+}
