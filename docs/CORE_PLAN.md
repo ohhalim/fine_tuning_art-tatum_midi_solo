@@ -152,6 +152,7 @@ Stage B에서 명시하는 것:
 46. Stage B objective flags review flow
 47. Stage B overlap-free solo-line review export
 48. Stage B duration variation review baseline
+49. Stage B phrase/cadence review baseline
 
 가장 최근 의미 있는 결과:
 
@@ -180,6 +181,7 @@ Stage B에서 명시하는 것:
 - Issue #95 connects objective flags to listening review notes and aggregate priority so problem/warning candidates are visible before manual listening.
 - Issue #97 exports overlap-free solo-line review MIDI variants while preserving original sample paths, reducing objective `overlap_polyphonic` from `9` to `0`.
 - Issue #99 adds varied-duration review baselines, reducing objective `duration_pattern_collapse` from `6` to `0` while keeping `overlap_polyphonic=0`.
+- Issue #101 adds a phrase/cadence review baseline, reducing `chromatic_walk` from `7` to `1` and `too_stepwise_or_scalar` from `6` to `0` in the next review set.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -399,6 +401,7 @@ Stage B에서 명시하는 것:
 - Issue #95 result: objective review priority reports `15` candidates, `6` warning/reviewable candidates, and `9` problem candidates before subjective listening.
 - Issue #97 result: overlap-free review export reports `15` reviewable candidates, `5` clean candidates, `10` warning candidates, and `overlap_polyphonic=0`.
 - Issue #99 result: duration variation review reports `15` reviewable candidates, `8` clean candidates, `7` warning candidates, `duration_pattern_collapse=0`, and `overlap_polyphonic=0`.
+- Issue #101 result: phrase/cadence review reports `12` reviewable candidates, `11` clean candidates, `1` warning candidate, `chromatic_walk=1`, and `too_stepwise_or_scalar=0`.
 
 해석:
 
@@ -678,26 +681,26 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B duration variation review baseline 추가
+Stage B phrase/cadence review baseline 추가
 ```
 
 결과:
 
-- varied-duration review baseline을 추가해 duration collapse를 줄였다.
-- output: `outputs/stage_b_listening_review_aggregate/harness_stage_b_duration_variation_review/listening_review_aggregate.md`
-- candidate count: `15`
-- objective reviewable: `15`
-- objective clean: `8`
-- objective warning: `7`
-- chromatic walk: `7`
+- phrase/cadence review baseline을 추가해 scalar/chromatic objective flags를 줄였다.
+- output: `outputs/stage_b_listening_review_aggregate/harness_stage_b_phrase_cadence_review/listening_review_aggregate.md`
+- candidate count: `12`
+- objective reviewable: `12`
+- objective clean: `11`
+- objective warning: `1`
+- chromatic walk: `1`
 - duration pattern collapse: `0`
 - overlap/polyphonic: `0`
-- too stepwise/scalar: `6`
+- too stepwise/scalar: `0`
 
 다음 작업:
 
-- chromatic/scalar exercise처럼 들리는 후보는 phrase vocabulary와 cadence target을 조정한다.
-- subjective listening result는 objective clean/warning priority를 참고해 채운다.
+- subjective listening result는 phrase/cadence review 후보를 기준으로 채운다.
+- subjective review 없이 다음 rule을 바꿔야 한다면 phrase naturalness를 objective metric으로 먼저 추가한다.
 - real Brad/reference chord label은 아직 임의로 넣지 않는다.
 
 ## 10. 한 문장 요약
