@@ -82,6 +82,8 @@ Modes:
                 Evaluate the tiny chord-labeled subset manifest and pitch-role summary contract.
   stage-b-generated-chord-eval
                 Evaluate generated candidate report bridge against known chord metadata.
+  stage-b-data-guide-generated-chord-eval
+                Generate data-guide hybrid review package and evaluate its known chord metadata.
   all           Run demo and tiny-compare.
 
 Environment:
@@ -829,6 +831,17 @@ run_stage_b_generated_chord_eval() {
     --candidate_limit 1
 }
 
+run_stage_b_data_guide_generated_chord_eval() {
+  local run_id="${RUN_ID:-harness_stage_b_data_guide_generated_chord_eval}"
+  print_header "Stage B data-guide hybrid review package"
+  RUN_ID="$run_id" run_stage_b_data_guide_hybrid
+  print_header "Stage B data-guide hybrid generated chord eval"
+  "$PYTHON_BIN" scripts/evaluate_generated_candidate_chords.py \
+    --run_id "$run_id" \
+    --candidate_report "outputs/stage_b_data_motif_review/${run_id}/review_manifest.json" \
+    --candidate_limit 6
+}
+
 case "$MODE" in
   status)
     run_status
@@ -928,6 +941,9 @@ case "$MODE" in
     ;;
   stage-b-generated-chord-eval)
     run_stage_b_generated_chord_eval
+    ;;
+  stage-b-data-guide-generated-chord-eval)
+    run_stage_b_data_guide_generated_chord_eval
     ;;
   all)
     run_demo
