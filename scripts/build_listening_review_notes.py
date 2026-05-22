@@ -160,6 +160,8 @@ def attach_objective_review(candidate_note: dict[str, Any], objective_candidate:
             "off_sixteenth_grid_count": int(metrics.get("off_sixteenth_grid_count", 0) or 0),
             "stepwise_interval_ratio": float(metrics.get("stepwise_interval_ratio", 0.0) or 0.0),
             "chromatic_interval_ratio": float(metrics.get("chromatic_interval_ratio", 0.0) or 0.0),
+            "large_leap_interval_ratio": float(metrics.get("large_leap_interval_ratio", 0.0) or 0.0),
+            "unresolved_large_leap_ratio": float(metrics.get("unresolved_large_leap_ratio", 0.0) or 0.0),
             "chord_tone_ratio": float(metrics.get("chord_tone_ratio", 0.0) or 0.0),
             "tension_ratio": float(metrics.get("tension_ratio", 0.0) or 0.0),
             "outside_ratio": float(metrics.get("outside_ratio", 0.0) or 0.0),

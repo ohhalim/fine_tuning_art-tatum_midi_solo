@@ -109,6 +109,64 @@ class ObjectiveMidiNoteReviewTest(unittest.TestCase):
         self.assertEqual(candidate["objective_bucket"], "problem")
         self.assertFalse(candidate["objective_reviewable"])
 
+    def test_unresolved_large_leap_candidate_is_flagged(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            midi_path = Path(tmp) / "unresolved_leaps.mid"
+            pitches = [60, 72, 83, 71, 82, 70, 81, 69]
+            self.write_midi(
+                midi_path,
+                [(index * 60, 60, pitch) for index, pitch in enumerate(pitches)],
+            )
+            report = analyze_review_manifest(
+                {
+                    "chord_progression": ["Cmaj7"],
+                    "candidates": [
+                        {
+                            "mode": "phrase_cadence",
+                            "review_rank": 1,
+                            "sample_index": 1,
+                            "review_midi_path": str(midi_path),
+                        }
+                    ],
+                }
+            )
+
+        candidate = report["candidates"][0]
+
+        self.assertIn("unresolved_large_leaps", candidate["objective_flags"])
+        self.assertGreaterEqual(candidate["metrics"]["large_leap_count"], 3)
+        self.assertGreaterEqual(candidate["metrics"]["unresolved_large_leap_ratio"], 0.45)
+        self.assertEqual(candidate["objective_bucket"], "warning")
+        self.assertTrue(candidate["objective_reviewable"])
+
+    def test_resolved_large_leap_candidate_is_not_flagged_as_unresolved(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            midi_path = Path(tmp) / "resolved_leaps.mid"
+            pitches = [60, 72, 69, 76, 72, 79, 76, 83]
+            self.write_midi(
+                midi_path,
+                [(index * 60, 60, pitch) for index, pitch in enumerate(pitches)],
+            )
+            report = analyze_review_manifest(
+                {
+                    "chord_progression": ["Cmaj7"],
+                    "candidates": [
+                        {
+                            "mode": "phrase_cadence",
+                            "review_rank": 1,
+                            "sample_index": 1,
+                            "review_midi_path": str(midi_path),
+                        }
+                    ],
+                }
+            )
+
+        candidate = report["candidates"][0]
+
+        self.assertNotIn("unresolved_large_leaps", candidate["objective_flags"])
+        self.assertGreaterEqual(candidate["metrics"]["large_leap_count"], 3)
+        self.assertLess(candidate["metrics"]["unresolved_large_leap_ratio"], 0.45)
+
     def test_objective_priority_helpers_penalize_severe_flags(self) -> None:
         metrics = {"note_count": 16, "unique_pitch_count": 8}
 

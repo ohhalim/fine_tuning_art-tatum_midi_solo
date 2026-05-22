@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-101-stage-b-phrase-cadence-review`
+- `issue-103-stage-b-phrase-naturalness-objectives`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,43 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #103은 Issue #101의 phrase/cadence 후보가 scalar/chromatic flag를 줄인 대신 leap-heavy exercise가 되었는지 확인하기 위해 phrase naturalness objective metric을 추가한 단계다.
+
+중요한 전제:
+
+- 이 단계는 subjective jazz quality를 자동 판정하지 않는다.
+- "큰 도약 뒤 회복 움직임이 있는가"만 objective risk로 본다.
+- 기존 Issue #101 결과를 더 엄격하게 다시 해석한다.
+
+Implemented:
+
+- large leap count
+- resolved / unresolved large leap count
+- unresolved large leap ratio
+- `unresolved_large_leaps` objective flag
+- listening review notes metric propagation
+- docs:
+  - `docs/STAGE_B_PHRASE_NATURALNESS_OBJECTIVES_2026-05-22.md`
+
+Result:
+
+- Issue #101 phrase/cadence review set에 새 metric 적용
+- candidate count: `12`
+- objective bucket counts:
+  - warning: `12`
+- objective flag counts:
+  - chromatic walk: `1`
+  - unresolved large leaps: `12`
+- previous Issue #101 had clean `11`, warning `1` before this metric existed.
+
+Decision:
+
+- scalar/chromatic issue는 줄었지만, phrase naturalness risk가 전 후보에서 드러났다.
+- 이것은 regression이 아니라 이전 metric이 못 보던 failure mode를 드러낸 것이다.
+- 다음 작업은 leap 뒤에 반대 방향 small recovery를 넣는 phrase-shape grammar 또는 data-derived contour resolution pattern이어야 한다.
+
+## Previous Probe Result
 
 Issue #101은 duration collapse 이후 남은 scalar/chromatic exercise 문제를 줄이기 위해 phrase/cadence review baseline을 추가한 단계다.
 
