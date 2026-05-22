@@ -104,6 +104,8 @@
   - 전체 review manifest 후보 15개를 파일 경로와 함께 listening review notes로 변환한 결과.
 - `STAGE_B_OBJECTIVE_MIDI_NOTE_REVIEW_2026-05-22.md`
   - generated review MIDI를 직접 읽어 overlap, grid, scalar/chromatic, duration collapse를 진단한 결과.
+- `STAGE_B_OBJECTIVE_FLAGS_REVIEW_FLOW_2026-05-22.md`
+  - objective MIDI flags를 listening review notes와 aggregate priority에 연결한 결과.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`

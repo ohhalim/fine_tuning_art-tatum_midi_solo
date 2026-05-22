@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-93-stage-b-objective-midi-note-review`
+- `issue-95-stage-b-objective-flags-review-flow`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,49 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #95는 objective MIDI note-level diagnostics를 listening review notes와 aggregate priority에 연결하는 단계다.
+
+중요한 전제:
+
+- 이 단계는 subjective listening review를 대체하지 않는다.
+- "재즈답다"를 자동 판정하지 않는다.
+- 사람이 들어야 할 후보를 objective problem/warning priority로 정렬한다.
+- overlap/polyphonic, off-grid, duration collapse, scalar/chromatic flag를 review notes 안에 보존한다.
+
+Implemented:
+
+- objective penalty / bucket / reviewable / priority score
+- listening review notes에 `objective_review` 첨부
+- aggregate report에 objective flag/bucket counts 추가
+- objective review priority table
+- `scripts/build_listening_review_notes.py --objective_midi_review_report`
+- `scripts/agent_harness.sh stage-b-objective-flags-review-flow`
+- docs:
+  - `docs/STAGE_B_OBJECTIVE_FLAGS_REVIEW_FLOW_2026-05-22.md`
+
+Result:
+
+- candidate count: `15`
+- objective reviewable count: `6`
+- objective bucket counts:
+  - problem: `9`
+  - warning: `6`
+- objective flag counts:
+  - chromatic walk: `7`
+  - duration pattern collapse: `9`
+  - overlap/polyphonic: `9`
+  - too stepwise/scalar: `4`
+- aggregate report:
+  - `outputs/stage_b_listening_review_aggregate/harness_stage_b_objective_flags_review_flow/listening_review_aggregate.md`
+
+Decision:
+
+- 지금 후보 중 `problem` 9개는 우선순위 낮은 review target이다.
+- `warning` 6개도 좋은 재즈 솔로라는 뜻은 아니며, duration collapse/chromatic exercise 문제를 갖는다.
+- 다음 generation rule change는 overlap을 만들지 않는 solo-line export와 duration/rhythm variation 개선을 먼저 봐야 한다.
+
+## Previous Probe Result
 
 Issue #93은 generated review MIDI를 직접 읽어 objective note-level diagnostics를 만드는 단계다.
 

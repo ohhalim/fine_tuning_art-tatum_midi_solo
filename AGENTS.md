@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #93: Stage B objective MIDI note review.
+- Issue #95: Stage B objective flags review flow.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -230,6 +230,12 @@ For Stage B objective MIDI note review changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-objective-midi-review
+```
+
+For Stage B objective flags review flow changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-objective-flags-review-flow
 ```
 
 For Stage B filled listening review aggregate changes, run:
