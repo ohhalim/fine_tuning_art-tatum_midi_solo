@@ -43,6 +43,11 @@ class ListeningReviewNotesTest(unittest.TestCase):
                     "review_midi_path": "named_midi/01_data_motif_rank_01_sample_01.mid",
                     "midi_path": "samples/data_motif/data_motif_sample_1.mid",
                     "context_midi_path": "context_midi/01_data_motif_rank_01_sample_01_with_context.mid",
+                    "review_variant": "overlap_free_solo_line",
+                    "review_postprocess_report": {
+                        "before_max_simultaneous_notes": 2,
+                        "after_max_simultaneous_notes": 1,
+                    },
                     "note_count": 63,
                     "unique_pitch_count": 24,
                     "dead_air_ratio": 0.56,
@@ -171,6 +176,11 @@ class ListeningReviewNotesTest(unittest.TestCase):
         self.assertEqual(len(notes["candidates"]), 2)
         self.assertEqual(notes["candidates"][0]["candidate_id"], "data_motif_rank_1_sample_1")
         self.assertEqual(notes["candidates"][0]["review_metadata"]["mode"], "data_motif")
+        self.assertEqual(notes["candidates"][0]["review_metadata"]["review_variant"], "overlap_free_solo_line")
+        self.assertEqual(
+            notes["candidates"][0]["review_metadata"]["review_postprocess_report"]["after_max_simultaneous_notes"],
+            1,
+        )
         self.assertEqual(
             notes["candidates"][0]["review_files"]["context_midi_path"],
             "context_midi/01_data_motif_rank_01_sample_01_with_context.mid",
