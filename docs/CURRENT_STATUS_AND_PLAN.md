@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-91-stage-b-full-review-manifest-notes`
+- `issue-93-stage-b-objective-midi-note-review`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,47 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #93은 generated review MIDI를 직접 읽어 objective note-level diagnostics를 만드는 단계다.
+
+중요한 전제:
+
+- 이 리포트는 subjective listening review가 아니다.
+- "재즈답다"를 판정하지 않는다.
+- 사람이 듣기 전에 걸러낼 수 있는 machine-observable 문제를 잡는다.
+
+Implemented:
+
+- objective MIDI note review script
+- max active notes / polyphonic tick ratio
+- 16th grid alignment
+- duration pattern collapse
+- stepwise / chromatic walk ratio
+- chord-tone / tension / outside / root ratio
+- first 16 note preview
+- `scripts/review_midi_note_objectives.py`
+- `scripts/agent_harness.sh stage-b-objective-midi-review`
+- docs:
+  - `docs/STAGE_B_OBJECTIVE_MIDI_NOTE_REVIEW_2026-05-22.md`
+
+Result:
+
+- candidate count: `15`
+- flag counts:
+  - chromatic walk: `7`
+  - duration pattern collapse: `9`
+  - overlap/polyphonic: `9`
+  - too stepwise/scalar: `4`
+- report:
+  - `outputs/stage_b_objective_midi_review/harness_stage_b_objective_midi_review/objective_midi_note_review.md`
+
+Decision:
+
+- `hand_written_swing`은 실제로 16th grid 밖이라기보다 overlap/polyphonic + scalar/chromatic + duration collapse 문제가 크다.
+- `straight_grid`는 timing grid는 맞지만 chromatic/scale exercise 성향이 강하다.
+- 다음 rule change는 subjective listening 이전에도 objective flags를 review priority와 gate에 반영해야 한다.
+
+## Previous Probe Result
 
 Issue #91은 review manifest 전체를 listening review notes template으로 변환하는 단계다.
 
