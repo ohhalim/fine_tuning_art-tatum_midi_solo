@@ -62,6 +62,7 @@ VALID_BASELINE_MODES = {
     "hand_written_swing",
     "data_motif",
     "data_motif_guide_tones",
+    "data_motif_phrase_recovery",
 }
 
 
@@ -1046,6 +1047,90 @@ def data_motif_guide_tones_tokens(
     return tokens
 
 
+def data_motif_phrase_recovery_tokens(
+    *,
+    primer_tokens: Sequence[int],
+    chords: Sequence[str],
+    bars: int,
+    note_groups_per_bar: int,
+    template_report: dict[str, Any],
+    seed: int,
+) -> list[int]:
+    rng = random.Random(int(seed))
+    summary = template_report["summary"]
+    rhythm_rows = summary["top_rhythm_templates"]
+    contour_rows = summary["top_contour_templates"]
+    tokens = [int(token) for token in primer_tokens]
+    recent_pitches: list[int] = []
+    motif_length = 4
+    motifs_per_bar = max(1, int(round(max(1, int(note_groups_per_bar)) / motif_length)))
+    slot_size = max(1, int(POSITIONS_PER_BAR) // motifs_per_bar)
+    pending_recovery_direction = 0
+
+    for bar_index in range(max(1, int(bars))):
+        chord = chords[bar_index % len(chords)] if chords else None
+        next_chord = chords[(bar_index + 1) % len(chords)] if chords else chord
+        if bar_index > 0:
+            tokens.append(TOKEN_BAR)
+            tokens.extend(chord_tokens(chord))
+        emitted_in_bar = 0
+        pitch_cells = phrase_cadence_pitch_class_cells(chord, next_chord, bar_index=bar_index)
+        for motif_index in range(motifs_per_bar):
+            row_index = bar_index * motifs_per_bar + motif_index
+            rhythm = weighted_choice(rhythm_rows, rng, row_index)["key"]
+            contour = weighted_choice(contour_rows, rng, row_index + int(seed))["key"]
+            slot_start = min(int(POSITIONS_PER_BAR) - 1, motif_index * slot_size)
+            positions = normalize_position_deltas(
+                rhythm["position_deltas"],
+                slot_start=slot_start,
+                slot_size=slot_size,
+            )
+            durations = fit_duration_tokens_to_positions(positions, rhythm["duration_steps"])
+            contour_steps = [int(step) for step in contour.get("pitch_intervals", [])] or [0]
+            anchor = 64 + ((bar_index % 3) * 3) + rng.choice([-2, 0, 2])
+            for local_index, (position, duration_token) in enumerate(zip(positions, durations)):
+                if emitted_in_bar >= int(note_groups_per_bar):
+                    break
+                if pending_recovery_direction and recent_pitches:
+                    pitch = recovery_pitch_after_large_leap(
+                        chord=chord,
+                        next_chord=next_chord,
+                        previous_pitch=recent_pitches[-1],
+                        leap_direction=pending_recovery_direction,
+                        recent_pitches=recent_pitches,
+                    )
+                    pending_recovery_direction = 0
+                else:
+                    cell_index = guide_tone_cell_index_for_position(int(position))
+                    pitch_class = pitch_cells[cell_index % len(pitch_cells)]
+                    contour_offset = contour_steps[local_index % len(contour_steps)]
+                    target_pitch = anchor + contour_offset
+                    if recent_pitches:
+                        target_pitch = int(round((target_pitch + int(recent_pitches[-1])) / 2))
+                    pitch = nearest_phrase_pitch_for_pitch_class(
+                        pitch_class,
+                        target_pitch=target_pitch,
+                        recent_pitches=recent_pitches,
+                    )
+
+                if recent_pitches:
+                    interval = int(pitch) - int(recent_pitches[-1])
+                    if abs(interval) >= 7:
+                        pending_recovery_direction = 1 if interval > 0 else -1
+                recent_pitches.append(pitch)
+                tokens.extend(
+                    [
+                        position_token(position),
+                        note_velocity_token(4),
+                        note_pitch_token(pitch),
+                        duration_token,
+                    ]
+                )
+                emitted_in_bar += 1
+    tokens.append(TOKEN_END)
+    return tokens
+
+
 def generated_tokens_for_mode(
     mode: str,
     *,
@@ -1123,6 +1208,15 @@ def generated_tokens_for_mode(
         )
     if mode == "data_motif_guide_tones":
         return data_motif_guide_tones_tokens(
+            primer_tokens=primer_tokens,
+            chords=chords,
+            bars=bars,
+            note_groups_per_bar=note_groups_per_bar,
+            template_report=template_report,
+            seed=seed,
+        )
+    if mode == "data_motif_phrase_recovery":
+        return data_motif_phrase_recovery_tokens(
             primer_tokens=primer_tokens,
             chords=chords,
             bars=bars,

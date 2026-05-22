@@ -155,6 +155,7 @@ Stage B에서 명시하는 것:
 49. Stage B phrase/cadence review baseline
 50. Stage B phrase naturalness objective metrics
 51. Stage B phrase recovery review baseline
+52. Stage B data motif phrase recovery baseline
 
 가장 최근 의미 있는 결과:
 
@@ -186,6 +187,7 @@ Stage B에서 명시하는 것:
 - Issue #101 adds a phrase/cadence review baseline, reducing `chromatic_walk` from `7` to `1` and `too_stepwise_or_scalar` from `6` to `0` in the next review set.
 - Issue #103 adds phrase naturalness metrics and reveals that all `12` Issue #101 review candidates have `unresolved_large_leaps`.
 - Issue #105 adds a phrase recovery baseline, reducing `phrase_recovery` unresolved large leap ratio to `0.000-0.048`.
+- Issue #107 combines data-derived motif rhythm with phrase recovery pitch grammar and keeps `data_motif_phrase_recovery` objective-clean.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -408,6 +410,7 @@ Stage B에서 명시하는 것:
 - Issue #101 result: phrase/cadence review reports `12` reviewable candidates, `11` clean candidates, `1` warning candidate, `chromatic_walk=1`, and `too_stepwise_or_scalar=0`.
 - Issue #103 result: phrase naturalness review reclassifies the same `12` candidates as warnings because `unresolved_large_leaps=12`.
 - Issue #105 result: phrase recovery review reports `phrase_cadence` candidates as `3` warnings and `phrase_recovery` candidates as `3` clean candidates.
+- Issue #107 result: data motif phrase recovery review reports `data_motif_guide_tones` as `3` warnings and `data_motif_phrase_recovery` as `3` clean candidates.
 
 해석:
 
@@ -687,28 +690,29 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B phrase recovery review baseline 추가
+Stage B data motif phrase recovery baseline 추가
 ```
 
 결과:
 
-- phrase recovery baseline을 추가해 unresolved large leap risk를 줄였다.
-- output: `outputs/stage_b_listening_review_aggregate/harness_stage_b_phrase_recovery_review/listening_review_aggregate.md`
-- candidate count: `6`
-- objective clean: `3`
+- data-derived motif rhythm과 phrase recovery pitch grammar를 결합했다.
+- output: `outputs/stage_b_listening_review_aggregate/harness_stage_b_data_motif_phrase_recovery_review/listening_review_aggregate.md`
+- candidate count: `9`
+- objective clean: `6`
 - objective warning: `3`
 - duration pattern collapse: `0`
 - overlap/polyphonic: `0`
 - too stepwise/scalar: `0`
 - unresolved large leaps: `3`
-- `phrase_cadence`: unresolved large leaps `3`
+- `data_motif_guide_tones`: unresolved large leaps `3`
+- `data_motif_phrase_recovery`: objective flags 없음
 - `phrase_recovery`: objective flags 없음
 
 다음 작업:
 
-- `phrase_recovery`를 data-derived motif rhythm과 결합한다.
 - 새 후보의 context MIDI를 기준으로 subjective listening review를 채운다.
-- broad training으로 넘어가기 전 reference contour template과 비교한다.
+- objective clean 후보라도 broad training으로 넘어가기 전 실제 piano-roll/listening review를 먼저 한다.
+- data-derived contour template에서 recovery pattern을 더 직접 추출할지 결정한다.
 - real Brad/reference chord label은 아직 임의로 넣지 않는다.
 
 ## 10. 한 문장 요약
