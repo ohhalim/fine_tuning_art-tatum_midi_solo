@@ -16,6 +16,7 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     guide_tone_pitch_classes,
     nearest_allowed_pitch_token,
     normalize_position_deltas,
+    overlap_free_solo_notes,
     parse_baseline_modes,
     straight_guide_tones_tokens,
     straight_grid_tokens,
@@ -316,6 +317,73 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
             self.assertTrue(Path(manifest["chord_guide_midi_path"]).exists())
             self.assertTrue((tmp_path / "review" / "review_manifest.json").exists())
             self.assertTrue((tmp_path / "review" / "review_candidates.md").exists())
+
+    def test_overlap_free_solo_notes_trims_to_next_onset(self) -> None:
+        notes = [
+            pretty_midi.Note(velocity=80, pitch=60, start=0.0, end=1.0),
+            pretty_midi.Note(velocity=82, pitch=62, start=0.5, end=1.5),
+            pretty_midi.Note(velocity=70, pitch=64, start=1.0, end=1.25),
+        ]
+
+        solo_notes, report = overlap_free_solo_notes(notes)
+
+        self.assertEqual(len(solo_notes), 3)
+        self.assertLessEqual(solo_notes[0].end, solo_notes[1].start)
+        self.assertLessEqual(solo_notes[1].end, solo_notes[2].start)
+        self.assertEqual(report["trimmed_note_count"], 2)
+        self.assertEqual(report["after_max_simultaneous_notes"], 1)
+
+    def test_build_review_export_can_write_overlap_free_variant(self) -> None:
+        with TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            source_midi = tmp_path / "source.mid"
+            midi = pretty_midi.PrettyMIDI(initial_tempo=124)
+            instrument = pretty_midi.Instrument(program=0, name="Solo")
+            instrument.notes.append(pretty_midi.Note(velocity=80, pitch=60, start=0.0, end=1.0))
+            instrument.notes.append(pretty_midi.Note(velocity=80, pitch=62, start=0.5, end=1.5))
+            midi.instruments.append(instrument)
+            midi.write(str(source_midi))
+            samples = {
+                "data_motif": [
+                    {
+                        "sample_index": 1,
+                        "sample_seed": 17,
+                        "valid": True,
+                        "strict_valid": True,
+                        "midi_path": str(source_midi),
+                        "metrics": {"note_count": 2, "unique_pitch_count": 2, "dead_air_ratio": 0.0},
+                        "rhythm_profile": {
+                            "syncopated_onset_ratio": 0.0,
+                            "unique_bar_position_pattern_ratio": 1.0,
+                            "duration_diversity_ratio": 0.5,
+                            "most_common_duration_ratio": 0.5,
+                            "ioi_diversity_ratio": 0.5,
+                            "most_common_ioi_ratio": 0.5,
+                        },
+                        "pitch_roles": {"tension_ratio": 0.0, "root_tone_ratio": 0.0},
+                    }
+                ]
+            }
+
+            manifest = build_review_export(
+                samples,
+                output_dir=tmp_path / "review",
+                top_n=1,
+                copy_midi=True,
+                chords=["Cm7"],
+                bpm=124,
+                bars=1,
+                overlap_free_review_midi=True,
+            )
+
+            candidate = manifest["candidates"][0]
+            exported = pretty_midi.PrettyMIDI(candidate["review_midi_path"])
+            exported_notes = exported.instruments[0].notes
+
+            self.assertEqual(candidate["review_variant"], "overlap_free_solo_line")
+            self.assertTrue(candidate["review_midi_path"].endswith("_overlap_free.mid"))
+            self.assertEqual(candidate["review_postprocess_report"]["after_max_simultaneous_notes"], 1)
+            self.assertLessEqual(exported_notes[0].end, exported_notes[1].start)
 
 
 if __name__ == "__main__":

@@ -106,6 +106,8 @@ def build_candidate_note_from_review_manifest(sample: dict[str, Any]) -> dict[st
             "sample_seed": sample.get("sample_seed"),
             "valid": bool(sample.get("valid", False)),
             "strict_valid": bool(sample.get("strict_valid", False)),
+            "review_variant": str(sample.get("review_variant", "original") or "original"),
+            "review_postprocess_report": sample.get("review_postprocess_report", {}),
         },
         "review_files": {
             "midi_path": str(sample.get("review_midi_path") or sample.get("midi_path") or ""),

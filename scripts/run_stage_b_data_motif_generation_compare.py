@@ -18,6 +18,7 @@ import pretty_midi
 ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 
+from inference.app.metrics import max_simultaneous_notes  # noqa: E402
 from inference.app.schemas import GenerationRequest  # noqa: E402
 from scripts.run_stage_b_generation_probe import (  # noqa: E402
     CHORD_TONE_INTERVALS,
@@ -850,6 +851,109 @@ def write_context_midi(
     return output_path
 
 
+def _best_note_for_onset(notes: Sequence[pretty_midi.Note]) -> pretty_midi.Note:
+    return max(
+        notes,
+        key=lambda note: (
+            int(note.velocity),
+            float(note.end) - float(note.start),
+            -abs(int(note.pitch) - 67),
+            -int(note.pitch),
+        ),
+    )
+
+
+def overlap_free_solo_notes(
+    notes: Sequence[pretty_midi.Note],
+    *,
+    time_precision: int = 6,
+    min_duration_sec: float = 0.001,
+) -> tuple[list[pretty_midi.Note], dict[str, Any]]:
+    valid_notes = [note for note in notes if float(note.end) > float(note.start)]
+    by_onset: dict[float, list[pretty_midi.Note]] = {}
+    for note in valid_notes:
+        onset = round(float(note.start), int(time_precision))
+        by_onset.setdefault(onset, []).append(note)
+
+    selected = [
+        _best_note_for_onset(onset_notes)
+        for _onset, onset_notes in sorted(by_onset.items(), key=lambda item: item[0])
+    ]
+
+    solo_notes: list[pretty_midi.Note] = []
+    trimmed_note_count = 0
+    for index, note in enumerate(selected):
+        start = float(note.start)
+        original_end = float(note.end)
+        next_start = float(selected[index + 1].start) if index + 1 < len(selected) else None
+        end = original_end
+        if next_start is not None and end > next_start:
+            end = next_start
+            trimmed_note_count += 1
+        if end <= start:
+            continue
+        if end - start < float(min_duration_sec):
+            end = start + float(min_duration_sec)
+            if next_start is not None and end > next_start:
+                continue
+        solo_notes.append(
+            pretty_midi.Note(
+                velocity=int(note.velocity),
+                pitch=int(note.pitch),
+                start=start,
+                end=end,
+            )
+        )
+
+    report = {
+        "before_note_count": int(len(valid_notes)),
+        "after_note_count": int(len(solo_notes)),
+        "same_onset_dropped_note_count": int(max(0, len(valid_notes) - len(selected))),
+        "trimmed_note_count": int(trimmed_note_count),
+        "before_max_simultaneous_notes": int(max_simultaneous_notes(list(valid_notes))) if valid_notes else 0,
+        "after_max_simultaneous_notes": int(max_simultaneous_notes(list(solo_notes))) if solo_notes else 0,
+    }
+    return solo_notes, report
+
+
+def write_overlap_free_solo_midi(
+    source_path: Path,
+    output_path: Path,
+    *,
+    bpm: float | int | None = None,
+) -> dict[str, Any]:
+    source = pretty_midi.PrettyMIDI(str(source_path))
+    tempo = float(bpm) if bpm is not None else float(source.estimate_tempo() or 120.0)
+    result = pretty_midi.PrettyMIDI(initial_tempo=tempo)
+    source_instruments = [instrument for instrument in source.instruments if not instrument.is_drum]
+    source_notes = [note for instrument in source_instruments for note in instrument.notes]
+    solo_notes, report = overlap_free_solo_notes(source_notes)
+    program = int(source_instruments[0].program) if source_instruments else 0
+    name = source_instruments[0].name if source_instruments else "Solo"
+    copied = pretty_midi.Instrument(
+        program=program,
+        is_drum=False,
+        name=f"Overlap-free {name or 'Solo'}",
+    )
+    copied.notes = solo_notes
+    result.instruments.append(copied)
+    total_report = {
+        "enabled": True,
+        "source_midi_path": str(source_path),
+        "output_midi_path": str(output_path),
+        "bpm": tempo,
+        "before_note_count": int(report["before_note_count"]),
+        "after_note_count": int(report["after_note_count"]),
+        "same_onset_dropped_note_count": int(report["same_onset_dropped_note_count"]),
+        "trimmed_note_count": int(report["trimmed_note_count"]),
+        "before_max_simultaneous_notes": int(report["before_max_simultaneous_notes"]),
+        "after_max_simultaneous_notes": int(report["after_max_simultaneous_notes"]),
+    }
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    result.write(str(output_path))
+    return total_report
+
+
 def build_compare_summary(
     mode_summaries: dict[str, dict[str, Any]],
     min_strict_valid_samples: int,
@@ -918,6 +1022,8 @@ def compact_review_candidate(
     review_rank: int,
     review_midi_path: Path | None,
     context_midi_path: Path | None,
+    review_variant: str = "original",
+    review_postprocess_report: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     rhythm = row.get("rhythm_profile", {})
     pitch_roles = row.get("pitch_roles", {})
@@ -932,6 +1038,8 @@ def compact_review_candidate(
         "midi_path": row["midi_path"],
         "review_midi_path": str(review_midi_path) if review_midi_path else None,
         "context_midi_path": str(context_midi_path) if context_midi_path else None,
+        "review_variant": review_variant,
+        "review_postprocess_report": review_postprocess_report or {},
         "note_count": int(metrics.get("note_count", 0) or 0),
         "unique_pitch_count": int(metrics.get("unique_pitch_count", 0) or 0),
         "dead_air_ratio": float(metrics.get("dead_air_ratio", 0.0) or 0.0),
@@ -956,8 +1064,8 @@ def review_markdown_report(manifest: dict[str, Any]) -> str:
         f"- candidate count: `{manifest['candidate_count']}`",
         f"- copy midi: `{str(manifest['copy_midi']).lower()}`",
         "",
-        "| mode | rank | sample | strict | notes | pitches | sync | bar-var | dur-var | dur-rep | ioi-var | ioi-rep | tension | solo/context MIDI |",
-        "|---|---:|---:|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        "| mode | rank | sample | variant | strict | notes | pitches | sync | bar-var | dur-var | dur-rep | ioi-var | ioi-rep | tension | solo/context MIDI |",
+        "|---|---:|---:|---|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     guide_path = manifest.get("chord_guide_midi_path")
     if guide_path:
@@ -970,7 +1078,7 @@ def review_markdown_report(manifest: dict[str, Any]) -> str:
         format_row["display_midi_path"] = midi_path
         format_row["display_context_midi_path"] = context_path
         lines.append(
-            "| {mode} | {review_rank} | {sample_index} | {strict_valid} | {note_count} | "
+            "| {mode} | {review_rank} | {sample_index} | {review_variant} | {strict_valid} | {note_count} | "
             "{unique_pitch_count} | {syncopated_onset_ratio:.3f} | "
             "{unique_bar_position_pattern_ratio:.3f} | {duration_diversity_ratio:.3f} | "
             "{most_common_duration_ratio:.3f} | {ioi_diversity_ratio:.3f} | "
@@ -989,6 +1097,7 @@ def build_review_export(
     chords: Sequence[str],
     bpm: float | int,
     bars: int,
+    overlap_free_review_midi: bool = False,
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     named_dir = output_dir / "named_midi"
@@ -1012,21 +1121,24 @@ def build_review_export(
         for review_rank, row in enumerate(rows[: int(top_n)], start=1):
             review_midi_path: Path | None = None
             context_midi_path: Path | None = None
+            review_variant = "original"
+            review_postprocess_report: dict[str, Any] | None = None
             if copy_midi:
                 source = Path(str(row["midi_path"]))
                 if not source.is_absolute():
                     source = ROOT_DIR / source
-                target = named_dir / (
-                    f"{mode_index:02d}_{mode}_rank_{review_rank:02d}_"
-                    f"sample_{int(row['sample_index']):02d}.mid"
-                )
+                base_name = f"{mode_index:02d}_{mode}_rank_{review_rank:02d}_sample_{int(row['sample_index']):02d}"
+                suffix = "_overlap_free.mid" if overlap_free_review_midi else ".mid"
+                target = named_dir / f"{base_name}{suffix}"
                 if source.exists():
-                    shutil.copy2(source, target)
+                    if overlap_free_review_midi:
+                        review_postprocess_report = write_overlap_free_solo_midi(source, target, bpm=bpm)
+                        review_variant = "overlap_free_solo_line"
+                    else:
+                        shutil.copy2(source, target)
                     review_midi_path = target
-                    context_target = context_dir / (
-                        f"{mode_index:02d}_{mode}_rank_{review_rank:02d}_"
-                        f"sample_{int(row['sample_index']):02d}_with_context.mid"
-                    )
+                    context_suffix = "_overlap_free_with_context.mid" if overlap_free_review_midi else "_with_context.mid"
+                    context_target = context_dir / f"{base_name}{context_suffix}"
                     context_midi_path = write_context_midi(
                         target,
                         context_target,
@@ -1041,12 +1153,15 @@ def build_review_export(
                     review_rank=review_rank,
                     review_midi_path=review_midi_path,
                     context_midi_path=context_midi_path,
+                    review_variant=review_variant,
+                    review_postprocess_report=review_postprocess_report,
                 )
             )
 
     manifest = {
         "output_dir": str(output_dir),
         "copy_midi": bool(copy_midi),
+        "overlap_free_review_midi": bool(overlap_free_review_midi),
         "top_n": int(top_n),
         "chord_progression": list(chords),
         "chord_guide_midi_path": str(chord_guide_midi_path) if chord_guide_midi_path else None,
@@ -1089,6 +1204,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--review_top_n", type=int, default=3)
     parser.add_argument("--review_output_root", type=str, default=str(ROOT_DIR / "outputs" / "stage_b_data_motif_review"))
     parser.add_argument("--copy_review_midi", action="store_true")
+    parser.add_argument("--overlap_free_review_midi", action="store_true")
     return parser
 
 
@@ -1186,6 +1302,7 @@ def main() -> int:
         output_dir=Path(args.review_output_root) / args.run_id,
         top_n=int(args.review_top_n),
         copy_midi=bool(args.copy_review_midi),
+        overlap_free_review_midi=bool(args.overlap_free_review_midi),
         chords=chords,
         bpm=args.bpm,
         bars=args.bars,
