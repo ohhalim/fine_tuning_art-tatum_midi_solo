@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-105-stage-b-phrase-recovery-review`
+- `issue-107-stage-b-data-motif-phrase-recovery`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,46 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #107은 `phrase_recovery` pitch grammar를 data-derived motif rhythm template과 결합한 단계다.
+
+중요한 전제:
+
+- hand-written grid가 아니라 실제 데이터에서 추출한 rhythm shape를 사용한다.
+- objective clean은 subjective jazz quality를 뜻하지 않는다.
+- 다음 단계는 듣기 리뷰가 필요하다.
+
+Implemented:
+
+- `data_motif_phrase_recovery` baseline mode
+- data-derived rhythm position/duration 유지
+- phrase recovery pitch grammar 결합
+- `scripts/agent_harness.sh stage-b-data-motif-phrase-recovery-review`
+- docs:
+  - `docs/STAGE_B_DATA_MOTIF_PHRASE_RECOVERY_2026-05-22.md`
+
+Result:
+
+- candidate count: `9`
+- objective bucket counts:
+  - clean: `6`
+  - warning: `3`
+- objective flag counts:
+  - unresolved large leaps: `3`
+- mode flag counts:
+  - `data_motif_guide_tones`: unresolved large leaps `3`
+  - `data_motif_phrase_recovery`: no objective flags
+  - `phrase_recovery`: no objective flags
+- `data_motif_guide_tones` unresolved large leap ratio: `0.583-0.652`
+- `data_motif_phrase_recovery` unresolved large leap ratio: `0.000-0.045`
+- `data_motif_phrase_recovery` tension ratio: `0.476-0.524`
+
+Decision:
+
+- `data_motif_phrase_recovery`는 data rhythm shape와 phrase recovery를 동시에 만족한다.
+- 다음 작업은 review MIDI/context MIDI를 listening review 대상으로 정리하거나, subjective review notes를 채우는 것이다.
+
+## Previous Probe Result
 
 Issue #105는 Issue #103에서 드러난 `unresolved_large_leaps` 문제를 줄이기 위해 phrase recovery baseline을 추가한 단계다.
 

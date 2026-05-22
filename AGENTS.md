@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #105: Stage B phrase recovery review baseline.
+- Issue #107: Stage B data motif phrase recovery baseline.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -267,6 +267,12 @@ For Stage B phrase recovery review changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-phrase-recovery-review
+```
+
+For Stage B data motif phrase recovery review changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-data-motif-phrase-recovery-review
 ```
 
 For Stage B filled listening review aggregate changes, run:
