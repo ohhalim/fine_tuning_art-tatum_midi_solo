@@ -90,6 +90,8 @@ Modes:
                 Generate pending listening review notes from the combined chord-eval review flow.
   stage-b-full-review-notes
                 Generate pending listening review notes from the full data-guide review manifest.
+  stage-b-objective-midi-review
+                Run objective note-level MIDI review on the full data-guide review manifest.
   stage-b-listening-review-aggregate
                 Aggregate pending or filled listening review notes into next-step signals.
   all           Run demo and tiny-compare.
@@ -144,6 +146,7 @@ run_quick() {
     scripts/evaluate_generated_candidate_chords.py \
     scripts/build_listening_review_notes.py \
     scripts/summarize_listening_review_notes.py \
+    scripts/review_midi_note_objectives.py \
     scripts/train_stage_a_full.py \
     scripts/train_stage_a_adapter.py \
     inference/app \
@@ -886,6 +889,16 @@ run_stage_b_full_review_notes() {
     --source_review_markdown "outputs/stage_b_data_motif_review/${run_id}/review_candidates.md"
 }
 
+run_stage_b_objective_midi_review() {
+  local run_id="${RUN_ID:-harness_stage_b_objective_midi_review}"
+  print_header "Stage B data-guide hybrid review package"
+  RUN_ID="$run_id" run_stage_b_data_guide_hybrid
+  print_header "Stage B objective MIDI note review"
+  "$PYTHON_BIN" scripts/review_midi_note_objectives.py \
+    --run_id "$run_id" \
+    --review_manifest "outputs/stage_b_data_motif_review/${run_id}/review_manifest.json"
+}
+
 run_stage_b_listening_review_aggregate() {
   local run_id="${RUN_ID:-harness_stage_b_listening_review_aggregate}"
   local review_notes_path="outputs/stage_b_listening_review_notes/${run_id}/review_notes_template.json"
@@ -1013,6 +1026,9 @@ case "$MODE" in
     ;;
   stage-b-full-review-notes)
     run_stage_b_full_review_notes
+    ;;
+  stage-b-objective-midi-review)
+    run_stage_b_objective_midi_review
     ;;
   stage-b-listening-review-aggregate)
     run_stage_b_listening_review_aggregate

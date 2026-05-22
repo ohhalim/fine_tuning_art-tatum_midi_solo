@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #91: Stage B full review manifest listening notes.
+- Issue #93: Stage B objective MIDI note review.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -224,6 +224,12 @@ For Stage B full review manifest listening notes changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-full-review-notes
+```
+
+For Stage B objective MIDI note review changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-objective-midi-review
 ```
 
 For Stage B filled listening review aggregate changes, run:
