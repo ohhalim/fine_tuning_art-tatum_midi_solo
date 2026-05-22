@@ -88,6 +88,8 @@ Modes:
                 Generate data-guide hybrid review package and write a combined chord-eval review markdown.
   stage-b-listening-review-notes
                 Generate pending listening review notes from the combined chord-eval review flow.
+  stage-b-listening-review-aggregate
+                Aggregate pending or filled listening review notes into next-step signals.
   all           Run demo and tiny-compare.
 
 Environment:
@@ -139,6 +141,7 @@ run_quick() {
     scripts/evaluate_chord_labeled_subset.py \
     scripts/evaluate_generated_candidate_chords.py \
     scripts/build_listening_review_notes.py \
+    scripts/summarize_listening_review_notes.py \
     scripts/train_stage_a_full.py \
     scripts/train_stage_a_adapter.py \
     inference/app \
@@ -870,6 +873,22 @@ run_stage_b_listening_review_notes() {
     --source_review_markdown "outputs/stage_b_generated_chord_eval/${run_id}/review_candidates_with_chord_eval.md"
 }
 
+run_stage_b_listening_review_aggregate() {
+  local run_id="${RUN_ID:-harness_stage_b_listening_review_aggregate}"
+  local review_notes_path="outputs/stage_b_listening_review_notes/${run_id}/review_notes_template.json"
+  if [[ ! -f "$review_notes_path" || "${FORCE_REGEN:-0}" == "1" ]]; then
+    print_header "Stage B listening review notes template"
+    RUN_ID="$run_id" run_stage_b_listening_review_notes
+  else
+    print_header "Stage B listening review notes template"
+    printf 'Using existing review notes: %s\n' "$review_notes_path"
+  fi
+  print_header "Stage B listening review aggregate"
+  "$PYTHON_BIN" scripts/summarize_listening_review_notes.py \
+    --run_id "$run_id" \
+    --review_notes "$review_notes_path"
+}
+
 case "$MODE" in
   status)
     run_status
@@ -978,6 +997,9 @@ case "$MODE" in
     ;;
   stage-b-listening-review-notes)
     run_stage_b_listening_review_notes
+    ;;
+  stage-b-listening-review-aggregate)
+    run_stage_b_listening_review_aggregate
     ;;
   all)
     run_demo
