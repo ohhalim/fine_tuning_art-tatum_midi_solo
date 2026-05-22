@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #79: Stage B chord-labeled evaluation subset contract.
+- Issue #81: Stage B generated candidate chord-labeled eval bridge.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -194,6 +194,12 @@ For Stage B chord-labeled evaluation subset changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-chord-labeled-eval
+```
+
+For Stage B generated candidate chord-labeled eval bridge changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generated-chord-eval
 ```
 
 For Stage B data-derived motif template extraction changes, run:

@@ -80,6 +80,8 @@ Modes:
                 Audit chord annotation coverage in role metadata, sidecars, and MIDI text events.
   stage-b-chord-labeled-eval
                 Evaluate the tiny chord-labeled subset manifest and pitch-role summary contract.
+  stage-b-generated-chord-eval
+                Evaluate generated candidate report bridge against known chord metadata.
   all           Run demo and tiny-compare.
 
 Environment:
@@ -129,6 +131,7 @@ run_quick() {
     scripts/run_manifest_prepare_smoke.py \
     scripts/audit_chord_progression_coverage.py \
     scripts/evaluate_chord_labeled_subset.py \
+    scripts/evaluate_generated_candidate_chords.py \
     scripts/train_stage_a_full.py \
     scripts/train_stage_a_adapter.py \
     inference/app \
@@ -817,6 +820,15 @@ run_stage_b_chord_labeled_eval() {
     --min_notes 16
 }
 
+run_stage_b_generated_chord_eval() {
+  local run_id="${RUN_ID:-harness_stage_b_generated_chord_eval}"
+  print_header "Stage B generated candidate chord-labeled eval bridge"
+  "$PYTHON_BIN" scripts/evaluate_generated_candidate_chords.py \
+    --run_id "$run_id" \
+    --write_tiny_fixture \
+    --candidate_limit 1
+}
+
 case "$MODE" in
   status)
     run_status
@@ -913,6 +925,9 @@ case "$MODE" in
     ;;
   stage-b-chord-labeled-eval)
     run_stage_b_chord_labeled_eval
+    ;;
+  stage-b-generated-chord-eval)
+    run_stage_b_generated_chord_eval
     ;;
   all)
     run_demo
