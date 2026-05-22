@@ -78,6 +78,8 @@
   - 추출된 motif catalog를 8-bar generation baseline에 연결해 hand-written swing grammar와 비교한 결과.
 - `STAGE_B_DATA_MOTIF_REVIEW_EXPORT_2026-05-21.md`
   - data-derived motif baseline과 hand-written swing baseline의 MIDI 후보를 named review package로 export한 결과.
+- `STAGE_B_REVIEW_CONTEXT_GRID_2026-05-22.md`
+  - solo-only 리뷰의 한계를 반영해 chord/bass context MIDI와 straight-grid timing reference를 추가한 결과.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`
@@ -104,7 +106,7 @@
 2. Brad Mehldau subset은 style adaptation과 holdout evaluation 용도로 분리한다.
 3. `max_files=2` Brad `control_v1` probe 결과를 기준으로 Stage A 한계를 문서화한다.
 4. broad training 전에 duration-explicit Stage B tokenization과 phrase/window dataset을 설계한다.
-5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, multi-sample probe, collapse sweep, strict collapse gate, 2-file generation probe, temporal coverage probe, coverage-aware constrained probe, coverage-aware A/B sweep, candidate ranking, harmonic/repetition gate, chord-aware pitch probe, candidate review export, longer 4-bar phrase probe, phrase contour diagnostics, root-bias diagnostics, pitch-mode comparison, 8-bar approach phrase probe, swing/motif phrase grammar probe, real phrase reference statistics, motif template extraction, data-derived motif baseline generation, and data motif review export를 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
+5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, multi-sample probe, collapse sweep, strict collapse gate, 2-file generation probe, temporal coverage probe, coverage-aware constrained probe, coverage-aware A/B sweep, candidate ranking, harmonic/repetition gate, chord-aware pitch probe, candidate review export, longer 4-bar phrase probe, phrase contour diagnostics, root-bias diagnostics, pitch-mode comparison, 8-bar approach phrase probe, swing/motif phrase grammar probe, real phrase reference statistics, motif template extraction, data-derived motif baseline generation, data motif review export, and review context/grid export를 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
 
 핵심 원칙:
 

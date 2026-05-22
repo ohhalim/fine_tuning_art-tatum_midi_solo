@@ -66,6 +66,8 @@ Modes:
                 Compare hand-written swing against data-derived motif baseline.
   stage-b-data-motif-review-export
                 Export named MIDI review candidates for data-derived motif compare.
+  stage-b-review-context-grid
+                Export review MIDI with chord context and straight-grid reference.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -689,6 +691,28 @@ run_stage_b_data_motif_review_export() {
     --copy_review_midi
 }
 
+run_stage_b_review_context_grid() {
+  local run_id="${RUN_ID:-harness_stage_b_review_context_grid}"
+  print_header "Stage B review context and straight-grid export"
+  "$PYTHON_BIN" scripts/run_stage_b_data_motif_generation_compare.py \
+    --run_id "$run_id" \
+    --input_dir ./midi_dataset/midi/studio \
+    --baseline_modes straight_grid,hand_written_swing,data_motif \
+    --max_files 4 \
+    --window_bars 8 \
+    --window_stride_bars 4 \
+    --min_window_target_notes 16 \
+    --motif_length 4 \
+    --max_bar_span 2 \
+    --max_records 64 \
+    --template_top_n 32 \
+    --num_samples 3 \
+    --bars 8 \
+    --note_groups_per_bar 8 \
+    --review_top_n 3 \
+    --copy_review_midi
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -775,6 +799,9 @@ case "$MODE" in
     ;;
   stage-b-data-motif-review-export)
     run_stage_b_data_motif_review_export
+    ;;
+  stage-b-review-context-grid)
+    run_stage_b_review_context_grid
     ;;
   manifest-dry-run)
     run_manifest_dry_run

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import random
 import shutil
@@ -12,11 +13,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Sequence
 
+import pretty_midi
+
 ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 
 from inference.app.schemas import GenerationRequest  # noqa: E402
 from scripts.run_stage_b_generation_probe import (  # noqa: E402
+    CHORD_TONE_INTERVALS,
     build_probe_summary,
     build_stage_b_primer,
     chord_aware_pitch_tokens,
@@ -33,18 +37,20 @@ from scripts.stage_b_tokens import (  # noqa: E402
     PIANO_PITCH_MAX,
     PIANO_PITCH_MIN,
     POSITIONS_PER_BAR,
+    ROOT_TO_PC,
     TOKEN_BAR,
     TOKEN_END,
     chord_tokens,
     note_duration_token,
     note_pitch_token,
     note_velocity_token,
+    parse_chord_symbol,
     pitch_from_token as stage_b_pitch_from_token,
     position_token,
 )
 
 
-VALID_BASELINE_MODES = {"hand_written_swing", "data_motif"}
+VALID_BASELINE_MODES = {"straight_grid", "hand_written_swing", "data_motif"}
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -297,6 +303,52 @@ def hand_written_swing_tokens(
     return tokens
 
 
+def straight_grid_tokens(
+    *,
+    primer_tokens: Sequence[int],
+    chords: Sequence[str],
+    bars: int,
+    note_groups_per_bar: int,
+    seed: int,
+) -> list[int]:
+    rng = random.Random(int(seed))
+    tokens = [int(token) for token in primer_tokens]
+    recent_pitches: list[int] = []
+    contour = [0, 2, 4, 5, 7, 5, 4, 2]
+    groups_per_bar = max(1, int(note_groups_per_bar))
+    duration_steps = max(1, int(POSITIONS_PER_BAR) // groups_per_bar)
+    positions = [min(int(POSITIONS_PER_BAR) - 1, index * duration_steps) for index in range(groups_per_bar)]
+
+    for bar_index in range(max(1, int(bars))):
+        chord = chords[bar_index % len(chords)] if chords else None
+        if bar_index > 0:
+            tokens.append(TOKEN_BAR)
+            tokens.extend(chord_tokens(chord))
+        base_token = base_pitch_token_for_chord(chord, rng, recent_pitches)
+        base_pitch = pitch_from_token(base_token)
+        for group_index, position in enumerate(positions):
+            target_pitch = base_pitch + contour[group_index % len(contour)]
+            pitch_candidates = chord_aware_pitch_tokens(
+                chord,
+                pitch_mode="approach_tensions",
+                recent_pitches=recent_pitches,
+                repeat_window=2,
+                group_index=group_index,
+            )
+            pitch_token_value = nearest_allowed_pitch_token(target_pitch, pitch_candidates, recent_pitches)
+            recent_pitches.append(pitch_from_token(pitch_token_value))
+            tokens.extend(
+                [
+                    position_token(position),
+                    note_velocity_token(4),
+                    pitch_token_value,
+                    note_duration_token(duration_steps),
+                ]
+            )
+    tokens.append(TOKEN_END)
+    return tokens
+
+
 def data_motif_tokens(
     *,
     primer_tokens: Sequence[int],
@@ -366,6 +418,14 @@ def generated_tokens_for_mode(
     template_report: dict[str, Any],
     seed: int,
 ) -> list[int]:
+    if mode == "straight_grid":
+        return straight_grid_tokens(
+            primer_tokens=primer_tokens,
+            chords=chords,
+            bars=bars,
+            note_groups_per_bar=note_groups_per_bar,
+            seed=seed,
+        )
     if mode == "hand_written_swing":
         return hand_written_swing_tokens(
             primer_tokens=primer_tokens,
@@ -401,6 +461,98 @@ def compact_summary(summary: dict[str, Any]) -> dict[str, Any]:
         "avg_root_tone_ratio": float(summary["avg_root_tone_ratio"]),
         "passed_strict_review_gate": bool(summary["passed_strict_review_gate"]),
     }
+
+
+def ordered_chord_pitches(chord: str | None, lower: int = 48, upper: int = 72) -> list[int]:
+    root, quality = parse_chord_symbol(chord)
+    root_pc = ROOT_TO_PC.get(root)
+    if root_pc is None:
+        root_pc = 0
+    intervals = sorted(CHORD_TONE_INTERVALS.get(quality, CHORD_TONE_INTERVALS["unknown"]))
+    base = lower + root_pc
+    while base > lower + 11:
+        base -= 12
+    pitches: list[int] = []
+    for interval in intervals:
+        pitch = base + int(interval)
+        while pitch > int(upper):
+            pitch -= 12
+        while pitch < int(lower):
+            pitch += 12
+        pitches.append(pitch)
+    return sorted(set(pitches))
+
+
+def bass_root_pitch(chord: str | None, lower: int = 36, upper: int = 47) -> int:
+    root, _quality = parse_chord_symbol(chord)
+    root_pc = ROOT_TO_PC.get(root, 0)
+    pitch = lower + root_pc
+    while pitch > upper:
+        pitch -= 12
+    while pitch < lower:
+        pitch += 12
+    return int(pitch)
+
+
+def chord_guide_instruments(
+    chords: Sequence[str],
+    *,
+    bpm: float | int,
+    bars: int,
+) -> list[pretty_midi.Instrument]:
+    bar_duration_sec = 60.0 / max(1e-6, float(bpm)) * 4.0
+    pad = pretty_midi.Instrument(program=4, is_drum=False, name="Chord Guide")
+    bass = pretty_midi.Instrument(program=32, is_drum=False, name="Bass Root Guide")
+    total_bars = max(1, int(bars))
+    for bar_index in range(total_bars):
+        chord = chords[bar_index % len(chords)] if chords else "Cmaj7"
+        start = bar_index * bar_duration_sec
+        end = start + bar_duration_sec
+        for pitch in ordered_chord_pitches(chord):
+            pad.notes.append(pretty_midi.Note(velocity=42, pitch=int(pitch), start=start, end=end))
+        bass.notes.append(
+            pretty_midi.Note(
+                velocity=52,
+                pitch=bass_root_pitch(chord),
+                start=start,
+                end=end,
+            )
+        )
+    return [pad, bass]
+
+
+def write_chord_guide_midi(
+    output_path: Path,
+    chords: Sequence[str],
+    *,
+    bpm: float | int,
+    bars: int,
+) -> Path:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    midi = pretty_midi.PrettyMIDI(initial_tempo=float(bpm))
+    midi.instruments.extend(chord_guide_instruments(chords, bpm=bpm, bars=bars))
+    midi.write(str(output_path))
+    return output_path
+
+
+def write_context_midi(
+    solo_midi_path: Path,
+    output_path: Path,
+    chords: Sequence[str],
+    *,
+    bpm: float | int,
+    bars: int,
+) -> Path:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    context = pretty_midi.PrettyMIDI(initial_tempo=float(bpm))
+    context.instruments.extend(chord_guide_instruments(chords, bpm=bpm, bars=bars))
+    solo = pretty_midi.PrettyMIDI(str(solo_midi_path))
+    for instrument in solo.instruments:
+        copied = copy.deepcopy(instrument)
+        copied.name = f"Solo - {copied.name or 'Stage B'}"
+        context.instruments.append(copied)
+    context.write(str(output_path))
+    return output_path
 
 
 def build_compare_summary(
@@ -470,6 +622,7 @@ def compact_review_candidate(
     *,
     review_rank: int,
     review_midi_path: Path | None,
+    context_midi_path: Path | None,
 ) -> dict[str, Any]:
     rhythm = row.get("rhythm_profile", {})
     pitch_roles = row.get("pitch_roles", {})
@@ -483,6 +636,7 @@ def compact_review_candidate(
         "strict_valid": bool(row["strict_valid"]),
         "midi_path": row["midi_path"],
         "review_midi_path": str(review_midi_path) if review_midi_path else None,
+        "context_midi_path": str(context_midi_path) if context_midi_path else None,
         "note_count": int(metrics.get("note_count", 0) or 0),
         "unique_pitch_count": int(metrics.get("unique_pitch_count", 0) or 0),
         "dead_air_ratio": float(metrics.get("dead_air_ratio", 0.0) or 0.0),
@@ -507,19 +661,26 @@ def review_markdown_report(manifest: dict[str, Any]) -> str:
         f"- candidate count: `{manifest['candidate_count']}`",
         f"- copy midi: `{str(manifest['copy_midi']).lower()}`",
         "",
-        "| mode | rank | sample | strict | notes | pitches | sync | bar-var | dur-var | dur-rep | ioi-var | ioi-rep | tension | midi |",
+        "| mode | rank | sample | strict | notes | pitches | sync | bar-var | dur-var | dur-rep | ioi-var | ioi-rep | tension | solo/context MIDI |",
         "|---|---:|---:|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
+    guide_path = manifest.get("chord_guide_midi_path")
+    if guide_path:
+        lines.insert(4, f"- chord guide midi: `{guide_path}`")
+        lines.insert(5, "")
     for row in manifest["candidates"]:
         midi_path = row.get("review_midi_path") or row.get("midi_path")
+        context_path = row.get("context_midi_path") or ""
         format_row = dict(row)
         format_row["display_midi_path"] = midi_path
+        format_row["display_context_midi_path"] = context_path
         lines.append(
             "| {mode} | {review_rank} | {sample_index} | {strict_valid} | {note_count} | "
             "{unique_pitch_count} | {syncopated_onset_ratio:.3f} | "
             "{unique_bar_position_pattern_ratio:.3f} | {duration_diversity_ratio:.3f} | "
             "{most_common_duration_ratio:.3f} | {ioi_diversity_ratio:.3f} | "
-            "{most_common_ioi_ratio:.3f} | {tension_ratio:.3f} | `{display_midi_path}` |".format(**format_row)
+            "{most_common_ioi_ratio:.3f} | {tension_ratio:.3f} | "
+            "`{display_midi_path}`<br>`{display_context_midi_path}` |".format(**format_row)
         )
     return "\n".join(lines).rstrip() + "\n"
 
@@ -530,17 +691,32 @@ def build_review_export(
     output_dir: Path,
     top_n: int,
     copy_midi: bool,
+    chords: Sequence[str],
+    bpm: float | int,
+    bars: int,
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     named_dir = output_dir / "named_midi"
+    context_dir = output_dir / "context_midi"
     if copy_midi:
         named_dir.mkdir(parents=True, exist_ok=True)
+        context_dir.mkdir(parents=True, exist_ok=True)
+
+    chord_guide_midi_path: Path | None = None
+    if copy_midi:
+        chord_guide_midi_path = write_chord_guide_midi(
+            output_dir / "chord_guide.mid",
+            chords,
+            bpm=bpm,
+            bars=bars,
+        )
 
     candidates: list[dict[str, Any]] = []
     for mode_index, mode in enumerate(sorted(samples_by_mode), start=1):
         rows = sorted(samples_by_mode[mode], key=candidate_sort_key, reverse=True)
         for review_rank, row in enumerate(rows[: int(top_n)], start=1):
             review_midi_path: Path | None = None
+            context_midi_path: Path | None = None
             if copy_midi:
                 source = Path(str(row["midi_path"]))
                 if not source.is_absolute():
@@ -552,12 +728,24 @@ def build_review_export(
                 if source.exists():
                     shutil.copy2(source, target)
                     review_midi_path = target
+                    context_target = context_dir / (
+                        f"{mode_index:02d}_{mode}_rank_{review_rank:02d}_"
+                        f"sample_{int(row['sample_index']):02d}_with_context.mid"
+                    )
+                    context_midi_path = write_context_midi(
+                        target,
+                        context_target,
+                        chords,
+                        bpm=bpm,
+                        bars=bars,
+                    )
             candidates.append(
                 compact_review_candidate(
                     mode,
                     row,
                     review_rank=review_rank,
                     review_midi_path=review_midi_path,
+                    context_midi_path=context_midi_path,
                 )
             )
 
@@ -565,6 +753,8 @@ def build_review_export(
         "output_dir": str(output_dir),
         "copy_midi": bool(copy_midi),
         "top_n": int(top_n),
+        "chord_progression": list(chords),
+        "chord_guide_midi_path": str(chord_guide_midi_path) if chord_guide_midi_path else None,
         "candidate_count": int(len(candidates)),
         "candidates": candidates,
     }
@@ -579,7 +769,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--input_dir", type=str, default="./midi_dataset/midi/studio")
     parser.add_argument("--issue_number", type=int, default=65)
-    parser.add_argument("--baseline_modes", type=str, default="hand_written_swing,data_motif")
+    parser.add_argument("--baseline_modes", type=str, default="straight_grid,hand_written_swing,data_motif")
     parser.add_argument("--max_files", type=int, default=4)
     parser.add_argument("--window_bars", type=int, default=8)
     parser.add_argument("--window_stride_bars", type=int, default=4)
@@ -701,6 +891,9 @@ def main() -> int:
         output_dir=Path(args.review_output_root) / args.run_id,
         top_n=int(args.review_top_n),
         copy_midi=bool(args.copy_review_midi),
+        chords=chords,
+        bpm=args.bpm,
+        bars=args.bars,
     )
     write_json(run_dir / "data_motif_compare_report.json", report)
     (run_dir / "data_motif_compare_report.md").write_text(markdown_report(report), encoding="utf-8")

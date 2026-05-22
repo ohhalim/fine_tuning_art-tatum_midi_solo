@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-05-21
+작성일: 2026-05-22
 
 ## Current Focus
 
@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-67-stage-b-data-motif-review-export`
+- `issue-69-stage-b-review-context-grid`
 
 현재 범위가 아닌 것:
 
@@ -36,30 +36,33 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #67은 Issue #65에서 만든 `hand_written_swing` vs `data_motif` baseline을 실제 review package로 export하는 단계다.
+Issue #69는 solo-only MIDI 리뷰의 한계를 해결하는 단계다.
 
-Issue #65에서 `data_motif`는 strict gate를 통과했고 bar-pattern variation과 duration repetition은 좋아졌지만, syncopation은 낮아졌다. 이제 mode가 명확히 드러나는 MIDI 파일로 piano-roll/listening review를 해야 한다.
+수동 리뷰에서 solo-line만 들으면 chord progression이 들리지 않아 in/out 판단이 어렵고, swing/motif 후보는 박자가 딱 맞지 않는 것처럼 들릴 수 있다는 피드백이 나왔다. 따라서 이번 작업은 chord/bass context와 straight-grid timing reference를 review export에 추가한다.
 
 Implemented:
 
-- `scripts/run_stage_b_data_motif_generation_compare.py` review export
-- `tests/test_stage_b_data_motif_generation_compare.py` review export test
-- `scripts/agent_harness.sh stage-b-data-motif-review-export`
+- `scripts/run_stage_b_data_motif_generation_compare.py` chord/context export
+- `tests/test_stage_b_data_motif_generation_compare.py` context export and straight-grid tests
+- `scripts/agent_harness.sh stage-b-review-context-grid`
 - output files:
   - `data_motif_compare_report.json`
   - `data_motif_compare_report.md`
   - `review_manifest.json`
   - `review_candidates.md`
   - `named_midi/*.mid`
+  - `context_midi/*_with_context.mid`
+  - `chord_guide.mid`
 
 Result:
 
-- source report: `outputs/stage_b_data_motif_compare/harness_stage_b_data_motif_review_export/data_motif_compare_report.json`
+- source report: `outputs/stage_b_data_motif_compare/harness_stage_b_review_context_grid/data_motif_compare_report.json`
 - setup: `./midi_dataset/midi/studio`, max files `4`, `8`-bar windows, stride `4`, min notes `16`
 - `hand_written_swing`: strict `3/3`
 - `data_motif`: strict `3/3`
-- review candidates: `6`
-- review output: `outputs/stage_b_data_motif_review/harness_stage_b_data_motif_review_export`
+- `straight_grid`: exported as timing reference
+- review candidates: `9`
+- review output: `outputs/stage_b_data_motif_review/harness_stage_b_review_context_grid`
 - data minus hand duration diversity delta: `+0.016`
 - data minus hand IOI diversity delta: `+0.016`
 - data minus hand bar-pattern delta: `+0.500`
@@ -69,9 +72,9 @@ Result:
 
 Decision:
 
-- review package가 만들어졌으므로 이제 실제 piano roll/listening 비교가 가능하다.
-- 다음 판단은 수치가 아니라 named MIDI 후보를 직접 확인한 결과로 해야 한다.
-- 들어보고 나서 model constrained generation에 연결할지, cadence/ending extraction을 먼저 강화할지 결정한다.
+- 이제 solo-only가 아니라 chord/bass guide 위에서 in/out을 판단할 수 있다.
+- `straight_grid`는 musical quality candidate가 아니라 timing reference로 본다.
+- 다음 판단은 context MIDI를 들어보고 swing을 유지할지, straight quantized output을 기본으로 둘지 결정하는 것이다.
 
 Detail:
 
@@ -89,6 +92,7 @@ Detail:
 - `docs/STAGE_B_MOTIF_TEMPLATE_EXTRACTION_2026-05-21.md`
 - `docs/STAGE_B_DATA_MOTIF_GENERATION_2026-05-21.md`
 - `docs/STAGE_B_DATA_MOTIF_REVIEW_EXPORT_2026-05-21.md`
+- `docs/STAGE_B_REVIEW_CONTEXT_GRID_2026-05-22.md`
 
 ## Active Issue #14
 

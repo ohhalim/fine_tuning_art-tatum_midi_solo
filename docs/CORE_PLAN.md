@@ -136,6 +136,7 @@ Stage B에서 명시하는 것:
 30. Stage B data-derived motif template extraction
 31. Stage B data-derived motif baseline generation
 32. Stage B data motif review export
+33. Stage B chord-context and straight-grid review export
 
 가장 최근 의미 있는 결과:
 
@@ -346,6 +347,7 @@ Stage B에서 명시하는 것:
 - Issue #65 result: data-derived motif baseline도 strict `3/3`을 통과했다.
 - Issue #65 result: hand-written swing 대비 bar-position variation은 `+0.500`, duration diversity는 `+0.016`, IOI diversity는 `+0.016` 개선됐지만 syncopation은 `-0.125` 낮아졌다.
 - Issue #67 result: `data_motif`와 `hand_written_swing` 후보를 mode/sample/rank가 드러나는 named MIDI review package로 export했다.
+- Issue #69 result: chord/bass guide가 들어간 context MIDI와 straight-grid timing reference를 추가했다.
 
 해석:
 
@@ -502,6 +504,34 @@ Stage B에서 명시하는 것:
 - data_motif가 더 자연스러우면 motif sampling을 model constrained generation에 연결한다.
 - 둘 다 초급 scale exercise면 cadence/phrase-ending extraction을 먼저 강화한다.
 
+### Phase 3.15. Chord Context and Straight-Grid Review
+
+목표:
+
+- solo-only MIDI 리뷰의 한계를 줄인다.
+- chord/bass guide가 포함된 context MIDI를 생성한다.
+- swing/motif timing이 문제인지 확인하기 위해 straight-grid reference를 같이 export한다.
+
+현재 결과:
+
+- completed: `chord_guide.mid`를 생성한다.
+- completed: candidate별 `*_with_context.mid`를 생성한다.
+- completed: `straight_grid` baseline mode를 추가했다.
+- latest result: `data_motif` strict `3/3`, `hand_written_swing` strict `3/3`.
+- latest result: `straight_grid`는 timing reference로 export한다.
+
+해석:
+
+- 이제 chord progression 위에서 line이 in인지 out인지 들을 수 있다.
+- swing/motif가 musical swing이 아니라 timing drift처럼 들리는지 비교할 수 있다.
+- straight_grid는 더 좋은 솔로가 아니라 timing 기준점이다.
+
+다음 통과 기준:
+
+- context MIDI를 직접 듣고 `data_motif`, `hand_written_swing`, `straight_grid`를 비교한다.
+- swing이 거슬리면 generated output은 straight quantized grid를 기본으로 둔다.
+- chord context 위에서도 phrase가 초급스럽다면 cadence/phrase-ending extraction을 먼저 강화한다.
+
 ### Phase 4. Generic Jazz Base 후보 학습
 
 목표:
@@ -596,7 +626,7 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B data motif review export 추가
+Stage B chord-context and straight-grid review export 추가
 ```
 
 결과:
@@ -606,13 +636,15 @@ Stage B data motif review export 추가
 - duration repetition ratio는 `0.750`에서 `0.375`로 낮췄다.
 - duration diversity와 IOI diversity는 소폭 올랐다.
 - syncopation은 `0.750`에서 `0.625`로 낮아졌다.
-- review candidates `6`개와 named MIDI package를 만들었다.
+- review candidates `9`개와 named MIDI package를 만들었다.
+- `chord_guide.mid`와 candidate별 `*_with_context.mid`를 만들었다.
+- `straight_grid` timing reference를 추가했다.
 
 다음 작업:
 
-- hand_written_swing 후보와 data_motif 후보를 piano roll/listening으로 비교한다.
-- syncopation 하락이 groove 약화로 들리는지 확인한다.
-- contour가 초급 코드톤 나열을 넘어 phrase motion으로 들리는지 본다.
+- context MIDI에서 chord progression 위에 solo-line을 들어본다.
+- straight_grid와 swing/motif 후보를 비교해 timing 문제가 실제로 들리는지 본다.
+- in/out 판단이 여전히 어렵다면 bar별 chord-tone/tension annotation을 추가한다.
 
 ## 10. 한 문장 요약
 
