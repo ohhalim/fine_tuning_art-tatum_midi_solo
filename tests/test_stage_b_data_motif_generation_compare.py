@@ -7,6 +7,7 @@ from tempfile import TemporaryDirectory
 import pretty_midi
 
 from scripts.run_stage_b_data_motif_generation_compare import (
+    build_compare_summary,
     build_review_export,
     chord_tone_pitch_classes,
     data_motif_guide_tones_tokens,
@@ -18,6 +19,7 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     normalize_position_deltas,
     overlap_free_solo_notes,
     parse_baseline_modes,
+    phrase_cadence_tokens,
     straight_guide_tones_tokens,
     straight_grid_tokens,
     varied_grid_position_duration_steps,
@@ -84,6 +86,38 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
             parse_baseline_modes("straight_grid,straight_guide_tones,data_motif_guide_tones"),
             ["straight_grid", "straight_guide_tones", "data_motif_guide_tones"],
         )
+
+    def test_parse_baseline_modes_accepts_phrase_cadence(self) -> None:
+        self.assertEqual(parse_baseline_modes("phrase_cadence"), ["phrase_cadence"])
+
+    def test_build_compare_summary_allows_selected_modes_without_hand_written_reference(self) -> None:
+        def valid_summary() -> dict:
+            return {
+                "sample_count": 3,
+                "valid_sample_count": 3,
+                "strict_valid_sample_count": 3,
+                "avg_syncopated_onset_ratio": 0.5,
+                "avg_unique_bar_position_pattern_ratio": 0.5,
+                "avg_duration_diversity_ratio": 0.25,
+                "avg_most_common_duration_ratio": 0.5,
+                "avg_ioi_diversity_ratio": 0.25,
+                "avg_most_common_ioi_ratio": 0.5,
+                "avg_tension_ratio": 0.2,
+                "avg_root_tone_ratio": 0.0,
+                "passed_strict_review_gate": True,
+            }
+
+        summary = build_compare_summary(
+            {
+                "phrase_cadence": valid_summary(),
+                "varied_guide_tones": valid_summary(),
+            },
+            min_strict_valid_samples=1,
+        )
+
+        self.assertFalse(summary["comparison_ready"])
+        self.assertTrue(summary["passed_selected_modes_gate"])
+        self.assertTrue(summary["passed_compare_gate"])
 
     def test_normalize_position_deltas_scales_into_slot(self) -> None:
         positions = normalize_position_deltas([0, 3, 9, 12], slot_start=8, slot_size=8)
@@ -310,6 +344,30 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
             else:
                 non_guide_run += 1
             self.assertLessEqual(non_guide_run, 1)
+
+    def test_phrase_cadence_tokens_reduce_scalar_and_chromatic_motion(self) -> None:
+        chords = ["Cm7", "F7", "Bbmaj7", "Ebmaj7"]
+        primer = build_stage_b_primer(chords, 124)
+        tokens = phrase_cadence_tokens(
+            primer_tokens=primer,
+            chords=chords,
+            bars=4,
+            note_groups_per_bar=8,
+            seed=17,
+        )
+        grammar = analyze_stage_b_note_grammar(tokens, primer_size=len(primer))
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+        pitches = [int(group["pitch"]) for group in groups]
+        intervals = [abs(right - left) for left, right in zip(pitches, pitches[1:])]
+        stepwise_ratio = sum(1 for interval in intervals if interval in {1, 2}) / len(intervals)
+        chromatic_ratio = sum(1 for interval in intervals if interval == 1) / len(intervals)
+        durations = [int(group["duration_steps"]) for group in groups]
+
+        self.assertTrue(grammar["grammar_valid"])
+        self.assertEqual(len(groups), 32)
+        self.assertGreaterEqual(len(set(durations)), 2)
+        self.assertLess(stepwise_ratio, 0.70)
+        self.assertLess(chromatic_ratio, 0.35)
 
     def test_build_review_export_copies_named_mode_files(self) -> None:
         with TemporaryDirectory() as tmp:

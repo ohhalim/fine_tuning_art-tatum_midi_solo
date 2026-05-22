@@ -57,6 +57,7 @@ VALID_BASELINE_MODES = {
     "straight_guide_tones",
     "varied_grid",
     "varied_guide_tones",
+    "phrase_cadence",
     "hand_written_swing",
     "data_motif",
     "data_motif_guide_tones",
@@ -296,6 +297,45 @@ def nearest_pitch_for_pitch_class(
         preferred = [pitch for pitch in candidates if 1 <= abs(pitch - previous) <= 7]
         if preferred:
             candidates = preferred
+    return int(
+        min(
+            candidates,
+            key=lambda pitch: (
+                abs(int(pitch) - int(target_pitch)),
+                abs(int(pitch) - 67),
+                int(pitch),
+            ),
+        )
+    )
+
+
+def nearest_phrase_pitch_for_pitch_class(
+    pitch_class: int,
+    *,
+    target_pitch: int,
+    recent_pitches: Sequence[int] | None = None,
+    min_interval: int = 3,
+    max_interval: int = 10,
+) -> int:
+    recent = list(recent_pitches or [])
+    candidates = [
+        pitch
+        for pitch in range(int(PIANO_PITCH_MIN), int(PIANO_PITCH_MAX) + 1)
+        if pitch % 12 == int(pitch_class) % 12
+    ]
+    blocked = set(recent[-2:])
+    filtered = [pitch for pitch in candidates if pitch not in blocked]
+    if filtered:
+        candidates = filtered
+    if recent:
+        previous = int(recent[-1])
+        phrase_candidates = [
+            pitch
+            for pitch in candidates
+            if int(min_interval) <= abs(int(pitch) - previous) <= int(max_interval)
+        ]
+        if phrase_candidates:
+            candidates = phrase_candidates
     return int(
         min(
             candidates,
@@ -673,6 +713,93 @@ def varied_guide_tones_tokens(
     return tokens
 
 
+def phrase_cadence_pitch_class_cells(
+    chord: str | None,
+    next_chord: str | None,
+    *,
+    bar_index: int,
+) -> list[int]:
+    guides = guide_tone_pitch_classes(chord)
+    non_root_tones = sorted(chord_tone_pitch_classes(chord, include_root=False))
+    tensions = sorted(tension_pitch_classes(chord))
+    next_guides = guide_tone_pitch_classes(next_chord)
+    fallback_tones = sorted(chord_tone_pitch_classes(chord)) or [0]
+
+    if not guides:
+        guides = non_root_tones or fallback_tones
+    if not non_root_tones:
+        non_root_tones = guides or fallback_tones
+    if not tensions:
+        tensions = non_root_tones
+    if not next_guides:
+        next_guides = guides
+
+    guide_a = guides[int(bar_index) % len(guides)]
+    guide_b = guides[(int(bar_index) + 1) % len(guides)]
+    color_a = tensions[int(bar_index) % len(tensions)]
+    color_b = tensions[(int(bar_index) + 1) % len(tensions)]
+    chord_color = non_root_tones[(int(bar_index) + 1) % len(non_root_tones)]
+    next_target = next_guides[int(bar_index) % len(next_guides)]
+
+    return [
+        guide_a,
+        color_a,
+        guide_b,
+        chord_color,
+        color_b,
+        guide_a,
+        approach_pitch_class(next_target, [guide_a, color_a, guide_b]),
+        next_target,
+    ]
+
+
+def phrase_cadence_tokens(
+    *,
+    primer_tokens: Sequence[int],
+    chords: Sequence[str],
+    bars: int,
+    note_groups_per_bar: int,
+    seed: int,
+) -> list[int]:
+    rng = random.Random(int(seed))
+    tokens = [int(token) for token in primer_tokens]
+    recent_pitches: list[int] = []
+    positions, durations = varied_grid_position_duration_steps(note_groups_per_bar)
+    target_register_patterns = [
+        [64, 72, 60, 69, 74, 65, 71, 67],
+        [69, 61, 73, 64, 70, 76, 63, 72],
+    ]
+
+    for bar_index in range(max(1, int(bars))):
+        chord = chords[bar_index % len(chords)] if chords else None
+        next_chord = chords[(bar_index + 1) % len(chords)] if chords else chord
+        if bar_index > 0:
+            tokens.append(TOKEN_BAR)
+            tokens.extend(chord_tokens(chord))
+        pitch_cells = phrase_cadence_pitch_class_cells(chord, next_chord, bar_index=bar_index)
+        register_pattern = target_register_patterns[bar_index % len(target_register_patterns)]
+        register_shift = rng.choice([-2, 0, 2])
+        for group_index, (position, duration) in enumerate(zip(positions, durations)):
+            pitch_class = pitch_cells[group_index % len(pitch_cells)]
+            target_pitch = register_pattern[group_index % len(register_pattern)] + register_shift
+            pitch = nearest_phrase_pitch_for_pitch_class(
+                pitch_class,
+                target_pitch=target_pitch,
+                recent_pitches=recent_pitches,
+            )
+            recent_pitches.append(pitch)
+            tokens.extend(
+                [
+                    position_token(position),
+                    note_velocity_token(4),
+                    note_pitch_token(pitch),
+                    note_duration_token(duration),
+                ]
+            )
+    tokens.append(TOKEN_END)
+    return tokens
+
+
 def data_motif_tokens(
     *,
     primer_tokens: Sequence[int],
@@ -836,6 +963,14 @@ def generated_tokens_for_mode(
         )
     if mode == "varied_guide_tones":
         return varied_guide_tones_tokens(
+            primer_tokens=primer_tokens,
+            chords=chords,
+            bars=bars,
+            note_groups_per_bar=note_groups_per_bar,
+            seed=seed,
+        )
+    if mode == "phrase_cadence":
+        return phrase_cadence_tokens(
             primer_tokens=primer_tokens,
             chords=chords,
             bars=bars,
@@ -1090,6 +1225,10 @@ def build_compare_summary(
     hand = mode_summaries.get("hand_written_swing")
     data = mode_summaries.get("data_motif")
     ready = bool(hand and data)
+    selected_modes_passed = bool(mode_summaries) and all(
+        int(summary["strict_valid_sample_count"]) >= int(min_strict_valid_samples)
+        for summary in mode_summaries.values()
+    )
     data_passed = bool(data and int(data["strict_valid_sample_count"]) >= int(min_strict_valid_samples))
     hand_passed = bool(hand and int(hand["strict_valid_sample_count"]) >= int(min_strict_valid_samples))
     def delta(metric: str) -> float:
@@ -1099,7 +1238,8 @@ def build_compare_summary(
         "comparison_ready": ready,
         "passed_hand_written_swing_gate": hand_passed,
         "passed_data_motif_gate": data_passed,
-        "passed_compare_gate": bool(ready and hand_passed and data_passed),
+        "passed_selected_modes_gate": selected_modes_passed,
+        "passed_compare_gate": bool((ready and hand_passed and data_passed) or selected_modes_passed),
         "duration_diversity_delta_data_minus_hand": delta("avg_duration_diversity_ratio"),
         "ioi_diversity_delta_data_minus_hand": delta("avg_ioi_diversity_ratio"),
         "bar_pattern_delta_data_minus_hand": delta("avg_unique_bar_position_pattern_ratio"),
