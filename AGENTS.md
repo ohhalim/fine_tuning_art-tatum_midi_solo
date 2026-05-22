@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #87: Stage B listening review notes schema.
+- Issue #89: Stage B filled listening review aggregate.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -218,6 +218,12 @@ For Stage B listening review notes schema changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-listening-review-notes
+```
+
+For Stage B filled listening review aggregate changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-listening-review-aggregate
 ```
 
 For Stage B data-derived motif template extraction changes, run:
