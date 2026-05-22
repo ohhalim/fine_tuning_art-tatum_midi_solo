@@ -148,6 +148,7 @@ Stage B에서 명시하는 것:
 42. Stage B listening review notes schema
 43. Stage B filled listening review aggregate
 44. Stage B full review manifest listening notes
+45. Stage B objective MIDI note review
 
 가장 최근 의미 있는 결과:
 
@@ -172,6 +173,7 @@ Stage B에서 명시하는 것:
 - Issue #87 creates a structured listening review notes schema so subjective review can be recorded consistently instead of as loose comments.
 - Issue #89 aggregates filled listening review notes into next-step signals and refuses to change generation rules when all candidates are still pending.
 - Issue #91 builds listening review notes from the full review manifest so all 15 review candidates, including timing references, have file paths and pending review fields.
+- Issue #93 reads generated MIDI notes directly and reports objective flags for overlap/polyphony, grid alignment, scalar/chromatic motion, duration collapse, and chord-role ratios.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -387,6 +389,7 @@ Stage B에서 명시하는 것:
 - Issue #87 result: listening review notes template contains `6` pending candidates and validates phrase quality, timing, chord fit, issue flags, and decision enums.
 - Issue #89 result: listening review aggregate reports `6` pending candidates, `0` reviewed candidates, and only recommends `collect_listening_reviews`.
 - Issue #91 result: full review manifest notes contain `15` pending candidates with `review_midi_path`, `context_midi_path`, mode, rank, sample, and rhythm/timing metrics.
+- Issue #93 result: objective MIDI review flags `chromatic_walk=7`, `duration_pattern_collapse=9`, `overlap_polyphonic=9`, and `too_stepwise_or_scalar=4`.
 
 해석:
 
@@ -666,22 +669,24 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B full review manifest listening notes 추가
+Stage B objective MIDI note review 추가
 ```
 
 결과:
 
-- review manifest 전체를 listening review notes template으로 변환한다.
-- output: `outputs/stage_b_listening_review_notes/harness_stage_b_full_review_notes/review_notes_template.json`
+- generated review MIDI를 직접 읽어 objective note-level diagnostics를 만든다.
+- output: `outputs/stage_b_objective_midi_review/harness_stage_b_objective_midi_review/objective_midi_note_review.md`
 - candidate count: `15`
-- reviewed count: `0`
-- pending count: `15`
-- fields: `review_metadata`, `review_files`, `source_metrics`, `listening`
+- chromatic walk: `7`
+- duration pattern collapse: `9`
+- overlap/polyphonic: `9`
+- too stepwise/scalar: `4`
 
 다음 작업:
 
-- full review notes가 채워지면 aggregate 결과로 `too_safe`, `too_scalar`, `too_mechanical`, `bad_timing`, `bad_chord_fit` 같은 issue flag를 기준으로 후속 issue를 분기한다.
-- pending-only artifact에서는 generation rule을 바꾸지 않는다.
+- objective flags를 candidate ranking/listening notes에 연결한다.
+- overlap/polyphonic과 duration collapse를 review priority와 gate에 반영한다.
+- subjective listening result는 objective MIDI review 이후에 채운다.
 - real Brad/reference chord label은 아직 임의로 넣지 않는다.
 
 ## 10. 한 문장 요약
