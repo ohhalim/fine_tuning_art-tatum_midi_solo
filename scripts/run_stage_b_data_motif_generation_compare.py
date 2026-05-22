@@ -58,6 +58,7 @@ VALID_BASELINE_MODES = {
     "varied_grid",
     "varied_guide_tones",
     "phrase_cadence",
+    "phrase_recovery",
     "hand_written_swing",
     "data_motif",
     "data_motif_guide_tones",
@@ -753,6 +754,61 @@ def phrase_cadence_pitch_class_cells(
     ]
 
 
+def phrase_recovery_pitch_classes(chord: str | None, next_chord: str | None) -> list[int]:
+    classes: list[int] = []
+    for pitch_class in (
+        guide_tone_pitch_classes(chord)
+        + sorted(chord_tone_pitch_classes(chord, include_root=False))
+        + sorted(tension_pitch_classes(chord))
+        + guide_tone_pitch_classes(next_chord)
+    ):
+        if pitch_class not in classes:
+            classes.append(int(pitch_class))
+    if not classes:
+        classes = sorted(chord_tone_pitch_classes(chord)) or [0]
+    return classes
+
+
+def recovery_pitch_after_large_leap(
+    *,
+    chord: str | None,
+    next_chord: str | None,
+    previous_pitch: int,
+    leap_direction: int,
+    recent_pitches: Sequence[int],
+) -> int:
+    pitch_classes = phrase_recovery_pitch_classes(chord, next_chord)
+    target_pitch = int(previous_pitch) - int(leap_direction) * 3
+    candidates = [
+        pitch
+        for pitch in range(int(PIANO_PITCH_MIN), int(PIANO_PITCH_MAX) + 1)
+        if pitch % 12 in pitch_classes
+    ]
+    blocked = set(int(pitch) for pitch in recent_pitches[-2:])
+    filtered = [pitch for pitch in candidates if pitch not in blocked]
+    if filtered:
+        candidates = filtered
+    recovery_candidates = [
+        pitch
+        for pitch in candidates
+        if 1 <= abs(int(pitch) - int(previous_pitch)) <= 5
+        and (1 if int(pitch) > int(previous_pitch) else -1 if int(pitch) < int(previous_pitch) else 0)
+        == -int(leap_direction)
+    ]
+    if recovery_candidates:
+        candidates = recovery_candidates
+    return int(
+        min(
+            candidates,
+            key=lambda pitch: (
+                abs(int(pitch) - int(target_pitch)),
+                abs(int(pitch) - 67),
+                int(pitch),
+            ),
+        )
+    )
+
+
 def phrase_cadence_tokens(
     *,
     primer_tokens: Sequence[int],
@@ -787,6 +843,69 @@ def phrase_cadence_tokens(
                 target_pitch=target_pitch,
                 recent_pitches=recent_pitches,
             )
+            recent_pitches.append(pitch)
+            tokens.extend(
+                [
+                    position_token(position),
+                    note_velocity_token(4),
+                    note_pitch_token(pitch),
+                    note_duration_token(duration),
+                ]
+            )
+    tokens.append(TOKEN_END)
+    return tokens
+
+
+def phrase_recovery_tokens(
+    *,
+    primer_tokens: Sequence[int],
+    chords: Sequence[str],
+    bars: int,
+    note_groups_per_bar: int,
+    seed: int,
+) -> list[int]:
+    rng = random.Random(int(seed))
+    tokens = [int(token) for token in primer_tokens]
+    recent_pitches: list[int] = []
+    positions, durations = varied_grid_position_duration_steps(note_groups_per_bar)
+    target_register_patterns = [
+        [64, 72, 60, 69, 74, 65, 71, 67],
+        [69, 61, 73, 64, 70, 76, 63, 72],
+    ]
+    pending_recovery_direction = 0
+
+    for bar_index in range(max(1, int(bars))):
+        chord = chords[bar_index % len(chords)] if chords else None
+        next_chord = chords[(bar_index + 1) % len(chords)] if chords else chord
+        if bar_index > 0:
+            tokens.append(TOKEN_BAR)
+            tokens.extend(chord_tokens(chord))
+        pitch_cells = phrase_cadence_pitch_class_cells(chord, next_chord, bar_index=bar_index)
+        register_pattern = target_register_patterns[bar_index % len(target_register_patterns)]
+        register_shift = rng.choice([-2, 0, 2])
+        for group_index, (position, duration) in enumerate(zip(positions, durations)):
+            if pending_recovery_direction and recent_pitches:
+                pitch = recovery_pitch_after_large_leap(
+                    chord=chord,
+                    next_chord=next_chord,
+                    previous_pitch=recent_pitches[-1],
+                    leap_direction=pending_recovery_direction,
+                    recent_pitches=recent_pitches,
+                )
+                pending_recovery_direction = 0
+            else:
+                pitch_class = pitch_cells[group_index % len(pitch_cells)]
+                target_pitch = register_pattern[group_index % len(register_pattern)] + register_shift
+                pitch = nearest_phrase_pitch_for_pitch_class(
+                    pitch_class,
+                    target_pitch=target_pitch,
+                    recent_pitches=recent_pitches,
+                )
+
+            if recent_pitches:
+                interval = int(pitch) - int(recent_pitches[-1])
+                if abs(interval) >= 7:
+                    pending_recovery_direction = 1 if interval > 0 else -1
             recent_pitches.append(pitch)
             tokens.extend(
                 [
@@ -971,6 +1090,14 @@ def generated_tokens_for_mode(
         )
     if mode == "phrase_cadence":
         return phrase_cadence_tokens(
+            primer_tokens=primer_tokens,
+            chords=chords,
+            bars=bars,
+            note_groups_per_bar=note_groups_per_bar,
+            seed=seed,
+        )
+    if mode == "phrase_recovery":
+        return phrase_recovery_tokens(
             primer_tokens=primer_tokens,
             chords=chords,
             bars=bars,

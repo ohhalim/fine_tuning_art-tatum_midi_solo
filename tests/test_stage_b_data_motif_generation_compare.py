@@ -20,6 +20,7 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     overlap_free_solo_notes,
     parse_baseline_modes,
     phrase_cadence_tokens,
+    phrase_recovery_tokens,
     straight_guide_tones_tokens,
     straight_grid_tokens,
     varied_grid_position_duration_steps,
@@ -89,6 +90,9 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
 
     def test_parse_baseline_modes_accepts_phrase_cadence(self) -> None:
         self.assertEqual(parse_baseline_modes("phrase_cadence"), ["phrase_cadence"])
+
+    def test_parse_baseline_modes_accepts_phrase_recovery(self) -> None:
+        self.assertEqual(parse_baseline_modes("phrase_recovery"), ["phrase_recovery"])
 
     def test_build_compare_summary_allows_selected_modes_without_hand_written_reference(self) -> None:
         def valid_summary() -> dict:
@@ -368,6 +372,36 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         self.assertGreaterEqual(len(set(durations)), 2)
         self.assertLess(stepwise_ratio, 0.70)
         self.assertLess(chromatic_ratio, 0.35)
+
+    def test_phrase_recovery_tokens_resolve_large_leaps(self) -> None:
+        chords = ["Cm7", "F7", "Bbmaj7", "Ebmaj7"]
+        primer = build_stage_b_primer(chords, 124)
+        tokens = phrase_recovery_tokens(
+            primer_tokens=primer,
+            chords=chords,
+            bars=4,
+            note_groups_per_bar=8,
+            seed=17,
+        )
+        grammar = analyze_stage_b_note_grammar(tokens, primer_size=len(primer))
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+        pitches = [int(group["pitch"]) for group in groups]
+        intervals = [right - left for left, right in zip(pitches, pitches[1:])]
+        large_leap_indexes = [index for index, interval in enumerate(intervals) if abs(interval) >= 7]
+        unresolved = 0
+        for index in large_leap_indexes:
+            if index + 1 >= len(intervals):
+                unresolved += 1
+                continue
+            direction = 1 if intervals[index] > 0 else -1
+            next_direction = 1 if intervals[index + 1] > 0 else -1 if intervals[index + 1] < 0 else 0
+            if next_direction != -direction or not 1 <= abs(intervals[index + 1]) <= 5:
+                unresolved += 1
+        unresolved_ratio = unresolved / len(large_leap_indexes)
+
+        self.assertTrue(grammar["grammar_valid"])
+        self.assertEqual(len(groups), 32)
+        self.assertLess(unresolved_ratio, 0.45)
 
     def test_build_review_export_copies_named_mode_files(self) -> None:
         with TemporaryDirectory() as tmp:

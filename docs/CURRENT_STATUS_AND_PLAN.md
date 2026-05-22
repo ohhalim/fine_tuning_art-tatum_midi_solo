@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-103-stage-b-phrase-naturalness-objectives`
+- `issue-105-stage-b-phrase-recovery-review`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,43 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #105는 Issue #103에서 드러난 `unresolved_large_leaps` 문제를 줄이기 위해 phrase recovery baseline을 추가한 단계다.
+
+중요한 전제:
+
+- 큰 도약을 금지하지 않는다.
+- 큰 도약 뒤 반대 방향 small recovery를 넣는다.
+- objective clean은 subjective jazz quality를 뜻하지 않는다.
+
+Implemented:
+
+- `phrase_recovery` baseline mode
+- `recovery_pitch_after_large_leap`
+- `scripts/agent_harness.sh stage-b-phrase-recovery-review`
+- docs:
+  - `docs/STAGE_B_PHRASE_RECOVERY_REVIEW_2026-05-22.md`
+
+Result:
+
+- candidate count: `6`
+- objective bucket counts:
+  - clean: `3`
+  - warning: `3`
+- objective flag counts:
+  - unresolved large leaps: `3`
+- mode flag counts:
+  - `phrase_cadence`: unresolved large leaps `3`
+  - `phrase_recovery`: no objective flags
+- `phrase_cadence` unresolved large leap ratio: `0.750-0.757`
+- `phrase_recovery` unresolved large leap ratio: `0.000-0.048`
+
+Decision:
+
+- `phrase_recovery`는 objective phrase naturalness risk를 줄인다.
+- 다음 작업은 `phrase_recovery`를 data-derived motif rhythm과 결합하거나, review MIDI/context MIDI 기준으로 listening review package를 만드는 것이다.
+
+## Previous Probe Result
 
 Issue #103은 Issue #101의 phrase/cadence 후보가 scalar/chromatic flag를 줄인 대신 leap-heavy exercise가 되었는지 확인하기 위해 phrase naturalness objective metric을 추가한 단계다.
 
