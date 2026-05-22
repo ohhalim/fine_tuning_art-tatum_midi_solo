@@ -26,6 +26,7 @@ OBJECTIVE_FLAG_PENALTIES = {
     "duration_pattern_collapse": 20,
     "chromatic_walk": 18,
     "too_stepwise_or_scalar": 16,
+    "unresolved_large_leaps": 16,
     "repeated_pitch": 14,
     "too_safe_chord_tones": 12,
 }
@@ -155,12 +156,28 @@ def interval_summary(notes: list[dict[str, int]]) -> dict[str, float | int]:
         for left, right in zip(directions, directions[1:])
         if left != 0 and right != 0 and left != right
     )
+    large_leap_indexes = [index for index, interval in enumerate(abs_intervals) if interval >= 7]
+    resolved_large_leaps = 0
+    for index in large_leap_indexes:
+        if index + 1 >= len(intervals):
+            continue
+        current_direction = directions[index]
+        next_direction = directions[index + 1]
+        next_size = abs_intervals[index + 1]
+        if current_direction != 0 and next_direction == -current_direction and 1 <= next_size <= 5:
+            resolved_large_leaps += 1
+    large_leap_count = len(large_leap_indexes)
+    unresolved_large_leaps = large_leap_count - resolved_large_leaps
     total = len(abs_intervals)
     return {
         "stepwise_interval_ratio": ratio(sum(1 for interval in abs_intervals if interval in {1, 2}), total),
         "chromatic_interval_ratio": ratio(sum(1 for interval in abs_intervals if interval == 1), total),
         "repeated_pitch_interval_ratio": ratio(sum(1 for interval in abs_intervals if interval == 0), total),
         "large_leap_interval_ratio": ratio(sum(1 for interval in abs_intervals if interval >= 7), total),
+        "large_leap_count": int(large_leap_count),
+        "resolved_large_leap_count": int(resolved_large_leaps),
+        "unresolved_large_leap_count": int(unresolved_large_leaps),
+        "unresolved_large_leap_ratio": ratio(unresolved_large_leaps, large_leap_count),
         "direction_change_ratio": ratio(direction_changes, max(0, len(directions) - 1)),
     }
 
@@ -246,6 +263,8 @@ def objective_flags(metrics: dict[str, Any]) -> list[str]:
         flags.append("too_stepwise_or_scalar")
     if metrics["chromatic_interval_ratio"] >= 0.35:
         flags.append("chromatic_walk")
+    if metrics["large_leap_count"] >= 3 and metrics["unresolved_large_leap_ratio"] >= 0.45:
+        flags.append("unresolved_large_leaps")
     if metrics["chord_tone_ratio"] >= 0.80 and metrics["tension_ratio"] <= 0.10:
         flags.append("too_safe_chord_tones")
     if metrics["most_common_duration_ratio"] >= 0.75:
@@ -390,8 +409,8 @@ def markdown_report(report: dict[str, Any], output_path: Path) -> str:
             "",
             "## Candidates",
             "",
-            "| candidate | bucket | reviewable | priority | penalty | notes | unique | max active | poly ratio | stepwise | chromatic | chord tone | tension | outside | flags |",
-            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+            "| candidate | bucket | reviewable | priority | penalty | notes | unique | max active | poly ratio | stepwise | chromatic | large leap | unresolved leap | chord tone | tension | outside | flags |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
         ]
     )
     for candidate in report["candidates"]:
@@ -412,6 +431,8 @@ def markdown_report(report: dict[str, Any], output_path: Path) -> str:
                     f"{metrics['polyphonic_tick_ratio']:.3f}",
                     f"{metrics['stepwise_interval_ratio']:.3f}",
                     f"{metrics['chromatic_interval_ratio']:.3f}",
+                    f"{metrics['large_leap_interval_ratio']:.3f}",
+                    f"{metrics['unresolved_large_leap_ratio']:.3f}",
                     f"{metrics['chord_tone_ratio']:.3f}",
                     f"{metrics['tension_ratio']:.3f}",
                     f"{metrics['outside_ratio']:.3f}",
