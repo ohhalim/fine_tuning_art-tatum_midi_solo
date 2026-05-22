@@ -82,6 +82,8 @@
   - solo-only 리뷰의 한계를 반영해 chord/bass context MIDI와 straight-grid timing reference를 추가한 결과.
 - `STAGE_B_GUIDE_TONE_CADENCE_2026-05-22.md`
   - straight-grid timing 위에서 scale/chromatic 나열을 줄이기 위한 guide-tone/cadence 후보를 추가한 결과.
+- `STAGE_B_DATA_GUIDE_HYBRID_2026-05-22.md`
+  - data-derived motif rhythm과 guide-tone/cadence pitch vocabulary를 결합한 hybrid 후보를 추가한 결과.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`

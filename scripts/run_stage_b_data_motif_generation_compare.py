@@ -51,7 +51,13 @@ from scripts.stage_b_tokens import (  # noqa: E402
 )
 
 
-VALID_BASELINE_MODES = {"straight_grid", "straight_guide_tones", "hand_written_swing", "data_motif"}
+VALID_BASELINE_MODES = {
+    "straight_grid",
+    "straight_guide_tones",
+    "hand_written_swing",
+    "data_motif",
+    "data_motif_guide_tones",
+}
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -333,6 +339,41 @@ def guide_tone_cadence_pitch_classes(
     ]
 
 
+def guide_tone_cell_index_for_position(position: int) -> int:
+    scaled = int(round(max(0, int(position)) * 8 / int(POSITIONS_PER_BAR)))
+    return max(0, min(7, scaled))
+
+
+def is_strong_beat_position(position: int) -> bool:
+    return int(position) % 4 == 0
+
+
+def guide_tone_pitch_for_position(
+    chord: str | None,
+    next_chord: str | None,
+    *,
+    bar_index: int,
+    position: int,
+    target_pitch: int,
+    recent_pitches: Sequence[int],
+) -> int:
+    cells = guide_tone_cadence_pitch_classes(chord, next_chord, bar_index=bar_index)
+    cell_index = guide_tone_cell_index_for_position(position)
+    pitch_class, role = cells[cell_index]
+    if is_strong_beat_position(position):
+        guides = guide_tone_pitch_classes(chord)
+        if guides:
+            guide_index = (int(position) // 4 + int(bar_index)) % len(guides)
+            pitch_class = guides[guide_index]
+    if role.startswith("approach") and recent_pitches:
+        target_pitch = int(recent_pitches[-1])
+    return nearest_pitch_for_pitch_class(
+        pitch_class,
+        target_pitch=target_pitch,
+        recent_pitches=recent_pitches,
+    )
+
+
 def base_pitch_token_for_chord(chord: str | None, rng: random.Random, recent_pitches: Sequence[int]) -> int:
     allowed = chord_aware_pitch_tokens(
         chord,
@@ -577,6 +618,74 @@ def data_motif_tokens(
     return tokens
 
 
+def data_motif_guide_tones_tokens(
+    *,
+    primer_tokens: Sequence[int],
+    chords: Sequence[str],
+    bars: int,
+    note_groups_per_bar: int,
+    template_report: dict[str, Any],
+    seed: int,
+) -> list[int]:
+    rng = random.Random(int(seed))
+    summary = template_report["summary"]
+    rhythm_rows = summary["top_rhythm_templates"]
+    contour_rows = summary["top_contour_templates"]
+    tokens = [int(token) for token in primer_tokens]
+    recent_pitches: list[int] = []
+    motif_length = 4
+    motifs_per_bar = max(1, int(round(max(1, int(note_groups_per_bar)) / motif_length)))
+    slot_size = max(1, int(POSITIONS_PER_BAR) // motifs_per_bar)
+
+    for bar_index in range(max(1, int(bars))):
+        chord = chords[bar_index % len(chords)] if chords else None
+        next_chord = chords[(bar_index + 1) % len(chords)] if chords else chord
+        if bar_index > 0:
+            tokens.append(TOKEN_BAR)
+            tokens.extend(chord_tokens(chord))
+        emitted_in_bar = 0
+        for motif_index in range(motifs_per_bar):
+            row_index = bar_index * motifs_per_bar + motif_index
+            rhythm = weighted_choice(rhythm_rows, rng, row_index)["key"]
+            contour = weighted_choice(contour_rows, rng, row_index + int(seed))["key"]
+            slot_start = min(int(POSITIONS_PER_BAR) - 1, motif_index * slot_size)
+            positions = normalize_position_deltas(
+                rhythm["position_deltas"],
+                slot_start=slot_start,
+                slot_size=slot_size,
+            )
+            durations = fit_duration_tokens_to_positions(positions, rhythm["duration_steps"])
+            contour_steps = [int(step) for step in contour.get("pitch_intervals", [])] or [0]
+            anchor = 64 + ((bar_index % 3) * 3) + rng.choice([-2, 0, 2])
+            for local_index, (position, duration_token) in enumerate(zip(positions, durations)):
+                if emitted_in_bar >= int(note_groups_per_bar):
+                    break
+                contour_offset = contour_steps[local_index % len(contour_steps)]
+                target_pitch = anchor + contour_offset
+                if recent_pitches:
+                    target_pitch = int(round((target_pitch + int(recent_pitches[-1])) / 2))
+                pitch = guide_tone_pitch_for_position(
+                    chord,
+                    next_chord,
+                    bar_index=bar_index,
+                    position=int(position),
+                    target_pitch=target_pitch,
+                    recent_pitches=recent_pitches,
+                )
+                recent_pitches.append(pitch)
+                tokens.extend(
+                    [
+                        position_token(position),
+                        note_velocity_token(4),
+                        note_pitch_token(pitch),
+                        duration_token,
+                    ]
+                )
+                emitted_in_bar += 1
+    tokens.append(TOKEN_END)
+    return tokens
+
+
 def generated_tokens_for_mode(
     mode: str,
     *,
@@ -613,6 +722,15 @@ def generated_tokens_for_mode(
         )
     if mode == "data_motif":
         return data_motif_tokens(
+            primer_tokens=primer_tokens,
+            chords=chords,
+            bars=bars,
+            note_groups_per_bar=note_groups_per_bar,
+            template_report=template_report,
+            seed=seed,
+        )
+    if mode == "data_motif_guide_tones":
+        return data_motif_guide_tones_tokens(
             primer_tokens=primer_tokens,
             chords=chords,
             bars=bars,

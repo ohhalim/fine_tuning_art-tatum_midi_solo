@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-71-stage-b-guide-tone-cadence`
+- `issue-73-stage-b-data-motif-guide-hybrid`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,45 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #73은 Issue #71의 다음 단계다.
+
+수동 리뷰 결론:
+
+- `straight_guide_tones`는 pitch vocabulary 기준선이지만 rhythm이 너무 교과서적일 수 있다.
+- `data_motif`는 rhythm variation이 더 낫지만 pitch가 scale/chromatic exercise처럼 들릴 수 있다.
+- 따라서 이번 후보는 data-derived rhythm과 guide-tone/cadence pitch 문법을 결합한다.
+
+Implemented:
+
+- `data_motif_guide_tones` baseline mode
+- data-derived rhythm/duration template 유지
+- contour template은 register 방향 참고로만 사용
+- strong beat guide-tone constraint
+- `scripts/agent_harness.sh stage-b-data-guide-hybrid`
+- docs:
+  - `docs/STAGE_B_DATA_GUIDE_HYBRID_2026-05-22.md`
+
+Result:
+
+- compare gate: passed
+- `data_motif`: strict `3/3`
+- `data_motif_guide_tones`: strict `3/3`
+- `data_motif_guide_tones` note count: `63`
+- `data_motif_guide_tones` unique pitch count: `23-24`
+- `data_motif_guide_tones` chord-tone ratio: `0.797`
+- `data_motif_guide_tones` tension ratio: `0.062`
+- `data_motif_guide_tones` root-tone ratio: `0.000`
+- `data_motif_guide_tones` unique bar-position pattern ratio: `1.000`
+- review output: `outputs/stage_b_data_motif_review/harness_stage_b_data_guide_hybrid`
+
+Decision:
+
+- 이번 후보의 목적은 "재즈 솔로 완성"이 아니라 `data_motif`와 `straight_guide_tones`의 장단점을 결합한 listening-review candidate를 만드는 것이다.
+- 들어볼 핵심 파일은 `outputs/stage_b_data_motif_review/harness_stage_b_data_guide_hybrid/context_midi/*data_motif_guide_tones*_with_context.mid`다.
+- 이 후보도 초급 멜로디처럼 들리면 다음은 코드 추가가 아니라 reference-derived guide-tone landing 통계 추출이다.
+
+## Previous Probe Result
 
 Issue #71은 Issue #69 review listening에서 나온 피드백을 반영한다.
 
