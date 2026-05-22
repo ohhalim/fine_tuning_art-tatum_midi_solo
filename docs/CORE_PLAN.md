@@ -137,6 +137,7 @@ Stage B에서 명시하는 것:
 31. Stage B data-derived motif baseline generation
 32. Stage B data motif review export
 33. Stage B chord-context and straight-grid review export
+34. Stage B straight-grid guide-tone/cadence review candidate
 
 가장 최근 의미 있는 결과:
 
@@ -348,6 +349,8 @@ Stage B에서 명시하는 것:
 - Issue #65 result: hand-written swing 대비 bar-position variation은 `+0.500`, duration diversity는 `+0.016`, IOI diversity는 `+0.016` 개선됐지만 syncopation은 `-0.125` 낮아졌다.
 - Issue #67 result: `data_motif`와 `hand_written_swing` 후보를 mode/sample/rank가 드러나는 named MIDI review package로 export했다.
 - Issue #69 result: chord/bass guide가 들어간 context MIDI와 straight-grid timing reference를 추가했다.
+- Issue #71 result: `straight_guide_tones` 후보를 추가해 swing timing 문제와 chromatic/scale pitch 문제를 분리했다.
+- Issue #71 result: `straight_guide_tones`는 note count `64`, unique pitch count `26-29`, chord-tone ratio `0.656`, tension ratio `0.172`, root-tone ratio `0.000`이지만 straight reference용 dead-air gate 때문에 strict `0/3`이다.
 
 해석:
 
@@ -626,25 +629,23 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B chord-context and straight-grid review export 추가
+Stage B straight-grid guide-tone/cadence review candidate 추가
 ```
 
 결과:
 
-- `hand_written_swing`과 `data_motif` 모두 strict `3/3`을 통과했다.
-- data-derived baseline은 bar-pattern variation을 `0.500`에서 `1.000`으로 올렸다.
-- duration repetition ratio는 `0.750`에서 `0.375`로 낮췄다.
-- duration diversity와 IOI diversity는 소폭 올랐다.
-- syncopation은 `0.750`에서 `0.625`로 낮아졌다.
-- review candidates `9`개와 named MIDI package를 만들었다.
-- `chord_guide.mid`와 candidate별 `*_with_context.mid`를 만들었다.
-- `straight_grid` timing reference를 추가했다.
+- `straight_guide_tones` baseline mode를 추가했다.
+- strong beat은 현재 chord의 guide tone으로 제한한다.
+- weak beat approach tone은 연속 chromatic run이 되지 않게 제한한다.
+- context MIDI review package에 `straight_grid`, `straight_guide_tones`, `hand_written_swing`, `data_motif`를 같이 export한다.
+- `straight_guide_tones`는 root-tone ratio `0.000`, chord-tone ratio `0.656`, tension ratio `0.172`를 기록했다.
+- `straight_guide_tones` strict `0/3`은 current dead-air gate가 straight reference에 맞지 않기 때문이며, 모델 성공 후보가 아니라 timing/pitch reference로 본다.
 
 다음 작업:
 
-- context MIDI에서 chord progression 위에 solo-line을 들어본다.
-- straight_grid와 swing/motif 후보를 비교해 timing 문제가 실제로 들리는지 본다.
-- in/out 판단이 여전히 어렵다면 bar별 chord-tone/tension annotation을 추가한다.
+- `04_straight_guide_tones_*_with_context.mid`를 듣고 scale/chromatic 느낌이 줄었는지 확인한다.
+- 여전히 교과서적이면 data-derived rhythm을 유지하고 strong-beat pitch만 guide-tone cadence로 제한하는 hybrid를 만든다.
+- in/out 판단이 어렵다면 review markdown에 bar/chord/pitch-role annotation을 추가한다.
 
 ## 10. 한 문장 요약
 

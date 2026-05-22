@@ -8,12 +8,15 @@ import pretty_midi
 
 from scripts.run_stage_b_data_motif_generation_compare import (
     build_review_export,
+    chord_tone_pitch_classes,
     data_motif_tokens,
     duration_tokens_from_steps,
     fit_duration_tokens_to_positions,
+    guide_tone_pitch_classes,
     nearest_allowed_pitch_token,
     normalize_position_deltas,
     parse_baseline_modes,
+    straight_guide_tones_tokens,
     straight_grid_tokens,
 )
 from scripts.run_stage_b_generation_probe import (
@@ -70,6 +73,12 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
     def test_parse_baseline_modes_rejects_unknown_mode(self) -> None:
         with self.assertRaises(ValueError):
             parse_baseline_modes("hand_written_swing,random")
+
+    def test_parse_baseline_modes_accepts_straight_guide_tones(self) -> None:
+        self.assertEqual(
+            parse_baseline_modes("straight_grid,straight_guide_tones"),
+            ["straight_grid", "straight_guide_tones"],
+        )
 
     def test_normalize_position_deltas_scales_into_slot(self) -> None:
         positions = normalize_position_deltas([0, 3, 9, 12], slot_start=8, slot_size=8)
@@ -139,6 +148,50 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         self.assertTrue(grammar["grammar_valid"])
         self.assertEqual(len(groups), 16)
         self.assertEqual({group["position"] % 2 for group in groups}, {0})
+
+    def test_straight_guide_tones_tokens_use_guide_tones_on_strong_beats(self) -> None:
+        chords = ["Cm7", "F7"]
+        primer = build_stage_b_primer(chords, 124)
+        tokens = straight_guide_tones_tokens(
+            primer_tokens=primer,
+            chords=chords,
+            bars=2,
+            note_groups_per_bar=8,
+            seed=17,
+        )
+
+        grammar = analyze_stage_b_note_grammar(tokens, primer_size=len(primer))
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+
+        self.assertTrue(grammar["grammar_valid"])
+        self.assertEqual(len(groups), 16)
+        self.assertEqual({group["position"] % 2 for group in groups}, {0})
+        for group in groups:
+            if int(group["position"]) in {0, 4, 8, 12}:
+                chord = chords[int(group["bar"]) % len(chords)]
+                pitch_class = int(group["pitch"]) % 12
+                self.assertIn(pitch_class, set(guide_tone_pitch_classes(chord)))
+
+    def test_straight_guide_tones_tokens_avoid_chromatic_scale_runs(self) -> None:
+        chords = ["Cm7", "F7"]
+        primer = build_stage_b_primer(chords, 124)
+        tokens = straight_guide_tones_tokens(
+            primer_tokens=primer,
+            chords=chords,
+            bars=2,
+            note_groups_per_bar=8,
+            seed=17,
+        )
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+        non_chord_run = 0
+
+        for group in groups:
+            chord = chords[int(group["bar"]) % len(chords)]
+            if int(group["pitch"]) % 12 in chord_tone_pitch_classes(chord):
+                non_chord_run = 0
+            else:
+                non_chord_run += 1
+            self.assertLessEqual(non_chord_run, 1)
 
     def test_build_review_export_copies_named_mode_files(self) -> None:
         with TemporaryDirectory() as tmp:

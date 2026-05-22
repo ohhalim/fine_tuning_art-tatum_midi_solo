@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #69: Stage B review MIDI chord context and straight-grid candidates.
+- Issue #71: Stage B straight-grid guide-tone/cadence candidates.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -200,6 +200,12 @@ For Stage B review MIDI chord-context/straight-grid changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-review-context-grid
+```
+
+For Stage B straight-grid guide-tone/cadence candidate changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-guide-tone-cadence
 ```
 
 For Stage B collapse/sampling-sweep changes, run:

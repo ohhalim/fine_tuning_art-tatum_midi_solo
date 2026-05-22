@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-69-stage-b-review-context-grid`
+- `issue-71-stage-b-guide-tone-cadence`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,46 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #71은 Issue #69 review listening에서 나온 피드백을 반영한다.
+
+수동 리뷰 결론:
+
+- `hand_written_swing`과 `data_motif`의 swing timing은 MIDI 입력 관점에서 박자가 어긋나게 들릴 수 있다.
+- `straight_grid`는 박자는 맞지만 scale/chromatic exercise처럼 들린다.
+- 따라서 다음 후보는 swing/humanization보다 straight quantized timing과 guide-tone/cadence pitch grammar를 먼저 검증해야 한다.
+
+Implemented:
+
+- `straight_guide_tones` baseline mode
+- strong beat guide-tone constraint
+- limited approach-tone cadence cell
+- `scripts/agent_harness.sh stage-b-guide-tone-cadence`
+- docs:
+  - `docs/STAGE_B_GUIDE_TONE_CADENCE_2026-05-22.md`
+
+Result:
+
+- compare gate: passed
+- `data_motif`: strict `3/3`
+- `hand_written_swing`: strict `3/3`
+- `straight_grid`: strict `0/3`, timing reference
+- `straight_guide_tones`: strict `0/3`, timing/pitch reference
+- `straight_guide_tones` note count: `64`
+- `straight_guide_tones` unique pitch count: `26-29`
+- `straight_guide_tones` chord-tone ratio: `0.656`
+- `straight_guide_tones` tension ratio: `0.172`
+- `straight_guide_tones` root-tone ratio: `0.000`
+- review output: `outputs/stage_b_data_motif_review/harness_stage_b_guide_tone_cadence`
+
+Decision:
+
+- swing 후보는 현재 MVP default로 밀지 않는다.
+- straight timing 후보와 data-derived motif 후보를 chord context 위에서 비교한다.
+- `straight_guide_tones`는 모델 성공 후보가 아니라, 박자와 harmonic vocabulary를 분리해 듣기 위한 reference다.
+- 다음 단계는 chord/pitch-role annotation 또는 data-motif rhythm + guide-tone strong-beat hybrid다.
+
+## Previous Probe Result
 
 Issue #69는 solo-only MIDI 리뷰의 한계를 해결하는 단계다.
 
