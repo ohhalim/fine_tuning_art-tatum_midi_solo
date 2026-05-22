@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-73-stage-b-data-motif-guide-hybrid`
+- `issue-75-stage-b-reference-pitch-role-stats`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,46 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #75는 generated 후보를 더 만들기 전에 reference pitch-role 기준을 세우려는 단계다.
+
+Implemented:
+
+- Stage B embedded chord token에서 bar chord 추출
+- note group별 pitch role 분류:
+  - `root`
+  - `guide`
+  - `chord`
+  - `tension`
+  - `approach`
+  - `outside`
+  - `unknown_chord`
+- strong/eighth/offgrid bucket별 landing 분포
+- generated 후보와 reference rhythm/pitch-role delta 비교
+- reference chord coverage가 부족하면 pitch-role delta를 생략하는 guard
+- `scripts/agent_harness.sh stage-b-reference-pitch-roles`
+- docs:
+  - `docs/STAGE_B_REFERENCE_PITCH_ROLE_STATS_2026-05-22.md`
+
+Result:
+
+- reference record count: `57`
+- reference note group mean: `32.649`
+- reference syncopated onset ratio mean: `0.736`
+- reference duration diversity ratio mean: `0.379`
+- reference IOI diversity ratio mean: `0.341`
+- known chord note ratio: `0.000`
+- unknown chord ratio: `1.000`
+- generated pitch-role deltas: intentionally omitted
+- report: `outputs/stage_b_reference_stats/harness_stage_b_reference_pitch_roles/reference_stats_report.md`
+
+Decision:
+
+- 현재 reference tokenized records에는 chord progression annotation이 들어있지 않다.
+- 따라서 `data_motif_guide_tones`가 reference보다 chord-tone/tension/approach 비율이 어떤지는 아직 판단할 수 없다.
+- 다음 논리적 작업은 generator 수정이 아니라 chord progression coverage audit 또는 chord annotation pipeline이다.
+
+## Previous Probe Result
 
 Issue #73은 Issue #71의 다음 단계다.
 
