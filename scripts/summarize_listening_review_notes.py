@@ -131,6 +131,10 @@ def aggregate_review_notes(payload: dict[str, Any]) -> dict[str, Any]:
     chord_fit_counts: Counter[str] = Counter()
     decision_counts: Counter[str] = Counter()
     issue_counts: Counter[str] = Counter()
+    objective_flag_counts: Counter[str] = Counter()
+    objective_bucket_counts: Counter[str] = Counter()
+    objective_reviewable_count = 0
+    objective_candidates: list[dict[str, Any]] = []
     reviewed_candidates: list[dict[str, Any]] = []
     by_decision: dict[str, list[dict[str, Any]]] = {}
 
@@ -150,6 +154,26 @@ def aggregate_review_notes(payload: dict[str, Any]) -> dict[str, Any]:
         for issue in listening.get("issues", []):
             issue_counts[str(issue)] += 1
 
+        objective_review = candidate.get("objective_review")
+        if isinstance(objective_review, dict):
+            objective_bucket = str(objective_review.get("objective_bucket", "problem"))
+            objective_flags = [str(flag) for flag in objective_review.get("objective_flags", [])]
+            objective_reviewable = bool(objective_review.get("objective_reviewable", False))
+            objective_bucket_counts[objective_bucket] += 1
+            objective_reviewable_count += int(objective_reviewable)
+            for flag in objective_flags:
+                objective_flag_counts[flag] += 1
+            objective_candidates.append(
+                {
+                    "candidate_id": candidate["candidate_id"],
+                    "objective_bucket": objective_bucket,
+                    "objective_reviewable": objective_reviewable,
+                    "objective_priority_score": int(objective_review.get("objective_priority_score", 0) or 0),
+                    "objective_penalty": int(objective_review.get("objective_penalty", 0) or 0),
+                    "objective_flags": objective_flags,
+                }
+            )
+
         if status == "reviewed":
             reviewed_candidates.append(
                 {
@@ -161,6 +185,7 @@ def aggregate_review_notes(payload: dict[str, Any]) -> dict[str, Any]:
                     "decision": decision,
                     "notes": str(listening.get("notes", "")),
                     "source_metrics": candidate.get("source_metrics", {}),
+                    "objective_review": candidate.get("objective_review", {}),
                 }
             )
 
@@ -187,6 +212,19 @@ def aggregate_review_notes(payload: dict[str, Any]) -> dict[str, Any]:
         "timing_counts": dict(sorted(timing_counts.items())),
         "chord_fit_counts": dict(sorted(chord_fit_counts.items())),
         "issue_counts": {**_empty_counter(ISSUE_VALUES), **dict(sorted(issue_counts.items()))},
+        "objective_review_candidate_count": int(len(objective_candidates)),
+        "objective_reviewable_count": int(objective_reviewable_count),
+        "objective_flag_counts": dict(sorted(objective_flag_counts.items())),
+        "objective_bucket_counts": dict(sorted(objective_bucket_counts.items())),
+        "objective_candidates_by_priority": sorted(
+            objective_candidates,
+            key=lambda item: (
+                0 if item["objective_reviewable"] else 1,
+                -int(item["objective_priority_score"]),
+                int(item["objective_penalty"]),
+                str(item["candidate_id"]),
+            ),
+        ),
         "source_metric_by_decision": {
             decision: _metric_summary(decision_candidates)
             for decision, decision_candidates in sorted(by_decision.items())
@@ -220,6 +258,30 @@ def markdown_summary(aggregate: dict[str, Any], output_path: Path) -> str:
     append_count_table("Timing Counts", aggregate["timing_counts"])
     append_count_table("Chord Fit Counts", aggregate["chord_fit_counts"])
     append_count_table("Issue Counts", aggregate["issue_counts"])
+    append_count_table("Objective Bucket Counts", aggregate["objective_bucket_counts"])
+    append_count_table("Objective Flag Counts", aggregate["objective_flag_counts"])
+
+    lines.extend(
+        [
+            "",
+            "## Objective Review Priority",
+            "",
+            f"- objective candidates: `{aggregate['objective_review_candidate_count']}`",
+            f"- objective reviewable: `{aggregate['objective_reviewable_count']}`",
+            "",
+            "| candidate | bucket | reviewable | priority | penalty | flags |",
+            "|---|---|---:|---:|---:|---|",
+        ]
+    )
+    for candidate in aggregate["objective_candidates_by_priority"]:
+        flags = ", ".join(candidate["objective_flags"]) or "ok_objective"
+        lines.append(
+            f"| {candidate['candidate_id']} | {candidate['objective_bucket']} | "
+            f"{str(candidate['objective_reviewable']).lower()} | {candidate['objective_priority_score']} | "
+            f"{candidate['objective_penalty']} | {flags} |"
+        )
+    if not aggregate["objective_candidates_by_priority"]:
+        lines.append("| none | none | false | 0 | 0 | none |")
 
     lines.extend(["", "## Recommended Followups", "", "| code | count | reason |", "|---|---:|---|"])
     for item in aggregate["recommended_followups"]:

@@ -67,6 +67,51 @@ class ListeningReviewNotesTest(unittest.TestCase):
             ],
         }
 
+    def sample_objective_report(self) -> dict:
+        return {
+            "source_report_path": "outputs/objective/objective_midi_note_review.json",
+            "candidates": [
+                {
+                    "candidate_id": "data_motif_rank_1_sample_1",
+                    "objective_flags": ["overlap_polyphonic"],
+                    "objective_penalty": 40,
+                    "objective_priority_score": 60,
+                    "objective_reviewable": False,
+                    "objective_bucket": "problem",
+                    "metrics": {
+                        "max_active_notes": 2,
+                        "polyphonic_tick_ratio": 0.25,
+                        "off_sixteenth_grid_count": 0,
+                        "stepwise_interval_ratio": 0.4,
+                        "chromatic_interval_ratio": 0.1,
+                        "chord_tone_ratio": 0.7,
+                        "tension_ratio": 0.2,
+                        "outside_ratio": 0.1,
+                        "most_common_duration_ratio": 0.5,
+                    },
+                },
+                {
+                    "candidate_id": "straight_grid_rank_1_sample_1",
+                    "objective_flags": ["chromatic_walk"],
+                    "objective_penalty": 18,
+                    "objective_priority_score": 82,
+                    "objective_reviewable": True,
+                    "objective_bucket": "warning",
+                    "metrics": {
+                        "max_active_notes": 1,
+                        "polyphonic_tick_ratio": 0.0,
+                        "off_sixteenth_grid_count": 0,
+                        "stepwise_interval_ratio": 0.8,
+                        "chromatic_interval_ratio": 0.4,
+                        "chord_tone_ratio": 0.5,
+                        "tension_ratio": 0.3,
+                        "outside_ratio": 0.2,
+                        "most_common_duration_ratio": 0.8,
+                    },
+                },
+            ],
+        }
+
     def test_build_review_notes_template_defaults_to_pending(self) -> None:
         notes = build_review_notes_template(self.sample_generated_report(), source_review_markdown="review.md")
 
@@ -139,6 +184,21 @@ class ListeningReviewNotesTest(unittest.TestCase):
 
         self.assertEqual(summary["candidate_count"], 2)
         self.assertEqual(summary["pending_count"], 2)
+
+    def test_build_review_notes_from_review_manifest_attaches_objective_review(self) -> None:
+        notes = build_review_notes_from_review_manifest(
+            self.sample_review_manifest(),
+            objective_midi_review_report=self.sample_objective_report(),
+        )
+
+        objective_review = notes["candidates"][0]["objective_review"]
+        summary = validate_review_notes(notes)
+
+        self.assertEqual(notes["source_objective_midi_review_report"], "outputs/objective/objective_midi_note_review.json")
+        self.assertEqual(objective_review["objective_bucket"], "problem")
+        self.assertFalse(objective_review["objective_reviewable"])
+        self.assertEqual(objective_review["metrics"]["max_active_notes"], 2)
+        self.assertEqual(summary["candidate_count"], 2)
 
 
 if __name__ == "__main__":

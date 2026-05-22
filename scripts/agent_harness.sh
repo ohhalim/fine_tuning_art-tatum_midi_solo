@@ -92,6 +92,8 @@ Modes:
                 Generate pending listening review notes from the full data-guide review manifest.
   stage-b-objective-midi-review
                 Run objective note-level MIDI review on the full data-guide review manifest.
+  stage-b-objective-flags-review-flow
+                Attach objective MIDI flags to review notes and aggregate review priority.
   stage-b-listening-review-aggregate
                 Aggregate pending or filled listening review notes into next-step signals.
   all           Run demo and tiny-compare.
@@ -899,6 +901,30 @@ run_stage_b_objective_midi_review() {
     --review_manifest "outputs/stage_b_data_motif_review/${run_id}/review_manifest.json"
 }
 
+run_stage_b_objective_flags_review_flow() {
+  local run_id="${RUN_ID:-harness_stage_b_objective_flags_review_flow}"
+  local review_manifest_path="outputs/stage_b_data_motif_review/${run_id}/review_manifest.json"
+  local review_markdown_path="outputs/stage_b_data_motif_review/${run_id}/review_candidates.md"
+  local objective_report_path="outputs/stage_b_objective_midi_review/${run_id}/objective_midi_note_review.json"
+  local review_notes_path="outputs/stage_b_listening_review_notes/${run_id}/review_notes_template.json"
+  print_header "Stage B data-guide hybrid review package"
+  RUN_ID="$run_id" run_stage_b_data_guide_hybrid
+  print_header "Stage B objective MIDI note review"
+  "$PYTHON_BIN" scripts/review_midi_note_objectives.py \
+    --run_id "$run_id" \
+    --review_manifest "$review_manifest_path"
+  print_header "Stage B objective-aware listening review notes"
+  "$PYTHON_BIN" scripts/build_listening_review_notes.py \
+    --run_id "$run_id" \
+    --review_manifest "$review_manifest_path" \
+    --source_review_markdown "$review_markdown_path" \
+    --objective_midi_review_report "$objective_report_path"
+  print_header "Stage B objective-aware listening review aggregate"
+  "$PYTHON_BIN" scripts/summarize_listening_review_notes.py \
+    --run_id "$run_id" \
+    --review_notes "$review_notes_path"
+}
+
 run_stage_b_listening_review_aggregate() {
   local run_id="${RUN_ID:-harness_stage_b_listening_review_aggregate}"
   local review_notes_path="outputs/stage_b_listening_review_notes/${run_id}/review_notes_template.json"
@@ -1029,6 +1055,9 @@ case "$MODE" in
     ;;
   stage-b-objective-midi-review)
     run_stage_b_objective_midi_review
+    ;;
+  stage-b-objective-flags-review-flow)
+    run_stage_b_objective_flags_review_flow
     ;;
   stage-b-listening-review-aggregate)
     run_stage_b_listening_review_aggregate

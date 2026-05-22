@@ -20,6 +20,16 @@ from scripts.build_listening_review_notes import write_json
 
 SCHEMA_VERSION = "stage_b_objective_midi_note_review_v1"
 NOTE_NAMES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+OBJECTIVE_FLAG_PENALTIES = {
+    "overlap_polyphonic": 40,
+    "off_sixteenth_grid": 35,
+    "duration_pattern_collapse": 20,
+    "chromatic_walk": 18,
+    "too_stepwise_or_scalar": 16,
+    "repeated_pitch": 14,
+    "too_safe_chord_tones": 12,
+}
+OBJECTIVE_SEVERE_FLAGS = {"overlap_polyphonic", "off_sixteenth_grid"}
 PITCH_CLASSES = {
     "C": 0,
     "C#": 1,
@@ -245,6 +255,37 @@ def objective_flags(metrics: dict[str, Any]) -> list[str]:
     return flags
 
 
+def objective_penalty(flags: list[str]) -> int:
+    return int(sum(OBJECTIVE_FLAG_PENALTIES.get(flag, 10) for flag in flags))
+
+
+def objective_reviewable(metrics: dict[str, Any], flags: list[str]) -> bool:
+    if any(flag in OBJECTIVE_SEVERE_FLAGS for flag in flags):
+        return False
+    if int(metrics.get("note_count", 0) or 0) < 8:
+        return False
+    if int(metrics.get("unique_pitch_count", 0) or 0) < 4:
+        return False
+    return True
+
+
+def objective_bucket(metrics: dict[str, Any], flags: list[str]) -> str:
+    if not objective_reviewable(metrics, flags):
+        return "problem"
+    if flags:
+        return "warning"
+    return "clean"
+
+
+def objective_priority_score(metrics: dict[str, Any], flags: list[str]) -> int:
+    score = 100 - objective_penalty(flags)
+    if int(metrics.get("note_count", 0) or 0) >= 24:
+        score += 3
+    if int(metrics.get("unique_pitch_count", 0) or 0) >= 8:
+        score += 3
+    return int(max(0, min(100, score)))
+
+
 def analyze_candidate(candidate: dict[str, Any], chord_progression: list[str]) -> dict[str, Any]:
     path = Path(str(candidate.get("review_midi_path") or candidate.get("midi_path") or ""))
     if not path.exists():
@@ -273,6 +314,10 @@ def analyze_candidate(candidate: dict[str, Any], chord_progression: list[str]) -
         for note in notes[:16]
     ]
     flags = objective_flags(metrics)
+    penalty = objective_penalty(flags)
+    reviewable = objective_reviewable(metrics, flags)
+    bucket = objective_bucket(metrics, flags)
+    priority_score = objective_priority_score(metrics, flags)
     return {
         "candidate_id": candidate_id(candidate),
         "mode": str(candidate.get("mode", "")),
@@ -282,6 +327,10 @@ def analyze_candidate(candidate: dict[str, Any], chord_progression: list[str]) -
         "context_midi_path": str(candidate.get("context_midi_path") or ""),
         "metrics": metrics,
         "objective_flags": flags,
+        "objective_penalty": penalty,
+        "objective_priority_score": priority_score,
+        "objective_reviewable": reviewable,
+        "objective_bucket": bucket,
         "first_16_notes": first_notes,
     }
 
@@ -293,6 +342,7 @@ def analyze_review_manifest(review_manifest: dict[str, Any]) -> dict[str, Any]:
     chord_progression = list(review_manifest.get("chord_progression") or [])
     analyzed = [analyze_candidate(candidate, chord_progression) for candidate in candidates]
     flag_counts = Counter(flag for candidate in analyzed for flag in candidate["objective_flags"])
+    bucket_counts = Counter(candidate["objective_bucket"] for candidate in analyzed)
     mode_counts: dict[str, Counter[str]] = {}
     for candidate in analyzed:
         counter = mode_counts.setdefault(candidate["mode"], Counter())
@@ -304,6 +354,8 @@ def analyze_review_manifest(review_manifest: dict[str, Any]) -> dict[str, Any]:
         "candidate_count": int(len(analyzed)),
         "chord_progression": chord_progression,
         "flag_counts": dict(sorted(flag_counts.items())),
+        "objective_bucket_counts": dict(sorted(bucket_counts.items())),
+        "objective_reviewable_count": int(sum(1 for candidate in analyzed if candidate["objective_reviewable"])),
         "mode_flag_counts": {mode: dict(sorted(counts.items())) for mode, counts in sorted(mode_counts.items())},
         "candidates": analyzed,
     }
@@ -315,6 +367,7 @@ def markdown_report(report: dict[str, Any], output_path: Path) -> str:
         "",
         f"- output: `{output_path}`",
         f"- candidate count: `{report['candidate_count']}`",
+        f"- objective reviewable: `{report['objective_reviewable_count']}`",
         f"- chord progression: `{' '.join(report['chord_progression'])}`",
         "",
         "## Flag Counts",
@@ -328,13 +381,17 @@ def markdown_report(report: dict[str, Any], output_path: Path) -> str:
     else:
         lines.append("| none | 0 |")
 
+    lines.extend(["", "## Objective Buckets", "", "| bucket | count |", "|---|---:|"])
+    for bucket, count in report["objective_bucket_counts"].items():
+        lines.append(f"| {bucket} | {count} |")
+
     lines.extend(
         [
             "",
             "## Candidates",
             "",
-            "| candidate | notes | unique | max active | poly ratio | stepwise | chromatic | chord tone | tension | outside | flags |",
-            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+            "| candidate | bucket | reviewable | priority | penalty | notes | unique | max active | poly ratio | stepwise | chromatic | chord tone | tension | outside | flags |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
         ]
     )
     for candidate in report["candidates"]:
@@ -345,6 +402,10 @@ def markdown_report(report: dict[str, Any], output_path: Path) -> str:
             + " | ".join(
                 [
                     candidate["candidate_id"],
+                    candidate["objective_bucket"],
+                    str(candidate["objective_reviewable"]).lower(),
+                    str(candidate["objective_priority_score"]),
+                    str(candidate["objective_penalty"]),
                     str(metrics["note_count"]),
                     str(metrics["unique_pitch_count"]),
                     str(metrics["max_active_notes"]),
