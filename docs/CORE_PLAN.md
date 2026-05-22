@@ -153,6 +153,7 @@ Stage B에서 명시하는 것:
 47. Stage B overlap-free solo-line review export
 48. Stage B duration variation review baseline
 49. Stage B phrase/cadence review baseline
+50. Stage B phrase naturalness objective metrics
 
 가장 최근 의미 있는 결과:
 
@@ -182,6 +183,7 @@ Stage B에서 명시하는 것:
 - Issue #97 exports overlap-free solo-line review MIDI variants while preserving original sample paths, reducing objective `overlap_polyphonic` from `9` to `0`.
 - Issue #99 adds varied-duration review baselines, reducing objective `duration_pattern_collapse` from `6` to `0` while keeping `overlap_polyphonic=0`.
 - Issue #101 adds a phrase/cadence review baseline, reducing `chromatic_walk` from `7` to `1` and `too_stepwise_or_scalar` from `6` to `0` in the next review set.
+- Issue #103 adds phrase naturalness metrics and reveals that all `12` Issue #101 review candidates have `unresolved_large_leaps`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -402,6 +404,7 @@ Stage B에서 명시하는 것:
 - Issue #97 result: overlap-free review export reports `15` reviewable candidates, `5` clean candidates, `10` warning candidates, and `overlap_polyphonic=0`.
 - Issue #99 result: duration variation review reports `15` reviewable candidates, `8` clean candidates, `7` warning candidates, `duration_pattern_collapse=0`, and `overlap_polyphonic=0`.
 - Issue #101 result: phrase/cadence review reports `12` reviewable candidates, `11` clean candidates, `1` warning candidate, `chromatic_walk=1`, and `too_stepwise_or_scalar=0`.
+- Issue #103 result: phrase naturalness review reclassifies the same `12` candidates as warnings because `unresolved_large_leaps=12`.
 
 해석:
 
@@ -681,26 +684,28 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B phrase/cadence review baseline 추가
+Stage B phrase naturalness objective metrics 추가
 ```
 
 결과:
 
-- phrase/cadence review baseline을 추가해 scalar/chromatic objective flags를 줄였다.
+- phrase naturalness objective metric을 추가해 unresolved large leap risk를 드러냈다.
 - output: `outputs/stage_b_listening_review_aggregate/harness_stage_b_phrase_cadence_review/listening_review_aggregate.md`
 - candidate count: `12`
 - objective reviewable: `12`
-- objective clean: `11`
-- objective warning: `1`
+- objective clean: `0`
+- objective warning: `12`
 - chromatic walk: `1`
 - duration pattern collapse: `0`
 - overlap/polyphonic: `0`
 - too stepwise/scalar: `0`
+- unresolved large leaps: `12`
 
 다음 작업:
 
-- subjective listening result는 phrase/cadence review 후보를 기준으로 채운다.
-- subjective review 없이 다음 rule을 바꿔야 한다면 phrase naturalness를 objective metric으로 먼저 추가한다.
+- leap 뒤에 반대 방향 small recovery를 넣는 phrase-shape grammar를 추가한다.
+- 또는 data-derived contour template에서 leap-resolution pattern을 추출한다.
+- subjective listening result는 새 objective warning을 참고해 채운다.
 - real Brad/reference chord label은 아직 임의로 넣지 않는다.
 
 ## 10. 한 문장 요약

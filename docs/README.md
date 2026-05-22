@@ -112,6 +112,8 @@
   - varied-duration baseline을 추가해 review MIDI의 duration collapse flag를 제거한 결과.
 - `STAGE_B_PHRASE_CADENCE_REVIEW_2026-05-22.md`
   - phrase/cadence baseline을 추가해 scalar/chromatic objective flags를 줄인 결과.
+- `STAGE_B_PHRASE_NATURALNESS_OBJECTIVES_2026-05-22.md`
+  - 큰 도약 뒤 회복 움직임이 없는 phrase naturalness risk를 objective flag로 추가한 결과.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`
@@ -138,7 +140,7 @@
 2. Brad Mehldau subset은 style adaptation과 holdout evaluation 용도로 분리한다.
 3. `max_files=2` Brad `control_v1` probe 결과를 기준으로 Stage A 한계를 문서화한다.
 4. broad training 전에 duration-explicit Stage B tokenization과 phrase/window dataset을 설계한다.
-5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, multi-sample probe, collapse sweep, strict collapse gate, 2-file generation probe, temporal coverage probe, coverage-aware constrained probe, coverage-aware A/B sweep, candidate ranking, harmonic/repetition gate, chord-aware pitch probe, candidate review export, longer 4-bar phrase probe, phrase contour diagnostics, root-bias diagnostics, pitch-mode comparison, 8-bar approach phrase probe, swing/motif phrase grammar probe, real phrase reference statistics, motif template extraction, data-derived motif baseline generation, data motif review export, review context/grid export, reference pitch-role stats, chord coverage audit, chord-labeled eval contract, generated chord eval bridge, data-guide generated chord eval, review markdown chord eval summary, listening review notes schema, filled listening review aggregate, full review manifest notes, objective MIDI note review, objective flags review flow, overlap-free review export, duration variation review, and phrase/cadence review를 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
+5. Stage B phrase/window tiny-overfit, constrained grammar probe, overlap gate, multi-sample probe, collapse sweep, strict collapse gate, 2-file generation probe, temporal coverage probe, coverage-aware constrained probe, coverage-aware A/B sweep, candidate ranking, harmonic/repetition gate, chord-aware pitch probe, candidate review export, longer 4-bar phrase probe, phrase contour diagnostics, root-bias diagnostics, pitch-mode comparison, 8-bar approach phrase probe, swing/motif phrase grammar probe, real phrase reference statistics, motif template extraction, data-derived motif baseline generation, data motif review export, review context/grid export, reference pitch-role stats, chord coverage audit, chord-labeled eval contract, generated chord eval bridge, data-guide generated chord eval, review markdown chord eval summary, listening review notes schema, filled listening review aggregate, full review manifest notes, objective MIDI note review, objective flags review flow, overlap-free review export, duration variation review, phrase/cadence review, and phrase naturalness objective review를 통과한 뒤 generic jazz base 학습 여부를 다시 결정한다.
 
 핵심 원칙:
 

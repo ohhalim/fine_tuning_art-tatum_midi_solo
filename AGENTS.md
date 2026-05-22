@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #101: Stage B phrase/cadence review baseline.
+- Issue #103: Stage B phrase naturalness objective metrics.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -253,6 +253,13 @@ bash scripts/agent_harness.sh stage-b-duration-variation-review
 For Stage B phrase/cadence review changes, run:
 
 ```bash
+bash scripts/agent_harness.sh stage-b-phrase-cadence-review
+```
+
+For Stage B phrase naturalness objective metric changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-objective-midi-review
 bash scripts/agent_harness.sh stage-b-phrase-cadence-review
 ```
 
