@@ -60,6 +60,8 @@ Modes:
                 Compare 8-bar baseline approach with swing/motif phrase grammar.
   stage-b-reference-stats
                 Build real Stage B phrase-window reference statistics.
+  stage-b-reference-pitch-roles
+                Build reference pitch-role landing stats and compare latest hybrid candidates.
   stage-b-motif-templates
                 Extract data-derived Stage B motif/rhythm templates.
   stage-b-data-motif-compare
@@ -639,6 +641,23 @@ run_stage_b_reference_stats() {
     --generated_report outputs/stage_b_phrase_grammar_compare/harness_stage_b_swing_motif_phrase/phrase_grammar_compare_report.json
 }
 
+run_stage_b_reference_pitch_roles() {
+  local run_id="${RUN_ID:-harness_stage_b_reference_pitch_roles}"
+  local generated_run_id="${run_id}_generated"
+  print_header "Stage B generated hybrid candidate report"
+  RUN_ID="$generated_run_id" run_stage_b_data_guide_hybrid
+  print_header "Stage B reference pitch-role landing statistics"
+  "$PYTHON_BIN" scripts/run_stage_b_reference_stats.py \
+    --run_id "$run_id" \
+    --input_dir ./midi_dataset/midi/studio \
+    --max_files 4 \
+    --window_bars 8 \
+    --window_stride_bars 4 \
+    --min_window_target_notes 16 \
+    --max_records 64 \
+    --generated_report "outputs/stage_b_data_motif_compare/${generated_run_id}/data_motif_compare_report.json"
+}
+
 run_stage_b_motif_templates() {
   local run_id="${RUN_ID:-harness_stage_b_motif_templates}"
   print_header "Stage B motif template extraction"
@@ -838,6 +857,9 @@ case "$MODE" in
     ;;
   stage-b-reference-stats)
     run_stage_b_reference_stats
+    ;;
+  stage-b-reference-pitch-roles)
+    run_stage_b_reference_pitch_roles
     ;;
   stage-b-motif-templates)
     run_stage_b_motif_templates

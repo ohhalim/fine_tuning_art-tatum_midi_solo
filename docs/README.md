@@ -84,6 +84,8 @@
   - straight-grid timing 위에서 scale/chromatic 나열을 줄이기 위한 guide-tone/cadence 후보를 추가한 결과.
 - `STAGE_B_DATA_GUIDE_HYBRID_2026-05-22.md`
   - data-derived motif rhythm과 guide-tone/cadence pitch vocabulary를 결합한 hybrid 후보를 추가한 결과.
+- `STAGE_B_REFERENCE_PITCH_ROLE_STATS_2026-05-22.md`
+  - reference phrase window에서 pitch-role landing 통계를 시도했고 chord annotation coverage가 없다는 blocker를 확인한 결과.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`

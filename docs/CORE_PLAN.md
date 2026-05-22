@@ -139,6 +139,7 @@ Stage B에서 명시하는 것:
 33. Stage B chord-context and straight-grid review export
 34. Stage B straight-grid guide-tone/cadence review candidate
 35. Stage B data-motif rhythm plus guide-tone/cadence pitch hybrid
+36. Stage B reference pitch-role landing statistics and chord-coverage gate
 
 가장 최근 의미 있는 결과:
 
@@ -354,6 +355,8 @@ Stage B에서 명시하는 것:
 - Issue #71 result: `straight_guide_tones`는 note count `64`, unique pitch count `26-29`, chord-tone ratio `0.656`, tension ratio `0.172`, root-tone ratio `0.000`이지만 straight reference용 dead-air gate 때문에 strict `0/3`이다.
 - Issue #73 result: `data_motif_guide_tones` 후보를 추가해 data-derived rhythm/duration template과 guide-tone/cadence pitch grammar를 결합했다.
 - Issue #73 result: `data_motif_guide_tones`는 strict `3/3`, note count `63`, unique pitch count `23-24`, chord-tone ratio `0.797`, tension ratio `0.062`, root-tone ratio `0.000`, unique bar-position pattern ratio `1.000`이다.
+- Issue #75 result: reference pitch-role landing 통계를 시도했지만 known chord note ratio가 `0.000`이라 pitch-role reference는 아직 사용할 수 없다.
+- Issue #75 result: 현재 비교 가능한 것은 rhythm reference뿐이며, pitch vocabulary 조정 전에 chord annotation coverage audit이 필요하다.
 
 해석:
 
@@ -632,23 +635,22 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B data-motif rhythm plus guide-tone/cadence pitch hybrid 추가
+Stage B reference pitch-role landing statistics 추가
 ```
 
 결과:
 
-- `data_motif_guide_tones` baseline mode를 추가했다.
-- rhythm/duration은 real phrase window에서 추출한 data-derived motif template을 유지한다.
-- contour template은 register 방향 참고로만 사용한다.
-- pitch class는 current chord guide tone, chord tone, tension, limited approach tone으로 제한한다.
-- strong beat은 현재 chord의 3도/7도 guide tone으로 제한한다.
-- 결과는 strict `3/3`, chord-tone ratio `0.797`, root-tone ratio `0.000`, unique bar-position pattern ratio `1.000`이다.
+- reference rhythm/contour 통계는 정상적으로 산출된다.
+- reference pitch-role landing 통계는 chord annotation coverage 부족으로 사용할 수 없다.
+- known chord note ratio는 `0.000`, unknown chord ratio는 `1.000`이다.
+- generated pitch-role delta는 거짓 기준이 되므로 의도적으로 생략한다.
+- `data_motif_guide_tones`는 rhythm delta만 reference와 비교 가능하다.
 
 다음 작업:
 
-- `data_motif_guide_tones` context MIDI를 `data_motif`, `straight_guide_tones`와 비교해 듣는다.
-- hybrid도 초급 멜로디처럼 들리면 reference-derived guide-tone landing 통계를 뽑는다.
-- in/out 판단이 어렵다면 review markdown에 bar/chord/pitch-role annotation을 추가한다.
+- Stage B source metadata의 chord progression coverage를 audit한다.
+- chord progression이 있는 subset만 reference pitch-role stats에 사용한다.
+- coverage가 없으면 chord inference/lead-sheet alignment를 별도 이슈로 분리한다.
 
 ## 10. 한 문장 요약
 
