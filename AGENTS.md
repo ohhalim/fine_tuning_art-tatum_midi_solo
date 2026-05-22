@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #77: Stage B chord progression coverage audit.
+- Issue #79: Stage B chord-labeled evaluation subset contract.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -188,6 +188,12 @@ For chord progression annotation coverage audit changes, run:
 
 ```bash
 bash scripts/agent_harness.sh chord-coverage-audit
+```
+
+For Stage B chord-labeled evaluation subset changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-chord-labeled-eval
 ```
 
 For Stage B data-derived motif template extraction changes, run:
