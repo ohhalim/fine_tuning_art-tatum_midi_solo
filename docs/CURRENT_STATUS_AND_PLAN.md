@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-81-stage-b-generated-chord-eval-bridge`
+- `issue-83-stage-b-data-guide-generated-chord-eval`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,44 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #83은 Issue #81의 bridge를 실제 `stage-b-data-guide-hybrid` review package에 적용한 단계다.
+
+중요한 전제:
+
+- raw generated MIDI는 `outputs/` artifact로만 둔다.
+- `review_manifest.json`의 known chord progression metadata만 사용한다.
+- real Brad/reference chord label 문제는 아직 해결되지 않았다.
+
+Implemented:
+
+- `stage-b-data-guide-hybrid` review package 생성
+- generated chord eval bridge 적용
+- `data_motif` vs `data_motif_guide_tones` chord-role profile 비교
+- `scripts/agent_harness.sh stage-b-data-guide-generated-chord-eval`
+- docs:
+  - `docs/STAGE_B_DATA_GUIDE_GENERATED_CHORD_EVAL_2026-05-22.md`
+
+Result:
+
+- evaluated candidate count: `6`
+- note count: `192`
+- aggregate chord-tone ratio: `0.656`
+- aggregate tension ratio: `0.120`
+- aggregate outside ratio: `0.000`
+- `data_motif` chord-tone ratio: `0.500`
+- `data_motif_guide_tones` chord-tone ratio: `0.812`
+- `data_motif` approach ratio: `0.281-0.312`
+- `data_motif_guide_tones` approach ratio: `0.156`
+- report: `outputs/stage_b_generated_chord_eval/harness_stage_b_data_guide_generated_chord_eval/generated_chord_eval_report.md`
+
+Decision:
+
+- `data_motif_guide_tones`는 실제로 chord-tone 쪽으로 더 안전하게 기울어져 있다.
+- 현재 문제가 outside note 폭주는 아니다.
+- 더 정확한 문제 후보는 chord-tone safety 과다, 낮은 tension 비율, phrase vocabulary 부족이다.
+
+## Previous Probe Result
 
 Issue #81은 Issue #79의 chord-labeled evaluator를 generated candidate report와 연결한 단계다.
 
