@@ -55,6 +55,8 @@ from scripts.stage_b_tokens import (  # noqa: E402
 VALID_BASELINE_MODES = {
     "straight_grid",
     "straight_guide_tones",
+    "varied_grid",
+    "varied_guide_tones",
     "hand_written_swing",
     "data_motif",
     "data_motif_guide_tones",
@@ -513,6 +515,72 @@ def straight_grid_tokens(
     return tokens
 
 
+def varied_grid_position_duration_steps(note_groups_per_bar: int) -> tuple[list[int], list[int]]:
+    groups_per_bar = max(1, int(note_groups_per_bar))
+    interval_pattern = [1, 3, 2, 2]
+    duration_pattern = [1, 2, 1, 2]
+    positions = [0]
+    while len(positions) < groups_per_bar:
+        next_position = positions[-1] + interval_pattern[(len(positions) - 1) % len(interval_pattern)]
+        if next_position >= int(POSITIONS_PER_BAR):
+            break
+        positions.append(next_position)
+
+    durations: list[int] = []
+    for index, position in enumerate(positions):
+        if index + 1 < len(positions):
+            max_duration = max(1, int(positions[index + 1]) - int(position))
+        else:
+            max_duration = max(1, int(POSITIONS_PER_BAR) - int(position))
+        raw_duration = duration_pattern[index % len(duration_pattern)]
+        durations.append(max(1, min(int(raw_duration), int(max_duration))))
+    return positions, durations
+
+
+def varied_grid_tokens(
+    *,
+    primer_tokens: Sequence[int],
+    chords: Sequence[str],
+    bars: int,
+    note_groups_per_bar: int,
+    seed: int,
+) -> list[int]:
+    rng = random.Random(int(seed))
+    tokens = [int(token) for token in primer_tokens]
+    recent_pitches: list[int] = []
+    contour = [0, 2, 5, 3, 7, 4, 9, 5]
+    positions, durations = varied_grid_position_duration_steps(note_groups_per_bar)
+
+    for bar_index in range(max(1, int(bars))):
+        chord = chords[bar_index % len(chords)] if chords else None
+        if bar_index > 0:
+            tokens.append(TOKEN_BAR)
+            tokens.extend(chord_tokens(chord))
+        base_token = base_pitch_token_for_chord(chord, rng, recent_pitches)
+        base_pitch = pitch_from_token(base_token)
+        for group_index, (position, duration) in enumerate(zip(positions, durations)):
+            target_pitch = base_pitch + contour[group_index % len(contour)]
+            pitch_candidates = chord_aware_pitch_tokens(
+                chord,
+                pitch_mode="approach_tensions",
+                recent_pitches=recent_pitches,
+                repeat_window=2,
+                group_index=group_index,
+            )
+            pitch_token_value = nearest_allowed_pitch_token(target_pitch, pitch_candidates, recent_pitches)
+            recent_pitches.append(pitch_from_token(pitch_token_value))
+            tokens.extend(
+                [
+                    position_token(position),
+                    note_velocity_token(4),
+                    pitch_token_value,
+                    note_duration_token(duration),
+                ]
+            )
+    tokens.append(TOKEN_END)
+    return tokens
+
+
 def straight_guide_tones_tokens(
     *,
     primer_tokens: Sequence[int],
@@ -554,6 +622,51 @@ def straight_guide_tones_tokens(
                     note_velocity_token(4),
                     note_pitch_token(pitch),
                     note_duration_token(duration_steps),
+                ]
+            )
+    tokens.append(TOKEN_END)
+    return tokens
+
+
+def varied_guide_tones_tokens(
+    *,
+    primer_tokens: Sequence[int],
+    chords: Sequence[str],
+    bars: int,
+    note_groups_per_bar: int,
+    seed: int,
+) -> list[int]:
+    rng = random.Random(int(seed))
+    tokens = [int(token) for token in primer_tokens]
+    recent_pitches: list[int] = []
+    positions, durations = varied_grid_position_duration_steps(note_groups_per_bar)
+
+    for bar_index in range(max(1, int(bars))):
+        chord = chords[bar_index % len(chords)] if chords else None
+        next_chord = chords[(bar_index + 1) % len(chords)] if chords else chord
+        if bar_index > 0:
+            tokens.append(TOKEN_BAR)
+            tokens.extend(chord_tokens(chord))
+        anchor = 64 + ((bar_index % 3) * 3) + rng.choice([-2, 0, 2])
+        for group_index, (position, duration) in enumerate(zip(positions, durations)):
+            target_anchor = anchor + (group_index % 4) * 2
+            if recent_pitches and group_index % 3 == 2:
+                target_anchor = int(recent_pitches[-1]) + rng.choice([-3, -1, 1, 3])
+            pitch = guide_tone_pitch_for_position(
+                chord,
+                next_chord,
+                bar_index=bar_index,
+                position=int(position),
+                target_pitch=target_anchor,
+                recent_pitches=recent_pitches,
+            )
+            recent_pitches.append(pitch)
+            tokens.extend(
+                [
+                    position_token(position),
+                    note_velocity_token(4),
+                    note_pitch_token(pitch),
+                    note_duration_token(duration),
                 ]
             )
     tokens.append(TOKEN_END)
@@ -707,6 +820,22 @@ def generated_tokens_for_mode(
         )
     if mode == "straight_guide_tones":
         return straight_guide_tones_tokens(
+            primer_tokens=primer_tokens,
+            chords=chords,
+            bars=bars,
+            note_groups_per_bar=note_groups_per_bar,
+            seed=seed,
+        )
+    if mode == "varied_grid":
+        return varied_grid_tokens(
+            primer_tokens=primer_tokens,
+            chords=chords,
+            bars=bars,
+            note_groups_per_bar=note_groups_per_bar,
+            seed=seed,
+        )
+    if mode == "varied_guide_tones":
+        return varied_guide_tones_tokens(
             primer_tokens=primer_tokens,
             chords=chords,
             bars=bars,

@@ -20,6 +20,9 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     parse_baseline_modes,
     straight_guide_tones_tokens,
     straight_grid_tokens,
+    varied_grid_position_duration_steps,
+    varied_grid_tokens,
+    varied_guide_tones_tokens,
 )
 from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_note_grammar,
@@ -260,6 +263,53 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
             else:
                 non_chord_run += 1
             self.assertLessEqual(non_chord_run, 1)
+
+    def test_varied_grid_position_duration_steps_do_not_collapse_duration(self) -> None:
+        positions, durations = varied_grid_position_duration_steps(8)
+
+        self.assertEqual(positions, [0, 1, 4, 6, 8, 9, 12, 14])
+        self.assertEqual(len(set(durations)), 2)
+        self.assertLess(max(durations.count(duration) for duration in set(durations)) / len(durations), 0.75)
+        for index, position in enumerate(positions[:-1]):
+            self.assertLessEqual(position + durations[index], positions[index + 1])
+
+    def test_varied_grid_tokens_use_multiple_durations(self) -> None:
+        chords = ["Cm7", "F7"]
+        primer = build_stage_b_primer(chords, 124)
+        tokens = varied_grid_tokens(
+            primer_tokens=primer,
+            chords=chords,
+            bars=2,
+            note_groups_per_bar=8,
+            seed=17,
+        )
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+        durations = [int(group["duration_steps"]) for group in groups]
+
+        self.assertGreaterEqual(len(set(durations)), 2)
+
+    def test_varied_guide_tones_tokens_use_guide_tone_pitches_and_multiple_durations(self) -> None:
+        chords = ["Cm7", "F7"]
+        primer = build_stage_b_primer(chords, 124)
+        tokens = varied_guide_tones_tokens(
+            primer_tokens=primer,
+            chords=chords,
+            bars=2,
+            note_groups_per_bar=8,
+            seed=17,
+        )
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+        durations = [int(group["duration_steps"]) for group in groups]
+        non_guide_run = 0
+
+        self.assertGreaterEqual(len(set(durations)), 2)
+        for group in groups:
+            chord = chords[int(group["bar"]) % len(chords)]
+            if int(group["pitch"]) % 12 in set(guide_tone_pitch_classes(chord)):
+                non_guide_run = 0
+            else:
+                non_guide_run += 1
+            self.assertLessEqual(non_guide_run, 1)
 
     def test_build_review_export_copies_named_mode_files(self) -> None:
         with TemporaryDirectory() as tmp:
