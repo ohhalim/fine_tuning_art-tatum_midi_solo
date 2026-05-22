@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #99: Stage B duration variation review baseline.
+- Issue #101: Stage B phrase/cadence review baseline.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -248,6 +248,12 @@ For Stage B duration variation review changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-duration-variation-review
+```
+
+For Stage B phrase/cadence review changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-phrase-cadence-review
 ```
 
 For Stage B filled listening review aggregate changes, run:

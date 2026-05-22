@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-99-stage-b-duration-variation-review-baseline`
+- `issue-101-stage-b-phrase-cadence-review`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,50 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #101은 duration collapse 이후 남은 scalar/chromatic exercise 문제를 줄이기 위해 phrase/cadence review baseline을 추가한 단계다.
+
+중요한 전제:
+
+- 이 단계는 objective pitch-contour flag를 줄이는 probe다.
+- "재즈답다"를 자동으로 보장하지 않는다.
+- overlap-free export와 varied-duration grid는 유지한다.
+- subjective listening review는 아직 pending이다.
+
+Implemented:
+
+- `phrase_cadence` baseline mode
+- phrase interval을 선호하는 pitch-class/register target
+- selected-mode strict gate
+- `scripts/agent_harness.sh stage-b-phrase-cadence-review`
+- docs:
+  - `docs/STAGE_B_PHRASE_CADENCE_REVIEW_2026-05-22.md`
+
+Result:
+
+- candidate count: `12`
+- objective reviewable count: `12`
+- objective bucket counts:
+  - clean: `11`
+  - warning: `1`
+- objective flag counts:
+  - chromatic walk: `1`
+  - too stepwise/scalar: `0`
+  - duration pattern collapse: `0`
+  - overlap/polyphonic: `0`
+- previous issue had:
+  - chromatic walk: `7`
+  - too stepwise/scalar: `6`
+- aggregate report:
+  - `outputs/stage_b_listening_review_aggregate/harness_stage_b_phrase_cadence_review/listening_review_aggregate.md`
+
+Decision:
+
+- scalar/chromatic objective flag는 크게 줄었다.
+- 이제 남은 핵심 문제는 objective metric보다 subjective phrase quality다.
+- 다음 작업은 새 review set을 기준으로 listening notes를 채우거나, subjective review 없이 바꿀 경우에는 phrase naturalness를 측정하는 objective metric을 추가해야 한다.
+
+## Previous Probe Result
 
 Issue #99는 duration collapse를 줄이기 위해 varied-duration review baseline을 추가한 단계다.
 
