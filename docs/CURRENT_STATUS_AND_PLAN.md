@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-75-stage-b-reference-pitch-role-stats`
+- `issue-77-stage-b-chord-coverage-audit`
 
 현재 범위가 아닌 것:
 
@@ -36,7 +36,48 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Probe Result
 
-Issue #75는 generated 후보를 더 만들기 전에 reference pitch-role 기준을 세우려는 단계다.
+Issue #77은 Issue #75에서 드러난 chord annotation blocker를 실제 dataset 기준으로 확인한 단계다.
+
+Implemented:
+
+- role dataset `meta.json` chord field/string scan
+- raw dataset sidecar scan:
+  - `.json`
+  - `.csv`
+  - `.tsv`
+  - `.txt`
+  - `.lab`
+  - `.jams`
+  - `.xml`
+  - `.musicxml`
+  - `.mxl`
+- MIDI lyric/text event chord-symbol scan
+- `scripts/audit_chord_progression_coverage.py`
+- `scripts/agent_harness.sh chord-coverage-audit`
+- docs:
+  - `docs/STAGE_B_CHORD_COVERAGE_AUDIT_2026-05-22.md`
+
+Result:
+
+- role meta scanned: `2812`
+- role meta chord hits: `0`
+- role meta unique source MIDI count: `28`
+- sidecar files found: `0`
+- MIDI text events scanned: `120`
+- MIDI chord text hits: `0`
+- usable chord annotation candidate: `false`
+- report: `outputs/chord_coverage_audit/harness_chord_coverage_audit/chord_coverage_audit.md`
+
+Decision:
+
+- 현재 로컬 dataset에는 바로 사용할 수 있는 chord progression annotation이 없다.
+- 따라서 generated 후보의 pitch-role 비율을 reference와 비교할 수 없다.
+- 다음 논리적 작업은 generator 튜닝이 아니라 작은 chord-labeled evaluation subset 또는 chord inference/lead-sheet alignment다.
+- 한 달 MVP 관점에서는 full chord inference보다 3-5개 phrase의 수동 chord-labeled evaluation subset이 더 작고 검증 가능하다.
+
+## Previous Probe Result
+
+Issue #75는 generated 후보를 더 만들기 전에 reference pitch-role 기준을 세우려는 단계였다.
 
 Implemented:
 
