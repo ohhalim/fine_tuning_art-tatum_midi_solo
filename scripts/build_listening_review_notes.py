@@ -19,6 +19,7 @@ PHRASE_QUALITY_VALUES = {"pending", "phrase", "fragment", "exercise", "invalid"}
 TIMING_VALUES = {"pending", "acceptable", "too_stiff", "too_loose", "off_grid"}
 CHORD_FIT_VALUES = {"pending", "fits", "too_safe", "too_outside", "unclear"}
 DECISION_VALUES = {"pending", "keep", "reject", "needs_followup"}
+OBJECTIVE_BUCKET_VALUES = {"clean", "warning", "problem"}
 ISSUE_VALUES = {
     "too_safe",
     "too_scalar",
@@ -124,6 +125,47 @@ def build_candidate_note_from_review_manifest(sample: dict[str, Any]) -> dict[st
     }
 
 
+def objective_review_by_candidate(objective_midi_review_report: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
+    if not objective_midi_review_report:
+        return {}
+    candidates = objective_midi_review_report.get("candidates")
+    if not isinstance(candidates, list):
+        raise ReviewNotesError("objective MIDI review report candidates must be a list")
+    indexed: dict[str, dict[str, Any]] = {}
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            raise ReviewNotesError("objective MIDI review candidate must be an object")
+        candidate_id = str(candidate.get("candidate_id") or "").strip()
+        if not candidate_id:
+            raise ReviewNotesError("objective MIDI review candidate_id is required")
+        indexed[candidate_id] = candidate
+    return indexed
+
+
+def attach_objective_review(candidate_note: dict[str, Any], objective_candidate: dict[str, Any] | None) -> None:
+    if not objective_candidate:
+        return
+    metrics = objective_candidate.get("metrics", {})
+    candidate_note["objective_review"] = {
+        "objective_flags": list(objective_candidate.get("objective_flags", [])),
+        "objective_penalty": int(objective_candidate.get("objective_penalty", 0) or 0),
+        "objective_priority_score": int(objective_candidate.get("objective_priority_score", 0) or 0),
+        "objective_reviewable": bool(objective_candidate.get("objective_reviewable", False)),
+        "objective_bucket": str(objective_candidate.get("objective_bucket", "problem")),
+        "metrics": {
+            "max_active_notes": int(metrics.get("max_active_notes", 0) or 0),
+            "polyphonic_tick_ratio": float(metrics.get("polyphonic_tick_ratio", 0.0) or 0.0),
+            "off_sixteenth_grid_count": int(metrics.get("off_sixteenth_grid_count", 0) or 0),
+            "stepwise_interval_ratio": float(metrics.get("stepwise_interval_ratio", 0.0) or 0.0),
+            "chromatic_interval_ratio": float(metrics.get("chromatic_interval_ratio", 0.0) or 0.0),
+            "chord_tone_ratio": float(metrics.get("chord_tone_ratio", 0.0) or 0.0),
+            "tension_ratio": float(metrics.get("tension_ratio", 0.0) or 0.0),
+            "outside_ratio": float(metrics.get("outside_ratio", 0.0) or 0.0),
+            "most_common_duration_ratio": float(metrics.get("most_common_duration_ratio", 0.0) or 0.0),
+        },
+    }
+
+
 def build_review_notes_template(
     generated_chord_eval_report: dict[str, Any],
     source_review_markdown: str | None = None,
@@ -149,15 +191,23 @@ def build_review_notes_template(
 def build_review_notes_from_review_manifest(
     review_manifest: dict[str, Any],
     source_review_markdown: str | None = None,
+    objective_midi_review_report: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     candidates = review_manifest.get("candidates")
     if not isinstance(candidates, list) or not candidates:
         raise ReviewNotesError("review manifest must contain non-empty candidates")
+    objective_by_candidate = objective_review_by_candidate(objective_midi_review_report)
+    candidate_notes = [build_candidate_note_from_review_manifest(sample) for sample in candidates]
+    for note in candidate_notes:
+        attach_objective_review(note, objective_by_candidate.get(note["candidate_id"]))
     return {
         "schema_version": SCHEMA_VERSION,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "source_review_manifest": str(review_manifest.get("source_manifest_path", "")),
         "source_review_markdown": source_review_markdown,
+        "source_objective_midi_review_report": str(
+            objective_midi_review_report.get("source_report_path", "") if objective_midi_review_report else ""
+        ),
         "reviewer": "",
         "review_context": {
             "listen_with_context_midi": True,
@@ -165,7 +215,7 @@ def build_review_notes_from_review_manifest(
             "do_not_infer_real_reference_chords": True,
         },
         "chord_progression": review_manifest.get("chord_progression", []),
-        "candidates": [build_candidate_note_from_review_manifest(sample) for sample in candidates],
+        "candidates": candidate_notes,
     }
 
 
@@ -206,6 +256,19 @@ def validate_review_notes(payload: dict[str, Any]) -> dict[str, Any]:
             raise ReviewNotesError(f"{candidate_id}.listening.issues must be a list")
         for issue in issues:
             _require_enum(issue, ISSUE_VALUES, f"{candidate_id}.listening.issues[]")
+        objective_review = candidate.get("objective_review")
+        if objective_review is not None:
+            if not isinstance(objective_review, dict):
+                raise ReviewNotesError(f"{candidate_id}.objective_review must be an object")
+            _require_enum(
+                objective_review.get("objective_bucket"),
+                OBJECTIVE_BUCKET_VALUES,
+                f"{candidate_id}.objective_review.objective_bucket",
+            )
+            if not isinstance(objective_review.get("objective_flags", []), list):
+                raise ReviewNotesError(f"{candidate_id}.objective_review.objective_flags must be a list")
+            if not isinstance(objective_review.get("objective_reviewable"), bool):
+                raise ReviewNotesError(f"{candidate_id}.objective_review.objective_reviewable must be a boolean")
         if listening.get("status") == "reviewed":
             completed += 1
         decisions[str(listening.get("decision"))] += 1
@@ -239,6 +302,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--generated_chord_eval_report", type=str, default=None)
     parser.add_argument("--review_manifest", type=str, default=None)
     parser.add_argument("--source_review_markdown", type=str, default=None)
+    parser.add_argument("--objective_midi_review_report", type=str, default=None)
     parser.add_argument("--review_notes", type=str, default=None)
     parser.add_argument(
         "--output_root",
@@ -261,9 +325,15 @@ def main() -> int:
             review_manifest_path = Path(args.review_manifest)
             review_manifest = read_json(review_manifest_path)
             review_manifest["source_manifest_path"] = str(review_manifest_path)
+            objective_report = None
+            if args.objective_midi_review_report:
+                objective_report_path = Path(args.objective_midi_review_report)
+                objective_report = read_json(objective_report_path)
+                objective_report["source_report_path"] = str(objective_report_path)
             notes = build_review_notes_from_review_manifest(
                 review_manifest,
                 source_review_markdown=args.source_review_markdown,
+                objective_midi_review_report=objective_report,
             )
         else:
             if not args.generated_chord_eval_report:

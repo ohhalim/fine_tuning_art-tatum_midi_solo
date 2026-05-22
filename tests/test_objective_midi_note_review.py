@@ -6,7 +6,14 @@ from pathlib import Path
 
 import mido
 
-from scripts.review_midi_note_objectives import analyze_review_manifest, chord_pitch_classes, pitch_name
+from scripts.review_midi_note_objectives import (
+    analyze_review_manifest,
+    chord_pitch_classes,
+    objective_bucket,
+    objective_penalty,
+    objective_reviewable,
+    pitch_name,
+)
 
 
 class ObjectiveMidiNoteReviewTest(unittest.TestCase):
@@ -66,6 +73,9 @@ class ObjectiveMidiNoteReviewTest(unittest.TestCase):
         self.assertIn("too_stepwise_or_scalar", candidate["objective_flags"])
         self.assertIn("chromatic_walk", candidate["objective_flags"])
         self.assertEqual(candidate["metrics"]["off_sixteenth_grid_count"], 0)
+        self.assertEqual(candidate["objective_bucket"], "warning")
+        self.assertTrue(candidate["objective_reviewable"])
+        self.assertGreater(candidate["objective_penalty"], 0)
 
     def test_overlap_candidate_is_flagged(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -96,6 +106,15 @@ class ObjectiveMidiNoteReviewTest(unittest.TestCase):
 
         self.assertIn("overlap_polyphonic", candidate["objective_flags"])
         self.assertGreater(candidate["metrics"]["polyphonic_tick_ratio"], 0)
+        self.assertEqual(candidate["objective_bucket"], "problem")
+        self.assertFalse(candidate["objective_reviewable"])
+
+    def test_objective_priority_helpers_penalize_severe_flags(self) -> None:
+        metrics = {"note_count": 16, "unique_pitch_count": 8}
+
+        self.assertEqual(objective_penalty(["overlap_polyphonic", "chromatic_walk"]), 58)
+        self.assertFalse(objective_reviewable(metrics, ["overlap_polyphonic"]))
+        self.assertEqual(objective_bucket(metrics, ["chromatic_walk"]), "warning")
 
 
 if __name__ == "__main__":

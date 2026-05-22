@@ -98,6 +98,34 @@ class ListeningReviewAggregateTest(unittest.TestCase):
         self.assertEqual(keep_metrics["avg_note_count"], 32.0)
         self.assertEqual(keep_metrics["avg_chord_tone_ratio"], 0.75)
 
+    def test_objective_review_fields_are_aggregated_for_priority(self) -> None:
+        notes = self.sample_notes()
+        notes["candidates"][0]["objective_review"] = {
+            "objective_flags": ["overlap_polyphonic"],
+            "objective_penalty": 40,
+            "objective_priority_score": 60,
+            "objective_reviewable": False,
+            "objective_bucket": "problem",
+            "metrics": {},
+        }
+        notes["candidates"][1]["objective_review"] = {
+            "objective_flags": ["chromatic_walk"],
+            "objective_penalty": 18,
+            "objective_priority_score": 82,
+            "objective_reviewable": True,
+            "objective_bucket": "warning",
+            "metrics": {},
+        }
+
+        aggregate = aggregate_review_notes(notes)
+        priority_ids = [candidate["candidate_id"] for candidate in aggregate["objective_candidates_by_priority"]]
+
+        self.assertEqual(aggregate["objective_review_candidate_count"], 2)
+        self.assertEqual(aggregate["objective_reviewable_count"], 1)
+        self.assertEqual(aggregate["objective_flag_counts"]["overlap_polyphonic"], 1)
+        self.assertEqual(aggregate["objective_bucket_counts"]["warning"], 1)
+        self.assertEqual(priority_ids[0], "candidate_2")
+
     def test_invalid_notes_are_rejected_before_aggregation(self) -> None:
         notes = self.sample_notes()
         notes["candidates"][0]["listening"]["decision"] = "maybe"
