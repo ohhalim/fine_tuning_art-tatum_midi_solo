@@ -86,6 +86,8 @@ Modes:
                 Generate data-guide hybrid review package and evaluate its known chord metadata.
   stage-b-review-markdown-chord-eval
                 Generate data-guide hybrid review package and write a combined chord-eval review markdown.
+  stage-b-listening-review-notes
+                Generate pending listening review notes from the combined chord-eval review flow.
   all           Run demo and tiny-compare.
 
 Environment:
@@ -136,6 +138,7 @@ run_quick() {
     scripts/audit_chord_progression_coverage.py \
     scripts/evaluate_chord_labeled_subset.py \
     scripts/evaluate_generated_candidate_chords.py \
+    scripts/build_listening_review_notes.py \
     scripts/train_stage_a_full.py \
     scripts/train_stage_a_adapter.py \
     inference/app \
@@ -856,6 +859,17 @@ run_stage_b_review_markdown_chord_eval() {
     --candidate_limit 6
 }
 
+run_stage_b_listening_review_notes() {
+  local run_id="${RUN_ID:-harness_stage_b_listening_review_notes}"
+  print_header "Stage B combined review markdown with chord eval"
+  RUN_ID="$run_id" run_stage_b_review_markdown_chord_eval
+  print_header "Stage B listening review notes template"
+  "$PYTHON_BIN" scripts/build_listening_review_notes.py \
+    --run_id "$run_id" \
+    --generated_chord_eval_report "outputs/stage_b_generated_chord_eval/${run_id}/generated_chord_eval_report.json" \
+    --source_review_markdown "outputs/stage_b_generated_chord_eval/${run_id}/review_candidates_with_chord_eval.md"
+}
+
 case "$MODE" in
   status)
     run_status
@@ -961,6 +975,9 @@ case "$MODE" in
     ;;
   stage-b-review-markdown-chord-eval)
     run_stage_b_review_markdown_chord_eval
+    ;;
+  stage-b-listening-review-notes)
+    run_stage_b_listening_review_notes
     ;;
   all)
     run_demo
