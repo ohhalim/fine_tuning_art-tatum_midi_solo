@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from scripts.build_listening_review_notes import ReviewNotesError, build_review_notes_template
-from scripts.summarize_listening_review_notes import aggregate_review_notes
+from scripts.summarize_listening_review_notes import aggregate_review_notes, markdown_summary
 
 
 class ListeningReviewAggregateTest(unittest.TestCase):
@@ -103,6 +104,16 @@ class ListeningReviewAggregateTest(unittest.TestCase):
 
         with self.assertRaises(ReviewNotesError):
             aggregate_review_notes(notes)
+
+    def test_markdown_summary_includes_review_dimension_tables(self) -> None:
+        aggregate = aggregate_review_notes(self.sample_notes())
+
+        markdown = markdown_summary(aggregate, Path("aggregate.json"))
+
+        self.assertIn("## Phrase Quality Counts", markdown)
+        self.assertIn("## Timing Counts", markdown)
+        self.assertIn("## Chord Fit Counts", markdown)
+        self.assertIn("| pending | 2 |", markdown)
 
 
 if __name__ == "__main__":

@@ -197,6 +197,15 @@ def aggregate_review_notes(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def markdown_summary(aggregate: dict[str, Any], output_path: Path) -> str:
+    def append_count_table(title: str, counts: dict[str, int]) -> None:
+        lines.extend(["", f"## {title}", "", "| item | count |", "|---|---:|"])
+        rows = [(key, count) for key, count in counts.items() if count]
+        if not rows:
+            lines.append("| none | 0 |")
+            return
+        for key, count in rows:
+            lines.append(f"| {key} | {count} |")
+
     lines = [
         "# Stage B Listening Review Aggregate",
         "",
@@ -205,21 +214,12 @@ def markdown_summary(aggregate: dict[str, Any], output_path: Path) -> str:
         f"- reviewed: `{aggregate['reviewed_count']}`",
         f"- pending: `{aggregate['pending_count']}`",
         f"- has reviewed candidates: `{aggregate['has_reviewed_candidates']}`",
-        "",
-        "## Decision Counts",
-        "",
-        "| decision | count |",
-        "|---|---:|",
     ]
-    for decision, count in aggregate["decision_counts"].items():
-        lines.append(f"| {decision} | {count} |")
-
-    lines.extend(["", "## Issue Counts", "", "| issue | count |", "|---|---:|"])
-    for issue, count in aggregate["issue_counts"].items():
-        if count:
-            lines.append(f"| {issue} | {count} |")
-    if len(lines) >= 2 and lines[-1] == "|---|---:|":
-        lines.append("| none | 0 |")
+    append_count_table("Decision Counts", aggregate["decision_counts"])
+    append_count_table("Phrase Quality Counts", aggregate["phrase_quality_counts"])
+    append_count_table("Timing Counts", aggregate["timing_counts"])
+    append_count_table("Chord Fit Counts", aggregate["chord_fit_counts"])
+    append_count_table("Issue Counts", aggregate["issue_counts"])
 
     lines.extend(["", "## Recommended Followups", "", "| code | count | reason |", "|---|---:|---|"])
     for item in aggregate["recommended_followups"]:

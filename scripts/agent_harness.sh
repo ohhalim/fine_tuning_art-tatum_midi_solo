@@ -875,12 +875,18 @@ run_stage_b_listening_review_notes() {
 
 run_stage_b_listening_review_aggregate() {
   local run_id="${RUN_ID:-harness_stage_b_listening_review_aggregate}"
-  print_header "Stage B listening review notes template"
-  RUN_ID="$run_id" run_stage_b_listening_review_notes
+  local review_notes_path="outputs/stage_b_listening_review_notes/${run_id}/review_notes_template.json"
+  if [[ ! -f "$review_notes_path" || "${FORCE_REGEN:-0}" == "1" ]]; then
+    print_header "Stage B listening review notes template"
+    RUN_ID="$run_id" run_stage_b_listening_review_notes
+  else
+    print_header "Stage B listening review notes template"
+    printf 'Using existing review notes: %s\n' "$review_notes_path"
+  fi
   print_header "Stage B listening review aggregate"
   "$PYTHON_BIN" scripts/summarize_listening_review_notes.py \
     --run_id "$run_id" \
-    --review_notes "outputs/stage_b_listening_review_notes/${run_id}/review_notes_template.json"
+    --review_notes "$review_notes_path"
 }
 
 case "$MODE" in
