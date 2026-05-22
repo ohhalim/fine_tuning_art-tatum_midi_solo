@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-85-stage-b-review-markdown-chord-eval`
+- `issue-87-stage-b-listening-review-notes`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,45 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #87은 청취 리뷰 결과를 후보별로 구조화해 기록할 notes schema를 만든 단계다.
+
+중요한 전제:
+
+- raw generated MIDI는 `outputs/` artifact로만 둔다.
+- Codex가 subjective listening result를 임의 작성하지 않는다.
+- 사람이 들은 결과를 같은 enum/field로 기록하기 위한 양식이다.
+- real Brad/reference chord label 문제는 아직 해결되지 않았다.
+
+Implemented:
+
+- listening review notes schema
+- review notes template generator
+- enum/status validator
+- `scripts/build_listening_review_notes.py`
+- `scripts/agent_harness.sh stage-b-listening-review-notes`
+- docs:
+  - `docs/STAGE_B_LISTENING_REVIEW_NOTES_2026-05-22.md`
+
+Result:
+
+- candidate count: `6`
+- reviewed count: `0`
+- pending count: `6`
+- decisions:
+  - keep: `0`
+  - needs_followup: `0`
+  - reject: `0`
+  - pending: `6`
+- review notes template:
+  - `outputs/stage_b_listening_review_notes/harness_stage_b_listening_review_notes/review_notes_template.json`
+
+Decision:
+
+- 이제 실제 청취 리뷰 결과를 `phrase_quality`, `timing`, `chord_fit`, `issues`, `decision`으로 분리해서 기록할 수 있다.
+- 다음 작업은 filled review notes를 aggregate해 다음 generation rule을 결정하는 것이다.
+
+## Previous Probe Result
 
 Issue #85는 generated chord eval summary를 기존 review markdown과 결합한 단계다.
 

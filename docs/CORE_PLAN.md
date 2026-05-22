@@ -145,6 +145,7 @@ Stage B에서 명시하는 것:
 39. Stage B generated candidate chord-labeled eval bridge
 40. Stage B data-guide hybrid generated chord evaluation
 41. Stage B review markdown chord eval summary
+42. Stage B listening review notes schema
 
 가장 최근 의미 있는 결과:
 
@@ -166,6 +167,7 @@ Stage B에서 명시하는 것:
 - Issue #81 connects generated candidate reports with known chord metadata to the chord-labeled evaluator.
 - Issue #83 applies that bridge to actual data-guide hybrid review candidates and shows `data_motif_guide_tones` has higher chord-tone ratio than `data_motif`.
 - Issue #85 writes a combined review markdown so MIDI paths, rhythm metrics, and chord-role metrics can be reviewed together.
+- Issue #87 creates a structured listening review notes schema so subjective review can be recorded consistently instead of as loose comments.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -378,6 +380,7 @@ Stage B에서 명시하는 것:
 - Issue #83 result: aggregate chord-tone ratio는 `0.656`, tension ratio는 `0.120`, outside ratio는 `0.000`이다.
 - Issue #83 result: `data_motif` chord-tone ratio는 `0.500`, `data_motif_guide_tones` chord-tone ratio는 `0.812`이다.
 - Issue #85 result: combined review markdown is written to `outputs/stage_b_generated_chord_eval/harness_stage_b_review_markdown_chord_eval/review_candidates_with_chord_eval.md`.
+- Issue #87 result: listening review notes template contains `6` pending candidates and validates phrase quality, timing, chord fit, issue flags, and decision enums.
 
 해석:
 
@@ -387,7 +390,7 @@ Stage B에서 명시하는 것:
 - `approach_tensions`는 pitch-level resolution을 만들지만, 이 또한 jazz vocabulary 자체는 아니다.
 - `swing_motif_approach`는 기계적인 grid 반복을 줄였지만, 이 또한 jazz vocabulary 자체는 아니다.
 - real phrase reference stats와 motif extraction 기준으로 보면 다음은 hand-written rhythm rule 확장이 아니라 data-derived motif/cadence control 쪽이 맞다.
-- 다만 pitch-role 쪽은 real reference chord label이 아직 없으므로, 다음 개선은 listening review 결과를 구조화하고 이후 수동 reference labels를 넣는 순서가 맞다.
+- 다만 pitch-role 쪽은 real reference chord label이 아직 없으므로, 다음 개선은 filled listening notes를 aggregate하고 이후 수동 reference labels를 넣는 순서가 맞다.
 
 ### Phase 3.10. Swing/Motif Phrase Grammar
 
@@ -657,19 +660,22 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B review markdown chord eval summary 첨부
+Stage B listening review notes schema 추가
 ```
 
 결과:
 
-- 기존 review markdown과 generated chord eval summary를 결합한 artifact를 만들었다.
-- output: `outputs/stage_b_generated_chord_eval/harness_stage_b_review_markdown_chord_eval/review_candidates_with_chord_eval.md`
-- combined markdown에는 MIDI path, context MIDI path, rhythm metrics, strict gate, chord-tone/tension/approach/outside summary가 함께 들어간다.
+- generated chord eval report에서 listening review notes template을 만든다.
+- output: `outputs/stage_b_listening_review_notes/harness_stage_b_listening_review_notes/review_notes_template.json`
+- candidate count: `6`
+- reviewed count: `0`
+- pending count: `6`
+- fields: `phrase_quality`, `timing`, `chord_fit`, `issues`, `decision`, `notes`
 
 다음 작업:
 
-- listening review notes schema를 만든다.
-- 후보별로 phrase/exercise, timing, chord fit, too safe/scalar/mechanical 여부를 기록한다.
+- filled listening review notes를 aggregate해서 다음 generation rule을 결정한다.
+- `too_safe`, `too_scalar`, `too_mechanical`, `bad_timing`, `bad_chord_fit` 같은 issue flag를 기준으로 후속 issue를 분기한다.
 - real Brad/reference chord label은 아직 임의로 넣지 않는다.
 
 ## 10. 한 문장 요약
