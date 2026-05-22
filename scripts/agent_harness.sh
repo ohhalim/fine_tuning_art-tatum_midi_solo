@@ -76,6 +76,8 @@ Modes:
                 Export data-motif rhythm plus guide-tone/cadence pitch candidates.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
+  chord-coverage-audit
+                Audit chord annotation coverage in role metadata, sidecars, and MIDI text events.
   all           Run demo and tiny-compare.
 
 Environment:
@@ -123,6 +125,7 @@ run_quick() {
     scripts/audit_jazz_piano_dataset.py \
     scripts/build_jazz_training_manifests.py \
     scripts/run_manifest_prepare_smoke.py \
+    scripts/audit_chord_progression_coverage.py \
     scripts/train_stage_a_full.py \
     scripts/train_stage_a_adapter.py \
     inference/app \
@@ -791,6 +794,16 @@ run_manifest_dry_run() {
     --overwrite
 }
 
+run_chord_coverage_audit() {
+  local run_id="${RUN_ID:-harness_chord_coverage_audit}"
+  print_header "Chord progression coverage audit"
+  "$PYTHON_BIN" scripts/audit_chord_progression_coverage.py \
+    --run_id "$run_id" \
+    --input_dir ./midi_dataset \
+    --role_meta_roots ./data,./outputs \
+    --max_midi_files 120
+}
+
 case "$MODE" in
   status)
     run_status
@@ -881,6 +894,9 @@ case "$MODE" in
     ;;
   manifest-dry-run)
     run_manifest_dry_run
+    ;;
+  chord-coverage-audit)
+    run_chord_coverage_audit
     ;;
   all)
     run_demo

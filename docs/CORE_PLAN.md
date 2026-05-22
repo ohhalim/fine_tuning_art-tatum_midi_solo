@@ -140,6 +140,7 @@ Stage B에서 명시하는 것:
 34. Stage B straight-grid guide-tone/cadence review candidate
 35. Stage B data-motif rhythm plus guide-tone/cadence pitch hybrid
 36. Stage B reference pitch-role landing statistics and chord-coverage gate
+37. Stage B chord progression coverage audit
 
 가장 최근 의미 있는 결과:
 
@@ -155,6 +156,8 @@ Stage B에서 명시하는 것:
 - Issue #49 fixes the length problem structurally, but repeated-pitch dependence remains a listening-review risk.
 - Issue #51 shows this is not adjacent same-note collapse: adjacent repeated pitch ratio is `0.000`, average direction change ratio is around `0.689`, and max longest same pitch run is `1`.
 - Issue #53 shows the perceived "root-heavy" line is not pure root collapse: average root tone ratio is around `0.271`, top candidate root ratio is around `0.219`, but tension ratio is `0.000`.
+- Issue #75 shows reference pitch-role stats cannot be trusted yet because known chord note ratio is `0.000`.
+- Issue #77 audits the local dataset for chord progression annotations and finds no usable candidate: role meta `2812` scanned with `0` hits, sidecars `0`, MIDI files scanned for text events `120` with `0` chord-text candidates.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -357,6 +360,8 @@ Stage B에서 명시하는 것:
 - Issue #73 result: `data_motif_guide_tones`는 strict `3/3`, note count `63`, unique pitch count `23-24`, chord-tone ratio `0.797`, tension ratio `0.062`, root-tone ratio `0.000`, unique bar-position pattern ratio `1.000`이다.
 - Issue #75 result: reference pitch-role landing 통계를 시도했지만 known chord note ratio가 `0.000`이라 pitch-role reference는 아직 사용할 수 없다.
 - Issue #75 result: 현재 비교 가능한 것은 rhythm reference뿐이며, pitch vocabulary 조정 전에 chord annotation coverage audit이 필요하다.
+- Issue #77 result: role metadata `2812`개, raw sidecar `0`개, text event를 검사한 MIDI file `120`개를 scan했지만 chord progression hit는 `0`이다.
+- Issue #77 result: 현재 local dataset에는 바로 쓸 수 있는 chord progression annotation이 없으므로 reference pitch-role comparison은 아직 불가능하다.
 
 해석:
 
@@ -366,6 +371,7 @@ Stage B에서 명시하는 것:
 - `approach_tensions`는 pitch-level resolution을 만들지만, 이 또한 jazz vocabulary 자체는 아니다.
 - `swing_motif_approach`는 기계적인 grid 반복을 줄였지만, 이 또한 jazz vocabulary 자체는 아니다.
 - real phrase reference stats와 motif extraction 기준으로 보면 다음은 hand-written rhythm rule 확장이 아니라 data-derived motif/cadence control 쪽이 맞다.
+- 다만 pitch-role 쪽은 reference chord label이 없으므로, 다음 pitch grammar 개선은 작은 chord-labeled evaluation subset 또는 chord inference/lead-sheet alignment가 먼저다.
 
 ### Phase 3.10. Swing/Motif Phrase Grammar
 
@@ -635,22 +641,22 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B reference pitch-role landing statistics 추가
+Stage B chord progression coverage audit 추가
 ```
 
 결과:
 
-- reference rhythm/contour 통계는 정상적으로 산출된다.
-- reference pitch-role landing 통계는 chord annotation coverage 부족으로 사용할 수 없다.
-- known chord note ratio는 `0.000`, unknown chord ratio는 `1.000`이다.
-- generated pitch-role delta는 거짓 기준이 되므로 의도적으로 생략한다.
-- `data_motif_guide_tones`는 rhythm delta만 reference와 비교 가능하다.
+- role metadata `2812`개를 scan했지만 chord progression hit는 `0`이다.
+- raw sidecar file은 발견되지 않았다.
+- MIDI lyric/text event를 검사한 MIDI file `120`개를 scan했지만 chord-text candidate는 `0`이다.
+- 현재 local dataset에는 바로 쓸 수 있는 chord progression annotation이 없다.
+- 따라서 reference pitch-role comparison은 아직 불가능하다.
 
 다음 작업:
 
-- Stage B source metadata의 chord progression coverage를 audit한다.
-- chord progression이 있는 subset만 reference pitch-role stats에 사용한다.
-- coverage가 없으면 chord inference/lead-sheet alignment를 별도 이슈로 분리한다.
+- 작은 chord-labeled evaluation subset을 만든다.
+- 우선 3-5개 phrase에 bar-level chord labels를 수동으로 붙여 generated candidate의 pitch-role sanity check를 시작한다.
+- full chord inference/lead-sheet alignment는 그 다음 별도 이슈로 분리한다.
 
 ## 10. 한 문장 요약
 
