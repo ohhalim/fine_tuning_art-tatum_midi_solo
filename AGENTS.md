@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #71: Stage B straight-grid guide-tone/cadence candidates.
+- Issue #73: Stage B data-motif rhythm plus guide-tone/cadence pitch hybrid candidates.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -206,6 +206,12 @@ For Stage B straight-grid guide-tone/cadence candidate changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-guide-tone-cadence
+```
+
+For Stage B data-motif rhythm plus guide-tone/cadence pitch hybrid changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-data-guide-hybrid
 ```
 
 For Stage B collapse/sampling-sweep changes, run:

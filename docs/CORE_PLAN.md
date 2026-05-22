@@ -138,6 +138,7 @@ Stage B에서 명시하는 것:
 32. Stage B data motif review export
 33. Stage B chord-context and straight-grid review export
 34. Stage B straight-grid guide-tone/cadence review candidate
+35. Stage B data-motif rhythm plus guide-tone/cadence pitch hybrid
 
 가장 최근 의미 있는 결과:
 
@@ -351,6 +352,8 @@ Stage B에서 명시하는 것:
 - Issue #69 result: chord/bass guide가 들어간 context MIDI와 straight-grid timing reference를 추가했다.
 - Issue #71 result: `straight_guide_tones` 후보를 추가해 swing timing 문제와 chromatic/scale pitch 문제를 분리했다.
 - Issue #71 result: `straight_guide_tones`는 note count `64`, unique pitch count `26-29`, chord-tone ratio `0.656`, tension ratio `0.172`, root-tone ratio `0.000`이지만 straight reference용 dead-air gate 때문에 strict `0/3`이다.
+- Issue #73 result: `data_motif_guide_tones` 후보를 추가해 data-derived rhythm/duration template과 guide-tone/cadence pitch grammar를 결합했다.
+- Issue #73 result: `data_motif_guide_tones`는 strict `3/3`, note count `63`, unique pitch count `23-24`, chord-tone ratio `0.797`, tension ratio `0.062`, root-tone ratio `0.000`, unique bar-position pattern ratio `1.000`이다.
 
 해석:
 
@@ -629,22 +632,22 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B straight-grid guide-tone/cadence review candidate 추가
+Stage B data-motif rhythm plus guide-tone/cadence pitch hybrid 추가
 ```
 
 결과:
 
-- `straight_guide_tones` baseline mode를 추가했다.
-- strong beat은 현재 chord의 guide tone으로 제한한다.
-- weak beat approach tone은 연속 chromatic run이 되지 않게 제한한다.
-- context MIDI review package에 `straight_grid`, `straight_guide_tones`, `hand_written_swing`, `data_motif`를 같이 export한다.
-- `straight_guide_tones`는 root-tone ratio `0.000`, chord-tone ratio `0.656`, tension ratio `0.172`를 기록했다.
-- `straight_guide_tones` strict `0/3`은 current dead-air gate가 straight reference에 맞지 않기 때문이며, 모델 성공 후보가 아니라 timing/pitch reference로 본다.
+- `data_motif_guide_tones` baseline mode를 추가했다.
+- rhythm/duration은 real phrase window에서 추출한 data-derived motif template을 유지한다.
+- contour template은 register 방향 참고로만 사용한다.
+- pitch class는 current chord guide tone, chord tone, tension, limited approach tone으로 제한한다.
+- strong beat은 현재 chord의 3도/7도 guide tone으로 제한한다.
+- 결과는 strict `3/3`, chord-tone ratio `0.797`, root-tone ratio `0.000`, unique bar-position pattern ratio `1.000`이다.
 
 다음 작업:
 
-- `04_straight_guide_tones_*_with_context.mid`를 듣고 scale/chromatic 느낌이 줄었는지 확인한다.
-- 여전히 교과서적이면 data-derived rhythm을 유지하고 strong-beat pitch만 guide-tone cadence로 제한하는 hybrid를 만든다.
+- `data_motif_guide_tones` context MIDI를 `data_motif`, `straight_guide_tones`와 비교해 듣는다.
+- hybrid도 초급 멜로디처럼 들리면 reference-derived guide-tone landing 통계를 뽑는다.
 - in/out 판단이 어렵다면 review markdown에 bar/chord/pitch-role annotation을 추가한다.
 
 ## 10. 한 문장 요약

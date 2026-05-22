@@ -70,6 +70,8 @@ Modes:
                 Export review MIDI with chord context and straight-grid reference.
   stage-b-guide-tone-cadence
                 Export straight-grid guide-tone/cadence candidates with chord context.
+  stage-b-data-guide-hybrid
+                Export data-motif rhythm plus guide-tone/cadence pitch candidates.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   all           Run demo and tiny-compare.
@@ -737,6 +739,28 @@ run_stage_b_guide_tone_cadence() {
     --copy_review_midi
 }
 
+run_stage_b_data_guide_hybrid() {
+  local run_id="${RUN_ID:-harness_stage_b_data_guide_hybrid}"
+  print_header "Stage B data-motif rhythm plus guide-tone pitch review export"
+  "$PYTHON_BIN" scripts/run_stage_b_data_motif_generation_compare.py \
+    --run_id "$run_id" \
+    --input_dir ./midi_dataset/midi/studio \
+    --baseline_modes straight_grid,straight_guide_tones,hand_written_swing,data_motif,data_motif_guide_tones \
+    --max_files 4 \
+    --window_bars 8 \
+    --window_stride_bars 4 \
+    --min_window_target_notes 16 \
+    --motif_length 4 \
+    --max_bar_span 2 \
+    --max_records 64 \
+    --template_top_n 32 \
+    --num_samples 3 \
+    --bars 8 \
+    --note_groups_per_bar 8 \
+    --review_top_n 3 \
+    --copy_review_midi
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -829,6 +853,9 @@ case "$MODE" in
     ;;
   stage-b-guide-tone-cadence)
     run_stage_b_guide_tone_cadence
+    ;;
+  stage-b-data-guide-hybrid)
+    run_stage_b_data_guide_hybrid
     ;;
   manifest-dry-run)
     run_manifest_dry_run
