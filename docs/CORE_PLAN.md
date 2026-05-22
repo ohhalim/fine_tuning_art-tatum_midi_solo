@@ -151,6 +151,7 @@ Stage B에서 명시하는 것:
 45. Stage B objective MIDI note review
 46. Stage B objective flags review flow
 47. Stage B overlap-free solo-line review export
+48. Stage B duration variation review baseline
 
 가장 최근 의미 있는 결과:
 
@@ -178,6 +179,7 @@ Stage B에서 명시하는 것:
 - Issue #93 reads generated MIDI notes directly and reports objective flags for overlap/polyphony, grid alignment, scalar/chromatic motion, duration collapse, and chord-role ratios.
 - Issue #95 connects objective flags to listening review notes and aggregate priority so problem/warning candidates are visible before manual listening.
 - Issue #97 exports overlap-free solo-line review MIDI variants while preserving original sample paths, reducing objective `overlap_polyphonic` from `9` to `0`.
+- Issue #99 adds varied-duration review baselines, reducing objective `duration_pattern_collapse` from `6` to `0` while keeping `overlap_polyphonic=0`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -396,6 +398,7 @@ Stage B에서 명시하는 것:
 - Issue #93 result: objective MIDI review flags `chromatic_walk=7`, `duration_pattern_collapse=9`, `overlap_polyphonic=9`, and `too_stepwise_or_scalar=4`.
 - Issue #95 result: objective review priority reports `15` candidates, `6` warning/reviewable candidates, and `9` problem candidates before subjective listening.
 - Issue #97 result: overlap-free review export reports `15` reviewable candidates, `5` clean candidates, `10` warning candidates, and `overlap_polyphonic=0`.
+- Issue #99 result: duration variation review reports `15` reviewable candidates, `8` clean candidates, `7` warning candidates, `duration_pattern_collapse=0`, and `overlap_polyphonic=0`.
 
 해석:
 
@@ -675,25 +678,24 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B overlap-free solo-line review export 추가
+Stage B duration variation review baseline 추가
 ```
 
 결과:
 
-- review export 단계에서 overlap-free solo-line MIDI variant를 생성한다.
-- output: `outputs/stage_b_listening_review_aggregate/harness_stage_b_overlap_free_review_export/listening_review_aggregate.md`
+- varied-duration review baseline을 추가해 duration collapse를 줄였다.
+- output: `outputs/stage_b_listening_review_aggregate/harness_stage_b_duration_variation_review/listening_review_aggregate.md`
 - candidate count: `15`
 - objective reviewable: `15`
-- objective clean: `5`
-- objective warning: `10`
+- objective clean: `8`
+- objective warning: `7`
 - chromatic walk: `7`
-- duration pattern collapse: `6`
+- duration pattern collapse: `0`
 - overlap/polyphonic: `0`
-- too stepwise/scalar: `4`
+- too stepwise/scalar: `6`
 
 다음 작업:
 
-- duration collapse가 있는 straight-grid 후보는 rhythm/duration variation을 개선한다.
 - chromatic/scalar exercise처럼 들리는 후보는 phrase vocabulary와 cadence target을 조정한다.
 - subjective listening result는 objective clean/warning priority를 참고해 채운다.
 - real Brad/reference chord label은 아직 임의로 넣지 않는다.
