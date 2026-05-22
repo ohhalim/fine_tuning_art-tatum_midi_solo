@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #81: Stage B generated candidate chord-labeled eval bridge.
+- Issue #83: Stage B data-guide hybrid generated chord eval.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -200,6 +200,12 @@ For Stage B generated candidate chord-labeled eval bridge changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-generated-chord-eval
+```
+
+For Stage B data-guide hybrid generated chord eval changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-data-guide-generated-chord-eval
 ```
 
 For Stage B data-derived motif template extraction changes, run:
