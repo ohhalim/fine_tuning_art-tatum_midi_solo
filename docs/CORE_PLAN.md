@@ -142,6 +142,7 @@ Stage B에서 명시하는 것:
 36. Stage B reference pitch-role landing statistics and chord-coverage gate
 37. Stage B chord progression coverage audit
 38. Stage B chord-labeled evaluation subset contract
+39. Stage B generated candidate chord-labeled eval bridge
 
 가장 최근 의미 있는 결과:
 
@@ -160,6 +161,7 @@ Stage B에서 명시하는 것:
 - Issue #75 shows reference pitch-role stats cannot be trusted yet because known chord note ratio is `0.000`.
 - Issue #77 audits the local dataset for chord progression annotations and finds no usable candidate: role meta `2812` scanned with `0` hits, sidecars `0`, MIDI files scanned for text events `120` with `0` chord-text candidates.
 - Issue #79 adds a tiny chord-labeled eval contract so known chord labels can produce pitch-role sanity summaries without pretending real Brad/reference labels already exist.
+- Issue #81 connects generated candidate reports with known chord metadata to the chord-labeled evaluator.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -366,6 +368,8 @@ Stage B에서 명시하는 것:
 - Issue #77 result: 현재 local dataset에는 바로 쓸 수 있는 chord progression annotation이 없으므로 reference pitch-role comparison은 아직 불가능하다.
 - Issue #79 result: `inline_notes` tiny fixture `2` samples, `32` notes로 chord-labeled eval contract를 검증했다.
 - Issue #79 result: fixture chord-tone ratio는 `0.844`, tension ratio는 `0.156`, outside ratio는 `0.000`이다.
+- Issue #81 result: generated candidate bridge fixture `1` sample, `16` notes로 report-to-evaluator 연결을 검증했다.
+- Issue #81 result: fixture chord-tone ratio는 `1.000`, tension ratio는 `0.000`, outside ratio는 `0.000`이다.
 
 해석:
 
@@ -375,7 +379,7 @@ Stage B에서 명시하는 것:
 - `approach_tensions`는 pitch-level resolution을 만들지만, 이 또한 jazz vocabulary 자체는 아니다.
 - `swing_motif_approach`는 기계적인 grid 반복을 줄였지만, 이 또한 jazz vocabulary 자체는 아니다.
 - real phrase reference stats와 motif extraction 기준으로 보면 다음은 hand-written rhythm rule 확장이 아니라 data-derived motif/cadence control 쪽이 맞다.
-- 다만 pitch-role 쪽은 real reference chord label이 아직 없으므로, 다음 pitch grammar 개선은 실제 3-5개 phrase의 수동 chord labels 또는 generated metadata bridge가 먼저다.
+- 다만 pitch-role 쪽은 real reference chord label이 아직 없으므로, 다음 pitch grammar 개선은 실제 generated review package에 bridge를 적용하고 이후 수동 reference labels를 넣는 순서가 맞다.
 
 ### Phase 3.10. Swing/Motif Phrase Grammar
 
@@ -645,22 +649,21 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B chord-labeled evaluation subset contract 추가
+Stage B generated candidate chord-labeled eval bridge 추가
 ```
 
 결과:
 
-- chord-labeled eval manifest schema를 만들었다.
-- 기본 fixture는 `data/eval/stage_b_chord_labeled_tiny/manifest.json`이다.
-- fixture는 `inline_notes` 기반이며 실제 Brad/reference label이라고 주장하지 않는다.
-- harness result: sample count `2`, note count `32`, chord-tone ratio `0.844`, tension ratio `0.156`, outside ratio `0.000`.
-- `midi_path` sample도 지원하지만 raw MIDI는 커밋하지 않는다.
+- generated candidate/review report의 known chord progression metadata를 chord-labeled evaluator에 연결했다.
+- supported metadata source: `chord_progression`, `chords`, `request.chord_progression`, `source_report.request.chord_progression`.
+- harness는 raw MIDI를 커밋하지 않고 outputs 아래 tiny fixture를 생성한다.
+- harness result: sample count `1`, note count `16`, chord-tone ratio `1.000`, tension ratio `0.000`, outside ratio `0.000`.
 
 다음 작업:
 
-- 코드가 확실한 3-5개 실제 review phrase를 manifest에 추가한다.
-- 또는 generated candidate report의 known chord progression metadata를 chord-labeled evaluator와 연결한다.
-- 불확실한 Brad/reference chord는 넣지 않는다.
+- 실제 `stage-b-data-guide-hybrid` review manifest에 generated chord eval bridge를 적용한다.
+- generated review markdown에 bridge report 요약을 같이 붙인다.
+- real Brad/reference chord label은 아직 임의로 넣지 않는다.
 
 ## 10. 한 문장 요약
 
