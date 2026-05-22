@@ -67,7 +67,10 @@ def chord_root(chord: str) -> int:
 
 def chord_pitch_classes(chord: str) -> set[int]:
     root = chord_root(chord)
-    if "maj7" in chord:
+    lowered = chord.lower()
+    if "m7b5" in lowered or "m7♭5" in lowered or "ø" in chord or "half-diminished" in lowered:
+        intervals = (0, 3, 6, 10)
+    elif "maj7" in chord:
         intervals = (0, 4, 7, 11)
     elif "m7" in chord:
         intervals = (0, 3, 7, 10)

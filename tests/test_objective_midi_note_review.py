@@ -6,7 +6,7 @@ from pathlib import Path
 
 import mido
 
-from scripts.review_midi_note_objectives import analyze_review_manifest, pitch_name
+from scripts.review_midi_note_objectives import analyze_review_manifest, chord_pitch_classes, pitch_name
 
 
 class ObjectiveMidiNoteReviewTest(unittest.TestCase):
@@ -35,6 +35,10 @@ class ObjectiveMidiNoteReviewTest(unittest.TestCase):
     def test_pitch_name(self) -> None:
         self.assertEqual(pitch_name(60), "C4")
         self.assertEqual(pitch_name(61), "C#4")
+
+    def test_half_diminished_chord_uses_flat_five(self) -> None:
+        self.assertEqual(chord_pitch_classes("Bm7b5"), {11, 2, 5, 9})
+        self.assertEqual(chord_pitch_classes("Bø7"), {11, 2, 5, 9})
 
     def test_stepwise_chromatic_candidate_is_flagged(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
