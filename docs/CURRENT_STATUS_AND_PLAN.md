@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-95-stage-b-objective-flags-review-flow`
+- `issue-97-stage-b-overlap-free-solo-line-review-export`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,50 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #97은 review export 단계에서 overlap-free solo-line MIDI variant를 만드는 단계다.
+
+중요한 전제:
+
+- 원본 generated sample MIDI는 `midi_path`에 보존한다.
+- 사람이 듣는 `review_midi_path`에는 `*_overlap_free.mid` variant를 넣는다.
+- 이것은 음악성을 높이는 학습이 아니라, chord block처럼 보이는 overlap artifact를 review 전에 제거하는 export step이다.
+- subjective jazz quality를 성공으로 주장하지 않는다.
+
+Implemented:
+
+- `--overlap_free_review_midi`
+- overlap-free solo-line MIDI writer
+- review manifest `review_variant`
+- review manifest `review_postprocess_report`
+- listening review notes `review_metadata.review_variant`
+- `scripts/agent_harness.sh stage-b-overlap-free-review-export`
+- docs:
+  - `docs/STAGE_B_OVERLAP_FREE_REVIEW_EXPORT_2026-05-22.md`
+
+Result:
+
+- candidate count: `15`
+- objective reviewable count: `15`
+- objective bucket counts:
+  - clean: `5`
+  - warning: `10`
+- objective flag counts:
+  - chromatic walk: `7`
+  - duration pattern collapse: `6`
+  - too stepwise/scalar: `4`
+  - overlap/polyphonic: `0`
+- previous overlap/polyphonic count was `9`
+- aggregate report:
+  - `outputs/stage_b_listening_review_aggregate/harness_stage_b_overlap_free_review_export/listening_review_aggregate.md`
+
+Decision:
+
+- overlap/polyphonic 문제는 review export에서 제거됐다.
+- 지금 남은 문제는 jazz vocabulary보다 duration collapse, scalar/chromatic motion, phrase quality 쪽이다.
+- 다음 generation rule change는 duration/rhythm variation 또는 candidate vocabulary 개선이어야 한다.
+
+## Previous Probe Result
 
 Issue #95는 objective MIDI note-level diagnostics를 listening review notes와 aggregate priority에 연결하는 단계다.
 

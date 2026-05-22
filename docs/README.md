@@ -106,6 +106,8 @@
   - generated review MIDI를 직접 읽어 overlap, grid, scalar/chromatic, duration collapse를 진단한 결과.
 - `STAGE_B_OBJECTIVE_FLAGS_REVIEW_FLOW_2026-05-22.md`
   - objective MIDI flags를 listening review notes와 aggregate priority에 연결한 결과.
+- `STAGE_B_OVERLAP_FREE_REVIEW_EXPORT_2026-05-22.md`
+  - overlap-free solo-line review MIDI variant를 export하고 objective overlap/polyphonic flag를 제거한 결과.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`

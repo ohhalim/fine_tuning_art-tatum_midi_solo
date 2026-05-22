@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #95: Stage B objective flags review flow.
+- Issue #97: Stage B overlap-free solo-line review export.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -236,6 +236,12 @@ For Stage B objective flags review flow changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-objective-flags-review-flow
+```
+
+For Stage B overlap-free solo-line review export changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-overlap-free-review-export
 ```
 
 For Stage B filled listening review aggregate changes, run:
