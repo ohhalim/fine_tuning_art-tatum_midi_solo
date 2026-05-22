@@ -10,7 +10,9 @@ import pretty_midi
 from scripts.evaluate_generated_candidate_chords import (
     ManifestError,
     build_report_from_candidate_report,
+    chord_eval_review_append_markdown,
     expand_chords,
+    write_combined_review_markdown,
     write_tiny_fixture,
 )
 
@@ -102,6 +104,32 @@ class GeneratedCandidateChordEvalTest(unittest.TestCase):
 
             self.assertEqual(report["summary"]["sample_count"], 1)
             self.assertGreater(report["summary"]["note_count"], 0)
+
+    def test_chord_eval_review_append_contains_candidate_table(self) -> None:
+        with TemporaryDirectory() as tmp:
+            report_path = write_tiny_fixture(Path(tmp))
+            report = build_report_from_candidate_report(report_path)
+
+            markdown = chord_eval_review_append_markdown(report)
+
+            self.assertIn("Generated Chord Eval Summary", markdown)
+            self.assertIn("chord-tone", markdown)
+            self.assertIn("fixture_generated_rank_1_sample_1", markdown)
+
+    def test_write_combined_review_markdown_appends_summary(self) -> None:
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report_path = write_tiny_fixture(root)
+            report = build_report_from_candidate_report(report_path)
+            review_path = root / "review_candidates.md"
+            output_path = root / "combined.md"
+            review_path.write_text("# Review Candidates\n\nOriginal content.\n", encoding="utf-8")
+
+            write_combined_review_markdown(review_path, report=report, output_path=output_path)
+
+            combined = output_path.read_text(encoding="utf-8")
+            self.assertIn("Original content.", combined)
+            self.assertIn("Generated Chord Eval Summary", combined)
 
 
 if __name__ == "__main__":

@@ -84,6 +84,8 @@ Modes:
                 Evaluate generated candidate report bridge against known chord metadata.
   stage-b-data-guide-generated-chord-eval
                 Generate data-guide hybrid review package and evaluate its known chord metadata.
+  stage-b-review-markdown-chord-eval
+                Generate data-guide hybrid review package and write a combined chord-eval review markdown.
   all           Run demo and tiny-compare.
 
 Environment:
@@ -842,6 +844,18 @@ run_stage_b_data_guide_generated_chord_eval() {
     --candidate_limit 6
 }
 
+run_stage_b_review_markdown_chord_eval() {
+  local run_id="${RUN_ID:-harness_stage_b_review_markdown_chord_eval}"
+  print_header "Stage B data-guide hybrid review package"
+  RUN_ID="$run_id" run_stage_b_data_guide_hybrid
+  print_header "Stage B combined review markdown with chord eval"
+  "$PYTHON_BIN" scripts/evaluate_generated_candidate_chords.py \
+    --run_id "$run_id" \
+    --candidate_report "outputs/stage_b_data_motif_review/${run_id}/review_manifest.json" \
+    --review_markdown "outputs/stage_b_data_motif_review/${run_id}/review_candidates.md" \
+    --candidate_limit 6
+}
+
 case "$MODE" in
   status)
     run_status
@@ -944,6 +958,9 @@ case "$MODE" in
     ;;
   stage-b-data-guide-generated-chord-eval)
     run_stage_b_data_guide_generated_chord_eval
+    ;;
+  stage-b-review-markdown-chord-eval)
+    run_stage_b_review_markdown_chord_eval
     ;;
   all)
     run_demo
