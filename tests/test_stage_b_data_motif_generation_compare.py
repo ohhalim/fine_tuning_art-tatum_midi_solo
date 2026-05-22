@@ -4,6 +4,8 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+import pretty_midi
+
 from scripts.run_stage_b_data_motif_generation_compare import (
     build_review_export,
     data_motif_tokens,
@@ -12,6 +14,7 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     nearest_allowed_pitch_token,
     normalize_position_deltas,
     parse_baseline_modes,
+    straight_grid_tokens,
 )
 from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_note_grammar,
@@ -120,11 +123,32 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
             self.assertEqual(positions, sorted(positions))
             self.assertEqual(len(positions), len(set(positions)))
 
+    def test_straight_grid_tokens_stay_on_even_subdivision_grid(self) -> None:
+        primer = build_stage_b_primer(["Cm7", "Fm7"], 124)
+        tokens = straight_grid_tokens(
+            primer_tokens=primer,
+            chords=["Cm7", "Fm7"],
+            bars=2,
+            note_groups_per_bar=8,
+            seed=17,
+        )
+
+        grammar = analyze_stage_b_note_grammar(tokens, primer_size=len(primer))
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+
+        self.assertTrue(grammar["grammar_valid"])
+        self.assertEqual(len(groups), 16)
+        self.assertEqual({group["position"] % 2 for group in groups}, {0})
+
     def test_build_review_export_copies_named_mode_files(self) -> None:
         with TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             source_midi = tmp_path / "source.mid"
-            source_midi.write_bytes(b"MThd")
+            midi = pretty_midi.PrettyMIDI(initial_tempo=124)
+            instrument = pretty_midi.Instrument(program=0, name="Solo")
+            instrument.notes.append(pretty_midi.Note(velocity=80, pitch=60, start=0.0, end=0.5))
+            midi.instruments.append(instrument)
+            midi.write(str(source_midi))
             samples = {
                 "data_motif": [
                     {
@@ -159,11 +183,17 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
                 output_dir=tmp_path / "review",
                 top_n=1,
                 copy_midi=True,
+                chords=["Cm7", "Fm7"],
+                bpm=124,
+                bars=2,
             )
 
             copied = Path(manifest["candidates"][0]["review_midi_path"])
+            context = Path(manifest["candidates"][0]["context_midi_path"])
             self.assertTrue(copied.exists())
+            self.assertTrue(context.exists())
             self.assertIn("data_motif", copied.name)
+            self.assertTrue(Path(manifest["chord_guide_midi_path"]).exists())
             self.assertTrue((tmp_path / "review" / "review_manifest.json").exists())
             self.assertTrue((tmp_path / "review" / "review_candidates.md").exists())
 
