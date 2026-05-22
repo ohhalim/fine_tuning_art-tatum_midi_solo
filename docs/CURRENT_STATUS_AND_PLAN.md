@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-87-stage-b-listening-review-notes`
+- `issue-89-stage-b-listening-review-aggregate`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,44 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #89는 사람이 채운 listening review notes를 다음 generation rule 수정 후보로 집계하는 단계다.
+
+중요한 전제:
+
+- Codex가 subjective listening result를 임의 작성하지 않는다.
+- pending-only notes에서는 generation rule 변경을 추천하지 않는다.
+- 사람이 채운 `issues`와 `decision`만 다음 실험 분기 기준으로 사용한다.
+- real Brad/reference chord label 문제는 아직 해결되지 않았다.
+
+Implemented:
+
+- listening review aggregate script
+- decision / phrase quality / timing / chord fit / issue count aggregation
+- source metric summary by decision
+- pending-only safety follow-up
+- `scripts/summarize_listening_review_notes.py`
+- `scripts/agent_harness.sh stage-b-listening-review-aggregate`
+- docs:
+  - `docs/STAGE_B_LISTENING_REVIEW_AGGREGATE_2026-05-22.md`
+
+Result:
+
+- candidate count: `6`
+- reviewed count: `0`
+- pending count: `6`
+- has reviewed candidates: `false`
+- recommended follow-up:
+  - `collect_listening_reviews`
+- aggregate report:
+  - `outputs/stage_b_listening_review_aggregate/harness_stage_b_listening_review_aggregate/listening_review_aggregate.json`
+
+Decision:
+
+- 지금 artifact만으로 generation rule을 바꾸면 안 된다.
+- 다음 rule change는 사람이 채운 review notes의 issue distribution을 근거로 분기한다.
+
+## Previous Probe Result
 
 Issue #87은 청취 리뷰 결과를 후보별로 구조화해 기록할 notes schema를 만든 단계다.
 
