@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-83-stage-b-data-guide-generated-chord-eval`
+- `issue-85-stage-b-review-markdown-chord-eval`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,45 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #85는 generated chord eval summary를 기존 review markdown과 결합한 단계다.
+
+중요한 전제:
+
+- raw generated MIDI는 `outputs/` artifact로만 둔다.
+- 원본 `review_candidates.md`는 수정하지 않는다.
+- combined markdown은 새 artifact로 생성한다.
+- real Brad/reference chord label 문제는 아직 해결되지 않았다.
+
+Implemented:
+
+- `scripts/evaluate_generated_candidate_chords.py --review_markdown`
+- combined review markdown writer
+- chord eval append markdown table
+- `scripts/agent_harness.sh stage-b-review-markdown-chord-eval`
+- docs:
+  - `docs/STAGE_B_REVIEW_MARKDOWN_CHORD_EVAL_2026-05-22.md`
+
+Result:
+
+- evaluated candidate count: `6`
+- note count: `192`
+- aggregate chord-tone ratio: `0.656`
+- aggregate tension ratio: `0.120`
+- aggregate outside ratio: `0.000`
+- `data_motif` chord-tone ratio: `0.500`
+- `data_motif_guide_tones` chord-tone ratio: `0.812`
+- approach ratio: `0.224`
+- outside ratio: `0.000`
+- combined review markdown:
+  - `outputs/stage_b_generated_chord_eval/harness_stage_b_review_markdown_chord_eval/review_candidates_with_chord_eval.md`
+
+Decision:
+
+- 이제 review markdown 한 파일에서 MIDI path, context path, rhythm metrics, chord-role metrics를 같이 볼 수 있다.
+- 다음 작업은 listening review 결과를 구조화해서 "좋다/나쁘다"를 말로 흘리지 않게 만드는 것이다.
+
+## Previous Probe Result
 
 Issue #83은 Issue #81의 bridge를 실제 `stage-b-data-guide-hybrid` review package에 적용한 단계다.
 

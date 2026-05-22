@@ -205,6 +205,53 @@ def markdown_report(report: dict[str, Any]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def chord_eval_review_append_markdown(report: dict[str, Any]) -> str:
+    summary = report["summary"]
+    ratios = summary["role_ratios"]
+    lines = [
+        "## Generated Chord Eval Summary",
+        "",
+        f"- source report: `{report['source_report_path']}`",
+        f"- chord progression: `{', '.join(report['chord_progression'])}`",
+        f"- evaluated candidates: `{summary['sample_count']}`",
+        f"- note count: `{summary['note_count']}`",
+        f"- chord-tone ratio: `{ratios['chord_tone_ratio']:.3f}`",
+        f"- tension ratio: `{ratios['tension_ratio']:.3f}`",
+        f"- approach ratio: `{ratios['approach_ratio']:.3f}`",
+        f"- outside ratio: `{ratios['outside_ratio']:.3f}`",
+        "",
+        "| sample | chord-tone | tension | approach | outside |",
+        "|---|---:|---:|---:|---:|",
+    ]
+    for sample in report["samples"]:
+        sample_ratios = sample["role_ratios"]
+        lines.append(
+            "| {sample_id} | {chord:.3f} | {tension:.3f} | {approach:.3f} | {outside:.3f} |".format(
+                sample_id=sample["sample_id"],
+                chord=sample_ratios["chord_tone_ratio"],
+                tension=sample_ratios["tension_ratio"],
+                approach=sample_ratios["approach_ratio"],
+                outside=sample_ratios["outside_ratio"],
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "Boundary: this uses generated candidate chord metadata only; it does not label real reference MIDI.",
+        ]
+    )
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def write_combined_review_markdown(review_markdown_path: Path, report: dict[str, Any], output_path: Path) -> None:
+    if not review_markdown_path.exists():
+        raise ManifestError(f"review markdown does not exist: {review_markdown_path}")
+    original = review_markdown_path.read_text(encoding="utf-8").rstrip()
+    combined = original + "\n\n---\n\n" + chord_eval_review_append_markdown(report)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(combined, encoding="utf-8")
+
+
 def write_tiny_fixture(run_dir: Path) -> Path:
     fixture_dir = run_dir / "fixture_generated_candidates"
     fixture_dir.mkdir(parents=True, exist_ok=True)
@@ -269,6 +316,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--candidate_limit", type=int, default=3)
     parser.add_argument("--default_bpm", type=float, default=124.0)
     parser.add_argument("--write_tiny_fixture", action="store_true")
+    parser.add_argument("--review_markdown", type=str, default=None)
+    parser.add_argument("--combined_review_markdown_name", type=str, default="review_candidates_with_chord_eval.md")
     return parser.parse_args()
 
 
@@ -290,6 +339,10 @@ def main() -> int:
     )
     write_json(run_dir / "generated_chord_eval_report.json", report)
     (run_dir / "generated_chord_eval_report.md").write_text(markdown_report(report), encoding="utf-8")
+    combined_review_path: Path | None = None
+    if args.review_markdown:
+        combined_review_path = run_dir / str(args.combined_review_markdown_name)
+        write_combined_review_markdown(Path(args.review_markdown), report=report, output_path=combined_review_path)
     print(
         json.dumps(
             {
@@ -299,6 +352,7 @@ def main() -> int:
                 "tension_ratio": report["summary"]["role_ratios"]["tension_ratio"],
                 "outside_ratio": report["summary"]["role_ratios"]["outside_ratio"],
                 "report_path": str(run_dir / "generated_chord_eval_report.md"),
+                "combined_review_markdown_path": str(combined_review_path) if combined_review_path else None,
             },
             ensure_ascii=True,
             indent=2,
