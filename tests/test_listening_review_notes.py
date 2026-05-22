@@ -4,6 +4,7 @@ import unittest
 
 from scripts.build_listening_review_notes import (
     ReviewNotesError,
+    build_review_notes_from_review_manifest,
     build_review_notes_template,
     validate_review_notes,
 )
@@ -25,6 +26,44 @@ class ListeningReviewNotesTest(unittest.TestCase):
                         "outside_ratio": 0.0,
                     },
                 }
+            ],
+        }
+
+    def sample_review_manifest(self) -> dict:
+        return {
+            "chord_progression": ["Cm7", "F7", "Bbmaj7", "Ebmaj7"],
+            "candidates": [
+                {
+                    "mode": "data_motif",
+                    "review_rank": 1,
+                    "sample_index": 1,
+                    "sample_seed": 17,
+                    "valid": True,
+                    "strict_valid": True,
+                    "review_midi_path": "named_midi/01_data_motif_rank_01_sample_01.mid",
+                    "midi_path": "samples/data_motif/data_motif_sample_1.mid",
+                    "context_midi_path": "context_midi/01_data_motif_rank_01_sample_01_with_context.mid",
+                    "note_count": 63,
+                    "unique_pitch_count": 24,
+                    "dead_air_ratio": 0.56,
+                    "syncopated_onset_ratio": 0.625,
+                    "unique_bar_position_pattern_ratio": 1.0,
+                    "duration_diversity_ratio": 0.0625,
+                    "most_common_duration_ratio": 0.375,
+                    "ioi_diversity_ratio": 0.079,
+                    "most_common_ioi_ratio": 0.429,
+                    "tension_ratio": 0.172,
+                    "root_tone_ratio": 0.0,
+                },
+                {
+                    "mode": "straight_grid",
+                    "review_rank": 1,
+                    "sample_index": 1,
+                    "review_midi_path": "named_midi/04_straight_grid_rank_01_sample_01.mid",
+                    "context_midi_path": "context_midi/04_straight_grid_rank_01_sample_01_with_context.mid",
+                    "note_count": 64,
+                    "unique_pitch_count": 26,
+                },
             ],
         }
 
@@ -77,6 +116,29 @@ class ListeningReviewNotesTest(unittest.TestCase):
 
         with self.assertRaises(ReviewNotesError):
             validate_review_notes(notes)
+
+    def test_build_review_notes_from_review_manifest_includes_files_and_modes(self) -> None:
+        notes = build_review_notes_from_review_manifest(
+            self.sample_review_manifest(),
+            source_review_markdown="review_candidates.md",
+        )
+
+        self.assertEqual(len(notes["candidates"]), 2)
+        self.assertEqual(notes["candidates"][0]["candidate_id"], "data_motif_rank_1_sample_1")
+        self.assertEqual(notes["candidates"][0]["review_metadata"]["mode"], "data_motif")
+        self.assertEqual(
+            notes["candidates"][0]["review_files"]["context_midi_path"],
+            "context_midi/01_data_motif_rank_01_sample_01_with_context.mid",
+        )
+        self.assertEqual(notes["candidates"][0]["source_metrics"]["syncopated_onset_ratio"], 0.625)
+
+    def test_build_review_notes_from_review_manifest_validates_pending_candidates(self) -> None:
+        notes = build_review_notes_from_review_manifest(self.sample_review_manifest())
+
+        summary = validate_review_notes(notes)
+
+        self.assertEqual(summary["candidate_count"], 2)
+        self.assertEqual(summary["pending_count"], 2)
 
 
 if __name__ == "__main__":

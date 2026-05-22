@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-89-stage-b-listening-review-aggregate`
+- `issue-91-stage-b-full-review-manifest-notes`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,43 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #91은 review manifest 전체를 listening review notes template으로 변환하는 단계다.
+
+중요한 전제:
+
+- Codex가 subjective listening result를 임의 작성하지 않는다.
+- 기존 generated chord eval report 기반 6개 후보 notes 경로는 유지한다.
+- 새 경로는 hand-written swing, straight-grid reference까지 포함한 full review package를 notes로 만든다.
+
+Implemented:
+
+- `scripts/build_listening_review_notes.py --review_manifest`
+- full review manifest candidate 변환
+- `review_metadata`와 `review_files` 필드 추가
+- rhythm/timing metrics를 `source_metrics`에 보존
+- `scripts/agent_harness.sh stage-b-full-review-notes`
+- docs:
+  - `docs/STAGE_B_FULL_REVIEW_MANIFEST_NOTES_2026-05-22.md`
+
+Result:
+
+- candidate count: `15`
+- reviewed count: `0`
+- pending count: `15`
+- first candidate:
+  - `data_motif_rank_1_sample_1`
+- last candidate:
+  - `straight_guide_tones_rank_3_sample_3`
+- review notes template:
+  - `outputs/stage_b_listening_review_notes/harness_stage_b_full_review_notes/review_notes_template.json`
+
+Decision:
+
+- 이제 사람이 들어야 할 review MIDI/context MIDI path가 notes 안에 직접 남는다.
+- 다음 rule change는 이 full notes가 실제로 채워진 뒤 aggregate 결과로 결정한다.
+
+## Previous Probe Result
 
 Issue #89는 사람이 채운 listening review notes를 다음 generation rule 수정 후보로 집계하는 단계다.
 

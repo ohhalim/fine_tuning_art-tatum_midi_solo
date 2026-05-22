@@ -147,6 +147,7 @@ Stage B에서 명시하는 것:
 41. Stage B review markdown chord eval summary
 42. Stage B listening review notes schema
 43. Stage B filled listening review aggregate
+44. Stage B full review manifest listening notes
 
 가장 최근 의미 있는 결과:
 
@@ -170,6 +171,7 @@ Stage B에서 명시하는 것:
 - Issue #85 writes a combined review markdown so MIDI paths, rhythm metrics, and chord-role metrics can be reviewed together.
 - Issue #87 creates a structured listening review notes schema so subjective review can be recorded consistently instead of as loose comments.
 - Issue #89 aggregates filled listening review notes into next-step signals and refuses to change generation rules when all candidates are still pending.
+- Issue #91 builds listening review notes from the full review manifest so all 15 review candidates, including timing references, have file paths and pending review fields.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -384,6 +386,7 @@ Stage B에서 명시하는 것:
 - Issue #85 result: combined review markdown is written to `outputs/stage_b_generated_chord_eval/harness_stage_b_review_markdown_chord_eval/review_candidates_with_chord_eval.md`.
 - Issue #87 result: listening review notes template contains `6` pending candidates and validates phrase quality, timing, chord fit, issue flags, and decision enums.
 - Issue #89 result: listening review aggregate reports `6` pending candidates, `0` reviewed candidates, and only recommends `collect_listening_reviews`.
+- Issue #91 result: full review manifest notes contain `15` pending candidates with `review_midi_path`, `context_midi_path`, mode, rank, sample, and rhythm/timing metrics.
 
 해석:
 
@@ -663,22 +666,21 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B filled listening review aggregate 추가
+Stage B full review manifest listening notes 추가
 ```
 
 결과:
 
-- filled listening review notes를 decision, phrase quality, timing, chord fit, issue flag 기준으로 집계한다.
-- output: `outputs/stage_b_listening_review_aggregate/harness_stage_b_listening_review_aggregate/listening_review_aggregate.json`
-- candidate count: `6`
+- review manifest 전체를 listening review notes template으로 변환한다.
+- output: `outputs/stage_b_listening_review_notes/harness_stage_b_full_review_notes/review_notes_template.json`
+- candidate count: `15`
 - reviewed count: `0`
-- pending count: `6`
-- has reviewed candidates: `false`
-- recommended follow-up: `collect_listening_reviews`
+- pending count: `15`
+- fields: `review_metadata`, `review_files`, `source_metrics`, `listening`
 
 다음 작업:
 
-- 사람이 채운 review notes가 생기면 `too_safe`, `too_scalar`, `too_mechanical`, `bad_timing`, `bad_chord_fit` 같은 issue flag를 기준으로 후속 issue를 분기한다.
+- full review notes가 채워지면 aggregate 결과로 `too_safe`, `too_scalar`, `too_mechanical`, `bad_timing`, `bad_chord_fit` 같은 issue flag를 기준으로 후속 issue를 분기한다.
 - pending-only artifact에서는 generation rule을 바꾸지 않는다.
 - real Brad/reference chord label은 아직 임의로 넣지 않는다.
 
