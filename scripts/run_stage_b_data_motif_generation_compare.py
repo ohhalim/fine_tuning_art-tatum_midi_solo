@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT_DIR))
 from inference.app.schemas import GenerationRequest  # noqa: E402
 from scripts.run_stage_b_generation_probe import (  # noqa: E402
     CHORD_TONE_INTERVALS,
+    TENSION_INTERVALS,
     build_probe_summary,
     build_stage_b_primer,
     chord_aware_pitch_tokens,
@@ -50,7 +51,7 @@ from scripts.stage_b_tokens import (  # noqa: E402
 )
 
 
-VALID_BASELINE_MODES = {"straight_grid", "hand_written_swing", "data_motif"}
+VALID_BASELINE_MODES = {"straight_grid", "straight_guide_tones", "hand_written_swing", "data_motif"}
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -211,6 +212,127 @@ def nearest_allowed_pitch_token(
     )
 
 
+def pitch_class_set(chord: str | None, intervals_by_quality: dict[str, set[int]]) -> set[int]:
+    root, quality = parse_chord_symbol(chord)
+    root_pc = ROOT_TO_PC.get(root)
+    if root_pc is None:
+        return set()
+    intervals = intervals_by_quality.get(quality, intervals_by_quality["unknown"])
+    return {(int(root_pc) + int(interval)) % 12 for interval in intervals}
+
+
+def chord_tone_pitch_classes(chord: str | None, *, include_root: bool = True) -> set[int]:
+    tones = pitch_class_set(chord, CHORD_TONE_INTERVALS)
+    if include_root:
+        return tones
+    root, _quality = parse_chord_symbol(chord)
+    root_pc = ROOT_TO_PC.get(root)
+    if root_pc is not None and len(tones) > 1:
+        tones.discard(int(root_pc))
+    return tones
+
+
+def guide_tone_pitch_classes(chord: str | None) -> list[int]:
+    root, quality = parse_chord_symbol(chord)
+    root_pc = ROOT_TO_PC.get(root)
+    if root_pc is None:
+        return sorted(chord_tone_pitch_classes(chord, include_root=False))
+    guide_intervals_by_quality = {
+        "maj": [4, 7],
+        "maj7": [4, 11],
+        "min": [3, 7],
+        "min7": [3, 10],
+        "dom7": [4, 10],
+        "dim": [3, 6],
+        "halfdim": [3, 10],
+        "sus": [5, 10],
+        "unknown": [4, 7],
+    }
+    return [
+        (int(root_pc) + int(interval)) % 12
+        for interval in guide_intervals_by_quality.get(quality, guide_intervals_by_quality["unknown"])
+    ]
+
+
+def tension_pitch_classes(chord: str | None) -> set[int]:
+    return pitch_class_set(chord, TENSION_INTERVALS)
+
+
+def approach_pitch_class(target_pitch_class: int, recent_pitch_classes: Sequence[int]) -> int:
+    for offset in (-1, 1, -2, 2):
+        candidate = (int(target_pitch_class) + offset) % 12
+        if candidate not in recent_pitch_classes[-1:]:
+            return candidate
+    return (int(target_pitch_class) - 1) % 12
+
+
+def nearest_pitch_for_pitch_class(
+    pitch_class: int,
+    *,
+    target_pitch: int,
+    recent_pitches: Sequence[int] | None = None,
+) -> int:
+    recent = list(recent_pitches or [])
+    candidates = [
+        pitch
+        for pitch in range(int(PIANO_PITCH_MIN), int(PIANO_PITCH_MAX) + 1)
+        if pitch % 12 == int(pitch_class) % 12
+    ]
+    blocked = set(recent[-2:])
+    filtered = [pitch for pitch in candidates if pitch not in blocked]
+    if filtered:
+        candidates = filtered
+    if recent:
+        previous = int(recent[-1])
+        preferred = [pitch for pitch in candidates if 1 <= abs(pitch - previous) <= 7]
+        if preferred:
+            candidates = preferred
+    return int(
+        min(
+            candidates,
+            key=lambda pitch: (
+                abs(int(pitch) - int(target_pitch)),
+                abs(int(pitch) - 67),
+                int(pitch),
+            ),
+        )
+    )
+
+
+def guide_tone_cadence_pitch_classes(
+    chord: str | None,
+    next_chord: str | None,
+    *,
+    bar_index: int,
+) -> list[tuple[int, str]]:
+    guides = guide_tone_pitch_classes(chord)
+    non_root_tones = sorted(chord_tone_pitch_classes(chord, include_root=False))
+    tensions = sorted(tension_pitch_classes(chord))
+    next_guides = guide_tone_pitch_classes(next_chord)
+
+    if not guides:
+        guides = non_root_tones or sorted(chord_tone_pitch_classes(chord))
+    if not non_root_tones:
+        non_root_tones = guides or sorted(chord_tone_pitch_classes(chord))
+
+    guide_a = guides[int(bar_index) % len(guides)]
+    guide_b = guides[(int(bar_index) + 1) % len(guides)]
+    color = tensions[int(bar_index) % len(tensions)] if tensions else non_root_tones[0]
+    chord_color = non_root_tones[(int(bar_index) + 1) % len(non_root_tones)]
+    next_target = next_guides[0] if next_guides else guide_a
+
+    return [
+        (guide_a, "guide"),
+        (color, "color"),
+        (guide_b, "guide"),
+        (approach_pitch_class(guide_b, [guide_a, color]), "approach"),
+        (guide_b, "guide"),
+        (chord_color, "chord"),
+        (guide_a, "guide"),
+        (approach_pitch_class(next_target, [guide_b, chord_color, guide_a]), "approach_next"),
+    ]
+
+
 def base_pitch_token_for_chord(chord: str | None, rng: random.Random, recent_pitches: Sequence[int]) -> int:
     allowed = chord_aware_pitch_tokens(
         chord,
@@ -349,6 +471,53 @@ def straight_grid_tokens(
     return tokens
 
 
+def straight_guide_tones_tokens(
+    *,
+    primer_tokens: Sequence[int],
+    chords: Sequence[str],
+    bars: int,
+    note_groups_per_bar: int,
+    seed: int,
+) -> list[int]:
+    rng = random.Random(int(seed))
+    tokens = [int(token) for token in primer_tokens]
+    recent_pitches: list[int] = []
+    groups_per_bar = max(1, int(note_groups_per_bar))
+    duration_steps = max(1, int(POSITIONS_PER_BAR) // groups_per_bar)
+    positions = [min(int(POSITIONS_PER_BAR) - 1, index * duration_steps) for index in range(groups_per_bar)]
+
+    for bar_index in range(max(1, int(bars))):
+        chord = chords[bar_index % len(chords)] if chords else None
+        next_chord = chords[(bar_index + 1) % len(chords)] if chords else chord
+        if bar_index > 0:
+            tokens.append(TOKEN_BAR)
+            tokens.extend(chord_tokens(chord))
+        pitch_cells = guide_tone_cadence_pitch_classes(chord, next_chord, bar_index=bar_index)
+        anchor = 64 + ((bar_index % 3) * 3) + rng.choice([-2, 0, 2])
+        for group_index, position in enumerate(positions):
+            pitch_class, role = pitch_cells[group_index % len(pitch_cells)]
+            if role.startswith("approach") and group_index > 0:
+                target_anchor = recent_pitches[-1] + rng.choice([-2, -1, 1, 2])
+            else:
+                target_anchor = anchor + (group_index % 4) * 2
+            pitch = nearest_pitch_for_pitch_class(
+                pitch_class,
+                target_pitch=target_anchor,
+                recent_pitches=recent_pitches,
+            )
+            recent_pitches.append(pitch)
+            tokens.extend(
+                [
+                    position_token(position),
+                    note_velocity_token(4),
+                    note_pitch_token(pitch),
+                    note_duration_token(duration_steps),
+                ]
+            )
+    tokens.append(TOKEN_END)
+    return tokens
+
+
 def data_motif_tokens(
     *,
     primer_tokens: Sequence[int],
@@ -420,6 +589,14 @@ def generated_tokens_for_mode(
 ) -> list[int]:
     if mode == "straight_grid":
         return straight_grid_tokens(
+            primer_tokens=primer_tokens,
+            chords=chords,
+            bars=bars,
+            note_groups_per_bar=note_groups_per_bar,
+            seed=seed,
+        )
+    if mode == "straight_guide_tones":
+        return straight_guide_tones_tokens(
             primer_tokens=primer_tokens,
             chords=chords,
             bars=bars,
