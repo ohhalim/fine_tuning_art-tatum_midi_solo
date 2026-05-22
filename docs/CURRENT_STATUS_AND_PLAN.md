@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-97-stage-b-overlap-free-solo-line-review-export`
+- `issue-99-stage-b-duration-variation-review-baseline`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,48 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #99는 duration collapse를 줄이기 위해 varied-duration review baseline을 추가한 단계다.
+
+중요한 전제:
+
+- 이 단계는 rhythmic 다양성을 조금 추가하는 probe다.
+- "재즈답다"를 자동으로 보장하지 않는다.
+- overlap-free export는 계속 유지한다.
+- subjective listening review는 아직 pending이다.
+
+Implemented:
+
+- `varied_grid` baseline mode
+- `varied_guide_tones` baseline mode
+- 16th-grid onset을 유지하면서 duration pattern 다양화
+- `scripts/agent_harness.sh stage-b-duration-variation-review`
+- docs:
+  - `docs/STAGE_B_DURATION_VARIATION_REVIEW_2026-05-22.md`
+
+Result:
+
+- candidate count: `15`
+- objective reviewable count: `15`
+- objective bucket counts:
+  - clean: `8`
+  - warning: `7`
+- objective flag counts:
+  - chromatic walk: `7`
+  - too stepwise/scalar: `6`
+  - duration pattern collapse: `0`
+  - overlap/polyphonic: `0`
+- previous duration pattern collapse count was `6`
+- aggregate report:
+  - `outputs/stage_b_listening_review_aggregate/harness_stage_b_duration_variation_review/listening_review_aggregate.md`
+
+Decision:
+
+- duration collapse는 objective flag 기준으로 제거됐다.
+- 이제 남은 핵심 문제는 scalar/chromatic exercise 느낌이다.
+- 다음 작업은 pitch contour / phrase vocabulary / cadence target을 개선하는 방향이어야 한다.
+
+## Previous Probe Result
 
 Issue #97은 review export 단계에서 overlap-free solo-line MIDI variant를 만드는 단계다.
 

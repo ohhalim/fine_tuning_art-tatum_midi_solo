@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #97: Stage B overlap-free solo-line review export.
+- Issue #99: Stage B duration variation review baseline.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -242,6 +242,12 @@ For Stage B overlap-free solo-line review export changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-overlap-free-review-export
+```
+
+For Stage B duration variation review changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-duration-variation-review
 ```
 
 For Stage B filled listening review aggregate changes, run:
