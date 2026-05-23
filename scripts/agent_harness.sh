@@ -86,6 +86,8 @@ Modes:
                 Compare data-motif guide tones against data-motif phrase recovery.
   stage-b-clean-review-package
                 Extract objective-clean data-motif phrase recovery candidates for listening review.
+  stage-b-clean-context-diagnostics
+                Diagnose objective-clean context MIDI candidates before subjective review.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   chord-coverage-audit
@@ -1047,6 +1049,21 @@ run_stage_b_clean_review_package() {
     --min_candidates 3
 }
 
+run_stage_b_clean_context_diagnostics() {
+  local source_run_id="${SOURCE_RUN_ID:-harness_stage_b_clean_review_package}"
+  local run_id="${RUN_ID:-harness_stage_b_clean_context_diagnostics}"
+  local clean_package_path="outputs/stage_b_clean_review_package/${source_run_id}/clean_review_package.json"
+  if [[ ! -f "$clean_package_path" ]]; then
+    print_header "Stage B objective-clean review package"
+    RUN_ID="$source_run_id" run_stage_b_clean_review_package
+  fi
+  print_header "Stage B clean context diagnostics"
+  "$PYTHON_BIN" scripts/build_clean_context_diagnostics.py \
+    --run_id "$run_id" \
+    --clean_package "$clean_package_path" \
+    --min_candidates 3
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -1287,6 +1304,9 @@ case "$MODE" in
     ;;
   stage-b-clean-review-package)
     run_stage_b_clean_review_package
+    ;;
+  stage-b-clean-context-diagnostics)
+    run_stage_b_clean_context_diagnostics
     ;;
   manifest-dry-run)
     run_manifest_dry_run
