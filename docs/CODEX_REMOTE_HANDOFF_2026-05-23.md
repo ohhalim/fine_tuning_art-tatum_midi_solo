@@ -20,7 +20,13 @@
 main
 ```
 
-최신 main merge:
+최신 handoff 문서 커밋:
+
+```text
+9fa7470 docs: Codex 원격 handoff 문서 추가
+```
+
+최신 기능 merge:
 
 ```text
 685ce5b Merge pull request #112 from ohhalim/issue-111-stage-b-clean-context-diagnostics

@@ -8,7 +8,12 @@
 
 현재 브랜치:
 
-- `issue-111-stage-b-clean-context-diagnostics`
+- `main`
+
+현재 active issue:
+
+- 없음. Issue #111은 PR #112로 main에 merge 완료.
+- 다음 권장 이슈: `Stage B clean listening review notes 추가`
 
 현재 범위가 아닌 것:
 

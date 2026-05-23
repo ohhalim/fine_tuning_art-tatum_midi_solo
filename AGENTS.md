@@ -9,9 +9,11 @@ Primary goal:
 - Build a reliable local MIDI generation and validation pipeline.
 - Prove model behavior with small, reproducible experiments before expanding scope.
 
-Current active branch scope:
+Current handoff scope:
 
-- Issue #111: Stage B clean context phrase diagnostics.
+- Latest functional issue completed: Issue #111, Stage B clean context phrase diagnostics.
+- Current branch should be `main` before starting new work.
+- Recommended next issue: Stage B clean listening review notes for the 3 objective-clean context candidates.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
