@@ -83,6 +83,19 @@ def run_lengths(values: list[int]) -> list[int]:
     return lengths
 
 
+def max_simultaneous_notes(notes: list[pretty_midi.Note]) -> int:
+    events: list[tuple[float, int]] = []
+    for note in notes:
+        events.append((float(note.start), 1))
+        events.append((float(note.end), -1))
+    current = 0
+    peak = 0
+    for _, delta in sorted(events, key=lambda event: (event[0], 0 if event[1] < 0 else 1)):
+        current += delta
+        peak = max(peak, current)
+    return int(peak)
+
+
 def analyze_solo_path(path: Path) -> dict[str, Any]:
     if not path.exists():
         raise CleanContextDiagnosticsError(f"solo MIDI does not exist: {path}")
@@ -137,6 +150,7 @@ def analyze_solo_path(path: Path) -> dict[str, Any]:
         "max_duration_beats": float(max(durations_beats)),
         "max_duration_bar_ratio": ratio(max(durations_beats), 4.0),
         "long_note_ratio": ratio(sum(1 for duration in durations_beats if duration >= 1.0), len(notes)),
+        "max_simultaneous_notes": max_simultaneous_notes(notes),
         "most_common_pitch_ratio": ratio(most_common_pitch_count, len(notes)),
         "repeated_pitch_interval_ratio": ratio(repeated_interval_count, len(intervals)),
         "longest_same_pitch_run": int(max(same_pitch_runs)),
@@ -184,6 +198,8 @@ def diagnostic_flags(metrics: dict[str, Any]) -> list[str]:
         flags.append("timing_needs_review")
     if float(metrics.get("max_duration_bar_ratio", 0.0) or 0.0) > 0.50:
         flags.append("long_sustain_risk")
+    if int(metrics.get("max_simultaneous_notes", 0) or 0) > 1:
+        flags.append("polyphonic_solo_overlap")
     if float(metrics.get("most_common_pitch_ratio", 0.0) or 0.0) > 0.20:
         flags.append("dominant_pitch_reuse")
     if int(metrics.get("longest_same_pitch_run", 0) or 0) >= 3:
@@ -257,8 +273,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- diagnostic flags: `{report['diagnostic_flag_counts']}`",
         f"- decision hints: `{report['decision_hint_counts']}`",
         "",
-        "| candidate | notes | unique | bars | grid off | max dur | pitch reuse | flags | hint | context |",
-        "|---|---:|---:|---:|---:|---:|---:|---|---|---|",
+        "| candidate | notes | unique | bars | grid off | max dur | max simultaneous | pitch reuse | flags | hint | context |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---|---|---|",
     ]
     for candidate in report["candidates"]:
         solo = candidate["solo_metrics"]
@@ -273,6 +289,7 @@ def markdown_report(report: dict[str, Any]) -> str:
                     f"{solo.get('covered_bar_count', 0)}/{solo.get('bar_count', 0)}",
                     f"{float(solo.get('off_sixteenth_grid_ratio', 0.0)):.3f}",
                     f"{float(solo.get('max_duration_beats', 0.0)):.3f}",
+                    str(solo.get("max_simultaneous_notes", 0)),
                     f"{float(solo.get('most_common_pitch_ratio', 0.0)):.3f}",
                     ", ".join(solo.get("diagnostic_flags", [])) or "none",
                     str(solo.get("decision_hint", "")),
@@ -288,11 +305,12 @@ def markdown_report(report: dict[str, Any]) -> str:
             "",
             "For each candidate, listen to the context MIDI and fill:",
             "",
-            "- timing: `good`, `too_loose`, `too_straight`, `unclear`",
-            "- chord_fit: `fits`, `too_safe`, `too_outside`, `unclear`",
-            "- phrase_continuation: `phrase_like`, `fragmented`, `exercise_like`, `unclear`",
-            "- landing: `clear`, `weak`, `missing`, `unclear`",
-            "- jazz_vocabulary: `present`, `weak`, `absent`, `unclear`",
+            "- timing: `strong`, `acceptable`, `stiff`, `rushed`, `dragging`, `pending`",
+            "- chord_fit: `strong`, `acceptable`, `too_safe`, `too_outside`, `unclear`, `pending`",
+            "- phrase_continuation: `strong`, `acceptable`, `weak`, `broken`, `pending`",
+            "- landing: `strong`, `acceptable`, `weak`, `unresolved`, `pending`",
+            "- jazz_vocabulary: `strong`, `acceptable`, `thin`, `exercise_like`, `pending`",
+            "- decision: `keep`, `needs_followup`, `reject`, `pending`",
         ]
     )
     return "\n".join(lines).rstrip() + "\n"

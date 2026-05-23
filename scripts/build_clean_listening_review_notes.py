@@ -32,28 +32,52 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=True, indent=2) + "\n", encoding="utf-8")
 
 
+def _as_mapping(value: Any) -> dict[str, Any]:
+    if isinstance(value, dict):
+        return value
+    return {}
+
+
+def _first_present(*values: Any, default: Any = "") -> Any:
+    for value in values:
+        if value not in (None, ""):
+            return value
+    return default
+
+
 def build_candidate_note(candidate: dict[str, Any], diagnostics_by_id: dict[str, dict[str, Any]]) -> dict[str, Any]:
     candidate_id = str(candidate.get("candidate_id") or "").strip()
     if not candidate_id:
         raise CleanListeningReviewNotesError("clean package candidate_id is required")
     diagnostics = diagnostics_by_id.get(candidate_id, {})
-    phrase_metrics = diagnostics.get("phrase_metrics", {})
+    package_metrics = _as_mapping(candidate.get("metrics"))
+    if not package_metrics:
+        package_metrics = candidate
+    phrase_metrics = _as_mapping(diagnostics.get("solo_metrics"))
+    if not phrase_metrics:
+        phrase_metrics = _as_mapping(diagnostics.get("phrase_metrics"))
     return {
         "candidate_id": candidate_id,
         "review_files": {
-            "midi_path": str(candidate.get("midi_path") or ""),
+            "midi_path": str(_first_present(candidate.get("review_midi_path"), candidate.get("midi_path"))),
             "context_midi_path": str(candidate.get("context_midi_path") or ""),
             "chord_guide_path": str(candidate.get("chord_guide_path") or ""),
             "bass_root_guide_path": str(candidate.get("bass_root_guide_path") or ""),
         },
         "source_metrics": {
-            "note_count": int(candidate.get("note_count", 0) or 0),
-            "unique_pitch_count": int(candidate.get("unique_pitch_count", 0) or 0),
-            "chord_tone_ratio": float(candidate.get("chord_tone_ratio", 0.0) or 0.0),
-            "tension_ratio": float(candidate.get("tension_ratio", 0.0) or 0.0),
-            "unresolved_large_leap_ratio": float(candidate.get("unresolved_large_leap_ratio", 0.0) or 0.0),
+            "note_count": int(_first_present(package_metrics.get("note_count"), phrase_metrics.get("note_count"), default=0) or 0),
+            "unique_pitch_count": int(
+                _first_present(package_metrics.get("unique_pitch_count"), phrase_metrics.get("unique_pitch_count"), default=0)
+                or 0
+            ),
+            "chord_tone_ratio": float(package_metrics.get("chord_tone_ratio", 0.0) or 0.0),
+            "tension_ratio": float(package_metrics.get("tension_ratio", 0.0) or 0.0),
+            "unresolved_large_leap_ratio": float(package_metrics.get("unresolved_large_leap_ratio", 0.0) or 0.0),
             "bar_coverage_ratio": float(phrase_metrics.get("bar_coverage_ratio", 0.0) or 0.0),
-            "off_grid_ratio": float(phrase_metrics.get("off_grid_ratio", 0.0) or 0.0),
+            "off_grid_ratio": float(
+                _first_present(phrase_metrics.get("off_sixteenth_grid_ratio"), phrase_metrics.get("off_grid_ratio"), default=0.0)
+                or 0.0
+            ),
             "max_duration_beats": float(phrase_metrics.get("max_duration_beats", 0.0) or 0.0),
             "max_simultaneous_notes": int(phrase_metrics.get("max_simultaneous_notes", 0) or 0),
         },
