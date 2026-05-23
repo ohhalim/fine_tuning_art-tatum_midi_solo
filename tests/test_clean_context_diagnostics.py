@@ -66,9 +66,35 @@ class CleanContextDiagnosticsTest(unittest.TestCase):
             candidate = report["candidates"][0]
             self.assertEqual(candidate["solo_metrics"]["note_count"], 32)
             self.assertEqual(candidate["solo_metrics"]["covered_bar_count"], 4)
+            self.assertEqual(candidate["solo_metrics"]["max_simultaneous_notes"], 1)
             self.assertEqual(candidate["context_summary"]["has_chord_guide"], True)
             self.assertEqual(candidate["context_summary"]["has_bass_guide"], True)
             self.assertIn("timing", candidate["review_checklist"])
+
+    def test_build_clean_context_diagnostics_reports_overlap_peak(self) -> None:
+        with TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            solo_path = tmp_path / "solo.mid"
+            context_path = tmp_path / "context.mid"
+            write_midi(solo_path, [(60, 0.0, 1.0), (64, 0.5, 1.5)])
+            write_context(context_path)
+
+            report = build_clean_context_diagnostics(
+                {
+                    "candidates": [
+                        {
+                            "candidate_id": "overlap_candidate",
+                            "review_midi_path": str(solo_path),
+                            "context_midi_path": str(context_path),
+                        }
+                    ],
+                },
+                output_dir=tmp_path / "diagnostics",
+            )
+
+        candidate = report["candidates"][0]
+        self.assertEqual(candidate["solo_metrics"]["max_simultaneous_notes"], 2)
+        self.assertIn("polyphonic_solo_overlap", candidate["solo_metrics"]["diagnostic_flags"])
 
     def test_context_summary_handles_missing_context(self) -> None:
         summary = context_summary(Path("missing_context.mid"))
@@ -101,6 +127,9 @@ class CleanContextDiagnosticsTest(unittest.TestCase):
         self.assertIn("short_candidate", markdown)
         self.assertIn("too_sparse_for_phrase_review", markdown)
         self.assertIn("Review Checklist", markdown)
+        self.assertIn("max simultaneous", markdown)
+        self.assertIn("needs_followup", markdown)
+        self.assertNotIn("too_straight", markdown)
 
 
 if __name__ == "__main__":

@@ -42,3 +42,22 @@ bash scripts/agent_harness.sh stage-b-clean-listening-review-notes
 이 단계는 generation rule을 바꾸지 않는다.
 
 목적은 objective-clean 3개를 실제 청취 관점으로 같은 기준에서 비교할 수 있게 만드는 것이다.
+
+## 후속 기록
+
+2026-05-24에 Codex MIDI-note proxy review를 별도 문서로 기록했다.
+
+```text
+docs/STAGE_B_CLEAN_MIDI_PROXY_REVIEW_2026-05-24.md
+```
+
+이 후속 기록은 실제 오디오 청취 리뷰가 아니라 MIDI note timing, pitch contour, context chord guide track을 읽은 piano-roll proxy review다.
+
+요약:
+
+- reviewed candidates: `3`
+- `needs_followup`: `2`
+- `reject`: `1`
+- `keep`: `0`
+
+다음 generation 방향은 broad training이 아니라 data-derived contour/cadence landing repair probe다.

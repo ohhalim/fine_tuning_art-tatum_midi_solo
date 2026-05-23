@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-05-23
+작성일: 2026-05-24
 
 ## Current Focus
 
@@ -8,12 +8,12 @@
 
 현재 브랜치:
 
-- `main`
+- 기준 브랜치: `main`
 
 현재 active issue:
 
-- 없음. Issue #111은 PR #112로 main에 merge 완료.
-- 다음 권장 이슈: `Stage B clean listening review notes 추가`
+- Stage B clean MIDI-note proxy review 결과 기록
+- 다음 권장 이슈: `Stage B data-derived contour/cadence landing repair probe`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,51 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Probe Result
+## Latest Review Result
+
+Issue #113은 Issue #109 clean review package와 Issue #111 clean context diagnostics 결과를 바탕으로,
+objective-clean context MIDI 후보 3개를 같은 schema에서 review할 수 있는 notes template을 추가한 단계다.
+
+그 다음 로컬 follow-up으로 Codex MIDI-note proxy review를 작성했다.
+
+중요한 전제:
+
+- 실제 오디오 청취 리뷰가 아니다.
+- MIDI note timing, pitch contour, context chord guide track을 읽은 piano-roll proxy review다.
+- `keep` 후보는 아직 없다.
+- 이 결과는 다음 generation probe 방향을 정하기 위한 보조 근거다.
+
+Docs:
+
+- `docs/STAGE_B_CLEAN_LISTENING_REVIEW_NOTES_2026-05-23.md`
+- `docs/STAGE_B_CLEAN_MIDI_PROXY_REVIEW_2026-05-24.md`
+
+Result:
+
+- reviewed candidates: `3`
+- pending candidates: `0`
+- decisions:
+  - `needs_followup`: `2`
+  - `reject`: `1`
+  - `keep`: `0`
+
+Candidate decisions:
+
+| candidate | timing | chord_fit | phrase | landing | vocabulary | decision |
+|---|---|---|---|---|---|---|
+| `data_motif_phrase_recovery_rank_1_sample_1` | `stiff` | `acceptable` | `acceptable` | `acceptable` | `thin` | `needs_followup` |
+| `data_motif_phrase_recovery_rank_2_sample_2` | `stiff` | `acceptable` | `weak` | `unresolved` | `thin` | `needs_followup` |
+| `data_motif_phrase_recovery_rank_3_sample_3` | `stiff` | `acceptable` | `broken` | `unresolved` | `exercise_like` | `reject` |
+
+Decision:
+
+- 후보 1은 현재 best follow-up baseline으로 남긴다.
+- 후보 2는 landing repair와 contour smoothing 테스트용으로만 의미가 있다.
+- 후보 3은 negative example로 둔다.
+- 다음 probe는 broad training이나 audio pivot이 아니라 contour/cadence/landing repair여야 한다.
+- rhythm stiffness와 repeated duration/rest template도 같이 추적해야 한다.
+
+## Previous Probe Result
 
 Issue #111은 Issue #109 clean review package 후보 3개를 context listening review 전에 MIDI note-level로 다시 진단한 단계다.
 
@@ -77,8 +121,9 @@ Result:
 Decision:
 
 - 객관 진단상 지금 후보 3개는 더 자동으로 거르기보다 들어볼 단계다.
-- 다음은 listening notes를 채워 phrase/timing/chord-fit/jazz-vocabulary 문제를 분류해야 한다.
-- 계속 초급 멜로디처럼 들리면 data-derived phrase/cadence vocabulary를 강화한다.
+- Issue #113과 2026-05-24 proxy review에서 notes는 채워졌다.
+- proxy review 결과, 후보들은 objective-clean이지만 여전히 timing stiff, contour/landing weakness, thin vocabulary 문제가 있다.
+- 다음은 data-derived contour/cadence landing repair probe다.
 - LMDM/audio diffusion 구현으로 pivot하지 않는다.
 
 ## Previous Probe Result

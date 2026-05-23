@@ -16,15 +16,17 @@ class CleanListeningReviewNotesTest(unittest.TestCase):
             "candidates": [
                 {
                     "candidate_id": "data_motif_phrase_recovery_rank_1_sample_1",
-                    "midi_path": "outputs/a.mid",
+                    "review_midi_path": "outputs/a.mid",
                     "context_midi_path": "outputs/a_ctx.mid",
                     "chord_guide_path": "outputs/a_chord.mid",
                     "bass_root_guide_path": "outputs/a_bass.mid",
-                    "note_count": 63,
-                    "unique_pitch_count": 19,
-                    "chord_tone_ratio": 0.508,
-                    "tension_ratio": 0.492,
-                    "unresolved_large_leap_ratio": 0.0,
+                    "metrics": {
+                        "note_count": 63,
+                        "unique_pitch_count": 19,
+                        "chord_tone_ratio": 0.508,
+                        "tension_ratio": 0.492,
+                        "unresolved_large_leap_ratio": 0.0,
+                    },
                 }
             ],
         }
@@ -35,9 +37,11 @@ class CleanListeningReviewNotesTest(unittest.TestCase):
             "candidates": [
                 {
                     "candidate_id": "data_motif_phrase_recovery_rank_1_sample_1",
-                    "phrase_metrics": {
+                    "solo_metrics": {
+                        "note_count": 63,
+                        "unique_pitch_count": 19,
                         "bar_coverage_ratio": 1.0,
-                        "off_grid_ratio": 0.0,
+                        "off_sixteenth_grid_ratio": 0.0,
                         "max_duration_beats": 1.0,
                         "max_simultaneous_notes": 1,
                     },
@@ -54,6 +58,18 @@ class CleanListeningReviewNotesTest(unittest.TestCase):
         self.assertEqual(listening["phrase_continuation"], "pending")
         self.assertEqual(listening["landing"], "pending")
         self.assertEqual(listening["jazz_vocabulary"], "pending")
+
+    def test_build_template_carries_review_paths_and_metrics(self) -> None:
+        notes = build_clean_listening_review_notes(self.sample_clean_package(), self.sample_diagnostics())
+        candidate = notes["candidates"][0]
+
+        self.assertEqual(candidate["review_files"]["midi_path"], "outputs/a.mid")
+        self.assertEqual(candidate["review_files"]["context_midi_path"], "outputs/a_ctx.mid")
+        self.assertEqual(candidate["source_metrics"]["note_count"], 63)
+        self.assertEqual(candidate["source_metrics"]["unique_pitch_count"], 19)
+        self.assertEqual(candidate["source_metrics"]["chord_tone_ratio"], 0.508)
+        self.assertEqual(candidate["source_metrics"]["bar_coverage_ratio"], 1.0)
+        self.assertEqual(candidate["source_metrics"]["off_grid_ratio"], 0.0)
 
     def test_validate_counts_pending(self) -> None:
         notes = build_clean_listening_review_notes(self.sample_clean_package(), self.sample_diagnostics())
