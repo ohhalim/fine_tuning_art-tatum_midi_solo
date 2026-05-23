@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-109-stage-b-clean-review-package`
+- `issue-111-stage-b-clean-context-diagnostics`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,48 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #111은 Issue #109 clean review package 후보 3개를 context listening review 전에 MIDI note-level로 다시 진단한 단계다.
+
+중요한 전제:
+
+- 새 generation rule을 추가한 것이 아니다.
+- objective-clean 후보가 실제 jazz quality를 보장하지 않는다.
+- 목적은 "이제 들어볼 후보인지"와 "자동 rule을 더 고칠 문제인지"를 분리하는 것이다.
+
+Implemented:
+
+- `scripts/build_clean_context_diagnostics.py`
+- `tests/test_clean_context_diagnostics.py`
+- `scripts/agent_harness.sh stage-b-clean-context-diagnostics`
+- docs:
+  - `docs/STAGE_B_CLEAN_CONTEXT_DIAGNOSTICS_2026-05-23.md`
+
+Result:
+
+- output:
+  - `outputs/stage_b_clean_context_diagnostics/harness_stage_b_clean_context_diagnostics/clean_context_diagnostics.md`
+- candidate count: `3`
+- diagnostic flags: none
+- decision hint:
+  - `listen_with_context`: `3`
+- all candidates:
+  - note count: `63`
+  - bar coverage: `8/8`
+  - off-grid ratio: `0.000`
+  - max duration: `1.000` beat
+  - context MIDI: exists
+  - chord guide: exists
+  - bass root guide: exists
+
+Decision:
+
+- 객관 진단상 지금 후보 3개는 더 자동으로 거르기보다 들어볼 단계다.
+- 다음은 listening notes를 채워 phrase/timing/chord-fit/jazz-vocabulary 문제를 분류해야 한다.
+- 계속 초급 멜로디처럼 들리면 data-derived phrase/cadence vocabulary를 강화한다.
+- LMDM/audio diffusion 구현으로 pivot하지 않는다.
+
+## Previous Probe Result
 
 Issue #109는 Issue #107의 Stage B data-motif phrase recovery 결과에서 objective-clean 후보만 추출해 listening review package로 묶는 단계다.
 

@@ -163,6 +163,7 @@ Stage B에서 명시하는 것:
 51. Stage B phrase recovery review baseline
 52. Stage B data motif phrase recovery baseline
 53. Stage B objective clean review package
+54. Stage B clean context phrase diagnostics
 
 가장 최근 의미 있는 결과:
 
@@ -197,6 +198,7 @@ Stage B에서 명시하는 것:
 - Issue #107 combines data-derived motif rhythm with phrase recovery pitch grammar and keeps `data_motif_phrase_recovery` objective-clean.
 - Issue #109 extracts only the objective-clean `data_motif_phrase_recovery` candidates into a focused listening review package.
 - Issue #109 result: `3` clean candidates, all with context MIDI paths, note count `63`, unique pitch count `19-23`, unresolved large leap ratio `0.000-0.045`, and tension ratio `0.476-0.524`.
+- Issue #111 reads those clean context candidates back at MIDI note-level and reports `3/3` as `listen_with_context`, with no diagnostic flags.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -421,6 +423,7 @@ Stage B에서 명시하는 것:
 - Issue #105 result: phrase recovery review reports `phrase_cadence` candidates as `3` warnings and `phrase_recovery` candidates as `3` clean candidates.
 - Issue #107 result: data motif phrase recovery review reports `data_motif_guide_tones` as `3` warnings and `data_motif_phrase_recovery` as `3` clean candidates.
 - Issue #109 result: objective clean review package keeps only the `3` `data_motif_phrase_recovery` candidates and writes `outputs/stage_b_clean_review_package/harness_stage_b_clean_review_package/clean_review_package.md`.
+- Issue #111 result: clean context diagnostics reports `3` candidates, diagnostic flags `{}`, bar coverage `8/8`, off-grid ratio `0.000`, max duration `1.000` beat, and decision hint `listen_with_context`.
 
 해석:
 
@@ -432,6 +435,7 @@ Stage B에서 명시하는 것:
 - real phrase reference stats와 motif extraction 기준으로 보면 다음은 hand-written rhythm rule 확장이 아니라 data-derived motif/cadence control 쪽이 맞다.
 - 다만 pitch-role 쪽은 real reference chord label이 아직 없으므로, 다음 개선은 실제 청취 결과를 notes에 채운 뒤 issue distribution으로 후속 generation rule을 분기하는 순서가 맞다.
 - 현재 다음 판단은 새 rule 추가가 아니라 clean package의 context MIDI를 듣고 phrase/timing/chord-fit review를 채우는 것이다.
+- Issue #111 기준으로도 자동 objective blocker는 남지 않았으므로, 다음 병목은 실제 subjective phrase quality review다.
 
 ### Phase 3.10. Swing/Motif Phrase Grammar
 
@@ -701,25 +705,27 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B objective clean review package 추가
+Stage B clean context phrase diagnostics 추가
 ```
 
 결과:
 
-- Issue #107 후보 중 objective-clean `data_motif_phrase_recovery`만 추출했다.
-- output: `outputs/stage_b_clean_review_package/harness_stage_b_clean_review_package/clean_review_package.md`
+- Issue #109 clean package 후보 3개를 MIDI note-level로 다시 진단했다.
+- output: `outputs/stage_b_clean_context_diagnostics/harness_stage_b_clean_context_diagnostics/clean_context_diagnostics.md`
 - candidate count: `3`
 - selected mode: `data_motif_phrase_recovery`
-- note count: `63`
+- note count: `63`, `63`, `63`
 - unique pitch count: `19-23`
-- unresolved large leap ratio: `0.000-0.045`
-- chord-tone ratio: `0.476-0.524`
-- tension ratio: `0.476-0.524`
-- solo MIDI와 context MIDI를 함께 제공한다.
+- bar coverage: `8/8`
+- off-grid ratio: `0.000`
+- max duration: `1.000` beat
+- diagnostic flags: none
+- decision hint: `listen_with_context`
+- context MIDI includes chord guide, bass root guide, and solo track.
 
 다음 작업:
 
-- clean package의 context MIDI를 기준으로 subjective listening review를 채운다.
+- clean context MIDI를 기준으로 subjective listening review를 채운다.
 - objective clean 후보라도 broad training으로 넘어가기 전 실제 piano-roll/listening review를 먼저 한다.
 - 문제가 계속 "초급 멜로디/코드톤 나열"이면 data-derived contour/cadence pattern을 더 직접 추출할지 결정한다.
 - real Brad/reference chord label은 아직 임의로 넣지 않는다.

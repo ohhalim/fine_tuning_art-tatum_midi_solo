@@ -11,7 +11,7 @@ Primary goal:
 
 Current active branch scope:
 
-- Issue #109: Stage B objective clean review package.
+- Issue #111: Stage B clean context phrase diagnostics.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -279,6 +279,12 @@ For Stage B objective-clean review package changes, run:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-clean-review-package
+```
+
+For Stage B clean context diagnostics changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-clean-context-diagnostics
 ```
 
 For Stage B filled listening review aggregate changes, run:
