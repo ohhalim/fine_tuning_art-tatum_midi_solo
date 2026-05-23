@@ -6,6 +6,8 @@
 
 ## Active Docs
 
+- `CODEX_REMOTE_HANDOFF_2026-05-23.md`
+  - Codex 앱/원격 세션이 최신 상태, 목표, 다음 작업을 바로 이해하기 위한 handoff 문서.
 - `CURRENT_STATUS_AND_PLAN.md`
   - 현재 브랜치 상태, 결정 사항, 다음 실행 순서.
 - `BRAD_MEHLDAU_FINETUNING_PLAN.md`
