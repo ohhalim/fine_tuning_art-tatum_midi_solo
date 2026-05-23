@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-05-22
+작성일: 2026-05-23
 
 ## Current Focus
 
@@ -8,7 +8,7 @@
 
 현재 브랜치:
 
-- `issue-107-stage-b-data-motif-phrase-recovery`
+- `issue-109-stage-b-clean-review-package`
 
 현재 범위가 아닌 것:
 
@@ -35,6 +35,51 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
 ## Latest Probe Result
+
+Issue #109는 Issue #107의 Stage B data-motif phrase recovery 결과에서 objective-clean 후보만 추출해 listening review package로 묶는 단계다.
+
+중요한 전제:
+
+- 새 generation rule을 추가한 것이 아니다.
+- objective clean은 subjective jazz quality를 뜻하지 않는다.
+- 목적은 "들을 가치가 있는 후보"만 줄여서 review loop를 좁히는 것이다.
+
+Implemented:
+
+- `scripts/build_clean_review_package.py`
+- clean 후보 필터:
+  - `objective_bucket == clean`
+  - `objective_flags == []`
+  - `mode == data_motif_phrase_recovery`
+- copied solo MIDI/context MIDI review package
+- `scripts/agent_harness.sh stage-b-clean-review-package`
+- docs:
+  - `docs/STAGE_B_CLEAN_REVIEW_PACKAGE_2026-05-23.md`
+
+Result:
+
+- output:
+  - `outputs/stage_b_clean_review_package/harness_stage_b_clean_review_package/clean_review_package.md`
+- candidate count: `3`
+- selected mode:
+  - `data_motif_phrase_recovery`
+- selected candidates:
+  - `data_motif_phrase_recovery_rank_1_sample_1`
+  - `data_motif_phrase_recovery_rank_2_sample_2`
+  - `data_motif_phrase_recovery_rank_3_sample_3`
+- note count: `63`, `63`, `63`
+- unique pitch count: `19`, `23`, `22`
+- unresolved large leap ratio: `0.000`, `0.000`, `0.045`
+- chord-tone ratio: `0.508`, `0.524`, `0.476`
+- tension ratio: `0.492`, `0.476`, `0.524`
+
+Decision:
+
+- 이제 "무작위 후보 전체"가 아니라 objective-clean 후보 3개를 context MIDI로 들으면 된다.
+- 이 결과는 아직 jazz solo quality 성공이 아니다.
+- 다음 판단은 chord context 위에서 phrase continuation, landing, timing, jazz vocabulary가 실제로 들리는지 확인하는 것이다.
+
+## Previous Probe Result
 
 Issue #107은 `phrase_recovery` pitch grammar를 data-derived motif rhythm template과 결합한 단계다.
 
