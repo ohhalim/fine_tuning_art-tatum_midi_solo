@@ -184,12 +184,14 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 30. data motif phrase recovery baseline
 31. objective clean review package
 32. clean context diagnostics
+33. clean listening review notes template
+34. clean MIDI-note proxy review
 
 자세한 전체 기록은 `docs/CORE_PLAN.md`에 있다.
 
 ## 7. Latest Meaningful Result
 
-최신 의미 있는 결과는 Issue #111이다.
+최신 의미 있는 결과는 Issue #113 이후의 clean MIDI-note proxy review다.
 
 Issue #109에서 objective-clean 후보 3개를 골랐다.
 
@@ -199,34 +201,54 @@ Issue #109에서 objective-clean 후보 3개를 골랐다.
 - `data_motif_phrase_recovery_rank_2_sample_2`
 - `data_motif_phrase_recovery_rank_3_sample_3`
 
-Issue #111에서 이 후보들을 MIDI note-level로 다시 진단했다.
+Issue #111에서 이 후보들을 MIDI note-level로 다시 진단했고, Issue #113에서 같은 schema로 review할 수 있는 clean listening review notes template을 만들었다.
+
+2026-05-24 로컬 follow-up에서는 Codex가 MIDI note timing, pitch contour, context chord guide track을 읽어 proxy review를 작성했다.
+
+중요한 경계:
+
+```text
+이것은 실제 오디오 청취 리뷰가 아니다.
+MIDI-note / piano-roll proxy review이며, 최종 subjective jazz quality proof가 아니다.
+```
 
 결과:
 
 - candidate count: `3`
-- diagnostic flags: none
-- decision hint:
-  - `listen_with_context`: `3`
+- reviewed count: `3`
+- pending count: `0`
+- decision counts:
+  - `needs_followup`: `2`
+  - `reject`: `1`
+  - `keep`: `0`
 - all candidates:
   - note count: `63`
   - bar coverage: `8/8`
   - off-grid ratio: `0.000`
   - max duration: `1.000` beat
+  - max simultaneous solo notes: `1`
   - context MIDI exists
   - chord guide exists
   - bass root guide exists
 
+Candidate decisions:
+
+| candidate | timing | chord_fit | phrase | landing | vocabulary | decision |
+|---|---|---|---|---|---|---|
+| `data_motif_phrase_recovery_rank_1_sample_1` | `stiff` | `acceptable` | `acceptable` | `acceptable` | `thin` | `needs_followup` |
+| `data_motif_phrase_recovery_rank_2_sample_2` | `stiff` | `acceptable` | `weak` | `unresolved` | `thin` | `needs_followup` |
+| `data_motif_phrase_recovery_rank_3_sample_3` | `stiff` | `acceptable` | `broken` | `unresolved` | `exercise_like` | `reject` |
+
 해석:
 
 ```text
-객관 진단상 지금 후보 3개는 더 자동으로 거르기보다 들어볼 단계다.
+객관 진단상 clean이지만, proxy review 기준으로는 keep 후보가 없다.
 ```
 
 중요:
 
 ```text
-이것은 jazz quality 성공이 아니다.
-이제 병목은 subjective listening review다.
+다음 병목은 basic MIDI validity가 아니라 rhythm stiffness, contour continuity, landing, thin vocabulary다.
 ```
 
 ## 8. Generated Outputs Are Not Committed
@@ -238,6 +260,7 @@ Issue #111에서 이 후보들을 MIDI note-level로 다시 진단했다.
 ```bash
 bash scripts/agent_harness.sh stage-b-clean-review-package
 bash scripts/agent_harness.sh stage-b-clean-context-diagnostics
+bash scripts/agent_harness.sh stage-b-clean-listening-review-notes
 ```
 
 생성될 주요 파일:
@@ -245,6 +268,7 @@ bash scripts/agent_harness.sh stage-b-clean-context-diagnostics
 ```text
 outputs/stage_b_clean_review_package/harness_stage_b_clean_review_package/clean_review_package.md
 outputs/stage_b_clean_context_diagnostics/harness_stage_b_clean_context_diagnostics/clean_context_diagnostics.md
+outputs/stage_b_clean_listening_review_notes/harness_stage_b_clean_listening_review_notes/clean_listening_review_notes_template.json
 ```
 
 로컬에서 마지막으로 사용한 context MIDI 파일:
@@ -271,9 +295,11 @@ Latest implementation files:
 ```text
 scripts/build_clean_review_package.py
 scripts/build_clean_context_diagnostics.py
+scripts/build_clean_listening_review_notes.py
 scripts/agent_harness.sh
 tests/test_clean_review_package.py
 tests/test_clean_context_diagnostics.py
+tests/test_clean_listening_review_notes.py
 ```
 
 Latest result docs:
@@ -281,6 +307,8 @@ Latest result docs:
 ```text
 docs/STAGE_B_CLEAN_REVIEW_PACKAGE_2026-05-23.md
 docs/STAGE_B_CLEAN_CONTEXT_DIAGNOSTICS_2026-05-23.md
+docs/STAGE_B_CLEAN_LISTENING_REVIEW_NOTES_2026-05-23.md
+docs/STAGE_B_CLEAN_MIDI_PROXY_REVIEW_2026-05-24.md
 ```
 
 Core historical docs:
@@ -314,6 +342,12 @@ For the latest clean context diagnostics:
 bash scripts/agent_harness.sh stage-b-clean-context-diagnostics
 ```
 
+For the latest clean listening review notes template:
+
+```bash
+bash scripts/agent_harness.sh stage-b-clean-listening-review-notes
+```
+
 Expected quick result:
 
 ```text
@@ -345,70 +379,31 @@ Minimum checks:
 - grid/timing is explainable
 - context MIDI exists when listening review needs chord context
 
-Current latest candidates pass the objective gate, but still need listening review.
+Current latest candidates pass the objective gate, but the MIDI-note proxy review did not produce a `keep` candidate.
 
 ## 12. What To Do Next
 
-The next correct task is **not** to add another generation rule immediately.
+The next correct task is **not** broad training, audio diffusion, or backend work.
 
-Next step:
-
-```text
-Create or fill a clean listening review notes package for the 3 context MIDI candidates.
-```
-
-The review should classify each candidate:
-
-- timing:
-  - `good`
-  - `too_loose`
-  - `too_straight`
-  - `unclear`
-- chord fit:
-  - `fits`
-  - `too_safe`
-  - `too_outside`
-  - `unclear`
-- phrase continuation:
-  - `phrase_like`
-  - `fragmented`
-  - `exercise_like`
-  - `unclear`
-- landing:
-  - `clear`
-  - `weak`
-  - `missing`
-  - `unclear`
-- jazz vocabulary:
-  - `present`
-  - `weak`
-  - `absent`
-  - `unclear`
-
-If the 3 candidates sound acceptable:
+Next step after documenting the proxy review:
 
 ```text
-Move toward model-side phrase continuation / generic jazz base probe.
+Stage B data-derived contour/cadence landing repair probe
 ```
 
-If they still sound beginner-like:
+The next probe should target:
 
-```text
-Do not pivot to audio.
-Do not add backend.
-Strengthen data-derived phrase/cadence vocabulary.
-```
+- final-note landing repair
+- large-leap/register contour smoothing
+- data-derived contour or cadence cells
+- rhythm/duration diversity without reintroducing duration collapse
+- candidate 1 as the best follow-up baseline
+- candidate 3 as the negative example
 
 Recommended next issue title:
 
 ```text
-Stage B clean listening review notes 추가
-```
-
-Alternative next issue if listening feedback says "still beginner-like":
-
-```text
-Stage B data-derived cadence vocabulary 추가
+Stage B data-derived contour/cadence landing repair probe
 ```
 
 ## 13. Do Not Do Next
@@ -442,13 +437,14 @@ Short explanation:
 We are building a symbolic MIDI jazz piano solo generation pipeline.
 Stage A failed musically, so the project moved to Stage B with explicit bar/position/chord/duration tokens.
 The latest work narrowed generated candidates down to 3 objective-clean, 8-bar, context-aware MIDI candidates.
-Objective note-level diagnostics show no current blocker, so the next step is listening review for phrase quality.
+Objective note-level diagnostics show no basic MIDI blocker, but MIDI-note proxy review found no keep candidate.
+The next step is a data-derived contour/cadence landing repair probe, not broad training.
 ```
 
 Very short explanation:
 
 ```text
-The pipeline can now produce objective-clean context MIDI candidates, but it has not yet proven real jazz phrase quality.
+The pipeline can now produce objective-clean context MIDI candidates, but proxy review points to rhythm stiffness, contour, and landing repair before broad training.
 ```
 
 ## 15. Remote Codex Working Rules
@@ -473,8 +469,8 @@ issue-<number>-stage-b-<short-scope>
 Recommended commit style:
 
 ```text
-feat: Stage B clean listening review notes 추가
-docs: Stage B listening review 결과 기록
+feat: Stage B contour/cadence landing repair 추가
+docs: Stage B MIDI-note proxy review 결과 기록
 ```
 
 ## 16. Critical Handoff Warning

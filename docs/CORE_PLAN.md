@@ -424,6 +424,8 @@ Stage B에서 명시하는 것:
 - Issue #107 result: data motif phrase recovery review reports `data_motif_guide_tones` as `3` warnings and `data_motif_phrase_recovery` as `3` clean candidates.
 - Issue #109 result: objective clean review package keeps only the `3` `data_motif_phrase_recovery` candidates and writes `outputs/stage_b_clean_review_package/harness_stage_b_clean_review_package/clean_review_package.md`.
 - Issue #111 result: clean context diagnostics reports `3` candidates, diagnostic flags `{}`, bar coverage `8/8`, off-grid ratio `0.000`, max duration `1.000` beat, and decision hint `listen_with_context`.
+- Issue #113 result: clean listening review notes template covers the `3` objective-clean context candidates and validates review enums/summary output.
+- 2026-05-24 Codex MIDI-note proxy review result: `needs_followup=2`, `reject=1`, `keep=0`; the strongest candidate is still `timing=stiff`, `jazz_vocabulary=thin`.
 
 해석:
 
@@ -434,8 +436,10 @@ Stage B에서 명시하는 것:
 - `swing_motif_approach`는 기계적인 grid 반복을 줄였지만, 이 또한 jazz vocabulary 자체는 아니다.
 - real phrase reference stats와 motif extraction 기준으로 보면 다음은 hand-written rhythm rule 확장이 아니라 data-derived motif/cadence control 쪽이 맞다.
 - 다만 pitch-role 쪽은 real reference chord label이 아직 없으므로, 다음 개선은 실제 청취 결과를 notes에 채운 뒤 issue distribution으로 후속 generation rule을 분기하는 순서가 맞다.
-- 현재 다음 판단은 새 rule 추가가 아니라 clean package의 context MIDI를 듣고 phrase/timing/chord-fit review를 채우는 것이다.
-- Issue #111 기준으로도 자동 objective blocker는 남지 않았으므로, 다음 병목은 실제 subjective phrase quality review다.
+- clean package의 context MIDI review boundary는 proxy review까지 진행됐다.
+- proxy review는 실제 오디오 청취가 아니므로 최종 subjective quality proof가 아니다.
+- 그러나 다음 generation 방향은 분명해졌다: broad training이 아니라 data-derived contour/cadence landing repair가 먼저다.
+- Issue #111/#113 기준으로도 자동 objective blocker는 남지 않았으므로, 다음 병목은 rhythm stiffness, contour continuity, landing, thin vocabulary다.
 
 ### Phase 3.10. Swing/Motif Phrase Grammar
 
@@ -705,29 +709,36 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B clean context phrase diagnostics 추가
+Stage B clean MIDI-note proxy review 결과 기록
 ```
 
 결과:
 
-- Issue #109 clean package 후보 3개를 MIDI note-level로 다시 진단했다.
-- output: `outputs/stage_b_clean_context_diagnostics/harness_stage_b_clean_context_diagnostics/clean_context_diagnostics.md`
+- Issue #109 clean package 후보 3개를 MIDI note-level로 다시 진단했고, Issue #113에서 clean listening review notes template을 만들었다.
+- Codex MIDI-note proxy review는 실제 오디오 청취가 아니라 note timing, pitch contour, context chord guide 기준의 piano-roll proxy review다.
+- output: `outputs/stage_b_clean_listening_review_notes/harness_stage_b_clean_listening_review_notes_codex_proxy/clean_listening_review_notes_codex_midi_proxy.json`
+- docs: `docs/STAGE_B_CLEAN_MIDI_PROXY_REVIEW_2026-05-24.md`
 - candidate count: `3`
-- selected mode: `data_motif_phrase_recovery`
-- note count: `63`, `63`, `63`
-- unique pitch count: `19-23`
-- bar coverage: `8/8`
-- off-grid ratio: `0.000`
-- max duration: `1.000` beat
-- diagnostic flags: none
-- decision hint: `listen_with_context`
-- context MIDI includes chord guide, bass root guide, and solo track.
+- reviewed count: `3`
+- pending count: `0`
+- decisions:
+  - `needs_followup`: `2`
+  - `reject`: `1`
+  - `keep`: `0`
+- 공통 문제:
+  - timing stiff
+  - repeated duration/rest template
+  - 큰 register jump 뒤 contour continuity 부족
+  - weak/unresolved landing
+  - jazz vocabulary thin 또는 exercise-like
 
 다음 작업:
 
-- clean context MIDI를 기준으로 subjective listening review를 채운다.
-- objective clean 후보라도 broad training으로 넘어가기 전 실제 piano-roll/listening review를 먼저 한다.
-- 문제가 계속 "초급 멜로디/코드톤 나열"이면 data-derived contour/cadence pattern을 더 직접 추출할지 결정한다.
+- 다음 issue는 `Stage B data-derived contour/cadence landing repair probe`로 잡는다.
+- 후보 1은 best follow-up baseline으로 유지한다.
+- 후보 3은 negative example로 둔다.
+- final-note landing repair, large-leap 이후 contour smoothing, data-derived cadence/contour cells를 검증한다.
+- objective clean 후보라도 broad training으로 넘어가지 않는다.
 - real Brad/reference chord label은 아직 임의로 넣지 않는다.
 - LMDM/audio diffusion은 장기 live instrument reference로만 남기고, 현재 MVP를 audio로 pivot하지 않는다.
 
