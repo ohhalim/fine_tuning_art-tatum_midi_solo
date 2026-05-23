@@ -84,6 +84,8 @@ Modes:
                 Compare phrase/cadence against leap-recovery phrase candidates.
   stage-b-data-motif-phrase-recovery-review
                 Compare data-motif guide tones against data-motif phrase recovery.
+  stage-b-clean-review-package
+                Extract objective-clean data-motif phrase recovery candidates for listening review.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   chord-coverage-audit
@@ -1026,6 +1028,25 @@ run_stage_b_data_motif_phrase_recovery_review() {
     --review_notes "$review_notes_path"
 }
 
+run_stage_b_clean_review_package() {
+  local source_run_id="${SOURCE_RUN_ID:-harness_stage_b_data_motif_phrase_recovery_review}"
+  local run_id="${RUN_ID:-harness_stage_b_clean_review_package}"
+  local review_manifest_path="outputs/stage_b_data_motif_review/${source_run_id}/review_manifest.json"
+  local objective_report_path="outputs/stage_b_objective_midi_review/${source_run_id}/objective_midi_note_review.json"
+  if [[ ! -f "$review_manifest_path" || ! -f "$objective_report_path" ]]; then
+    print_header "Stage B data-motif phrase recovery review export"
+    SOURCE_RUN_ID="$source_run_id" RUN_ID="$source_run_id" run_stage_b_data_motif_phrase_recovery_review
+  fi
+  print_header "Stage B objective-clean review package"
+  "$PYTHON_BIN" scripts/build_clean_review_package.py \
+    --run_id "$run_id" \
+    --review_manifest "$review_manifest_path" \
+    --objective_report "$objective_report_path" \
+    --allowed_modes data_motif_phrase_recovery \
+    --copy_files \
+    --min_candidates 3
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -1263,6 +1284,9 @@ case "$MODE" in
     ;;
   stage-b-data-motif-phrase-recovery-review)
     run_stage_b_data_motif_phrase_recovery_review
+    ;;
+  stage-b-clean-review-package)
+    run_stage_b_clean_review_package
     ;;
   manifest-dry-run)
     run_manifest_dry_run
