@@ -221,8 +221,10 @@ def varied_phrase_slot_bounds(
         if int(motif_index) > 0:
             slot_start = max(0, slot_start - start_shift)
         return min(int(POSITIONS_PER_BAR) - 1, slot_start), slot_size
-    split_patterns = [8, 7, 9, 8, 7, 9, 8, 7]
-    first_slot_size = split_patterns[(int(bar_index) + int(variation_index)) % len(split_patterns)]
+    split_patterns = [8, 7, 9, 8, 9, 7, 8, 9]
+    first_slot_size = split_patterns[
+        (int(bar_index) * 3 + int(variation_index)) % len(split_patterns)
+    ]
     if int(motif_index) == 0:
         return 0, first_slot_size
     return first_slot_size, max(1, int(POSITIONS_PER_BAR) - first_slot_size)
@@ -235,8 +237,9 @@ def varied_phrase_duration_tokens(
     bar_index: int,
     motif_index: int,
     variation_index: int = 0,
+    max_tail_duration: int = 6,
 ) -> list[int]:
-    variation = [0, 1, 2, 0, 3, 1, 4, 2]
+    variation = [0, 1, 2, 0, 3, 1, 4, 2, 1, 3, 0, 2, 4, 1, 2, 3]
     varied_steps = [
         max(
             1,
@@ -244,14 +247,23 @@ def varied_phrase_duration_tokens(
                 int(MAX_DURATION_STEPS),
                 int(step)
                 + variation[
-                    (int(bar_index) * 2 + int(motif_index) + index + int(variation_index))
+                    (
+                        int(bar_index) * 3
+                        + int(motif_index) * 5
+                        + index
+                        + int(variation_index)
+                    )
                     % len(variation)
                 ],
             ),
         )
         for index, step in enumerate(duration_steps)
     ]
-    return fit_duration_tokens_to_positions(positions, varied_steps, max_tail_duration=6)
+    return fit_duration_tokens_to_positions(
+        positions,
+        varied_steps,
+        max_tail_duration=max(1, int(max_tail_duration)),
+    )
 
 
 def varied_phrase_positions(
@@ -277,9 +289,14 @@ def varied_phrase_positions(
         [0, 2, 5, 7],
         [0, 3, 5, 7],
         [0, 2, 4, 7],
+        [0, 3, 6, 8],
+        [0, 2, 6, 8],
+        [0, 2, 5, 8],
+        [0, 3, 5, 8],
+        [0, 2, 4, 6],
     ]
     pattern = anti_repeat_patterns[
-        (int(bar_index) * 2 + int(motif_index) + int(variation_index))
+        (int(bar_index) * 3 + int(motif_index) * 5 + int(variation_index))
         % len(anti_repeat_patterns)
     ]
     if len(positions) > len(pattern):
@@ -290,8 +307,62 @@ def varied_phrase_positions(
         int(slot_start) + int(round(int(step) * (slot_size - 1) / local_max))
         for step in pattern[: len(positions)]
     ]
+    offset_patterns = [
+        [0, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, -1, -2, 0],
+        [0, 1, -1, 0],
+        [0, 0, 1, 0],
+        [0, -1, 0, 0],
+        [0, 1, 0, -1],
+        [0, 0, 0, 0],
+    ]
+    offsets = offset_patterns[
+        (int(bar_index) * 5 + int(motif_index) + int(variation_index))
+        % len(offset_patterns)
+    ]
+    shifted_positions = [
+        max(int(slot_start), min(slot_end, int(position) + offsets[index % len(offsets)]))
+        for index, position in enumerate(raw_positions)
+    ]
+    shifted_gaps = [
+        int(right) - int(left) for left, right in zip(shifted_positions, shifted_positions[1:])
+    ]
+    if shifted_gaps and min(shifted_gaps) >= 1 and sum(1 for gap in shifted_gaps if gap == 1) <= 1:
+        raw_positions = shifted_positions
     repaired = strictly_increasing_positions(raw_positions, int(slot_start), slot_end)
     return repaired if len(repaired) == len(positions) else positions
+
+
+def phrase_vocabulary_contour_delta(
+    contour_steps: Sequence[int],
+    *,
+    local_index: int,
+    bar_index: int,
+    motif_index: int,
+    variation_index: int = 0,
+) -> int:
+    steps = [int(step) for step in contour_steps] or [0]
+    current = steps[int(local_index) % len(steps)]
+    previous = steps[(int(local_index) - 1) % len(steps)]
+    delta = max(-5, min(5, int(current) - int(previous)))
+    phrase_role = (int(bar_index) + int(variation_index)) % 4
+    if int(motif_index) % 2 == 1:
+        if phrase_role in {0, 3}:
+            delta = -delta
+        elif phrase_role == 1:
+            delta += 1 if delta <= 0 else -1
+    contour_biases = [-1, 2, 0, -2, 1, 3, -1, 0]
+    delta += contour_biases[
+        (
+            int(bar_index) * 2
+            + int(motif_index) * 3
+            + int(local_index)
+            + int(variation_index)
+        )
+        % len(contour_biases)
+    ]
+    return max(-4, min(4, int(delta)))
 
 
 def nearest_allowed_pitch_token(
@@ -1492,12 +1563,20 @@ def data_motif_rhythm_phrase_variation_tokens(
                 motif_index=motif_index,
                 variation_index=seed_variation,
             )
+            max_tail_duration = 6
+            if positions and motif_index + 1 < motifs_per_bar:
+                next_slot_start = min(
+                    int(POSITIONS_PER_BAR) - 1,
+                    int(slot_start) + int(slot_size),
+                )
+                max_tail_duration = max(1, min(6, int(next_slot_start) - int(positions[-1])))
             durations = varied_phrase_duration_tokens(
                 positions,
                 rhythm["duration_steps"],
                 bar_index=bar_index,
                 motif_index=motif_index,
                 variation_index=seed_variation,
+                max_tail_duration=max_tail_duration,
             )
             contour_steps = [int(step) for step in contour.get("pitch_intervals", [])] or [0]
             for local_index, (position, duration_token) in enumerate(zip(positions, durations)):
@@ -1552,7 +1631,8 @@ def data_motif_rhythm_phrase_variation_tokens(
                     cell_index = (
                         guide_tone_cell_index_for_position(int(position))
                         + seed_variation
-                        + int(motif_index)
+                        + int(bar_index) * 2
+                        + int(motif_index) * 3
                     )
                     pitch_class = pitch_cells[cell_index % len(pitch_cells)]
                     if penultimate_in_bar:
@@ -1562,7 +1642,10 @@ def data_motif_rhythm_phrase_variation_tokens(
                         )
                         if landing_classes:
                             pitch_class = approach_pitch_class(
-                                landing_classes[(bar_index + seed_variation) % len(landing_classes)],
+                                landing_classes[
+                                    (bar_index * 3 + motif_index + seed_variation)
+                                    % len(landing_classes)
+                                ],
                                 [int(pitch) % 12 for pitch in recent_pitches[-2:]],
                             )
                     line_pitch_classes = [pitch_class] + [
@@ -1573,11 +1656,23 @@ def data_motif_rhythm_phrase_variation_tokens(
                     ]
                     contour_offset = contour_steps[local_index % len(contour_steps)]
                     if recent_pitches:
-                        previous_step = contour_steps[(local_index - 1) % len(contour_steps)]
-                        contour_delta = max(-5, min(5, int(contour_offset) - int(previous_step)))
+                        contour_delta = phrase_vocabulary_contour_delta(
+                            contour_steps,
+                            local_index=local_index,
+                            bar_index=bar_index,
+                            motif_index=motif_index,
+                            variation_index=seed_variation,
+                        )
                         target_pitch = int(recent_pitches[-1]) + contour_delta
                     else:
-                        target_pitch = anchor + int(contour_offset)
+                        anchor_bias = phrase_vocabulary_contour_delta(
+                            contour_steps,
+                            local_index=local_index,
+                            bar_index=bar_index,
+                            motif_index=motif_index,
+                            variation_index=seed_variation,
+                        )
+                        target_pitch = anchor + int(contour_offset) + anchor_bias
                     target_pitch = max(min_solo_pitch, min(max_solo_pitch, int(target_pitch)))
                     pitch = bounded_phrase_pitch_for_pitch_classes(
                         line_pitch_classes,
