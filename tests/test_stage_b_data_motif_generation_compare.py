@@ -26,12 +26,14 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     parse_baseline_modes,
     phrase_cadence_tokens,
     phrase_recovery_tokens,
+    phrase_vocabulary_contour_delta,
     straight_guide_tones_tokens,
     straight_grid_tokens,
     varied_grid_position_duration_steps,
     varied_grid_tokens,
     varied_guide_tones_tokens,
     varied_phrase_positions,
+    varied_phrase_slot_bounds,
 )
 from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_note_grammar,
@@ -180,6 +182,50 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         self.assertEqual(len(positions), 4)
         self.assertEqual(positions, sorted(set(positions)))
         self.assertGreaterEqual(min(gaps), 2)
+
+    def test_varied_phrase_positions_expands_bar_pattern_vocabulary(self) -> None:
+        patterns = []
+        for bar_index in range(8):
+            bar_positions = []
+            for motif_index in range(2):
+                slot_start, slot_size = varied_phrase_slot_bounds(
+                    bar_index,
+                    motif_index,
+                    2,
+                    variation_index=0,
+                )
+                bar_positions.extend(
+                    varied_phrase_positions(
+                        [0, 3, 4, 9],
+                        slot_start=slot_start,
+                        slot_size=slot_size,
+                        bar_index=bar_index,
+                        motif_index=motif_index,
+                        variation_index=0,
+                    )
+                )
+            patterns.append(tuple(sorted(bar_positions)))
+
+        self.assertGreaterEqual(len(set(patterns)), 7)
+
+    def test_phrase_vocabulary_contour_delta_mirrors_response_motif(self) -> None:
+        call_delta = phrase_vocabulary_contour_delta(
+            [0, 2, 5, 3],
+            local_index=1,
+            bar_index=0,
+            motif_index=0,
+            variation_index=0,
+        )
+        response_delta = phrase_vocabulary_contour_delta(
+            [0, 2, 5, 3],
+            local_index=1,
+            bar_index=0,
+            motif_index=1,
+            variation_index=0,
+        )
+
+        self.assertGreater(call_delta, 0)
+        self.assertLess(response_delta, 0)
 
     def test_nearest_allowed_pitch_token_avoids_recent_pitch_when_possible(self) -> None:
         allowed = list(range(TOKEN_NOTE_PITCH_START, TOKEN_NOTE_PITCH_END + 1))

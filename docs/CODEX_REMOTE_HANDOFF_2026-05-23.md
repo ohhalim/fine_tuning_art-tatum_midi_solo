@@ -194,18 +194,52 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 40. sample-diverse rhythm variation MIDI-note proxy review
 41. rhythm variation timing-grid repetition repair
 42. timing-grid repaired rhythm MIDI-note proxy review
+43. rhythm variation phrase-vocabulary diversity repair
 
 자세한 전체 기록은 `docs/CORE_PLAN.md`에 있다.
 
 ## 7. Latest Meaningful Result
 
-최신 의미 있는 결과는 Stage B timing-grid repaired rhythm MIDI-note proxy review다.
+최신 의미 있는 결과는 Stage B rhythm variation phrase-vocabulary diversity repair다.
+
+Issue #130은 Issue #128 proxy review에서 남은 `too_stiff=6`, `keep=0` 병목을 generation rule 쪽에서 한 번 더 좁혔다.
+
+결과:
+
+- candidate count: `6`
+- `data_motif_rhythm_phrase_variation`:
+  - strict: `3/3`
+  - final landing resolved: `3/3`
+  - max interval: `4`
+  - avg syncopation: `0.684`
+  - avg unique bar-position pattern ratio: `0.958`
+  - avg IOI diversity ratio: `0.091`
+  - avg most-common IOI ratio: `0.385`
+  - avg most-common duration ratio: `0.384`
+- duplicate note sequences: `0`
+- objective MIDI flag counts: `{}`
+- variation review MIDI before/after max simultaneous notes: `1/1`
+
+해석:
+
+- Issue #130 keeps the Issue #126 timing-grid guardrail.
+- bar-position vocabulary no longer repeats on the previous short cycle.
+- IOI diversity recovers above the Issue #126 value.
+- dominant IOI repetition drops below Issue #126.
+- this is still not a musical success claim because review notes for these repaired candidates are pending.
+
+Docs:
+
+```text
+docs/STAGE_B_RHYTHM_VARIATION_PHRASE_VOCAB_REPAIR_2026-05-25.md
+```
+
+The previous review was Stage B timing-grid repaired rhythm MIDI-note proxy review.
 
 Issue #128은 Issue #126 timing-grid repaired 후보를 같은 listening review notes schema로 다시 채운 MIDI-note proxy review다.
 
 결과:
 
-- candidate count: `6`
 - reviewed count: `6`
 - pending count: `0`
 - decisions:
@@ -220,13 +254,6 @@ Issue #128은 Issue #126 timing-grid repaired 후보를 같은 listening review 
   - `improve_phrase_vocabulary`: `14`
   - `fix_timing_grid`: `12`
   - `increase_motif_variation`: `6`
-
-해석:
-
-- Issue #126 timing repair is useful as a guardrail.
-- repaired variation candidates keep duplicate note sequences at `0`, objective flags `{}`, max interval `4`, and large/unresolved leap ratios `0.000`.
-- the repair still produced no `keep` candidate.
-- the next generation bottleneck is phrase-vocabulary diversity, not broad training.
 
 Docs:
 
@@ -673,30 +700,29 @@ Minimum checks:
 - context MIDI exists when listening review needs chord context
 
 Current latest contour/landing repair candidates pass the objective MIDI gate, but MIDI-note proxy review still produced no `keep` candidate.
-Current latest rhythm/phrase variation candidates pass the objective MIDI gate, have no exact duplicate note sequences, and have lower dominant IOI repetition, but MIDI-note proxy review still produced no `keep` candidate.
+Current latest rhythm/phrase variation candidates pass the objective MIDI gate, have no exact duplicate note sequences, have lower dominant IOI repetition, and now have wider bar-position/IOI phrase vocabulary. MIDI-note proxy review for these repaired candidates is still pending.
 
 ## 12. What To Do Next
 
 The next correct task is **not** broad training, audio diffusion, or backend work.
 
-Next step after the timing-grid repaired rhythm MIDI-note proxy review:
+Next step after the rhythm variation phrase-vocabulary diversity repair:
 
 ```text
-Stage B rhythm variation phrase-vocabulary diversity repair
+Stage B phrase-vocabulary repaired rhythm MIDI-note proxy review
 ```
 
-The next generation issue should target:
+The next review should target:
 
-- preserving the timing repair guardrail while restoring phrase diversity
-- adding phrase-level contour and call-response variation
-- avoiding a return to high dominant IOI repetition
-- keeping duplicate note sequence count `0`
-- keeping objective MIDI flags `{}`, max interval bound, and final guide landing
+- whether the wider bar-position/IOI vocabulary reduces `too_stiff`
+- whether lower tension ratio makes the line too safe
+- whether rank 1 sample 3 is stronger than the previous timing-grid repaired rank 1
+- whether another generation repair is needed before training scope expands
 
 Recommended next issue title:
 
 ```text
-Stage B rhythm variation phrase-vocabulary diversity repair
+Stage B phrase-vocabulary repaired rhythm MIDI-note proxy review
 ```
 
 ## 13. Do Not Do Next
