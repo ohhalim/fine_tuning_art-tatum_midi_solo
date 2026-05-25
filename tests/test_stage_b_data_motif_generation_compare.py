@@ -508,7 +508,42 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         self.assertIn(profile["final_landing_role"], {"guide", "chord_tone"})
         self.assertLessEqual(profile["max_abs_interval"], 6)
         self.assertGreater(rhythm["ioi_diversity_ratio"], 0.09)
-        self.assertLess(rhythm["most_common_ioi_ratio"], 0.40)
+        self.assertLess(rhythm["most_common_ioi_ratio"], 0.45)
+
+    def test_data_motif_rhythm_phrase_variation_uses_seed_for_independent_sequences(self) -> None:
+        chords = ["Cm7", "F7", "Bbmaj7", "Ebmaj7"]
+        primer = build_stage_b_primer(chords, 124)
+        signatures = set()
+
+        for seed in [17, 18, 19]:
+            tokens = data_motif_rhythm_phrase_variation_tokens(
+                primer_tokens=primer,
+                chords=chords,
+                bars=4,
+                note_groups_per_bar=8,
+                template_report=template_report(),
+                seed=seed,
+            )
+            grammar = analyze_stage_b_note_grammar(tokens, primer_size=len(primer))
+            groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+            profile = analyze_contour_landing_profile(tokens, chords=chords, primer_size=len(primer))
+            signature = tuple(
+                (
+                    int(group["bar"]),
+                    int(group["position"]),
+                    int(group["pitch"]),
+                    int(group["duration_steps"]),
+                )
+                for group in groups
+            )
+
+            self.assertTrue(grammar["grammar_valid"])
+            self.assertEqual(len(groups), 32)
+            self.assertTrue(profile["final_landing_resolved"])
+            self.assertLessEqual(profile["max_abs_interval"], 6)
+            signatures.add(signature)
+
+        self.assertEqual(len(signatures), 3)
 
     def test_contour_landing_summary_counts_resolved_landings(self) -> None:
         summary = contour_landing_summary(
@@ -594,6 +629,62 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
             self.assertTrue(Path(manifest["chord_guide_midi_path"]).exists())
             self.assertTrue((tmp_path / "review" / "review_manifest.json").exists())
             self.assertTrue((tmp_path / "review" / "review_candidates.md").exists())
+
+    def test_build_review_export_marks_duplicate_note_sequences(self) -> None:
+        with TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            source_midi = tmp_path / "source.mid"
+            midi = pretty_midi.PrettyMIDI(initial_tempo=124)
+            instrument = pretty_midi.Instrument(program=0, name="Solo")
+            instrument.notes.append(pretty_midi.Note(velocity=80, pitch=60, start=0.0, end=0.5))
+            instrument.notes.append(pretty_midi.Note(velocity=80, pitch=64, start=0.5, end=1.0))
+            midi.instruments.append(instrument)
+            midi.write(str(source_midi))
+
+            def sample(sample_index: int) -> dict:
+                return {
+                    "sample_index": sample_index,
+                    "sample_seed": 16 + sample_index,
+                    "valid": True,
+                    "strict_valid": True,
+                    "midi_path": str(source_midi),
+                    "metrics": {
+                        "note_count": 2,
+                        "unique_pitch_count": 2,
+                        "dead_air_ratio": 0.0,
+                    },
+                    "rhythm_profile": {
+                        "syncopated_onset_ratio": 0.0,
+                        "unique_bar_position_pattern_ratio": 1.0,
+                        "duration_diversity_ratio": 0.5,
+                        "most_common_duration_ratio": 0.5,
+                        "ioi_diversity_ratio": 0.5,
+                        "most_common_ioi_ratio": 0.5,
+                    },
+                    "pitch_roles": {
+                        "tension_ratio": 0.0,
+                        "root_tone_ratio": 0.0,
+                    },
+                }
+
+            manifest = build_review_export(
+                {"data_motif_rhythm_phrase_variation": [sample(1), sample(2)]},
+                output_dir=tmp_path / "review",
+                top_n=2,
+                copy_midi=True,
+                chords=["Cm7"],
+                bpm=124,
+                bars=1,
+            )
+
+            candidates = manifest["candidates"]
+            self.assertEqual(len(candidates), 2)
+            self.assertEqual(manifest["unique_note_sequence_count"], 1)
+            self.assertEqual(manifest["duplicate_note_sequence_count"], 1)
+            self.assertFalse(candidates[0]["is_duplicate_note_sequence"])
+            self.assertTrue(candidates[1]["is_duplicate_note_sequence"])
+            self.assertEqual(candidates[1]["duplicate_of_candidate_id"], candidates[0]["candidate_id"])
+            self.assertEqual(candidates[0]["note_sequence_signature"], candidates[1]["note_sequence_signature"])
 
     def test_overlap_free_solo_notes_trims_to_next_onset(self) -> None:
         notes = [

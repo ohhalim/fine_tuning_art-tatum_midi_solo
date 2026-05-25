@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- Stage B rhythm/phrase variation MIDI-note proxy review
-- 다음 권장 이슈: `Stage B rhythm/phrase variation sample diversity repair`
+- Stage B rhythm/phrase variation sample diversity repair
+- 다음 권장 이슈: `Stage B sample-diverse rhythm variation MIDI-note proxy review`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,44 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Review Result
+## Latest Probe Result
+
+Issue #122는 Issue #120 proxy review에서 확인된 rhythm variation exact duplicate 문제를 고쳤다.
+
+Docs:
+
+- `docs/STAGE_B_RHYTHM_VARIATION_SAMPLE_DIVERSITY_2026-05-25.md`
+
+Implemented:
+
+- `data_motif_rhythm_phrase_variation` seed가 rhythm template row, contour template row, slot boundary, duration variation, pitch-cell selection, approach target에 반영된다.
+- review export가 MIDI note/start/end/pitch sequence signature를 기록한다.
+- review manifest가 `unique_note_sequence_count`와 `duplicate_note_sequence_count`를 기록한다.
+- review candidates markdown에 `duplicate` column이 추가됐다.
+
+Validation result:
+
+- candidate count: `6`
+- unique note sequences: `6`
+- duplicate note sequences: `0`
+- objective MIDI flag counts: `{}`
+
+Variation candidates:
+
+| candidate | notes | pitches | sync | dur-var | ioi-var | ioi-rep | landing | max interval |
+|---|---:|---:|---:|---:|---:|---:|---|---:|
+| `data_motif_rhythm_phrase_variation_rank_1_sample_2` | 62 | 29 | 0.667 | 0.111 | 0.097 | 0.500 | guide | 6 |
+| `data_motif_rhythm_phrase_variation_rank_2_sample_3` | 62 | 22 | 0.730 | 0.111 | 0.113 | 0.565 | guide | 6 |
+| `data_motif_rhythm_phrase_variation_rank_3_sample_1` | 60 | 21 | 0.694 | 0.097 | 0.115 | 0.426 | guide | 6 |
+
+Decision:
+
+- sample-level duplicate problem은 해결됐다.
+- variation candidates는 이제 independent review evidence로 볼 수 있다.
+- 다만 IOI repetition이 여전히 높아 timing stiffness risk는 남아 있다.
+- 다음은 새 sample-diverse 후보를 MIDI-note proxy review로 채우는 단계다.
+
+## Previous Review Result
 
 Issue #120은 Issue #118 rhythm/phrase variation 후보 3개와 contour repair baseline 3개를 같은 listening review notes schema로 채운 MIDI-note proxy review다.
 

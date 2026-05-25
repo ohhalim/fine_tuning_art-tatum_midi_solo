@@ -190,12 +190,44 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 36. contour repair MIDI-note proxy review
 37. rhythm/phrase vocabulary variation probe
 38. rhythm/phrase variation MIDI-note proxy review
+39. rhythm/phrase variation sample diversity repair
 
 자세한 전체 기록은 `docs/CORE_PLAN.md`에 있다.
 
 ## 7. Latest Meaningful Result
 
-최신 의미 있는 결과는 Stage B rhythm/phrase variation MIDI-note proxy review다.
+최신 의미 있는 결과는 Stage B rhythm/phrase variation sample diversity repair다.
+
+Issue #122는 Issue #120 proxy review에서 확인된 exact duplicate rank candidate 문제를 고쳤다.
+
+결과:
+
+- candidate count: `6`
+- unique note sequences: `6`
+- duplicate note sequences: `0`
+- objective MIDI flag counts: `{}`
+- `data_motif_rhythm_phrase_variation`:
+  - strict: `3/3`
+  - final landing resolved: `3/3`
+  - max interval: `6`
+  - avg syncopation: `0.697`
+  - avg duration diversity: `0.106`
+  - avg IOI diversity: `0.108`
+  - avg most-common IOI ratio: `0.497`
+
+Implemented:
+
+- sample seed now affects rhythm template row, contour template row, slot boundary, duration variation, pitch-cell selection, and approach target.
+- review manifest records `note_sequence_signature`, `is_duplicate_note_sequence`, and `duplicate_of_candidate_id`.
+- review markdown shows duplicate status.
+
+Docs:
+
+```text
+docs/STAGE_B_RHYTHM_VARIATION_SAMPLE_DIVERSITY_2026-05-25.md
+```
+
+The previous review was Stage B rhythm/phrase variation MIDI-note proxy review.
 
 Issue #120은 Issue #118 variation 후보와 contour repair baseline 후보를 같은 listening review notes schema로 채웠다.
 
@@ -456,6 +488,7 @@ docs/STAGE_B_CLEAN_MIDI_PROXY_REVIEW_2026-05-24.md
 docs/STAGE_B_CONTOUR_LANDING_REPAIR_2026-05-25.md
 docs/STAGE_B_CONTOUR_REPAIR_MIDI_PROXY_REVIEW_2026-05-25.md
 docs/STAGE_B_RHYTHM_PHRASE_VARIATION_MIDI_PROXY_REVIEW_2026-05-25.md
+docs/STAGE_B_RHYTHM_VARIATION_SAMPLE_DIVERSITY_2026-05-25.md
 docs/STAGE_B_RHYTHM_PHRASE_VARIATION_2026-05-25.md
 ```
 
@@ -534,29 +567,29 @@ Minimum checks:
 - context MIDI exists when listening review needs chord context
 
 Current latest contour/landing repair candidates pass the objective MIDI gate, but MIDI-note proxy review still produced no `keep` candidate.
-Current latest rhythm/phrase variation candidates pass the objective MIDI gate, but MIDI-note proxy review found exact duplicate rank candidates and no `keep` candidate.
+Current latest rhythm/phrase variation candidates pass the objective MIDI gate and are no longer exact duplicate note sequences, but their sample-diverse listening/proxy notes are still pending.
 
 ## 12. What To Do Next
 
 The next correct task is **not** broad training, audio diffusion, or backend work.
 
-Next step after the rhythm/phrase variation MIDI-note proxy review:
+Next step after the rhythm/phrase variation sample diversity repair:
 
 ```text
-Stage B rhythm/phrase variation sample diversity repair
+Stage B sample-diverse rhythm variation MIDI-note proxy review
 ```
 
-The next probe should target:
+The next review should target:
 
-- making rank 1-3 variation candidates independent note sequences
-- applying sample seed to rhythm slot boundary, motif template selection, pitch contour, or cadence target
-- adding duplicate sequence detection to review export/ranking
-- preserving objective-clean gate while producing independent review candidates
+- whether independent variation candidates are useful review evidence
+- whether high IOI repetition still reads as `too_stiff`
+- whether the improved sample diversity changes phrase-quality decisions
+- whether the next generation issue should target timing-grid repair or motif/cadence vocabulary
 
 Recommended next issue title:
 
 ```text
-Stage B rhythm/phrase variation sample diversity repair
+Stage B sample-diverse rhythm variation MIDI-note proxy review
 ```
 
 ## 13. Do Not Do Next
