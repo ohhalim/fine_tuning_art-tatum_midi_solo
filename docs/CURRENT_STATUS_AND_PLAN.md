@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- Stage B rhythm variation timing-grid repetition repair
-- 다음 권장 이슈: `Stage B timing-grid repaired rhythm MIDI-note proxy review`
+- Stage B timing-grid repaired rhythm MIDI-note proxy review
+- 다음 권장 이슈: `Stage B rhythm variation phrase-vocabulary diversity repair`
 
 현재 범위가 아닌 것:
 
@@ -39,20 +39,52 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Probe Result
+## Latest Review Result
+
+Issue #128은 Issue #126 timing-grid repaired 후보를 같은 listening review notes schema로 다시 채운 MIDI-note proxy review다.
+
+Docs:
+
+- `docs/STAGE_B_TIMING_GRID_REPAIRED_PROXY_REVIEW_2026-05-25.md`
+
+중요한 전제:
+
+- 실제 오디오 청취 리뷰가 아니다.
+- MIDI note timing, pitch contour, objective MIDI metrics, context chord guide track, duplicate note-sequence fields 기준이다.
+- `keep` 후보를 만들기보다 다음 generation rule 병목을 정하는 단계다.
+
+Result:
+
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `needs_followup`: `6`
+  - `reject`: `0`
+  - `keep`: `0`
+- timing:
+  - `too_stiff`: `6`
+- duplicate note sequences: `0`
+- objective MIDI flags: `{}`
+
+Aggregate follow-ups:
+
+- `improve_phrase_vocabulary`: `14`
+- `fix_timing_grid`: `12`
+- `increase_motif_variation`: `6`
+
+Decision:
+
+- timing repair is useful as a guardrail: duplicates remain `0`, objective flags remain `{}`, variation max interval is `4`, and large/unresolved leap ratios are `0.000`.
+- it did not produce a `keep` candidate.
+- the next generation issue should target phrase-vocabulary diversity while preserving the objective-clean and duplicate-free properties.
+
+## Previous Probe Result
 
 Issue #126은 Issue #124 proxy review에서 남은 `too_stiff=6` 문제를 좁혀서 timing-grid repetition을 줄였다.
 
 Docs:
 
 - `docs/STAGE_B_RHYTHM_VARIATION_TIMING_GRID_REPAIR_2026-05-25.md`
-
-Implemented:
-
-- `varied_phrase_positions()` anti-repetition position repair
-- variation slot split을 `7-9` step 중심으로 제한
-- variation max interval bound를 `4`로 강화
-- non-final bar landing은 strict cadence보다 bounded phrase pitch를 우선해 unresolved large-leap risk를 제거
 
 Result:
 
@@ -75,13 +107,7 @@ Tradeoff:
 - bar-position variation: `1.000 -> 0.583`
 - duration diversity: `0.106 -> 0.084`
 
-Decision:
-
-- dominant IOI repetition and objective leap risk improved.
-- position vocabulary became more conservative.
-- next step is a MIDI-note proxy review of the timing-grid repaired candidates.
-
-## Previous Review Result
+## Previous Sample-Diverse Review Result
 
 Issue #124는 Issue #122에서 sample diversity를 고친 rhythm variation 후보를 MIDI-note proxy review로 다시 채웠다.
 
