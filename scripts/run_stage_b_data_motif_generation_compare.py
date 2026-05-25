@@ -455,6 +455,73 @@ def phrase_shape_pitch_classes(
     return ordered
 
 
+def register_safe_phrase_pitch_classes(
+    pitch_classes: Sequence[int],
+    *,
+    recent_pitches: Sequence[int],
+    bar_index: int,
+    motif_index: int,
+    local_index: int,
+    variation_index: int = 0,
+) -> list[int]:
+    ordered: list[int] = []
+    for pitch_class in pitch_classes:
+        normalized = int(pitch_class) % 12
+        if normalized not in ordered:
+            ordered.append(normalized)
+    if len(ordered) <= 1:
+        return ordered
+
+    recent_short = {int(pitch) % 12 for pitch in recent_pitches[-2:]}
+    recent_phrase = {int(pitch) % 12 for pitch in recent_pitches[-6:]}
+    development_role = (
+        int(bar_index) * 3
+        + int(motif_index) * 5
+        + int(local_index)
+        + int(variation_index)
+    ) % 6
+    if development_role in {1, 3, 5}:
+        fresh = [pitch_class for pitch_class in ordered if pitch_class not in recent_phrase]
+    elif development_role == 4:
+        fresh = [pitch_class for pitch_class in ordered if pitch_class not in recent_short]
+    else:
+        fresh = []
+    if not fresh:
+        return ordered
+
+    selected = fresh[
+        (int(bar_index) + int(motif_index) + int(local_index) + int(variation_index))
+        % len(fresh)
+    ]
+    return [selected] + [pitch_class for pitch_class in ordered if pitch_class != selected]
+
+
+def register_safe_phrase_target_pitch(
+    target_pitch: int,
+    *,
+    bar_index: int,
+    motif_index: int,
+    local_index: int,
+    variation_index: int = 0,
+    min_pitch: int = PIANO_PITCH_MIN,
+    max_pitch: int = PIANO_PITCH_MAX,
+) -> int:
+    vocabulary_offsets = [0, 3, -2, 4, -3, 2, -4, 1, 5, -1, 2, -3]
+    offset = vocabulary_offsets[
+        (
+            int(bar_index) * 5
+            + int(motif_index) * 3
+            + int(local_index)
+            + int(variation_index)
+        )
+        % len(vocabulary_offsets)
+    ]
+    if (int(bar_index) + int(motif_index) + int(variation_index)) % 2 == 1:
+        offset = -offset
+    shaped = int(target_pitch) + int(offset)
+    return max(int(min_pitch), min(int(max_pitch), shaped))
+
+
 def nearest_allowed_pitch_token(
     target_pitch: int,
     allowed_tokens: Sequence[int],
@@ -1062,6 +1129,41 @@ def recovery_pitch_after_large_leap(
     )
 
 
+def register_safe_phrase_cell_penalty(candidate_pitch: int, recent_pitches: Sequence[int]) -> int:
+    recent = [int(pitch) for pitch in recent_pitches]
+    if len(recent) < 2:
+        return 0
+
+    candidate = int(candidate_pitch)
+    recent_classes = [pitch % 12 for pitch in recent]
+    candidate_class = candidate % 12
+    penalty = 0
+
+    if candidate_class in set(recent_classes[-3:]):
+        penalty += 1
+    if len(recent_classes) >= 2:
+        phrase_cells = {
+            tuple(recent_classes[index : index + 3])
+            for index in range(max(0, len(recent_classes) - 18), len(recent_classes) - 2)
+        }
+        if tuple(recent_classes[-2:] + [candidate_class]) in phrase_cells:
+            penalty += 3
+    if len(recent_classes) >= 3:
+        phrase_cells = {
+            tuple(recent_classes[index : index + 4])
+            for index in range(max(0, len(recent_classes) - 18), len(recent_classes) - 3)
+        }
+        if tuple(recent_classes[-3:] + [candidate_class]) in phrase_cells:
+            penalty += 5
+        exact_cells = {
+            tuple(recent[index : index + 4])
+            for index in range(max(0, len(recent) - 18), len(recent) - 3)
+        }
+        if tuple(recent[-3:] + [candidate]) in exact_cells:
+            penalty += 7
+    return penalty
+
+
 def bounded_phrase_pitch_for_pitch_classes(
     pitch_classes: Sequence[int],
     *,
@@ -1070,6 +1172,7 @@ def bounded_phrase_pitch_for_pitch_classes(
     max_interval: int = 7,
     allow_repeat_fallback: bool = False,
     allow_wider_fallback: bool = True,
+    avoid_repeated_cells: bool = False,
     min_pitch: int = PIANO_PITCH_MIN,
     max_pitch: int = PIANO_PITCH_MAX,
 ) -> int:
@@ -1083,6 +1186,12 @@ def bounded_phrase_pitch_for_pitch_classes(
 
     recent = list(recent_pitches or [])
     priority = {pitch_class: index for index, pitch_class in enumerate(ordered_classes)}
+
+    def cell_penalty(pitch: int) -> int:
+        if not avoid_repeated_cells:
+            return 0
+        return register_safe_phrase_cell_penalty(int(pitch), recent)
+
     candidates = [
         pitch
         for pitch in range(int(min_pitch), int(max_pitch) + 1)
@@ -1122,6 +1231,7 @@ def bounded_phrase_pitch_for_pitch_classes(
             min(
                 candidates,
                 key=lambda pitch: (
+                    cell_penalty(int(pitch)),
                     abs(int(pitch) - previous),
                     priority[int(pitch) % 12],
                     abs(int(pitch) - int(target_pitch)),
@@ -1135,6 +1245,7 @@ def bounded_phrase_pitch_for_pitch_classes(
         min(
             candidates,
             key=lambda pitch: (
+                cell_penalty(int(pitch)),
                 priority[int(pitch) % 12],
                 abs(int(pitch) - int(target_pitch)),
                 abs(int(pitch) - 67),
@@ -1758,6 +1869,14 @@ def data_motif_rhythm_phrase_variation_tokens(
                         local_index=local_index,
                         variation_index=seed_variation,
                     )
+                    line_pitch_classes = register_safe_phrase_pitch_classes(
+                        line_pitch_classes,
+                        recent_pitches=recent_pitches,
+                        bar_index=bar_index,
+                        motif_index=motif_index,
+                        local_index=local_index,
+                        variation_index=seed_variation,
+                    )
                     contour_offset = contour_steps[local_index % len(contour_steps)]
                     if recent_pitches:
                         contour_delta = phrase_vocabulary_contour_delta(
@@ -1785,6 +1904,15 @@ def data_motif_rhythm_phrase_variation_tokens(
                         min_pitch=bar_min_pitch,
                         max_pitch=bar_max_pitch,
                     )
+                    target_pitch = register_safe_phrase_target_pitch(
+                        target_pitch,
+                        bar_index=bar_index,
+                        motif_index=motif_index,
+                        local_index=local_index,
+                        variation_index=seed_variation,
+                        min_pitch=bar_min_pitch,
+                        max_pitch=bar_max_pitch,
+                    )
                     pitch = bounded_phrase_pitch_for_pitch_classes(
                         line_pitch_classes,
                         target_pitch=target_pitch,
@@ -1792,6 +1920,7 @@ def data_motif_rhythm_phrase_variation_tokens(
                         max_interval=max_variation_interval,
                         allow_repeat_fallback=True,
                         allow_wider_fallback=False,
+                        avoid_repeated_cells=True,
                         min_pitch=bar_min_pitch,
                         max_pitch=bar_max_pitch,
                     )

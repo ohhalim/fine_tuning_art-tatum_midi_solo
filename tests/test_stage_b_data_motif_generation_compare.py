@@ -27,6 +27,9 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     parse_baseline_modes,
     phrase_cadence_tokens,
     phrase_recovery_tokens,
+    register_safe_phrase_cell_penalty,
+    register_safe_phrase_pitch_classes,
+    register_safe_phrase_target_pitch,
     phrase_shape_pitch_classes,
     phrase_shape_target_pitch,
     phrase_vocabulary_contour_delta,
@@ -259,6 +262,48 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
 
         self.assertIn(classes[0], tension_pitch_classes("Cm7"))
         self.assertIn(3, classes)
+
+    def test_register_safe_phrase_pitch_classes_prioritizes_fresh_color(self) -> None:
+        classes = register_safe_phrase_pitch_classes(
+            [0, 2, 4, 5, 7, 9],
+            recent_pitches=[60, 62, 64, 65, 67],
+            bar_index=0,
+            motif_index=0,
+            local_index=1,
+            variation_index=0,
+        )
+
+        self.assertEqual(classes[0], 9)
+        self.assertIn(0, classes)
+
+    def test_register_safe_phrase_target_pitch_stays_inside_register_window(self) -> None:
+        high = register_safe_phrase_target_pitch(
+            78,
+            bar_index=0,
+            motif_index=0,
+            local_index=8,
+            variation_index=0,
+            min_pitch=55,
+            max_pitch=79,
+        )
+        low = register_safe_phrase_target_pitch(
+            56,
+            bar_index=0,
+            motif_index=0,
+            local_index=6,
+            variation_index=0,
+            min_pitch=55,
+            max_pitch=79,
+        )
+
+        self.assertEqual(high, 79)
+        self.assertEqual(low, 55)
+
+    def test_register_safe_phrase_cell_penalty_flags_repeated_cells(self) -> None:
+        repeated = register_safe_phrase_cell_penalty(64, [60, 62, 64, 67, 60, 62])
+        fresh = register_safe_phrase_cell_penalty(69, [60, 62, 64, 67, 60, 62])
+
+        self.assertGreater(repeated, fresh)
 
     def test_focused_context_register_bounds_lifts_final_cadence_range(self) -> None:
         early_min, early_max = focused_context_register_bounds(1, 8, min_pitch=48, max_pitch=84)
@@ -667,8 +712,11 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
 
         self.assertTrue(grammar["grammar_valid"])
         self.assertGreaterEqual(len(groups), 63)
+        self.assertGreaterEqual(len(set(pitches)), 18)
         self.assertLessEqual(max(pitches), 79)
         self.assertGreaterEqual(min(final_bar_pitches), 60)
+        four_note_cells = [tuple(pitches[index : index + 4]) for index in range(len(pitches) - 3)]
+        self.assertEqual(len(four_note_cells), len(set(four_note_cells)))
         self.assertTrue(profile["final_landing_resolved"])
         self.assertLessEqual(profile["max_abs_interval"], 4)
 
