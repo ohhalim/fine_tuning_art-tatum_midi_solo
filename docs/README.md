@@ -158,6 +158,8 @@
   - focused package의 단일 proxy keep 후보를 context MIDI note 기준으로 다시 판단하고 register/cadence blocker를 정리한 결과.
 - `STAGE_B_FOCUSED_CONTEXT_REGISTER_CADENCE_REPAIR_2026-05-25.md`
   - focused context blocker였던 C6-to-G3 register arc를 줄이고 final cadence를 solo register에 남기는 repair 결과.
+- `STAGE_B_REGISTER_CADENCE_REPAIRED_PROXY_REVIEW_2026-05-26.md`
+  - register-cadence repaired 후보를 MIDI-note/context 기준으로 proxy review하고 boxed-in phrase vocabulary blocker를 정리한 결과.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`

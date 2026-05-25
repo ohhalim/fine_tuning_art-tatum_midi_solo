@@ -181,6 +181,7 @@ Stage B에서 명시하는 것:
 69. Stage B proxy-keep rhythm candidate focused review package
 70. Stage B proxy-keep focused context MIDI-note decision
 71. Stage B focused context register-arc cadence repair
+72. Stage B register-cadence repaired focused proxy review
 
 가장 최근 의미 있는 결과:
 
@@ -251,6 +252,8 @@ Stage B에서 명시하는 것:
 - Issue #140 result: the candidate stays useful as a diagnostic seed, but register arc (`C6` to final `G3`) and cadence/phrase punctuation block a final keep.
 - Issue #142 adds focused-context register bounds to `data_motif_rhythm_phrase_variation` so final cadence stays in a right-hand solo register.
 - Issue #142 result: variation strict `3/3`, final landing `3/3`, max interval `4`, duplicate note sequences `0`, objective flags `{}`; repaired top candidate ends on `G4` instead of `G3`.
+- Issue #144 fills focused proxy review notes for the register-cadence repaired candidates.
+- Issue #144 result: `reviewed=6`, `keep=0`, `needs_followup=5`, `reject=1`, objective flags `{}`; repaired top candidate fixes the register blocker but remains boxed-in/cell-like with unique pitch count `18`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
