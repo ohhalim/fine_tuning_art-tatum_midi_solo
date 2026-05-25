@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- Stage B phrase-vocabulary repaired rhythm MIDI-note proxy review
-- 다음 권장 이슈: `Stage B rhythm variation phrase-shape tension repair`
+- Stage B rhythm variation phrase-shape tension repair
+- 다음 권장 이슈: `Stage B phrase-shape tension repaired MIDI-note proxy review`
 
 현재 범위가 아닌 것:
 
@@ -39,19 +39,56 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Review Result
+## Latest Probe Result
+
+Issue #134는 Issue #132 proxy review에서 남은 no-keep 병목을 generation rule 쪽에서 다시 좁힌 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_RHYTHM_VARIATION_PHRASE_SHAPE_TENSION_REPAIR_2026-05-25.md`
+
+Implemented:
+
+- `phrase_shape_target_pitch()`로 extreme high-register sketch를 줄였다.
+- `phrase_shape_pitch_classes()`로 일부 local phrase role에서 tension pitch class와 next chord guide tone을 우선했다.
+- final cadence landing에서 strict interval bound가 깨지지 않도록 최근 pitch blocking을 완화했다.
+
+Result:
+
+- candidate count: `6`
+- variation candidates:
+  - strict: `3/3`
+  - final landing: `3/3`
+  - max interval: `4`
+  - average syncopation: `0.684`
+  - average bar-position pattern ratio: `0.958`
+  - average IOI diversity ratio: `0.091`
+  - average most-common IOI ratio: `0.385`
+  - average tension ratio: `0.437`
+- duplicate note sequences: `0`
+- objective MIDI flags: `{}`
+- before/after max simultaneous notes for variation review MIDI: `1/1`
+
+Compared with Issue #130:
+
+- average tension ratio: `0.358 -> 0.437`
+- bar-position pattern ratio: `0.958 -> 0.958`
+- IOI diversity ratio: `0.091 -> 0.091`
+- most-common IOI ratio: `0.385 -> 0.385`
+
+Decision:
+
+- phrase-shape/tension repair preserves the rhythm/position guardrails while restoring tension color.
+- this is not a musical success claim until filled MIDI-note proxy review confirms whether `too_safe` and phrase sketch/exercise problems decreased.
+- next step is a focused proxy review of the repaired candidates.
+
+## Previous Review Result
 
 Issue #132는 Issue #130 phrase-vocabulary repaired rhythm 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
 
 Docs:
 
 - `docs/STAGE_B_PHRASE_VOCAB_REPAIRED_PROXY_REVIEW_2026-05-25.md`
-
-중요한 전제:
-
-- 실제 오디오 청취 리뷰가 아니다.
-- MIDI note timing, pitch contour, objective MIDI metrics, context chord guide track, duplicate note-sequence fields 기준이다.
-- `keep` 후보를 만들기보다 다음 generation rule 병목을 정하는 단계다.
 
 Result:
 
@@ -61,63 +98,16 @@ Result:
   - `needs_followup`: `6`
   - `reject`: `0`
   - `keep`: `0`
-- phrase quality:
-  - `phrase`: `3`
-  - `fragment`: `2`
-  - `exercise`: `1`
 - timing:
   - `acceptable`: `2`
   - `too_stiff`: `4`
-- chord fit:
-  - `fits`: `5`
-  - `too_safe`: `1`
+- aggregate follow-ups:
+  - `improve_phrase_vocabulary`: `11`
+  - `fix_timing_grid`: `8`
+  - `increase_motif_variation`: `5`
+  - `increase_tension_approach_vocabulary`: `2`
 - duplicate note sequences: `0`
 - objective MIDI flags: `{}`
-
-Aggregate follow-ups:
-
-- `improve_phrase_vocabulary`: `11`
-- `fix_timing_grid`: `8`
-- `increase_motif_variation`: `5`
-- `increase_tension_approach_vocabulary`: `2`
-
-Compared with Issue #128:
-
-- `too_stiff`: `6 -> 4`
-- timing `acceptable`: `0 -> 2`
-- `improve_phrase_vocabulary`: `14 -> 11`
-- `fix_timing_grid`: `12 -> 8`
-- `increase_motif_variation`: `6 -> 5`
-
-Decision:
-
-- phrase-vocabulary repair should be kept.
-- it improved timing proxy signals without breaking objective-clean/duplicate-free guardrails.
-- it is not enough for a keep candidate.
-- next generation work should target phrase shape and tension/approach vocabulary.
-
-## Previous Probe Result
-
-Issue #130은 Issue #128 proxy review에서 남은 `too_stiff=6`, `keep=0` 병목을 generation rule 쪽에서 한 번 더 좁힌 작업이다.
-
-Docs:
-
-- `docs/STAGE_B_RHYTHM_VARIATION_PHRASE_VOCAB_REPAIR_2026-05-25.md`
-
-Result:
-
-- variation candidates:
-  - strict: `3/3`
-  - final landing: `3/3`
-  - max interval: `4`
-  - average syncopation: `0.684`
-  - average bar-position pattern ratio: `0.958`
-  - average IOI diversity ratio: `0.091`
-  - average most-common IOI ratio: `0.385`
-  - average most-common duration ratio: `0.384`
-- duplicate note sequences: `0`
-- objective MIDI flags: `{}`
-- before/after max simultaneous notes for variation review MIDI: `1/1`
 
 ## Previous Sample-Diverse Review Result
 

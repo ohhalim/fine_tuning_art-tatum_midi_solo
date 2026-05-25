@@ -196,18 +196,51 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 42. timing-grid repaired rhythm MIDI-note proxy review
 43. rhythm variation phrase-vocabulary diversity repair
 44. phrase-vocabulary repaired rhythm MIDI-note proxy review
+45. rhythm variation phrase-shape tension repair
 
 자세한 전체 기록은 `docs/CORE_PLAN.md`에 있다.
 
 ## 7. Latest Meaningful Result
 
-최신 의미 있는 결과는 Stage B phrase-vocabulary repaired rhythm MIDI-note proxy review다.
+최신 의미 있는 결과는 Stage B rhythm variation phrase-shape tension repair다.
+
+Issue #134는 Issue #132 proxy review에서 남은 no-keep 병목을 generation rule 쪽에서 다시 좁혔다.
+
+결과:
+
+- candidate count: `6`
+- `data_motif_rhythm_phrase_variation`:
+  - strict: `3/3`
+  - final landing resolved: `3/3`
+  - max interval: `4`
+  - avg syncopation: `0.684`
+  - avg unique bar-position pattern ratio: `0.958`
+  - avg IOI diversity ratio: `0.091`
+  - avg most-common IOI ratio: `0.385`
+  - avg tension ratio: `0.437`
+- duplicate note sequences: `0`
+- objective MIDI flag counts: `{}`
+- variation review MIDI before/after max simultaneous notes: `1/1`
+
+해석:
+
+- Issue #134 keeps the Issue #130 position/IOI guardrail.
+- avg tension ratio recovers from `0.358` to `0.437`.
+- objective flags remain `{}`.
+- this is still not a musical success claim because review notes for these repaired candidates are pending.
+
+Docs:
+
+```text
+docs/STAGE_B_RHYTHM_VARIATION_PHRASE_SHAPE_TENSION_REPAIR_2026-05-25.md
+```
+
+The previous review was Stage B phrase-vocabulary repaired rhythm MIDI-note proxy review.
 
 Issue #132는 Issue #130 phrase-vocabulary repaired rhythm 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
 
 결과:
 
-- candidate count: `6`
 - reviewed count: `6`
 - pending count: `0`
 - decisions:
@@ -227,13 +260,6 @@ Issue #132는 Issue #130 phrase-vocabulary repaired rhythm 후보를 MIDI-note/c
   - `fix_timing_grid`: `8`
   - `increase_motif_variation`: `5`
   - `increase_tension_approach_vocabulary`: `2`
-
-해석:
-
-- Issue #130 phrase-vocabulary repair should be kept.
-- timing proxy improved: `too_stiff` fell from `6` to `4`.
-- there is still no `keep` candidate.
-- next generation work should target phrase shape and tension/approach vocabulary, not broad training.
 
 Docs:
 
@@ -733,29 +759,29 @@ Minimum checks:
 - context MIDI exists when listening review needs chord context
 
 Current latest contour/landing repair candidates pass the objective MIDI gate, but MIDI-note proxy review still produced no `keep` candidate.
-Current latest rhythm/phrase variation candidates pass the objective MIDI gate, have no exact duplicate note sequences, have lower dominant IOI repetition, and now have wider bar-position/IOI phrase vocabulary. MIDI-note proxy review shows timing improvement but still no `keep` candidate.
+Current latest rhythm/phrase variation candidates pass the objective MIDI gate, have no exact duplicate note sequences, have lower dominant IOI repetition, wider bar-position/IOI phrase vocabulary, and restored tension ratio. MIDI-note proxy review for these phrase-shape/tension repaired candidates is still pending.
 
 ## 12. What To Do Next
 
 The next correct task is **not** broad training, audio diffusion, or backend work.
 
-Next step after the phrase-vocabulary repaired rhythm MIDI-note proxy review:
+Next step after the rhythm variation phrase-shape tension repair:
 
 ```text
-Stage B rhythm variation phrase-shape tension repair
+Stage B phrase-shape tension repaired MIDI-note proxy review
 ```
 
-The next generation issue should target:
+The next review should target:
 
-- keeping Issue #130 position/IOI guardrails
-- improving phrase shape beyond high-register sketch or scalar exercise
-- increasing tension/approach color without outside-note or unresolved-leap flags
-- keeping duplicate note sequence count `0` and objective MIDI flags `{}`
+- whether rank 1 sample 3 is stronger than Issue #132 rank 1
+- whether tension repair reduces `too_safe`
+- whether high-register arc and exercise-like behavior remain blockers
+- whether any candidate can become `keep` by proxy
 
 Recommended next issue title:
 
 ```text
-Stage B rhythm variation phrase-shape tension repair
+Stage B phrase-shape tension repaired MIDI-note proxy review
 ```
 
 ## 13. Do Not Do Next
