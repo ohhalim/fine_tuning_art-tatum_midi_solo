@@ -90,6 +90,8 @@ Modes:
                 Compare contour landing repair against rhythm/phrase vocabulary variation.
   stage-b-clean-review-package
                 Extract objective-clean data-motif phrase recovery candidates for listening review.
+  stage-b-proxy-keep-focused-package
+                Extract proxy-keep reviewed candidates into a focused context listening package.
   stage-b-clean-context-diagnostics
                 Diagnose objective-clean context MIDI candidates before subjective review.
   stage-b-clean-listening-review-notes
@@ -168,6 +170,7 @@ run_quick() {
     scripts/evaluate_generated_candidate_chords.py \
     scripts/build_listening_review_notes.py \
     scripts/summarize_listening_review_notes.py \
+    scripts/build_focused_review_package.py \
     scripts/review_midi_note_objectives.py \
     scripts/train_stage_a_full.py \
     scripts/train_stage_a_adapter.py \
@@ -1139,6 +1142,29 @@ run_stage_b_clean_review_package() {
     --min_candidates 3
 }
 
+run_stage_b_proxy_keep_focused_package() {
+  local source_run_id="${SOURCE_RUN_ID:-harness_stage_b_phrase_shape_tension_codex_proxy}"
+  local objective_run_id="${OBJECTIVE_RUN_ID:-harness_stage_b_rhythm_phrase_variation}"
+  local run_id="${RUN_ID:-harness_stage_b_proxy_keep_focused_package}"
+  local review_notes_path="outputs/stage_b_listening_review_notes/${source_run_id}/phrase_shape_tension_repaired_review_notes_codex_midi_proxy.json"
+  local objective_report_path="outputs/stage_b_objective_midi_review/${objective_run_id}/objective_midi_note_review.json"
+  if [[ ! -f "$review_notes_path" ]]; then
+    printf 'Missing proxy-filled review notes: %s\n' "$review_notes_path" >&2
+    return 2
+  fi
+  if [[ ! -f "$objective_report_path" ]]; then
+    printf 'Missing objective MIDI review report: %s\n' "$objective_report_path" >&2
+    return 2
+  fi
+  print_header "Stage B proxy-keep focused review package"
+  "$PYTHON_BIN" scripts/build_focused_review_package.py \
+    --run_id "$run_id" \
+    --review_notes "$review_notes_path" \
+    --objective_report "$objective_report_path" \
+    --copy_files \
+    --min_candidates 1
+}
+
 run_stage_b_clean_context_diagnostics() {
   local source_run_id="${SOURCE_RUN_ID:-harness_stage_b_clean_review_package}"
   local run_id="${RUN_ID:-harness_stage_b_clean_context_diagnostics}"
@@ -1417,6 +1443,9 @@ case "$MODE" in
     ;;
   stage-b-clean-review-package)
     run_stage_b_clean_review_package
+    ;;
+  stage-b-proxy-keep-focused-package)
+    run_stage_b_proxy_keep_focused_package
     ;;
   stage-b-clean-context-diagnostics)
     run_stage_b_clean_context_diagnostics

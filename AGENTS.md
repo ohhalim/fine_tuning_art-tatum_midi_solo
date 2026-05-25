@@ -283,6 +283,12 @@ For Stage B objective-clean review package changes, run:
 bash scripts/agent_harness.sh stage-b-clean-review-package
 ```
 
+For Stage B proxy-keep focused review package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-proxy-keep-focused-package
+```
+
 For Stage B clean context diagnostics changes, run:
 
 ```bash
