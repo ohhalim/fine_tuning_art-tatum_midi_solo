@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import random
 import shutil
@@ -206,12 +207,22 @@ def fit_duration_tokens_to_positions(
     return [note_duration_token(step) for step in fitted]
 
 
-def varied_phrase_slot_bounds(bar_index: int, motif_index: int, motifs_per_bar: int) -> tuple[int, int]:
+def varied_phrase_slot_bounds(
+    bar_index: int,
+    motif_index: int,
+    motifs_per_bar: int,
+    *,
+    variation_index: int = 0,
+) -> tuple[int, int]:
     if int(motifs_per_bar) != 2:
         slot_size = max(1, int(POSITIONS_PER_BAR) // max(1, int(motifs_per_bar)))
-        return min(int(POSITIONS_PER_BAR) - 1, int(motif_index) * slot_size), slot_size
+        start_shift = int(variation_index) % max(1, min(3, slot_size))
+        slot_start = int(motif_index) * slot_size
+        if int(motif_index) > 0:
+            slot_start = max(0, slot_start - start_shift)
+        return min(int(POSITIONS_PER_BAR) - 1, slot_start), slot_size
     split_patterns = [9, 7, 10, 6, 8, 11, 5, 9]
-    first_slot_size = split_patterns[int(bar_index) % len(split_patterns)]
+    first_slot_size = split_patterns[(int(bar_index) + int(variation_index)) % len(split_patterns)]
     if int(motif_index) == 0:
         return 0, first_slot_size
     return first_slot_size, max(1, int(POSITIONS_PER_BAR) - first_slot_size)
@@ -223,6 +234,7 @@ def varied_phrase_duration_tokens(
     *,
     bar_index: int,
     motif_index: int,
+    variation_index: int = 0,
 ) -> list[int]:
     variation = [0, 1, 2, 0, 3, 1, 4, 2]
     varied_steps = [
@@ -230,7 +242,11 @@ def varied_phrase_duration_tokens(
             1,
             min(
                 int(MAX_DURATION_STEPS),
-                int(step) + variation[(int(bar_index) * 2 + int(motif_index) + index) % len(variation)],
+                int(step)
+                + variation[
+                    (int(bar_index) * 2 + int(motif_index) + index + int(variation_index))
+                    % len(variation)
+                ],
             ),
         )
         for index, step in enumerate(duration_steps)
@@ -1398,6 +1414,7 @@ def data_motif_rhythm_phrase_variation_tokens(
     pending_recovery_direction = 0
     min_solo_pitch = 48
     max_solo_pitch = 84
+    seed_variation = abs(int(seed)) % 17
 
     for bar_index in range(max(1, int(bars))):
         chord = chords[bar_index % len(chords)] if chords else None
@@ -1408,12 +1425,17 @@ def data_motif_rhythm_phrase_variation_tokens(
             tokens.extend(chord_tokens(chord))
         emitted_in_bar = 0
         pitch_cells = phrase_cadence_pitch_class_cells(chord, next_chord, bar_index=bar_index)
-        anchor = 60 + ((bar_index % 3) * 4) + rng.choice([-2, 0, 2])
+        anchor = 60 + (((bar_index + seed_variation) % 3) * 4) + rng.choice([-3, 0, 3])
         for motif_index in range(motifs_per_bar):
             row_index = bar_index * motifs_per_bar + motif_index
-            rhythm = weighted_choice(rhythm_rows, rng, row_index + bar_index)["key"]
-            contour = weighted_choice(contour_rows, rng, row_index + int(seed) + bar_index)["key"]
-            slot_start, slot_size = varied_phrase_slot_bounds(bar_index, motif_index, motifs_per_bar)
+            rhythm = weighted_choice(rhythm_rows, rng, row_index + bar_index + seed_variation)["key"]
+            contour = weighted_choice(contour_rows, rng, row_index + bar_index + seed_variation)["key"]
+            slot_start, slot_size = varied_phrase_slot_bounds(
+                bar_index,
+                motif_index,
+                motifs_per_bar,
+                variation_index=seed_variation,
+            )
             positions = normalize_position_deltas(
                 rhythm["position_deltas"],
                 slot_start=slot_start,
@@ -1424,6 +1446,7 @@ def data_motif_rhythm_phrase_variation_tokens(
                 rhythm["duration_steps"],
                 bar_index=bar_index,
                 motif_index=motif_index,
+                variation_index=seed_variation,
             )
             contour_steps = [int(step) for step in contour.get("pitch_intervals", [])] or [0]
             for local_index, (position, duration_token) in enumerate(zip(positions, durations)):
@@ -1461,7 +1484,11 @@ def data_motif_rhythm_phrase_variation_tokens(
                     )
                     pending_recovery_direction = 0
                 else:
-                    cell_index = guide_tone_cell_index_for_position(int(position))
+                    cell_index = (
+                        guide_tone_cell_index_for_position(int(position))
+                        + seed_variation
+                        + int(motif_index)
+                    )
                     pitch_class = pitch_cells[cell_index % len(pitch_cells)]
                     if penultimate_in_bar:
                         target_chord = chord if final_bar else next_chord
@@ -1470,7 +1497,7 @@ def data_motif_rhythm_phrase_variation_tokens(
                         )
                         if landing_classes:
                             pitch_class = approach_pitch_class(
-                                landing_classes[bar_index % len(landing_classes)],
+                                landing_classes[(bar_index + seed_variation) % len(landing_classes)],
                                 [int(pitch) % 12 for pitch in recent_pitches[-2:]],
                             )
                     line_pitch_classes = [pitch_class] + [
@@ -1981,6 +2008,56 @@ def candidate_sort_key(row: dict[str, Any]) -> tuple[Any, ...]:
     )
 
 
+def review_candidate_id(row: dict[str, Any]) -> str:
+    mode = str(row.get("mode") or "candidate").strip() or "candidate"
+    rank = int(row.get("review_rank", 0) or 0)
+    sample_index = int(row.get("sample_index", 0) or 0)
+    if rank and sample_index:
+        return f"{mode}_rank_{rank}_sample_{sample_index}"
+    return str(row.get("midi_path") or mode)
+
+
+def midi_note_sequence_signature(midi_path: Path | None) -> str | None:
+    if not midi_path or not midi_path.exists():
+        return None
+    midi = pretty_midi.PrettyMIDI(str(midi_path))
+    notes = sorted(
+        [note for instrument in midi.instruments if not instrument.is_drum for note in instrument.notes],
+        key=lambda note: (note.start, note.pitch, note.end),
+    )
+    sequence = [
+        {
+            "start": round(float(note.start), 6),
+            "end": round(float(note.end), 6),
+            "pitch": int(note.pitch),
+        }
+        for note in notes
+    ]
+    raw = json.dumps(sequence, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+
+
+def annotate_duplicate_note_sequences(candidates: list[dict[str, Any]]) -> None:
+    seen: dict[str, str] = {}
+    for row in candidates:
+        path_text = str(row.get("review_midi_path") or row.get("midi_path") or "")
+        midi_path = Path(path_text) if path_text else None
+        if midi_path and not midi_path.is_absolute():
+            midi_path = ROOT_DIR / midi_path
+        signature = midi_note_sequence_signature(midi_path)
+        row["note_sequence_signature"] = signature
+        row["is_duplicate_note_sequence"] = False
+        row["duplicate_of_candidate_id"] = None
+        if not signature:
+            continue
+        candidate_id = review_candidate_id(row)
+        if signature in seen:
+            row["is_duplicate_note_sequence"] = True
+            row["duplicate_of_candidate_id"] = seen[signature]
+            continue
+        seen[signature] = candidate_id
+
+
 def compact_review_candidate(
     mode: str,
     row: dict[str, Any],
@@ -1995,7 +2072,7 @@ def compact_review_candidate(
     pitch_roles = row.get("pitch_roles", {})
     metrics = row.get("metrics", {})
     contour = row.get("contour_landing_profile", {})
-    return {
+    result = {
         "mode": mode,
         "review_rank": int(review_rank),
         "sample_index": int(row["sample_index"]),
@@ -2026,6 +2103,8 @@ def compact_review_candidate(
         "abrupt_register_reset_count": int(contour.get("abrupt_register_reset_count", 0) or 0),
         "diagnostic_failure_reason": row.get("diagnostic_failure_reason"),
     }
+    result["candidate_id"] = review_candidate_id(result)
+    return result
 
 
 def review_markdown_report(manifest: dict[str, Any]) -> str:
@@ -2033,21 +2112,31 @@ def review_markdown_report(manifest: dict[str, Any]) -> str:
         "# Stage B Data Motif Review Candidates",
         "",
         f"- candidate count: `{manifest['candidate_count']}`",
+        f"- unique note sequences: `{manifest.get('unique_note_sequence_count', 0)}`",
+        f"- duplicate note sequences: `{manifest.get('duplicate_note_sequence_count', 0)}`",
         f"- copy midi: `{str(manifest['copy_midi']).lower()}`",
-        "",
-        "| mode | rank | sample | variant | strict | landing | max interval | resets | notes | pitches | sync | bar-var | dur-var | dur-rep | ioi-var | ioi-rep | tension | solo/context MIDI |",
-        "|---|---:|---:|---|:---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     guide_path = manifest.get("chord_guide_midi_path")
     if guide_path:
-        lines.insert(4, f"- chord guide midi: `{guide_path}`")
-        lines.insert(5, "")
+        lines.append(f"- chord guide midi: `{guide_path}`")
+    lines.extend(
+        [
+            "",
+            "| mode | rank | sample | variant | strict | landing | max interval | resets | notes | pitches | sync | bar-var | dur-var | dur-rep | ioi-var | ioi-rep | tension | duplicate | solo/context MIDI |",
+            "|---|---:|---:|---|:---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
+        ]
+    )
     for row in manifest["candidates"]:
         midi_path = row.get("review_midi_path") or row.get("midi_path")
         context_path = row.get("context_midi_path") or ""
         format_row = dict(row)
         format_row["display_midi_path"] = midi_path
         format_row["display_context_midi_path"] = context_path
+        format_row["duplicate_display"] = (
+            str(row.get("duplicate_of_candidate_id"))
+            if row.get("is_duplicate_note_sequence")
+            else "-"
+        )
         lines.append(
             "| {mode} | {review_rank} | {sample_index} | {review_variant} | {strict_valid} | "
             "{final_landing_role} | {max_abs_interval} | {abrupt_register_reset_count} | {note_count} | "
@@ -2055,7 +2144,9 @@ def review_markdown_report(manifest: dict[str, Any]) -> str:
             "{unique_bar_position_pattern_ratio:.3f} | {duration_diversity_ratio:.3f} | "
             "{most_common_duration_ratio:.3f} | {ioi_diversity_ratio:.3f} | "
             "{most_common_ioi_ratio:.3f} | {tension_ratio:.3f} | "
-            "`{display_midi_path}`<br>`{display_context_midi_path}` |".format(**format_row)
+            "{duplicate_display} | `{display_midi_path}`<br>`{display_context_midi_path}` |".format(
+                **format_row
+            )
         )
     return "\n".join(lines).rstrip() + "\n"
 
@@ -2130,6 +2221,11 @@ def build_review_export(
                 )
             )
 
+    annotate_duplicate_note_sequences(candidates)
+    unique_note_sequence_count = len(
+        {str(row.get("note_sequence_signature")) for row in candidates if row.get("note_sequence_signature")}
+    )
+    duplicate_note_sequence_count = sum(1 for row in candidates if row.get("is_duplicate_note_sequence"))
     manifest = {
         "output_dir": str(output_dir),
         "copy_midi": bool(copy_midi),
@@ -2138,6 +2234,8 @@ def build_review_export(
         "chord_progression": list(chords),
         "chord_guide_midi_path": str(chord_guide_midi_path) if chord_guide_midi_path else None,
         "candidate_count": int(len(candidates)),
+        "unique_note_sequence_count": int(unique_note_sequence_count),
+        "duplicate_note_sequence_count": int(duplicate_note_sequence_count),
         "candidates": candidates,
     }
     write_json(output_dir / "review_manifest.json", manifest)
