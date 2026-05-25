@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #138, Stage B proxy-keep rhythm candidate focused review package
-- 다음 권장 이슈: `Stage B proxy-keep focused context listening decision`
+- latest completed: Issue #140, Stage B proxy-keep focused context listening decision
+- 다음 권장 이슈: `Stage B focused context register-arc cadence repair`
 
 현재 범위가 아닌 것:
 
@@ -41,24 +41,24 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Review Result
 
-Issue #138은 Issue #136에서 처음 나온 proxy `keep` 후보만 solo/context MIDI와 objective note summary로 묶은 focused review package다.
+Issue #140은 Issue #138 focused package의 단일 proxy `keep` 후보를 solo/context MIDI note 기준으로 다시 판단한 focused context decision이다.
 
 Docs:
 
-- `docs/STAGE_B_PROXY_KEEP_FOCUSED_REVIEW_PACKAGE_2026-05-25.md`
+- `docs/STAGE_B_PROXY_KEEP_FOCUSED_CONTEXT_DECISION_2026-05-25.md`
 
 중요한 전제:
 
-- 이 package는 실제 오디오 청취 승인이 아니다.
-- `keep` 후보를 focused context listening으로 넘기기 위한 재현 가능한 artifact다.
-- `outputs/` 아래 copied MIDI/package 파일은 생성 artifact라 커밋하지 않는다.
+- 실제 오디오 청취 리뷰가 아니다.
+- MIDI note, context chord guide, bass root guide, objective metrics 기준의 focused proxy decision이다.
+- 이 결과만으로 broad training이나 style adaptation을 시작하지 않는다.
 
 Result:
 
-- decision filter: `keep`
-- package candidate count: `1`
-- copied solo MIDI files: `1`
-- copied context MIDI files: `1`
+- prior proxy decision: `keep`
+- focused context decision: `needs_followup`
+- keep as diagnostic seed: `yes`
+- ready for broad training: `no`
 
 Focused candidate:
 
@@ -72,18 +72,41 @@ Focused candidate:
 - objective MIDI tension ratio: `0.540`
 - objective MIDI flags: `[]`
 
-Generated package:
+Positive evidence:
 
-- `outputs/stage_b_focused_review_package/harness_stage_b_proxy_keep_focused_package/focused_review_package.json`
-- `outputs/stage_b_focused_review_package/harness_stage_b_proxy_keep_focused_package/focused_review_package.md`
+- max active notes: `1`
+- off-sixteenth-grid count: `0`
+- repeated pitch interval ratio: `0.000`
+- no duplicated 4-note or 8-note pitch-class chunks
+
+Blocking evidence:
+
+- register/contour: the line reaches `C6` around bar 4, then drifts down to `G3` by the final bar.
+- phrase punctuation: the 8-bar arc still reads like similar eighth/quarter-grid cells rather than a clear cadence.
+- context fit: chord fit is clean, but some outside notes are side-slip artifacts rather than clearly prepared/released color tones.
 
 Decision:
 
-- The proxy keep candidate is isolated and reproducible.
-- The next decision should be a focused context listening decision on this single solo/context pair.
-- broad training is still premature until this candidate survives real listening.
+- The Issue #138 package remains useful as a focused review artifact.
+- The candidate should not be promoted to a final listening keep.
+- The next repair should preserve objective-clean rhythm guardrails while adding register-arc control and cadence/phrase punctuation.
 
-## Previous Review Result
+## Previous Package Result
+
+Issue #138은 Issue #136에서 처음 나온 proxy `keep` 후보만 solo/context MIDI와 objective note summary로 묶은 focused review package다.
+
+Docs:
+
+- `docs/STAGE_B_PROXY_KEEP_FOCUSED_REVIEW_PACKAGE_2026-05-25.md`
+
+Result:
+
+- decision filter: `keep`
+- package candidate count: `1`
+- copied solo MIDI files: `1`
+- copied context MIDI files: `1`
+
+## Previous Proxy Review Result
 
 Issue #136은 Issue #134 phrase-shape/tension repaired rhythm 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
 
