@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- Stage B rhythm variation phrase-shape tension repair
-- 다음 권장 이슈: `Stage B phrase-shape tension repaired MIDI-note proxy review`
+- Stage B phrase-shape tension repaired MIDI-note proxy review
+- 다음 권장 이슈: `Stage B proxy-keep rhythm candidate focused review package`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,60 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Probe Result
+## Latest Review Result
+
+Issue #136은 Issue #134 phrase-shape/tension repaired rhythm 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
+
+Docs:
+
+- `docs/STAGE_B_PHRASE_SHAPE_TENSION_PROXY_REVIEW_2026-05-25.md`
+
+중요한 전제:
+
+- 실제 오디오 청취 리뷰가 아니다.
+- `keep`은 proxy 기준 focused context listening 후보라는 뜻이다.
+- broad training이나 musical success claim으로 해석하지 않는다.
+
+Result:
+
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `keep`: `1`
+  - `needs_followup`: `5`
+  - `reject`: `0`
+- timing:
+  - `acceptable`: `2`
+  - `too_stiff`: `4`
+- chord fit:
+  - `fits`: `6`
+- duplicate note sequences: `0`
+- objective MIDI flags: `{}`
+
+Proxy keep candidate:
+
+- `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- note count: `63`
+- unique pitch count: `28`
+- max interval: `4`
+- IOI repetition: `0.371`
+- objective MIDI tension ratio: `0.540`
+
+Aggregate follow-ups:
+
+- `improve_phrase_vocabulary`: `10`
+- `fix_timing_grid`: `8`
+- `increase_motif_variation`: `5`
+- `increase_tension_approach_vocabulary`: `0`
+
+Decision:
+
+- Issue #134 phrase-shape/tension repair should be kept.
+- `data_motif_rhythm_phrase_variation_rank_1_sample_3` becomes a proxy keep candidate.
+- broad training is still premature.
+- next work should isolate the proxy keep candidate into a focused context review package.
+
+## Previous Probe Result
 
 Issue #134는 Issue #132 proxy review에서 남은 no-keep 병목을 generation rule 쪽에서 다시 좁힌 작업이다.
 
@@ -47,67 +100,19 @@ Docs:
 
 - `docs/STAGE_B_RHYTHM_VARIATION_PHRASE_SHAPE_TENSION_REPAIR_2026-05-25.md`
 
-Implemented:
-
-- `phrase_shape_target_pitch()`로 extreme high-register sketch를 줄였다.
-- `phrase_shape_pitch_classes()`로 일부 local phrase role에서 tension pitch class와 next chord guide tone을 우선했다.
-- final cadence landing에서 strict interval bound가 깨지지 않도록 최근 pitch blocking을 완화했다.
-
 Result:
 
-- candidate count: `6`
 - variation candidates:
   - strict: `3/3`
   - final landing: `3/3`
   - max interval: `4`
-  - average syncopation: `0.684`
+  - average tension ratio: `0.437`
   - average bar-position pattern ratio: `0.958`
   - average IOI diversity ratio: `0.091`
   - average most-common IOI ratio: `0.385`
-  - average tension ratio: `0.437`
 - duplicate note sequences: `0`
 - objective MIDI flags: `{}`
 - before/after max simultaneous notes for variation review MIDI: `1/1`
-
-Compared with Issue #130:
-
-- average tension ratio: `0.358 -> 0.437`
-- bar-position pattern ratio: `0.958 -> 0.958`
-- IOI diversity ratio: `0.091 -> 0.091`
-- most-common IOI ratio: `0.385 -> 0.385`
-
-Decision:
-
-- phrase-shape/tension repair preserves the rhythm/position guardrails while restoring tension color.
-- this is not a musical success claim until filled MIDI-note proxy review confirms whether `too_safe` and phrase sketch/exercise problems decreased.
-- next step is a focused proxy review of the repaired candidates.
-
-## Previous Review Result
-
-Issue #132는 Issue #130 phrase-vocabulary repaired rhythm 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
-
-Docs:
-
-- `docs/STAGE_B_PHRASE_VOCAB_REPAIRED_PROXY_REVIEW_2026-05-25.md`
-
-Result:
-
-- reviewed candidates: `6`
-- pending candidates: `0`
-- decisions:
-  - `needs_followup`: `6`
-  - `reject`: `0`
-  - `keep`: `0`
-- timing:
-  - `acceptable`: `2`
-  - `too_stiff`: `4`
-- aggregate follow-ups:
-  - `improve_phrase_vocabulary`: `11`
-  - `fix_timing_grid`: `8`
-  - `increase_motif_variation`: `5`
-  - `increase_tension_approach_vocabulary`: `2`
-- duplicate note sequences: `0`
-- objective MIDI flags: `{}`
 
 ## Previous Sample-Diverse Review Result
 
