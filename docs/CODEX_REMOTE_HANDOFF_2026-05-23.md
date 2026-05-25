@@ -188,12 +188,46 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 34. clean MIDI-note proxy review
 35. contour/cadence landing repair probe
 36. contour repair MIDI-note proxy review
+37. rhythm/phrase vocabulary variation probe
 
 자세한 전체 기록은 `docs/CORE_PLAN.md`에 있다.
 
 ## 7. Latest Meaningful Result
 
-최신 의미 있는 결과는 Stage B contour repair MIDI-note proxy review다.
+최신 의미 있는 결과는 Stage B rhythm/phrase vocabulary variation probe다.
+
+Issue #118은 Issue #116 contour repair MIDI-note proxy review에서 나온 `too_stiff=6`, `too_mechanical=6`, `too_repetitive=6` 문제를 좁혀서 검증했다.
+
+결과:
+
+- compared modes:
+  - `data_motif_contour_landing_repair`
+  - `data_motif_rhythm_phrase_variation`
+- candidate count: `6`
+- `data_motif_rhythm_phrase_variation`:
+  - strict: `3/3`
+  - final landing resolved: `3/3`
+  - max interval: `6`
+  - objective MIDI flags: `{}`
+  - unresolved large leap ratio: `0.000`
+  - repeated pitch interval ratio: `0.000`
+  - pitch range floor: `>=51`
+  - syncopation: `0.694`
+  - duration diversity: `0.097`
+  - IOI diversity: `0.115`
+- comparison `data_motif_contour_landing_repair`:
+  - max interval: `7`
+  - syncopation: `0.625`
+  - duration diversity: `0.062`
+  - IOI diversity: `0.079`
+
+Docs:
+
+```text
+docs/STAGE_B_RHYTHM_PHRASE_VARIATION_2026-05-25.md
+```
+
+The previous review was Stage B contour repair MIDI-note proxy review.
 
 Issue #116은 Issue #115 이후 repair-vs-baseline 후보 6개를 같은 listening review notes schema로 채웠다.
 
@@ -381,6 +415,7 @@ docs/STAGE_B_CLEAN_LISTENING_REVIEW_NOTES_2026-05-23.md
 docs/STAGE_B_CLEAN_MIDI_PROXY_REVIEW_2026-05-24.md
 docs/STAGE_B_CONTOUR_LANDING_REPAIR_2026-05-25.md
 docs/STAGE_B_CONTOUR_REPAIR_MIDI_PROXY_REVIEW_2026-05-25.md
+docs/STAGE_B_RHYTHM_PHRASE_VARIATION_2026-05-25.md
 ```
 
 Core historical docs:
@@ -458,28 +493,29 @@ Minimum checks:
 - context MIDI exists when listening review needs chord context
 
 Current latest contour/landing repair candidates pass the objective MIDI gate, but MIDI-note proxy review still produced no `keep` candidate.
+Current latest rhythm/phrase variation candidates also pass the objective MIDI gate, but their listening/proxy notes are still pending.
 
 ## 12. What To Do Next
 
 The next correct task is **not** broad training, audio diffusion, or backend work.
 
-Next step after the contour repair MIDI-note proxy review:
+Next step after the rhythm/phrase variation probe:
 
 ```text
-Stage B rhythm/phrase vocabulary variation probe
+Stage B rhythm/phrase variation MIDI-note proxy review
 ```
 
-The next probe should target:
+The next review should target:
 
-- duration/IOI template rigidity
-- phrase vocabulary variation beyond guide-tone landing
-- motif variation without reintroducing objective MIDI flags
-- register floor control so repaired phrases do not fall into C1/A#1 solo register
+- whether rhythm variation reduces `too_stiff` and `too_repetitive`
+- whether the lower tension ratio makes the line too safe
+- whether the register floor improves phrase plausibility
+- whether note count `60` feels too sparse
 
 Recommended next issue title:
 
 ```text
-Stage B rhythm/phrase vocabulary variation probe
+Stage B rhythm/phrase variation MIDI-note proxy review
 ```
 
 ## 13. Do Not Do Next
@@ -512,15 +548,15 @@ Short explanation:
 ```text
 We are building a symbolic MIDI jazz piano solo generation pipeline.
 Stage A failed musically, so the project moved to Stage B with explicit bar/position/chord/duration tokens.
-The latest work filled MIDI-note proxy review notes for 6 contour-repair-vs-baseline candidates.
-Objective note-level diagnostics show no flags, but proxy review still produced keep=0 with too_stiff=6, too_mechanical=6, and too_repetitive=6.
-The next step is a rhythm/phrase vocabulary variation probe, not broad training.
+The latest work added a rhythm/phrase variation probe after contour repair proxy review.
+Objective note-level diagnostics show no flags, and rhythm variation improves syncopation, duration diversity, and IOI diversity while preserving resolved landings.
+The next step is MIDI-note proxy review of those variation candidates, not broad training.
 ```
 
 Very short explanation:
 
 ```text
-The pipeline can now repair contour/landing objectives, but MIDI-note proxy review says rhythm stiffness, mechanical repetition, and weak phrase vocabulary remain blockers.
+The pipeline can now improve contour/landing and some rhythm metrics, but the new variation candidates still need MIDI-note proxy review before more generation changes.
 ```
 
 ## 15. Remote Codex Working Rules
