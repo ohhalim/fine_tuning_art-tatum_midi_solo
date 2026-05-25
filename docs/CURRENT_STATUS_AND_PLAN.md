@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-05-25
+작성일: 2026-05-26
 
 ## Current Focus
 
@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #142, Stage B focused context register-arc cadence repair
-- 다음 권장 이슈: `Stage B register-cadence repaired focused proxy review`
+- latest completed: Issue #144, Stage B register-cadence repaired focused proxy review
+- 다음 권장 이슈: `Stage B register-safe phrase vocabulary repair`
 
 현재 범위가 아닌 것:
 
@@ -41,17 +41,63 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Review Result
 
+Issue #144는 Issue #142 register-cadence repair 이후의 후보를 MIDI-note/context 기준으로 다시 채운 focused proxy review다.
+
+Docs:
+
+- `docs/STAGE_B_REGISTER_CADENCE_REPAIRED_PROXY_REVIEW_2026-05-26.md`
+
+중요한 전제:
+
+- 실제 오디오 청취 리뷰가 아니다.
+- MIDI note, context chord guide, bass root guide, objective metrics 기준의 proxy review다.
+- broad training이나 style adaptation claim으로 해석하지 않는다.
+
+Result:
+
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `keep`: `0`
+  - `needs_followup`: `5`
+  - `reject`: `1`
+- timing:
+  - `acceptable`: `2`
+  - `too_stiff`: `4`
+- chord fit:
+  - `fits`: `6`
+- objective MIDI flags: `{}`
+
+Repaired top candidate:
+
+- `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- note count: `63`
+- unique pitch count: `18`
+- pitch range: `C#4-G5`
+- final landing: `G4`
+- final bar notes: `F4, G4, A#4, A4, F4, D4, F#4, G4`
+- objective MIDI flags: `[]`
+
+Aggregate follow-ups:
+
+- `improve_phrase_vocabulary`: `14`
+- `fix_timing_grid`: `8`
+- `increase_motif_variation`: `3`
+
+Decision:
+
+- Issue #142 register-cadence repair should be kept.
+- The prior `C6` to final `G3` context blocker is fixed.
+- No candidate is promoted to `keep`.
+- The next repair should re-expand phrase vocabulary and motif development while keeping the new register bounds.
+
+## Previous Probe Result
+
 Issue #142는 Issue #140 focused context decision에서 확인한 C6-to-G3 register/cadence blocker를 generation rule 쪽에서 좁게 고친 작업이다.
 
 Docs:
 
 - `docs/STAGE_B_FOCUSED_CONTEXT_REGISTER_CADENCE_REPAIR_2026-05-25.md`
-
-중요한 전제:
-
-- 기존 rhythm/position guardrail과 objective-clean 상태를 유지하는 register/cadence repair다.
-- final cadence를 bass-guide register가 아니라 right-hand solo register 안에 남기는 것이 목적이다.
-- 아직 musical pass가 아니며, 다시 focused proxy review가 필요하다.
 
 Result:
 
@@ -60,31 +106,7 @@ Result:
 - max interval: `4`
 - duplicate note sequences: `0`
 - objective MIDI flag counts: `{}`
-
-Top repaired candidate:
-
-- `data_motif_rhythm_phrase_variation_rank_1_sample_3`
-- note count: `63`
-- unique pitch count: `18`
-- objective pitch range: `61-79`
-- final landing: `G4`
-- final landing role: `guide`
-- final bar notes: `F4, G4, A#4, A4, F4, D4, F#4, G4`
-- source tension ratio: `0.413`
-- objective MIDI tension ratio: `0.540`
-- objective MIDI flags: `[]`
-
-Aggregate tradeoff:
-
-- avg tension ratio moved from the previous `0.437` area to `0.395`
-- top candidate unique pitch count dropped from `28` to `18`
-- this is acceptable for Issue #142 but must be checked for a boxed-in phrase feel
-
-Decision:
-
-- Keep the register/cadence repair.
-- The previous C6-to-G3 focused context blocker is repaired for the top candidate.
-- The next step is a focused proxy review of the repaired candidates.
+- repaired top candidate final landing: `G4`
 
 ## Previous Decision Result
 

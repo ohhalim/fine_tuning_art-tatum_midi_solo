@@ -201,12 +201,54 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 47. proxy-keep rhythm candidate focused review package
 48. proxy-keep focused context MIDI-note decision
 49. focused context register-arc cadence repair
+50. register-cadence repaired focused proxy review
 
 자세한 전체 기록은 `docs/CORE_PLAN.md`에 있다.
 
 ## 7. Latest Meaningful Result
 
-최신 의미 있는 결과는 Stage B focused context register-arc cadence repair다.
+최신 의미 있는 결과는 Stage B register-cadence repaired focused proxy review다.
+
+Issue #144는 Issue #142 register-cadence repair 이후의 후보를 MIDI-note/context 기준으로 다시 채운 focused proxy review다.
+
+결과:
+
+- reviewed candidates: `6`
+- decisions:
+  - `keep`: `0`
+  - `needs_followup`: `5`
+  - `reject`: `1`
+- timing:
+  - `acceptable`: `2`
+  - `too_stiff`: `4`
+- chord fit: `fits=6`
+- objective MIDI flag counts: `{}`
+- selected candidate: `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- selected candidate note count: `63`
+- selected candidate unique pitch count: `18`
+- selected candidate pitch range: `C#4-G5`
+- selected candidate final landing: `G4`
+- selected candidate objective flags: `[]`
+- aggregate follow-ups:
+  - `improve_phrase_vocabulary`: `14`
+  - `fix_timing_grid`: `8`
+  - `increase_motif_variation`: `3`
+
+해석:
+
+- The previous C6-to-G3 focused context blocker is repaired for the top candidate.
+- The Issue #142 register-cadence repair should be kept.
+- No candidate is promoted to final keep.
+- broad training is still premature.
+- next work should re-expand phrase vocabulary and motif development while keeping the new register bounds.
+
+Docs:
+
+```text
+docs/STAGE_B_REGISTER_CADENCE_REPAIRED_PROXY_REVIEW_2026-05-26.md
+```
+
+The previous probe was Stage B focused context register-arc cadence repair.
 
 Issue #142는 Issue #140 focused context decision에서 확인한 C6-to-G3 register/cadence blocker를 generation rule 쪽에서 좁게 고친 작업이다.
 
@@ -217,20 +259,7 @@ Issue #142는 Issue #140 focused context decision에서 확인한 C6-to-G3 regis
 - max interval: `4`
 - duplicate note sequences: `0`
 - objective MIDI flag counts: `{}`
-- selected candidate: `data_motif_rhythm_phrase_variation_rank_1_sample_3`
-- selected candidate note count: `63`
-- selected candidate unique pitch count: `18`
-- selected candidate pitch range: `61-79`
-- selected candidate final landing: `G4`
-- selected candidate final landing role: `guide`
-- selected candidate objective flags: `[]`
-
-해석:
-
-- The previous C6-to-G3 focused context blocker is repaired for the top candidate.
-- The repair preserves objective-clean status and duplicate-free status.
-- broad training is still premature.
-- next work should run a focused proxy review on the repaired candidates and check whether the narrowed register feels boxed-in.
+- repaired top candidate final landing: `G4`
 
 Docs:
 
