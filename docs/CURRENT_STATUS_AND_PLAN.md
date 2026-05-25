@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- Stage B rhythm/phrase vocabulary variation probe
-- 다음 권장 이슈: `Stage B rhythm/phrase variation MIDI-note proxy review`
+- Stage B rhythm/phrase variation MIDI-note proxy review
+- 다음 권장 이슈: `Stage B rhythm/phrase variation sample diversity repair`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,61 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Probe Result
+## Latest Review Result
+
+Issue #120은 Issue #118 rhythm/phrase variation 후보 3개와 contour repair baseline 3개를 같은 listening review notes schema로 채운 MIDI-note proxy review다.
+
+중요한 전제:
+
+- 실제 오디오 청취 리뷰가 아니다.
+- MIDI note timing, pitch contour, objective MIDI metrics, context chord guide track, exact note-sequence comparison을 기준으로 한 proxy review다.
+- `keep` 후보는 만들지 않는다.
+
+Docs:
+
+- `docs/STAGE_B_RHYTHM_PHRASE_VARIATION_MIDI_PROXY_REVIEW_2026-05-25.md`
+
+Generated outputs:
+
+- proxy-filled notes:
+  - `outputs/stage_b_listening_review_notes/harness_stage_b_rhythm_phrase_variation_codex_proxy/rhythm_phrase_variation_review_notes_codex_midi_proxy.json`
+- aggregate:
+  - `outputs/stage_b_listening_review_aggregate/harness_stage_b_rhythm_phrase_variation_codex_proxy/listening_review_aggregate.md`
+
+Result:
+
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `needs_followup`: `4`
+  - `reject`: `2`
+  - `keep`: `0`
+- timing:
+  - `too_stiff`: `6`
+- aggregate follow-ups:
+  - `fix_timing_grid`: `12`
+  - `improve_phrase_vocabulary`: `10`
+  - `increase_motif_variation`: `6`
+
+Candidate decisions:
+
+| candidate | phrase | timing | chord_fit | decision |
+|---|---|---|---|---|
+| `data_motif_contour_landing_repair_rank_1_sample_1` | `fragment` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_contour_landing_repair_rank_2_sample_2` | `phrase` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_contour_landing_repair_rank_3_sample_3` | `fragment` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_rhythm_phrase_variation_rank_1_sample_1` | `phrase` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_rhythm_phrase_variation_rank_2_sample_2` | `phrase` | `too_stiff` | `fits` | `reject` |
+| `data_motif_rhythm_phrase_variation_rank_3_sample_3` | `phrase` | `too_stiff` | `fits` | `reject` |
+
+Decision:
+
+- rhythm/phrase variation은 register floor, max interval, duration/IOI objective metrics를 개선했다.
+- 그러나 `data_motif_rhythm_phrase_variation` rank 1-3 MIDI note/start/duration sequence가 완전히 동일했다.
+- rank 1은 representative follow-up candidate로 남기고, rank 2/3은 duplicate review evidence라 reject한다.
+- 다음은 variation mode의 sample-level diversity repair다.
+
+## Previous Probe Result
 
 Issue #118은 Issue #116 contour repair MIDI-note proxy review에서 드러난 `too_stiff`, `too_mechanical`, `too_repetitive`, `weak_phrase` 문제를 좁혀서 검증했다.
 
@@ -70,7 +124,7 @@ Decision:
 - rhythm/phrase variation은 objective rhythm target을 개선했다.
 - variation 후보는 pitch floor `>=51`, unresolved large leap ratio `0.000`, repeated pitch interval ratio `0.000`이다.
 - 하지만 note count가 `60`으로 줄고 tension ratio가 `0.371`로 낮아졌다.
-- 다음은 새 variation 후보를 MIDI-note proxy review로 채워 실제 follow-up 방향을 정해야 한다.
+- Issue #120 proxy review 결과, 새 variation 후보 3개가 exact duplicate라 sample-level diversity repair가 필요하다.
 
 ## Previous Review Result
 

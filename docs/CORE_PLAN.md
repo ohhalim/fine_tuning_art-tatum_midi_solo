@@ -169,6 +169,7 @@ Stage B에서 명시하는 것:
 57. Stage B data-derived contour/cadence landing repair probe
 58. Stage B contour repair MIDI-note proxy review
 59. Stage B rhythm/phrase vocabulary variation probe
+60. Stage B rhythm/phrase variation MIDI-note proxy review
 
 가장 최근 의미 있는 결과:
 
@@ -212,6 +213,9 @@ Stage B에서 명시하는 것:
 - Issue #116 contour repair aggregate reports `too_stiff=6`, `too_mechanical=6`, `too_repetitive=6`, and recommends phrase vocabulary, timing grid, and motif variation follow-ups.
 - Issue #118 adds `data_motif_rhythm_phrase_variation`, improving syncopation `0.625 -> 0.694`, duration diversity `0.062 -> 0.097`, and IOI diversity `0.079 -> 0.115` while keeping objective MIDI flag counts `{}`.
 - Issue #118 preserves final landing `3/3`, reduces max interval `7 -> 6`, and keeps unresolved large leap ratio `0.000` for the variation candidates.
+- Issue #120 fills MIDI-note proxy review notes for the rhythm/phrase variation candidates and contour repair baseline.
+- Issue #120 result: `reviewed=6`, `needs_followup=4`, `reject=2`, `keep=0`, and all candidates still have `timing=too_stiff`.
+- Issue #120 finds that the `data_motif_rhythm_phrase_variation` rank 1-3 candidates are exact duplicate note/start/duration sequences, so rank 2 and rank 3 are rejected as duplicate review evidence.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -230,7 +234,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 rhythm/phrase variation 후보의 MIDI-note proxy review다. Issue #118은 objective rhythm metrics를 개선했지만 note count 감소와 tension ratio 하락이 있어 실제 review boundary가 필요하다.
+이제 다음 단계는 rhythm/phrase variation mode의 sample-level diversity repair다. Issue #118은 objective rhythm metrics를 개선했고 Issue #120은 register/large-leap 개선을 확인했지만, ranked candidates가 exact duplicate로 나와 독립적인 review 후보를 만들지 못했다.
 
 ## 6. 다음 단계 로드맵
 
@@ -445,6 +449,8 @@ Stage B에서 명시하는 것:
 - Issue #116 aggregate result: `phrase=1`, `fragment=4`, `exercise=1`, `too_stiff=6`, `fits=4`, `unclear=2`.
 - Issue #118 result: `data_motif_rhythm_phrase_variation` is strict `3/3`, final landing resolved `3/3`, max interval `6`, objective flags `{}`, and pitch range floor `>=51`.
 - Issue #118 rhythm result: syncopation `0.694`, duration diversity `0.097`, IOI diversity `0.115`, compared with contour repair `0.625`, `0.062`, `0.079`.
+- Issue #120 MIDI-note proxy review result: `reviewed=6`, `needs_followup=4`, `reject=2`, `keep=0`.
+- Issue #120 result: variation rank 1 is the representative follow-up candidate, but variation rank 2 and rank 3 are exact duplicates of rank 1 and should not be treated as independent listening evidence.
 
 해석:
 
@@ -459,7 +465,8 @@ Stage B에서 명시하는 것:
 - proxy review는 실제 오디오 청취가 아니므로 최종 subjective quality proof가 아니다.
 - Issue #115는 contour continuity와 final landing objective target을 개선했다.
 - contour repair MIDI-note proxy review 결과, 다음 병목은 landing이 아니라 rhythm stiffness, repeated duration/rest template, thin phrase vocabulary다.
-- Issue #118은 그 병목 중 rhythm objective metrics와 register floor를 개선했지만, listening/proxy review는 아직 pending이다.
+- Issue #118은 그 병목 중 rhythm objective metrics와 register floor를 개선했다.
+- Issue #120 proxy review 결과, 다음 병목은 exact duplicate rank candidates를 없애는 sample diversity repair다.
 
 ### Phase 3.10. Swing/Motif Phrase Grammar
 
