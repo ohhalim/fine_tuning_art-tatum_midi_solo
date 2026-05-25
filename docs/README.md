@@ -152,6 +152,8 @@
   - rhythm/position guardrail을 유지하면서 phrase target register와 tension pitch-class 우선순위를 보강한 결과.
 - `STAGE_B_PHRASE_SHAPE_TENSION_PROXY_REVIEW_2026-05-25.md`
   - phrase-shape/tension repaired rhythm 후보를 MIDI-note/context 기준으로 proxy review하고 첫 proxy keep 후보를 정리한 결과.
+- `STAGE_B_PROXY_KEEP_FOCUSED_REVIEW_PACKAGE_2026-05-25.md`
+  - 첫 proxy keep 후보만 solo/context MIDI와 objective note summary로 묶은 focused review package 결과.
 - `REFERENCES.md`
   - 2024-2026 symbolic MIDI 연구까지 포함한 fine-tuning/tokenization reference map과 구현 판단 기준.
 - `INFERENCE_MODEL_SPEC.md`

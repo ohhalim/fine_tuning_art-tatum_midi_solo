@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- Stage B phrase-shape tension repaired MIDI-note proxy review
-- 다음 권장 이슈: `Stage B proxy-keep rhythm candidate focused review package`
+- latest completed: Issue #138, Stage B proxy-keep rhythm candidate focused review package
+- 다음 권장 이슈: `Stage B proxy-keep focused context listening decision`
 
 현재 범위가 아닌 것:
 
@@ -41,22 +41,59 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Review Result
 
+Issue #138은 Issue #136에서 처음 나온 proxy `keep` 후보만 solo/context MIDI와 objective note summary로 묶은 focused review package다.
+
+Docs:
+
+- `docs/STAGE_B_PROXY_KEEP_FOCUSED_REVIEW_PACKAGE_2026-05-25.md`
+
+중요한 전제:
+
+- 이 package는 실제 오디오 청취 승인이 아니다.
+- `keep` 후보를 focused context listening으로 넘기기 위한 재현 가능한 artifact다.
+- `outputs/` 아래 copied MIDI/package 파일은 생성 artifact라 커밋하지 않는다.
+
+Result:
+
+- decision filter: `keep`
+- package candidate count: `1`
+- copied solo MIDI files: `1`
+- copied context MIDI files: `1`
+
+Focused candidate:
+
+- `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- note count: `63`
+- unique pitch count: `28`
+- phrase quality: `phrase`
+- timing: `acceptable`
+- chord fit: `fits`
+- source tension ratio: `0.413`
+- objective MIDI tension ratio: `0.540`
+- objective MIDI flags: `[]`
+
+Generated package:
+
+- `outputs/stage_b_focused_review_package/harness_stage_b_proxy_keep_focused_package/focused_review_package.json`
+- `outputs/stage_b_focused_review_package/harness_stage_b_proxy_keep_focused_package/focused_review_package.md`
+
+Decision:
+
+- The proxy keep candidate is isolated and reproducible.
+- The next decision should be a focused context listening decision on this single solo/context pair.
+- broad training is still premature until this candidate survives real listening.
+
+## Previous Review Result
+
 Issue #136은 Issue #134 phrase-shape/tension repaired rhythm 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
 
 Docs:
 
 - `docs/STAGE_B_PHRASE_SHAPE_TENSION_PROXY_REVIEW_2026-05-25.md`
 
-중요한 전제:
-
-- 실제 오디오 청취 리뷰가 아니다.
-- `keep`은 proxy 기준 focused context listening 후보라는 뜻이다.
-- broad training이나 musical success claim으로 해석하지 않는다.
-
 Result:
 
 - reviewed candidates: `6`
-- pending candidates: `0`
 - decisions:
   - `keep`: `1`
   - `needs_followup`: `5`
@@ -68,29 +105,11 @@ Result:
   - `fits`: `6`
 - duplicate note sequences: `0`
 - objective MIDI flags: `{}`
-
-Proxy keep candidate:
-
-- `data_motif_rhythm_phrase_variation_rank_1_sample_3`
-- note count: `63`
-- unique pitch count: `28`
-- max interval: `4`
-- IOI repetition: `0.371`
-- objective MIDI tension ratio: `0.540`
-
-Aggregate follow-ups:
-
-- `improve_phrase_vocabulary`: `10`
-- `fix_timing_grid`: `8`
-- `increase_motif_variation`: `5`
-- `increase_tension_approach_vocabulary`: `0`
-
-Decision:
-
-- Issue #134 phrase-shape/tension repair should be kept.
-- `data_motif_rhythm_phrase_variation_rank_1_sample_3` becomes a proxy keep candidate.
-- broad training is still premature.
-- next work should isolate the proxy keep candidate into a focused context review package.
+- aggregate follow-ups:
+  - `improve_phrase_vocabulary`: `10`
+  - `fix_timing_grid`: `8`
+  - `increase_motif_variation`: `5`
+  - `increase_tension_approach_vocabulary`: `0`
 
 ## Previous Probe Result
 
