@@ -65,6 +65,7 @@ VALID_BASELINE_MODES = {
     "data_motif_guide_tones",
     "data_motif_phrase_recovery",
     "data_motif_contour_landing_repair",
+    "data_motif_rhythm_phrase_variation",
 }
 
 
@@ -203,6 +204,38 @@ def fit_duration_tokens_to_positions(
             max_duration = max(1, min(int(max_tail_duration), int(POSITIONS_PER_BAR) - int(position)))
         fitted.append(max(1, min(raw_steps[index], max_duration)))
     return [note_duration_token(step) for step in fitted]
+
+
+def varied_phrase_slot_bounds(bar_index: int, motif_index: int, motifs_per_bar: int) -> tuple[int, int]:
+    if int(motifs_per_bar) != 2:
+        slot_size = max(1, int(POSITIONS_PER_BAR) // max(1, int(motifs_per_bar)))
+        return min(int(POSITIONS_PER_BAR) - 1, int(motif_index) * slot_size), slot_size
+    split_patterns = [9, 7, 10, 6, 8, 11, 5, 9]
+    first_slot_size = split_patterns[int(bar_index) % len(split_patterns)]
+    if int(motif_index) == 0:
+        return 0, first_slot_size
+    return first_slot_size, max(1, int(POSITIONS_PER_BAR) - first_slot_size)
+
+
+def varied_phrase_duration_tokens(
+    positions: Sequence[int],
+    duration_steps: Sequence[int],
+    *,
+    bar_index: int,
+    motif_index: int,
+) -> list[int]:
+    variation = [0, 1, 2, 0, 3, 1, 4, 2]
+    varied_steps = [
+        max(
+            1,
+            min(
+                int(MAX_DURATION_STEPS),
+                int(step) + variation[(int(bar_index) * 2 + int(motif_index) + index) % len(variation)],
+            ),
+        )
+        for index, step in enumerate(duration_steps)
+    ]
+    return fit_duration_tokens_to_positions(positions, varied_steps, max_tail_duration=6)
 
 
 def nearest_allowed_pitch_token(
@@ -819,6 +852,8 @@ def bounded_phrase_pitch_for_pitch_classes(
     recent_pitches: Sequence[int] | None = None,
     max_interval: int = 7,
     allow_repeat_fallback: bool = False,
+    min_pitch: int = PIANO_PITCH_MIN,
+    max_pitch: int = PIANO_PITCH_MAX,
 ) -> int:
     ordered_classes: list[int] = []
     for pitch_class in pitch_classes:
@@ -826,13 +861,13 @@ def bounded_phrase_pitch_for_pitch_classes(
         if normalized not in ordered_classes:
             ordered_classes.append(normalized)
     if not ordered_classes:
-        return max(int(PIANO_PITCH_MIN), min(int(PIANO_PITCH_MAX), int(target_pitch)))
+        return max(int(min_pitch), min(int(max_pitch), int(target_pitch)))
 
     recent = list(recent_pitches or [])
     priority = {pitch_class: index for index, pitch_class in enumerate(ordered_classes)}
     candidates = [
         pitch
-        for pitch in range(int(PIANO_PITCH_MIN), int(PIANO_PITCH_MAX) + 1)
+        for pitch in range(int(min_pitch), int(max_pitch) + 1)
         if pitch % 12 in priority
     ]
     blocked = set(recent[-2:])
@@ -893,6 +928,9 @@ def cadence_landing_pitch(
     *,
     final_bar: bool,
     recent_pitches: Sequence[int],
+    max_interval: int = 7,
+    min_pitch: int = PIANO_PITCH_MIN,
+    max_pitch: int = PIANO_PITCH_MAX,
 ) -> int:
     target_chord = chord if final_bar else next_chord
     pitch_classes = guide_tone_pitch_classes(target_chord)
@@ -906,8 +944,10 @@ def cadence_landing_pitch(
         pitch_classes,
         target_pitch=previous,
         recent_pitches=recent_pitches,
-        max_interval=7,
+        max_interval=max_interval,
         allow_repeat_fallback=True,
+        min_pitch=min_pitch,
+        max_pitch=max_pitch,
     )
 
 
@@ -1337,6 +1377,143 @@ def data_motif_contour_landing_repair_tokens(
     return tokens
 
 
+def data_motif_rhythm_phrase_variation_tokens(
+    *,
+    primer_tokens: Sequence[int],
+    chords: Sequence[str],
+    bars: int,
+    note_groups_per_bar: int,
+    template_report: dict[str, Any],
+    seed: int,
+) -> list[int]:
+    rng = random.Random(int(seed))
+    summary = template_report["summary"]
+    rhythm_rows = summary["top_rhythm_templates"]
+    contour_rows = summary["top_contour_templates"]
+    tokens = [int(token) for token in primer_tokens]
+    recent_pitches: list[int] = []
+    motif_length = 4
+    groups_per_bar = max(1, int(note_groups_per_bar))
+    motifs_per_bar = max(1, int(round(groups_per_bar / motif_length)))
+    pending_recovery_direction = 0
+    min_solo_pitch = 48
+    max_solo_pitch = 84
+
+    for bar_index in range(max(1, int(bars))):
+        chord = chords[bar_index % len(chords)] if chords else None
+        next_chord = chords[(bar_index + 1) % len(chords)] if chords else chord
+        final_bar = bar_index == max(1, int(bars)) - 1
+        if bar_index > 0:
+            tokens.append(TOKEN_BAR)
+            tokens.extend(chord_tokens(chord))
+        emitted_in_bar = 0
+        pitch_cells = phrase_cadence_pitch_class_cells(chord, next_chord, bar_index=bar_index)
+        anchor = 60 + ((bar_index % 3) * 4) + rng.choice([-2, 0, 2])
+        for motif_index in range(motifs_per_bar):
+            row_index = bar_index * motifs_per_bar + motif_index
+            rhythm = weighted_choice(rhythm_rows, rng, row_index + bar_index)["key"]
+            contour = weighted_choice(contour_rows, rng, row_index + int(seed) + bar_index)["key"]
+            slot_start, slot_size = varied_phrase_slot_bounds(bar_index, motif_index, motifs_per_bar)
+            positions = normalize_position_deltas(
+                rhythm["position_deltas"],
+                slot_start=slot_start,
+                slot_size=slot_size,
+            )
+            durations = varied_phrase_duration_tokens(
+                positions,
+                rhythm["duration_steps"],
+                bar_index=bar_index,
+                motif_index=motif_index,
+            )
+            contour_steps = [int(step) for step in contour.get("pitch_intervals", [])] or [0]
+            for local_index, (position, duration_token) in enumerate(zip(positions, durations)):
+                if emitted_in_bar >= groups_per_bar:
+                    break
+                last_in_bar = emitted_in_bar == groups_per_bar - 1
+                penultimate_in_bar = emitted_in_bar == groups_per_bar - 2
+                if pending_recovery_direction and recent_pitches and not last_in_bar:
+                    pitch = recovery_pitch_after_large_leap(
+                        chord=chord,
+                        next_chord=next_chord,
+                        previous_pitch=recent_pitches[-1],
+                        leap_direction=pending_recovery_direction,
+                        recent_pitches=recent_pitches,
+                    )
+                    if pitch < min_solo_pitch or pitch > max_solo_pitch:
+                        pitch = bounded_phrase_pitch_for_pitch_classes(
+                            phrase_recovery_pitch_classes(chord, next_chord),
+                            target_pitch=max(min_solo_pitch, min(max_solo_pitch, pitch)),
+                            recent_pitches=recent_pitches,
+                            max_interval=6,
+                            min_pitch=min_solo_pitch,
+                            max_pitch=max_solo_pitch,
+                        )
+                    pending_recovery_direction = 0
+                elif last_in_bar:
+                    pitch = cadence_landing_pitch(
+                        chord,
+                        next_chord,
+                        final_bar=final_bar,
+                        recent_pitches=recent_pitches,
+                        max_interval=6,
+                        min_pitch=min_solo_pitch,
+                        max_pitch=max_solo_pitch,
+                    )
+                    pending_recovery_direction = 0
+                else:
+                    cell_index = guide_tone_cell_index_for_position(int(position))
+                    pitch_class = pitch_cells[cell_index % len(pitch_cells)]
+                    if penultimate_in_bar:
+                        target_chord = chord if final_bar else next_chord
+                        landing_classes = guide_tone_pitch_classes(target_chord) or sorted(
+                            chord_tone_pitch_classes(target_chord, include_root=False)
+                        )
+                        if landing_classes:
+                            pitch_class = approach_pitch_class(
+                                landing_classes[bar_index % len(landing_classes)],
+                                [int(pitch) % 12 for pitch in recent_pitches[-2:]],
+                            )
+                    line_pitch_classes = [pitch_class] + [
+                        candidate_pitch_class
+                        for candidate_pitch_class in pitch_cells
+                        + phrase_recovery_pitch_classes(chord, next_chord)
+                        if candidate_pitch_class != pitch_class
+                    ]
+                    contour_offset = contour_steps[local_index % len(contour_steps)]
+                    if recent_pitches:
+                        previous_step = contour_steps[(local_index - 1) % len(contour_steps)]
+                        contour_delta = max(-5, min(5, int(contour_offset) - int(previous_step)))
+                        target_pitch = int(recent_pitches[-1]) + contour_delta
+                    else:
+                        target_pitch = anchor + int(contour_offset)
+                    target_pitch = max(min_solo_pitch, min(max_solo_pitch, int(target_pitch)))
+                    pitch = bounded_phrase_pitch_for_pitch_classes(
+                        line_pitch_classes,
+                        target_pitch=target_pitch,
+                        recent_pitches=recent_pitches,
+                        max_interval=6,
+                        min_pitch=min_solo_pitch,
+                        max_pitch=max_solo_pitch,
+                    )
+
+                if recent_pitches:
+                    interval = int(pitch) - int(recent_pitches[-1])
+                    if abs(interval) >= 7:
+                        pending_recovery_direction = 1 if interval > 0 else -1
+                recent_pitches.append(pitch)
+                tokens.extend(
+                    [
+                        position_token(position),
+                        note_velocity_token(4),
+                        note_pitch_token(pitch),
+                        duration_token,
+                    ]
+                )
+                emitted_in_bar += 1
+    tokens.append(TOKEN_END)
+    return tokens
+
+
 def analyze_contour_landing_profile(
     tokens: Sequence[int],
     *,
@@ -1476,6 +1653,15 @@ def generated_tokens_for_mode(
         )
     if mode == "data_motif_contour_landing_repair":
         return data_motif_contour_landing_repair_tokens(
+            primer_tokens=primer_tokens,
+            chords=chords,
+            bars=bars,
+            note_groups_per_bar=note_groups_per_bar,
+            template_report=template_report,
+            seed=seed,
+        )
+    if mode == "data_motif_rhythm_phrase_variation":
+        return data_motif_rhythm_phrase_variation_tokens(
             primer_tokens=primer_tokens,
             chords=chords,
             bars=bars,

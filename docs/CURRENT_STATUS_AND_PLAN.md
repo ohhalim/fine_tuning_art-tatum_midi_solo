@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- Stage B contour repair candidates MIDI-note proxy review
-- 다음 권장 이슈: `Stage B rhythm/phrase vocabulary variation probe`
+- Stage B rhythm/phrase vocabulary variation probe
+- 다음 권장 이슈: `Stage B rhythm/phrase variation MIDI-note proxy review`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,40 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Review Result
+## Latest Probe Result
+
+Issue #118은 Issue #116 contour repair MIDI-note proxy review에서 드러난 `too_stiff`, `too_mechanical`, `too_repetitive`, `weak_phrase` 문제를 좁혀서 검증했다.
+
+Docs:
+
+- `docs/STAGE_B_RHYTHM_PHRASE_VARIATION_2026-05-25.md`
+
+Implemented:
+
+- `data_motif_rhythm_phrase_variation` baseline mode
+- variable slot boundary rhythm placement
+- varied duration fitting before next onset
+- penultimate approach pitch class before guide-tone landing
+- solo register floor/ceiling: `48-84`
+- variation mode pitch interval bound: `6`
+- harness:
+  - `bash scripts/agent_harness.sh stage-b-rhythm-phrase-variation`
+
+Result:
+
+| mode | samples | strict | landing | max interval | sync | dur-var | ioi-var | objective flags |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| `data_motif_contour_landing_repair` | 3 | 3 | 3/3 | 7 | 0.625 | 0.062 | 0.079 | `{}` |
+| `data_motif_rhythm_phrase_variation` | 3 | 3 | 3/3 | 6 | 0.694 | 0.097 | 0.115 | `{}` |
+
+Decision:
+
+- rhythm/phrase variation은 objective rhythm target을 개선했다.
+- variation 후보는 pitch floor `>=51`, unresolved large leap ratio `0.000`, repeated pitch interval ratio `0.000`이다.
+- 하지만 note count가 `60`으로 줄고 tension ratio가 `0.371`로 낮아졌다.
+- 다음은 새 variation 후보를 MIDI-note proxy review로 채워 실제 follow-up 방향을 정해야 한다.
+
+## Previous Review Result
 
 Issue #116은 Issue #115 이후 contour/landing repair 후보 3개와 phrase recovery baseline 후보 3개를 같은 listening review notes schema로 채웠다.
 

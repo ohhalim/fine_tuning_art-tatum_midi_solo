@@ -15,6 +15,7 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     data_motif_contour_landing_repair_tokens,
     data_motif_guide_tones_tokens,
     data_motif_phrase_recovery_tokens,
+    data_motif_rhythm_phrase_variation_tokens,
     data_motif_tokens,
     duration_tokens_from_steps,
     fit_duration_tokens_to_positions,
@@ -33,6 +34,7 @@ from scripts.run_stage_b_data_motif_generation_compare import (
 )
 from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_note_grammar,
+    analyze_stage_b_rhythm_profile,
     build_stage_b_primer,
     extract_stage_b_note_groups,
 )
@@ -105,6 +107,12 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         self.assertEqual(
             parse_baseline_modes("data_motif_contour_landing_repair"),
             ["data_motif_contour_landing_repair"],
+        )
+
+    def test_parse_baseline_modes_accepts_rhythm_phrase_variation(self) -> None:
+        self.assertEqual(
+            parse_baseline_modes("data_motif_rhythm_phrase_variation"),
+            ["data_motif_rhythm_phrase_variation"],
         )
 
     def test_build_compare_summary_allows_selected_modes_without_hand_written_reference(self) -> None:
@@ -475,6 +483,32 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         self.assertLess(repeated_ratio, 0.20)
         self.assertLessEqual(profile["max_abs_interval"], 12)
         self.assertEqual(profile["abrupt_register_reset_count"], 0)
+
+    def test_data_motif_rhythm_phrase_variation_preserves_landing_and_varies_rhythm(self) -> None:
+        chords = ["Cm7", "F7", "Bbmaj7", "Ebmaj7"]
+        primer = build_stage_b_primer(chords, 124)
+        tokens = data_motif_rhythm_phrase_variation_tokens(
+            primer_tokens=primer,
+            chords=chords,
+            bars=4,
+            note_groups_per_bar=8,
+            template_report=template_report(),
+            seed=17,
+        )
+        grammar = analyze_stage_b_note_grammar(tokens, primer_size=len(primer))
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+        profile = analyze_contour_landing_profile(tokens, chords=chords, primer_size=len(primer))
+        rhythm = analyze_stage_b_rhythm_profile(tokens, primer_size=len(primer))
+        pitches = [int(group["pitch"]) for group in groups]
+
+        self.assertTrue(grammar["grammar_valid"])
+        self.assertEqual(len(groups), 32)
+        self.assertGreaterEqual(min(pitches), 48)
+        self.assertTrue(profile["final_landing_resolved"])
+        self.assertIn(profile["final_landing_role"], {"guide", "chord_tone"})
+        self.assertLessEqual(profile["max_abs_interval"], 6)
+        self.assertGreater(rhythm["ioi_diversity_ratio"], 0.09)
+        self.assertLess(rhythm["most_common_ioi_ratio"], 0.40)
 
     def test_contour_landing_summary_counts_resolved_landings(self) -> None:
         summary = contour_landing_summary(
