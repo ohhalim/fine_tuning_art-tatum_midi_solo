@@ -186,12 +186,43 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 32. clean context diagnostics
 33. clean listening review notes template
 34. clean MIDI-note proxy review
+35. contour/cadence landing repair probe
 
 자세한 전체 기록은 `docs/CORE_PLAN.md`에 있다.
 
 ## 7. Latest Meaningful Result
 
-최신 의미 있는 결과는 Issue #113 이후의 clean MIDI-note proxy review다.
+최신 의미 있는 결과는 Stage B data-derived contour/cadence landing repair probe다.
+
+이 probe는 2026-05-24 clean MIDI-note proxy review에서 드러난 contour/landing 문제를 좁혀서 검증했다.
+
+결과:
+
+- compared modes:
+  - `data_motif_contour_landing_repair`
+  - `data_motif_phrase_recovery`
+- candidate count: `6`
+- `data_motif_contour_landing_repair`:
+  - strict: `3/3`
+  - final landing resolved: `3/3`
+  - max interval: `7`
+  - abrupt register resets: `0`
+  - objective MIDI flags: `{}`
+- `data_motif_phrase_recovery` comparison:
+  - strict: `3/3`
+  - final landing resolved: `1/3`
+  - max interval: `13`
+- listening review notes:
+  - reviewed count: `0`
+  - pending count: `6`
+
+Docs:
+
+```text
+docs/STAGE_B_CONTOUR_LANDING_REPAIR_2026-05-25.md
+```
+
+이전 근거는 Issue #113 이후의 clean MIDI-note proxy review다.
 
 Issue #109에서 objective-clean 후보 3개를 골랐다.
 
@@ -248,7 +279,7 @@ Candidate decisions:
 중요:
 
 ```text
-다음 병목은 basic MIDI validity가 아니라 rhythm stiffness, contour continuity, landing, thin vocabulary다.
+다음 병목은 basic MIDI validity가 아니라 rhythm stiffness, duration/IOI diversity 부족, thin vocabulary를 청취로 확인하는 일이다.
 ```
 
 ## 8. Generated Outputs Are Not Committed
@@ -293,10 +324,12 @@ AGENTS.md
 Latest implementation files:
 
 ```text
+scripts/run_stage_b_data_motif_generation_compare.py
 scripts/build_clean_review_package.py
 scripts/build_clean_context_diagnostics.py
 scripts/build_clean_listening_review_notes.py
 scripts/agent_harness.sh
+tests/test_stage_b_data_motif_generation_compare.py
 tests/test_clean_review_package.py
 tests/test_clean_context_diagnostics.py
 tests/test_clean_listening_review_notes.py
@@ -309,6 +342,7 @@ docs/STAGE_B_CLEAN_REVIEW_PACKAGE_2026-05-23.md
 docs/STAGE_B_CLEAN_CONTEXT_DIAGNOSTICS_2026-05-23.md
 docs/STAGE_B_CLEAN_LISTENING_REVIEW_NOTES_2026-05-23.md
 docs/STAGE_B_CLEAN_MIDI_PROXY_REVIEW_2026-05-24.md
+docs/STAGE_B_CONTOUR_LANDING_REPAIR_2026-05-25.md
 ```
 
 Core historical docs:
@@ -348,10 +382,16 @@ For the latest clean listening review notes template:
 bash scripts/agent_harness.sh stage-b-clean-listening-review-notes
 ```
 
+For the latest contour/cadence landing repair probe:
+
+```bash
+bash scripts/agent_harness.sh stage-b-contour-landing-repair
+```
+
 Expected quick result:
 
 ```text
-Ran 213 tests
+Ran 222 tests
 OK
 ```
 
@@ -379,31 +419,29 @@ Minimum checks:
 - grid/timing is explainable
 - context MIDI exists when listening review needs chord context
 
-Current latest candidates pass the objective gate, but the MIDI-note proxy review did not produce a `keep` candidate.
+Current latest contour/landing repair candidates pass the objective MIDI gate, but listening review is still pending.
 
 ## 12. What To Do Next
 
 The next correct task is **not** broad training, audio diffusion, or backend work.
 
-Next step after documenting the proxy review:
+Next step after the contour/landing repair probe:
 
 ```text
-Stage B data-derived contour/cadence landing repair probe
+Stage B contour repair candidates listening review notes
 ```
 
-The next probe should target:
+The next review should target:
 
-- final-note landing repair
-- large-leap/register contour smoothing
-- data-derived contour or cadence cells
-- rhythm/duration diversity without reintroducing duration collapse
-- candidate 1 as the best follow-up baseline
-- candidate 3 as the negative example
+- whether repaired guide-tone landings actually sound like phrase endings
+- whether max interval reduction improves contour continuity
+- whether rhythm stiffness still dominates the listening result
+- whether the next issue should focus on rhythm template diversity/rest-duration variation
 
 Recommended next issue title:
 
 ```text
-Stage B data-derived contour/cadence landing repair probe
+Stage B contour repair candidates listening review notes
 ```
 
 ## 13. Do Not Do Next
@@ -436,15 +474,15 @@ Short explanation:
 ```text
 We are building a symbolic MIDI jazz piano solo generation pipeline.
 Stage A failed musically, so the project moved to Stage B with explicit bar/position/chord/duration tokens.
-The latest work narrowed generated candidates down to 3 objective-clean, 8-bar, context-aware MIDI candidates.
-Objective note-level diagnostics show no basic MIDI blocker, but MIDI-note proxy review found no keep candidate.
-The next step is a data-derived contour/cadence landing repair probe, not broad training.
+The latest work added a data-derived contour/cadence landing repair probe.
+Objective note-level diagnostics now show no flags for the 6 repair-vs-baseline review candidates, and the repair mode resolves final landing 3/3 with max interval 7.
+The next step is filling listening review notes for those context MIDI candidates, not broad training.
 ```
 
 Very short explanation:
 
 ```text
-The pipeline can now produce objective-clean context MIDI candidates, but proxy review points to rhythm stiffness, contour, and landing repair before broad training.
+The pipeline can now produce objective-clean contour/landing repair candidates, but listening review still has to decide whether rhythm stiffness and thin vocabulary remain blockers.
 ```
 
 ## 15. Remote Codex Working Rules

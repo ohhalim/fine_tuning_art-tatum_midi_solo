@@ -10,6 +10,9 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     build_compare_summary,
     build_review_export,
     chord_tone_pitch_classes,
+    analyze_contour_landing_profile,
+    contour_landing_summary,
+    data_motif_contour_landing_repair_tokens,
     data_motif_guide_tones_tokens,
     data_motif_phrase_recovery_tokens,
     data_motif_tokens,
@@ -97,6 +100,12 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
 
     def test_parse_baseline_modes_accepts_data_motif_phrase_recovery(self) -> None:
         self.assertEqual(parse_baseline_modes("data_motif_phrase_recovery"), ["data_motif_phrase_recovery"])
+
+    def test_parse_baseline_modes_accepts_contour_landing_repair(self) -> None:
+        self.assertEqual(
+            parse_baseline_modes("data_motif_contour_landing_repair"),
+            ["data_motif_contour_landing_repair"],
+        )
 
     def test_build_compare_summary_allows_selected_modes_without_hand_written_reference(self) -> None:
         def valid_summary() -> dict:
@@ -438,6 +447,62 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         self.assertEqual(len(groups), 32)
         self.assertGreater(len({group["position"] for group in groups}), 4)
         self.assertLess(unresolved_ratio, 0.45)
+
+    def test_data_motif_contour_landing_repair_resolves_final_landing_and_smooths_register(self) -> None:
+        chords = ["Cm7", "F7", "Bbmaj7", "Ebmaj7"]
+        primer = build_stage_b_primer(chords, 124)
+        tokens = data_motif_contour_landing_repair_tokens(
+            primer_tokens=primer,
+            chords=chords,
+            bars=4,
+            note_groups_per_bar=8,
+            template_report=template_report(),
+            seed=17,
+        )
+        grammar = analyze_stage_b_note_grammar(tokens, primer_size=len(primer))
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+        profile = analyze_contour_landing_profile(tokens, chords=chords, primer_size=len(primer))
+        pitches = [int(group["pitch"]) for group in groups]
+        repeated_ratio = sum(1 for left, right in zip(pitches, pitches[1:]) if left == right) / (
+            len(pitches) - 1
+        )
+
+        self.assertTrue(grammar["grammar_valid"])
+        self.assertEqual(len(groups), 32)
+        self.assertGreater(len({group["position"] for group in groups}), 4)
+        self.assertTrue(profile["final_landing_resolved"])
+        self.assertIn(profile["final_landing_role"], {"guide", "chord_tone"})
+        self.assertLess(repeated_ratio, 0.20)
+        self.assertLessEqual(profile["max_abs_interval"], 12)
+        self.assertEqual(profile["abrupt_register_reset_count"], 0)
+
+    def test_contour_landing_summary_counts_resolved_landings(self) -> None:
+        summary = contour_landing_summary(
+            [
+                {
+                    "contour_landing_profile": {
+                        "final_landing_resolved": True,
+                        "final_landing_role": "guide",
+                        "max_abs_interval": 7,
+                        "abrupt_register_reset_count": 0,
+                    }
+                },
+                {
+                    "contour_landing_profile": {
+                        "final_landing_resolved": False,
+                        "final_landing_role": "outside",
+                        "max_abs_interval": 14,
+                        "abrupt_register_reset_count": 1,
+                    }
+                },
+            ]
+        )
+
+        self.assertEqual(summary["final_landing_resolved_count"], 1)
+        self.assertEqual(summary["final_landing_role_counts"]["guide"], 1)
+        self.assertEqual(summary["final_landing_role_counts"]["outside"], 1)
+        self.assertEqual(summary["total_abrupt_register_reset_count"], 1)
+        self.assertEqual(summary["max_abs_interval"], 14)
 
     def test_build_review_export_copies_named_mode_files(self) -> None:
         with TemporaryDirectory() as tmp:

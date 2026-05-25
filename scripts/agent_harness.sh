@@ -84,6 +84,8 @@ Modes:
                 Compare phrase/cadence against leap-recovery phrase candidates.
   stage-b-data-motif-phrase-recovery-review
                 Compare data-motif guide tones against data-motif phrase recovery.
+  stage-b-contour-landing-repair
+                Compare data-motif phrase recovery against contour/cadence landing repair.
   stage-b-clean-review-package
                 Extract objective-clean data-motif phrase recovery candidates for listening review.
   stage-b-clean-context-diagnostics
@@ -1032,6 +1034,48 @@ run_stage_b_data_motif_phrase_recovery_review() {
     --review_notes "$review_notes_path"
 }
 
+run_stage_b_contour_landing_repair() {
+  local run_id="${RUN_ID:-harness_stage_b_contour_landing_repair}"
+  local review_manifest_path="outputs/stage_b_data_motif_review/${run_id}/review_manifest.json"
+  local review_markdown_path="outputs/stage_b_data_motif_review/${run_id}/review_candidates.md"
+  local objective_report_path="outputs/stage_b_objective_midi_review/${run_id}/objective_midi_note_review.json"
+  local review_notes_path="outputs/stage_b_listening_review_notes/${run_id}/review_notes_template.json"
+  print_header "Stage B contour/cadence landing repair review export"
+  "$PYTHON_BIN" scripts/run_stage_b_data_motif_generation_compare.py \
+    --run_id "$run_id" \
+    --issue_number 115 \
+    --input_dir ./midi_dataset/midi/studio \
+    --baseline_modes data_motif_phrase_recovery,data_motif_contour_landing_repair \
+    --max_files 4 \
+    --window_bars 8 \
+    --window_stride_bars 4 \
+    --min_window_target_notes 16 \
+    --motif_length 4 \
+    --max_bar_span 2 \
+    --max_records 64 \
+    --template_top_n 32 \
+    --num_samples 3 \
+    --bars 8 \
+    --note_groups_per_bar 8 \
+    --review_top_n 3 \
+    --copy_review_midi \
+    --overlap_free_review_midi
+  print_header "Stage B objective MIDI note review"
+  "$PYTHON_BIN" scripts/review_midi_note_objectives.py \
+    --run_id "$run_id" \
+    --review_manifest "$review_manifest_path"
+  print_header "Stage B objective-aware listening review notes"
+  "$PYTHON_BIN" scripts/build_listening_review_notes.py \
+    --run_id "$run_id" \
+    --review_manifest "$review_manifest_path" \
+    --source_review_markdown "$review_markdown_path" \
+    --objective_midi_review_report "$objective_report_path"
+  print_header "Stage B objective-aware listening review aggregate"
+  "$PYTHON_BIN" scripts/summarize_listening_review_notes.py \
+    --run_id "$run_id" \
+    --review_notes "$review_notes_path"
+}
+
 run_stage_b_clean_review_package() {
   local source_run_id="${SOURCE_RUN_ID:-harness_stage_b_data_motif_phrase_recovery_review}"
   local run_id="${RUN_ID:-harness_stage_b_clean_review_package}"
@@ -1320,6 +1364,9 @@ case "$MODE" in
     ;;
   stage-b-data-motif-phrase-recovery-review)
     run_stage_b_data_motif_phrase_recovery_review
+    ;;
+  stage-b-contour-landing-repair)
+    run_stage_b_contour_landing_repair
     ;;
   stage-b-clean-review-package)
     run_stage_b_clean_review_package
