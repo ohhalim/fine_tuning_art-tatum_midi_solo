@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-05-24
+작성일: 2026-05-25
 
 ## Current Focus
 
@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- Stage B clean MIDI-note proxy review 결과 기록
-- 다음 권장 이슈: `Stage B data-derived contour/cadence landing repair probe`
+- Stage B data-derived contour/cadence landing repair probe
+- 다음 권장 이슈: `Stage B contour repair candidates listening review notes`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,44 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Review Result
+## Latest Probe Result
+
+이번 probe는 2026-05-24 MIDI-note proxy review에서 드러난 contour/landing 문제를 좁혀서 검증했다.
+
+Docs:
+
+- `docs/STAGE_B_CONTOUR_LANDING_REPAIR_2026-05-25.md`
+
+Implemented:
+
+- `data_motif_contour_landing_repair` baseline mode
+- data-derived rhythm/contour template 유지
+- bar 마지막 note를 guide tone/non-root chord tone으로 landing
+- 같은 음 반복을 피하는 bounded pitch-class selector
+- contour/landing metrics:
+  - `final_landing_resolved`
+  - `final_landing_role`
+  - `max_abs_interval`
+  - `abrupt_register_reset_count`
+- harness:
+  - `bash scripts/agent_harness.sh stage-b-contour-landing-repair`
+
+Result:
+
+| mode | samples | strict | final landing | max interval | resets | objective flags |
+|---|---:|---:|---:|---:|---:|---|
+| `data_motif_contour_landing_repair` | 3 | 3 | 3/3 | 7 | 0 | `{}` |
+| `data_motif_phrase_recovery` | 3 | 3 | 1/3 | 13 | 0 | `{}` |
+
+Decision:
+
+- contour/landing objective target은 개선됐다.
+- new mode는 repeated-pitch objective flag도 만들지 않았다.
+- 하지만 rhythm stiffness는 해결되지 않았다.
+- listening review notes는 아직 `6`개 모두 pending이다.
+- 다음은 generation rule을 더 바꾸기 전에 context MIDI 기준으로 이 6개 후보를 review해야 한다.
+
+## Previous Review Result
 
 Issue #113은 Issue #109 clean review package와 Issue #111 clean context diagnostics 결과를 바탕으로,
 objective-clean context MIDI 후보 3개를 같은 schema에서 review할 수 있는 notes template을 추가한 단계다.

@@ -27,6 +27,7 @@ from scripts.run_stage_b_generation_probe import (  # noqa: E402
     build_stage_b_primer,
     chord_aware_pitch_tokens,
     decode_stage_b_midi,
+    extract_stage_b_note_groups,
     jazz_rhythm_duration_tokens,
     jazz_rhythm_position_tokens,
     parse_chords,
@@ -63,6 +64,7 @@ VALID_BASELINE_MODES = {
     "data_motif",
     "data_motif_guide_tones",
     "data_motif_phrase_recovery",
+    "data_motif_contour_landing_repair",
 }
 
 
@@ -810,6 +812,105 @@ def recovery_pitch_after_large_leap(
     )
 
 
+def bounded_phrase_pitch_for_pitch_classes(
+    pitch_classes: Sequence[int],
+    *,
+    target_pitch: int,
+    recent_pitches: Sequence[int] | None = None,
+    max_interval: int = 7,
+    allow_repeat_fallback: bool = False,
+) -> int:
+    ordered_classes: list[int] = []
+    for pitch_class in pitch_classes:
+        normalized = int(pitch_class) % 12
+        if normalized not in ordered_classes:
+            ordered_classes.append(normalized)
+    if not ordered_classes:
+        return max(int(PIANO_PITCH_MIN), min(int(PIANO_PITCH_MAX), int(target_pitch)))
+
+    recent = list(recent_pitches or [])
+    priority = {pitch_class: index for index, pitch_class in enumerate(ordered_classes)}
+    candidates = [
+        pitch
+        for pitch in range(int(PIANO_PITCH_MIN), int(PIANO_PITCH_MAX) + 1)
+        if pitch % 12 in priority
+    ]
+    blocked = set(recent[-2:])
+    filtered = [pitch for pitch in candidates if pitch not in blocked]
+    if filtered:
+        candidates = filtered
+
+    prefer_primary_pitch_class = True
+    if recent:
+        previous = int(recent[-1])
+        bounded = [pitch for pitch in candidates if 1 <= abs(int(pitch) - previous) <= int(max_interval)]
+        if bounded:
+            candidates = bounded
+        else:
+            near = [
+                pitch
+                for pitch in candidates
+                if 1 <= abs(int(pitch) - previous) <= int(max_interval) + 5
+            ]
+            if near:
+                candidates = near
+                prefer_primary_pitch_class = False
+            elif allow_repeat_fallback and previous % 12 in priority:
+                return previous
+            prefer_primary_pitch_class = False
+
+    if recent and not prefer_primary_pitch_class:
+        previous = int(recent[-1])
+        return int(
+            min(
+                candidates,
+                key=lambda pitch: (
+                    abs(int(pitch) - previous),
+                    priority[int(pitch) % 12],
+                    abs(int(pitch) - int(target_pitch)),
+                    abs(int(pitch) - 67),
+                    int(pitch),
+                ),
+            )
+        )
+
+    return int(
+        min(
+            candidates,
+            key=lambda pitch: (
+                priority[int(pitch) % 12],
+                abs(int(pitch) - int(target_pitch)),
+                abs(int(pitch) - 67),
+                int(pitch),
+            ),
+        )
+    )
+
+
+def cadence_landing_pitch(
+    chord: str | None,
+    next_chord: str | None,
+    *,
+    final_bar: bool,
+    recent_pitches: Sequence[int],
+) -> int:
+    target_chord = chord if final_bar else next_chord
+    pitch_classes = guide_tone_pitch_classes(target_chord)
+    for pitch_class in sorted(chord_tone_pitch_classes(target_chord, include_root=False)):
+        if pitch_class not in pitch_classes:
+            pitch_classes.append(int(pitch_class))
+    if not pitch_classes:
+        pitch_classes = sorted(chord_tone_pitch_classes(target_chord)) or [0]
+    previous = int(recent_pitches[-1]) if recent_pitches else 67
+    return bounded_phrase_pitch_for_pitch_classes(
+        pitch_classes,
+        target_pitch=previous,
+        recent_pitches=recent_pitches,
+        max_interval=7,
+        allow_repeat_fallback=True,
+    )
+
+
 def phrase_cadence_tokens(
     *,
     primer_tokens: Sequence[int],
@@ -1131,6 +1232,155 @@ def data_motif_phrase_recovery_tokens(
     return tokens
 
 
+def data_motif_contour_landing_repair_tokens(
+    *,
+    primer_tokens: Sequence[int],
+    chords: Sequence[str],
+    bars: int,
+    note_groups_per_bar: int,
+    template_report: dict[str, Any],
+    seed: int,
+) -> list[int]:
+    rng = random.Random(int(seed))
+    summary = template_report["summary"]
+    rhythm_rows = summary["top_rhythm_templates"]
+    contour_rows = summary["top_contour_templates"]
+    tokens = [int(token) for token in primer_tokens]
+    recent_pitches: list[int] = []
+    motif_length = 4
+    groups_per_bar = max(1, int(note_groups_per_bar))
+    motifs_per_bar = max(1, int(round(groups_per_bar / motif_length)))
+    slot_size = max(1, int(POSITIONS_PER_BAR) // motifs_per_bar)
+    pending_recovery_direction = 0
+
+    for bar_index in range(max(1, int(bars))):
+        chord = chords[bar_index % len(chords)] if chords else None
+        next_chord = chords[(bar_index + 1) % len(chords)] if chords else chord
+        final_bar = bar_index == max(1, int(bars)) - 1
+        if bar_index > 0:
+            tokens.append(TOKEN_BAR)
+            tokens.extend(chord_tokens(chord))
+        emitted_in_bar = 0
+        pitch_cells = phrase_cadence_pitch_class_cells(chord, next_chord, bar_index=bar_index)
+        anchor = 64 + ((bar_index % 2) * 3) + rng.choice([-2, 0, 2])
+        for motif_index in range(motifs_per_bar):
+            row_index = bar_index * motifs_per_bar + motif_index
+            rhythm = weighted_choice(rhythm_rows, rng, row_index)["key"]
+            contour = weighted_choice(contour_rows, rng, row_index + int(seed))["key"]
+            slot_start = min(int(POSITIONS_PER_BAR) - 1, motif_index * slot_size)
+            positions = normalize_position_deltas(
+                rhythm["position_deltas"],
+                slot_start=slot_start,
+                slot_size=slot_size,
+            )
+            durations = fit_duration_tokens_to_positions(positions, rhythm["duration_steps"])
+            contour_steps = [int(step) for step in contour.get("pitch_intervals", [])] or [0]
+            for local_index, (position, duration_token) in enumerate(zip(positions, durations)):
+                if emitted_in_bar >= groups_per_bar:
+                    break
+                last_in_bar = emitted_in_bar == groups_per_bar - 1
+                if pending_recovery_direction and recent_pitches and not last_in_bar:
+                    pitch = recovery_pitch_after_large_leap(
+                        chord=chord,
+                        next_chord=next_chord,
+                        previous_pitch=recent_pitches[-1],
+                        leap_direction=pending_recovery_direction,
+                        recent_pitches=recent_pitches,
+                    )
+                    pending_recovery_direction = 0
+                elif last_in_bar:
+                    pitch = cadence_landing_pitch(
+                        chord,
+                        next_chord,
+                        final_bar=final_bar,
+                        recent_pitches=recent_pitches,
+                    )
+                    pending_recovery_direction = 0
+                else:
+                    cell_index = guide_tone_cell_index_for_position(int(position))
+                    pitch_class = pitch_cells[cell_index % len(pitch_cells)]
+                    line_pitch_classes = [pitch_class] + [
+                        candidate_pitch_class
+                        for candidate_pitch_class in pitch_cells
+                        + phrase_recovery_pitch_classes(chord, next_chord)
+                        if candidate_pitch_class != pitch_class
+                    ]
+                    contour_offset = contour_steps[local_index % len(contour_steps)]
+                    if recent_pitches:
+                        previous_step = contour_steps[(local_index - 1) % len(contour_steps)]
+                        contour_delta = max(-5, min(5, int(contour_offset) - int(previous_step)))
+                        target_pitch = int(recent_pitches[-1]) + contour_delta
+                    else:
+                        target_pitch = anchor + int(contour_offset)
+                    pitch = bounded_phrase_pitch_for_pitch_classes(
+                        line_pitch_classes,
+                        target_pitch=target_pitch,
+                        recent_pitches=recent_pitches,
+                        max_interval=7,
+                    )
+
+                if recent_pitches:
+                    interval = int(pitch) - int(recent_pitches[-1])
+                    if abs(interval) >= 7:
+                        pending_recovery_direction = 1 if interval > 0 else -1
+                recent_pitches.append(pitch)
+                tokens.extend(
+                    [
+                        position_token(position),
+                        note_velocity_token(4),
+                        note_pitch_token(pitch),
+                        duration_token,
+                    ]
+                )
+                emitted_in_bar += 1
+    tokens.append(TOKEN_END)
+    return tokens
+
+
+def analyze_contour_landing_profile(
+    tokens: Sequence[int],
+    *,
+    chords: Sequence[str],
+    primer_size: int,
+) -> dict[str, Any]:
+    groups = extract_stage_b_note_groups(tokens, primer_size=primer_size)
+    if not groups:
+        return {
+            "final_landing_resolved": False,
+            "final_landing_role": "none",
+            "max_abs_interval": 0,
+            "abrupt_register_reset_count": 0,
+        }
+    pitches = [int(group["pitch"]) for group in groups]
+    intervals = [pitches[index + 1] - pitches[index] for index in range(len(pitches) - 1)]
+    final_group = groups[-1]
+    final_chord = chords[int(final_group["bar"]) % len(chords)] if chords else None
+    final_pc = int(final_group["pitch"]) % 12
+    guide_pcs = set(guide_tone_pitch_classes(final_chord))
+    chord_pcs = chord_tone_pitch_classes(final_chord)
+    tension_pcs = tension_pitch_classes(final_chord)
+    if final_pc in guide_pcs:
+        landing_role = "guide"
+    elif final_pc in chord_pcs:
+        landing_role = "chord_tone"
+    elif final_pc in tension_pcs:
+        landing_role = "tension"
+    else:
+        landing_role = "outside"
+    abrupt_resets = 0
+    for left, right in zip(intervals, intervals[1:]):
+        if abs(left) >= 12 and abs(right) >= 12 and (left > 0) != (right > 0):
+            abrupt_resets += 1
+    return {
+        "final_landing_pitch": int(final_group["pitch"]),
+        "final_landing_pitch_class": int(final_pc),
+        "final_landing_role": landing_role,
+        "final_landing_resolved": bool(landing_role in {"guide", "chord_tone"}),
+        "max_abs_interval": int(max((abs(interval) for interval in intervals), default=0)),
+        "abrupt_register_reset_count": int(abrupt_resets),
+    }
+
+
 def generated_tokens_for_mode(
     mode: str,
     *,
@@ -1224,6 +1474,15 @@ def generated_tokens_for_mode(
             template_report=template_report,
             seed=seed,
         )
+    if mode == "data_motif_contour_landing_repair":
+        return data_motif_contour_landing_repair_tokens(
+            primer_tokens=primer_tokens,
+            chords=chords,
+            bars=bars,
+            note_groups_per_bar=note_groups_per_bar,
+            template_report=template_report,
+            seed=seed,
+        )
     raise ValueError(f"unknown baseline mode: {mode}")
 
 
@@ -1240,7 +1499,33 @@ def compact_summary(summary: dict[str, Any]) -> dict[str, Any]:
         "avg_most_common_ioi_ratio": float(summary["avg_most_common_ioi_ratio"]),
         "avg_tension_ratio": float(summary["avg_tension_ratio"]),
         "avg_root_tone_ratio": float(summary["avg_root_tone_ratio"]),
+        "final_landing_resolved_count": int(summary.get("final_landing_resolved_count", 0) or 0),
+        "final_landing_resolved_ratio": float(summary.get("final_landing_resolved_ratio", 0.0) or 0.0),
+        "avg_max_abs_interval": float(summary.get("avg_max_abs_interval", 0.0) or 0.0),
+        "max_abs_interval": int(summary.get("max_abs_interval", 0) or 0),
+        "total_abrupt_register_reset_count": int(summary.get("total_abrupt_register_reset_count", 0) or 0),
         "passed_strict_review_gate": bool(summary["passed_strict_review_gate"]),
+    }
+
+
+def contour_landing_summary(rows: Sequence[dict[str, Any]]) -> dict[str, Any]:
+    profiles = [row.get("contour_landing_profile", {}) for row in rows]
+    sample_count = len(profiles)
+    resolved_count = sum(1 for profile in profiles if profile.get("final_landing_resolved"))
+    max_abs_values = [int(profile.get("max_abs_interval", 0) or 0) for profile in profiles]
+    abrupt_counts = [int(profile.get("abrupt_register_reset_count", 0) or 0) for profile in profiles]
+    role_counts: dict[str, int] = {}
+    for profile in profiles:
+        role = str(profile.get("final_landing_role") or "none")
+        role_counts[role] = role_counts.get(role, 0) + 1
+    return {
+        "final_landing_resolved_count": int(resolved_count),
+        "final_landing_resolved_ratio": float(resolved_count / sample_count) if sample_count else 0.0,
+        "avg_max_abs_interval": float(sum(max_abs_values) / sample_count) if sample_count else 0.0,
+        "max_abs_interval": int(max(max_abs_values, default=0)),
+        "total_abrupt_register_reset_count": int(sum(abrupt_counts)),
+        "avg_abrupt_register_reset_count": float(sum(abrupt_counts) / sample_count) if sample_count else 0.0,
+        "final_landing_role_counts": dict(sorted(role_counts.items())),
     }
 
 
@@ -1480,12 +1765,13 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- bar-pattern delta, data minus hand: `{summary['bar_pattern_delta_data_minus_hand']:.3f}`",
         f"- syncopation delta, data minus hand: `{summary['syncopation_delta_data_minus_hand']:.3f}`",
         "",
-        "| mode | samples | strict | sync | bar-var | dur-var | dur-rep | ioi-var | ioi-rep | tension | root |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| mode | samples | strict | landing | max interval | resets | sync | bar-var | dur-var | dur-rep | ioi-var | ioi-rep | tension | root |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for mode, row in sorted(summary["mode_summaries"].items()):
         lines.append(
             "| {mode} | {sample_count} | {strict_valid_sample_count} | "
+            "{final_landing_resolved_ratio:.3f} | {max_abs_interval} | {total_abrupt_register_reset_count} | "
             "{avg_syncopated_onset_ratio:.3f} | {avg_unique_bar_position_pattern_ratio:.3f} | "
             "{avg_duration_diversity_ratio:.3f} | {avg_most_common_duration_ratio:.3f} | "
             "{avg_ioi_diversity_ratio:.3f} | {avg_most_common_ioi_ratio:.3f} | "
@@ -1494,11 +1780,15 @@ def markdown_report(report: dict[str, Any]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
-def candidate_sort_key(row: dict[str, Any]) -> tuple[int, int, float, float, float]:
+def candidate_sort_key(row: dict[str, Any]) -> tuple[Any, ...]:
     rhythm = row.get("rhythm_profile", {})
+    contour = row.get("contour_landing_profile", {})
     return (
         int(bool(row.get("strict_valid"))),
         int(bool(row.get("valid"))),
+        int(bool(contour.get("final_landing_resolved"))),
+        -int(contour.get("abrupt_register_reset_count", 0) or 0),
+        -int(contour.get("max_abs_interval", 0) or 0),
         float(rhythm.get("unique_bar_position_pattern_ratio", 0.0) or 0.0),
         float(rhythm.get("duration_diversity_ratio", 0.0) or 0.0),
         -float(rhythm.get("most_common_duration_ratio", 0.0) or 0.0),
@@ -1518,6 +1808,7 @@ def compact_review_candidate(
     rhythm = row.get("rhythm_profile", {})
     pitch_roles = row.get("pitch_roles", {})
     metrics = row.get("metrics", {})
+    contour = row.get("contour_landing_profile", {})
     return {
         "mode": mode,
         "review_rank": int(review_rank),
@@ -1543,6 +1834,10 @@ def compact_review_candidate(
         "most_common_ioi_ratio": float(rhythm.get("most_common_ioi_ratio", 0.0) or 0.0),
         "tension_ratio": float(pitch_roles.get("tension_ratio", 0.0) or 0.0),
         "root_tone_ratio": float(pitch_roles.get("root_tone_ratio", 0.0) or 0.0),
+        "final_landing_resolved": bool(contour.get("final_landing_resolved", False)),
+        "final_landing_role": str(contour.get("final_landing_role") or "none"),
+        "max_abs_interval": int(contour.get("max_abs_interval", 0) or 0),
+        "abrupt_register_reset_count": int(contour.get("abrupt_register_reset_count", 0) or 0),
         "diagnostic_failure_reason": row.get("diagnostic_failure_reason"),
     }
 
@@ -1554,8 +1849,8 @@ def review_markdown_report(manifest: dict[str, Any]) -> str:
         f"- candidate count: `{manifest['candidate_count']}`",
         f"- copy midi: `{str(manifest['copy_midi']).lower()}`",
         "",
-        "| mode | rank | sample | variant | strict | notes | pitches | sync | bar-var | dur-var | dur-rep | ioi-var | ioi-rep | tension | solo/context MIDI |",
-        "|---|---:|---:|---|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        "| mode | rank | sample | variant | strict | landing | max interval | resets | notes | pitches | sync | bar-var | dur-var | dur-rep | ioi-var | ioi-rep | tension | solo/context MIDI |",
+        "|---|---:|---:|---|:---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     guide_path = manifest.get("chord_guide_midi_path")
     if guide_path:
@@ -1568,7 +1863,8 @@ def review_markdown_report(manifest: dict[str, Any]) -> str:
         format_row["display_midi_path"] = midi_path
         format_row["display_context_midi_path"] = context_path
         lines.append(
-            "| {mode} | {review_rank} | {sample_index} | {review_variant} | {strict_valid} | {note_count} | "
+            "| {mode} | {review_rank} | {sample_index} | {review_variant} | {strict_valid} | "
+            "{final_landing_role} | {max_abs_interval} | {abrupt_register_reset_count} | {note_count} | "
             "{unique_pitch_count} | {syncopated_onset_ratio:.3f} | "
             "{unique_bar_position_pattern_ratio:.3f} | {duration_diversity_ratio:.3f} | "
             "{most_common_duration_ratio:.3f} | {ioi_diversity_ratio:.3f} | "
@@ -1761,24 +2057,29 @@ def main() -> int:
                 simultaneous_limit=int(args.max_simultaneous_notes),
             )
             midi.write(str(midi_path))
-            rows.append(
-                sample_report(
-                    sample_index=index,
-                    sample_seed=sample_seed,
-                    tokens=tokens,
-                    primer_size=len(primer_tokens),
-                    target_length=int(args.max_sequence),
-                    midi_path=midi_path,
-                    request=request,
-                    postprocess_report=postprocess_report,
-                )
+            row = sample_report(
+                sample_index=index,
+                sample_seed=sample_seed,
+                tokens=tokens,
+                primer_size=len(primer_tokens),
+                target_length=int(args.max_sequence),
+                midi_path=midi_path,
+                request=request,
+                postprocess_report=postprocess_report,
             )
+            row["contour_landing_profile"] = analyze_contour_landing_profile(
+                tokens,
+                chords=chords,
+                primer_size=len(primer_tokens),
+            )
+            rows.append(row)
         summary = build_probe_summary(
             rows,
             min_valid_samples=1,
             min_strict_valid_samples=int(args.min_strict_valid_samples),
             require_all_grammar_samples=True,
         )
+        summary.update(contour_landing_summary(rows))
         report["samples"][mode] = rows
         samples_by_mode[mode] = rows
         mode_summaries[mode] = summary
