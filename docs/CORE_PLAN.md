@@ -172,6 +172,7 @@ Stage B에서 명시하는 것:
 60. Stage B rhythm/phrase variation MIDI-note proxy review
 61. Stage B rhythm/phrase variation sample diversity repair
 62. Stage B sample-diverse rhythm variation MIDI-note proxy review
+63. Stage B rhythm variation timing-grid repetition repair
 
 가장 최근 의미 있는 결과:
 
@@ -222,6 +223,8 @@ Stage B에서 명시하는 것:
 - Issue #122 review export reports `candidate_count=6`, `unique_note_sequence_count=6`, `duplicate_note_sequence_count=0`, and objective MIDI flag counts `{}`.
 - Issue #124 fills MIDI-note proxy review notes for the sample-diverse rhythm variation candidates.
 - Issue #124 result: `reviewed=6`, `needs_followup=6`, `reject=0`, `keep=0`, `too_stiff=6`, and duplicate note sequences remain `0`.
+- Issue #126 reduces average most-common IOI ratio from `0.497` to `0.412`, keeps duplicate note sequences at `0`, and keeps objective MIDI flag counts `{}`.
+- Issue #126 also removes objective large/unresolved large-leap risk from the variation candidates, but lowers IOI/bar-position/duration diversity.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -240,7 +243,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 rhythm variation timing-grid repetition repair다. Issue #124는 sample-diverse 후보를 review했고, duplicate 문제보다 timing stiffness와 mechanical phrase template이 다음 병목임을 확인했다.
+이제 다음 단계는 timing-grid repaired rhythm 후보의 MIDI-note proxy review다. Issue #126은 dominant IOI repetition을 줄였지만, diversity tradeoff가 있어 실제 review boundary가 필요하다.
 
 ## 6. 다음 단계 로드맵
 
@@ -461,6 +464,8 @@ Stage B에서 명시하는 것:
 - Issue #122 result: the repaired variation candidates remain strict `3/3`, final landing `3/3`, max interval `6`, and objective flags `{}`.
 - Issue #124 MIDI-note proxy review result: `reviewed=6`, `needs_followup=6`, `reject=0`, `keep=0`.
 - Issue #124 aggregate result: `improve_phrase_vocabulary=14`, `fix_timing_grid=12`, `increase_motif_variation=6`.
+- Issue #126 timing-grid repair result: variation `avg_most_common_ioi_ratio=0.412`, `max_interval=4`, `duplicate_note_sequence_count=0`, objective flags `{}`.
+- Issue #126 tradeoff: variation `avg_ioi_diversity_ratio=0.070`, `avg_unique_bar_position_pattern_ratio=0.583`, and `avg_duration_diversity_ratio=0.084`.
 
 해석:
 
@@ -479,6 +484,7 @@ Stage B에서 명시하는 것:
 - Issue #120 proxy review 결과, 다음 병목은 exact duplicate rank candidates를 없애는 sample diversity repair였다.
 - Issue #122는 duplicate 문제를 고쳤다.
 - Issue #124는 sample-diverse 후보도 여전히 `too_stiff=6`임을 확인했으므로, 다음 병목은 timing-grid repetition repair다.
+- Issue #126은 timing-grid repetition을 줄였지만 diversity tradeoff가 있으므로, 다음은 repaired candidates proxy review다.
 
 ### Phase 3.10. Swing/Motif Phrase Grammar
 

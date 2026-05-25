@@ -31,6 +31,7 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     varied_grid_position_duration_steps,
     varied_grid_tokens,
     varied_guide_tones_tokens,
+    varied_phrase_positions,
 )
 from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_note_grammar,
@@ -164,6 +165,21 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         steps = [duration_steps_from_token(token) for token in tokens]
 
         self.assertEqual(steps, [1, 2, 4, 4])
+
+    def test_varied_phrase_positions_avoids_adjacent_grid_clusters(self) -> None:
+        positions = varied_phrase_positions(
+            [0, 3, 4, 9],
+            slot_start=0,
+            slot_size=8,
+            bar_index=1,
+            motif_index=0,
+            variation_index=2,
+        )
+        gaps = [right - left for left, right in zip(positions, positions[1:])]
+
+        self.assertEqual(len(positions), 4)
+        self.assertEqual(positions, sorted(set(positions)))
+        self.assertGreaterEqual(min(gaps), 2)
 
     def test_nearest_allowed_pitch_token_avoids_recent_pitch_when_possible(self) -> None:
         allowed = list(range(TOKEN_NOTE_PITCH_START, TOKEN_NOTE_PITCH_END + 1))
@@ -506,9 +522,9 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         self.assertGreaterEqual(min(pitches), 48)
         self.assertTrue(profile["final_landing_resolved"])
         self.assertIn(profile["final_landing_role"], {"guide", "chord_tone"})
-        self.assertLessEqual(profile["max_abs_interval"], 6)
+        self.assertLessEqual(profile["max_abs_interval"], 4)
         self.assertGreater(rhythm["ioi_diversity_ratio"], 0.09)
-        self.assertLess(rhythm["most_common_ioi_ratio"], 0.45)
+        self.assertLess(rhythm["most_common_ioi_ratio"], 0.43)
 
     def test_data_motif_rhythm_phrase_variation_uses_seed_for_independent_sequences(self) -> None:
         chords = ["Cm7", "F7", "Bbmaj7", "Ebmaj7"]
@@ -540,7 +556,7 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
             self.assertTrue(grammar["grammar_valid"])
             self.assertEqual(len(groups), 32)
             self.assertTrue(profile["final_landing_resolved"])
-            self.assertLessEqual(profile["max_abs_interval"], 6)
+            self.assertLessEqual(profile["max_abs_interval"], 4)
             signatures.add(signature)
 
         self.assertEqual(len(signatures), 3)

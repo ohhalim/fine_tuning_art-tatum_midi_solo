@@ -221,7 +221,7 @@ def varied_phrase_slot_bounds(
         if int(motif_index) > 0:
             slot_start = max(0, slot_start - start_shift)
         return min(int(POSITIONS_PER_BAR) - 1, slot_start), slot_size
-    split_patterns = [9, 7, 10, 6, 8, 11, 5, 9]
+    split_patterns = [8, 7, 9, 8, 7, 9, 8, 7]
     first_slot_size = split_patterns[(int(bar_index) + int(variation_index)) % len(split_patterns)]
     if int(motif_index) == 0:
         return 0, first_slot_size
@@ -252,6 +252,46 @@ def varied_phrase_duration_tokens(
         for index, step in enumerate(duration_steps)
     ]
     return fit_duration_tokens_to_positions(positions, varied_steps, max_tail_duration=6)
+
+
+def varied_phrase_positions(
+    position_deltas: Sequence[int],
+    *,
+    slot_start: int,
+    slot_size: int,
+    bar_index: int,
+    motif_index: int,
+    variation_index: int = 0,
+) -> list[int]:
+    positions = normalize_position_deltas(
+        position_deltas,
+        slot_start=slot_start,
+        slot_size=slot_size,
+    )
+    if len(positions) < 4:
+        return positions
+
+    slot_size = max(1, int(slot_size))
+    slot_end = min(int(POSITIONS_PER_BAR) - 1, int(slot_start) + slot_size - 1)
+    anti_repeat_patterns = [
+        [0, 2, 5, 7],
+        [0, 3, 5, 7],
+        [0, 2, 4, 7],
+    ]
+    pattern = anti_repeat_patterns[
+        (int(bar_index) * 2 + int(motif_index) + int(variation_index))
+        % len(anti_repeat_patterns)
+    ]
+    if len(positions) > len(pattern):
+        tail = [pattern[-1] + index + 1 for index in range(len(positions) - len(pattern))]
+        pattern = pattern + tail
+    local_max = max(1, int(pattern[-1]))
+    raw_positions = [
+        int(slot_start) + int(round(int(step) * (slot_size - 1) / local_max))
+        for step in pattern[: len(positions)]
+    ]
+    repaired = strictly_increasing_positions(raw_positions, int(slot_start), slot_end)
+    return repaired if len(repaired) == len(positions) else positions
 
 
 def nearest_allowed_pitch_token(
@@ -868,6 +908,7 @@ def bounded_phrase_pitch_for_pitch_classes(
     recent_pitches: Sequence[int] | None = None,
     max_interval: int = 7,
     allow_repeat_fallback: bool = False,
+    allow_wider_fallback: bool = True,
     min_pitch: int = PIANO_PITCH_MIN,
     max_pitch: int = PIANO_PITCH_MAX,
 ) -> int:
@@ -897,7 +938,7 @@ def bounded_phrase_pitch_for_pitch_classes(
         bounded = [pitch for pitch in candidates if 1 <= abs(int(pitch) - previous) <= int(max_interval)]
         if bounded:
             candidates = bounded
-        else:
+        elif allow_wider_fallback:
             near = [
                 pitch
                 for pitch in candidates
@@ -907,6 +948,10 @@ def bounded_phrase_pitch_for_pitch_classes(
                 candidates = near
                 prefer_primary_pitch_class = False
             elif allow_repeat_fallback and previous % 12 in priority:
+                return previous
+            prefer_primary_pitch_class = False
+        else:
+            if allow_repeat_fallback and previous % 12 in priority:
                 return previous
             prefer_primary_pitch_class = False
 
@@ -945,6 +990,7 @@ def cadence_landing_pitch(
     final_bar: bool,
     recent_pitches: Sequence[int],
     max_interval: int = 7,
+    allow_wider_fallback: bool = True,
     min_pitch: int = PIANO_PITCH_MIN,
     max_pitch: int = PIANO_PITCH_MAX,
 ) -> int:
@@ -962,6 +1008,7 @@ def cadence_landing_pitch(
         recent_pitches=recent_pitches,
         max_interval=max_interval,
         allow_repeat_fallback=True,
+        allow_wider_fallback=allow_wider_fallback,
         min_pitch=min_pitch,
         max_pitch=max_pitch,
     )
@@ -1414,6 +1461,7 @@ def data_motif_rhythm_phrase_variation_tokens(
     pending_recovery_direction = 0
     min_solo_pitch = 48
     max_solo_pitch = 84
+    max_variation_interval = 4
     seed_variation = abs(int(seed)) % 17
 
     for bar_index in range(max(1, int(bars))):
@@ -1436,10 +1484,13 @@ def data_motif_rhythm_phrase_variation_tokens(
                 motifs_per_bar,
                 variation_index=seed_variation,
             )
-            positions = normalize_position_deltas(
+            positions = varied_phrase_positions(
                 rhythm["position_deltas"],
                 slot_start=slot_start,
                 slot_size=slot_size,
+                bar_index=bar_index,
+                motif_index=motif_index,
+                variation_index=seed_variation,
             )
             durations = varied_phrase_duration_tokens(
                 positions,
@@ -1467,21 +1518,35 @@ def data_motif_rhythm_phrase_variation_tokens(
                             phrase_recovery_pitch_classes(chord, next_chord),
                             target_pitch=max(min_solo_pitch, min(max_solo_pitch, pitch)),
                             recent_pitches=recent_pitches,
-                            max_interval=6,
+                            max_interval=max_variation_interval,
+                            allow_wider_fallback=False,
                             min_pitch=min_solo_pitch,
                             max_pitch=max_solo_pitch,
                         )
                     pending_recovery_direction = 0
                 elif last_in_bar:
-                    pitch = cadence_landing_pitch(
-                        chord,
-                        next_chord,
-                        final_bar=final_bar,
-                        recent_pitches=recent_pitches,
-                        max_interval=6,
-                        min_pitch=min_solo_pitch,
-                        max_pitch=max_solo_pitch,
-                    )
+                    if final_bar:
+                        pitch = cadence_landing_pitch(
+                            chord,
+                            next_chord,
+                            final_bar=final_bar,
+                            recent_pitches=recent_pitches,
+                            max_interval=max_variation_interval,
+                            allow_wider_fallback=False,
+                            min_pitch=min_solo_pitch,
+                            max_pitch=max_solo_pitch,
+                        )
+                    else:
+                        pitch = bounded_phrase_pitch_for_pitch_classes(
+                            phrase_recovery_pitch_classes(chord, next_chord),
+                            target_pitch=int(recent_pitches[-1]) if recent_pitches else anchor,
+                            recent_pitches=recent_pitches,
+                            max_interval=max_variation_interval,
+                            allow_repeat_fallback=True,
+                            allow_wider_fallback=False,
+                            min_pitch=min_solo_pitch,
+                            max_pitch=max_solo_pitch,
+                        )
                     pending_recovery_direction = 0
                 else:
                     cell_index = (
@@ -1518,7 +1583,9 @@ def data_motif_rhythm_phrase_variation_tokens(
                         line_pitch_classes,
                         target_pitch=target_pitch,
                         recent_pitches=recent_pitches,
-                        max_interval=6,
+                        max_interval=max_variation_interval,
+                        allow_repeat_fallback=True,
+                        allow_wider_fallback=False,
                         min_pitch=min_solo_pitch,
                         max_pitch=max_solo_pitch,
                     )
