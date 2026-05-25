@@ -175,6 +175,7 @@ Stage B에서 명시하는 것:
 63. Stage B rhythm variation timing-grid repetition repair
 64. Stage B timing-grid repaired rhythm MIDI-note proxy review
 65. Stage B rhythm variation phrase-vocabulary diversity repair
+66. Stage B phrase-vocabulary repaired rhythm MIDI-note proxy review
 
 가장 최근 의미 있는 결과:
 
@@ -231,6 +232,9 @@ Stage B에서 명시하는 것:
 - Issue #128 concludes the next repair should widen phrase vocabulary while preserving duplicate-free/objective-clean timing repair guardrails.
 - Issue #130 widens rhythm variation phrase vocabulary while preserving duplicate-free/objective-clean guardrails.
 - Issue #130 result: variation `avg_unique_bar_position_pattern_ratio=0.958`, `avg_ioi_diversity_ratio=0.091`, `avg_most_common_ioi_ratio=0.385`, `max_interval=4`, duplicate note sequences `0`, objective flags `{}`.
+- Issue #132 fills MIDI-note proxy review notes for the phrase-vocabulary repaired candidates.
+- Issue #132 result: `reviewed=6`, `needs_followup=6`, `reject=0`, `keep=0`, `too_stiff=4`, `acceptable=2`, objective flags `{}`.
+- Issue #132 confirms phrase-vocabulary repair should be kept, but next generation work should target phrase shape and tension/approach vocabulary.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -249,7 +253,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 phrase-vocabulary repaired rhythm 후보의 MIDI-note proxy review다. Issue #130은 objective surface를 개선했지만, 실제 `too_stiff` proxy 판단이 줄었는지는 아직 채워진 review notes로 확인하지 않았다.
+이제 다음 단계는 rhythm variation phrase-shape tension repair다. Issue #132는 timing proxy가 개선됐지만 keep 후보는 여전히 없고, best repaired candidate도 phrase sketch/safe exercise 문제를 남겼다.
 
 ## 6. 다음 단계 로드맵
 
@@ -477,6 +481,8 @@ Stage B에서 명시하는 것:
 - Issue #128 confirms timing repair should be kept as a guardrail but not treated as a musical solution; the next generation bottleneck is phrase-vocabulary diversity.
 - Issue #130 phrase-vocabulary repair result: variation `avg_unique_bar_position_pattern_ratio=0.958`, `avg_ioi_diversity_ratio=0.091`, `avg_most_common_ioi_ratio=0.385`, `avg_most_common_duration_ratio=0.384`, and objective flags `{}`.
 - Issue #130 variation review MIDI has duplicate note sequence count `0` and before/after max simultaneous notes `1/1`.
+- Issue #132 MIDI-note proxy review result: `reviewed=6`, `needs_followup=6`, `reject=0`, `keep=0`, timing `acceptable=2`, `too_stiff=4`.
+- Issue #132 aggregate result: `improve_phrase_vocabulary=11`, `fix_timing_grid=8`, `increase_motif_variation=5`, `increase_tension_approach_vocabulary=2`.
 
 해석:
 
@@ -498,6 +504,7 @@ Stage B에서 명시하는 것:
 - Issue #126은 timing-grid repetition을 줄였지만 diversity tradeoff가 있으므로, 다음은 repaired candidates proxy review다.
 - Issue #128은 repaired candidates도 no-keep임을 확인했으므로, 다음은 objective-clean/duplicate-free 조건을 유지한 phrase-vocabulary diversity repair다.
 - Issue #130은 objective surface를 개선했으므로, 다음은 repaired candidates가 proxy review에서 `too_stiff`를 줄였는지 확인하는 review issue다.
+- Issue #132는 phrase-vocabulary repair가 timing proxy를 개선했지만 no-keep이므로, 다음은 phrase shape와 tension/approach vocabulary repair다.
 
 ### Phase 3.10. Swing/Motif Phrase Grammar
 
@@ -767,34 +774,35 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B rhythm variation phrase-vocabulary diversity repair
+Stage B phrase-vocabulary repaired rhythm MIDI-note proxy review
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_RHYTHM_VARIATION_PHRASE_VOCAB_REPAIR_2026-05-25.md`
-- harness: `bash scripts/agent_harness.sh stage-b-rhythm-phrase-variation`
-- review package: `outputs/stage_b_data_motif_review/harness_stage_b_rhythm_phrase_variation/review_candidates.md`
-- objective report: `outputs/stage_b_objective_midi_review/harness_stage_b_rhythm_phrase_variation/objective_midi_note_review.json`
-- variation candidates:
-  - strict: `3/3`
-  - final landing resolved: `3/3`
-  - max interval: `4`
-  - objective flags: `{}`
-  - duplicate note sequence count: `0`
-  - average syncopation: `0.684`
-  - average bar-position pattern ratio: `0.958`
-  - average IOI diversity: `0.091`
-  - average most-common IOI ratio: `0.385`
-  - average most-common duration ratio: `0.384`
-- review notes are still pending.
+- docs: `docs/STAGE_B_PHRASE_VOCAB_REPAIRED_PROXY_REVIEW_2026-05-25.md`
+- review notes: `outputs/stage_b_listening_review_notes/harness_stage_b_phrase_vocab_repaired_codex_proxy/phrase_vocab_repaired_rhythm_review_notes_codex_midi_proxy.json`
+- aggregate: `outputs/stage_b_listening_review_aggregate/harness_stage_b_phrase_vocab_repaired_codex_proxy/listening_review_aggregate.md`
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `needs_followup`: `6`
+  - `reject`: `0`
+  - `keep`: `0`
+- timing:
+  - `acceptable`: `2`
+  - `too_stiff`: `4`
+- aggregate follow-ups:
+  - `improve_phrase_vocabulary`: `11`
+  - `fix_timing_grid`: `8`
+  - `increase_motif_variation`: `5`
+  - `increase_tension_approach_vocabulary`: `2`
 
 다음 작업:
 
-- 다음 issue는 `Stage B phrase-vocabulary repaired rhythm MIDI-note proxy review`로 잡는다.
-- repaired 후보가 실제 proxy review에서 `too_stiff`를 줄이는지 확인한다.
-- lower tension ratio가 too-safe 문제로 들리는지 확인한다.
-- rank 1 sample 3이 이전 timing-grid repaired rank 1보다 나은 review candidate인지 확인한다.
+- 다음 issue는 `Stage B rhythm variation phrase-shape tension repair`로 잡는다.
+- Issue #130 position/IOI guardrail은 유지한다.
+- high-register phrase sketch와 safe scalar exercise 문제를 줄인다.
+- tension/approach color를 늘리되 outside-note/unresolved-leap flags를 만들지 않는다.
 - objective clean 후보라도 broad training으로 넘어가지 않는다.
 - real Brad/reference chord label은 아직 임의로 넣지 않는다.
 - LMDM/audio diffusion은 장기 live instrument reference로만 남기고, 현재 MVP를 audio로 pivot하지 않는다.

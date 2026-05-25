@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- Stage B rhythm variation phrase-vocabulary diversity repair
-- 다음 권장 이슈: `Stage B phrase-vocabulary repaired rhythm MIDI-note proxy review`
+- Stage B phrase-vocabulary repaired rhythm MIDI-note proxy review
+- 다음 권장 이슈: `Stage B rhythm variation phrase-shape tension repair`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,64 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Probe Result
+## Latest Review Result
+
+Issue #132는 Issue #130 phrase-vocabulary repaired rhythm 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
+
+Docs:
+
+- `docs/STAGE_B_PHRASE_VOCAB_REPAIRED_PROXY_REVIEW_2026-05-25.md`
+
+중요한 전제:
+
+- 실제 오디오 청취 리뷰가 아니다.
+- MIDI note timing, pitch contour, objective MIDI metrics, context chord guide track, duplicate note-sequence fields 기준이다.
+- `keep` 후보를 만들기보다 다음 generation rule 병목을 정하는 단계다.
+
+Result:
+
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `needs_followup`: `6`
+  - `reject`: `0`
+  - `keep`: `0`
+- phrase quality:
+  - `phrase`: `3`
+  - `fragment`: `2`
+  - `exercise`: `1`
+- timing:
+  - `acceptable`: `2`
+  - `too_stiff`: `4`
+- chord fit:
+  - `fits`: `5`
+  - `too_safe`: `1`
+- duplicate note sequences: `0`
+- objective MIDI flags: `{}`
+
+Aggregate follow-ups:
+
+- `improve_phrase_vocabulary`: `11`
+- `fix_timing_grid`: `8`
+- `increase_motif_variation`: `5`
+- `increase_tension_approach_vocabulary`: `2`
+
+Compared with Issue #128:
+
+- `too_stiff`: `6 -> 4`
+- timing `acceptable`: `0 -> 2`
+- `improve_phrase_vocabulary`: `14 -> 11`
+- `fix_timing_grid`: `12 -> 8`
+- `increase_motif_variation`: `6 -> 5`
+
+Decision:
+
+- phrase-vocabulary repair should be kept.
+- it improved timing proxy signals without breaking objective-clean/duplicate-free guardrails.
+- it is not enough for a keep candidate.
+- next generation work should target phrase shape and tension/approach vocabulary.
+
+## Previous Probe Result
 
 Issue #130은 Issue #128 proxy review에서 남은 `too_stiff=6`, `keep=0` 병목을 generation rule 쪽에서 한 번 더 좁힌 작업이다.
 
@@ -47,18 +104,8 @@ Docs:
 
 - `docs/STAGE_B_RHYTHM_VARIATION_PHRASE_VOCAB_REPAIR_2026-05-25.md`
 
-Implemented:
-
-- 8-step slot split cycle로 bar-position pattern 반복을 줄였다.
-- phrase position anti-repeat pattern을 3개에서 8개로 늘렸다.
-- seed/bar/motif 기반 local position offset을 추가했다.
-- duration variation cycle을 늘리고 motif tail duration이 다음 motif를 덮지 않도록 제한했다.
-- `phrase_vocabulary_contour_delta()`로 call/response contour bias를 추가했다.
-- pitch-cell selection에도 bar/motif shift를 넣었다.
-
 Result:
 
-- candidate count: `6`
 - variation candidates:
   - strict: `3/3`
   - final landing: `3/3`
@@ -71,52 +118,6 @@ Result:
 - duplicate note sequences: `0`
 - objective MIDI flags: `{}`
 - before/after max simultaneous notes for variation review MIDI: `1/1`
-
-Compared with Issue #126:
-
-- bar-position pattern ratio: `0.583 -> 0.958`
-- IOI diversity ratio: `0.070 -> 0.091`
-- most-common IOI ratio: `0.412 -> 0.385`
-- most-common duration ratio: `0.416 -> 0.384`
-
-Decision:
-
-- phrase-vocabulary repair improves the objective surface requested by Issue #128.
-- this is not a musical success claim until filled MIDI-note proxy review confirms whether `too_stiff` decreased.
-- next step is a focused proxy review of the repaired candidates.
-
-## Previous Review Result
-
-Issue #128은 Issue #126 timing-grid repaired 후보를 같은 listening review notes schema로 다시 채운 MIDI-note proxy review다.
-
-Docs:
-
-- `docs/STAGE_B_TIMING_GRID_REPAIRED_PROXY_REVIEW_2026-05-25.md`
-
-Result:
-
-- reviewed candidates: `6`
-- pending candidates: `0`
-- decisions:
-  - `needs_followup`: `6`
-  - `reject`: `0`
-  - `keep`: `0`
-- timing:
-  - `too_stiff`: `6`
-- duplicate note sequences: `0`
-- objective MIDI flags: `{}`
-
-Aggregate follow-ups:
-
-- `improve_phrase_vocabulary`: `14`
-- `fix_timing_grid`: `12`
-- `increase_motif_variation`: `6`
-
-Decision:
-
-- timing repair is useful as a guardrail.
-- it did not produce a `keep` candidate.
-- the next generation issue should target phrase-vocabulary diversity while preserving objective-clean and duplicate-free properties.
 
 ## Previous Sample-Diverse Review Result
 
