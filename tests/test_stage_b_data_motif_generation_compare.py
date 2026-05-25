@@ -26,9 +26,12 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     parse_baseline_modes,
     phrase_cadence_tokens,
     phrase_recovery_tokens,
+    phrase_shape_pitch_classes,
+    phrase_shape_target_pitch,
     phrase_vocabulary_contour_delta,
     straight_guide_tones_tokens,
     straight_grid_tokens,
+    tension_pitch_classes,
     varied_grid_position_duration_steps,
     varied_grid_tokens,
     varied_guide_tones_tokens,
@@ -226,6 +229,35 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
 
         self.assertGreater(call_delta, 0)
         self.assertLess(response_delta, 0)
+
+    def test_phrase_shape_target_pitch_pulls_extreme_register_toward_phrase_center(self) -> None:
+        shaped = phrase_shape_target_pitch(
+            84,
+            bar_index=0,
+            motif_index=0,
+            variation_index=2,
+            min_pitch=48,
+            max_pitch=84,
+        )
+
+        self.assertLess(shaped, 80)
+        self.assertGreaterEqual(shaped, 48)
+
+    def test_phrase_shape_pitch_classes_can_prioritize_tension_color(self) -> None:
+        classes = phrase_shape_pitch_classes(
+            base_pitch_class=3,
+            chord="Cm7",
+            next_chord="F7",
+            pitch_cells=[3, 10, 2, 5],
+            recent_pitches=[63, 62],
+            bar_index=0,
+            motif_index=0,
+            local_index=1,
+            variation_index=0,
+        )
+
+        self.assertIn(classes[0], tension_pitch_classes("Cm7"))
+        self.assertIn(3, classes)
 
     def test_nearest_allowed_pitch_token_avoids_recent_pitch_when_possible(self) -> None:
         allowed = list(range(TOKEN_NOTE_PITCH_START, TOKEN_NOTE_PITCH_END + 1))

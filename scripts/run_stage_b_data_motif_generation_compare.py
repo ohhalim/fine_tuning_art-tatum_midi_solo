@@ -365,6 +365,76 @@ def phrase_vocabulary_contour_delta(
     return max(-4, min(4, int(delta)))
 
 
+def phrase_shape_target_pitch(
+    target_pitch: int,
+    *,
+    bar_index: int,
+    motif_index: int,
+    variation_index: int = 0,
+    min_pitch: int = PIANO_PITCH_MIN,
+    max_pitch: int = PIANO_PITCH_MAX,
+) -> int:
+    register_centers = [62, 66, 70, 67, 64, 69, 65, 61]
+    response_offsets = [0, -3, 2, -2, 3, 0, -1, 1]
+    center = register_centers[
+        (int(bar_index) * 2 + int(motif_index) + int(variation_index))
+        % len(register_centers)
+    ]
+    center += response_offsets[
+        (int(bar_index) + int(motif_index) * 3 + int(variation_index))
+        % len(response_offsets)
+    ]
+    shaped = int(round((int(target_pitch) + int(center) * 2) / 3))
+    return max(int(min_pitch), min(int(max_pitch), shaped))
+
+
+def phrase_shape_pitch_classes(
+    *,
+    base_pitch_class: int,
+    chord: str | None,
+    next_chord: str | None,
+    pitch_cells: Sequence[int],
+    recent_pitches: Sequence[int],
+    bar_index: int,
+    motif_index: int,
+    local_index: int,
+    variation_index: int = 0,
+) -> list[int]:
+    recent_pitch_classes = {int(pitch) % 12 for pitch in recent_pitches[-2:]}
+    color_role = (
+        int(bar_index) * 5
+        + int(motif_index) * 3
+        + int(local_index)
+        + int(variation_index)
+    ) % 8
+    ordered: list[int] = []
+
+    def add(pitch_class: int) -> None:
+        normalized = int(pitch_class) % 12
+        if normalized not in ordered:
+            ordered.append(normalized)
+
+    tensions = sorted(tension_pitch_classes(chord))
+    if color_role in {1, 4, 6} and tensions:
+        for pitch_class in tensions[color_role % len(tensions) :] + tensions[: color_role % len(tensions)]:
+            if int(pitch_class) % 12 not in recent_pitch_classes:
+                add(int(pitch_class))
+                break
+
+    if color_role == 3:
+        for pitch_class in guide_tone_pitch_classes(next_chord):
+            if int(pitch_class) % 12 not in recent_pitch_classes:
+                add(int(pitch_class))
+                break
+
+    add(base_pitch_class)
+    for pitch_class in list(pitch_cells) + phrase_recovery_pitch_classes(chord, next_chord):
+        add(int(pitch_class))
+    if recent_pitches:
+        add(int(recent_pitches[-1]) % 12)
+    return ordered
+
+
 def nearest_allowed_pitch_token(
     target_pitch: int,
     allowed_tokens: Sequence[int],
@@ -1073,10 +1143,13 @@ def cadence_landing_pitch(
     if not pitch_classes:
         pitch_classes = sorted(chord_tone_pitch_classes(target_chord)) or [0]
     previous = int(recent_pitches[-1]) if recent_pitches else 67
+    recent_for_landing = list(recent_pitches)
+    if not allow_wider_fallback and recent_for_landing:
+        recent_for_landing = recent_for_landing[-1:]
     return bounded_phrase_pitch_for_pitch_classes(
         pitch_classes,
         target_pitch=previous,
-        recent_pitches=recent_pitches,
+        recent_pitches=recent_for_landing,
         max_interval=max_interval,
         allow_repeat_fallback=True,
         allow_wider_fallback=allow_wider_fallback,
@@ -1648,12 +1721,17 @@ def data_motif_rhythm_phrase_variation_tokens(
                                 ],
                                 [int(pitch) % 12 for pitch in recent_pitches[-2:]],
                             )
-                    line_pitch_classes = [pitch_class] + [
-                        candidate_pitch_class
-                        for candidate_pitch_class in pitch_cells
-                        + phrase_recovery_pitch_classes(chord, next_chord)
-                        if candidate_pitch_class != pitch_class
-                    ]
+                    line_pitch_classes = phrase_shape_pitch_classes(
+                        base_pitch_class=pitch_class,
+                        chord=chord,
+                        next_chord=next_chord,
+                        pitch_cells=pitch_cells,
+                        recent_pitches=recent_pitches,
+                        bar_index=bar_index,
+                        motif_index=motif_index,
+                        local_index=local_index,
+                        variation_index=seed_variation,
+                    )
                     contour_offset = contour_steps[local_index % len(contour_steps)]
                     if recent_pitches:
                         contour_delta = phrase_vocabulary_contour_delta(
@@ -1673,7 +1751,14 @@ def data_motif_rhythm_phrase_variation_tokens(
                             variation_index=seed_variation,
                         )
                         target_pitch = anchor + int(contour_offset) + anchor_bias
-                    target_pitch = max(min_solo_pitch, min(max_solo_pitch, int(target_pitch)))
+                    target_pitch = phrase_shape_target_pitch(
+                        target_pitch,
+                        bar_index=bar_index,
+                        motif_index=motif_index,
+                        variation_index=seed_variation,
+                        min_pitch=min_solo_pitch,
+                        max_pitch=max_solo_pitch,
+                    )
                     pitch = bounded_phrase_pitch_for_pitch_classes(
                         line_pitch_classes,
                         target_pitch=target_pitch,
