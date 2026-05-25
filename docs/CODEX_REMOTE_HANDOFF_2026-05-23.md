@@ -199,12 +199,45 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 45. rhythm variation phrase-shape tension repair
 46. phrase-shape tension repaired MIDI-note proxy review
 47. proxy-keep rhythm candidate focused review package
+48. proxy-keep focused context MIDI-note decision
 
 자세한 전체 기록은 `docs/CORE_PLAN.md`에 있다.
 
 ## 7. Latest Meaningful Result
 
-최신 의미 있는 결과는 Stage B proxy-keep rhythm candidate focused review package다.
+최신 의미 있는 결과는 Stage B proxy-keep focused context MIDI-note decision이다.
+
+Issue #140은 Issue #138 focused package의 단일 proxy `keep` 후보를 solo/context MIDI note 기준으로 다시 판단한 focused context decision이다.
+
+결과:
+
+- prior proxy decision: `keep`
+- focused context decision: `needs_followup`
+- keep as diagnostic seed: `yes`
+- ready for broad training: `no`
+- selected candidate: `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- selected candidate note count: `63`
+- selected candidate unique pitch count: `28`
+- selected candidate timing: `acceptable`
+- selected candidate chord fit: `fits`
+- selected candidate objective flags: `[]`
+- primary blocker: register arc reaches `C6` around bar 4 and drifts to final `G3`
+- secondary blocker: phrase/cadence punctuation is still too grid-cell-like
+
+해석:
+
+- The Issue #138 package remains useful as a focused review artifact.
+- The candidate should not be promoted to a final listening keep.
+- broad training is still premature.
+- next work should preserve the objective-clean rhythm guardrails while adding register-arc control and cadence/phrase punctuation.
+
+Docs:
+
+```text
+docs/STAGE_B_PROXY_KEEP_FOCUSED_CONTEXT_DECISION_2026-05-25.md
+```
+
+The previous package was Stage B proxy-keep rhythm candidate focused review package.
 
 Issue #138은 Issue #136에서 처음 나온 proxy `keep` 후보만 solo/context MIDI와 objective note summary로 묶은 focused review package다.
 
@@ -214,19 +247,6 @@ Issue #138은 Issue #136에서 처음 나온 proxy `keep` 후보만 solo/context
 - package candidate count: `1`
 - copied solo MIDI files: `1`
 - copied context MIDI files: `1`
-- selected candidate: `data_motif_rhythm_phrase_variation_rank_1_sample_3`
-- selected candidate note count: `63`
-- selected candidate unique pitch count: `28`
-- selected candidate timing: `acceptable`
-- selected candidate chord fit: `fits`
-- selected candidate objective flags: `[]`
-
-해석:
-
-- This isolates the first proxy keep candidate in the current Stage B review chain.
-- `keep` still means focused context listening candidate, not real audio proof or training readiness.
-- broad training is still premature.
-- next work should make a focused context listening decision on the single copied solo/context MIDI pair.
 
 Docs:
 
