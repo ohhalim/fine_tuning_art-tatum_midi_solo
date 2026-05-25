@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- Stage B data-derived contour/cadence landing repair probe
-- 다음 권장 이슈: `Stage B contour repair candidates listening review notes`
+- Stage B contour repair candidates MIDI-note proxy review
+- 다음 권장 이슈: `Stage B rhythm/phrase vocabulary variation probe`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,66 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Probe Result
+## Latest Review Result
+
+Issue #116은 Issue #115 이후 contour/landing repair 후보 3개와 phrase recovery baseline 후보 3개를 같은 listening review notes schema로 채웠다.
+
+중요한 전제:
+
+- 실제 오디오 청취 리뷰가 아니다.
+- MIDI note timing, pitch contour, objective MIDI metrics, context chord guide track을 읽은 proxy review다.
+- `keep` 후보는 만들지 않는다.
+
+Docs:
+
+- `docs/STAGE_B_CONTOUR_REPAIR_MIDI_PROXY_REVIEW_2026-05-25.md`
+
+Generated outputs:
+
+- proxy-filled notes:
+  - `outputs/stage_b_listening_review_notes/harness_stage_b_contour_landing_repair_codex_proxy/contour_repair_listening_review_notes_codex_midi_proxy.json`
+- aggregate:
+  - `outputs/stage_b_listening_review_aggregate/harness_stage_b_contour_landing_repair_codex_proxy/listening_review_aggregate.md`
+
+Result:
+
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `needs_followup`: `5`
+  - `reject`: `1`
+  - `keep`: `0`
+- phrase quality:
+  - `phrase`: `1`
+  - `fragment`: `4`
+  - `exercise`: `1`
+- timing:
+  - `too_stiff`: `6`
+- issues:
+  - `bad_timing`: `6`
+  - `too_mechanical`: `6`
+  - `too_repetitive`: `6`
+  - `weak_phrase`: `5`
+
+Candidate decisions:
+
+| candidate | phrase | timing | chord_fit | decision |
+|---|---|---|---|---|
+| `data_motif_contour_landing_repair_rank_1_sample_1` | `fragment` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_contour_landing_repair_rank_2_sample_2` | `phrase` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_contour_landing_repair_rank_3_sample_3` | `fragment` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_phrase_recovery_rank_1_sample_1` | `fragment` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_phrase_recovery_rank_2_sample_2` | `fragment` | `too_stiff` | `unclear` | `needs_followup` |
+| `data_motif_phrase_recovery_rank_3_sample_3` | `exercise` | `too_stiff` | `unclear` | `reject` |
+
+Decision:
+
+- contour/landing repair는 objective target을 개선했지만 아직 musical keep 후보를 만들지 못했다.
+- strongest candidate는 `data_motif_contour_landing_repair_rank_2_sample_2`다.
+- 다음은 landing repair가 아니라 rhythm/phrase vocabulary variation을 봐야 한다.
+- broad training, audio diffusion, backend/UI는 아직 다음 단계가 아니다.
+
+## Previous Probe Result
 
 이번 probe는 2026-05-24 MIDI-note proxy review에서 드러난 contour/landing 문제를 좁혀서 검증했다.
 
