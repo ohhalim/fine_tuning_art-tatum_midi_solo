@@ -388,6 +388,26 @@ def phrase_shape_target_pitch(
     return max(int(min_pitch), min(int(max_pitch), shaped))
 
 
+def focused_context_register_bounds(
+    bar_index: int,
+    bars: int,
+    *,
+    min_pitch: int = PIANO_PITCH_MIN,
+    max_pitch: int = PIANO_PITCH_MAX,
+) -> tuple[int, int]:
+    """Keep focused review candidates out of bass-guide and sketch extremes."""
+    total_bars = max(1, int(bars))
+    lower = max(int(min_pitch), 55)
+    upper = min(int(max_pitch), 79)
+    if total_bars >= 4 and int(bar_index) >= total_bars - 3:
+        lower = max(lower, 58)
+        upper = min(upper, 77)
+    if total_bars >= 4 and int(bar_index) >= total_bars - 2:
+        lower = max(lower, 60)
+        upper = min(upper, 76)
+    return lower, max(lower, upper)
+
+
 def phrase_shape_pitch_classes(
     *,
     base_pitch_class: int,
@@ -1603,8 +1623,8 @@ def data_motif_rhythm_phrase_variation_tokens(
     groups_per_bar = max(1, int(note_groups_per_bar))
     motifs_per_bar = max(1, int(round(groups_per_bar / motif_length)))
     pending_recovery_direction = 0
-    min_solo_pitch = 48
-    max_solo_pitch = 84
+    min_solo_pitch = 55
+    max_solo_pitch = 79
     max_variation_interval = 4
     seed_variation = abs(int(seed)) % 17
 
@@ -1612,6 +1632,12 @@ def data_motif_rhythm_phrase_variation_tokens(
         chord = chords[bar_index % len(chords)] if chords else None
         next_chord = chords[(bar_index + 1) % len(chords)] if chords else chord
         final_bar = bar_index == max(1, int(bars)) - 1
+        bar_min_pitch, bar_max_pitch = focused_context_register_bounds(
+            bar_index,
+            bars,
+            min_pitch=min_solo_pitch,
+            max_pitch=max_solo_pitch,
+        )
         if bar_index > 0:
             tokens.append(TOKEN_BAR)
             tokens.extend(chord_tokens(chord))
@@ -1665,15 +1691,15 @@ def data_motif_rhythm_phrase_variation_tokens(
                         leap_direction=pending_recovery_direction,
                         recent_pitches=recent_pitches,
                     )
-                    if pitch < min_solo_pitch or pitch > max_solo_pitch:
+                    if pitch < bar_min_pitch or pitch > bar_max_pitch:
                         pitch = bounded_phrase_pitch_for_pitch_classes(
                             phrase_recovery_pitch_classes(chord, next_chord),
-                            target_pitch=max(min_solo_pitch, min(max_solo_pitch, pitch)),
+                            target_pitch=max(bar_min_pitch, min(bar_max_pitch, pitch)),
                             recent_pitches=recent_pitches,
                             max_interval=max_variation_interval,
                             allow_wider_fallback=False,
-                            min_pitch=min_solo_pitch,
-                            max_pitch=max_solo_pitch,
+                            min_pitch=bar_min_pitch,
+                            max_pitch=bar_max_pitch,
                         )
                     pending_recovery_direction = 0
                 elif last_in_bar:
@@ -1685,8 +1711,8 @@ def data_motif_rhythm_phrase_variation_tokens(
                             recent_pitches=recent_pitches,
                             max_interval=max_variation_interval,
                             allow_wider_fallback=False,
-                            min_pitch=min_solo_pitch,
-                            max_pitch=max_solo_pitch,
+                            min_pitch=bar_min_pitch,
+                            max_pitch=bar_max_pitch,
                         )
                     else:
                         pitch = bounded_phrase_pitch_for_pitch_classes(
@@ -1696,8 +1722,8 @@ def data_motif_rhythm_phrase_variation_tokens(
                             max_interval=max_variation_interval,
                             allow_repeat_fallback=True,
                             allow_wider_fallback=False,
-                            min_pitch=min_solo_pitch,
-                            max_pitch=max_solo_pitch,
+                            min_pitch=bar_min_pitch,
+                            max_pitch=bar_max_pitch,
                         )
                     pending_recovery_direction = 0
                 else:
@@ -1756,8 +1782,8 @@ def data_motif_rhythm_phrase_variation_tokens(
                         bar_index=bar_index,
                         motif_index=motif_index,
                         variation_index=seed_variation,
-                        min_pitch=min_solo_pitch,
-                        max_pitch=max_solo_pitch,
+                        min_pitch=bar_min_pitch,
+                        max_pitch=bar_max_pitch,
                     )
                     pitch = bounded_phrase_pitch_for_pitch_classes(
                         line_pitch_classes,
@@ -1766,8 +1792,8 @@ def data_motif_rhythm_phrase_variation_tokens(
                         max_interval=max_variation_interval,
                         allow_repeat_fallback=True,
                         allow_wider_fallback=False,
-                        min_pitch=min_solo_pitch,
-                        max_pitch=max_solo_pitch,
+                        min_pitch=bar_min_pitch,
+                        max_pitch=bar_max_pitch,
                     )
 
                 if recent_pitches:

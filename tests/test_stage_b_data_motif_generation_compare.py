@@ -19,6 +19,7 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     data_motif_tokens,
     duration_tokens_from_steps,
     fit_duration_tokens_to_positions,
+    focused_context_register_bounds,
     guide_tone_pitch_classes,
     nearest_allowed_pitch_token,
     normalize_position_deltas,
@@ -258,6 +259,14 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
 
         self.assertIn(classes[0], tension_pitch_classes("Cm7"))
         self.assertIn(3, classes)
+
+    def test_focused_context_register_bounds_lifts_final_cadence_range(self) -> None:
+        early_min, early_max = focused_context_register_bounds(1, 8, min_pitch=48, max_pitch=84)
+        final_min, final_max = focused_context_register_bounds(7, 8, min_pitch=48, max_pitch=84)
+
+        self.assertEqual((early_min, early_max), (55, 79))
+        self.assertGreaterEqual(final_min, 60)
+        self.assertLessEqual(final_max, 76)
 
     def test_nearest_allowed_pitch_token_avoids_recent_pitch_when_possible(self) -> None:
         allowed = list(range(TOKEN_NOTE_PITCH_START, TOKEN_NOTE_PITCH_END + 1))
@@ -638,6 +647,30 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
             signatures.add(signature)
 
         self.assertEqual(len(signatures), 3)
+
+    def test_data_motif_rhythm_phrase_variation_keeps_final_context_cadence_in_solo_register(self) -> None:
+        chords = ["Cm7", "Fm7", "Bb7", "Ebmaj7"]
+        primer = build_stage_b_primer(chords, 124)
+        tokens = data_motif_rhythm_phrase_variation_tokens(
+            primer_tokens=primer,
+            chords=chords,
+            bars=8,
+            note_groups_per_bar=8,
+            template_report=template_report(),
+            seed=19,
+        )
+        grammar = analyze_stage_b_note_grammar(tokens, primer_size=len(primer))
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+        profile = analyze_contour_landing_profile(tokens, chords=chords, primer_size=len(primer))
+        pitches = [int(group["pitch"]) for group in groups]
+        final_bar_pitches = [int(group["pitch"]) for group in groups if int(group["bar"]) == 7]
+
+        self.assertTrue(grammar["grammar_valid"])
+        self.assertGreaterEqual(len(groups), 63)
+        self.assertLessEqual(max(pitches), 79)
+        self.assertGreaterEqual(min(final_bar_pitches), 60)
+        self.assertTrue(profile["final_landing_resolved"])
+        self.assertLessEqual(profile["max_abs_interval"], 4)
 
     def test_contour_landing_summary_counts_resolved_landings(self) -> None:
         summary = contour_landing_summary(
