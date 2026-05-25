@@ -4,7 +4,7 @@
 
 ## 목적
 
-Issue #115의 `data_motif_contour_landing_repair` 후보 3개와 `data_motif_phrase_recovery` baseline 후보 3개를
+Issue #116은 Issue #115의 `data_motif_contour_landing_repair` 후보 3개와 `data_motif_phrase_recovery` baseline 후보 3개를
 같은 listening review notes schema로 채우고, 다음 generation rule 방향을 정리한다.
 
 중요한 경계:

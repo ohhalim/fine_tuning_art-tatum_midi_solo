@@ -195,7 +195,7 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 
 최신 의미 있는 결과는 Stage B contour repair MIDI-note proxy review다.
 
-Issue #115 이후 repair-vs-baseline 후보 6개를 같은 listening review notes schema로 채웠다.
+Issue #116은 Issue #115 이후 repair-vs-baseline 후보 6개를 같은 listening review notes schema로 채웠다.
 
 중요한 경계:
 

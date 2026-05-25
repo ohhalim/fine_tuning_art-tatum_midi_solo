@@ -207,8 +207,8 @@ Stage B에서 명시하는 것:
 - 2026-05-24 MIDI-note proxy review marks the `3` candidates as `needs_followup=2`, `reject=1`, `keep=0`, with contour/landing and rhythm stiffness as the next blockers.
 - Issue #115 adds `data_motif_contour_landing_repair`, improving final resolved landing from `1/3` to `3/3` and reducing max interval from `13` to `7` in the comparison harness.
 - Issue #115 objective MIDI review reports candidate count `6` and objective flag counts `{}` for the repair-vs-baseline review set.
-- 2026-05-25 contour repair MIDI-note proxy review marks the `6` repair-vs-baseline candidates as `needs_followup=5`, `reject=1`, `keep=0`.
-- 2026-05-25 contour repair aggregate reports `too_stiff=6`, `too_mechanical=6`, `too_repetitive=6`, and recommends phrase vocabulary, timing grid, and motif variation follow-ups.
+- Issue #116 contour repair MIDI-note proxy review marks the `6` repair-vs-baseline candidates as `needs_followup=5`, `reject=1`, `keep=0`.
+- Issue #116 contour repair aggregate reports `too_stiff=6`, `too_mechanical=6`, `too_repetitive=6`, and recommends phrase vocabulary, timing grid, and motif variation follow-ups.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -438,8 +438,8 @@ Stage B에서 명시하는 것:
 - 2026-05-24 Codex MIDI-note proxy review result: `needs_followup=2`, `reject=1`, `keep=0`; the strongest candidate is still `timing=stiff`, `jazz_vocabulary=thin`.
 - Issue #115 result: `data_motif_contour_landing_repair` is strict `3/3`, final landing resolved `3/3`, max interval `7`, abrupt resets `0`, and objective MIDI flag counts `{}`.
 - Issue #115 comparison: `data_motif_phrase_recovery` is still strict `3/3`, but final landing resolved is `1/3` and max interval is `13`.
-- 2026-05-25 contour repair MIDI-note proxy review result: `reviewed=6`, `needs_followup=5`, `reject=1`, `keep=0`.
-- 2026-05-25 aggregate result: `phrase=1`, `fragment=4`, `exercise=1`, `too_stiff=6`, `fits=4`, `unclear=2`.
+- Issue #116 contour repair MIDI-note proxy review result: `reviewed=6`, `needs_followup=5`, `reject=1`, `keep=0`.
+- Issue #116 aggregate result: `phrase=1`, `fragment=4`, `exercise=1`, `too_stiff=6`, `fits=4`, `unclear=2`.
 
 해석:
 

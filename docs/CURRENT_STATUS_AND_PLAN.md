@@ -41,7 +41,7 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Review Result
 
-Issue #115 이후 contour/landing repair 후보 3개와 phrase recovery baseline 후보 3개를 같은 listening review notes schema로 채웠다.
+Issue #116은 Issue #115 이후 contour/landing repair 후보 3개와 phrase recovery baseline 후보 3개를 같은 listening review notes schema로 채웠다.
 
 중요한 전제:
 
