@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #144, Stage B register-cadence repaired focused proxy review
-- 다음 권장 이슈: `Stage B register-safe phrase vocabulary repair`
+- latest completed: Issue #146, Stage B register-safe phrase vocabulary repair
+- 다음 권장 이슈: `Stage B register-safe phrase vocabulary repaired proxy review`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,33 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Review Result
+## Latest Probe Result
+
+Issue #146는 Issue #144 proxy review에서 남은 boxed-in/cell-like phrase blocker를 generation rule 쪽에서 좁게 고친 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_REGISTER_SAFE_PHRASE_VOCAB_REPAIR_2026-05-26.md`
+
+Result:
+
+- variation valid/strict samples: `3/3`
+- final landing resolved: `3/3`
+- max interval: `4`
+- duplicate note sequences: `0`
+- objective MIDI flag counts: `{}`
+- top repaired candidate: `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- top repaired candidate unique pitch count: `18`
+- top repaired candidate pitch range: `G3-G5`
+- exact repeated 4-note cells in top repaired solo review MIDI: `0`
+
+Decision:
+
+- Issue #142 register/cadence bounds remain intact.
+- Issue #146 reduces exact repeated phrase-cell evidence, but does not prove final musical quality.
+- The next boundary should be a fresh proxy/listening review of the register-safe phrase vocabulary repaired candidates.
+
+## Previous Review Result
 
 Issue #144는 Issue #142 register-cadence repair 이후의 후보를 MIDI-note/context 기준으로 다시 채운 focused proxy review다.
 

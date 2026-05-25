@@ -202,6 +202,8 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 48. proxy-keep focused context MIDI-note decision
 49. focused context register-arc cadence repair
 50. register-cadence repaired focused proxy review
+51. register-safe phrase vocabulary repair
+52. register-safe phrase vocabulary repaired proxy review
 
 자세한 전체 기록은 `docs/CORE_PLAN.md`에 있다.
 
@@ -246,6 +248,32 @@ Docs:
 
 ```text
 docs/STAGE_B_REGISTER_CADENCE_REPAIRED_PROXY_REVIEW_2026-05-26.md
+```
+
+Issue #146 adds register-safe phrase vocabulary repair after the Issue #144 review.
+
+결과:
+
+- variation valid/strict samples: `3/3`
+- final landing resolved: `3/3`
+- max interval: `4`
+- duplicate note sequences: `0`
+- objective MIDI flag counts: `{}`
+- top repaired candidate: `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- top repaired candidate unique pitch count: `18`
+- top repaired candidate pitch range: `G3-G5`
+- exact repeated 4-note cells in top repaired solo review MIDI: `0`
+
+해석:
+
+- Issue #142 register/cadence bounds remain intact.
+- The repair reduces exact phrase-cell repetition but does not prove final musical quality.
+- The next step should be a fresh proxy/listening review of the repaired candidates.
+
+Docs:
+
+```text
+docs/STAGE_B_REGISTER_SAFE_PHRASE_VOCAB_REPAIR_2026-05-26.md
 ```
 
 The previous probe was Stage B focused context register-arc cadence repair.
@@ -882,29 +910,29 @@ Minimum checks:
 - context MIDI exists when listening review needs chord context
 
 Current latest contour/landing repair candidates pass the objective MIDI gate, but MIDI-note proxy review still produced no `keep` candidate.
-Current latest rhythm/phrase variation candidates pass the objective MIDI gate, have no exact duplicate note sequences, have lower dominant IOI repetition, wider bar-position/IOI phrase vocabulary, and restored tension ratio. MIDI-note proxy review now has one proxy keep candidate for focused context listening.
+Current latest rhythm/phrase variation candidates pass the objective MIDI gate, have no exact duplicate note sequences, preserve the focused register/cadence bounds, and now reduce exact repeated phrase-cell evidence. A fresh proxy/listening review is needed before promoting any repaired candidate to `keep`.
 
 ## 12. What To Do Next
 
 The next correct task is **not** broad training, audio diffusion, or backend work.
 
-Next step after the phrase-shape tension repaired MIDI-note proxy review:
+Next step after the register-safe phrase vocabulary repair:
 
 ```text
-Stage B proxy-keep rhythm candidate focused review package
+Stage B register-safe phrase vocabulary repaired proxy review
 ```
 
 The next issue should target:
 
-- copying only the proxy keep candidate and context MIDI into a focused review package
-- preserving objective metrics and first-note summaries
-- linking back to the full manifest and proxy review notes
+- filling proxy review notes for the repaired candidates
+- checking whether the repeated-cell reduction improves phrase feel
+- preserving objective metrics, register bounds, and context MIDI links
 - avoiding final musical-quality claims without real listening
 
 Recommended next issue title:
 
 ```text
-Stage B proxy-keep rhythm candidate focused review package
+Stage B register-safe phrase vocabulary repaired proxy review
 ```
 
 ## 13. Do Not Do Next

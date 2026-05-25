@@ -182,6 +182,8 @@ Stage B에서 명시하는 것:
 70. Stage B proxy-keep focused context MIDI-note decision
 71. Stage B focused context register-arc cadence repair
 72. Stage B register-cadence repaired focused proxy review
+73. Stage B register-safe phrase vocabulary repair
+74. Stage B register-safe phrase vocabulary repaired proxy review
 
 가장 최근 의미 있는 결과:
 
@@ -254,6 +256,8 @@ Stage B에서 명시하는 것:
 - Issue #142 result: variation strict `3/3`, final landing `3/3`, max interval `4`, duplicate note sequences `0`, objective flags `{}`; repaired top candidate ends on `G4` instead of `G3`.
 - Issue #144 fills focused proxy review notes for the register-cadence repaired candidates.
 - Issue #144 result: `reviewed=6`, `keep=0`, `needs_followup=5`, `reject=1`, objective flags `{}`; repaired top candidate fixes the register blocker but remains boxed-in/cell-like with unique pitch count `18`.
+- Issue #146 adds register-safe phrase vocabulary repair to reduce repeated cells without reopening the focused-context register/cadence blocker.
+- Issue #146 result: variation strict `3/3`, final landing `3/3`, max interval `4`, duplicate note sequences `0`, objective flags `{}`; top repaired candidate keeps unique pitch count `18` and has `0` exact repeated 4-note cells in the solo review MIDI.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -272,7 +276,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 proxy-keep rhythm candidate focused review package다. Issue #136은 첫 proxy keep 후보를 만들었지만, 이것은 focused context listening 후보일 뿐 broad training 근거가 아니다.
+이제 다음 단계는 register-safe phrase vocabulary repaired proxy review다. Issue #146은 objective-clean/register-safe 후보를 만들었지만, 이것은 fresh proxy/listening review 전까지 broad training 근거가 아니다.
 
 ## 6. 다음 단계 로드맵
 
@@ -820,7 +824,7 @@ Stage B phrase-shape tension repaired MIDI-note proxy review
   - max interval: `4`
   - objective MIDI tension ratio: `0.540`
 
-다음 작업:
+당시 다음 작업:
 
 - 다음 issue는 `Stage B proxy-keep rhythm candidate focused review package`로 잡는다.
 - proxy keep candidate와 context MIDI만 별도 package로 격리한다.
