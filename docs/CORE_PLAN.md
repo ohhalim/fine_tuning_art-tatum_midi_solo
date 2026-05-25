@@ -167,6 +167,7 @@ Stage B에서 명시하는 것:
 55. Stage B clean listening review notes template
 56. Stage B clean MIDI-note proxy review
 57. Stage B data-derived contour/cadence landing repair probe
+58. Stage B contour repair MIDI-note proxy review
 
 가장 최근 의미 있는 결과:
 
@@ -206,6 +207,8 @@ Stage B에서 명시하는 것:
 - 2026-05-24 MIDI-note proxy review marks the `3` candidates as `needs_followup=2`, `reject=1`, `keep=0`, with contour/landing and rhythm stiffness as the next blockers.
 - Issue #115 adds `data_motif_contour_landing_repair`, improving final resolved landing from `1/3` to `3/3` and reducing max interval from `13` to `7` in the comparison harness.
 - Issue #115 objective MIDI review reports candidate count `6` and objective flag counts `{}` for the repair-vs-baseline review set.
+- 2026-05-25 contour repair MIDI-note proxy review marks the `6` repair-vs-baseline candidates as `needs_followup=5`, `reject=1`, `keep=0`.
+- 2026-05-25 contour repair aggregate reports `too_stiff=6`, `too_mechanical=6`, `too_repetitive=6`, and recommends phrase vocabulary, timing grid, and motif variation follow-ups.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -224,7 +227,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 contour/landing repair 후보를 context MIDI로 review하는 것이다. Issue #115는 objective contour와 final landing risk를 줄였지만, rhythm stiffness와 낮은 duration/IOI diversity는 그대로 남아 있다. 따라서 generic jazz base 학습 전에 listening/piano-roll review로 musical value를 확인한다.
+이제 다음 단계는 rhythm/phrase vocabulary variation이다. Issue #115는 objective contour와 final landing risk를 줄였지만, MIDI-note proxy review에서도 모든 후보가 `too_stiff`, `too_mechanical`, `too_repetitive`로 남았다. 따라서 generic jazz base 학습 전에 data-derived rhythm/phrase variation을 더 검증한다.
 
 ## 6. 다음 단계 로드맵
 
@@ -435,6 +438,8 @@ Stage B에서 명시하는 것:
 - 2026-05-24 Codex MIDI-note proxy review result: `needs_followup=2`, `reject=1`, `keep=0`; the strongest candidate is still `timing=stiff`, `jazz_vocabulary=thin`.
 - Issue #115 result: `data_motif_contour_landing_repair` is strict `3/3`, final landing resolved `3/3`, max interval `7`, abrupt resets `0`, and objective MIDI flag counts `{}`.
 - Issue #115 comparison: `data_motif_phrase_recovery` is still strict `3/3`, but final landing resolved is `1/3` and max interval is `13`.
+- 2026-05-25 contour repair MIDI-note proxy review result: `reviewed=6`, `needs_followup=5`, `reject=1`, `keep=0`.
+- 2026-05-25 aggregate result: `phrase=1`, `fragment=4`, `exercise=1`, `too_stiff=6`, `fits=4`, `unclear=2`.
 
 해석:
 
@@ -448,7 +453,7 @@ Stage B에서 명시하는 것:
 - clean package의 context MIDI review boundary는 proxy review까지 진행됐다.
 - proxy review는 실제 오디오 청취가 아니므로 최종 subjective quality proof가 아니다.
 - Issue #115는 contour continuity와 final landing objective target을 개선했다.
-- 아직 listening review가 pending이므로, 다음 병목은 rhythm stiffness, repeated duration/rest template, thin vocabulary가 실제로 얼마나 들리는지 확인하는 것이다.
+- contour repair MIDI-note proxy review 결과, 다음 병목은 landing이 아니라 rhythm stiffness, repeated duration/rest template, thin phrase vocabulary다.
 
 ### Phase 3.10. Swing/Motif Phrase Grammar
 
@@ -718,39 +723,33 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B data-derived contour/cadence landing repair probe
+Stage B contour repair candidates MIDI-note proxy review
 ```
 
 결과:
 
-- `data_motif_contour_landing_repair` mode를 추가했다.
-- docs: `docs/STAGE_B_CONTOUR_LANDING_REPAIR_2026-05-25.md`
-- harness: `bash scripts/agent_harness.sh stage-b-contour-landing-repair`
-- compare output: `outputs/stage_b_data_motif_compare/harness_stage_b_contour_landing_repair/data_motif_compare_report.md`
-- review package: `outputs/stage_b_data_motif_review/harness_stage_b_contour_landing_repair/review_candidates.md`
+- docs: `docs/STAGE_B_CONTOUR_REPAIR_MIDI_PROXY_REVIEW_2026-05-25.md`
+- proxy-filled notes: `outputs/stage_b_listening_review_notes/harness_stage_b_contour_landing_repair_codex_proxy/contour_repair_listening_review_notes_codex_midi_proxy.json`
+- aggregate: `outputs/stage_b_listening_review_aggregate/harness_stage_b_contour_landing_repair_codex_proxy/listening_review_aggregate.md`
 - candidate count: `6`
-- `data_motif_contour_landing_repair`:
-  - strict: `3/3`
-  - final landing resolved: `3/3`
-  - max interval: `7`
-  - abrupt register resets: `0`
-  - objective flags: `{}`
-- `data_motif_phrase_recovery` comparison:
-  - strict: `3/3`
-  - final landing resolved: `1/3`
-  - max interval: `13`
+- reviewed count: `6`
+- pending count: `0`
+- decisions:
+  - `needs_followup`: `5`
+  - `reject`: `1`
+  - `keep`: `0`
 - remaining issue:
-  - rhythm stiffness
-  - low duration diversity
-  - low IOI diversity
-  - subjective listening notes still pending
+  - `too_stiff`: `6`
+  - `too_mechanical`: `6`
+  - `too_repetitive`: `6`
+  - `weak_phrase`: `5`
 
 다음 작업:
 
-- 다음 issue는 `Stage B contour repair candidates listening review notes`로 잡는다.
-- 새 repair 후보 3개와 baseline 후보 3개를 context MIDI 기준으로 review한다.
-- repair 후보가 실제로 phrase ending/contour continuity로 들리는지 확인한다.
-- 여전히 stiff/exercise-like이면 rhythm template diversity 또는 rest/duration variation을 다음 issue로 분리한다.
+- 다음 issue는 `Stage B rhythm/phrase vocabulary variation probe`로 잡는다.
+- landing repair를 반복하지 말고 duration/IOI template rigidity와 phrase vocabulary를 함께 본다.
+- register floor를 둬서 repaired phrase가 C1/A#1 solo register로 떨어지지 않게 한다.
+- strongest repair 후보 `data_motif_contour_landing_repair_rank_2_sample_2`는 comparison baseline으로 유지한다.
 - objective clean 후보라도 broad training으로 넘어가지 않는다.
 - real Brad/reference chord label은 아직 임의로 넣지 않는다.
 - LMDM/audio diffusion은 장기 live instrument reference로만 남기고, 현재 MVP를 audio로 pivot하지 않는다.

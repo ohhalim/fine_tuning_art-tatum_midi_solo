@@ -187,12 +187,51 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 33. clean listening review notes template
 34. clean MIDI-note proxy review
 35. contour/cadence landing repair probe
+36. contour repair MIDI-note proxy review
 
 자세한 전체 기록은 `docs/CORE_PLAN.md`에 있다.
 
 ## 7. Latest Meaningful Result
 
-최신 의미 있는 결과는 Stage B data-derived contour/cadence landing repair probe다.
+최신 의미 있는 결과는 Stage B contour repair MIDI-note proxy review다.
+
+Issue #115 이후 repair-vs-baseline 후보 6개를 같은 listening review notes schema로 채웠다.
+
+중요한 경계:
+
+```text
+이것은 실제 오디오 청취 리뷰가 아니다.
+MIDI-note / piano-roll proxy review이며, 최종 subjective jazz quality proof가 아니다.
+```
+
+결과:
+
+- candidate count: `6`
+- reviewed count: `6`
+- pending count: `0`
+- decisions:
+  - `needs_followup`: `5`
+  - `reject`: `1`
+  - `keep`: `0`
+- phrase quality:
+  - `phrase`: `1`
+  - `fragment`: `4`
+  - `exercise`: `1`
+- timing:
+  - `too_stiff`: `6`
+- issue counts:
+  - `bad_timing`: `6`
+  - `too_mechanical`: `6`
+  - `too_repetitive`: `6`
+  - `weak_phrase`: `5`
+
+Docs:
+
+```text
+docs/STAGE_B_CONTOUR_REPAIR_MIDI_PROXY_REVIEW_2026-05-25.md
+```
+
+The previous probe was Stage B data-derived contour/cadence landing repair.
 
 이 probe는 2026-05-24 clean MIDI-note proxy review에서 드러난 contour/landing 문제를 좁혀서 검증했다.
 
@@ -212,9 +251,7 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
   - strict: `3/3`
   - final landing resolved: `1/3`
   - max interval: `13`
-- listening review notes:
-  - reviewed count: `0`
-  - pending count: `6`
+- contour repair MIDI-note proxy review later filled those notes with `reviewed=6`, `keep=0`.
 
 Docs:
 
@@ -343,6 +380,7 @@ docs/STAGE_B_CLEAN_CONTEXT_DIAGNOSTICS_2026-05-23.md
 docs/STAGE_B_CLEAN_LISTENING_REVIEW_NOTES_2026-05-23.md
 docs/STAGE_B_CLEAN_MIDI_PROXY_REVIEW_2026-05-24.md
 docs/STAGE_B_CONTOUR_LANDING_REPAIR_2026-05-25.md
+docs/STAGE_B_CONTOUR_REPAIR_MIDI_PROXY_REVIEW_2026-05-25.md
 ```
 
 Core historical docs:
@@ -419,29 +457,29 @@ Minimum checks:
 - grid/timing is explainable
 - context MIDI exists when listening review needs chord context
 
-Current latest contour/landing repair candidates pass the objective MIDI gate, but listening review is still pending.
+Current latest contour/landing repair candidates pass the objective MIDI gate, but MIDI-note proxy review still produced no `keep` candidate.
 
 ## 12. What To Do Next
 
 The next correct task is **not** broad training, audio diffusion, or backend work.
 
-Next step after the contour/landing repair probe:
+Next step after the contour repair MIDI-note proxy review:
 
 ```text
-Stage B contour repair candidates listening review notes
+Stage B rhythm/phrase vocabulary variation probe
 ```
 
-The next review should target:
+The next probe should target:
 
-- whether repaired guide-tone landings actually sound like phrase endings
-- whether max interval reduction improves contour continuity
-- whether rhythm stiffness still dominates the listening result
-- whether the next issue should focus on rhythm template diversity/rest-duration variation
+- duration/IOI template rigidity
+- phrase vocabulary variation beyond guide-tone landing
+- motif variation without reintroducing objective MIDI flags
+- register floor control so repaired phrases do not fall into C1/A#1 solo register
 
 Recommended next issue title:
 
 ```text
-Stage B contour repair candidates listening review notes
+Stage B rhythm/phrase vocabulary variation probe
 ```
 
 ## 13. Do Not Do Next
@@ -474,15 +512,15 @@ Short explanation:
 ```text
 We are building a symbolic MIDI jazz piano solo generation pipeline.
 Stage A failed musically, so the project moved to Stage B with explicit bar/position/chord/duration tokens.
-The latest work added a data-derived contour/cadence landing repair probe.
-Objective note-level diagnostics now show no flags for the 6 repair-vs-baseline review candidates, and the repair mode resolves final landing 3/3 with max interval 7.
-The next step is filling listening review notes for those context MIDI candidates, not broad training.
+The latest work filled MIDI-note proxy review notes for 6 contour-repair-vs-baseline candidates.
+Objective note-level diagnostics show no flags, but proxy review still produced keep=0 with too_stiff=6, too_mechanical=6, and too_repetitive=6.
+The next step is a rhythm/phrase vocabulary variation probe, not broad training.
 ```
 
 Very short explanation:
 
 ```text
-The pipeline can now produce objective-clean contour/landing repair candidates, but listening review still has to decide whether rhythm stiffness and thin vocabulary remain blockers.
+The pipeline can now repair contour/landing objectives, but MIDI-note proxy review says rhythm stiffness, mechanical repetition, and weak phrase vocabulary remain blockers.
 ```
 
 ## 15. Remote Codex Working Rules
