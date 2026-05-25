@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- Stage B rhythm/phrase variation sample diversity repair
-- 다음 권장 이슈: `Stage B sample-diverse rhythm variation MIDI-note proxy review`
+- Stage B sample-diverse rhythm variation MIDI-note proxy review
+- 다음 권장 이슈: `Stage B rhythm variation timing-grid repetition repair`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,57 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Probe Result
+## Latest Review Result
+
+Issue #124는 Issue #122에서 sample diversity를 고친 rhythm variation 후보를 MIDI-note proxy review로 다시 채웠다.
+
+중요한 전제:
+
+- 실제 오디오 청취 리뷰가 아니다.
+- MIDI note timing, pitch contour, objective MIDI metrics, context chord guide track, duplicate note-sequence fields 기준이다.
+- `keep` 후보는 만들지 않는다.
+
+Docs:
+
+- `docs/STAGE_B_SAMPLE_DIVERSE_RHYTHM_PROXY_REVIEW_2026-05-25.md`
+
+Result:
+
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `needs_followup`: `6`
+  - `reject`: `0`
+  - `keep`: `0`
+- timing:
+  - `too_stiff`: `6`
+- duplicate note sequences:
+  - `0`
+
+Aggregate follow-ups:
+
+- `improve_phrase_vocabulary`: `14`
+- `fix_timing_grid`: `12`
+- `increase_motif_variation`: `6`
+
+Candidate decisions:
+
+| candidate | phrase | timing | chord_fit | decision |
+|---|---|---|---|---|
+| `data_motif_contour_landing_repair_rank_1_sample_1` | `fragment` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_contour_landing_repair_rank_2_sample_2` | `phrase` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_contour_landing_repair_rank_3_sample_3` | `fragment` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_rhythm_phrase_variation_rank_1_sample_2` | `phrase` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_rhythm_phrase_variation_rank_2_sample_3` | `fragment` | `too_stiff` | `fits` | `needs_followup` |
+| `data_motif_rhythm_phrase_variation_rank_3_sample_1` | `fragment` | `too_stiff` | `fits` | `needs_followup` |
+
+Decision:
+
+- sample diversity repair는 유효했고, exact duplicate 문제는 해결됐다.
+- 하지만 variation 후보도 아직 timing-stiff이고 phrase vocabulary가 mechanical하다.
+- 다음 generation issue는 duplicate repair가 아니라 timing-grid repetition repair다.
+
+## Previous Probe Result
 
 Issue #122는 Issue #120 proxy review에서 확인된 rhythm variation exact duplicate 문제를 고쳤다.
 
