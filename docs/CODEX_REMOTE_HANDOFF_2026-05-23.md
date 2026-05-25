@@ -200,12 +200,45 @@ Stage B는 REMI/Jazz Transformer 계열 판단을 따른다.
 46. phrase-shape tension repaired MIDI-note proxy review
 47. proxy-keep rhythm candidate focused review package
 48. proxy-keep focused context MIDI-note decision
+49. focused context register-arc cadence repair
 
 자세한 전체 기록은 `docs/CORE_PLAN.md`에 있다.
 
 ## 7. Latest Meaningful Result
 
-최신 의미 있는 결과는 Stage B proxy-keep focused context MIDI-note decision이다.
+최신 의미 있는 결과는 Stage B focused context register-arc cadence repair다.
+
+Issue #142는 Issue #140 focused context decision에서 확인한 C6-to-G3 register/cadence blocker를 generation rule 쪽에서 좁게 고친 작업이다.
+
+결과:
+
+- variation strict samples: `3/3`
+- final landing resolved: `3/3`
+- max interval: `4`
+- duplicate note sequences: `0`
+- objective MIDI flag counts: `{}`
+- selected candidate: `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- selected candidate note count: `63`
+- selected candidate unique pitch count: `18`
+- selected candidate pitch range: `61-79`
+- selected candidate final landing: `G4`
+- selected candidate final landing role: `guide`
+- selected candidate objective flags: `[]`
+
+해석:
+
+- The previous C6-to-G3 focused context blocker is repaired for the top candidate.
+- The repair preserves objective-clean status and duplicate-free status.
+- broad training is still premature.
+- next work should run a focused proxy review on the repaired candidates and check whether the narrowed register feels boxed-in.
+
+Docs:
+
+```text
+docs/STAGE_B_FOCUSED_CONTEXT_REGISTER_CADENCE_REPAIR_2026-05-25.md
+```
+
+The previous decision was Stage B proxy-keep focused context MIDI-note decision.
 
 Issue #140은 Issue #138 focused package의 단일 proxy `keep` 후보를 solo/context MIDI note 기준으로 다시 판단한 focused context decision이다.
 
@@ -215,21 +248,7 @@ Issue #140은 Issue #138 focused package의 단일 proxy `keep` 후보를 solo/c
 - focused context decision: `needs_followup`
 - keep as diagnostic seed: `yes`
 - ready for broad training: `no`
-- selected candidate: `data_motif_rhythm_phrase_variation_rank_1_sample_3`
-- selected candidate note count: `63`
-- selected candidate unique pitch count: `28`
-- selected candidate timing: `acceptable`
-- selected candidate chord fit: `fits`
-- selected candidate objective flags: `[]`
-- primary blocker: register arc reaches `C6` around bar 4 and drifts to final `G3`
-- secondary blocker: phrase/cadence punctuation is still too grid-cell-like
-
-해석:
-
-- The Issue #138 package remains useful as a focused review artifact.
-- The candidate should not be promoted to a final listening keep.
-- broad training is still premature.
-- next work should preserve the objective-clean rhythm guardrails while adding register-arc control and cadence/phrase punctuation.
+- blocker: register arc reaches `C6` around bar 4 and drifts to final `G3`
 
 Docs:
 

@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #140, Stage B proxy-keep focused context listening decision
-- 다음 권장 이슈: `Stage B focused context register-arc cadence repair`
+- latest completed: Issue #142, Stage B focused context register-arc cadence repair
+- 다음 권장 이슈: `Stage B register-cadence repaired focused proxy review`
 
 현재 범위가 아닌 것:
 
@@ -41,17 +41,58 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 ## Latest Review Result
 
+Issue #142는 Issue #140 focused context decision에서 확인한 C6-to-G3 register/cadence blocker를 generation rule 쪽에서 좁게 고친 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_FOCUSED_CONTEXT_REGISTER_CADENCE_REPAIR_2026-05-25.md`
+
+중요한 전제:
+
+- 기존 rhythm/position guardrail과 objective-clean 상태를 유지하는 register/cadence repair다.
+- final cadence를 bass-guide register가 아니라 right-hand solo register 안에 남기는 것이 목적이다.
+- 아직 musical pass가 아니며, 다시 focused proxy review가 필요하다.
+
+Result:
+
+- variation strict samples: `3/3`
+- final landing resolved: `3/3`
+- max interval: `4`
+- duplicate note sequences: `0`
+- objective MIDI flag counts: `{}`
+
+Top repaired candidate:
+
+- `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- note count: `63`
+- unique pitch count: `18`
+- objective pitch range: `61-79`
+- final landing: `G4`
+- final landing role: `guide`
+- final bar notes: `F4, G4, A#4, A4, F4, D4, F#4, G4`
+- source tension ratio: `0.413`
+- objective MIDI tension ratio: `0.540`
+- objective MIDI flags: `[]`
+
+Aggregate tradeoff:
+
+- avg tension ratio moved from the previous `0.437` area to `0.395`
+- top candidate unique pitch count dropped from `28` to `18`
+- this is acceptable for Issue #142 but must be checked for a boxed-in phrase feel
+
+Decision:
+
+- Keep the register/cadence repair.
+- The previous C6-to-G3 focused context blocker is repaired for the top candidate.
+- The next step is a focused proxy review of the repaired candidates.
+
+## Previous Decision Result
+
 Issue #140은 Issue #138 focused package의 단일 proxy `keep` 후보를 solo/context MIDI note 기준으로 다시 판단한 focused context decision이다.
 
 Docs:
 
 - `docs/STAGE_B_PROXY_KEEP_FOCUSED_CONTEXT_DECISION_2026-05-25.md`
-
-중요한 전제:
-
-- 실제 오디오 청취 리뷰가 아니다.
-- MIDI note, context chord guide, bass root guide, objective metrics 기준의 focused proxy decision이다.
-- 이 결과만으로 broad training이나 style adaptation을 시작하지 않는다.
 
 Result:
 
@@ -59,37 +100,7 @@ Result:
 - focused context decision: `needs_followup`
 - keep as diagnostic seed: `yes`
 - ready for broad training: `no`
-
-Focused candidate:
-
-- `data_motif_rhythm_phrase_variation_rank_1_sample_3`
-- note count: `63`
-- unique pitch count: `28`
-- phrase quality: `phrase`
-- timing: `acceptable`
-- chord fit: `fits`
-- source tension ratio: `0.413`
-- objective MIDI tension ratio: `0.540`
-- objective MIDI flags: `[]`
-
-Positive evidence:
-
-- max active notes: `1`
-- off-sixteenth-grid count: `0`
-- repeated pitch interval ratio: `0.000`
-- no duplicated 4-note or 8-note pitch-class chunks
-
-Blocking evidence:
-
-- register/contour: the line reaches `C6` around bar 4, then drifts down to `G3` by the final bar.
-- phrase punctuation: the 8-bar arc still reads like similar eighth/quarter-grid cells rather than a clear cadence.
-- context fit: chord fit is clean, but some outside notes are side-slip artifacts rather than clearly prepared/released color tones.
-
-Decision:
-
-- The Issue #138 package remains useful as a focused review artifact.
-- The candidate should not be promoted to a final listening keep.
-- The next repair should preserve objective-clean rhythm guardrails while adding register-arc control and cadence/phrase punctuation.
+- blocker: register/contour reaches `C6` around bar 4, then drifts down to `G3` by the final bar.
 
 ## Previous Package Result
 
