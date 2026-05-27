@@ -176,8 +176,8 @@ most-common IOI와 duration 집중은 줄었지만, source tension ratio와 IOI 
 
 현재 main 기준 최신 판단:
 
-- latest completed: Issue #198
-- 다음 권장 작업: `Stage B focused timing vocabulary follow-up proxy keep focused package`
+- latest completed: Issue #200
+- 다음 권장 작업: `Stage B focused timing vocabulary follow-up focused context decision`
 - broad training: 아직 진행하지 않음
 - Brad style adaptation: 아직 진행하지 않음
 - backend/API/product MVP: 범위 밖
@@ -265,15 +265,15 @@ bash scripts/agent_harness.sh stage-b-listening-review-aggregate
 ## 다음 작업
 
 ```text
-Stage B focused timing vocabulary follow-up proxy keep focused package
+Stage B focused timing vocabulary follow-up focused context decision
 ```
 
 목표:
 
-- Issue #198 proxy keep 후보 1개를 focused context package로 격리
-- solo MIDI와 context MIDI, objective first-note summary를 함께 보존
-- focused context에서도 유지되는지 다음 decision issue로 분리
-- proxy keep 하나만 보고 broad training으로 넘어가지 않음
+- Issue #200 focused package의 solo/context MIDI를 기준으로 후보를 다시 판단
+- register, final landing, max interval, repeated cell status, context guide coverage를 분리 확인
+- 유지되면 focused listening review notes template로 넘김
+- focused context keep 하나만 보고 broad training으로 넘어가지 않음
 
 ## 문서
 
