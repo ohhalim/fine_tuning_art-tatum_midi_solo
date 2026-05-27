@@ -176,8 +176,8 @@ most-common IOI와 duration 집중은 줄었지만, source tension ratio와 IOI 
 
 현재 main 기준 최신 판단:
 
-- latest completed: Issue #190
-- 다음 권장 작업: `Stage B focused timing vocabulary focused listening review notes`
+- latest completed: Issue #192
+- 다음 권장 작업: `Stage B focused timing vocabulary focused listening review fill`
 - broad training: 아직 진행하지 않음
 - Brad style adaptation: 아직 진행하지 않음
 - backend/API/product MVP: 범위 밖
@@ -265,15 +265,15 @@ bash scripts/agent_harness.sh stage-b-listening-review-aggregate
 ## 다음 작업
 
 ```text
-Stage B focused timing vocabulary focused listening review notes
+Stage B focused timing vocabulary focused listening review fill
 ```
 
 목표:
 
-- Issue #190에서 `keep_for_focused_listening`으로 남은 후보 1개를 listening review notes template로 변환
-- solo/context MIDI path와 focused context decision evidence를 함께 기록
-- timing, chord fit, phrase continuation, landing, jazz vocabulary를 별도 필드로 남김
-- focused listening note를 채우기 전에는 generation rule을 다시 바꾸지 않음
+- Issue #192 focused listening review notes template의 pending fields를 채움
+- timing, chord fit, phrase continuation, landing, jazz vocabulary를 분리 평가
+- `keep`이면 다음 model-core 경계를 정의
+- `needs_followup`이면 다음 repair 축을 timing, phrase vocabulary, motif variation, chord color 중 하나로 좁힘
 
 ## 문서
 
