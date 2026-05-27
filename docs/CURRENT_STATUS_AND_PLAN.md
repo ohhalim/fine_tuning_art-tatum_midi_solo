@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #204, Stage B focused timing vocabulary follow-up focused context decision
-- 다음 권장 이슈: `Stage B focused timing vocabulary follow-up focused listening review notes`
+- latest completed: Issue #206, Stage B focused timing vocabulary follow-up focused listening review notes
+- 다음 권장 이슈: `Stage B focused timing vocabulary follow-up focused listening review fill`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,48 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Focused Timing Vocabulary Follow-up Focused Context Decision Result
+## Latest Focused Timing Vocabulary Follow-up Focused Listening Review Notes Result
+
+Issue #206은 Issue #204에서 `keep_for_focused_listening`으로 남은 단일 후보를 focused listening review notes template으로 분리한 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_FOCUSED_TIMING_VOCABULARY_FOLLOWUP_FOCUSED_LISTENING_REVIEW_NOTES_2026-05-27.md`
+
+Generated artifacts:
+
+- `outputs/stage_b_focused_listening_review_notes/harness_stage_b_focused_timing_vocab_followup_focused_listening_notes/focused_listening_review_notes_template.json`
+- `outputs/stage_b_focused_listening_review_notes/harness_stage_b_focused_timing_vocab_followup_focused_listening_notes/focused_listening_review_notes_summary.json`
+
+Result:
+
+- candidate count: `1`
+- reviewed count: `0`
+- pending count: `1`
+- decision pending: `1`
+- candidate: `data_motif_rhythm_phrase_variation_rank_2_sample_2`
+- focused context decision: `keep_for_focused_listening`
+- proxy decision: `keep`
+- proxy issue: `too_mechanical`
+- objective bucket: `clean`
+- objective flags: `[]`
+
+Pending real-listening fields:
+
+- timing
+- chord fit
+- phrase continuation
+- landing
+- jazz vocabulary
+- decision
+
+Decision:
+
+- The focused listening notes template exists for the single focused-context keep candidate.
+- No generation rule should be changed from this pending template alone.
+- The next issue should fill the focused listening review notes using solo/context MIDI evidence.
+
+## Previous Focused Timing Vocabulary Follow-up Focused Context Decision Result
 
 Issue #204는 Issue #200 focused package의 단일 proxy `keep` 후보를 solo/context MIDI note 기준으로 다시 판단한 focused context decision이다.
 
