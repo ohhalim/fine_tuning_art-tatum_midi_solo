@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #178, Stage B phrase vocabulary motif focused context decision
-- 다음 권장 이슈: `Stage B phrase vocabulary motif focused listening review notes`
+- latest completed: Issue #180, Stage B phrase vocabulary motif focused listening review notes
+- 다음 권장 이슈: `Stage B phrase vocabulary motif focused listening review fill`
 
 현재 범위가 아닌 것:
 
@@ -38,6 +38,44 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Latest Phrase Vocabulary/Motif Focused Listening Review Notes Result
+
+Issue #180은 Issue #178에서 `keep_for_focused_listening`으로 남은 단일 후보를 focused listening review notes template으로 만든 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_PHRASE_VOCAB_MOTIF_FOCUSED_LISTENING_REVIEW_NOTES_2026-05-27.md`
+
+Generated artifact:
+
+- `outputs/stage_b_focused_listening_review_notes/harness_stage_b_phrase_vocab_motif_focused_listening_notes/focused_listening_review_notes_template.json`
+
+Result:
+
+- candidate count: `1`
+- reviewed count: `0`
+- pending count: `1`
+- decision pending: `1`
+- candidate: `data_motif_rhythm_phrase_variation_rank_2_sample_2`
+- proxy decision: `keep`
+- objective bucket: `clean`
+- objective flags: `[]`
+
+Pending real-listening fields:
+
+- timing
+- chord fit
+- phrase continuation
+- landing
+- jazz vocabulary
+- decision
+
+Decision:
+
+- The focused listening review notes template is ready.
+- No generation rule changes should come from this pending template alone.
+- Next step is to fill the focused listening review fields for this one candidate.
 
 ## Latest Phrase Vocabulary/Motif Focused Context Decision Result
 
