@@ -1146,7 +1146,8 @@ run_stage_b_proxy_keep_focused_package() {
   local source_run_id="${SOURCE_RUN_ID:-harness_stage_b_phrase_shape_tension_codex_proxy}"
   local objective_run_id="${OBJECTIVE_RUN_ID:-harness_stage_b_rhythm_phrase_variation}"
   local run_id="${RUN_ID:-harness_stage_b_proxy_keep_focused_package}"
-  local review_notes_path="outputs/stage_b_listening_review_notes/${source_run_id}/phrase_shape_tension_repaired_review_notes_codex_midi_proxy.json"
+  local review_notes_file="${REVIEW_NOTES_FILE:-phrase_shape_tension_repaired_review_notes_codex_midi_proxy.json}"
+  local review_notes_path="${REVIEW_NOTES_PATH:-outputs/stage_b_listening_review_notes/${source_run_id}/${review_notes_file}}"
   local objective_report_path="outputs/stage_b_objective_midi_review/${objective_run_id}/objective_midi_note_review.json"
   if [[ ! -f "$review_notes_path" ]]; then
     printf 'Missing proxy-filled review notes: %s\n' "$review_notes_path" >&2
