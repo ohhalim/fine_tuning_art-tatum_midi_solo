@@ -289,6 +289,9 @@ Stage B에서 명시하는 것:
 - Issue #164 fills MIDI-note/context proxy review notes for the Issue #162 repaired candidates.
 - Issue #164 result: `reviewed=6`, `keep=0`, `needs_followup=5`, `reject=1`, timing `acceptable=2`, `too_stiff=4`, objective bucket `clean=6`, objective flags `{}`.
 - Issue #164 aggregate result: `improve_phrase_vocabulary=16`, `fix_timing_grid=8`, `increase_motif_variation=3`; next generation work should improve duration/IOI objective directly.
+- Issue #168 adds phrase-level duration/IOI bar-position planning for `data_motif_rhythm_phrase_variation` and ranks review candidates by IOI diversity before duration diversity.
+- Issue #168 result: variation strict `3/3`, final landing `3/3`, max interval `4`, objective MIDI flags `{}`, duration diversity `0.078`, IOI diversity `0.111`, tension `0.375`.
+- Issue #168 tradeoff: most-common IOI worsened to `0.481`, so this is an objective-diversity repair, not a musical keep.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -307,7 +310,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 phrase-level duration IOI objective repair다. Issue #164는 timing count를 낮췄지만 proxy keep을 만들지 못했고, phrase vocabulary와 duration/IOI objective가 다음 blocker다.
+이제 다음 단계는 duration IOI repaired proxy review다. Issue #168은 duration/IOI diversity를 개선했지만 most-common IOI 반복 tradeoff가 남았고, proxy keep 여부는 아직 확인되지 않았다.
 
 ## 6. 다음 단계 로드맵
 
@@ -863,9 +866,9 @@ Stage B data-derived timing phrase repaired proxy review
 
 다음 작업:
 
-- 다음 issue는 `Stage B phrase-level duration IOI objective repair`로 잡는다.
-- syncopation/tension을 되도록 유지하면서 duration/IOI diversity를 직접 개선한다.
-- objective clean 후보라도 broad training으로 넘어가지 않는다.
+- 다음 issue는 `Stage B duration IOI repaired proxy review`로 잡는다.
+- Issue #168 후보를 MIDI-note/context 기준으로 채워, 늘어난 IOI 종류가 실제로 덜 mechanical한지 확인한다.
+- objective clean 후보라도 proxy keep이 없으면 broad training으로 넘어가지 않는다.
 
 ## 10. 한 문장 요약
 

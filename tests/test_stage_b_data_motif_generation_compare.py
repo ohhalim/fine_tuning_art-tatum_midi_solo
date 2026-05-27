@@ -26,6 +26,7 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     normalize_position_deltas,
     overlap_free_solo_notes,
     parse_baseline_modes,
+    phrase_level_duration_ioi_bar_positions,
     phrase_cadence_tokens,
     phrase_recovery_tokens,
     register_safe_phrase_cell_penalty,
@@ -689,6 +690,22 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         self.assertLessEqual(profile["max_abs_interval"], 4)
         self.assertGreater(rhythm["ioi_diversity_ratio"], 0.09)
         self.assertLess(rhythm["most_common_ioi_ratio"], 0.43)
+
+    def test_phrase_level_duration_ioi_positions_add_longer_gaps(self) -> None:
+        all_ioi = set()
+        for bar_index in range(8):
+            positions = phrase_level_duration_ioi_bar_positions(bar_index, variation_index=0)
+            self.assertEqual(len(positions), 8)
+            self.assertEqual(positions, sorted(set(positions)))
+            self.assertEqual(positions[0], 0)
+            self.assertLessEqual(positions[-1], 15)
+            all_ioi.update(
+                right - left
+                for left, right in zip(positions, positions[1:])
+            )
+
+        self.assertGreaterEqual(len(all_ioi), 6)
+        self.assertIn(6, all_ioi)
 
     def test_data_motif_rhythm_phrase_variation_uses_seed_for_independent_sequences(self) -> None:
         chords = ["Cm7", "F7", "Bbmaj7", "Ebmaj7"]

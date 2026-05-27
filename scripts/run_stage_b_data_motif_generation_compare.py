@@ -334,6 +334,24 @@ def varied_phrase_positions(
     return repaired if len(repaired) == len(positions) else positions
 
 
+def phrase_level_duration_ioi_bar_positions(bar_index: int, variation_index: int = 0) -> list[int]:
+    phrase_patterns = [
+        [0, 2, 4, 10, 11, 12, 14, 15],
+        [0, 4, 6, 8, 9, 12, 14, 15],
+        [0, 1, 3, 5, 10, 12, 14, 15],
+        [0, 2, 4, 8, 10, 12, 14, 15],
+        [0, 1, 3, 5, 9, 11, 13, 15],
+        [0, 3, 4, 9, 11, 13, 14, 15],
+        [0, 3, 5, 8, 10, 11, 13, 14],
+        [0, 3, 5, 7, 9, 11, 13, 15],
+        [0, 2, 3, 4, 11, 12, 13, 15],
+    ]
+    pattern = phrase_patterns[
+        (int(bar_index) * 5 + int(variation_index)) % len(phrase_patterns)
+    ]
+    return list(pattern)
+
+
 def data_derived_timing_template_rows(summary: dict[str, Any]) -> list[dict[str, Any]]:
     full_rows = list(summary.get("top_full_templates") or [])
     rhythm_rows = list(summary.get("top_rhythm_templates") or [])
@@ -1785,6 +1803,14 @@ def data_motif_rhythm_phrase_variation_tokens(
         emitted_in_bar = 0
         pitch_cells = phrase_cadence_pitch_class_cells(chord, next_chord, bar_index=bar_index)
         anchor = 60 + (((bar_index + seed_variation) % 3) * 4) + rng.choice([-3, 0, 3])
+        bar_ioi_positions = (
+            phrase_level_duration_ioi_bar_positions(
+                bar_index,
+                variation_index=seed_variation,
+            )
+            if motifs_per_bar == 2 and groups_per_bar == 8
+            else []
+        )
         for motif_index in range(motifs_per_bar):
             row_index = bar_index * motifs_per_bar + motif_index
             rhythm = weighted_choice(timing_rows, rng, row_index + bar_index + seed_variation)["key"]
@@ -1803,12 +1829,19 @@ def data_motif_rhythm_phrase_variation_tokens(
                 motif_index=motif_index,
                 variation_index=seed_variation,
             )
+            if bar_ioi_positions:
+                motif_start = int(motif_index) * motif_length
+                motif_end = motif_start + motif_length
+                positions = bar_ioi_positions[motif_start:motif_end]
             max_tail_duration = 6
             if positions and motif_index + 1 < motifs_per_bar:
-                next_slot_start = min(
-                    int(POSITIONS_PER_BAR) - 1,
-                    int(slot_start) + int(slot_size),
-                )
+                if bar_ioi_positions:
+                    next_slot_start = bar_ioi_positions[(int(motif_index) + 1) * motif_length]
+                else:
+                    next_slot_start = min(
+                        int(POSITIONS_PER_BAR) - 1,
+                        int(slot_start) + int(slot_size),
+                    )
                 max_tail_duration = max(1, min(6, int(next_slot_start) - int(positions[-1])))
             durations = varied_phrase_duration_tokens(
                 positions,
@@ -2435,6 +2468,8 @@ def candidate_sort_key(row: dict[str, Any]) -> tuple[Any, ...]:
         -int(contour.get("abrupt_register_reset_count", 0) or 0),
         -int(contour.get("max_abs_interval", 0) or 0),
         float(rhythm.get("unique_bar_position_pattern_ratio", 0.0) or 0.0),
+        float(rhythm.get("ioi_diversity_ratio", 0.0) or 0.0),
+        -float(rhythm.get("most_common_ioi_ratio", 0.0) or 0.0),
         float(rhythm.get("duration_diversity_ratio", 0.0) or 0.0),
         -float(rhythm.get("most_common_duration_ratio", 0.0) or 0.0),
     )
