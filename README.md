@@ -176,8 +176,8 @@ most-common IOI와 duration 집중은 줄었지만, source tension ratio와 IOI 
 
 현재 main 기준 최신 판단:
 
-- latest completed: Issue #180
-- 다음 권장 작업: `Stage B phrase vocabulary motif focused listening review fill`
+- latest completed: Issue #182
+- 다음 권장 작업: `Stage B focused timing vocabulary follow-up repair`
 - broad training: 아직 진행하지 않음
 - Brad style adaptation: 아직 진행하지 않음
 - backend/API/product MVP: 범위 밖
@@ -265,14 +265,14 @@ bash scripts/agent_harness.sh stage-b-listening-review-aggregate
 ## 다음 작업
 
 ```text
-Stage B phrase vocabulary motif focused listening review fill
+Stage B focused timing vocabulary follow-up repair
 ```
 
 목표:
 
-- Issue #180 focused listening notes의 pending 필드 채우기
-- timing, chord fit, phrase continuation, landing, jazz vocabulary를 분리해 기록
-- 후보가 유지되면 다음 model-core boundary를 정의하고, 탈락하면 다음 repair 축을 좁힘
+- focused listening fill에서 확인한 `timing=stiff`, `jazz_vocabulary=thin` 병목 개선
+- repeated 3/4-note pitch-class cell을 줄이되 register/final landing guardrail 유지
+- off-grid artifact, overlap/polyphony, max interval regression 방지
 - proxy keep이 없으면 broad training으로 넘어가지 않음
 
 ## 문서

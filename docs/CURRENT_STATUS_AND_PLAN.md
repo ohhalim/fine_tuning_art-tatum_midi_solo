@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #180, Stage B phrase vocabulary motif focused listening review notes
-- 다음 권장 이슈: `Stage B phrase vocabulary motif focused listening review fill`
+- latest completed: Issue #182, Stage B phrase vocabulary motif focused listening review fill
+- 다음 권장 이슈: `Stage B focused timing vocabulary follow-up repair`
 
 현재 범위가 아닌 것:
 
@@ -38,6 +38,35 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Latest Phrase Vocabulary/Motif Focused Listening Fill Result
+
+Issue #182는 Issue #180 focused listening review notes template을 MIDI-note/context evidence 기준으로 채운 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_PHRASE_VOCAB_MOTIF_FOCUSED_LISTENING_FILL_2026-05-27.md`
+
+Filled result:
+
+- candidate count: `1`
+- reviewed count: `1`
+- pending count: `0`
+- decision:
+  - `keep`: `0`
+  - `needs_followup`: `1`
+  - `reject`: `0`
+- timing: `stiff`
+- chord fit: `acceptable`
+- phrase continuation: `acceptable`
+- landing: `acceptable`
+- jazz vocabulary: `thin`
+
+Decision:
+
+- The candidate survives focused context register and cadence checks.
+- It does not survive as final keep because timing remains grid-derived and vocabulary reads thin/mechanical.
+- Next repair should target timing-grid stiffness and repeated short pitch-class cells while preserving objective-clean/register/cadence guardrails.
 
 ## Latest Phrase Vocabulary/Motif Focused Listening Review Notes Result
 
