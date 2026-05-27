@@ -195,6 +195,7 @@ Stage B에서 명시하는 것:
 83. Stage B duration/IOI objective repair
 84. Stage B duration/IOI repaired proxy review
 85. Stage B phrase vocabulary motif variation repair
+86. Stage B phrase vocabulary motif variation repaired proxy review
 
 가장 최근 의미 있는 결과:
 
@@ -301,6 +302,10 @@ Stage B에서 명시하는 것:
 - Issue #172 repairs phrase vocabulary/motif variation by balancing duration/IOI bar-position patterns and preferring recent pitch reuse avoidance before motif-sized interval preference.
 - Issue #172 result: variation strict `3/3`, final landing `3/3`, max interval `4`, objective MIDI flags `{}`, unique pitch count `18-20`, duration diversity `0.089`, most-common duration `0.406`, most-common IOI `0.397`.
 - Issue #172 tradeoff: IOI diversity falls to `0.095` and source tension ratio falls to `0.318`, so the repaired candidates require fresh proxy review before any keep claim.
+- Issue #174 fills MIDI-note/context proxy review notes for the Issue #172 repaired candidates.
+- Issue #174 result: `reviewed=6`, `keep=1`, `needs_followup=3`, `reject=2`, timing `acceptable=3`, `too_stiff=3`, objective bucket `clean=6`, objective flags `{}`.
+- Issue #174 proxy keep: `data_motif_rhythm_phrase_variation_rank_2_sample_2`, unique pitch count `18`, source most-common IOI `0.397`, objective stepwise ratio `0.460`, objective tension ratio `0.469`, final landing `guide`.
+- Issue #174 aggregate result: `improve_phrase_vocabulary=13`, `fix_timing_grid=6`, `increase_motif_variation=3`; next work should isolate the proxy keep candidate into a focused context package before claiming final quality.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -319,7 +324,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 phrase vocabulary motif variation repaired proxy review다. Issue #172는 objective-clean repair를 만들었지만, tension/IOI tradeoff가 있어 MIDI-note/context 기준의 fresh proxy decision이 필요하다.
+이제 다음 단계는 phrase vocabulary motif proxy keep focused package다. Issue #174는 proxy keep 후보를 하나 만들었지만, focused context review 전에는 final musical quality로 보지 않는다.
 
 ## 6. 다음 단계 로드맵
 
