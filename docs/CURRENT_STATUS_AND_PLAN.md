@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #164, Stage B data-derived timing phrase repaired proxy review
-- 다음 권장 이슈: `Stage B phrase-level duration IOI objective repair`
+- latest completed: Issue #168, Stage B phrase-level duration IOI objective repair
+- 다음 권장 이슈: `Stage B duration IOI repaired proxy review`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,40 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Data-Derived Timing Phrase Proxy Review Result
+## Latest Duration/IOI Objective Repair Result
+
+Issue #168은 Issue #164 이후 남은 phrase-level duration/IOI 병목을 generation rule 쪽에서 좁게 본 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_DURATION_IOI_OBJECTIVE_REPAIR_2026-05-27.md`
+
+Implementation:
+
+- `data_motif_rhythm_phrase_variation`의 8-note/bar 경로에 phrase-level duration/IOI bar-position plan을 추가했다.
+- review candidate sort key에서 IOI diversity와 most-common IOI를 duration diversity보다 먼저 반영했다.
+
+Result:
+
+- `data_motif_rhythm_phrase_variation` valid: `3/3`
+- strict: `3/3`
+- final landing resolved: `3/3`
+- max interval: `4`
+- objective MIDI flags: `{}`
+- duplicate note sequences: `0`
+- avg syncopated onset ratio: `0.682`
+- avg duration diversity ratio: `0.078`
+- avg IOI diversity ratio: `0.111`
+- avg most-common IOI ratio: `0.481`
+- avg tension ratio: `0.375`
+
+Decision:
+
+- Duration/IOI diversity objective는 개선됐다.
+- 그러나 most-common IOI ratio가 악화됐기 때문에 musical keep으로 승격하지 않는다.
+- 다음은 repaired 후보를 MIDI-note/context 기준으로 proxy review해 이 tradeoff가 실제로 덜 mechanical한지 확인한다.
+
+## Previous Data-Derived Timing Phrase Proxy Review Result
 
 Issue #164는 Issue #162 data-derived timing phrase vocabulary repair 이후의 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
 
