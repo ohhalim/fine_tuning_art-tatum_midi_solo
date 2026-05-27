@@ -305,6 +305,13 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
 
         self.assertGreater(repeated, fresh)
 
+    def test_register_safe_phrase_cell_penalty_uses_longer_phrase_memory(self) -> None:
+        recent = [60, 62, 64] + [65, 67, 69, 70, 72, 74, 76, 77, 79, 81] * 2 + [60, 62]
+        repeated = register_safe_phrase_cell_penalty(64, recent)
+        fresh = register_safe_phrase_cell_penalty(66, recent)
+
+        self.assertGreater(repeated, fresh)
+
     def test_focused_context_register_bounds_lifts_final_cadence_range(self) -> None:
         early_min, early_max = focused_context_register_bounds(1, 8, min_pitch=48, max_pitch=84)
         final_min, final_max = focused_context_register_bounds(7, 8, min_pitch=48, max_pitch=84)
