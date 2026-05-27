@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #188, Stage B focused timing vocabulary proxy keep focused package
-- 다음 권장 이슈: `Stage B focused timing vocabulary focused context decision`
+- latest completed: Issue #190, Stage B focused timing vocabulary focused context decision
+- 다음 권장 이슈: `Stage B focused timing vocabulary focused listening review notes`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,44 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Focused Timing Vocabulary Proxy Keep Focused Package Result
+## Latest Focused Timing Vocabulary Focused Context Decision Result
+
+Issue #190은 Issue #188 focused package의 단일 proxy `keep` 후보를 solo/context MIDI note 기준으로 다시 판단한 focused context decision이다.
+
+Docs:
+
+- `docs/STAGE_B_FOCUSED_TIMING_VOCABULARY_FOCUSED_CONTEXT_DECISION_2026-05-27.md`
+
+Focused candidate:
+
+- candidate: `data_motif_rhythm_phrase_variation_rank_3_sample_3`
+- prior proxy decision: `keep`
+- focused context decision: `keep_for_focused_listening`
+- note count: `64`
+- unique pitch count: `20`
+- pitch range: `G3-G5`
+- final landing: `D5`
+- final chord: `Ebmaj7`
+- final role: `guide`
+- max interval: `4`
+- objective flags: `[]`
+- duplicated 3-note pitch-class chunks: `2`
+- duplicated 4-note pitch-class chunks: `0`
+- duplicated 8-note pitch-class chunks: `0`
+
+Context track check:
+
+- chord guide: `32` notes, range `C3-G#4`
+- bass root guide: `8` notes, range `C2-A#2`
+- solo track: `64` notes, range `G3-G5`
+
+Decision:
+
+- The candidate survives focused-context register, cadence, and context-track checks.
+- This is still not final musical quality.
+- The next issue should create focused listening review notes before changing generation rules again.
+
+## Previous Focused Timing Vocabulary Proxy Keep Focused Package Result
 
 Issue #188은 Issue #186 proxy keep 후보를 focused context review package로 분리한 작업이다.
 
