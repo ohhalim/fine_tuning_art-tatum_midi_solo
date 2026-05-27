@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #156, Stage B register-safe focused listening review fill
-- 다음 권장 이슈: `Stage B register-safe timing motif follow-up repair`
+- latest completed: Issue #158, Stage B register-safe timing motif follow-up repair
+- 다음 권장 이슈: `Stage B register-safe timing motif repaired proxy review`
 
 현재 범위가 아닌 것:
 
@@ -38,6 +38,42 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Latest Timing Motif Repair Result
+
+Issue #158은 Issue #156 focused listening fill에서 나온 timing stiffness, repeated pitch-class cell, thin vocabulary blocker를 generation rule 쪽에서 좁게 다시 본 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_REGISTER_SAFE_TIMING_MOTIF_REPAIR_2026-05-27.md`
+
+변경:
+
+- recent phrase memory를 최근 `6`음에서 `8`음으로 확장했다.
+- repeated pitch-class cell penalty lookback을 `18`에서 `32`로 확장했다.
+- repeated 3-note/4-note pitch-class cell과 exact 4-note cell penalty를 강화했다.
+- asymmetric timing-position variation은 지표가 악화되어 최종 변경에서 제외했다.
+
+Result:
+
+- `data_motif_rhythm_phrase_variation` valid: `3/3`
+- strict: `3/3`
+- final landing resolved: `3/3`
+- max interval: `4`
+- objective MIDI flags: `{}`
+- avg syncopated onset ratio: `0.684`
+- avg unique bar-position pattern ratio: `0.958`
+- avg IOI diversity ratio: `0.091`
+- avg most-common IOI ratio: `0.385`
+- avg tension ratio: `0.358`
+- avg root-tone ratio: `0.021`
+
+Decision:
+
+- register-safe final cadence guardrail은 유지됐다.
+- phrase-cell repetition guard는 부분 개선으로 남긴다.
+- timing stiffness는 해결됐다고 보지 않는다.
+- 다음은 repaired candidate set을 fresh proxy review로 다시 판단한다.
 
 ## Latest Focused Listening Fill Result
 

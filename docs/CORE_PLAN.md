@@ -188,6 +188,7 @@ Stage B에서 명시하는 것:
 76. Stage B register-safe proxy-keep focused context decision
 77. Stage B register-safe focused listening review notes
 78. Stage B register-safe focused listening review fill
+79. Stage B register-safe timing motif follow-up repair
 
 가장 최근 의미 있는 결과:
 
@@ -273,6 +274,9 @@ Stage B에서 명시하는 것:
 - Issue #154 result: candidate count `1`, pending count `1`, proxy decision `keep`; real-listening fields remain pending and must be filled before another generation repair.
 - Issue #156 fills that focused review template by Codex MIDI-focused review and downgrades the candidate to `needs_followup`.
 - Issue #156 result: timing `stiff`, chord fit `acceptable`, phrase continuation `weak`, landing `acceptable`, jazz vocabulary `thin`; next repair should target timing stiffness, motif variation, and phrase vocabulary while keeping the register-safe final cadence guardrail.
+- Issue #158 adds a partial register-safe timing/motif follow-up repair by widening recent phrase memory from `6` to `8` notes and repeated cell penalty lookback from `18` to `32`.
+- Issue #158 result: variation strict `3/3`, final landing `3/3`, max interval `4`, objective MIDI flags `{}`, avg IOI diversity `0.091`, avg most-common IOI `0.385`, avg tension `0.358`, avg root-tone `0.021`.
+- Issue #158 keeps the motif guard but does not claim the timing blocker is solved; asymmetric timing-position changes were excluded because they worsened the metrics.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -291,7 +295,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 register-safe timing motif follow-up repair다. Issue #156은 후보를 최종 keep으로 올리지 않았고, 다음 repair는 timing stiffness와 repeated phrase cells를 좁게 겨냥해야 한다.
+이제 다음 단계는 register-safe timing motif repaired proxy review다. Issue #158은 strict/objective-clean guardrail을 유지했지만 timing stiffness를 해결했다고 보지 않으므로, fresh MIDI-note/context proxy review로 partial motif guard를 keep할지 판단해야 한다.
 
 ## 6. 다음 단계 로드맵
 
@@ -817,37 +821,36 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B phrase-shape tension repaired MIDI-note proxy review
+Stage B register-safe timing motif follow-up repair
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_PHRASE_SHAPE_TENSION_PROXY_REVIEW_2026-05-25.md`
-- review notes: `outputs/stage_b_listening_review_notes/harness_stage_b_phrase_shape_tension_codex_proxy/phrase_shape_tension_repaired_review_notes_codex_midi_proxy.json`
-- aggregate: `outputs/stage_b_listening_review_aggregate/harness_stage_b_phrase_shape_tension_codex_proxy/listening_review_aggregate.md`
-- reviewed candidates: `6`
-- pending candidates: `0`
-- decisions:
-  - `keep`: `1`
-  - `needs_followup`: `5`
-  - `reject`: `0`
-- proxy keep candidate:
-  - `data_motif_rhythm_phrase_variation_rank_1_sample_3`
-  - objective flags: `{}`
-  - note count: `63`
-  - unique pitch count: `28`
-  - max interval: `4`
-  - objective MIDI tension ratio: `0.540`
+- docs: `docs/STAGE_B_REGISTER_SAFE_TIMING_MOTIF_REPAIR_2026-05-27.md`
+- changed: register-safe recent phrase memory `6 -> 8`
+- changed: repeated cell penalty lookback `18 -> 32`
+- variation strict candidates: `3/3`
+- final landing resolved: `3/3`
+- max interval: `4`
+- objective MIDI flags: `{}`
+- avg IOI diversity: `0.091`
+- avg most-common IOI ratio: `0.385`
+- avg tension ratio: `0.358`
+- avg root-tone ratio: `0.021`
 
-당시 다음 작업:
+판단:
 
-- 다음 issue는 `Stage B proxy-keep rhythm candidate focused review package`로 잡는다.
-- proxy keep candidate와 context MIDI만 별도 package로 격리한다.
-- objective metrics와 first-note summary를 같이 보존한다.
-- real listening 전까지 final musical quality를 주장하지 않는다.
+- register-safe final cadence guardrail은 유지됐다.
+- phrase-cell repetition guard는 부분 개선으로 남긴다.
+- asymmetric timing-position variation은 지표를 악화시켜 제외했다.
+- timing stiffness는 아직 해결됐다고 보지 않는다.
+
+다음 작업:
+
+- 다음 issue는 `Stage B register-safe timing motif repaired proxy review`로 잡는다.
+- repaired candidate set을 MIDI-note/context 기준으로 fresh proxy review한다.
+- partial motif guard를 keep할지, data-derived timing phrase vocabulary로 넘어갈지 결정한다.
 - objective clean 후보라도 broad training으로 넘어가지 않는다.
-- real Brad/reference chord label은 아직 임의로 넣지 않는다.
-- LMDM/audio diffusion은 장기 live instrument reference로만 남기고, 현재 MVP를 audio로 pivot하지 않는다.
 
 ## 10. 한 문장 요약
 

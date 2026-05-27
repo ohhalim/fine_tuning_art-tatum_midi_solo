@@ -473,16 +473,16 @@ def register_safe_phrase_pitch_classes(
         return ordered
 
     recent_short = {int(pitch) % 12 for pitch in recent_pitches[-2:]}
-    recent_phrase = {int(pitch) % 12 for pitch in recent_pitches[-6:]}
+    recent_phrase = {int(pitch) % 12 for pitch in recent_pitches[-8:]}
     development_role = (
         int(bar_index) * 3
         + int(motif_index) * 5
         + int(local_index)
         + int(variation_index)
     ) % 6
-    if development_role in {1, 3, 5}:
+    if development_role in {0, 1, 3, 5}:
         fresh = [pitch_class for pitch_class in ordered if pitch_class not in recent_phrase]
-    elif development_role == 4:
+    elif development_role in {2, 4}:
         fresh = [pitch_class for pitch_class in ordered if pitch_class not in recent_short]
     else:
         fresh = []
@@ -1139,28 +1139,29 @@ def register_safe_phrase_cell_penalty(candidate_pitch: int, recent_pitches: Sequ
     candidate_class = candidate % 12
     penalty = 0
 
-    if candidate_class in set(recent_classes[-3:]):
-        penalty += 1
+    lookback = 32
+    if candidate_class in set(recent_classes[-4:]):
+        penalty += 2
     if len(recent_classes) >= 2:
         phrase_cells = {
             tuple(recent_classes[index : index + 3])
-            for index in range(max(0, len(recent_classes) - 18), len(recent_classes) - 2)
+            for index in range(max(0, len(recent_classes) - lookback), len(recent_classes) - 2)
         }
         if tuple(recent_classes[-2:] + [candidate_class]) in phrase_cells:
-            penalty += 3
+            penalty += 6
     if len(recent_classes) >= 3:
         phrase_cells = {
             tuple(recent_classes[index : index + 4])
-            for index in range(max(0, len(recent_classes) - 18), len(recent_classes) - 3)
+            for index in range(max(0, len(recent_classes) - lookback), len(recent_classes) - 3)
         }
         if tuple(recent_classes[-3:] + [candidate_class]) in phrase_cells:
-            penalty += 5
+            penalty += 10
         exact_cells = {
             tuple(recent[index : index + 4])
-            for index in range(max(0, len(recent) - 18), len(recent) - 3)
+            for index in range(max(0, len(recent) - lookback), len(recent) - 3)
         }
         if tuple(recent[-3:] + [candidate]) in exact_cells:
-            penalty += 7
+            penalty += 12
     return penalty
 
 
