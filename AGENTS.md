@@ -59,6 +59,18 @@ Keep public GitHub artifacts project-focused and tool-neutral.
 - Use issue and PR titles that describe the project change directly, for example `Stage B phrase duration repair` or `포트폴리오용 README 정리`.
 - Keep merge reports and final summaries focused on issue number, PR number, merge commit, changed files, and validation commands.
 
+## Public Record Style
+
+Write public records like a production engineering handoff.
+
+- Use structured sections when the artifact is more than a trivial change: `Summary`, `Context`, `Scope`, `Validation`, `Risk`, and `Follow-up`.
+- State the user-visible or project-visible behavior first, then implementation details.
+- Record the exact validation commands that were run, including environment/tooling failures when they happen.
+- Keep decisions evidence-based: include measured metrics, reviewed artifacts, issue links, and remaining tradeoffs.
+- Avoid vague labels such as `update`, `misc`, or `cleanup` when a specific project outcome can be named.
+- Keep commit subjects conventional and specific, with Korean bodies for context, changes, and validation when the change is non-trivial.
+- Do not claim final musical quality from proxy or objective checks alone; document it as a review boundary and name the next review step.
+
 ## Conditional Auto-Merge Policy
 
 The agent may merge a pull request without asking again only when all of the following are true:
