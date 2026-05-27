@@ -336,15 +336,15 @@ def varied_phrase_positions(
 
 def phrase_level_duration_ioi_bar_positions(bar_index: int, variation_index: int = 0) -> list[int]:
     phrase_patterns = [
-        [0, 2, 4, 10, 11, 12, 14, 15],
-        [0, 4, 6, 8, 9, 12, 14, 15],
-        [0, 1, 3, 5, 10, 12, 14, 15],
-        [0, 2, 4, 8, 10, 12, 14, 15],
-        [0, 1, 3, 5, 9, 11, 13, 15],
-        [0, 3, 4, 9, 11, 13, 14, 15],
-        [0, 3, 5, 8, 10, 11, 13, 14],
-        [0, 3, 5, 7, 9, 11, 13, 15],
-        [0, 2, 3, 4, 11, 12, 13, 15],
+        [0, 1, 2, 4, 6, 8, 11, 15],
+        [0, 2, 3, 4, 6, 9, 13, 14],
+        [0, 1, 2, 4, 6, 11, 12, 14],
+        [0, 4, 6, 7, 9, 11, 12, 13],
+        [0, 2, 5, 9, 10, 11, 13, 15],
+        [0, 1, 4, 5, 6, 10, 12, 14],
+        [0, 3, 7, 8, 9, 11, 14, 15],
+        [0, 2, 3, 5, 6, 7, 12, 14],
+        [0, 1, 3, 5, 7, 8, 9, 15],
     ]
     pattern = phrase_patterns[
         (int(bar_index) * 5 + int(variation_index)) % len(phrase_patterns)
@@ -1221,6 +1221,7 @@ def bounded_phrase_pitch_for_pitch_classes(
     allow_repeat_fallback: bool = False,
     allow_wider_fallback: bool = True,
     avoid_repeated_cells: bool = False,
+    preferred_abs_intervals: Sequence[int] | None = None,
     min_pitch: int = PIANO_PITCH_MIN,
     max_pitch: int = PIANO_PITCH_MAX,
 ) -> int:
@@ -1239,6 +1240,29 @@ def bounded_phrase_pitch_for_pitch_classes(
         if not avoid_repeated_cells:
             return 0
         return register_safe_phrase_cell_penalty(int(pitch), recent)
+
+    preferred_intervals = {
+        int(interval)
+        for interval in (preferred_abs_intervals or [])
+        if int(interval) > 0
+    }
+
+    def interval_penalty(pitch: int) -> int:
+        if not recent or not preferred_intervals:
+            return 0
+        interval = abs(int(pitch) - int(recent[-1]))
+        if interval in preferred_intervals:
+            return 0
+        return min(abs(interval - preferred) for preferred in preferred_intervals)
+
+    def reuse_penalty(pitch: int) -> int:
+        if not avoid_repeated_cells or not recent:
+            return 0
+        recent_window = [int(value) for value in recent[-32:]]
+        pitch = int(pitch)
+        exact_reuse = sum(1 for value in recent_window if value == pitch)
+        class_reuse = sum(1 for value in recent_window[-12:] if value % 12 == pitch % 12)
+        return exact_reuse * 4 + class_reuse * 2
 
     candidates = [
         pitch
@@ -1280,6 +1304,8 @@ def bounded_phrase_pitch_for_pitch_classes(
                 candidates,
                 key=lambda pitch: (
                     cell_penalty(int(pitch)),
+                    reuse_penalty(int(pitch)),
+                    interval_penalty(int(pitch)),
                     abs(int(pitch) - previous),
                     priority[int(pitch) % 12],
                     abs(int(pitch) - int(target_pitch)),
@@ -1294,6 +1320,8 @@ def bounded_phrase_pitch_for_pitch_classes(
             candidates,
             key=lambda pitch: (
                 cell_penalty(int(pitch)),
+                reuse_penalty(int(pitch)),
+                interval_penalty(int(pitch)),
                 priority[int(pitch) % 12],
                 abs(int(pitch) - int(target_pitch)),
                 abs(int(pitch) - 67),
@@ -1984,6 +2012,7 @@ def data_motif_rhythm_phrase_variation_tokens(
                         allow_repeat_fallback=True,
                         allow_wider_fallback=False,
                         avoid_repeated_cells=True,
+                        preferred_abs_intervals=(3, 4),
                         min_pitch=bar_min_pitch,
                         max_pitch=bar_max_pitch,
                     )

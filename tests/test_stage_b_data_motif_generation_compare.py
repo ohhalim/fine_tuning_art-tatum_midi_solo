@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from collections import Counter
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -9,6 +10,7 @@ import pretty_midi
 from scripts.run_stage_b_data_motif_generation_compare import (
     build_compare_summary,
     build_review_export,
+    bounded_phrase_pitch_for_pitch_classes,
     chord_tone_pitch_classes,
     analyze_contour_landing_profile,
     contour_landing_summary,
@@ -693,19 +695,47 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
 
     def test_phrase_level_duration_ioi_positions_add_longer_gaps(self) -> None:
         all_ioi = set()
-        for bar_index in range(8):
-            positions = phrase_level_duration_ioi_bar_positions(bar_index, variation_index=0)
-            self.assertEqual(len(positions), 8)
-            self.assertEqual(positions, sorted(set(positions)))
-            self.assertEqual(positions[0], 0)
-            self.assertLessEqual(positions[-1], 15)
-            all_ioi.update(
-                right - left
-                for left, right in zip(positions, positions[1:])
-            )
+        for variation_index in range(3):
+            ioi_steps = []
+            previous_last_position = None
+            for bar_index in range(8):
+                positions = phrase_level_duration_ioi_bar_positions(
+                    bar_index,
+                    variation_index=variation_index,
+                )
+                self.assertEqual(len(positions), 8)
+                self.assertEqual(positions, sorted(set(positions)))
+                self.assertEqual(positions[0], 0)
+                self.assertLessEqual(positions[-1], 15)
+                if previous_last_position is not None:
+                    ioi_steps.append(16 - previous_last_position + positions[0])
+                ioi_steps.extend(
+                    right - left
+                    for left, right in zip(positions, positions[1:])
+                )
+                previous_last_position = positions[-1]
+
+            ioi_counts = Counter(ioi_steps)
+            self.assertGreaterEqual(len(ioi_counts), 6)
+            self.assertLessEqual(max(ioi_counts.values()) / len(ioi_steps), 0.40)
+            all_ioi.update(ioi_counts)
 
         self.assertGreaterEqual(len(all_ioi), 6)
         self.assertIn(6, all_ioi)
+
+    def test_bounded_phrase_pitch_can_prefer_motif_size_intervals(self) -> None:
+        pitch = bounded_phrase_pitch_for_pitch_classes(
+            [0, 3, 4, 7],
+            target_pitch=62,
+            recent_pitches=[60],
+            max_interval=4,
+            allow_wider_fallback=False,
+            preferred_abs_intervals=(3, 4),
+            min_pitch=60,
+            max_pitch=67,
+        )
+
+        self.assertIn(abs(pitch - 60), {3, 4})
 
     def test_data_motif_rhythm_phrase_variation_uses_seed_for_independent_sequences(self) -> None:
         chords = ["Cm7", "F7", "Bbmaj7", "Ebmaj7"]

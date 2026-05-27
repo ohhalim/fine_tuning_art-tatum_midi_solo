@@ -192,6 +192,9 @@ Stage B에서 명시하는 것:
 80. Stage B register-safe timing motif repaired proxy review
 81. Stage B data-derived timing phrase vocabulary repair
 82. Stage B data-derived timing phrase repaired proxy review
+83. Stage B duration/IOI objective repair
+84. Stage B duration/IOI repaired proxy review
+85. Stage B phrase vocabulary motif variation repair
 
 가장 최근 의미 있는 결과:
 
@@ -275,7 +278,7 @@ Stage B에서 명시하는 것:
 - Issue #152 result: the prior C6-to-G3 focused-context blocker is gone; remaining risks are repeated pitch-class cells, grid-derived timing, and chromatic color handling that needs real listening review.
 - Issue #154 creates a one-candidate focused listening review notes template from the focused package.
 - Issue #154 result: candidate count `1`, pending count `1`, proxy decision `keep`; real-listening fields remain pending and must be filled before another generation repair.
-- Issue #156 fills that focused review template by Codex MIDI-focused review and downgrades the candidate to `needs_followup`.
+- Issue #156 fills that focused review template by MIDI-focused proxy review and downgrades the candidate to `needs_followup`.
 - Issue #156 result: timing `stiff`, chord fit `acceptable`, phrase continuation `weak`, landing `acceptable`, jazz vocabulary `thin`; next repair should target timing stiffness, motif variation, and phrase vocabulary while keeping the register-safe final cadence guardrail.
 - Issue #158 adds a partial register-safe timing/motif follow-up repair by widening recent phrase memory from `6` to `8` notes and repeated cell penalty lookback from `18` to `32`.
 - Issue #158 result: variation strict `3/3`, final landing `3/3`, max interval `4`, objective MIDI flags `{}`, avg IOI diversity `0.091`, avg most-common IOI `0.385`, avg tension `0.358`, avg root-tone `0.021`.
@@ -295,6 +298,9 @@ Stage B에서 명시하는 것:
 - Issue #170 fills MIDI-note/context proxy review notes for the Issue #168 repaired candidates.
 - Issue #170 result: `reviewed=6`, `keep=0`, `needs_followup=4`, `reject=2`, timing `acceptable=2`, `too_stiff=4`, objective bucket `clean=6`, objective flags `{}`.
 - Issue #170 aggregate result: `improve_phrase_vocabulary=12`, `fix_timing_grid=8`, `increase_motif_variation=4`; next generation work should reduce small-cell mechanical contour while preserving objective-clean guardrails.
+- Issue #172 repairs phrase vocabulary/motif variation by balancing duration/IOI bar-position patterns and preferring recent pitch reuse avoidance before motif-sized interval preference.
+- Issue #172 result: variation strict `3/3`, final landing `3/3`, max interval `4`, objective MIDI flags `{}`, unique pitch count `18-20`, duration diversity `0.089`, most-common duration `0.406`, most-common IOI `0.397`.
+- Issue #172 tradeoff: IOI diversity falls to `0.095` and source tension ratio falls to `0.318`, so the repaired candidates require fresh proxy review before any keep claim.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -313,7 +319,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 phrase vocabulary motif variation repair다. Issue #170은 proxy keep이 없음을 확인했고, 가장 큰 blocker는 phrase vocabulary와 motif variation이다.
+이제 다음 단계는 phrase vocabulary motif variation repaired proxy review다. Issue #172는 objective-clean repair를 만들었지만, tension/IOI tradeoff가 있어 MIDI-note/context 기준의 fresh proxy decision이 필요하다.
 
 ## 6. 다음 단계 로드맵
 
@@ -521,7 +527,7 @@ Stage B에서 명시하는 것:
 - Issue #109 result: objective clean review package keeps only the `3` `data_motif_phrase_recovery` candidates and writes `outputs/stage_b_clean_review_package/harness_stage_b_clean_review_package/clean_review_package.md`.
 - Issue #111 result: clean context diagnostics reports `3` candidates, diagnostic flags `{}`, bar coverage `8/8`, off-grid ratio `0.000`, max duration `1.000` beat, and decision hint `listen_with_context`.
 - Issue #113 result: clean listening review notes template covers the `3` objective-clean context candidates and validates review enums/summary output.
-- 2026-05-24 Codex MIDI-note proxy review result: `needs_followup=2`, `reject=1`, `keep=0`; the strongest candidate is still `timing=stiff`, `jazz_vocabulary=thin`.
+- 2026-05-24 MIDI-note proxy review result: `needs_followup=2`, `reject=1`, `keep=0`; the strongest candidate is still `timing=stiff`, `jazz_vocabulary=thin`.
 - Issue #115 result: `data_motif_contour_landing_repair` is strict `3/3`, final landing resolved `3/3`, max interval `7`, abrupt resets `0`, and objective MIDI flag counts `{}`.
 - Issue #115 comparison: `data_motif_phrase_recovery` is still strict `3/3`, but final landing resolved is `1/3` and max interval is `13`.
 - Issue #116 contour repair MIDI-note proxy review result: `reviewed=6`, `needs_followup=5`, `reject=1`, `keep=0`.
