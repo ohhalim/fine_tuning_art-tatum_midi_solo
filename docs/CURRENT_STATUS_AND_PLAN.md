@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #194, Stage B focused timing vocabulary focused listening review fill
-- 다음 권장 이슈: `Stage B focused timing vocabulary listening follow-up repair`
+- latest completed: Issue #196, Stage B focused timing vocabulary listening follow-up repair
+- 다음 권장 이슈: `Stage B focused timing vocabulary listening follow-up repaired proxy review`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,48 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Focused Timing Vocabulary Focused Listening Fill Result
+## Latest Focused Timing Vocabulary Listening Follow-up Repair Result
+
+Issue #196은 Issue #194 focused listening fill에서 남은 `timing=stiff`, `jazz_vocabulary=thin` 병목을 generation rule 쪽에서 좁게 본 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_FOCUSED_TIMING_VOCABULARY_LISTENING_FOLLOWUP_REPAIR_2026-05-27.md`
+
+Implementation:
+
+- safe alternative가 있을 때 직전 pitch-class를 후보에서 제외했다.
+- repeat fallback 직전에 tension/recovery/next-guide pitch-class 대체 후보를 시도했다.
+- fallback 후보는 최근에 쓰지 않은 실제 pitch를 우선 선택한다.
+
+Result:
+
+- `data_motif_rhythm_phrase_variation` valid: `3/3`
+- strict: `3/3`
+- final landing resolved: `3/3`
+- max interval: `4`
+- objective MIDI flags: `{}`
+- avg syncopated onset ratio: `0.703`
+- avg duration diversity ratio: `0.089`
+- avg most-common IOI ratio: `0.397`
+- avg source tension ratio: `0.307`
+- avg root-tone ratio: `0.036`
+
+Pitch-cell effect:
+
+- rank 1 adjacent repeats: `2 -> 0`
+- rank 2 adjacent repeats: `4 -> 0`
+- rank 3 adjacent repeats: `2 -> 0`
+- rank 2 duplicated 3-note cells: `7 -> 0`
+- rank 2 duplicated 4-note cells: `3 -> 0`
+
+Decision:
+
+- Objective-clean/register/cadence guardrails are preserved.
+- Rank 2 has the clearest repair signal.
+- Source tension fell and rank 1/3 short-cell repeats increased, so this is a fresh proxy review target, not final keep.
+
+## Previous Focused Timing Vocabulary Focused Listening Fill Result
 
 Issue #194는 Issue #192 focused listening review notes template을 MIDI-note/context evidence 기준으로 채운 작업이다.
 
