@@ -30,13 +30,13 @@ Allowed without additional permission:
 - update docs that describe the current implementation or experiment result
 - create GitHub issues that follow `docs/CORE_PLAN.md`
 - create focused issue branches from latest `main`
-- push Codex-created issue branches
-- create PRs for Codex-created issue branches
-- merge Codex-created PRs when the Conditional Auto-Merge Policy is satisfied
+- push agent-created issue branches
+- create PRs for agent-created issue branches
+- merge agent-created PRs when the Conditional Auto-Merge Policy is satisfied
 
 Must ask first:
 
-- merging pull requests that were not created by Codex in the current task flow
+- merging pull requests that were not created by the agent in the current task flow
 - deployment
 - external uploads
 - destructive cleanup of generated files, checkpoints, datasets, or user-created outputs
@@ -47,31 +47,41 @@ Must ask first:
 
 If the user says "자동으로 진행해", "플랜대로 계속해", or equivalent, that counts as permission to repeat the issue -> branch -> commit -> push -> PR -> safe auto-merge loop within `docs/CORE_PLAN.md` until a critical blocker appears.
 
-If the Codex host UI still asks for tool approval, that is a runtime permission gate outside this repo policy. Within this repository policy, plan-scoped GitHub issue/branch/PR/merge work is already allowed without re-asking the user.
+If the host UI still asks for tool approval, that is a runtime permission gate outside this repo policy. Within this repository policy, plan-scoped GitHub issue/branch/PR/merge work is already allowed without re-asking the user.
+
+## Public Naming Rules
+
+Keep public GitHub artifacts project-focused and tool-neutral.
+
+- Do not include assistant/tool names in branch names, issue titles, issue bodies, PR titles, PR bodies, or commit messages unless the user explicitly asks.
+- Do not use PR title prefixes that identify the implementation tool.
+- Use neutral branch names such as `issue-123-short-topic`, `docs/short-topic`, `feat/short-topic`, or `fix/short-topic`.
+- Use issue and PR titles that describe the project change directly, for example `Stage B phrase duration repair` or `포트폴리오용 README 정리`.
+- Keep merge reports and final summaries focused on issue number, PR number, merge commit, changed files, and validation commands.
 
 ## Conditional Auto-Merge Policy
 
-Codex may merge a pull request without asking again only when all of the following are true:
+The agent may merge a pull request without asking again only when all of the following are true:
 
-- the user explicitly asked Codex to continue through PR completion for the current issue, or explicitly allowed automatic merge behavior
-- the pull request was created by Codex for the current issue branch
+- the user explicitly asked the agent to continue through PR completion for the current issue, or explicitly allowed automatic merge behavior
+- the pull request was created by the agent for the current issue branch
 - the pull request targets `main`
 - the PR is marked mergeable by GitHub
 - the working branch contains only changes scoped to the current issue
 - all relevant local validation commands passed, or the only failures are documented environment/tooling issues that do not affect the change
-- the PR has no unresolved requested changes or review blockers known to Codex
+- the PR has no unresolved requested changes or review blockers known to the agent
 - the merge method is the repository default merge method unless the user specified another method
 
-Codex must not auto-merge when any of the following are true:
+The agent must not auto-merge when any of the following are true:
 
 - the user says "내가 머지할게", "머지 전에는 불러", "merge는 내가 할게", or equivalent
 - the PR includes deployment, credentials, destructive cleanup, raw dataset/checkpoint uploads, or external publishing
 - GitHub reports merge conflicts or an unknown/unmergeable state after a reasonable refresh
 - validation failed for reasons related to the changed code
 - the diff includes unrelated user changes
-- the PR was opened by someone else or predates the current Codex task flow
+- the PR was opened by someone else or predates the current agent task flow
 
-After an automatic merge, Codex should report:
+After an automatic merge, the agent should report:
 
 - issue number
 - PR number and URL
