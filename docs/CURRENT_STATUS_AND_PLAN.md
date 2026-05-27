@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #206, Stage B focused timing vocabulary follow-up focused listening review notes
-- 다음 권장 이슈: `Stage B focused timing vocabulary follow-up focused listening review fill`
+- latest completed: Issue #208, Stage B focused timing vocabulary follow-up focused listening review fill
+- 다음 권장 이슈: `Stage B focused timing vocabulary keep candidate consolidation`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,55 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Focused Timing Vocabulary Follow-up Focused Listening Review Notes Result
+## Latest Focused Timing Vocabulary Follow-up Focused Listening Fill Result
+
+Issue #208은 Issue #206 focused listening review notes template의 pending fields를 MIDI note/context evidence 기준으로 채운 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_FOCUSED_TIMING_VOCABULARY_FOLLOWUP_FOCUSED_LISTENING_FILL_2026-05-27.md`
+
+Filled notes:
+
+- `outputs/stage_b_focused_listening_review_notes/harness_stage_b_focused_timing_vocab_followup_focused_listening_notes/focused_listening_review_notes_filled.json`
+
+Filled result:
+
+- candidate count: `1`
+- reviewed count: `1`
+- pending count: `0`
+- keep: `1`
+- needs followup: `0`
+- reject: `0`
+
+Focused listening fields:
+
+- timing: `acceptable`
+- chord fit: `strong`
+- phrase continuation: `acceptable`
+- landing: `strong`
+- jazz vocabulary: `acceptable`
+- decision: `keep`
+
+Supporting evidence:
+
+- note count: `64`
+- unique pitch count: `19`
+- range: `G3-G5`
+- final landing: `D5` over `Ebmaj7`
+- max interval: `4`
+- objective flags: `[]`
+- adjacent pitch repeats: `0`
+- duplicated 3/4/8-note pitch-class chunks: `0`
+- objective outside ratio: `0.016`
+
+Decision:
+
+- Keep the candidate as the current best focused review candidate.
+- Do not claim broad training readiness or style adaptation success from one focused keep.
+- The next issue should consolidate what is proven and what remains proxy-only before choosing broader repeatability or portfolio README polish.
+
+## Previous Focused Timing Vocabulary Follow-up Focused Listening Review Notes Result
 
 Issue #206은 Issue #204에서 `keep_for_focused_listening`으로 남은 단일 후보를 focused listening review notes template으로 분리한 작업이다.
 
