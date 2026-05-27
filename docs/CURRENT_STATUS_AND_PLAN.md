@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #182, Stage B phrase vocabulary motif focused listening review fill
-- 다음 권장 이슈: `Stage B focused timing vocabulary follow-up repair`
+- latest completed: Issue #184, Stage B focused timing vocabulary follow-up repair
+- 다음 권장 이슈: `Stage B focused timing vocabulary repaired proxy review`
 
 현재 범위가 아닌 것:
 
@@ -38,6 +38,42 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Latest Focused Timing Vocabulary Follow-up Repair Result
+
+Issue #184는 Issue #182 focused listening fill에서 드러난 `timing=stiff`, `jazz_vocabulary=thin` 병목을 generation rule 쪽에서 좁게 본 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_FOCUSED_TIMING_VOCABULARY_REPAIR_2026-05-27.md`
+
+Implementation:
+
+- replayed 3-note/4-note pitch-class cell을 이어 만드는 candidate pitch-class를 safe alternative가 있을 때 제외했다.
+- repeated cell penalty를 강화했다.
+- max interval 후보가 없을 때 넓은 leap 대신 repeat fallback을 사용해 max interval guardrail을 보존했다.
+
+Result:
+
+- `data_motif_rhythm_phrase_variation` valid: `3/3`
+- strict: `3/3`
+- final landing resolved: `3/3`
+- max interval: `4`
+- objective MIDI flags: `{}`
+- avg syncopated onset ratio: `0.703`
+- avg duration diversity ratio: `0.089`
+- avg most-common IOI ratio: `0.397`
+- avg tension ratio: `0.323`
+- avg root-tone ratio: `0.031`
+- repaired variation unique pitch count: `19-20`
+- repaired variation stepwise interval ratio: `0.460`
+
+Decision:
+
+- Objective-clean/register/cadence guardrails are preserved.
+- Rank 1/3 reduce 4-note pitch-class cell repetition.
+- Rank 2 introduces more adjacent pitch repeat and short-cell repetition.
+- This is a tradeoff repair, so the next step is fresh proxy review, not final keep.
 
 ## Latest Phrase Vocabulary/Motif Focused Listening Fill Result
 

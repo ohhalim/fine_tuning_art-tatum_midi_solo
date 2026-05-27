@@ -340,6 +340,32 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
 
         self.assertGreater(repeated, fresh)
 
+    def test_register_safe_phrase_pitch_classes_drops_replayed_cell_when_safe_exists(self) -> None:
+        pitch_classes = register_safe_phrase_pitch_classes(
+            [4, 9],
+            recent_pitches=[60, 62, 64, 67, 60, 62],
+            bar_index=0,
+            motif_index=0,
+            local_index=0,
+            variation_index=0,
+        )
+
+        self.assertEqual(pitch_classes, [9])
+
+    def test_bounded_phrase_pitch_repeat_fallback_preserves_interval_guardrail(self) -> None:
+        pitch = bounded_phrase_pitch_for_pitch_classes(
+            [6],
+            target_pitch=66,
+            recent_pitches=[75],
+            max_interval=4,
+            allow_repeat_fallback=True,
+            allow_wider_fallback=False,
+            min_pitch=55,
+            max_pitch=76,
+        )
+
+        self.assertEqual(pitch, 75)
+
     def test_focused_context_register_bounds_lifts_final_cadence_range(self) -> None:
         early_min, early_max = focused_context_register_bounds(1, 8, min_pitch=48, max_pitch=84)
         final_min, final_max = focused_context_register_bounds(7, 8, min_pitch=48, max_pitch=84)

@@ -519,6 +519,26 @@ def register_safe_phrase_pitch_classes(
     if len(ordered) <= 1:
         return ordered
 
+    recent_classes = [int(pitch) % 12 for pitch in recent_pitches]
+    blocked_cell_classes: set[int] = set()
+    lookback = 32
+    if len(recent_classes) >= 2:
+        prefix = tuple(recent_classes[-2:])
+        for index in range(max(0, len(recent_classes) - lookback), len(recent_classes) - 2):
+            cell = tuple(recent_classes[index : index + 3])
+            if cell[:2] == prefix:
+                blocked_cell_classes.add(cell[-1])
+    if len(recent_classes) >= 3:
+        prefix = tuple(recent_classes[-3:])
+        for index in range(max(0, len(recent_classes) - lookback), len(recent_classes) - 3):
+            cell = tuple(recent_classes[index : index + 4])
+            if cell[:3] == prefix:
+                blocked_cell_classes.add(cell[-1])
+    if blocked_cell_classes:
+        safe_ordered = [pitch_class for pitch_class in ordered if pitch_class not in blocked_cell_classes]
+        if safe_ordered:
+            ordered = safe_ordered
+
     recent_short = {int(pitch) % 12 for pitch in recent_pitches[-2:]}
     recent_phrase = {int(pitch) % 12 for pitch in recent_pitches[-8:]}
     development_role = (
@@ -1188,27 +1208,27 @@ def register_safe_phrase_cell_penalty(candidate_pitch: int, recent_pitches: Sequ
 
     lookback = 32
     if candidate_class in set(recent_classes[-4:]):
-        penalty += 2
+        penalty += 3
     if len(recent_classes) >= 2:
         phrase_cells = {
             tuple(recent_classes[index : index + 3])
             for index in range(max(0, len(recent_classes) - lookback), len(recent_classes) - 2)
         }
         if tuple(recent_classes[-2:] + [candidate_class]) in phrase_cells:
-            penalty += 6
+            penalty += 14
     if len(recent_classes) >= 3:
         phrase_cells = {
             tuple(recent_classes[index : index + 4])
             for index in range(max(0, len(recent_classes) - lookback), len(recent_classes) - 3)
         }
         if tuple(recent_classes[-3:] + [candidate_class]) in phrase_cells:
-            penalty += 10
+            penalty += 22
         exact_cells = {
             tuple(recent[index : index + 4])
             for index in range(max(0, len(recent) - lookback), len(recent) - 3)
         }
         if tuple(recent[-3:] + [candidate]) in exact_cells:
-            penalty += 12
+            penalty += 28
     return penalty
 
 
@@ -1289,11 +1309,11 @@ def bounded_phrase_pitch_for_pitch_classes(
             if near:
                 candidates = near
                 prefer_primary_pitch_class = False
-            elif allow_repeat_fallback and previous % 12 in priority:
+            elif allow_repeat_fallback:
                 return previous
             prefer_primary_pitch_class = False
         else:
-            if allow_repeat_fallback and previous % 12 in priority:
+            if allow_repeat_fallback:
                 return previous
             prefer_primary_pitch_class = False
 
