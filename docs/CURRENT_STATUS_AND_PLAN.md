@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #174, Stage B phrase vocabulary motif variation repaired proxy review
-- 다음 권장 이슈: `Stage B phrase vocabulary motif proxy keep focused package`
+- latest completed: Issue #176, Stage B phrase vocabulary motif proxy keep focused package
+- 다음 권장 이슈: `Stage B phrase vocabulary motif focused context decision`
 
 현재 범위가 아닌 것:
 
@@ -38,6 +38,43 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Latest Phrase Vocabulary/Motif Proxy Keep Focused Package Result
+
+Issue #176은 Issue #174 proxy keep 후보를 focused context review package로 분리한 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_PHRASE_VOCAB_MOTIF_PROXY_KEEP_FOCUSED_PACKAGE_2026-05-27.md`
+
+Generated package:
+
+- `outputs/stage_b_focused_review_package/harness_stage_b_phrase_vocab_motif_proxy_keep_focused_package/focused_review_package.json`
+- `outputs/stage_b_focused_review_package/harness_stage_b_phrase_vocab_motif_proxy_keep_focused_package/focused_review_package.md`
+
+Result:
+
+- candidate count: `1`
+- decision filter: `keep`
+- copied MIDI files: `2`
+- candidate: `data_motif_rhythm_phrase_variation_rank_2_sample_2`
+- valid: `true`
+- strict valid: `true`
+- note count: `64`
+- unique pitch count: `18`
+- source syncopated onset ratio: `0.719`
+- source most-common IOI ratio: `0.397`
+- objective chord-tone ratio: `0.531`
+- objective tension ratio: `0.469`
+- objective stepwise interval ratio: `0.460`
+- objective unresolved large leap ratio: `0.000`
+- objective flags: `[]`
+
+Decision:
+
+- Issue #176 successfully isolates the proxy keep candidate into a focused package.
+- This is still not final musical quality.
+- Next step is focused context decision using the copied solo/context MIDI pair.
 
 ## Latest Phrase Vocabulary/Motif Variation Proxy Review Result
 
