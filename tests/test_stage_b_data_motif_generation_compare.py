@@ -12,6 +12,7 @@ from scripts.run_stage_b_data_motif_generation_compare import (
     chord_tone_pitch_classes,
     analyze_contour_landing_profile,
     contour_landing_summary,
+    data_derived_timing_template_rows,
     data_motif_contour_landing_repair_tokens,
     data_motif_guide_tones_tokens,
     data_motif_phrase_recovery_tokens,
@@ -86,6 +87,24 @@ def template_report() -> dict:
                     "count": 1,
                     "key": {
                         "pitch_intervals": [0, -2, 1, 0],
+                    },
+                },
+            ],
+            "top_full_templates": [
+                {
+                    "count": 2,
+                    "key": {
+                        "position_deltas": [0, 2, 3, 5],
+                        "duration_steps": [5, 6, 8, 3],
+                        "pitch_intervals": [0, 5, 12, 6],
+                    },
+                },
+                {
+                    "count": 1,
+                    "key": {
+                        "position_deltas": [0, 1, 2, 3],
+                        "duration_steps": [2, 2, 2, 2],
+                        "pitch_intervals": [0, 1, 2, 3],
                     },
                 },
             ],
@@ -214,6 +233,12 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
             patterns.append(tuple(sorted(bar_positions)))
 
         self.assertGreaterEqual(len(set(patterns)), 7)
+
+    def test_data_derived_timing_template_rows_prefers_phrase_like_full_templates(self) -> None:
+        rows = data_derived_timing_template_rows(template_report()["summary"])
+
+        self.assertEqual(rows[0]["key"]["position_deltas"], [0, 2, 3, 5])
+        self.assertNotEqual(rows[0]["key"]["duration_steps"], [2, 2, 2, 2])
 
     def test_phrase_vocabulary_contour_delta_mirrors_response_motif(self) -> None:
         call_delta = phrase_vocabulary_contour_delta(

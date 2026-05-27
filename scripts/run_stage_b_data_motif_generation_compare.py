@@ -334,6 +334,35 @@ def varied_phrase_positions(
     return repaired if len(repaired) == len(positions) else positions
 
 
+def data_derived_timing_template_rows(summary: dict[str, Any]) -> list[dict[str, Any]]:
+    full_rows = list(summary.get("top_full_templates") or [])
+    rhythm_rows = list(summary.get("top_rhythm_templates") or [])
+
+    phrase_like: list[dict[str, Any]] = []
+    for row in full_rows:
+        key = row.get("key", {})
+        deltas = [int(delta) for delta in key.get("position_deltas", [])]
+        durations = [int(step) for step in key.get("duration_steps", [])]
+        if len(deltas) < 4:
+            continue
+        gaps = [right - left for left, right in zip(deltas, deltas[1:]) if right > left]
+        has_varied_ioi = len(set(gaps)) >= 2
+        has_phrase_span = max(deltas) - min(deltas) >= 4
+        fits_local_phrase_slot = max(deltas) - min(deltas) <= 8
+        has_duration_shape = len(set(durations[: len(deltas)])) >= 2
+        has_reviewable_duration_span = bool(durations) and max(durations[: len(deltas)]) <= 8
+        if (
+            has_phrase_span
+            and fits_local_phrase_slot
+            and has_reviewable_duration_span
+            and (has_varied_ioi or has_duration_shape)
+        ):
+            phrase_like.append(row)
+    if phrase_like and len(phrase_like) < 4:
+        return phrase_like + rhythm_rows
+    return phrase_like or rhythm_rows
+
+
 def phrase_vocabulary_contour_delta(
     contour_steps: Sequence[int],
     *,
@@ -1727,7 +1756,7 @@ def data_motif_rhythm_phrase_variation_tokens(
 ) -> list[int]:
     rng = random.Random(int(seed))
     summary = template_report["summary"]
-    rhythm_rows = summary["top_rhythm_templates"]
+    timing_rows = data_derived_timing_template_rows(summary)
     contour_rows = summary["top_contour_templates"]
     tokens = [int(token) for token in primer_tokens]
     recent_pitches: list[int] = []
@@ -1758,7 +1787,7 @@ def data_motif_rhythm_phrase_variation_tokens(
         anchor = 60 + (((bar_index + seed_variation) % 3) * 4) + rng.choice([-3, 0, 3])
         for motif_index in range(motifs_per_bar):
             row_index = bar_index * motifs_per_bar + motif_index
-            rhythm = weighted_choice(rhythm_rows, rng, row_index + bar_index + seed_variation)["key"]
+            rhythm = weighted_choice(timing_rows, rng, row_index + bar_index + seed_variation)["key"]
             contour = weighted_choice(contour_rows, rng, row_index + bar_index + seed_variation)["key"]
             slot_start, slot_size = varied_phrase_slot_bounds(
                 bar_index,

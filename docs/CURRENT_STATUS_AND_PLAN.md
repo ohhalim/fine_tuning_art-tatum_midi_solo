@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #160, Stage B register-safe timing motif repaired proxy review
-- 다음 권장 이슈: `Stage B data-derived timing phrase vocabulary repair`
+- latest completed: Issue #162, Stage B data-derived timing phrase vocabulary repair
+- 다음 권장 이슈: `Stage B data-derived timing phrase repaired proxy review`
 
 현재 범위가 아닌 것:
 
@@ -38,6 +38,40 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Latest Data-Derived Timing Phrase Repair Result
+
+Issue #162는 Issue #160 proxy review에서 확인한 timing stiffness와 phrase vocabulary blocker를 generation rule 쪽에서 다시 좁힌 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_DATA_DERIVED_TIMING_PHRASE_REPAIR_2026-05-27.md`
+
+Implementation:
+
+- `top_full_templates`에서 phrase-like timing rows를 우선 선택한다.
+- long-span/long-sustain full templates는 review-safe phrase slot에 맞지 않아 제외한다.
+- position/duration shaping은 기존 review-safe path를 유지한다.
+
+Result:
+
+- `data_motif_rhythm_phrase_variation` valid: `3/3`
+- strict: `3/3`
+- final landing resolved: `3/3`
+- max interval: `4`
+- objective MIDI flags: `{}`
+- avg syncopated onset ratio: `0.693`
+- avg unique bar-position pattern ratio: `0.958`
+- avg duration diversity ratio: `0.073`
+- avg IOI diversity ratio: `0.079`
+- avg most-common IOI ratio: `0.392`
+- avg tension ratio: `0.375`
+
+Decision:
+
+- strict/objective-clean guardrail은 유지됐다.
+- syncopation과 tension은 개선됐지만, duration/IOI diversity는 조금 후퇴했다.
+- 다음은 fresh proxy review로 이 tradeoff가 실제로 덜 mechanical한지 판단한다.
 
 ## Latest Timing Motif Repaired Proxy Review Result
 
