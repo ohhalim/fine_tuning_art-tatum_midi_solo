@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #152, Stage B register-safe proxy-keep focused context decision
-- 다음 권장 이슈: `Stage B register-safe focused listening review notes`
+- latest completed: Issue #154, Stage B register-safe focused listening review notes
+- 다음 권장 이슈: `Stage B register-safe focused listening review fill`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,39 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Focused Context Decision
+## Latest Focused Listening Notes Result
+
+Issue #154는 Issue #152에서 `keep_for_focused_listening`으로 판단한 단일 후보를 실제 청취용 review notes template으로 만든 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_REGISTER_SAFE_FOCUSED_LISTENING_REVIEW_NOTES_2026-05-27.md`
+
+Result:
+
+- candidate count: `1`
+- reviewed count: `0`
+- pending count: `1`
+- generated template:
+  - `outputs/stage_b_focused_listening_review_notes/harness_stage_b_focused_listening_review_notes/focused_listening_review_notes_template.json`
+
+Candidate:
+
+- `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- proxy decision: `keep`
+- proxy timing: `acceptable`
+- note count: `63`
+- unique pitch count: `18`
+- source tension ratio: `0.349`
+- objective flags: `[]`
+
+Decision:
+
+- The one-candidate focused listening review template is ready.
+- The candidate remains pending until a real listening pass is filled.
+- No generation repair should start from this artifact alone.
+
+## Previous Focused Context Decision
 
 Issue #152는 Issue #150 focused package의 단일 proxy `keep` 후보를 solo/context MIDI note 기준으로 다시 판단한 focused context decision이다.
 

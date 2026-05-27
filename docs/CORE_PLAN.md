@@ -186,6 +186,7 @@ Stage B에서 명시하는 것:
 74. Stage B register-safe phrase vocabulary repaired proxy review
 75. Stage B register-safe proxy-keep focused context package
 76. Stage B register-safe proxy-keep focused context decision
+77. Stage B register-safe focused listening review notes
 
 가장 최근 의미 있는 결과:
 
@@ -267,6 +268,8 @@ Stage B에서 명시하는 것:
 - Issue #150 result: focused package `candidate_count=1`, selected candidate `data_motif_rhythm_phrase_variation_rank_1_sample_3`, objective flags `[]`, copied MIDI files `2`.
 - Issue #152 reviews that single focused package against solo/context MIDI notes and keeps it as `keep_for_focused_listening`.
 - Issue #152 result: the prior C6-to-G3 focused-context blocker is gone; remaining risks are repeated pitch-class cells, grid-derived timing, and chromatic color handling that needs real listening review.
+- Issue #154 creates a one-candidate focused listening review notes template from the focused package.
+- Issue #154 result: candidate count `1`, pending count `1`, proxy decision `keep`; real-listening fields remain pending and must be filled before another generation repair.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -285,7 +288,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 register-safe focused listening review notes다. Issue #152는 단일 후보를 focused listening review로 넘길 수 있다고 판단했지만, 이것은 실제 listening note가 채워지기 전까지 broad training 근거가 아니다.
+이제 다음 단계는 register-safe focused listening review fill이다. Issue #154는 notes template만 만들었고, 실제 listening note가 채워지기 전까지 broad training 또는 추가 generation repair 근거가 아니다.
 
 ## 6. 다음 단계 로드맵
 

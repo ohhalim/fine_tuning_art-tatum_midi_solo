@@ -96,6 +96,8 @@ Modes:
                 Diagnose objective-clean context MIDI candidates before subjective review.
   stage-b-clean-listening-review-notes
                 Build clean listening review notes template for 3 context candidates.
+  stage-b-focused-listening-review-notes
+                Build focused listening review notes template for a proxy-keep package.
   manifest-dry-run
                 Run audit -> manifest -> prepare_role_dataset smoke.
   chord-coverage-audit
@@ -169,6 +171,7 @@ run_quick() {
     scripts/evaluate_chord_labeled_subset.py \
     scripts/evaluate_generated_candidate_chords.py \
     scripts/build_listening_review_notes.py \
+    scripts/build_focused_listening_review_notes.py \
     scripts/summarize_listening_review_notes.py \
     scripts/build_focused_review_package.py \
     scripts/review_midi_note_objectives.py \
@@ -1198,6 +1201,20 @@ run_stage_b_clean_listening_review_notes() {
   "$PYTHON_BIN" scripts/build_clean_listening_review_notes.py     --run_id "$run_id"     --clean_package "$clean_package_path"     --clean_context_diagnostics "$diagnostics_path"
 }
 
+run_stage_b_focused_listening_review_notes() {
+  local focused_run_id="${FOCUSED_RUN_ID:-harness_stage_b_register_safe_proxy_keep_focused_package}"
+  local run_id="${RUN_ID:-harness_stage_b_focused_listening_review_notes}"
+  local focused_package_path="${FOCUSED_PACKAGE_PATH:-outputs/stage_b_focused_review_package/${focused_run_id}/focused_review_package.json}"
+  if [[ ! -f "$focused_package_path" ]]; then
+    printf 'Missing focused review package: %s\n' "$focused_package_path" >&2
+    return 2
+  fi
+  print_header "Stage B focused listening review notes"
+  "$PYTHON_BIN" scripts/build_focused_listening_review_notes.py \
+    --run_id "$run_id" \
+    --focused_package "$focused_package_path"
+}
+
 run_manifest_dry_run() {
   local run_id="${RUN_ID:-harness_manifest_prepare}"
   print_header "Manifest prepare dry-run"
@@ -1453,6 +1470,9 @@ case "$MODE" in
     ;;
   stage-b-clean-listening-review-notes)
     run_stage_b_clean_listening_review_notes
+    ;;
+  stage-b-focused-listening-review-notes)
+    run_stage_b_focused_listening_review_notes
     ;;
   manifest-dry-run)
     run_manifest_dry_run
