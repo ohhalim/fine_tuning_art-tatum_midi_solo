@@ -200,6 +200,7 @@ Stage B에서 명시하는 것:
 88. Stage B phrase vocabulary motif focused context decision
 89. Stage B phrase vocabulary motif focused listening review notes
 90. Stage B phrase vocabulary motif focused listening review fill
+91. Stage B focused timing vocabulary follow-up repair
 
 가장 최근 의미 있는 결과:
 
@@ -318,6 +319,9 @@ Stage B에서 명시하는 것:
 - Issue #180 result: focused notes `candidate_count=1`, pending count `1`, proxy decision `keep`; real-listening fields remain pending and must be filled before another generation repair.
 - Issue #182 fills that focused listening review note and downgrades the candidate to `needs_followup`.
 - Issue #182 result: timing `stiff`, chord fit `acceptable`, phrase continuation `acceptable`, landing `acceptable`, jazz vocabulary `thin`; next repair should target grid-derived timing and short pitch-class vocabulary while preserving focused-context register/cadence guardrails.
+- Issue #184 adds a focused timing/vocabulary follow-up repair by blocking replayed 3/4-note pitch-class cells when a safe alternative exists and preserving max interval with repeat fallback.
+- Issue #184 result: variation strict `3/3`, final landing `3/3`, max interval `4`, objective flags `{}`, unique pitch count `19-20`, stepwise interval ratio `0.460`, root-tone ratio `0.031`.
+- Issue #184 tradeoff: rank 1/3 reduce short-cell repetition, but rank 2 introduces more adjacent pitch repeat; this requires fresh proxy review before any keep claim.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -336,7 +340,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 focused timing vocabulary follow-up repair다. Issue #182는 final keep을 만들지 못했지만, 다음 repair 축을 timing stiffness와 short pitch-class vocabulary로 좁혔다.
+이제 다음 단계는 focused timing vocabulary repaired proxy review다. Issue #184는 objective-clean repair를 만들었지만, adjacent repeat tradeoff가 있어 MIDI-note/context 기준의 fresh proxy decision이 필요하다.
 
 ## 6. 다음 단계 로드맵
 
