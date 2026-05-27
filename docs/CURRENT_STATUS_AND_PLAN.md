@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #154, Stage B register-safe focused listening review notes
-- 다음 권장 이슈: `Stage B register-safe focused listening review fill`
+- latest completed: Issue #156, Stage B register-safe focused listening review fill
+- 다음 권장 이슈: `Stage B register-safe timing motif follow-up repair`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,47 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Focused Listening Notes Result
+## Latest Focused Listening Fill Result
+
+Issue #156은 Issue #154 focused listening review notes template을 Codex MIDI-focused review 기준으로 채운 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_REGISTER_SAFE_FOCUSED_LISTENING_FILL_2026-05-27.md`
+
+중요한 전제:
+
+- 실제 오디오 청취 리뷰가 아니다.
+- MIDI note sequence, solo/context MIDI path, chord/bass guide context, objective metrics를 근거로 채운 focused review다.
+- broad training이나 style adaptation claim으로 해석하지 않는다.
+
+Result:
+
+- candidate count: `1`
+- reviewed count: `1`
+- pending count: `0`
+- decision:
+  - `keep`: `0`
+  - `needs_followup`: `1`
+  - `reject`: `0`
+
+Candidate:
+
+- `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- timing: `stiff`
+- chord fit: `acceptable`
+- phrase continuation: `weak`
+- landing: `acceptable`
+- jazz vocabulary: `thin`
+- decision: `needs_followup`
+
+Decision:
+
+- Do not promote the candidate to final `keep`.
+- Keep the register-safe repair and final cadence guardrail.
+- Next work should target timing stiffness, motif variation, and phrase vocabulary without reopening the C6-to-G3 register blocker.
+
+## Previous Focused Listening Notes Result
 
 Issue #154는 Issue #152에서 `keep_for_focused_listening`으로 판단한 단일 후보를 실제 청취용 review notes template으로 만든 작업이다.
 
