@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #184, Stage B focused timing vocabulary follow-up repair
-- 다음 권장 이슈: `Stage B focused timing vocabulary repaired proxy review`
+- latest completed: Issue #186, Stage B focused timing vocabulary repaired proxy review
+- 다음 권장 이슈: `Stage B focused timing vocabulary proxy keep focused package`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,54 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Focused Timing Vocabulary Follow-up Repair Result
+## Latest Focused Timing Vocabulary Proxy Review Result
+
+Issue #186은 Issue #184 focused timing/vocabulary follow-up repair 후보를 MIDI-note/context evidence 기준으로 다시 채운 proxy review다.
+
+Docs:
+
+- `docs/STAGE_B_FOCUSED_TIMING_VOCABULARY_PROXY_REVIEW_2026-05-27.md`
+
+Generated artifacts:
+
+- `outputs/stage_b_listening_review_notes/harness_stage_b_focused_timing_vocab_proxy_review/focused_timing_vocab_repaired_review_notes.json`
+- `outputs/stage_b_listening_review_aggregate/harness_stage_b_focused_timing_vocab_proxy_review/listening_review_aggregate.json`
+
+Filled result:
+
+- candidate count: `6`
+- reviewed count: `6`
+- pending count: `0`
+- decisions:
+  - `keep`: `1`
+  - `needs_followup`: `3`
+  - `reject`: `2`
+- phrase quality: `phrase=3`, `fragment=2`, `exercise=1`
+- timing: `acceptable=3`, `too_stiff=3`
+- chord fit: `fits=6`
+- objective bucket: `clean=6`
+- objective flags: `{}`
+
+Proxy keep:
+
+- candidate: `data_motif_rhythm_phrase_variation_rank_3_sample_3`
+- note count: `64`
+- unique pitch count: `20`
+- max interval: `4`
+- final landing: `guide`
+- source syncopated onset ratio: `0.703`
+- source most-common IOI ratio: `0.397`
+- objective stepwise interval ratio: `0.460`
+- objective tension ratio: `0.453`
+
+Decision:
+
+- Exactly one repaired candidate is promoted to proxy `keep`.
+- This is still only a focused-context review input, not final musical quality.
+- The next issue should isolate the proxy keep candidate into a focused context review package.
+- Broad training and Brad style adaptation remain premature.
+
+## Previous Focused Timing Vocabulary Follow-up Repair Result
 
 Issue #184는 Issue #182 focused listening fill에서 드러난 `timing=stiff`, `jazz_vocabulary=thin` 병목을 generation rule 쪽에서 좁게 본 작업이다.
 
