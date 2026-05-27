@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #150, Stage B register-safe proxy-keep focused context package
-- 다음 권장 이슈: `Stage B register-safe proxy-keep focused context decision`
+- latest completed: Issue #152, Stage B register-safe proxy-keep focused context decision
+- 다음 권장 이슈: `Stage B register-safe focused listening review notes`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,53 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Package Result
+## Latest Focused Context Decision
+
+Issue #152는 Issue #150 focused package의 단일 proxy `keep` 후보를 solo/context MIDI note 기준으로 다시 판단한 focused context decision이다.
+
+Docs:
+
+- `docs/STAGE_B_REGISTER_SAFE_FOCUSED_CONTEXT_DECISION_2026-05-27.md`
+
+중요한 전제:
+
+- 실제 오디오 청취 리뷰가 아니다.
+- `keep`은 focused listening review로 넘길 수 있다는 뜻이다.
+- broad training이나 style adaptation claim으로 해석하지 않는다.
+
+Result:
+
+- prior proxy decision: `keep`
+- focused context decision: `keep_for_focused_listening`
+- keep as diagnostic seed: `yes`
+- ready for broad training: `no`
+- ready for style adaptation claim: `no`
+
+Positive evidence:
+
+- candidate: `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- objective flags: `[]`
+- note count: `63`
+- unique pitch count: `18`
+- pitch range: `G3-G5`
+- final landing: `G4`
+- max interval: `4`
+- max active notes: `1`
+- off-sixteenth-grid count: `0`
+
+Remaining risk:
+
+- repeated 3-note pitch-class cells and one repeated 4-note pitch-class cell remain.
+- timing is still grid-derived.
+- chromatic color handling needs real context listening.
+
+Decision:
+
+- The prior C6-to-G3 focused-context blocker is no longer present.
+- The next boundary should create focused listening review notes for this one candidate.
+- Do not change generation rules again until that focused listening artifact is filled.
+
+## Previous Package Result
 
 Issue #150은 Issue #148에서 복구된 proxy `keep` 후보만 분리해 focused context review용 package로 묶은 작업이다.
 
