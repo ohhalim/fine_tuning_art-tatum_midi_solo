@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #162, Stage B data-derived timing phrase vocabulary repair
-- 다음 권장 이슈: `Stage B data-derived timing phrase repaired proxy review`
+- latest completed: Issue #164, Stage B data-derived timing phrase repaired proxy review
+- 다음 권장 이슈: `Stage B phrase-level duration IOI objective repair`
 
 현재 범위가 아닌 것:
 
@@ -38,6 +38,41 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Latest Data-Derived Timing Phrase Proxy Review Result
+
+Issue #164는 Issue #162 data-derived timing phrase vocabulary repair 이후의 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
+
+Docs:
+
+- `docs/STAGE_B_DATA_DERIVED_TIMING_PHRASE_PROXY_REVIEW_2026-05-27.md`
+
+Result:
+
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `keep`: `0`
+  - `needs_followup`: `5`
+  - `reject`: `1`
+- timing:
+  - `acceptable`: `2`
+  - `too_stiff`: `4`
+- chord fit: `fits=6`
+- objective bucket: `clean=6`
+- objective flags: `{}`
+
+Aggregate follow-up signals:
+
+- `improve_phrase_vocabulary`: `16`
+- `fix_timing_grid`: `8`
+- `increase_motif_variation`: `3`
+
+Decision:
+
+- Issue #162는 reviewable timing/tension tradeoff로 유지할 수 있다.
+- 그러나 proxy `keep` 후보는 아직 없다.
+- 다음은 row selection이 아니라 duration/IOI objective를 직접 개선하는 단계다.
 
 ## Latest Data-Derived Timing Phrase Repair Result
 
