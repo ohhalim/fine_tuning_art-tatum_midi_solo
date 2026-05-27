@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #200, Stage B focused timing vocabulary follow-up proxy keep focused package
-- 다음 권장 이슈: `Stage B focused timing vocabulary follow-up focused context decision`
+- latest completed: Issue #204, Stage B focused timing vocabulary follow-up focused context decision
+- 다음 권장 이슈: `Stage B focused timing vocabulary follow-up focused listening review notes`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,46 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Focused Timing Vocabulary Follow-up Proxy Keep Package Result
+## Latest Focused Timing Vocabulary Follow-up Focused Context Decision Result
+
+Issue #204는 Issue #200 focused package의 단일 proxy `keep` 후보를 solo/context MIDI note 기준으로 다시 판단한 focused context decision이다.
+
+Docs:
+
+- `docs/STAGE_B_FOCUSED_TIMING_VOCABULARY_FOLLOWUP_FOCUSED_CONTEXT_DECISION_2026-05-27.md`
+
+Focused candidate:
+
+- candidate: `data_motif_rhythm_phrase_variation_rank_2_sample_2`
+- prior proxy decision: `keep`
+- focused context decision: `keep_for_focused_listening`
+- note count: `64`
+- unique pitch count: `19`
+- pitch range: `G3-G5`
+- final landing: `D5`
+- final chord: `Ebmaj7`
+- final role: `guide/chord tone`
+- max interval: `4`
+- adjacent pitch repeats: `0`
+- adjacent pitch-class repeats: `0`
+- duplicated 3-note pitch-class chunks: `0`
+- duplicated 4-note pitch-class chunks: `0`
+- duplicated 8-note pitch-class chunks: `0`
+- objective flags: `[]`
+
+Context track check:
+
+- chord guide exists: `32` notes, range `C3-G#4`
+- bass root guide exists: `8` notes, range `C2-A#2`
+- solo track exists: `64` notes, range `G3-G5`
+
+Decision:
+
+- The focused package does not show a register, cadence, repeated-cell, or context-track blocker.
+- The candidate is good enough to move into a focused listening review artifact.
+- This is not proof of final musical quality because timing and vocabulary naturalness still require review.
+
+## Previous Focused Timing Vocabulary Follow-up Proxy Keep Package Result
 
 Issue #200은 Issue #198 proxy keep 후보를 focused context review package로 분리한 작업이다.
 
@@ -77,7 +116,7 @@ Decision:
 
 - The proxy keep candidate is now isolated as a one-candidate focused package.
 - This remains a focused-context review input, not final musical quality.
-- The next issue should decide whether the candidate survives focused context MIDI-note review.
+- The next issue should create focused listening review notes for the Issue #204 keep candidate.
 
 ## Previous Focused Timing Vocabulary Follow-up Proxy Review Result
 

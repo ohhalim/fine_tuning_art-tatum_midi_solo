@@ -209,6 +209,7 @@ Stage B에서 명시하는 것:
 97. Stage B focused timing vocabulary listening follow-up repair
 98. Stage B focused timing vocabulary listening follow-up repaired proxy review
 99. Stage B focused timing vocabulary follow-up proxy keep focused package
+100. Stage B focused timing vocabulary follow-up focused context decision
 
 가장 최근 의미 있는 결과:
 
@@ -350,6 +351,8 @@ Stage B에서 명시하는 것:
 - Issue #198 proxy keep: `data_motif_rhythm_phrase_variation_rank_2_sample_2`, adjacent repeats `0`, duplicated 3/4/8-note cells `0`, final landing `D5`, max interval `4`, objective tension `0.469`.
 - Issue #200 isolates that proxy keep candidate into a focused context review package with copied solo/context MIDI and objective first-note summary.
 - Issue #200 result: focused package `candidate_count=1`, selected candidate `data_motif_rhythm_phrase_variation_rank_2_sample_2`, objective flags `[]`, copied MIDI files `2`.
+- Issue #204 reviews that focused package against solo/context MIDI notes and keeps it as `keep_for_focused_listening`.
+- Issue #204 result: solo range `G3-G5`, final landing `D5` over `Ebmaj7`, max interval `4`, adjacent repeats `0`, duplicated 3/4/8-note pitch-class chunks `0`, objective flags `[]`; remaining risks are mechanical timing, low IOI diversity, and moderate source tension.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -368,7 +371,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 focused timing vocabulary follow-up focused context decision이다. Issue #200은 후보를 단일 package로 격리했지만, 아직 solo/context MIDI note 기준의 focused-context 유지 여부를 판단하지 않았다.
+이제 다음 단계는 focused timing vocabulary follow-up focused listening review notes다. Issue #204는 후보를 focused context `keep_for_focused_listening`으로 유지했지만, 아직 timing, phrase continuation, landing, jazz vocabulary를 focused listening notes로 분리하지 않았다.
 
 ## 6. 다음 단계 로드맵
 
