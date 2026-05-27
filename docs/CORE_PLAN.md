@@ -191,6 +191,7 @@ Stage B에서 명시하는 것:
 79. Stage B register-safe timing motif follow-up repair
 80. Stage B register-safe timing motif repaired proxy review
 81. Stage B data-derived timing phrase vocabulary repair
+82. Stage B data-derived timing phrase repaired proxy review
 
 가장 최근 의미 있는 결과:
 
@@ -285,6 +286,9 @@ Stage B에서 명시하는 것:
 - Issue #162 adds data-derived timing row selection for `data_motif_rhythm_phrase_variation` by preferring phrase-like `top_full_templates` while preserving review-safe position/duration shaping.
 - Issue #162 result: variation strict `3/3`, final landing `3/3`, max interval `4`, objective MIDI flags `{}`, avg syncopation `0.693`, avg tension `0.375`.
 - Issue #162 tradeoff: duration diversity fell to `0.073`, IOI diversity fell to `0.079`, and most-common IOI rose to `0.392`; this requires fresh proxy review before promoting the repair.
+- Issue #164 fills MIDI-note/context proxy review notes for the Issue #162 repaired candidates.
+- Issue #164 result: `reviewed=6`, `keep=0`, `needs_followup=5`, `reject=1`, timing `acceptable=2`, `too_stiff=4`, objective bucket `clean=6`, objective flags `{}`.
+- Issue #164 aggregate result: `improve_phrase_vocabulary=16`, `fix_timing_grid=8`, `increase_motif_variation=3`; next generation work should improve duration/IOI objective directly.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -303,7 +307,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 data-derived timing phrase repaired proxy review다. Issue #162는 guardrail을 유지하며 syncopation/tension을 올렸지만 IOI/duration tradeoff가 있어 MIDI-note/context review가 필요하다.
+이제 다음 단계는 phrase-level duration IOI objective repair다. Issue #164는 timing count를 낮췄지만 proxy keep을 만들지 못했고, phrase vocabulary와 duration/IOI objective가 다음 blocker다.
 
 ## 6. 다음 단계 로드맵
 
@@ -829,32 +833,38 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B data-derived timing phrase vocabulary repair
+Stage B data-derived timing phrase repaired proxy review
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_DATA_DERIVED_TIMING_PHRASE_REPAIR_2026-05-27.md`
-- variation strict candidates: `3/3`
-- final landing resolved: `3/3`
-- max interval: `4`
+- docs: `docs/STAGE_B_DATA_DERIVED_TIMING_PHRASE_PROXY_REVIEW_2026-05-27.md`
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `keep`: `0`
+  - `needs_followup`: `5`
+  - `reject`: `1`
+- timing:
+  - `acceptable`: `2`
+  - `too_stiff`: `4`
+- objective bucket: `clean=6`
 - objective flags: `{}`
-- avg syncopated onset ratio: `0.693`
-- avg duration diversity ratio: `0.073`
-- avg IOI diversity ratio: `0.079`
-- avg most-common IOI ratio: `0.392`
-- avg tension ratio: `0.375`
+- aggregate:
+  - `improve_phrase_vocabulary=16`
+  - `fix_timing_grid=8`
+  - `increase_motif_variation=3`
 
 판단:
 
-- data-derived timing row selection은 reviewable tradeoff다.
-- syncopation/tension은 좋아졌지만 duration/IOI diversity는 조금 나빠졌다.
-- 이 변경을 musical improvement로 확정하지 않는다.
+- Issue #162는 reviewable timing/tension tradeoff지만 proxy keep은 아니다.
+- timing count는 줄었지만 phrase vocabulary가 여전히 최상위 blocker다.
+- duration/IOI objective를 직접 봐야 한다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B data-derived timing phrase repaired proxy review`로 잡는다.
-- MIDI-note/context 기준으로 tradeoff를 판단한다.
+- 다음 issue는 `Stage B phrase-level duration IOI objective repair`로 잡는다.
+- syncopation/tension을 되도록 유지하면서 duration/IOI diversity를 직접 개선한다.
 - objective clean 후보라도 broad training으로 넘어가지 않는다.
 
 ## 10. 한 문장 요약
