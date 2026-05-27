@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #158, Stage B register-safe timing motif follow-up repair
-- 다음 권장 이슈: `Stage B register-safe timing motif repaired proxy review`
+- latest completed: Issue #160, Stage B register-safe timing motif repaired proxy review
+- 다음 권장 이슈: `Stage B data-derived timing phrase vocabulary repair`
 
 현재 범위가 아닌 것:
 
@@ -38,6 +38,39 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Latest Timing Motif Repaired Proxy Review Result
+
+Issue #160은 Issue #158 register-safe timing motif follow-up repair 이후의 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
+
+Docs:
+
+- `docs/STAGE_B_REGISTER_SAFE_TIMING_MOTIF_REPAIRED_PROXY_REVIEW_2026-05-27.md`
+
+Result:
+
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `keep`: `0`
+  - `needs_followup`: `5`
+  - `reject`: `1`
+- timing: `too_stiff=6`
+- chord fit: `fits=6`
+- objective bucket: `clean=6`
+- objective flags: `{}`
+
+Aggregate follow-up signals:
+
+- `improve_phrase_vocabulary`: `16`
+- `fix_timing_grid`: `12`
+- `increase_motif_variation`: `3`
+
+Decision:
+
+- Issue #158의 register-safe phrase-cell penalty guard는 partial safety improvement로 유지할 수 있다.
+- 그러나 repaired candidate를 proxy `keep`으로 올리지는 않는다.
+- 다음은 같은 penalty를 더 누적하는 것이 아니라 data-derived timing/phrase vocabulary repair다.
 
 ## Latest Timing Motif Repair Result
 
