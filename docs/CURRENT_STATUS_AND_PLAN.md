@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #172, Stage B phrase vocabulary motif variation repair
-- 다음 권장 이슈: `Stage B phrase vocabulary motif variation repaired proxy review`
+- latest completed: Issue #174, Stage B phrase vocabulary motif variation repaired proxy review
+- 다음 권장 이슈: `Stage B phrase vocabulary motif proxy keep focused package`
 
 현재 범위가 아닌 것:
 
@@ -38,6 +38,58 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Latest Phrase Vocabulary/Motif Variation Proxy Review Result
+
+Issue #174는 Issue #172 phrase vocabulary/motif variation repair 후보를 MIDI-note/context 기준으로 채운 proxy review다.
+
+Docs:
+
+- `docs/STAGE_B_PHRASE_VOCAB_MOTIF_VARIATION_PROXY_REVIEW_2026-05-27.md`
+
+Result:
+
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `keep`: `1`
+  - `needs_followup`: `3`
+  - `reject`: `2`
+- timing:
+  - `acceptable`: `3`
+  - `too_stiff`: `3`
+- phrase quality:
+  - `phrase`: `3`
+  - `fragment`: `2`
+  - `exercise`: `1`
+- chord fit: `fits=6`
+- objective bucket: `clean=6`
+- objective flags: `{}`
+
+Proxy keep:
+
+- candidate: `data_motif_rhythm_phrase_variation_rank_2_sample_2`
+- note count: `64`
+- unique pitch count: `18`
+- source syncopated onset ratio: `0.719`
+- source duration diversity ratio: `0.094`
+- source most-common IOI ratio: `0.397`
+- objective stepwise interval ratio: `0.460`
+- objective tension ratio: `0.469`
+- final landing: `guide`
+- max interval: `4`
+
+Aggregate follow-up signals:
+
+- `improve_phrase_vocabulary`: `13`
+- `fix_timing_grid`: `6`
+- `increase_motif_variation`: `3`
+
+Decision:
+
+- Issue #172 repair produced one proxy keep candidate.
+- This is not final musical quality; it only justifies a focused context package.
+- Next step is to isolate the proxy keep candidate and run focused context review before any further generation repair.
 
 ## Latest Phrase Vocabulary/Motif Variation Repair Result
 
