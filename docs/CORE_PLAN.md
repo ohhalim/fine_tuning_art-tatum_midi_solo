@@ -212,6 +212,7 @@ Stage B에서 명시하는 것:
 100. Stage B focused timing vocabulary follow-up focused context decision
 101. Stage B focused timing vocabulary follow-up focused listening review notes
 102. Stage B focused timing vocabulary follow-up focused listening review fill
+103. Stage B focused timing vocabulary keep candidate consolidation
 
 가장 최근 의미 있는 결과:
 
@@ -359,6 +360,8 @@ Stage B에서 명시하는 것:
 - Issue #206 result: focused notes `candidate_count=1`, pending count `1`, proxy decision `keep`, proxy issue `too_mechanical`; real-listening fields remain pending and must be filled before another generation repair.
 - Issue #208 fills that focused listening review note and keeps the candidate as the current best focused review candidate.
 - Issue #208 result: timing `acceptable`, chord fit `strong`, phrase continuation `acceptable`, landing `strong`, jazz vocabulary `acceptable`, decision `keep`; this remains a single-candidate focused keep, not broad model-quality proof.
+- Issue #210 consolidates that keep candidate as the current reviewable MIDI outcome and separates proven evidence from non-proven claims.
+- Issue #210 result: current pipeline has a single focused keep candidate with objective-clean status, zero adjacent repeats, zero duplicated 3/4/8-note pitch-class chunks, and focused review `keep`; broad model quality, human/audio preference, multi-seed reliability, and style adaptation remain unproven.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -377,7 +380,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 focused timing vocabulary keep candidate consolidation이다. Issue #208은 focused review `keep` 후보를 만들었지만, 아직 어떤 증거가 model-core MVP에 해당하고 어떤 주장이 proxy-only인지 정리하지 않았다.
+이제 다음 단계는 포트폴리오용 README 최종 정리다. Issue #210은 technical evidence를 정리했으므로, 다음 문서는 이 결과를 과장 없이 지원용 프로젝트 설명으로 재구성해야 한다.
 
 ## 6. 다음 단계 로드맵
 

@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #208, Stage B focused timing vocabulary follow-up focused listening review fill
-- 다음 권장 이슈: `Stage B focused timing vocabulary keep candidate consolidation`
+- latest completed: Issue #210, Stage B focused timing vocabulary keep candidate consolidation
+- 다음 권장 이슈: `포트폴리오용 README 최종 정리`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,40 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Focused Timing Vocabulary Follow-up Focused Listening Fill Result
+## Latest Focused Timing Vocabulary Keep Candidate Consolidation Result
+
+Issue #210은 Issue #208에서 `keep`으로 남은 focused review candidate의 의미를 model-core MVP 관점에서 정리한 consolidation이다.
+
+Docs:
+
+- `docs/STAGE_B_FOCUSED_TIMING_VOCABULARY_KEEP_CANDIDATE_CONSOLIDATION_2026-05-27.md`
+
+Consolidated candidate:
+
+- candidate: `data_motif_rhythm_phrase_variation_rank_2_sample_2`
+- consolidated decision: current best focused review candidate
+- note count: `64`
+- unique pitch count: `19`
+- range: `G3-G5`
+- phrase span: `32.0` beats
+- final landing: `D5` over `Ebmaj7`
+- max interval: `4`
+- objective flags: `[]`
+- adjacent pitch repeats: `0`
+- duplicated 3/4/8-note pitch-class chunks: `0`
+- timing: `acceptable`
+- chord fit: `strong`
+- phrase continuation: `acceptable`
+- landing: `strong`
+- jazz vocabulary: `acceptable`
+
+Consolidated interpretation:
+
+- This is a reviewable symbolic MIDI solo-line outcome under the current constrained Stage B pipeline.
+- This is not broad model-quality proof, human/audio listening proof, or pianist style adaptation proof.
+- The next issue should turn this evidence into a portfolio README narrative without overstating model quality.
+
+## Previous Focused Timing Vocabulary Follow-up Focused Listening Fill Result
 
 Issue #208은 Issue #206 focused listening review notes template의 pending fields를 MIDI note/context evidence 기준으로 채운 작업이다.
 
