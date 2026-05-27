@@ -189,6 +189,7 @@ Stage B에서 명시하는 것:
 77. Stage B register-safe focused listening review notes
 78. Stage B register-safe focused listening review fill
 79. Stage B register-safe timing motif follow-up repair
+80. Stage B register-safe timing motif repaired proxy review
 
 가장 최근 의미 있는 결과:
 
@@ -277,6 +278,9 @@ Stage B에서 명시하는 것:
 - Issue #158 adds a partial register-safe timing/motif follow-up repair by widening recent phrase memory from `6` to `8` notes and repeated cell penalty lookback from `18` to `32`.
 - Issue #158 result: variation strict `3/3`, final landing `3/3`, max interval `4`, objective MIDI flags `{}`, avg IOI diversity `0.091`, avg most-common IOI `0.385`, avg tension `0.358`, avg root-tone `0.021`.
 - Issue #158 keeps the motif guard but does not claim the timing blocker is solved; asymmetric timing-position changes were excluded because they worsened the metrics.
+- Issue #160 fills MIDI-note/context proxy review notes for the Issue #158 repaired candidates.
+- Issue #160 result: `reviewed=6`, `keep=0`, `needs_followup=5`, `reject=1`, timing `too_stiff=6`, objective bucket `clean=6`, objective flags `{}`.
+- Issue #160 aggregate result: `improve_phrase_vocabulary=16`, `fix_timing_grid=12`, `increase_motif_variation=3`; next generation work should use data-derived timing/phrase vocabulary instead of another local penalty tweak.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -295,7 +299,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 register-safe timing motif repaired proxy review다. Issue #158은 strict/objective-clean guardrail을 유지했지만 timing stiffness를 해결했다고 보지 않으므로, fresh MIDI-note/context proxy review로 partial motif guard를 keep할지 판단해야 한다.
+이제 다음 단계는 data-derived timing phrase vocabulary repair다. Issue #160은 repaired 후보를 proxy keep으로 올리지 않았고, timing/phrase vocabulary 문제가 여전히 우선순위임을 확인했다.
 
 ## 6. 다음 단계 로드맵
 
@@ -821,35 +825,38 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B register-safe timing motif follow-up repair
+Stage B register-safe timing motif repaired proxy review
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_REGISTER_SAFE_TIMING_MOTIF_REPAIR_2026-05-27.md`
-- changed: register-safe recent phrase memory `6 -> 8`
-- changed: repeated cell penalty lookback `18 -> 32`
-- variation strict candidates: `3/3`
-- final landing resolved: `3/3`
-- max interval: `4`
-- objective MIDI flags: `{}`
-- avg IOI diversity: `0.091`
-- avg most-common IOI ratio: `0.385`
-- avg tension ratio: `0.358`
-- avg root-tone ratio: `0.021`
+- docs: `docs/STAGE_B_REGISTER_SAFE_TIMING_MOTIF_REPAIRED_PROXY_REVIEW_2026-05-27.md`
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `keep`: `0`
+  - `needs_followup`: `5`
+  - `reject`: `1`
+- timing: `too_stiff=6`
+- chord fit: `fits=6`
+- objective bucket: `clean=6`
+- objective flags: `{}`
+- aggregate:
+  - `improve_phrase_vocabulary=16`
+  - `fix_timing_grid=12`
+  - `increase_motif_variation=3`
 
 판단:
 
-- register-safe final cadence guardrail은 유지됐다.
-- phrase-cell repetition guard는 부분 개선으로 남긴다.
-- asymmetric timing-position variation은 지표를 악화시켜 제외했다.
-- timing stiffness는 아직 해결됐다고 보지 않는다.
+- Issue #158의 register-safe phrase-cell penalty guard는 partial safety improvement로 남긴다.
+- repaired 후보를 proxy `keep`으로 올리지는 않는다.
+- timing stiffness와 phrase vocabulary는 여전히 blocker다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B register-safe timing motif repaired proxy review`로 잡는다.
-- repaired candidate set을 MIDI-note/context 기준으로 fresh proxy review한다.
-- partial motif guard를 keep할지, data-derived timing phrase vocabulary로 넘어갈지 결정한다.
+- 다음 issue는 `Stage B data-derived timing phrase vocabulary repair`로 잡는다.
+- phrase-level onset/duration cell을 data-derived template에서 가져오는 쪽을 검증한다.
+- register-safe bounds, max interval, final guide/chord landing, objective-clean output은 유지한다.
 - objective clean 후보라도 broad training으로 넘어가지 않는다.
 
 ## 10. 한 문장 요약
