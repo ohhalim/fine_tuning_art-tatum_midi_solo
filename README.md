@@ -1,208 +1,278 @@
-# Jazz Piano MIDI Fine-Tuning Probe
+# Jazz Piano MIDI 생성 파이프라인
 
-This repository is currently focused on symbolic MIDI fine-tuning experiments for jazz piano solo generation.
+> symbolic MIDI 기반 재즈 피아노 솔로 생성 모델을 만들기 전에, 생성 결과가 실제로 리뷰 가능한지 검증하는 로컬 실험 파이프라인입니다.
 
-The active goal is narrow:
+이 프로젝트는 "MIDI 파일이 생성됐다"를 성공으로 보지 않습니다.
 
-> Audit the full jazz piano MIDI corpus, validate the current `control_v1` Stage A path, and decide whether to build a generic jazz pianist base before Brad Mehldau style adaptation.
+생성된 `.mid`를 note 단위로 다시 읽고, phrase coverage, polyphony, dead-air, repeated cell, chord/tension ratio, final landing, IOI/duration diversity 같은 지표로 실패 원인을 분리합니다.
 
-This is not currently a Spring Boot/backend MVP, DAW plugin, SaaS product, or realtime performance system. Those ideas are archived until the model path produces reviewable MIDI.
+현재 목표는 완성된 재즈 솔로 모델이 아니라, **reviewable jazz solo-line MIDI를 만들 수 있는 tokenization, generation, decoding, evaluation loop를 증명하는 것**입니다.
 
-## Current Scope
+## 핵심 요약
 
-- Audit the full jazz piano MIDI dataset.
-- Keep Brad Mehldau data separate for style adaptation and holdout evaluation.
-- Prepare role-conditioned `control_v1` tokenized data.
-- Run tiny and small full-checkpoint training probes.
-- Generate MIDI samples from trained checkpoints.
-- Reject invalid outputs such as one-note files, long sustain blocks, and chord blocks.
-- Decide whether to continue with `control_v1` training or move to duration-explicit tokenization.
+- Python 기반 symbolic MIDI generation 실험 프로젝트
+- Stage A `NOTE_ON/OFF` 방식의 실패 원인을 분석하고 Stage B duration-explicit token으로 전환
+- Music Transformer 계열 모델 학습/생성 경로와 grammar-constrained generation probe 구현
+- MIDI 파일 생성 후 objective review와 proxy listening review를 반복하는 검증 루프 구축
+- 생성물이 one-note, long sustain, chord block, repeated cell인지 자동으로 걸러내는 quality gate 운영
+- 현재는 broad training, Brad style adaptation, backend/API, DAW plugin으로 확장하지 않고 model-core 검증에 집중
 
-## Key Documents
+## 왜 만들었나
 
-- `docs/CURRENT_STATUS_AND_PLAN.md`
-  - Current branch state and next execution order.
-- `docs/BRAD_MEHLDAU_FINETUNING_PLAN.md`
-  - Dataset audit, probe order, and acceptance criteria.
-- `docs/DATASET_STRATEGY.md`
-  - Full jazz piano corpus audit, generic jazz pianist base, and Brad style adaptation plan.
-- `docs/STAGE_A_TOKEN_FORMAT.md`
-  - `control_v1` sequence contract.
-- `docs/STAGE_A_TRAINING_MODES.md`
-  - Full-checkpoint, adapter, and LoRA mode boundaries.
-- `docs/STAGE_A_TINY_OVERFIT.md`
-  - Tiny-overfit smoke test criteria.
-- `docs/STAGE_A_CODE_REVIEW_2026-05-18.md`
-  - Review of why previous generated MIDI was not musically valid.
-- `docs/REFERENCES.md`
-  - 2024-2026 reference map for tokenization, conditioning, sequence length, datasets, and implementation choices.
-- `docs/archive/`
-  - Deferred backend/API/ERD/realtime/product-planning documents.
+처음에는 Brad Mehldau 스타일의 jazz piano MIDI generator를 목표로 시작했습니다. 하지만 작은 dataset으로 바로 학습을 키우면, 모델이 좋아진 것처럼 보이는 `.mid` 파일만 남고 실제로는 다음 문제가 반복됐습니다.
 
-## Repository Layout
+- note count가 너무 적음
+- 긴 sustain block
+- chord block처럼 보이는 출력
+- solo-line이 아닌 동시 발음 구조
+- 반복 pitch-class cell
+- grid-derived timing stiffness
+- final landing이 음악적으로 어색함
 
-```text
-scripts/
-  audit_jazz_piano_dataset.py     # Full corpus audit before broad training
-  build_jazz_training_manifests.py # Audit-based train/val/holdout manifest builder
-  audit_brad_mehldau_dataset.py   # Dataset audit before training
-  prepare_role_dataset.py         # conditioning.mid/target.mid + tokenized data
-  control_tokens.py               # control_v1 token helpers
-  train_stage_a_full.py           # from-scratch/full-checkpoint training
-  train_stage_a_adapter.py        # adapter training when a real base checkpoint exists
-  train_qlora.py                  # lower-level training implementation
-  generate.py                     # checkpoint-based MIDI generation
-  run_control_v1_tiny_overfit.py  # control_v1 tiny-overfit smoke
-  run_manifest_prepare_smoke.py   # audit -> manifest -> prepare dry-run
-  agent_harness.sh                # local validation harness
+그래서 방향을 바꿨습니다.
 
-inference/app/
-  generator.py                    # request-conditioned generation wrapper
-  metrics.py                      # MIDI validity and quality metrics
-  postprocess.py                  # repair and output constraints
+> 모델을 키우기 전에, 실패를 재현하고 측정할 수 있는 generation/evaluation pipeline을 먼저 만든다.
 
-docs/
-  README.md
-  CURRENT_STATUS_AND_PLAN.md
-  BRAD_MEHLDAU_FINETUNING_PLAN.md
-  STAGE_A_*.md
-  archive/
+## 전체 파이프라인
+
+```mermaid
+flowchart LR
+    A["MIDI dataset audit"] --> B["role-conditioned dataset"]
+    B --> C["Stage B tokenization"]
+    C --> D["generation probe"]
+    D --> E["MIDI decode"]
+    E --> F["postprocess / overlap-free export"]
+    F --> G["objective MIDI review"]
+    G --> H["proxy listening review"]
+    H --> I["next focused repair issue"]
 ```
 
-## Setup
+## Stage 전환 기록
 
-```bash
-pip install -r requirements.txt
-```
+### Stage A: control_v1 실패 확인
 
-Run the fast local validation harness:
+초기 Stage A는 `NOTE_ON/OFF` 중심의 control token 방식이었습니다. 학습/생성 경로는 runnable했지만 생성 MIDI가 실제 솔로 라인으로 보기 어려웠습니다.
 
-```bash
-bash scripts/agent_harness.sh quick
-```
+대표 실패:
 
-## Dataset Audit
+- one-note collapse
+- long sustain block
+- chord block 출력
+- phrase coverage 부족
 
-```bash
-python scripts/audit_jazz_piano_dataset.py
-```
+결론:
 
-Current local audit result:
+- Stage A를 더 강하게 postprocess하지 않는다.
+- duration과 position을 명시하는 Stage B tokenization으로 전환한다.
+
+### Stage B: duration-explicit symbolic probe
+
+Stage B에서는 REMI/Jazz Transformer 계열 판단에 맞춰 다음 token family를 명시했습니다.
+
+- `BAR`
+- `POSITION`
+- `CHORD_ROOT`
+- `CHORD_QUALITY`
+- `NOTE_PITCH`
+- `NOTE_DURATION`
+- `VELOCITY`
+
+이후 2-bar/4-bar/8-bar phrase window 단위로 generation probe를 만들고, 생성된 MIDI를 다시 note-level로 평가했습니다.
+
+## 주요 구현 내용
+
+### 1. Dataset audit
+
+전체 jazz piano MIDI corpus를 먼저 audit했습니다.
 
 - active dataset tree: `midi_dataset/midi`
-- files: `2777`
 - readable files: `2777`
 - candidate files: `2775`
 - candidate non-Brad files: `2703`
 - candidate Brad files: `72`
 - exact duplicate hash groups: `0`
 
-Decision:
+Brad dataset은 바로 scratch training에 쓰지 않고, generic jazz base 이후 adaptation/holdout 후보로 분리했습니다.
 
-- Use the filtered non-Brad candidates for a generic jazz pianist base only after tokenizer sanity is validated.
-- Use Brad candidates for style adaptation and holdout evaluation.
-- Do not train both `midi_dataset/midi` and duplicate mirror `midi_dataset/midi_kong`.
+### 2. Stage B generation probes
 
-Build training manifests from the audit JSON:
+작은 실험을 여러 단계로 쪼개서 검증했습니다.
 
-```bash
-python scripts/build_jazz_training_manifests.py
+- grammar-constrained generation
+- overlap/dedup gate
+- temporal coverage diagnostics
+- coverage-aware constrained generation
+- chord-aware pitch constrained generation
+- data-derived motif rhythm generation
+- phrase/cadence review baseline
+- register-safe final landing repair
+- data-derived timing phrase vocabulary repair
+
+각 probe는 "좋은 MIDI 하나"가 아니라 여러 sample의 pass-rate와 failure reason을 남기도록 만들었습니다.
+
+### 3. Objective MIDI review
+
+생성된 MIDI를 다시 읽어서 다음 기준으로 검사합니다.
+
+- non-zero note count
+- unique pitch count
+- max simultaneous notes
+- polyphonic tick ratio
+- phrase coverage
+- dead-air ratio
+- max note duration ratio
+- repeated pitch/cell ratio
+- max interval
+- unresolved large leap ratio
+- chord-tone/tension/outside/root ratio
+- final guide/chord landing
+- IOI/duration diversity
+
+`valid .mid exists`는 성공 조건이 아닙니다.
+
+### 4. Proxy listening review
+
+실제 오디오 청취 전 단계로, MIDI note sequence와 context MIDI를 기준으로 proxy review notes를 채웁니다.
+
+최근 review 결과:
+
+- Issue #164: `Stage B data-derived timing phrase repaired proxy review`
+- reviewed candidates: `6`
+- `keep`: `0`
+- `needs_followup`: `5`
+- `reject`: `1`
+- timing: `acceptable=2`, `too_stiff=4`
+- objective bucket: `clean=6`
+- objective flags: `{}`
+
+해석:
+
+- objective-clean 후보는 만들 수 있지만, 아직 최종 keep 후보는 없습니다.
+- 다음 병목은 phrase vocabulary와 duration/IOI diversity입니다.
+
+## 최근 개선 예시
+
+Issue #162에서는 `data_motif_rhythm_phrase_variation`에서 phrase-like `top_full_templates`를 우선 선택하도록 바꿨습니다.
+
+결과:
+
+| metric | 이전 | 이후 |
+|---|---:|---:|
+| strict valid | 3/3 | 3/3 |
+| final landing resolved | 3/3 | 3/3 |
+| max interval | 4 | 4 |
+| objective MIDI flags | `{}` | `{}` |
+| avg syncopated onset ratio | 0.684 | 0.693 |
+| avg tension ratio | 0.358 | 0.375 |
+| avg duration diversity ratio | 0.079 | 0.073 |
+| avg IOI diversity ratio | 0.091 | 0.079 |
+
+좋아진 점도 있지만 duration/IOI diversity는 후퇴했습니다. 그래서 이 변경은 "성공"으로 확정하지 않고, 다음 proxy review에서 tradeoff로 판단했습니다.
+
+## 현재 상태
+
+현재 main 기준 최신 판단:
+
+- latest completed: Issue #164
+- 다음 권장 작업: `Stage B phrase-level duration IOI objective repair`
+- broad training: 아직 진행하지 않음
+- Brad style adaptation: 아직 진행하지 않음
+- backend/API/product MVP: 범위 밖
+
+현재 가장 중요한 원칙:
+
+> objective-clean MIDI를 만들었다고 해서 음악적으로 좋은 솔로라고 주장하지 않는다.
+
+## 기술 스택
+
+- Python
+- PyTorch 기반 Music Transformer 실험 코드
+- pretty_midi
+- NumPy
+- unittest
+- Bash harness
+- MIDI tokenization / decoding / postprocess pipeline
+
+## 주요 파일
+
+```text
+scripts/
+  prepare_role_dataset.py
+  run_stage_b_generation_probe.py
+  run_stage_b_data_motif_generation_compare.py
+  review_midi_note_objectives.py
+  build_listening_review_notes.py
+  summarize_listening_review_notes.py
+  agent_harness.sh
+
+inference/app/
+  generator.py
+  metrics.py
+  postprocess.py
+
+docs/
+  CURRENT_STATUS_AND_PLAN.md
+  CORE_PLAN.md
+  STAGE_B_*.md
 ```
 
-Generated manifest files are written under `data/manifests/` and are not committed.
+## 실행 방법
 
-Run a small end-to-end dry-run:
-
-```bash
-bash scripts/agent_harness.sh manifest-dry-run
-```
-
-## Prepare Data
-
-Small probe:
+환경 설치:
 
 ```bash
-python scripts/prepare_role_dataset.py \
-  --input_dir "./midi_dataset/midi/studio/Brad Mehldau" \
-  --output_dir ./data/roles_probe2 \
-  --role lead \
-  --sequence_format control_v1 \
-  --max_files 2 \
-  --overwrite
+pip install -r requirements.txt
 ```
 
-Manifest-based generic split:
-
-```bash
-python scripts/prepare_role_dataset.py \
-  --train_manifest ./data/manifests/generic_jazz_train.txt \
-  --val_manifest ./data/manifests/generic_jazz_val.txt \
-  --output_dir ./data/roles_generic_jazz \
-  --role lead \
-  --sequence_format control_v1 \
-  --overwrite
-```
-
-Full 18-file dataset:
-
-```bash
-python scripts/prepare_role_dataset.py \
-  --input_dir "./midi_dataset/midi/studio/Brad Mehldau" \
-  --output_dir ./data/roles \
-  --role lead \
-  --sequence_format control_v1 \
-  --overwrite
-```
-
-## Train Probe
-
-Start small:
-
-```bash
-python scripts/train_stage_a_full.py \
-  --data_dir ./data/roles_probe2/lead/tokenized \
-  --output_dir ./checkpoints/brad_mehldau_control_v1_probe2 \
-  --epochs 1 \
-  --batch_size 4 \
-  --num_workers 0 \
-  --max_sequence 512
-```
-
-Only after the small probe runs and generates reviewable MIDI, run a larger 5-file or full 18-file training probe.
-
-## Quality Gate
-
-A `.mid` file is not successful just because it exists.
-
-Invalid outputs include:
-
-- one-note or two-note files
-- repeated single-pitch phrases
-- long sustain blocks
-- block chords masquerading as a solo line
-- phrase coverage that does not match the requested bars
-- excessive dead air for the selected density
-
-If `control_v1` training still produces sustain/chord blocks, the next move is duration-explicit tokenization, not more postprocess.
-
-## Agent Workflow
-
-Project rules live in `AGENTS.md`.
-
-Before committing:
+빠른 검증:
 
 ```bash
 bash scripts/agent_harness.sh quick
 ```
 
-For inference, generation, metrics, or model-loading changes, also run:
+Stage B rhythm/phrase variation probe:
 
 ```bash
-bash scripts/agent_harness.sh demo
+bash scripts/agent_harness.sh stage-b-rhythm-phrase-variation
 ```
 
-For tiny-overfit or training-mode changes, also run:
+listening review aggregate:
 
 ```bash
-bash scripts/agent_harness.sh tiny-compare
+bash scripts/agent_harness.sh stage-b-listening-review-aggregate
 ```
+
+## 포트폴리오 관점에서 보여줄 수 있는 점
+
+이 프로젝트에서 중요한 것은 "AI로 음악을 만들었다"가 아니라, 모델 출력 실패를 엔지니어링 문제로 분해한 과정입니다.
+
+- 생성 결과를 파일 존재 여부가 아니라 note-level metric으로 검증
+- 실패한 Stage A를 고집하지 않고 representation 문제로 재정의
+- Stage B tokenization, constrained generation, review gate를 단계적으로 구축
+- 각 실험을 issue 단위로 나누고, 결과가 나쁘면 그 이유를 다음 실험 조건으로 연결
+- 성능을 과장하지 않고 현재 한계와 다음 병목을 문서화
+
+## 현재 한계
+
+- 아직 final `keep` 후보가 없습니다.
+- timing stiffness와 phrase vocabulary 문제가 남아 있습니다.
+- Brad style adaptation을 주장할 단계가 아닙니다.
+- 실시간 DAW/plugin, backend/API, product MVP는 아직 후순위입니다.
+
+## 다음 작업
+
+```text
+Stage B phrase-level duration IOI objective repair
+```
+
+목표:
+
+- Issue #162의 syncopation/tension 개선은 최대한 유지
+- duration diversity와 IOI diversity를 직접 개선
+- register-safe bounds, max interval, final guide/chord landing, objective-clean output 유지
+
+## 문서
+
+- [Current Status and Plan](docs/CURRENT_STATUS_AND_PLAN.md)
+- [Core Plan](docs/CORE_PLAN.md)
+- [References](docs/REFERENCES.md)
