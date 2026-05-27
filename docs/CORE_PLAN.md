@@ -184,6 +184,7 @@ Stage B에서 명시하는 것:
 72. Stage B register-cadence repaired focused proxy review
 73. Stage B register-safe phrase vocabulary repair
 74. Stage B register-safe phrase vocabulary repaired proxy review
+75. Stage B register-safe proxy-keep focused context package
 
 가장 최근 의미 있는 결과:
 
@@ -261,6 +262,8 @@ Stage B에서 명시하는 것:
 - Issue #148 fills MIDI-note/context proxy review notes for the register-safe phrase vocabulary repaired candidates.
 - Issue #148 result: `reviewed=6`, `keep=1`, `needs_followup=4`, `reject=1`, objective flags `{}`; `data_motif_rhythm_phrase_variation_rank_1_sample_3` is restored as a proxy keep candidate for focused context review only.
 - Issue #148 aggregate result: `improve_phrase_vocabulary=13`, `fix_timing_grid=8`, `increase_motif_variation=3`, so broad training is still premature.
+- Issue #150 isolates that register-safe proxy keep candidate into a focused context review package with copied solo/context MIDI and objective first-note summary.
+- Issue #150 result: focused package `candidate_count=1`, selected candidate `data_motif_rhythm_phrase_variation_rank_1_sample_3`, objective flags `[]`, copied MIDI files `2`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -279,7 +282,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 register-safe proxy keep candidate focused context package다. Issue #148은 proxy 기준 `keep` 후보를 되살렸지만, 이것은 focused context review 전까지 broad training 근거가 아니다.
+이제 다음 단계는 register-safe proxy keep candidate focused context decision이다. Issue #150은 단일 후보 review artifact를 만들었지만, 이것은 focused context review 전까지 broad training 근거가 아니다.
 
 ## 6. 다음 단계 로드맵
 

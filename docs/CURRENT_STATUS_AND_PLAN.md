@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #148, Stage B register-safe phrase vocabulary repaired proxy review
-- 다음 권장 이슈: `Stage B register-safe proxy-keep focused context package`
+- latest completed: Issue #150, Stage B register-safe proxy-keep focused context package
+- 다음 권장 이슈: `Stage B register-safe proxy-keep focused context decision`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,45 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Proxy Review Result
+## Latest Package Result
+
+Issue #150은 Issue #148에서 복구된 proxy `keep` 후보만 분리해 focused context review용 package로 묶은 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_REGISTER_SAFE_PROXY_KEEP_FOCUSED_PACKAGE_2026-05-27.md`
+
+중요한 전제:
+
+- `keep`은 MIDI-note proxy 기준이다.
+- 실제 오디오 청취 승인이나 최종 musical-quality claim이 아니다.
+- broad training이나 Brad style adaptation으로 바로 확장하지 않는다.
+
+Result:
+
+- decision filter: `keep`
+- package candidate count: `1`
+- copied solo MIDI files: `1`
+- copied context MIDI files: `1`
+
+Selected candidate:
+
+- `data_motif_rhythm_phrase_variation_rank_1_sample_3`
+- phrase: `phrase`
+- timing: `acceptable`
+- chord fit: `fits`
+- notes: `63`
+- unique pitch count: `18`
+- source tension ratio: `0.349`
+- objective flags: `[]`
+
+Decision:
+
+- Issue #148 proxy keep candidate is now isolated as a single focused context review artifact.
+- The next decision should come from reviewing this one solo/context MIDI pair.
+- This still does not prove broad model quality.
+
+## Previous Proxy Review Result
 
 Issue #148은 Issue #146 register-safe phrase vocabulary repair 이후의 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
 
