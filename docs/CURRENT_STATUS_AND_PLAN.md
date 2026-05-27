@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #176, Stage B phrase vocabulary motif proxy keep focused package
-- 다음 권장 이슈: `Stage B phrase vocabulary motif focused context decision`
+- latest completed: Issue #178, Stage B phrase vocabulary motif focused context decision
+- 다음 권장 이슈: `Stage B phrase vocabulary motif focused listening review notes`
 
 현재 범위가 아닌 것:
 
@@ -38,6 +38,47 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Latest Phrase Vocabulary/Motif Focused Context Decision Result
+
+Issue #178은 Issue #176 focused package의 단일 proxy `keep` 후보를 solo/context MIDI note 기준으로 다시 판단한 focused context decision이다.
+
+Docs:
+
+- `docs/STAGE_B_PHRASE_VOCAB_MOTIF_FOCUSED_CONTEXT_DECISION_2026-05-27.md`
+
+Candidate:
+
+- `data_motif_rhythm_phrase_variation_rank_2_sample_2`
+
+Positive evidence:
+
+- objective bucket: `clean`
+- objective flags: `[]`
+- note count: `64`
+- unique pitch count: `18`
+- pitch range: `G3-G5`
+- final landing: `G4`
+- max interval: `4`
+- unresolved large leap ratio: `0.000`
+- adjacent repeated pitch count: `0`
+- duplicated 8-note pitch-class chunks: `0`
+- context chord guide: `32` notes, range `C3-G#4`
+- context bass root guide: `8` notes, range `C2-A#2`
+
+Remaining risk:
+
+- duplicated 3-note pitch-class chunks: `5`
+- duplicated 4-note pitch-class chunks: `2`
+- timing remains grid-derived
+- source tension ratio: `0.344`
+
+Decision:
+
+- focused context decision: `keep_for_focused_listening`
+- ready for broad training: `no`
+- ready for style adaptation claim: `no`
+- next step: focused listening review notes template for this single candidate
 
 ## Latest Phrase Vocabulary/Motif Proxy Keep Focused Package Result
 
