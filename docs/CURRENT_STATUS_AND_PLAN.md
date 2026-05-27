@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #168, Stage B phrase-level duration IOI objective repair
-- 다음 권장 이슈: `Stage B duration IOI repaired proxy review`
+- latest completed: Issue #170, Stage B duration IOI repaired proxy review
+- 다음 권장 이슈: `Stage B phrase vocabulary motif variation repair`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,46 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Duration/IOI Objective Repair Result
+## Latest Duration/IOI Repaired Proxy Review Result
+
+Issue #170은 Issue #168 duration/IOI objective repair 이후의 후보를 MIDI-note/context 기준으로 다시 채운 proxy review다.
+
+Docs:
+
+- `docs/STAGE_B_DURATION_IOI_REPAIRED_PROXY_REVIEW_2026-05-27.md`
+
+Result:
+
+- reviewed candidates: `6`
+- pending candidates: `0`
+- decisions:
+  - `keep`: `0`
+  - `needs_followup`: `4`
+  - `reject`: `2`
+- timing:
+  - `acceptable`: `2`
+  - `too_stiff`: `4`
+- phrase quality:
+  - `phrase`: `2`
+  - `fragment`: `3`
+  - `exercise`: `1`
+- chord fit: `fits=6`
+- objective bucket: `clean=6`
+- objective flags: `{}`
+
+Aggregate follow-up signals:
+
+- `improve_phrase_vocabulary`: `12`
+- `fix_timing_grid`: `8`
+- `increase_motif_variation`: `4`
+
+Decision:
+
+- Issue #168은 objective duration/IOI diversity repair로 유지한다.
+- 그러나 proxy `keep` 후보는 아직 없다.
+- 다음은 small-cell mechanical contour를 줄이는 phrase vocabulary/motif variation repair다.
+
+## Previous Duration/IOI Objective Repair Result
 
 Issue #168은 Issue #164 이후 남은 phrase-level duration/IOI 병목을 generation rule 쪽에서 좁게 본 작업이다.
 

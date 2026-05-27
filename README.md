@@ -168,14 +168,14 @@ Issue #168에서는 `data_motif_rhythm_phrase_variation`에 phrase-level duratio
 | avg IOI diversity ratio | 0.079 | 0.111 |
 | avg most-common IOI ratio | 0.392 | 0.481 |
 
-duration/IOI diversity는 개선됐지만 most-common IOI 반복은 악화됐습니다. 그래서 이 변경도 "성공"으로 확정하지 않고, 다음 proxy review에서 tradeoff로 판단합니다.
+duration/IOI diversity는 개선됐지만 most-common IOI 반복은 악화됐습니다. 이어진 proxy review에서도 `keep` 후보는 나오지 않아, 다음 병목은 phrase vocabulary와 motif variation으로 좁혔습니다.
 
 ## 현재 상태
 
 현재 main 기준 최신 판단:
 
-- latest completed: Issue #168
-- 다음 권장 작업: `Stage B duration IOI repaired proxy review`
+- latest completed: Issue #170
+- 다음 권장 작업: `Stage B phrase vocabulary motif variation repair`
 - broad training: 아직 진행하지 않음
 - Brad style adaptation: 아직 진행하지 않음
 - backend/API/product MVP: 범위 밖
@@ -263,14 +263,14 @@ bash scripts/agent_harness.sh stage-b-listening-review-aggregate
 ## 다음 작업
 
 ```text
-Stage B duration IOI repaired proxy review
+Stage B phrase vocabulary motif variation repair
 ```
 
 목표:
 
-- Issue #168의 duration/IOI objective repair 후보를 MIDI-note/context 기준으로 검토
-- IOI diversity 개선이 실제로 덜 mechanical한 phrase로 이어졌는지 확인
-- most-common IOI 악화 tradeoff를 proxy review에서 분리
+- Issue #168의 IOI diversity 개선은 가능한 한 유지
+- small-cell mechanical contour와 scalar/exercise 느낌 줄이기
+- most-common IOI repetition을 unique IOI count와 함께 개선
 - proxy keep이 없으면 broad training으로 넘어가지 않음
 
 ## 문서
