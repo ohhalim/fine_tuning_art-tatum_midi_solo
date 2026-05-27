@@ -206,6 +206,7 @@ Stage B에서 명시하는 것:
 94. Stage B focused timing vocabulary focused context decision
 95. Stage B focused timing vocabulary focused listening review notes
 96. Stage B focused timing vocabulary focused listening review fill
+97. Stage B focused timing vocabulary listening follow-up repair
 
 가장 최근 의미 있는 결과:
 
@@ -339,6 +340,9 @@ Stage B에서 명시하는 것:
 - Issue #192 result: focused notes `candidate_count=1`, pending count `1`, proxy decision `keep`; real-listening fields remain pending and must be filled before another generation repair.
 - Issue #194 fills that focused listening review note and downgrades the candidate to `needs_followup`.
 - Issue #194 result: timing `stiff`, chord fit `acceptable`, phrase continuation `acceptable`, landing `strong`, jazz vocabulary `thin`; next repair should target adjacent repeats, duplicated 3-note cells, timing stiffness, and chord-color/tension while preserving focused-context register/cadence guardrails.
+- Issue #196 adds a focused listening follow-up repair by avoiding immediate pitch-class reuse when safe alternatives exist and by trying tension/recovery/next-guide alternatives before repeat fallback.
+- Issue #196 result: variation strict `3/3`, final landing `3/3`, max interval `4`, objective flags `{}`, adjacent pitch repeats reduced to `0` for all three repaired candidates.
+- Issue #196 tradeoff: rank 2 improves duplicated 3/4-note cells to `0`, but avg source tension falls to `0.307` and rank 1/3 duplicated 3-note cells increase; this requires fresh proxy review before any keep claim.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -357,7 +361,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 focused timing vocabulary listening follow-up repair다. Issue #194는 focused context candidate를 final keep으로 올리지 않았고, remaining blocker를 timing/vocabulary/chord color로 좁혔다.
+이제 다음 단계는 focused timing vocabulary listening follow-up repaired proxy review다. Issue #196은 adjacent repeat를 고쳤지만 source tension과 short-cell tradeoff가 있어 MIDI-note/context 기준의 fresh decision이 필요하다.
 
 ## 6. 다음 단계 로드맵
 

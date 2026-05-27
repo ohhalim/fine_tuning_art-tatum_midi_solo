@@ -539,6 +539,11 @@ def register_safe_phrase_pitch_classes(
         if safe_ordered:
             ordered = safe_ordered
 
+    if recent_classes and len(ordered) > 1:
+        non_repeating_ordered = [pitch_class for pitch_class in ordered if pitch_class != recent_classes[-1]]
+        if non_repeating_ordered:
+            ordered = non_repeating_ordered
+
     recent_short = {int(pitch) % 12 for pitch in recent_pitches[-2:]}
     recent_phrase = {int(pitch) % 12 for pitch in recent_pitches[-8:]}
     development_role = (
@@ -1242,6 +1247,7 @@ def bounded_phrase_pitch_for_pitch_classes(
     allow_wider_fallback: bool = True,
     avoid_repeated_cells: bool = False,
     preferred_abs_intervals: Sequence[int] | None = None,
+    repeat_fallback_pitch_classes: Sequence[int] | None = None,
     min_pitch: int = PIANO_PITCH_MIN,
     max_pitch: int = PIANO_PITCH_MAX,
 ) -> int:
@@ -1255,6 +1261,11 @@ def bounded_phrase_pitch_for_pitch_classes(
 
     recent = list(recent_pitches or [])
     priority = {pitch_class: index for index, pitch_class in enumerate(ordered_classes)}
+    fallback_classes: list[int] = []
+    for pitch_class in repeat_fallback_pitch_classes or []:
+        normalized = int(pitch_class) % 12
+        if normalized not in fallback_classes:
+            fallback_classes.append(normalized)
 
     def cell_penalty(pitch: int) -> int:
         if not avoid_repeated_cells:
@@ -1284,6 +1295,42 @@ def bounded_phrase_pitch_for_pitch_classes(
         class_reuse = sum(1 for value in recent_window[-12:] if value % 12 == pitch % 12)
         return exact_reuse * 4 + class_reuse * 2
 
+    def repeat_fallback_pitch(previous: int) -> int:
+        fallback_priority = {
+            pitch_class: index
+            for index, pitch_class in enumerate(fallback_classes)
+            if pitch_class != int(previous) % 12
+        }
+        if not fallback_priority:
+            return int(previous)
+        fallback_candidates = [
+            pitch
+            for pitch in range(int(min_pitch), int(max_pitch) + 1)
+            if pitch % 12 in fallback_priority
+            and 1 <= abs(int(pitch) - int(previous)) <= int(max_interval)
+        ]
+        if not fallback_candidates:
+            return int(previous)
+        recent_window = [int(value) for value in recent[-32:]]
+        fresh_fallback_candidates = [pitch for pitch in fallback_candidates if int(pitch) not in recent_window]
+        if fresh_fallback_candidates:
+            fallback_candidates = fresh_fallback_candidates
+        return int(
+            min(
+                fallback_candidates,
+                key=lambda pitch: (
+                    cell_penalty(int(pitch)),
+                    reuse_penalty(int(pitch)),
+                    interval_penalty(int(pitch)),
+                    abs(int(pitch) - int(previous)),
+                    fallback_priority[int(pitch) % 12],
+                    abs(int(pitch) - int(target_pitch)),
+                    abs(int(pitch) - 67),
+                    int(pitch),
+                ),
+            )
+        )
+
     candidates = [
         pitch
         for pitch in range(int(min_pitch), int(max_pitch) + 1)
@@ -1310,11 +1357,11 @@ def bounded_phrase_pitch_for_pitch_classes(
                 candidates = near
                 prefer_primary_pitch_class = False
             elif allow_repeat_fallback:
-                return previous
+                return repeat_fallback_pitch(previous)
             prefer_primary_pitch_class = False
         else:
             if allow_repeat_fallback:
-                return previous
+                return repeat_fallback_pitch(previous)
             prefer_primary_pitch_class = False
 
     if recent and not prefer_primary_pitch_class:
@@ -2033,6 +2080,11 @@ def data_motif_rhythm_phrase_variation_tokens(
                         allow_wider_fallback=False,
                         avoid_repeated_cells=True,
                         preferred_abs_intervals=(3, 4),
+                        repeat_fallback_pitch_classes=(
+                            sorted(tension_pitch_classes(chord))
+                            + phrase_recovery_pitch_classes(chord, next_chord)
+                            + sorted(guide_tone_pitch_classes(next_chord))
+                        ),
                         min_pitch=bar_min_pitch,
                         max_pitch=bar_max_pitch,
                     )

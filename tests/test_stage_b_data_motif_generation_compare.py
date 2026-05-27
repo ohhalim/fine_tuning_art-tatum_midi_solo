@@ -304,6 +304,18 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         self.assertEqual(classes[0], 9)
         self.assertIn(0, classes)
 
+    def test_register_safe_phrase_pitch_classes_drops_immediate_repeat_when_safe_exists(self) -> None:
+        classes = register_safe_phrase_pitch_classes(
+            [7, 9],
+            recent_pitches=[60, 64, 67],
+            bar_index=0,
+            motif_index=0,
+            local_index=0,
+            variation_index=0,
+        )
+
+        self.assertEqual(classes, [9])
+
     def test_register_safe_phrase_target_pitch_stays_inside_register_window(self) -> None:
         high = register_safe_phrase_target_pitch(
             78,
@@ -365,6 +377,21 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         )
 
         self.assertEqual(pitch, 75)
+
+    def test_bounded_phrase_pitch_repeat_fallback_uses_safe_color_alternative(self) -> None:
+        pitch = bounded_phrase_pitch_for_pitch_classes(
+            [6],
+            target_pitch=66,
+            recent_pitches=[75],
+            max_interval=4,
+            allow_repeat_fallback=True,
+            allow_wider_fallback=False,
+            repeat_fallback_pitch_classes=[2, 5],
+            min_pitch=55,
+            max_pitch=76,
+        )
+
+        self.assertEqual(pitch, 74)
 
     def test_focused_context_register_bounds_lifts_final_cadence_range(self) -> None:
         early_min, early_max = focused_context_register_bounds(1, 8, min_pitch=48, max_pitch=84)
@@ -814,11 +841,15 @@ class StageBDataMotifGenerationCompareTest(unittest.TestCase):
         profile = analyze_contour_landing_profile(tokens, chords=chords, primer_size=len(primer))
         pitches = [int(group["pitch"]) for group in groups]
         final_bar_pitches = [int(group["pitch"]) for group in groups if int(group["bar"]) == 7]
+        adjacent_repeated_pitch_count = sum(
+            1 for left, right in zip(pitches, pitches[1:]) if int(left) == int(right)
+        )
 
         self.assertTrue(grammar["grammar_valid"])
         self.assertGreaterEqual(len(groups), 63)
         self.assertGreaterEqual(len(set(pitches)), 18)
         self.assertLessEqual(max(pitches), 79)
+        self.assertEqual(adjacent_repeated_pitch_count, 0)
         self.assertGreaterEqual(min(final_bar_pitches), 60)
         four_note_cells = [tuple(pitches[index : index + 4]) for index in range(len(pitches) - 3)]
         self.assertEqual(len(four_note_cells), len(set(four_note_cells)))
