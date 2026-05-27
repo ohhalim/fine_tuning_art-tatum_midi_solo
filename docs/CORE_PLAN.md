@@ -197,6 +197,7 @@ Stage B에서 명시하는 것:
 85. Stage B phrase vocabulary motif variation repair
 86. Stage B phrase vocabulary motif variation repaired proxy review
 87. Stage B phrase vocabulary motif proxy keep focused package
+88. Stage B phrase vocabulary motif focused context decision
 
 가장 최근 의미 있는 결과:
 
@@ -309,6 +310,8 @@ Stage B에서 명시하는 것:
 - Issue #174 aggregate result: `improve_phrase_vocabulary=13`, `fix_timing_grid=6`, `increase_motif_variation=3`; next work should isolate the proxy keep candidate into a focused context package before claiming final quality.
 - Issue #176 isolates that proxy keep candidate into a focused context review package with copied solo/context MIDI and objective first-note summary.
 - Issue #176 result: focused package `candidate_count=1`, selected candidate `data_motif_rhythm_phrase_variation_rank_2_sample_2`, objective flags `[]`, copied MIDI files `2`.
+- Issue #178 reviews that focused package against solo/context MIDI notes and keeps it as `keep_for_focused_listening`.
+- Issue #178 result: solo range `G3-G5`, final landing `G4`, duplicated 8-note pitch-class chunks `0`, objective flags `[]`; remaining risks are duplicated short pitch-class cells, grid-derived timing, and modest source tension.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -327,7 +330,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 phrase vocabulary motif focused context decision이다. Issue #176은 proxy keep 후보를 focused package로 격리했지만, solo/context MIDI 기준 판단 전에는 final musical quality로 보지 않는다.
+이제 다음 단계는 phrase vocabulary motif focused listening review notes다. Issue #178은 focused context 기준으로 후보를 유지했지만, 실제 청취 판단 필드는 별도 notes artifact에서 pending으로 관리해야 한다.
 
 ## 6. 다음 단계 로드맵
 
