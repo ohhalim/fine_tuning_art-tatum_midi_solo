@@ -199,6 +199,7 @@ Stage B에서 명시하는 것:
 87. Stage B phrase vocabulary motif proxy keep focused package
 88. Stage B phrase vocabulary motif focused context decision
 89. Stage B phrase vocabulary motif focused listening review notes
+90. Stage B phrase vocabulary motif focused listening review fill
 
 가장 최근 의미 있는 결과:
 
@@ -315,6 +316,8 @@ Stage B에서 명시하는 것:
 - Issue #178 result: solo range `G3-G5`, final landing `G4`, duplicated 8-note pitch-class chunks `0`, objective flags `[]`; remaining risks are duplicated short pitch-class cells, grid-derived timing, and modest source tension.
 - Issue #180 creates a one-candidate focused listening review notes template from the Issue #178 focused-context keep.
 - Issue #180 result: focused notes `candidate_count=1`, pending count `1`, proxy decision `keep`; real-listening fields remain pending and must be filled before another generation repair.
+- Issue #182 fills that focused listening review note and downgrades the candidate to `needs_followup`.
+- Issue #182 result: timing `stiff`, chord fit `acceptable`, phrase continuation `acceptable`, landing `acceptable`, jazz vocabulary `thin`; next repair should target grid-derived timing and short pitch-class vocabulary while preserving focused-context register/cadence guardrails.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -333,7 +336,7 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 phrase vocabulary motif focused listening review fill이다. Issue #180은 template만 만들었으므로 pending 상태에서 generation rule을 바꾸지 않는다.
+이제 다음 단계는 focused timing vocabulary follow-up repair다. Issue #182는 final keep을 만들지 못했지만, 다음 repair 축을 timing stiffness와 short pitch-class vocabulary로 좁혔다.
 
 ## 6. 다음 단계 로드맵
 
