@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #192, Stage B focused timing vocabulary focused listening review notes
-- 다음 권장 이슈: `Stage B focused timing vocabulary focused listening review fill`
+- latest completed: Issue #194, Stage B focused timing vocabulary focused listening review fill
+- 다음 권장 이슈: `Stage B focused timing vocabulary listening follow-up repair`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,40 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Focused Timing Vocabulary Focused Listening Review Notes Result
+## Latest Focused Timing Vocabulary Focused Listening Fill Result
+
+Issue #194는 Issue #192 focused listening review notes template을 MIDI-note/context evidence 기준으로 채운 작업이다.
+
+Docs:
+
+- `docs/STAGE_B_FOCUSED_TIMING_VOCABULARY_FOCUSED_LISTENING_FILL_2026-05-27.md`
+
+Filled notes:
+
+- `outputs/stage_b_focused_listening_review_notes/harness_stage_b_focused_timing_vocab_focused_listening_notes/focused_listening_review_notes_filled.json`
+
+Filled result:
+
+- candidate count: `1`
+- reviewed count: `1`
+- pending count: `0`
+- decision:
+  - `keep`: `0`
+  - `needs_followup`: `1`
+  - `reject`: `0`
+- timing: `stiff`
+- chord fit: `acceptable`
+- phrase continuation: `acceptable`
+- landing: `strong`
+- jazz vocabulary: `thin`
+
+Decision:
+
+- The candidate survives focused context register/cadence checks and has a strong guide landing.
+- It does not survive as final keep because timing remains grid-derived and vocabulary reads thin/mechanical.
+- Next repair should target adjacent repeats, duplicated 3-note cells, and chord-color/tension while preserving objective-clean/register/cadence guardrails.
+
+## Previous Focused Timing Vocabulary Focused Listening Review Notes Result
 
 Issue #192는 Issue #190에서 `keep_for_focused_listening`으로 남은 단일 후보를 focused listening review notes template으로 만든 작업이다.
 
