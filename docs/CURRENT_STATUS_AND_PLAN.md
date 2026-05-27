@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest completed: Issue #210, Stage B focused timing vocabulary keep candidate consolidation
-- 다음 권장 이슈: `포트폴리오용 README 최종 정리`
+- latest completed: Issue #212, 포트폴리오용 README 최종 정리
+- 다음 권장 이슈: `이력서 프로젝트 bullet 정리`
 
 현재 범위가 아닌 것:
 
@@ -39,7 +39,27 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest Focused Timing Vocabulary Keep Candidate Consolidation Result
+## Latest Portfolio README Polish Result
+
+Issue #212는 Issue #210 consolidation evidence를 바탕으로 README를 지원용 포트폴리오 문서처럼 재구성한 작업이다.
+
+Updated file:
+
+- `README.md`
+
+Result:
+
+- README 상단에 문제 정의, 접근 방식, 핵심 성과를 배치했다.
+- current best focused review candidate evidence를 표로 요약했다.
+- "증명한 것"과 "아직 증명하지 않은 것"을 분리했다.
+- 실행 방법, 주요 파일, 한계, 다음 작업을 포트폴리오 독자가 읽기 쉬운 순서로 정리했다.
+- broad model quality, human/audio preference, style adaptation, product readiness를 주장하지 않는다.
+
+Next recommended issue:
+
+- `이력서 프로젝트 bullet 정리`
+
+## Previous Focused Timing Vocabulary Keep Candidate Consolidation Result
 
 Issue #210은 Issue #208에서 `keep`으로 남은 focused review candidate의 의미를 model-core MVP 관점에서 정리한 consolidation이다.
 
