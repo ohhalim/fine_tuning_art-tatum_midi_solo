@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #272, Stage B margin-recovered timing/repetition phrase/vocabulary follow-up repair
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary focused context review`
+- latest functional result: Issue #274, Stage B margin-recovered phrase/vocabulary focused context review
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary focused listening notes`
 
 현재 범위가 아닌 것:
 
@@ -1112,6 +1112,52 @@ Issue #270 후보 대비:
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_REPAIR_2026-05-28.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Focused Context Result
+
+Issue #274는 Issue #272 selected candidate를 solo/context package로 격리하고 focused context decision을 다시 실행한 작업이다.
+
+변경:
+
+- phrase/vocabulary repair summary 기반 focused package builder 추가
+- selected candidate solo-line MIDI와 context MIDI 생성/복사
+- 기존 focused context decision 기준으로 final landing, context guide, max active, repeated cell 재검증
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_phrase_vocabulary_focused_package`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-focused-context`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43` |
+| copied MIDI files | `2` |
+| focused context decision | `keep_for_focused_listening` |
+| decision flags | `{}` |
+| note count | `13` |
+| unique pitch count | `8` |
+| range | `G4-E5` |
+| phrase span | `7.000` beats |
+| max active notes | `1` |
+| dead-air ratio | `0.333` |
+| adjacent pitch repeats | `0` |
+| max interval | `7` |
+| duplicated 3-note chunks | `0` |
+| final landing | `C5` over `Fm7`, chord tone |
+| context tracks | chord guide, bass root guide, solo |
+
+해석:
+
+- focused context blocker는 발견되지 않았다.
+- final note는 outside가 아니라 chord tone이다.
+- adjacent repeat와 wide interval objective repair 상태를 유지한 채 focused listening review로 넘길 수 있다.
+- 아직 human/audio preference나 broad model quality proof는 아니다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_FOCUSED_CONTEXT_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
