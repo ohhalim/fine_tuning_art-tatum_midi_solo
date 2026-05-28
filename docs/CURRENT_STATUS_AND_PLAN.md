@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #246, Stage B margin-recovered proxy keep consolidation
-- 다음 권장 이슈: `Stage B margin-recovered proxy keep focused package`
+- latest functional result: Issue #248, Stage B margin-recovered proxy keep focused package
+- 다음 권장 이슈: `Stage B margin-recovered focused context decision`
 
 현재 범위가 아닌 것:
 
@@ -528,6 +528,48 @@ Issue #246은 Issue #244의 MIDI metric proxy review 결과를 README와 상태 
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PROXY_KEEP_CONSOLIDATION_2026-05-28.md`
+
+## Current Margin-Recovered Proxy Keep Focused Package Result
+
+Issue #248은 Issue #246의 proxy keep 후보를 focused solo/context review package로 격리한 작업이다.
+
+변경:
+
+- `scripts/build_stage_b_margin_recovered_focused_package.py` 추가
+- proxy keep 후보 `margin_recovered_rank_2_seed_31_sample_5`만 focused package로 추출
+- source generated MIDI를 simultaneous limit `1`의 focused solo-line MIDI로 변환
+- generation request의 BPM/chord progression으로 context MIDI 생성
+- `stage-b-margin-recovered-proxy-keep-focused-package` harness 추가
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_focused_package`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-proxy-keep-focused-package`
+
+결과:
+
+| 항목 | 결과 |
+|---|---|
+| package candidate count | `1` |
+| copied MIDI files | `2` |
+| selected candidate | `margin_recovered_rank_2_seed_31_sample_5` |
+| source note count | `19` |
+| focused note count | `14` |
+| source max simultaneous notes | `2` |
+| focused max simultaneous notes | `1` |
+| focused removed notes | `5` |
+| context chords | `Cm7`, `Fm7`, `Bb7`, `Ebmaj7` |
+| context BPM | `124` |
+
+해석:
+
+- proxy keep 후보를 focused context review 가능한 단일 artifact로 고정했다.
+- 이 단계는 package 생성과 solo/context 격리이며, 아직 focused context decision이나 human listening proof가 아니다.
+- 다음 작업은 solo/context MIDI 기준으로 register, chord guide fit, phrase continuation, dead-air 체감을 판단하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PROXY_KEEP_FOCUSED_PACKAGE_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
