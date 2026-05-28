@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #260, Stage B margin-recovered pitch vocabulary focused listening notes
-- 다음 권장 이슈: `Stage B margin-recovered pitch vocabulary focused listening fill`
+- latest functional result: Issue #262, Stage B margin-recovered pitch vocabulary focused listening fill
+- 다음 권장 이슈: `Stage B margin-recovered pitch vocabulary timing/repetition follow-up repair`
 
 현재 범위가 아닌 것:
 
@@ -829,6 +829,48 @@ Issue #260은 Issue #258 focused context keep 후보를 focused listening review
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_FOCUSED_LISTENING_NOTES_2026-05-28.md`
+
+## Current Margin-Recovered Pitch Vocabulary Focused Listening Fill Result
+
+Issue #262는 Issue #260 pending notes를 MIDI/context evidence 기준으로 채운 작업이다.
+
+변경:
+
+- focused listening notes fill script 추가
+- dead-air, adjacent repeat, phrase span, final landing evidence를 fill output에 보존
+- timing / phrase continuation / vocabulary risk를 decision에 반영
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_pitch_vocab_focused_listening_fill`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-pitch-vocab-focused-listening-fill`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_pitch_vocab_seed_17_topk_5_temp_09_n24_sample_4` |
+| reviewed count | `1` |
+| pending count | `0` |
+| prior decision | `keep_for_focused_listening` |
+| final decision | `needs_followup` |
+| timing | `stiff` |
+| chord fit | `strong` |
+| phrase continuation | `weak` |
+| landing | `strong` |
+| jazz vocabulary | `thin` |
+| dead-air ratio | `0.400` |
+| adjacent pitch repeats | `3` |
+
+해석:
+
+- chord fit과 landing은 blocker가 아니다.
+- timing, phrase continuation, vocabulary가 blocker다.
+- 다음 작업은 pitch vocabulary gate를 유지하면서 dead-air와 adjacent repeats를 줄이는 follow-up repair다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_FOCUSED_LISTENING_FILL_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
