@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #226, Stage B raw generation dead-air outlier diagnostics
-- 다음 권장 이슈: `Stage B dead-air-aware candidate selection gate`
+- latest functional result: Issue #228, Stage B dead-air-aware candidate selection gate
+- 다음 권장 이슈: `Stage B broader source repeatability with candidate gate`
 
 현재 범위가 아닌 것:
 
@@ -169,6 +169,36 @@ Issue #226은 Issue #224의 seed `31` dead-air outlier 원인을 분리한 작�
 Docs:
 
 - `docs/STAGE_B_DEAD_AIR_OUTLIER_DIAGNOSTICS_2026-05-28.md`
+
+## Current Dead-Air-Aware Candidate Gate Result
+
+Issue #228은 repeatability sweep에 dead-air outlier 집계와 strict-valid 후보 선택 기준을 추가한 작업이다.
+
+검증:
+
+- `ISSUE_NUMBER=228 RUN_ID=issue_228_stage_b_dead_air_candidate_gate bash scripts/agent_harness.sh stage-b-raw-generation-repeatability`
+
+결과:
+
+- total samples: `9`
+- strict valid sample count: `8/9`
+- grammar gate sample count: `9/9`
+- dead-air outlier count: `1`
+- dead-air outlier rate: `0.111`
+- max allowed outlier rate: `0.250`
+- selected best candidate: seed `17`, sample `3`
+- selected best dead-air ratio: `0.333`
+- seed `31` best strict candidate: sample `2`, dead-air `0.750`
+
+해석:
+
+- outlier를 숨기지 않고 별도 rate로 기록한다.
+- outlier가 있는 seed에서도 strict-valid 대체 후보를 선택할 수 있다.
+- 다음 작업은 source file 수를 늘려 candidate selection gate가 유지되는지 확인하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_DEAD_AIR_AWARE_CANDIDATE_GATE_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 

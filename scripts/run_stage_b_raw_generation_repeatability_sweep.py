@@ -162,12 +162,55 @@ def reason_label(value: Any) -> str:
     return ", ".join(f"{reason} ({count})" for reason, count in sorted(value.items()))
 
 
+def sample_float(sample: dict[str, Any], section: str, key: str, default: float = 0.0) -> float:
+    value = sample.get(section, {}).get(key, default)
+    return float(value if value is not None else default)
+
+
+def sample_int(sample: dict[str, Any], section: str, key: str, default: int = 0) -> int:
+    value = sample.get(section, {}).get(key, default)
+    return int(value if value is not None else default)
+
+
+def candidate_summary(seed: int, run_id: str, sample: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "seed": int(seed),
+        "run_id": run_id,
+        "sample_index": int(sample.get("sample_index", 0) or 0),
+        "midi_path": str(sample.get("midi_path", "")),
+        "dead_air_ratio": sample_float(sample, "metrics", "dead_air_ratio"),
+        "note_count": sample_int(sample, "metrics", "note_count"),
+        "unique_pitch_count": sample_int(sample, "metrics", "unique_pitch_count"),
+        "phrase_coverage_ratio": sample_float(sample, "metrics", "phrase_coverage_ratio"),
+        "onset_coverage_ratio": sample_float(sample, "temporal_coverage", "onset_coverage_ratio"),
+        "sustained_coverage_ratio": sample_float(sample, "temporal_coverage", "sustained_coverage_ratio"),
+        "postprocess_removal_ratio": sample_float(sample, "collapse", "postprocess_removal_ratio"),
+    }
+
+
+def best_strict_candidate(seed: int, run_id: str, samples: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
+    strict_candidates = [sample for sample in samples if bool(sample.get("strict_valid", False))]
+    if not strict_candidates:
+        return None
+    best = sorted(
+        strict_candidates,
+        key=lambda sample: (
+            sample_float(sample, "metrics", "dead_air_ratio"),
+            sample_float(sample, "collapse", "postprocess_removal_ratio"),
+            -sample_int(sample, "metrics", "note_count"),
+            int(sample.get("sample_index", 0) or 0),
+        ),
+    )[0]
+    return candidate_summary(seed, run_id, best)
+
+
 def row_from_report(
     seed: int,
     run_id: str,
     report_path: Path,
     report: dict[str, Any] | None,
     command_result: dict[str, Any],
+    dead_air_gate: float,
 ) -> dict[str, Any]:
     if report is None:
         return {
@@ -180,19 +223,24 @@ def row_from_report(
             "strict_valid_sample_count": 0,
             "grammar_gate_sample_count": 0,
             "passed_strict_review_gate": False,
+            "dead_air_outlier_count": 0,
+            "best_strict_candidate": None,
             "failure_reasons": {"missing_report": 1},
             "strict_failure_reasons": {"missing_report": 1},
             "diagnostic_failure_reasons": {"missing_report": 1},
         }
 
     summary = report.get("summary", {})
+    samples = [sample for sample in report.get("samples", []) if isinstance(sample, dict)]
     note_counts = _sample_metric_values(report, "note_count")
     unique_pitch_counts = _sample_metric_values(report, "unique_pitch_count")
     max_simultaneous_values = _sample_metric_values(report, "max_simultaneous_notes")
     phrase_coverage_values = _sample_metric_values(report, "phrase_coverage_ratio")
+    dead_air_ratios = _sample_metric_values(report, "dead_air_ratio")
     complete_note_groups = _grammar_values(report, "complete_note_groups")
     invalid_token_counts = _grammar_values(report, "invalid_token_count")
     postprocess_removal_ratios = _collapse_values(report, "postprocess_removal_ratio")
+    dead_air_outlier_count = sum(1 for value in dead_air_ratios if float(value) >= float(dead_air_gate))
 
     return {
         "seed": int(seed),
@@ -227,6 +275,10 @@ def row_from_report(
         "complete_note_group_range": _range(complete_note_groups),
         "invalid_token_count_range": _range(invalid_token_counts),
         "postprocess_removal_ratio_range": _range(postprocess_removal_ratios),
+        "dead_air_ratio_range": _range(dead_air_ratios),
+        "dead_air_outlier_count": int(dead_air_outlier_count),
+        "dead_air_gate": float(dead_air_gate),
+        "best_strict_candidate": best_strict_candidate(seed, run_id, samples),
         "failure_reasons": summary.get("failure_reasons", {}),
         "diagnostic_failure_reasons": summary.get("diagnostic_failure_reasons", {}),
         "strict_failure_reasons": summary.get("strict_failure_reasons", {}),
@@ -240,6 +292,7 @@ def build_repeatability_summary(
     min_strict_samples_per_seed: int,
     min_overall_strict_rate: float,
     max_postprocess_removal_ratio: float,
+    max_dead_air_outlier_rate: float,
 ) -> dict[str, Any]:
     total_samples = sum(int(row.get("sample_count", 0) or 0) for row in rows)
     total_valid = sum(int(row.get("valid_sample_count", 0) or 0) for row in rows)
@@ -263,6 +316,27 @@ def build_repeatability_summary(
     valid_rate = float(total_valid / total_samples) if total_samples else 0.0
     grammar_rate = float(total_grammar / total_samples) if total_samples else 0.0
     min_observed_input_files = min(input_file_counts) if input_file_counts else 0
+    total_dead_air_outliers = sum(int(row.get("dead_air_outlier_count", 0) or 0) for row in rows)
+    dead_air_outlier_rate = float(total_dead_air_outliers / total_samples) if total_samples else 0.0
+    seed_best_candidates = [
+        row.get("best_strict_candidate")
+        for row in rows
+        if isinstance(row.get("best_strict_candidate"), dict)
+    ]
+    selected_best_candidate = (
+        sorted(
+            seed_best_candidates,
+            key=lambda candidate: (
+                float(candidate.get("dead_air_ratio", 0.0) or 0.0),
+                float(candidate.get("postprocess_removal_ratio", 0.0) or 0.0),
+                -int(candidate.get("note_count", 0) or 0),
+                int(candidate.get("seed", 0) or 0),
+                int(candidate.get("sample_index", 0) or 0),
+            ),
+        )[0]
+        if seed_best_candidates
+        else None
+    )
 
     passed = bool(
         len(rows) >= int(min_seed_count)
@@ -270,6 +344,8 @@ def build_repeatability_summary(
         and len(seeds_with_strict) == len(rows)
         and strict_rate >= float(min_overall_strict_rate)
         and max_removal <= float(max_postprocess_removal_ratio)
+        and len(seed_best_candidates) == len(rows)
+        and dead_air_outlier_rate <= float(max_dead_air_outlier_rate)
         and not any(int(row.get("returncode", 0) or 0) != 0 for row in rows)
     )
 
@@ -291,12 +367,23 @@ def build_repeatability_summary(
         "min_overall_strict_rate": float(min_overall_strict_rate),
         "max_postprocess_removal_ratio": float(max_removal),
         "allowed_max_postprocess_removal_ratio": float(max_postprocess_removal_ratio),
+        "total_dead_air_outlier_count": int(total_dead_air_outliers),
+        "dead_air_outlier_rate": dead_air_outlier_rate,
+        "max_dead_air_outlier_rate": float(max_dead_air_outlier_rate),
+        "seed_best_candidates": seed_best_candidates,
+        "selected_best_candidate": selected_best_candidate,
         "failing_seeds": [int(row["seed"]) for row in failing_rows],
         "passed_repeatability_gate": passed,
     }
 
 
 def markdown_report(rows: Sequence[dict[str, Any]], summary: dict[str, Any]) -> str:
+    selected = summary.get("selected_best_candidate") if isinstance(summary.get("selected_best_candidate"), dict) else None
+    selected_label = (
+        f"seed {selected['seed']} sample {selected['sample_index']} dead-air {float(selected['dead_air_ratio']):.3f}"
+        if selected
+        else "none"
+    )
     lines = [
         "# Stage B Raw Generation Repeatability Sweep",
         "",
@@ -307,15 +394,18 @@ def markdown_report(rows: Sequence[dict[str, Any]], summary: dict[str, Any]) -> 
         f"- strict pass-rate: `{summary['strict_valid_sample_rate']:.3f}`",
         f"- grammar pass-rate: `{summary['grammar_gate_sample_rate']:.3f}`",
         f"- max postprocess removal ratio: `{summary['max_postprocess_removal_ratio']:.3f}`",
+        f"- dead-air outlier rate: `{summary['dead_air_outlier_rate']:.3f}`",
+        f"- selected best candidate: `{selected_label}`",
         "",
-        "| seed | files | samples | grammar | valid | strict | notes | pitches | max simultaneous | phrase coverage | max removal | strict gate |",
-        "|---:|---:|---:|---:|---:|---:|---|---|---|---|---:|:---:|",
+        "| seed | files | samples | grammar | valid | strict | dead-air outliers | best sample | best dead-air | notes | pitches | phrase coverage | max removal | strict gate |",
+        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---:|:---:|",
     ]
     for row in rows:
+        best = row.get("best_strict_candidate") if isinstance(row.get("best_strict_candidate"), dict) else None
         lines.append(
             "| {seed} | {input_file_count} | {sample_count} | {grammar_gate_sample_count} | "
-            "{valid_sample_count} | {strict_valid_sample_count} | {note_range} | "
-            "{pitch_range} | {simul_range} | {coverage_range} | {max_removal:.3f} | "
+            "{valid_sample_count} | {strict_valid_sample_count} | {dead_air_outlier_count} | "
+            "{best_sample} | {best_dead_air} | {note_range} | {pitch_range} | {coverage_range} | {max_removal:.3f} | "
             "{strict_gate} |".format(
                 seed=row["seed"],
                 input_file_count=row.get("input_file_count", 0),
@@ -323,9 +413,11 @@ def markdown_report(rows: Sequence[dict[str, Any]], summary: dict[str, Any]) -> 
                 grammar_gate_sample_count=row.get("grammar_gate_sample_count", 0),
                 valid_sample_count=row.get("valid_sample_count", 0),
                 strict_valid_sample_count=row.get("strict_valid_sample_count", 0),
+                dead_air_outlier_count=row.get("dead_air_outlier_count", 0),
+                best_sample=best.get("sample_index", "-") if best else "-",
+                best_dead_air=f"{float(best.get('dead_air_ratio', 0.0)):.3f}" if best else "-",
                 note_range=range_label(row.get("note_count_range"), digits=0),
                 pitch_range=range_label(row.get("unique_pitch_count_range"), digits=0),
-                simul_range=range_label(row.get("max_simultaneous_notes_range"), digits=0),
                 coverage_range=range_label(row.get("phrase_coverage_ratio_range"), digits=3),
                 max_removal=float(row.get("max_postprocess_removal_ratio", 0.0) or 0.0),
                 strict_gate=bool(row.get("passed_strict_review_gate", False)),
@@ -345,7 +437,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "outputs" / "stage_b_raw_generation_repeatability"))
     parser.add_argument("--probe_output_root", type=str, default=str(ROOT_DIR / "outputs" / "stage_b_generation_probe"))
     parser.add_argument("--run_id", type=str, default=None)
-    parser.add_argument("--issue_number", type=int, default=224)
+    parser.add_argument("--issue_number", type=int, default=0)
     parser.add_argument("--seeds", type=str, default="17,23,31")
     parser.add_argument("--max_files", type=int, default=2)
     parser.add_argument("--epochs", type=int, default=50)
@@ -362,6 +454,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min_strict_samples_per_seed", type=int, default=1)
     parser.add_argument("--min_overall_strict_rate", type=float, default=0.67)
     parser.add_argument("--max_allowed_postprocess_removal_ratio", type=float, default=0.49)
+    parser.add_argument("--dead_air_gate", type=float, default=0.8)
+    parser.add_argument("--max_dead_air_outlier_rate", type=float, default=0.25)
     parser.add_argument("--max_collapse_warning_sample_rate", type=float, default=0.34)
     parser.add_argument("--strict_min_unique_pitches", type=int, default=3)
     parser.add_argument("--strict_min_unique_positions", type=int, default=3)
@@ -399,6 +493,7 @@ def main() -> int:
                 report_path=report_path,
                 report=report,
                 command_result=command_result,
+                dead_air_gate=args.dead_air_gate,
             )
         )
 
@@ -409,6 +504,7 @@ def main() -> int:
         min_strict_samples_per_seed=args.min_strict_samples_per_seed,
         min_overall_strict_rate=args.min_overall_strict_rate,
         max_postprocess_removal_ratio=args.max_allowed_postprocess_removal_ratio,
+        max_dead_air_outlier_rate=args.max_dead_air_outlier_rate,
     )
     report = {
         "run_id": run_id,
@@ -421,6 +517,8 @@ def main() -> int:
             "temperature": float(args.temperature),
             "top_k": int(args.top_k),
             "postprocess_overlap": True,
+            "dead_air_gate": float(args.dead_air_gate),
+            "max_dead_air_outlier_rate": float(args.max_dead_air_outlier_rate),
         },
         "summary": summary,
         "rows": rows,
