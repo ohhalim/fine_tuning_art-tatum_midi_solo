@@ -33,6 +33,7 @@
 | final landing 검증 부족 | 마지막 음이 chord context와 맞는지 판단 어려움 | context MIDI, chord guide, bass root guide와 함께 focused context review 구성 | focused 후보 final landing `D5` over `Ebmaj7` 확인 |
 | 주관적 리뷰 기록 불일치 | "좋다/나쁘다" 식의 loose comment로 다음 repair target 불명확 | listening review notes schema 추가 | timing, chord fit, phrase continuation, landing, vocabulary, decision 분리 |
 | 실험 결과 과장 위험 | 단일 후보 keep을 모델 완성으로 오해 가능 | proven / not proven / remaining risk 문서화 | current best focused candidate와 broad quality claim 분리 |
+| margin-recovered 후보의 focused keep 실패 | 후보 3개 모두 pitch vocabulary 부족, rank 2는 dead-air도 높음 | 기존 seed31 checkpoint에서 top_k4 12-sample repair 후보 재선별 | sample 8에서 dead-air `0.444 -> 0.294`, focused unique pitch `4 -> 5`, remaining flag `low_pitch_variety` |
 
 ## 파이프라인 구조
 
@@ -51,7 +52,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #252 기준 model-core MVP:
+Issue #254 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -76,6 +77,7 @@ Issue #252 기준 model-core MVP:
 | margin-recovered focused package | rank `2` 후보만 solo/context review package로 격리, focused solo-line max active `1` |
 | margin-recovered focused context decision | rank `2` proxy keep을 `needs_followup`으로 하향, low pitch variety / dead-air blocker 기록 |
 | margin-recovered fallback comparison | rank `1/2/3` 전체 focused context 비교, focused keep `0/3`, 공통 blocker low pitch variety |
+| margin-recovered pitch/dead-air repair | top_k4 12-sample 재선별로 sample `8` 선택, dead-air `0.294`, focused unique pitch `5`, remaining flag `low_pitch_variety` |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -101,6 +103,8 @@ MVP 근거:
 - rank `2` 후보를 focused package로 격리하고 source note count `19` -> focused solo-line note count `14`, max simultaneous notes `2` -> `1` 변환 기록
 - focused context decision에서 unique pitch `4`, dead-air `0.444`로 `needs_followup` 판정해 proxy keep을 최종 후보로 과장하지 않음
 - margin-recovered 후보 3개 전체를 같은 focused context 기준으로 비교해 fallback 후보 없음, low pitch variety `3/3` 확인
+- 기존 seed `31` checkpoint의 top_k4 12-sample repair에서 dead-air를 `0.444 -> 0.294`로 낮추고 focused unique pitch를 `4 -> 5`로 올린 partial repair 확인
+- repair sample `8`도 focused unique pitch gate `6`에는 미달하므로 focused keep이나 broad quality로 승격하지 않음
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -111,8 +115,8 @@ MVP 근거:
 |---|---|
 | 만든 것 | symbolic MIDI 생성 모델의 dataset, tokenization, training, generation, decode, objective review, proxy review pipeline |
 | 겪은 문제 | `.mid` 파일 존재만으로 성공 판단 불가, one-note collapse, long sustain block, chord block, dead-air outlier, seed-level margin 부족 |
-| 해결 방식 | duration-explicit token 구조, grammar/coverage/chord-aware probe, overlap-free postprocess, repeatability sweep, dead-air diagnostics, proxy review scoring |
-| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3` |
+| 해결 방식 | duration-explicit token 구조, grammar/coverage/chord-aware probe, overlap-free postprocess, repeatability sweep, dead-air diagnostics, proxy review scoring, repair candidate selection |
+| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, repair sample dead-air `0.294` |
 | 주장 경계 | reviewable MIDI 후보 생성 검증 파이프라인까지 가능, human listening preference / Brad style adaptation / broad production quality는 미검증 |
 
 Issue #210 기준 current best focused review candidate:
@@ -150,7 +154,7 @@ Issue #210 기준 current best focused review candidate:
 |---|---|
 | broad unconstrained trained-model generation quality | 미검증 |
 | broad multi-seed model quality | 부분 검증 / 6-file 3-seed 5-sample local sweep hard gate 통과, seed-level margin warning 해소 |
-| dead-air outlier control | 부분 검증 / candidate selection gate 추가, 생성 자체 억제는 미완료 |
+| dead-air outlier control | 부분 검증 / candidate selection gate와 sample-level repair 추가, pitch vocabulary gate는 미완료 |
 | human/audio listening preference | 미검증 |
 | Brad Mehldau style adaptation | 미검증 |
 | generic jazz pianist base 완성 | 미검증 |

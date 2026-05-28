@@ -50,6 +50,8 @@ Modes:
                 Review the margin-recovered focused package against solo/context MIDI metrics.
   stage-b-margin-recovered-focused-fallback-comparison
                 Compare all margin-recovered candidates with focused context decisions.
+  stage-b-margin-recovered-pitch-dead-air-repair
+                Run expanded top-k sampling and select a pitch/dead-air repair candidate.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -181,6 +183,7 @@ run_quick() {
     scripts/fill_stage_b_margin_recovered_proxy_review.py \
     scripts/build_stage_b_margin_recovered_focused_package.py \
     scripts/review_stage_b_margin_recovered_focused_context.py \
+    scripts/select_stage_b_margin_recovered_repair_candidate.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -424,6 +427,40 @@ run_stage_b_margin_recovered_focused_fallback_comparison() {
     --run_id "$run_id" \
     --focused_package "outputs/stage_b_margin_recovered_focused_package/${package_run_id}/focused_review_package.json" \
     --expected_candidate_count 3
+}
+
+run_stage_b_margin_recovered_pitch_dead_air_repair() {
+  local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_margin_recovered_pitch_dead_air_repair_generation}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_pitch_dead_air_repair_selection}"
+  local checkpoint_dir="${CHECKPOINT_DIR:-outputs/stage_b_generation_probe/issue_238_stage_b_candidate_count_margin_recovery_seed31_files6/checkpoints}"
+  print_header "Stage B margin-recovered pitch/dead-air repair generation"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$generation_run_id" \
+    --checkpoint_dir "$checkpoint_dir" \
+    --skip_prepare \
+    --skip_train \
+    --seed 31 \
+    --max_files 6 \
+    --max_sequence 96 \
+    --num_samples 12 \
+    --temperature 0.9 \
+    --top_k 4 \
+    --postprocess_overlap \
+    --max_simultaneous_notes 2 \
+    --require_valid_sample \
+    --require_strict_valid_sample \
+    --require_note_groups \
+    --issue_number 254
+
+  print_header "Stage B margin-recovered pitch/dead-air repair selection"
+  "$PYTHON_BIN" scripts/select_stage_b_margin_recovered_repair_candidate.py \
+    --run_id "$run_id" \
+    --report_path "outputs/stage_b_generation_probe/${generation_run_id}/report.json" \
+    --baseline_candidate_id margin_recovered_rank_2_seed_31_sample_5 \
+    --baseline_dead_air 0.4444444444444444 \
+    --baseline_unique_pitch_count 4 \
+    --expected_sample_index 8 \
+    --require_partial_repair
 }
 
 run_stage_b_constrained_probe() {
@@ -1572,6 +1609,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-focused-fallback-comparison)
     run_stage_b_margin_recovered_focused_fallback_comparison
+    ;;
+  stage-b-margin-recovered-pitch-dead-air-repair)
+    run_stage_b_margin_recovered_pitch_dead_air_repair
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
