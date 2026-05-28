@@ -40,6 +40,7 @@
 | focused listening fill 후 최종 keep 실패 | dead-air가 gate 상한이고 adjacent repeat가 남음 | MIDI/context evidence 기준 listening fields 채움 | timing `stiff`, phrase `weak`, vocabulary `thin`, decision `needs_followup` |
 | timing/repetition repair 필요 | Issue #262 후보의 chord fit과 landing은 strong이지만 timing과 phrase continuation이 약함 | top_k7, temperature `0.86`, seed `37/41` sweep으로 dead-air와 adjacent repeat 동시 개선 후보 선택 | selected sample `39`, dead-air `0.400 -> 0.353`, adjacent repeats `3 -> 2`, unique pitch `6 -> 7` |
 | repair 후보 context 검증 필요 | objective repair만으로 final landing과 context guide 적합성 판단 불가 | solo/context package를 만들고 focused context decision 재실행 | decision `keep_for_focused_listening`, flags `{}`, final `A#4` over `Fm7` tension |
+| context keep 후보 청감 판단 보류 | context keep만으로 timing/phrase/vocabulary 최종 판단 불가 | focused listening notes template 생성 | candidate `1`, pending `1`, risks `dead_air_ratio_remaining`, `adjacent_pitch_repeats`, `wide_interval_review` |
 
 ## 파이프라인 구조
 
@@ -58,7 +59,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #266 기준 model-core MVP:
+Issue #268 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -90,6 +91,7 @@ Issue #266 기준 model-core MVP:
 | margin-recovered pitch vocabulary focused listening fill | reviewed `1`, pending `0`, decision `needs_followup`, timing `stiff`, vocabulary `thin` |
 | margin-recovered timing/repetition repair | seed37/41 top_k7 temp0.86 96개 후보 중 `2`개 qualified, sample `39` 선택, dead-air `0.353`, adjacent repeats `2` |
 | margin-recovered timing/repetition focused context | selected repair 후보를 solo/context package로 격리, decision `keep_for_focused_listening`, flags `{}` |
+| margin-recovered timing/repetition focused listening notes | focused listening template 생성, candidate `1`, pending `1`, review risks `3` |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -126,6 +128,7 @@ MVP 근거:
 - timing/repetition repair sweep에서 focused unique pitch `7`, note count `14`, max active `1`, duplicated 3-note chunk `0`, dead-air `0.353`, adjacent repeats `2`인 qualified 후보 선택
 - Issue #264 후보는 Issue #262 대비 objective timing/repetition metric은 개선됐지만, focused context/listening 재검증 전 최종 keep으로 보지 않음
 - timing/repetition repair 후보를 solo/context package로 격리해 range `C#4-G5`, phrase span `6.5` beats, max active `1`, final `A#4` over `Fm7` tension, context decision `keep_for_focused_listening` 확인
+- context keep 후보를 focused listening notes template으로 넘기고 timing, phrase continuation, landing, vocabulary, final decision을 pending으로 유지
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
