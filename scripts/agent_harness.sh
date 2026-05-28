@@ -52,6 +52,8 @@ Modes:
                 Compare all margin-recovered candidates with focused context decisions.
   stage-b-margin-recovered-pitch-dead-air-repair
                 Run expanded top-k sampling and select a pitch/dead-air repair candidate.
+  stage-b-margin-recovered-pitch-vocab-sweep
+                Run seed/top-k sweep and select a pitch-vocabulary qualified candidate.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -184,6 +186,7 @@ run_quick() {
     scripts/build_stage_b_margin_recovered_focused_package.py \
     scripts/review_stage_b_margin_recovered_focused_context.py \
     scripts/select_stage_b_margin_recovered_repair_candidate.py \
+    scripts/summarize_stage_b_margin_recovered_pitch_vocab_sweep.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -461,6 +464,59 @@ run_stage_b_margin_recovered_pitch_dead_air_repair() {
     --baseline_unique_pitch_count 4 \
     --expected_sample_index 8 \
     --require_partial_repair
+}
+
+run_stage_b_margin_recovered_pitch_vocab_sweep() {
+  local seed17_run_id="${SEED17_RUN_ID:-harness_stage_b_margin_recovered_pitch_vocab_seed17_topk5_temp090_n24}"
+  local seed31_run_id="${SEED31_RUN_ID:-harness_stage_b_margin_recovered_pitch_vocab_seed31_topk5_temp090_n24}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_pitch_vocab_sweep}"
+  local checkpoint_dir="${CHECKPOINT_DIR:-outputs/stage_b_generation_probe/issue_238_stage_b_candidate_count_margin_recovery_seed31_files6/checkpoints}"
+  print_header "Stage B margin-recovered pitch vocabulary sweep seed 17"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$seed17_run_id" \
+    --checkpoint_dir "$checkpoint_dir" \
+    --skip_prepare \
+    --skip_train \
+    --seed 17 \
+    --max_files 6 \
+    --max_sequence 96 \
+    --num_samples 24 \
+    --temperature 0.9 \
+    --top_k 5 \
+    --postprocess_overlap \
+    --max_simultaneous_notes 2 \
+    --require_valid_sample \
+    --require_strict_valid_sample \
+    --require_note_groups \
+    --issue_number 256
+
+  print_header "Stage B margin-recovered pitch vocabulary sweep seed 31"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$seed31_run_id" \
+    --checkpoint_dir "$checkpoint_dir" \
+    --skip_prepare \
+    --skip_train \
+    --seed 31 \
+    --max_files 6 \
+    --max_sequence 96 \
+    --num_samples 24 \
+    --temperature 0.9 \
+    --top_k 5 \
+    --postprocess_overlap \
+    --max_simultaneous_notes 2 \
+    --require_valid_sample \
+    --require_strict_valid_sample \
+    --require_note_groups \
+    --issue_number 256
+
+  print_header "Stage B margin-recovered pitch vocabulary sweep summary"
+  "$PYTHON_BIN" scripts/summarize_stage_b_margin_recovered_pitch_vocab_sweep.py \
+    --run_id "$run_id" \
+    --report_path "outputs/stage_b_generation_probe/${seed17_run_id}/report.json" \
+    --report_path "outputs/stage_b_generation_probe/${seed31_run_id}/report.json" \
+    --require_qualified \
+    --expected_source_run_id "$seed17_run_id" \
+    --expected_sample_index 4
 }
 
 run_stage_b_constrained_probe() {
@@ -1612,6 +1668,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-pitch-dead-air-repair)
     run_stage_b_margin_recovered_pitch_dead_air_repair
+    ;;
+  stage-b-margin-recovered-pitch-vocab-sweep)
+    run_stage_b_margin_recovered_pitch_vocab_sweep
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

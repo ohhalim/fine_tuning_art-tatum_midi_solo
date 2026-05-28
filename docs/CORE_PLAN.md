@@ -72,6 +72,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered focused context decision 문서: `docs/STAGE_B_MARGIN_RECOVERED_FOCUSED_CONTEXT_DECISION_2026-05-28.md`
 - margin-recovered focused fallback comparison 문서: `docs/STAGE_B_MARGIN_RECOVERED_FOCUSED_FALLBACK_COMPARISON_2026-05-28.md`
 - margin-recovered pitch/dead-air repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PITCH_DEAD_AIR_REPAIR_2026-05-28.md`
+- margin-recovered pitch vocabulary sweep 문서: `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_SWEEP_2026-05-28.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -89,6 +90,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered focused context decision: rank `2` proxy keep을 `needs_followup`으로 하향, low pitch variety/dead-air blocker 기록
 - margin-recovered focused fallback comparison: 후보 3개 전체 focused context 비교, focused keep `0/3`, low pitch variety `3/3`
 - margin-recovered pitch/dead-air repair: 기존 seed `31` checkpoint top_k4 12-sample 재선별, sample `8` dead-air `0.294`, focused unique pitch `5`, remaining flag `low_pitch_variety`
+- margin-recovered pitch vocabulary sweep: seed `17/31` top_k5 48개 후보 중 qualified `1`, selected unique pitch `6`, dead-air `0.400`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -277,6 +279,7 @@ Stage B에서 명시하는 것:
 122. Stage B margin-recovered focused context decision
 123. Stage B margin-recovered focused fallback comparison
 124. Stage B margin-recovered pitch/dead-air repair
+125. Stage B margin-recovered pitch vocabulary sweep
 
 가장 최근 의미 있는 결과:
 
@@ -436,6 +439,8 @@ Stage B에서 명시하는 것:
 - Issue #218 result: README now ends at execution commands and keeps the focus on implementation, problem solving, validation, and results.
 - Issue #254 runs a top_k4 12-sample repair from the existing seed `31` checkpoint and selects sample `8` as the best partial pitch/dead-air repair.
 - Issue #254 result: dead-air improves from `0.444` to `0.294`, focused unique pitch improves from `4` to `5`, and remaining flag is `low_pitch_variety`; this is not a focused keep.
+- Issue #256 runs a seed/top-k pitch vocabulary sweep over `48` candidates and finds `1` qualified candidate.
+- Issue #256 result: selected sample has focused unique pitch `6`, dead-air `0.400`, focused notes `13`, duplicated 3-note chunks `0`, but dead-air and adjacent repeats regress from Issue #254.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -454,8 +459,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #254는 dead-air를 줄이는 partial repair를 확인했지만 focused unique pitch가 `5`에 머물렀다.
-다음 작업은 dead-air `<= 0.40`을 유지하면서 focused unique pitch `>= 6`을 만족시키는 pitch vocabulary expansion sweep이어야 한다.
+Issue #256은 focused unique pitch `>= 6` 후보를 찾았지만 dead-air가 Issue #254 대비 `0.294 -> 0.400`으로 나빠졌다.
+다음 작업은 이 qualified 후보를 focused context review로 격리해 dead-air와 adjacent repeat tradeoff가 실제 blocker인지 확인하는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -981,33 +986,35 @@ Issue #254는 dead-air를 줄이는 partial repair를 확인했지만 focused un
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered pitch/dead-air repair
+Stage B margin-recovered pitch vocabulary sweep
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PITCH_DEAD_AIR_REPAIR_2026-05-28.md`
-- generation samples: `12`
-- strict valid samples: `12/12`
-- grammar gate samples: `12/12`
-- selected repair candidate: `margin_recovered_repair_seed_31_sample_8`
-- dead-air: `0.444 -> 0.294`
-- focused unique pitch count: `4 -> 5`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_SWEEP_2026-05-28.md`
+- report count: `2`
+- candidate count: `48`
+- qualified candidate count: `1`
+- selected candidate: `margin_recovered_pitch_vocab_seed_17_topk_5_temp_09_n24_sample_4`
+- focused unique pitch count: `5 -> 6` compared with Issue #254
+- dead-air: `0.294 -> 0.400` compared with Issue #254
+- focused notes: `13`
 - focused max active notes: `1`
 - duplicated 3-note pitch-class chunks: `0`
-- focused keep ready: false
-- remaining flag: `low_pitch_variety`
+- adjacent pitch repeats: `3`
+- remaining flags: `[]`
 
 판단:
 
-- sample `8`은 dead-air와 pitch variety를 동시에 개선한 partial repair다.
-- focused unique pitch가 `6` 미만이라 focused keep으로 승격하지 않는다.
+- selected sample은 pitch vocabulary hard gate를 통과했다.
+- dead-air는 absolute gate 안에 있지만 Issue #254보다 나빠졌다.
+- adjacent repeat도 `1 -> 3`으로 늘었다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered pitch-vocabulary expansion sweep`으로 잡는다.
-- dead-air `<= 0.40`을 유지하면서 focused unique pitch `>= 6`을 만족시키는 generation/selection sweep을 분리한다.
+- 다음 issue는 `Stage B margin-recovered pitch vocabulary focused context review`로 잡는다.
+- selected sample을 context package로 격리해 dead-air와 adjacent repeat tradeoff가 실제 blocker인지 판단한다.
 - max active `1`과 repeated-cell-free 조건은 유지한다.
 - focused context에서 다시 통과하기 전에는 listening review notes로 올리지 않는다.
 
