@@ -36,6 +36,8 @@ Modes:
                 Run raw Stage B generation across multiple seeds and source files.
   stage-b-dead-air-diagnostics
                 Diagnose dead-air outliers from a Stage B generation probe report.
+  stage-b-seed-strict-margin-diagnostics
+                Diagnose per-seed strict margin risk from a Stage B repeatability summary.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -161,6 +163,7 @@ run_quick() {
     scripts/run_stage_b_generation_probe.py \
     scripts/run_stage_b_raw_generation_repeatability_sweep.py \
     scripts/diagnose_stage_b_dead_air_outliers.py \
+    scripts/diagnose_stage_b_seed_strict_margins.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -313,6 +316,17 @@ run_stage_b_dead_air_diagnostics() {
     --run_id "$run_id" \
     --report_path "$report_path" \
     --expected_outliers 1
+}
+
+run_stage_b_seed_strict_margin_diagnostics() {
+  local run_id="${RUN_ID:-harness_stage_b_seed_strict_margin_diagnostics}"
+  local summary_path="${SUMMARY_PATH:-outputs/stage_b_raw_generation_repeatability/issue_232_stage_b_larger_source_risk_boundary_files6/repeatability_summary.json}"
+  print_header "Stage B seed strict margin diagnostics"
+  "$PYTHON_BIN" scripts/diagnose_stage_b_seed_strict_margins.py \
+    --run_id "$run_id" \
+    --summary_path "$summary_path" \
+    --warning_min_strict_samples_per_seed 2 \
+    --expected_margin_warning_seeds 17
 }
 
 run_stage_b_constrained_probe() {
@@ -1440,6 +1454,9 @@ case "$MODE" in
     ;;
   stage-b-dead-air-diagnostics)
     run_stage_b_dead_air_diagnostics
+    ;;
+  stage-b-seed-strict-margin-diagnostics)
+    run_stage_b_seed_strict_margin_diagnostics
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
