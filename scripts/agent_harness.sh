@@ -38,6 +38,8 @@ Modes:
                 Diagnose dead-air outliers from a Stage B generation probe report.
   stage-b-seed-strict-margin-diagnostics
                 Diagnose per-seed strict margin risk from a Stage B repeatability summary.
+  stage-b-margin-recovered-review-export
+                Export review metrics from a margin-recovered Stage B repeatability summary.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -164,6 +166,7 @@ run_quick() {
     scripts/run_stage_b_raw_generation_repeatability_sweep.py \
     scripts/diagnose_stage_b_dead_air_outliers.py \
     scripts/diagnose_stage_b_seed_strict_margins.py \
+    scripts/build_stage_b_margin_recovered_review_export.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -329,6 +332,16 @@ run_stage_b_seed_strict_margin_diagnostics() {
     --summary_path "$summary_path" \
     --warning_min_strict_samples_per_seed 2 \
     --expected_margin_warning_seeds 17
+}
+
+run_stage_b_margin_recovered_review_export() {
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_review_export}"
+  local summary_path="${SUMMARY_PATH:-outputs/stage_b_raw_generation_repeatability/issue_238_stage_b_candidate_count_margin_recovery/repeatability_summary.json}"
+  print_header "Stage B margin-recovered candidate review export"
+  "$PYTHON_BIN" scripts/build_stage_b_margin_recovered_review_export.py \
+    --run_id "$run_id" \
+    --summary_path "$summary_path" \
+    --expected_candidate_count 3
 }
 
 run_stage_b_constrained_probe() {
@@ -1459,6 +1472,9 @@ case "$MODE" in
     ;;
   stage-b-seed-strict-margin-diagnostics)
     run_stage_b_seed_strict_margin_diagnostics
+    ;;
+  stage-b-margin-recovered-review-export)
+    run_stage_b_margin_recovered_review_export
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
