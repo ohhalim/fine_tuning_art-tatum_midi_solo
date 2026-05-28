@@ -32,6 +32,8 @@ Modes:
                 Prepare Stage B phrase windows and verify token vocab fit.
   stage-b-generation-probe
                 Run a Stage B raw decode/generation gate probe.
+  stage-b-raw-generation-repeatability
+                Run raw Stage B generation across multiple seeds and source files.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -155,6 +157,7 @@ run_quick() {
     scripts/prepare_role_dataset.py \
     scripts/run_stage_b_window_tiny_overfit.py \
     scripts/run_stage_b_generation_probe.py \
+    scripts/run_stage_b_raw_generation_repeatability_sweep.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -258,6 +261,31 @@ run_stage_b_generation_probe() {
     --require_note_groups \
     --require_valid_sample \
     --require_strict_valid_sample
+}
+
+run_stage_b_raw_generation_repeatability() {
+  local run_id="${RUN_ID:-harness_stage_b_raw_generation_repeatability}"
+  print_header "Stage B raw generation repeatability sweep"
+  "$PYTHON_BIN" scripts/run_stage_b_raw_generation_repeatability_sweep.py \
+    --run_id "$run_id" \
+    --max_files 2 \
+    --seeds 17,23,31 \
+    --epochs 50 \
+    --batch_size 8 \
+    --max_sequence 96 \
+    --num_samples 3 \
+    --top_k 4 \
+    --temperature 0.9 \
+    --min_seed_count 3 \
+    --min_source_files 2 \
+    --min_strict_samples_per_seed 1 \
+    --min_overall_strict_rate 0.67 \
+    --n_layers 1 \
+    --num_heads 4 \
+    --d_model 64 \
+    --dim_feedforward 128 \
+    --lora_r 4 \
+    --lora_alpha 8
 }
 
 run_stage_b_constrained_probe() {
@@ -1379,6 +1407,9 @@ case "$MODE" in
     ;;
   stage-b-generation-probe)
     run_stage_b_generation_probe
+    ;;
+  stage-b-raw-generation-repeatability)
+    run_stage_b_raw_generation_repeatability
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
