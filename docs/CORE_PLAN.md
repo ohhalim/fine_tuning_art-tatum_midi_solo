@@ -62,6 +62,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - broader source 문서: `docs/STAGE_B_BROADER_SOURCE_CANDIDATE_GATE_2026-05-28.md`
 - larger source boundary 문서: `docs/STAGE_B_LARGER_SOURCE_RISK_BOUNDARY_2026-05-28.md`
 - seed strict margin 진단 문서: `docs/STAGE_B_SEED_STRICT_MARGIN_DIAGNOSTICS_2026-05-28.md`
+- seed strict margin warning gate 문서: `docs/STAGE_B_SEED_STRICT_MARGIN_WARNING_GATE_2026-05-28.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -69,6 +70,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - broader source candidate gate: 3-file/3-seed sweep 통과, strict `7/9`, dead-air outlier rate `0.222`
 - larger source risk boundary: 4/5/6-file hard gate 통과, 6-file seed `17` strict `1/3`
 - seed strict margin diagnostics: 6-file seed `17` failure가 sample `1` dead-air와 sample `2` unique-pitch로 분리됨
+- seed strict margin warning gate: hard gate 유지, 6-file warning seed `17` summary 기록
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -247,6 +249,7 @@ Stage B에서 명시하는 것:
 112. Stage B broader source repeatability with candidate gate
 113. Stage B larger source repeatability risk boundary
 114. Stage B seed-level strict margin diagnostics
+115. Stage B per-seed strict margin warning gate
 
 가장 최근 의미 있는 결과:
 

@@ -282,6 +282,7 @@ run_stage_b_raw_generation_repeatability() {
   local top_k="${TOP_K:-4}"
   local temperature="${TEMPERATURE:-0.9}"
   local max_dead_air_outlier_rate="${MAX_DEAD_AIR_OUTLIER_RATE:-0.25}"
+  local warning_min_strict_samples_per_seed="${WARNING_MIN_STRICT_SAMPLES_PER_SEED:-2}"
   print_header "Stage B raw generation repeatability sweep"
   "$PYTHON_BIN" scripts/run_stage_b_raw_generation_repeatability_sweep.py \
     --run_id "$run_id" \
@@ -298,6 +299,7 @@ run_stage_b_raw_generation_repeatability() {
     --min_source_files "$min_source_files" \
     --min_strict_samples_per_seed 1 \
     --min_overall_strict_rate 0.67 \
+    --warning_min_strict_samples_per_seed "$warning_min_strict_samples_per_seed" \
     --dead_air_gate 0.8 \
     --max_dead_air_outlier_rate "$max_dead_air_outlier_rate" \
     --n_layers 1 \

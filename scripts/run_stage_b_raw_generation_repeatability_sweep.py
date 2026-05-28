@@ -293,6 +293,7 @@ def build_repeatability_summary(
     min_overall_strict_rate: float,
     max_postprocess_removal_ratio: float,
     max_dead_air_outlier_rate: float,
+    warning_min_strict_samples_per_seed: int = 2,
 ) -> dict[str, Any]:
     total_samples = sum(int(row.get("sample_count", 0) or 0) for row in rows)
     total_valid = sum(int(row.get("valid_sample_count", 0) or 0) for row in rows)
@@ -322,6 +323,19 @@ def build_repeatability_summary(
         row.get("best_strict_candidate")
         for row in rows
         if isinstance(row.get("best_strict_candidate"), dict)
+    ]
+    strict_margin_warning_rows = [
+        {
+            "seed": int(row["seed"]),
+            "sample_count": int(row.get("sample_count", 0) or 0),
+            "strict_valid_sample_count": int(row.get("strict_valid_sample_count", 0) or 0),
+            "warning_min_strict_samples_per_seed": int(warning_min_strict_samples_per_seed),
+            "strict_margin": int(
+                int(row.get("strict_valid_sample_count", 0) or 0) - int(warning_min_strict_samples_per_seed)
+            ),
+        }
+        for row in rows
+        if int(row.get("strict_valid_sample_count", 0) or 0) < int(warning_min_strict_samples_per_seed)
     ]
     selected_best_candidate = (
         sorted(
@@ -370,6 +384,10 @@ def build_repeatability_summary(
         "total_dead_air_outlier_count": int(total_dead_air_outliers),
         "dead_air_outlier_rate": dead_air_outlier_rate,
         "max_dead_air_outlier_rate": float(max_dead_air_outlier_rate),
+        "warning_min_strict_samples_per_seed": int(warning_min_strict_samples_per_seed),
+        "strict_margin_warning_seed_count": int(len(strict_margin_warning_rows)),
+        "strict_margin_warning_seeds": [int(row["seed"]) for row in strict_margin_warning_rows],
+        "strict_margin_warning_rows": strict_margin_warning_rows,
         "seed_best_candidates": seed_best_candidates,
         "selected_best_candidate": selected_best_candidate,
         "failing_seeds": [int(row["seed"]) for row in failing_rows],
@@ -395,16 +413,19 @@ def markdown_report(rows: Sequence[dict[str, Any]], summary: dict[str, Any]) -> 
         f"- grammar pass-rate: `{summary['grammar_gate_sample_rate']:.3f}`",
         f"- max postprocess removal ratio: `{summary['max_postprocess_removal_ratio']:.3f}`",
         f"- dead-air outlier rate: `{summary['dead_air_outlier_rate']:.3f}`",
+        f"- warning min strict per seed: `{summary.get('warning_min_strict_samples_per_seed', 0)}`",
+        f"- strict margin warning seeds: `{summary.get('strict_margin_warning_seeds', [])}`",
         f"- selected best candidate: `{selected_label}`",
         "",
-        "| seed | files | samples | grammar | valid | strict | dead-air outliers | best sample | best dead-air | notes | pitches | phrase coverage | max removal | strict gate |",
-        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---:|:---:|",
+        "| seed | files | samples | grammar | valid | strict | margin warning | dead-air outliers | best sample | best dead-air | notes | pitches | phrase coverage | max removal | strict gate |",
+        "|---:|---:|---:|---:|---:|---:|:---:|---:|---:|---:|---|---|---|---:|:---:|",
     ]
+    warning_seeds = set(int(seed) for seed in summary.get("strict_margin_warning_seeds", []))
     for row in rows:
         best = row.get("best_strict_candidate") if isinstance(row.get("best_strict_candidate"), dict) else None
         lines.append(
             "| {seed} | {input_file_count} | {sample_count} | {grammar_gate_sample_count} | "
-            "{valid_sample_count} | {strict_valid_sample_count} | {dead_air_outlier_count} | "
+            "{valid_sample_count} | {strict_valid_sample_count} | {margin_warning} | {dead_air_outlier_count} | "
             "{best_sample} | {best_dead_air} | {note_range} | {pitch_range} | {coverage_range} | {max_removal:.3f} | "
             "{strict_gate} |".format(
                 seed=row["seed"],
@@ -413,6 +434,7 @@ def markdown_report(rows: Sequence[dict[str, Any]], summary: dict[str, Any]) -> 
                 grammar_gate_sample_count=row.get("grammar_gate_sample_count", 0),
                 valid_sample_count=row.get("valid_sample_count", 0),
                 strict_valid_sample_count=row.get("strict_valid_sample_count", 0),
+                margin_warning=int(row["seed"]) in warning_seeds,
                 dead_air_outlier_count=row.get("dead_air_outlier_count", 0),
                 best_sample=best.get("sample_index", "-") if best else "-",
                 best_dead_air=f"{float(best.get('dead_air_ratio', 0.0)):.3f}" if best else "-",
@@ -453,6 +475,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min_source_files", type=int, default=2)
     parser.add_argument("--min_strict_samples_per_seed", type=int, default=1)
     parser.add_argument("--min_overall_strict_rate", type=float, default=0.67)
+    parser.add_argument("--warning_min_strict_samples_per_seed", type=int, default=2)
     parser.add_argument("--max_allowed_postprocess_removal_ratio", type=float, default=0.49)
     parser.add_argument("--dead_air_gate", type=float, default=0.8)
     parser.add_argument("--max_dead_air_outlier_rate", type=float, default=0.25)
@@ -505,6 +528,7 @@ def main() -> int:
         min_overall_strict_rate=args.min_overall_strict_rate,
         max_postprocess_removal_ratio=args.max_allowed_postprocess_removal_ratio,
         max_dead_air_outlier_rate=args.max_dead_air_outlier_rate,
+        warning_min_strict_samples_per_seed=args.warning_min_strict_samples_per_seed,
     )
     report = {
         "run_id": run_id,
@@ -519,6 +543,7 @@ def main() -> int:
             "postprocess_overlap": True,
             "dead_air_gate": float(args.dead_air_gate),
             "max_dead_air_outlier_rate": float(args.max_dead_air_outlier_rate),
+            "warning_min_strict_samples_per_seed": int(args.warning_min_strict_samples_per_seed),
         },
         "summary": summary,
         "rows": rows,

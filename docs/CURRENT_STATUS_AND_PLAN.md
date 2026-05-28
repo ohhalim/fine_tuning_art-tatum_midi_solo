@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #234, Stage B seed-level strict margin diagnostics
-- 다음 권장 이슈: `Stage B per-seed strict margin warning gate`
+- latest functional result: Issue #236, Stage B per-seed strict margin warning gate
+- 다음 권장 이슈: `Stage B candidate count margin recovery sweep`
 
 현재 범위가 아닌 것:
 
@@ -310,6 +310,45 @@ seed `17` sample breakdown:
 Docs:
 
 - `docs/STAGE_B_SEED_STRICT_MARGIN_DIAGNOSTICS_2026-05-28.md`
+
+## Current Seed Strict Margin Warning Gate Result
+
+Issue #236은 repeatability summary에 seed별 strict margin warning을 추가한 작업이다.
+
+변경:
+
+- `--warning_min_strict_samples_per_seed` 인자 추가
+- `strict_margin_warning_seed_count`, `strict_margin_warning_seeds`, `strict_margin_warning_rows` summary 추가
+- summary markdown의 seed table에 `margin warning` column 추가
+- harness에서 `WARNING_MIN_STRICT_SAMPLES_PER_SEED` 환경 변수 연결
+
+검증:
+
+- `bash scripts/agent_harness.sh stage-b-raw-generation-repeatability`
+- `ISSUE_NUMBER=236 MAX_FILES=6 MIN_SOURCE_FILES=6 RUN_ID=issue_236_stage_b_seed_strict_margin_warning_gate bash scripts/agent_harness.sh stage-b-raw-generation-repeatability`
+
+6-file 결과:
+
+- repeatability gate: 통과
+- strict valid samples: `7/9`
+- grammar gate samples: `9/9`
+- dead-air outlier rate: `0.111`
+- hard min strict per seed: `1`
+- warning min strict per seed: `2`
+- strict margin warning seeds: `17`
+- selected best candidate: seed `23`, sample `1`, dead-air `0.375`
+
+해석:
+
+- hard gate와 soft warning이 분리됐다.
+- 6-file run은 기존 hard gate를 계속 통과한다.
+- seed `17`의 strict margin risk가 aggregate pass-rate에 묻히지 않고 summary에 직접 드러난다.
+- warning은 실패 처리가 아니라 다음 실험 우선순위 신호다.
+- 다음 작업은 samples per seed를 늘렸을 때 seed `17` margin warning이 줄어드는지 확인하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_SEED_STRICT_MARGIN_WARNING_GATE_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
