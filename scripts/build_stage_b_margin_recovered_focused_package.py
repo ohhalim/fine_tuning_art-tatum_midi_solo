@@ -131,7 +131,7 @@ def selected_keep_candidates(review_notes: dict[str, Any], *, decision: str) -> 
         if not isinstance(candidate, dict):
             raise MarginRecoveredFocusedPackageError("candidate must be an object")
         listening = candidate.get("listening") if isinstance(candidate.get("listening"), dict) else {}
-        if str(listening.get("decision") or "") == decision:
+        if str(decision) == "all" or str(listening.get("decision") or "") == decision:
             selected.append(candidate)
     return selected
 

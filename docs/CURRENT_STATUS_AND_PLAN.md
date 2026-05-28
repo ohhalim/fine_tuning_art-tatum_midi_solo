@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #250, Stage B margin-recovered focused context decision
-- 다음 권장 이슈: `Stage B margin-recovered focused pitch-vocabulary dead-air follow-up`
+- latest functional result: Issue #252, Stage B margin-recovered focused fallback comparison
+- 다음 권장 이슈: `Stage B margin-recovered pitch-vocabulary dead-air repair`
 
 현재 범위가 아닌 것:
 
@@ -614,6 +614,41 @@ Issue #250은 Issue #248 focused package의 단일 proxy keep 후보를 solo/con
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_FOCUSED_CONTEXT_DECISION_2026-05-28.md`
+
+## Current Margin-Recovered Focused Fallback Comparison Result
+
+Issue #252는 margin-recovered 후보 3개 전체를 focused solo/context metric 기준으로 비교한 작업이다.
+
+변경:
+
+- focused package builder에서 decision `all` 지원
+- margin-recovered 후보 3개 전체 focused package 생성
+- 후보 3개 전체 focused context decision 실행
+- fallback 후보 유무와 blocker aggregate 기록
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_focused_review_package tests.test_stage_b_margin_recovered_focused_package tests.test_stage_b_margin_recovered_focused_context_decision`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-focused-fallback-comparison`
+
+결과:
+
+| candidate | prior | focused decision | notes | unique | dead-air | flags |
+|---|---|---|---:|---:|---:|---|
+| `margin_recovered_rank_1_seed_23_sample_1` | needs_followup | needs_followup | `4` | `4` | `0.375` | too_sparse, low_pitch_variety, short_phrase_span |
+| `margin_recovered_rank_2_seed_31_sample_5` | keep | needs_followup | `14` | `4` | `0.444` | low_pitch_variety, dead_air_needs_review |
+| `margin_recovered_rank_3_seed_17_sample_3` | needs_followup | needs_followup | `11` | `4` | `0.500` | too_sparse, low_pitch_variety, dead_air_needs_review |
+
+해석:
+
+- margin-recovered 후보군 안에는 focused listening으로 올릴 fallback 후보가 없다.
+- low pitch variety는 `3/3` 후보에서 공통 blocker다.
+- rank `2`는 상대적으로 가장 낫지만 focused keep으로 승격하지 않는다.
+- 다음 작업은 fallback 선택이 아니라 pitch vocabulary와 dead-air를 함께 줄이는 repair다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_FOCUSED_FALLBACK_COMPARISON_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
