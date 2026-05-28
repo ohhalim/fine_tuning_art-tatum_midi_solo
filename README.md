@@ -46,6 +46,7 @@
 | phrase/vocabulary repair 후보 context 검증 필요 | objective gate 통과만으로 final landing과 context guide 적합성 판단 불가 | solo/context package를 만들고 focused context decision 재실행 | decision `keep_for_focused_listening`, flags `{}`, final `C5` over `Fm7` chord tone |
 | context keep 후보 청감 판단 보류 | focused context keep만으로 timing/phrase/vocabulary 최종 판단 불가 | focused listening notes template 생성 | candidate `1`, pending `1`, risk `sustained_coverage_review` |
 | focused listening fill 후 keep 판정 경계 | sustained coverage가 threshold 근처라 최종 음악 품질로 과장할 위험 | MIDI/context evidence 기준으로 listening fields 채움 | timing `acceptable`, phrase `acceptable`, vocabulary `acceptable`, decision `keep`, human/audio proof는 미검증 |
+| keep 후보 과장 위험 | evidence fill의 `keep`을 broad model quality로 오해할 수 있음 | proven / not proven / next boundary로 consolidation | current margin-recovered evidence keep candidate와 human/audio 미검증 범위 분리 |
 
 ## 파이프라인 구조
 
@@ -64,7 +65,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #278 기준 model-core MVP:
+Issue #280 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -102,6 +103,7 @@ Issue #278 기준 model-core MVP:
 | margin-recovered phrase vocabulary focused context | selected repair 후보를 solo/context package로 격리, decision `keep_for_focused_listening`, flags `{}` |
 | margin-recovered phrase vocabulary focused listening notes | focused listening template 생성, candidate `1`, pending `1`, review risk `sustained_coverage_review` |
 | margin-recovered phrase vocabulary focused listening fill | reviewed `1`, pending `0`, timing `acceptable`, phrase `acceptable`, vocabulary `acceptable`, decision `keep` |
+| margin-recovered phrase vocabulary keep consolidation | current evidence keep candidate 정리, human/audio proof와 broad quality claim boundary 분리 |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -144,6 +146,7 @@ MVP 근거:
 - phrase/vocabulary repair 후보를 solo/context package로 격리해 range `G4-E5`, phrase span `7.0` beats, max active `1`, final `C5` over `Fm7` chord tone, context decision `keep_for_focused_listening` 확인
 - context keep 후보를 focused listening notes template으로 넘기고 timing, phrase continuation, landing, vocabulary, final decision을 pending으로 유지
 - focused listening fill에서 timing `acceptable`, phrase continuation `acceptable`, jazz vocabulary `acceptable`, final decision `keep`으로 기록하되 human/audio proof와 분리
+- margin-recovered evidence keep candidate를 정리하고 broad trained-model quality, human/audio preference, Brad style adaptation은 아직 미검증으로 유지
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -157,6 +160,25 @@ MVP 근거:
 | 해결 방식 | duration-explicit token 구조, grammar/coverage/chord-aware probe, overlap-free postprocess, repeatability sweep, dead-air diagnostics, proxy review scoring, repair candidate selection |
 | 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused context `keep_for_focused_listening`, phrase/vocabulary focused fill `keep` |
 | 주장 경계 | reviewable MIDI 후보 생성 검증 파이프라인까지 가능, human listening preference / Brad style adaptation / broad production quality는 미검증 |
+
+Issue #280 기준 current margin-recovered evidence keep candidate:
+
+| 항목 | 결과 |
+|---|---|
+| candidate | `margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43` |
+| decision path | objective repair -> focused context -> focused listening notes -> evidence fill |
+| filled decision | `keep` |
+| note count | `13` |
+| unique pitch count | `8` |
+| range | `G4-E5` |
+| phrase span | `7.000` beats |
+| max active notes | `1` |
+| dead-air ratio | `0.333` |
+| sustained coverage | `0.594` |
+| adjacent pitch repeats | `0` |
+| max interval | `7` |
+| final landing | `C5` over `Fm7`, chord tone |
+| remaining risk | `sustained_coverage_review` |
 
 Issue #210 기준 current best focused review candidate:
 
