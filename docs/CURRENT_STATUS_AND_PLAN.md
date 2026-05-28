@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #264, Stage B margin-recovered pitch vocabulary timing/repetition follow-up repair
-- 다음 권장 이슈: `Stage B margin-recovered timing/repetition focused context review`
+- latest functional result: Issue #266, Stage B margin-recovered timing/repetition focused context review
+- 다음 권장 이슈: `Stage B margin-recovered timing/repetition focused listening notes`
 
 현재 범위가 아닌 것:
 
@@ -923,6 +923,51 @@ Issue #262 후보 대비:
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_REPAIR_2026-05-28.md`
+
+## Current Margin-Recovered Timing/Repetition Focused Context Result
+
+Issue #266은 Issue #264 selected candidate를 solo/context package로 격리하고 focused context decision을 다시 실행한 작업이다.
+
+변경:
+
+- timing/repetition repair summary 기반 focused package builder 추가
+- selected candidate solo-line MIDI와 context MIDI 생성/복사
+- 기존 focused context decision 기준으로 final landing, context guide, max active, repeated cell 재검증
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_timing_repetition_focused_package`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-timing-repetition-focused-context`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_timing_repetition_seed_37_topk_7_temp_086_n48_sample_39` |
+| copied MIDI files | `2` |
+| focused context decision | `keep_for_focused_listening` |
+| decision flags | `{}` |
+| note count | `14` |
+| unique pitch count | `7` |
+| range | `C#4-G5` |
+| phrase span | `6.500` beats |
+| max active notes | `1` |
+| dead-air ratio | `0.353` |
+| adjacent pitch repeats | `2` |
+| duplicated 3-note chunks | `0` |
+| final landing | `A#4` over `Fm7`, tension |
+| context tracks | chord guide, bass root guide, solo |
+
+해석:
+
+- focused context blocker는 발견되지 않았다.
+- final note는 outside가 아니라 tension이다.
+- 이 결과는 focused listening review 진입 조건이다.
+- 아직 human/audio preference나 broad model quality proof는 아니다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_CONTEXT_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 

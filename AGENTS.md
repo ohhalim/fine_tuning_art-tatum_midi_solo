@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #264, Stage B margin-recovered pitch vocabulary timing/repetition follow-up repair.
+- Latest functional issue completed: Issue #266, Stage B margin-recovered timing/repetition focused context review.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered timing/repetition focused context review.
+- Recommended next issue: Stage B margin-recovered timing/repetition focused listening notes.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -426,6 +426,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-timing-repetition-repair
 ```
 
 This harness tests whether the selected pitch-vocabulary candidate can keep focused unique pitch coverage while reducing dead-air and adjacent pitch repetition.
+
+For Stage B margin-recovered timing/repetition focused context changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-timing-repetition-focused-context
+```
+
+This harness packages the selected timing/repetition repair candidate with chord/bass context and verifies focused context decision readiness.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
