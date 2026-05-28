@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #278, Stage B margin-recovered phrase/vocabulary focused listening fill.
+- Latest functional issue completed: Issue #280, Stage B margin-recovered phrase/vocabulary keep consolidation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary keep consolidation.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary keep stability comparison.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

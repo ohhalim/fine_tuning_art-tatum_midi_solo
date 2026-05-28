@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #278, Stage B margin-recovered phrase/vocabulary focused listening fill
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary keep consolidation`
+- latest functional result: Issue #280, Stage B margin-recovered phrase/vocabulary keep consolidation
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary keep stability comparison`
 
 현재 범위가 아닌 것:
 
@@ -1250,6 +1250,51 @@ Issue #278은 Issue #276 focused listening notes를 MIDI/context evidence 기준
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_FOCUSED_LISTENING_FILL_2026-05-28.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Keep Consolidation Result
+
+Issue #280은 Issue #278 filled `keep` 결과를 current margin-recovered evidence keep candidate로 정리한 작업이다.
+
+변경:
+
+- keep consolidation 문서 추가
+- current margin-recovered evidence keep candidate metrics 정리
+- proven / not proven / next boundary 분리
+- README와 handoff docs 업데이트
+
+검증:
+
+- `bash scripts/agent_harness.sh quick`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43` |
+| decision path | objective repair -> focused context -> focused listening notes -> evidence fill |
+| focused context decision | `keep_for_focused_listening` |
+| filled listening decision | `keep` |
+| note count | `13` |
+| unique pitch count | `8` |
+| range | `G4-E5` |
+| phrase span | `7.000` beats |
+| max active notes | `1` |
+| dead-air ratio | `0.333` |
+| sustained coverage | `0.594` |
+| adjacent pitch repeats | `0` |
+| max interval | `7` |
+| final landing | `C5` over `Fm7`, chord tone |
+| remaining evidence risk | `sustained_coverage_review` |
+
+해석:
+
+- current margin-recovered evidence keep candidate가 정리됐다.
+- human/audio preference, broad trained-model quality, Brad style adaptation, broader repeatability는 아직 미검증이다.
+- 다음은 단일 keep 후보가 아닌지 stability comparison으로 분리한다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_KEEP_CONSOLIDATION_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
