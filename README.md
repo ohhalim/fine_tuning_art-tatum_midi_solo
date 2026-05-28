@@ -35,6 +35,7 @@
 | 실험 결과 과장 위험 | 단일 후보 keep을 모델 완성으로 오해 가능 | proven / not proven / remaining risk 문서화 | current best focused candidate와 broad quality claim 분리 |
 | margin-recovered 후보의 focused keep 실패 | 후보 3개 모두 pitch vocabulary 부족, rank 2는 dead-air도 높음 | 기존 seed31 checkpoint에서 top_k4 12-sample repair 후보 재선별 | sample 8에서 dead-air `0.444 -> 0.294`, focused unique pitch `4 -> 5`, remaining flag `low_pitch_variety` |
 | pitch vocabulary gate 미달 | Issue #254 후보가 dead-air는 낮지만 focused unique pitch `5`에 머무름 | seed/top-k sweep으로 48개 후보 재평가 | seed17 top_k5 sample 4에서 focused unique pitch `6`, dead-air `0.400`, qualified `1/48` |
+| context review 전 후보 과장 위험 | pitch vocabulary gate 통과만으로 listening 후보라고 보기 어려움 | selected candidate를 solo/context package로 격리해 focused context decision 실행 | decision `keep_for_focused_listening`, flags `{}`, max active `1`, final `G#4` over `Fm7` chord tone |
 
 ## 파이프라인 구조
 
@@ -53,7 +54,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #256 기준 model-core MVP:
+Issue #258 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -80,6 +81,7 @@ Issue #256 기준 model-core MVP:
 | margin-recovered fallback comparison | rank `1/2/3` 전체 focused context 비교, focused keep `0/3`, 공통 blocker low pitch variety |
 | margin-recovered pitch/dead-air repair | top_k4 12-sample 재선별로 sample `8` 선택, dead-air `0.294`, focused unique pitch `5`, remaining flag `low_pitch_variety` |
 | margin-recovered pitch vocabulary sweep | seed17/31 top_k5 48개 후보 중 `1`개 qualified, selected focused unique pitch `6`, dead-air `0.400` |
+| margin-recovered pitch vocabulary focused context | selected qualified 후보를 context package로 격리, decision `keep_for_focused_listening`, flags `{}` |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -109,6 +111,8 @@ MVP 근거:
 - repair sample `8`도 focused unique pitch gate `6`에는 미달하므로 focused keep이나 broad quality로 승격하지 않음
 - seed/top-k sweep 48개 후보 중 focused unique pitch `6`, dead-air `0.400`, note count `13`, duplicated 3-note chunk `0`인 qualified 후보 `1`개 확인
 - Issue #256 후보는 Issue #254 대비 dead-air가 `+0.106`, adjacent repeat이 `+2`라서 focused context review 전 최종 후보로 승격하지 않음
+- selected pitch-vocab 후보를 focused context package로 격리해 context guide 존재, max active `1`, final landing chord tone, decision `keep_for_focused_listening` 확인
+- focused context keep은 listening review 진입 조건이며, dead-air `0.400`과 adjacent repeats `3`은 다음 review risk로 유지
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -120,7 +124,7 @@ MVP 근거:
 | 만든 것 | symbolic MIDI 생성 모델의 dataset, tokenization, training, generation, decode, objective review, proxy review pipeline |
 | 겪은 문제 | `.mid` 파일 존재만으로 성공 판단 불가, one-note collapse, long sustain block, chord block, dead-air outlier, seed-level margin 부족 |
 | 해결 방식 | duration-explicit token 구조, grammar/coverage/chord-aware probe, overlap-free postprocess, repeatability sweep, dead-air diagnostics, proxy review scoring, repair candidate selection |
-| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab sweep qualified `1/48` |
+| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening` |
 | 주장 경계 | reviewable MIDI 후보 생성 검증 파이프라인까지 가능, human listening preference / Brad style adaptation / broad production quality는 미검증 |
 
 Issue #210 기준 current best focused review candidate:
