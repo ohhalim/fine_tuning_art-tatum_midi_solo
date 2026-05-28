@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #252, Stage B margin-recovered focused fallback comparison
-- 다음 권장 이슈: `Stage B margin-recovered pitch-vocabulary dead-air repair`
+- latest functional result: Issue #254, Stage B margin-recovered pitch/dead-air repair
+- 다음 권장 이슈: `Stage B margin-recovered pitch-vocabulary expansion sweep`
 
 현재 범위가 아닌 것:
 
@@ -649,6 +649,47 @@ Issue #252는 margin-recovered 후보 3개 전체를 focused solo/context metric
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_FOCUSED_FALLBACK_COMPARISON_2026-05-28.md`
+
+## Current Margin-Recovered Pitch/Dead-Air Repair Result
+
+Issue #254는 Issue #252에서 남은 low pitch variety / dead-air blocker를 broad training 없이 좁게 repair한 작업이다.
+
+변경:
+
+- 기존 seed `31` 6-file checkpoint를 사용해 top_k4 12-sample decode 실행
+- generation report의 sample MIDI를 focused solo-line 기준으로 다시 읽는 selector 추가
+- baseline 대비 dead-air delta, focused unique pitch delta, remaining flags 기록
+- `stage-b-margin-recovered-pitch-dead-air-repair` harness 추가
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_repair_candidate_selection`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-pitch-dead-air-repair`
+
+결과:
+
+| 항목 | baseline rank 2 sample 5 | repair sample 8 |
+|---|---:|---:|
+| focused notes | `14` | `13` |
+| focused unique pitches | `4` | `5` |
+| dead-air ratio | `0.444` | `0.294` |
+| onset coverage | `0.500` | `0.594` |
+| sustained coverage | `0.719` | `0.781` |
+| focused max active notes | `1` | `1` |
+| duplicated 3-note pitch-class chunks | `0` | `0` |
+| adjacent pitch repeats | `3` | `1` |
+| focused keep ready | false | false |
+
+해석:
+
+- sample `8`은 dead-air와 unique pitch를 동시에 개선한 partial repair다.
+- focused keep 기준으로는 아직 low pitch variety가 남는다.
+- 이 결과는 model quality나 style adaptation 성공이 아니라 pitch/dead-air blocker를 한 단계 좁힌 evidence다.
+- 다음 작업은 dead-air `<= 0.40`을 유지하면서 focused unique pitch `>= 6`을 만족시키는 pitch vocabulary expansion sweep이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PITCH_DEAD_AIR_REPAIR_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
