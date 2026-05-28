@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #238, Stage B candidate count margin recovery sweep
-- 다음 권장 이슈: `Stage B margin-recovered candidate review export`
+- latest functional result: Issue #240, Stage B margin-recovered candidate review export
+- 다음 권장 이슈: `Stage B margin-recovered candidate listening review notes`
 
 현재 범위가 아닌 것:
 
@@ -382,6 +382,40 @@ Issue #238은 6-file 조건에서 samples per seed를 `3`에서 `5`로 늘렸을
 Docs:
 
 - `docs/STAGE_B_CANDIDATE_COUNT_MARGIN_RECOVERY_2026-05-28.md`
+
+## Current Margin-Recovered Candidate Review Export Result
+
+Issue #240은 Issue #238의 6-file / 5-sample repeatability 결과에서 seed별 best candidate 3개를 objective review table로 추출한 작업이다.
+
+변경:
+
+- repeatability summary를 읽는 candidate review export script 추가
+- selected best와 seed별 best candidate를 review rank로 정리
+- objective metric markdown/json export 생성
+- generated MIDI와 output artifact는 commit하지 않음
+
+검증:
+
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-review-export`
+
+결과:
+
+| rank | selected | seed | sample | seed strict | outliers | dead-air | notes | pitches | phrase | onset | sustained | removal |
+|---:|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `1` | true | `23` | `1` | `4/5` | `1` | `0.375` | `9` | `4` | `0.437` | `0.312` | `0.438` | `0.357` |
+| `2` | false | `31` | `5` | `5/5` | `0` | `0.444` | `19` | `4` | `0.937` | `0.500` | `0.719` | `0.095` |
+| `3` | false | `17` | `3` | `3/5` | `1` | `0.500` | `17` | `4` | `1.000` | `0.594` | `0.844` | `0.227` |
+
+해석:
+
+- selected best는 dead-air 기준으로 seed `23`, sample `1`이다.
+- seed `31`, sample `5`는 selected best보다 dead-air는 높지만 note count와 coverage가 더 높아 listening 비교 가치가 있다.
+- seed `17`, sample `3`은 strict-valid지만 seed 내부 failure가 남아 있어 안정성은 가장 낮다.
+- 다음 작업은 rank `1`, `2`, `3` 후보를 listening review note template로 정리하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_CANDIDATE_REVIEW_EXPORT_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
