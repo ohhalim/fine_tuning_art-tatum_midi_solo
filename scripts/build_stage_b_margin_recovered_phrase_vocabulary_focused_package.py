@@ -28,7 +28,17 @@ class MarginRecoveredPhraseVocabularyFocusedPackageError(ValueError):
 DEFAULT_DECISION = "phrase_vocabulary_qualified"
 
 
-def selected_candidate(repair_summary: dict[str, Any]) -> dict[str, Any]:
+def selected_candidate(repair_summary: dict[str, Any], *, candidate_id: str = "") -> dict[str, Any]:
+    if candidate_id:
+        candidates = repair_summary.get("candidates")
+        if not isinstance(candidates, list) or not candidates:
+            raise MarginRecoveredPhraseVocabularyFocusedPackageError(
+                "repair summary must contain candidates when candidate_id is provided"
+            )
+        for candidate in candidates:
+            if isinstance(candidate, dict) and str(candidate.get("candidate_id") or "") == candidate_id:
+                return candidate
+        raise MarginRecoveredPhraseVocabularyFocusedPackageError(f"candidate_id not found: {candidate_id}")
     candidate = repair_summary.get("selected_candidate")
     if not isinstance(candidate, dict):
         raise MarginRecoveredPhraseVocabularyFocusedPackageError(
@@ -41,8 +51,9 @@ def review_notes_from_repair(
     repair_summary: dict[str, Any],
     *,
     decision: str = DEFAULT_DECISION,
+    candidate_id: str = "",
 ) -> dict[str, Any]:
-    candidate = selected_candidate(repair_summary)
+    candidate = selected_candidate(repair_summary, candidate_id=candidate_id)
     candidate_id = str(candidate.get("candidate_id") or "")
     midi_path = str(candidate.get("midi_path") or "")
     if not candidate_id:
@@ -117,8 +128,9 @@ def build_phrase_vocabulary_focused_package(
     *,
     output_dir: Path,
     decision: str = DEFAULT_DECISION,
+    candidate_id: str = "",
 ) -> dict[str, Any]:
-    review_notes = review_notes_from_repair(repair_summary, decision=decision)
+    review_notes = review_notes_from_repair(repair_summary, decision=decision, candidate_id=candidate_id)
     package = build_margin_recovered_focused_package(
         review_notes,
         output_dir=output_dir,
@@ -139,6 +151,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--decision", type=str, default=DEFAULT_DECISION)
+    parser.add_argument("--candidate_id", type=str, default="")
     parser.add_argument("--expected_candidate_id", type=str, default="")
     parser.add_argument("--min_candidates", type=int, default=1)
     return parser
@@ -153,6 +166,7 @@ def main() -> int:
         repair_summary,
         output_dir=output_dir,
         decision=str(args.decision),
+        candidate_id=str(args.candidate_id or ""),
     )
     output_dir.mkdir(parents=True, exist_ok=True)
     write_json(output_dir / "focused_review_package.json", package)

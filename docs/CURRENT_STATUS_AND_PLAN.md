@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #282, Stage B margin-recovered phrase/vocabulary keep stability comparison
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary qualified peer focused context review`
+- latest functional result: Issue #284, Stage B margin-recovered phrase/vocabulary qualified peer focused context review
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary qualified peer focused listening notes`
 
 현재 범위가 아닌 것:
 
@@ -1335,6 +1335,52 @@ Issue #282는 Issue #280 current margin-recovered evidence keep candidate가 단
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_KEEP_STABILITY_2026-05-28.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Qualified Peer Focused Context Result
+
+Issue #284는 Issue #282에서 확인한 qualified peer 후보를 solo/context package로 격리하고 focused context decision을 실행한 작업이다.
+
+변경:
+
+- phrase/vocabulary focused package builder에 explicit `candidate_id` 선택 옵션 추가
+- qualified peer candidate를 solo/context package로 격리
+- 기존 focused context decision 기준으로 final landing, context guide, max active, repeated cell 재검증
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_phrase_vocabulary_focused_package`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-peer-focused-context`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_phrase_vocab_seed_61_topk_7_temp_082_n48_sample_25` |
+| copied MIDI files | `2` |
+| focused context decision | `keep_for_focused_listening` |
+| decision flags | `{}` |
+| note count | `13` |
+| unique pitch count | `8` |
+| range | `G4-E5` |
+| phrase span | `7.000` beats |
+| max active notes | `1` |
+| dead-air ratio | `0.333` |
+| adjacent pitch repeats | `0` |
+| max interval | `7` |
+| duplicated 3-note chunks | `0` |
+| final landing | `C5` over `Fm7`, chord tone |
+| context tracks | chord guide, bass root guide, solo |
+
+해석:
+
+- qualified peer도 focused context blocker 없이 통과했다.
+- selected keep candidate와 peer 후보의 focused context metrics가 동일 수준이다.
+- 아직 peer 후보의 focused listening notes/fill은 진행하지 않았다.
+- 이 결과는 fallback review evidence이며 broad model quality나 human/audio proof는 아니다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_QUALIFIED_PEER_FOCUSED_CONTEXT_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
