@@ -34,6 +34,8 @@ Modes:
                 Run a Stage B raw decode/generation gate probe.
   stage-b-raw-generation-repeatability
                 Run raw Stage B generation across multiple seeds and source files.
+  stage-b-dead-air-diagnostics
+                Diagnose dead-air outliers from a Stage B generation probe report.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -158,6 +160,7 @@ run_quick() {
     scripts/run_stage_b_window_tiny_overfit.py \
     scripts/run_stage_b_generation_probe.py \
     scripts/run_stage_b_raw_generation_repeatability_sweep.py \
+    scripts/diagnose_stage_b_dead_air_outliers.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -286,6 +289,16 @@ run_stage_b_raw_generation_repeatability() {
     --dim_feedforward 128 \
     --lora_r 4 \
     --lora_alpha 8
+}
+
+run_stage_b_dead_air_diagnostics() {
+  local run_id="${RUN_ID:-harness_stage_b_dead_air_diagnostics}"
+  local report_path="${REPORT_PATH:-outputs/stage_b_generation_probe/issue_224_stage_b_raw_generation_repeatability_final2_seed31_files2/report.json}"
+  print_header "Stage B dead-air diagnostics"
+  "$PYTHON_BIN" scripts/diagnose_stage_b_dead_air_outliers.py \
+    --run_id "$run_id" \
+    --report_path "$report_path" \
+    --expected_outliers 1
 }
 
 run_stage_b_constrained_probe() {
@@ -1410,6 +1423,9 @@ case "$MODE" in
     ;;
   stage-b-raw-generation-repeatability)
     run_stage_b_raw_generation_repeatability
+    ;;
+  stage-b-dead-air-diagnostics)
+    run_stage_b_dead_air_diagnostics
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

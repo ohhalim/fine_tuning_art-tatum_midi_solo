@@ -51,7 +51,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #222 기준 model-core MVP:
+Issue #226 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -62,6 +62,7 @@ Issue #222 기준 model-core MVP:
 | repair 조건 | 50 epoch tiny-overfit, top_k `4`, overlap postprocess |
 | repeatability sweep | 2 source files / 3 seeds / 9 samples |
 | repeatability result | strict `8/9`, grammar `9/9`, dead-air outlier `1` |
+| dead-air diagnostics | seed `31` sample `1`, dead-air `0.857`, collapse warning false |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -73,6 +74,7 @@ MVP 근거:
 - complete note groups `21-22`, invalid token count `0`
 - postprocess 후 note count `13-18`, unique pitch count `4-6`
 - 2-file/3-seed repeatability sweep에서 strict pass-rate `0.889`
+- dead-air outlier가 collapse/postprocess 문제가 아니라 낮은 onset/sustained coverage 문제임을 분리
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
