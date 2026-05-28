@@ -67,6 +67,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered candidate review export 문서: `docs/STAGE_B_MARGIN_RECOVERED_CANDIDATE_REVIEW_EXPORT_2026-05-28.md`
 - margin-recovered listening review notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_LISTENING_REVIEW_NOTES_2026-05-28.md`
 - margin-recovered proxy review fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_PROXY_REVIEW_FILL_2026-05-28.md`
+- margin-recovered proxy keep consolidation 문서: `docs/STAGE_B_MARGIN_RECOVERED_PROXY_KEEP_CONSOLIDATION_2026-05-28.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -79,6 +80,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered candidate review export: seed별 best 후보 3개 objective table 추출, selected best seed `23` sample `1`
 - margin-recovered listening review notes: 후보 3개 pending notes template 생성, selected best count `1`
 - margin-recovered MIDI proxy review fill: rank `2` seed `31` sample `5` proxy keep, rank `1`은 needs_followup
+- margin-recovered proxy keep consolidation: dead-air 단일 기준 selected best와 phrase-rich proxy keep 후보의 claim boundary 정리
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -262,6 +264,7 @@ Stage B에서 명시하는 것:
 117. Stage B margin-recovered candidate review export
 118. Stage B margin-recovered candidate listening review notes
 119. Stage B margin-recovered MIDI proxy review fill
+120. Stage B margin-recovered proxy keep consolidation
 
 가장 최근 의미 있는 결과:
 
@@ -437,7 +440,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-이제 다음 단계는 이력서 프로젝트 bullet 정리다. Issue #212는 README를 정리했으므로, 다음 문서는 지원서에 넣을 3-5개 bullet을 수치와 역할 중심으로 압축해야 한다.
+현재 다음 단계는 margin-recovered proxy keep 후보를 focused solo/context review package로 격리하는 것이다.
+Issue #246은 README와 상태 문서에서 proxy keep의 claim boundary를 고정했으므로, 다음 문서는 새 품질 주장이 아니라 review artifact 경계를 좁혀야 한다.
 
 ## 6. 다음 단계 로드맵
 
@@ -963,40 +967,33 @@ Stage B에서 명시하는 것:
 완료된 바로 전 작업:
 
 ```text
-Stage B data-derived timing phrase repaired proxy review
+Stage B margin-recovered proxy keep consolidation
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_DATA_DERIVED_TIMING_PHRASE_PROXY_REVIEW_2026-05-27.md`
-- reviewed candidates: `6`
-- pending candidates: `0`
-- decisions:
-  - `keep`: `0`
-  - `needs_followup`: `5`
-  - `reject`: `1`
-- timing:
-  - `acceptable`: `2`
-  - `too_stiff`: `4`
-- objective bucket: `clean=6`
-- objective flags: `{}`
-- aggregate:
-  - `improve_phrase_vocabulary=16`
-  - `fix_timing_grid=8`
-  - `increase_motif_variation=3`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PROXY_KEEP_CONSOLIDATION_2026-05-28.md`
+- proxy keep candidate: `margin_recovered_rank_2_seed_31_sample_5`
+- proxy score: `0.698`
+- timing: `acceptable`
+- phrase: `strong`
+- vocabulary: `acceptable`
+- decision: `keep`
+- rejected shortcut: rank `1` dead-air best만으로 최종 선택 불가
+- claim boundary: MIDI metric proxy review이며 human listening proof가 아님
 
 판단:
 
-- Issue #162는 reviewable timing/tension tradeoff지만 proxy keep은 아니다.
-- timing count는 줄었지만 phrase vocabulary가 여전히 최상위 blocker다.
-- duration/IOI objective를 직접 봐야 한다.
+- dead-air gate는 필요하지만 단독 ranking 기준으로는 부족하다.
+- 현재 주장 가능한 것은 reviewable MIDI 후보를 검증하고 좁히는 pipeline이다.
+- broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B phrase vocabulary motif variation repair`로 잡는다.
-- Issue #168의 IOI diversity 개선은 가능한 한 유지한다.
-- small-cell mechanical contour와 most-common IOI repetition을 함께 줄인다.
-- objective clean 후보라도 proxy keep이 없으면 broad training으로 넘어가지 않는다.
+- 다음 issue는 `Stage B margin-recovered proxy keep focused package`로 잡는다.
+- rank `2` seed `31` sample `5`의 solo MIDI와 context MIDI를 focused review artifact로 격리한다.
+- 새 generation repair보다 reviewable artifact 고정을 먼저 한다.
+- focused package 전에는 proxy keep을 final musical quality로 주장하지 않는다.
 
 ## 10. 한 문장 요약
 
