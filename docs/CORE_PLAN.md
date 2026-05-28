@@ -66,6 +66,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - candidate count margin recovery 문서: `docs/STAGE_B_CANDIDATE_COUNT_MARGIN_RECOVERY_2026-05-28.md`
 - margin-recovered candidate review export 문서: `docs/STAGE_B_MARGIN_RECOVERED_CANDIDATE_REVIEW_EXPORT_2026-05-28.md`
 - margin-recovered listening review notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_LISTENING_REVIEW_NOTES_2026-05-28.md`
+- margin-recovered proxy review fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_PROXY_REVIEW_FILL_2026-05-28.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -77,6 +78,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - candidate count margin recovery: 6-file 5-sample run에서 strict `12/15`, warning seed 없음
 - margin-recovered candidate review export: seed별 best 후보 3개 objective table 추출, selected best seed `23` sample `1`
 - margin-recovered listening review notes: 후보 3개 pending notes template 생성, selected best count `1`
+- margin-recovered MIDI proxy review fill: rank `2` seed `31` sample `5` proxy keep, rank `1`은 needs_followup
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -259,6 +261,7 @@ Stage B에서 명시하는 것:
 116. Stage B candidate count margin recovery sweep
 117. Stage B margin-recovered candidate review export
 118. Stage B margin-recovered candidate listening review notes
+119. Stage B margin-recovered MIDI proxy review fill
 
 가장 최근 의미 있는 결과:
 
