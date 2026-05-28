@@ -170,6 +170,80 @@ class StageBRawGenerationRepeatabilityTest(unittest.TestCase):
         self.assertAlmostEqual(summary["dead_air_outlier_rate"], 1 / 6)
         self.assertEqual(summary["selected_best_candidate"]["seed"], 23)
 
+    def test_build_repeatability_summary_warns_without_failing_gate(self) -> None:
+        rows = [
+            {
+                "seed": 17,
+                "returncode": 0,
+                "input_file_count": 6,
+                "sample_count": 3,
+                "valid_sample_count": 1,
+                "strict_valid_sample_count": 1,
+                "grammar_gate_sample_count": 3,
+                "max_postprocess_removal_ratio": 0.25,
+                "dead_air_outlier_count": 1,
+                "best_strict_candidate": {
+                    "seed": 17,
+                    "sample_index": 3,
+                    "dead_air_ratio": 0.5,
+                    "postprocess_removal_ratio": 0.2,
+                    "note_count": 17,
+                },
+            },
+            {
+                "seed": 23,
+                "returncode": 0,
+                "input_file_count": 6,
+                "sample_count": 3,
+                "valid_sample_count": 3,
+                "strict_valid_sample_count": 3,
+                "grammar_gate_sample_count": 3,
+                "max_postprocess_removal_ratio": 0.35,
+                "dead_air_outlier_count": 0,
+                "best_strict_candidate": {
+                    "seed": 23,
+                    "sample_index": 1,
+                    "dead_air_ratio": 0.375,
+                    "postprocess_removal_ratio": 0.35,
+                    "note_count": 9,
+                },
+            },
+            {
+                "seed": 31,
+                "returncode": 0,
+                "input_file_count": 6,
+                "sample_count": 3,
+                "valid_sample_count": 3,
+                "strict_valid_sample_count": 3,
+                "grammar_gate_sample_count": 3,
+                "max_postprocess_removal_ratio": 0.42,
+                "dead_air_outlier_count": 0,
+                "best_strict_candidate": {
+                    "seed": 31,
+                    "sample_index": 2,
+                    "dead_air_ratio": 0.636,
+                    "postprocess_removal_ratio": 0.42,
+                    "note_count": 12,
+                },
+            },
+        ]
+
+        summary = build_repeatability_summary(
+            rows,
+            min_seed_count=3,
+            min_source_files=6,
+            min_strict_samples_per_seed=1,
+            min_overall_strict_rate=0.67,
+            max_postprocess_removal_ratio=0.49,
+            max_dead_air_outlier_rate=0.25,
+            warning_min_strict_samples_per_seed=2,
+        )
+
+        self.assertTrue(summary["passed_repeatability_gate"])
+        self.assertEqual(summary["strict_margin_warning_seed_count"], 1)
+        self.assertEqual(summary["strict_margin_warning_seeds"], [17])
+        self.assertEqual(summary["strict_margin_warning_rows"][0]["strict_margin"], -1)
+
     def test_markdown_report_contains_gate_and_seed_rows(self) -> None:
         rows = [
             {
@@ -204,6 +278,8 @@ class StageBRawGenerationRepeatabilityTest(unittest.TestCase):
             "grammar_gate_sample_rate": 1.0,
             "max_postprocess_removal_ratio": 0.2,
             "dead_air_outlier_rate": 0.0,
+            "warning_min_strict_samples_per_seed": 2,
+            "strict_margin_warning_seeds": [17],
             "selected_best_candidate": {"seed": 17, "sample_index": 2, "dead_air_ratio": 0.4},
         }
 
@@ -212,6 +288,7 @@ class StageBRawGenerationRepeatabilityTest(unittest.TestCase):
         self.assertIn("passed repeatability gate", markdown)
         self.assertIn("| 17 |", markdown)
         self.assertIn("strict pass-rate", markdown)
+        self.assertIn("strict margin warning seeds", markdown)
         self.assertIn("selected best candidate", markdown)
 
 

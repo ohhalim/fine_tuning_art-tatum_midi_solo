@@ -51,7 +51,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #232 기준 model-core MVP:
+Issue #236 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -67,6 +67,7 @@ Issue #232 기준 model-core MVP:
 | broader source gate | 3 source files / strict `7/9`, dead-air outlier rate `0.222`, selected best dead-air `0.222` |
 | larger source boundary | 4/5/6 source files hard gate 통과, 6-file seed `17` strict margin `1/3` |
 | seed strict margin diagnostics | 6-file seed `17`: sample `1` dead-air, sample `2` unique pitch, sample `3` strict-valid |
+| seed margin warning gate | hard gate 유지, warning min strict per seed `2`, warning seed `17` 기록 |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -83,6 +84,7 @@ MVP 근거:
 - 3-file repeatability에서 strict `7/9`, dead-air outlier rate `0.222 <= 0.250` 확인
 - 4/5/6-file repeatability hard gate 통과, 6-file seed `17`에서 strict `1/3` 및 unique pitch failure 확인
 - 6-file seed `17`의 dead-air failure와 unique-pitch failure가 서로 다른 후보에서 발생함을 sample 단위로 분리
+- per-seed strict margin warning을 repeatability summary에 추가해 aggregate pass-rate로 가려지는 후보 안정성 리스크 기록
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
