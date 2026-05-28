@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #248, Stage B margin-recovered proxy keep focused package
-- 다음 권장 이슈: `Stage B margin-recovered focused context decision`
+- latest functional result: Issue #250, Stage B margin-recovered focused context decision
+- 다음 권장 이슈: `Stage B margin-recovered focused pitch-vocabulary dead-air follow-up`
 
 현재 범위가 아닌 것:
 
@@ -570,6 +570,50 @@ Issue #248은 Issue #246의 proxy keep 후보를 focused solo/context review pac
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PROXY_KEEP_FOCUSED_PACKAGE_2026-05-28.md`
+
+## Current Margin-Recovered Focused Context Decision Result
+
+Issue #250은 Issue #248 focused package의 단일 proxy keep 후보를 solo/context MIDI metric 기준으로 다시 판단한 작업이다.
+
+변경:
+
+- `scripts/review_stage_b_margin_recovered_focused_context.py` 추가
+- focused package의 solo/context MIDI를 다시 읽어 context decision 생성
+- final note chord role, context track 존재, pitch variety, dead-air, max active notes 기록
+- context guide가 solo tail을 덮도록 focused package context bars 보정
+- `stage-b-margin-recovered-focused-context-decision` harness 추가
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_focused_context_decision`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-focused-context-decision`
+
+결과:
+
+| 항목 | 결과 |
+|---|---|
+| candidate | `margin_recovered_rank_2_seed_31_sample_5` |
+| prior proxy decision | keep |
+| focused context decision | needs_followup |
+| decision flags | `low_pitch_variety`, `dead_air_needs_review` |
+| note count | `14` |
+| unique pitch count | `4` |
+| range | `D#4-C5` |
+| phrase span | `7.500` beats |
+| max active notes | `1` |
+| dead-air ratio | `0.444` |
+| final note | `C5` over `Bb7`, tension |
+| context tracks | chord guide / bass guide / solo present |
+
+해석:
+
+- rank `2` 후보는 proxy keep이었지만 focused context에서는 focused listening으로 올리기 부족하다.
+- polyphony와 final chord role은 blocker가 아니지만, pitch vocabulary와 dead-air가 blocker다.
+- 다음 작업은 broad training이 아니라 low pitch variety와 dead-air를 함께 줄이는 follow-up이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_FOCUSED_CONTEXT_DECISION_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 

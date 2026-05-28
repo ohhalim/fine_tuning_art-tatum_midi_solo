@@ -51,7 +51,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #248 기준 model-core MVP:
+Issue #250 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -74,6 +74,7 @@ Issue #248 기준 model-core MVP:
 | MIDI proxy review fill | rank `2` seed `31` sample `5` proxy keep, rank `1` dead-air best는 needs_followup |
 | proxy keep consolidation | dead-air 단일 기준 selected best와 phrase-rich proxy keep 후보의 claim boundary 문서화 |
 | margin-recovered focused package | rank `2` 후보만 solo/context review package로 격리, focused solo-line max active `1` |
+| margin-recovered focused context decision | rank `2` proxy keep을 `needs_followup`으로 하향, low pitch variety / dead-air blocker 기록 |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -97,6 +98,7 @@ MVP 근거:
 - MIDI metric proxy review에서 dead-air 최저 후보보다 phrase/onset/sustained coverage가 높은 rank `2` 후보를 keep으로 분리
 - rank `2` seed `31` sample `5`는 MIDI metric proxy keep이며, human listening preference나 broad model quality claim과 분리
 - rank `2` 후보를 focused package로 격리하고 source note count `19` -> focused solo-line note count `14`, max simultaneous notes `2` -> `1` 변환 기록
+- focused context decision에서 unique pitch `4`, dead-air `0.444`로 `needs_followup` 판정해 proxy keep을 최종 후보로 과장하지 않음
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -108,7 +110,7 @@ MVP 근거:
 | 만든 것 | symbolic MIDI 생성 모델의 dataset, tokenization, training, generation, decode, objective review, proxy review pipeline |
 | 겪은 문제 | `.mid` 파일 존재만으로 성공 판단 불가, one-note collapse, long sustain block, chord block, dead-air outlier, seed-level margin 부족 |
 | 해결 방식 | duration-explicit token 구조, grammar/coverage/chord-aware probe, overlap-free postprocess, repeatability sweep, dead-air diagnostics, proxy review scoring |
-| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, proxy keep 후보 `margin_recovered_rank_2_seed_31_sample_5` focused package 격리 |
+| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, proxy keep 후보 focused context에서 `needs_followup` 판정 |
 | 주장 경계 | reviewable MIDI 후보 생성 검증 파이프라인까지 가능, human listening preference / Brad style adaptation / broad production quality는 미검증 |
 
 Issue #210 기준 current best focused review candidate:
