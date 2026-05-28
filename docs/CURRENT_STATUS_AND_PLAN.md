@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #242, Stage B margin-recovered candidate listening review notes
-- 다음 권장 이슈: `Stage B margin-recovered MIDI proxy review fill`
+- latest functional result: Issue #244, Stage B margin-recovered MIDI proxy review fill
+- 다음 권장 이슈: `Stage B margin-recovered proxy keep consolidation`
 
 현재 범위가 아닌 것:
 
@@ -457,6 +457,39 @@ Issue #242는 Issue #240의 margin-recovered review export를 기반으로 liste
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_LISTENING_REVIEW_NOTES_2026-05-28.md`
+
+## Current Margin-Recovered MIDI Proxy Review Fill Result
+
+Issue #244는 Issue #242의 pending notes를 MIDI metric 기반 proxy review로 채운 작업이다.
+
+변경:
+
+- margin-recovered listening notes를 proxy review로 채우는 script 추가
+- dead-air, note count, phrase/onset/sustained coverage, postprocess removal, seed failure 상태를 기반으로 proxy score 계산
+- 실제 청감 review가 아님을 output에 명시
+
+검증:
+
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-proxy-review-fill`
+
+결과:
+
+| candidate | selected by dead-air | score | timing | phrase | vocabulary | decision |
+|---|:---:|---:|---|---|---|---|
+| `margin_recovered_rank_1_seed_23_sample_1` | true | `0.251` | stiff | weak | thin | needs_followup |
+| `margin_recovered_rank_2_seed_31_sample_5` | false | `0.698` | acceptable | strong | acceptable | keep |
+| `margin_recovered_rank_3_seed_17_sample_3` | false | `0.564` | acceptable | strong | acceptable | needs_followup |
+
+해석:
+
+- dead-air만으로 selected best를 고르면 phrase richness가 낮은 후보를 선택할 수 있다.
+- 6-file 5-sample run에서 proxy 기준 가장 나은 후보는 rank `2` seed `31` sample `5`다.
+- rank `2`는 seed 내부 failure가 없고, note count와 coverage가 가장 균형적이다.
+- 이 결과는 MIDI metric proxy review이며 실제 청감 review가 아니다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PROXY_REVIEW_FILL_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 

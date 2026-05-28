@@ -42,6 +42,8 @@ Modes:
                 Export review metrics from a margin-recovered Stage B repeatability summary.
   stage-b-margin-recovered-listening-notes
                 Build pending listening notes for margin-recovered Stage B candidates.
+  stage-b-margin-recovered-proxy-review-fill
+                Fill margin-recovered listening notes with MIDI-metric proxy review.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -170,6 +172,7 @@ run_quick() {
     scripts/diagnose_stage_b_seed_strict_margins.py \
     scripts/build_stage_b_margin_recovered_review_export.py \
     scripts/build_stage_b_margin_recovered_listening_notes.py \
+    scripts/fill_stage_b_margin_recovered_proxy_review.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -355,6 +358,16 @@ run_stage_b_margin_recovered_listening_notes() {
     --run_id "$run_id" \
     --review_export "$review_export" \
     --expected_candidate_count 3
+}
+
+run_stage_b_margin_recovered_proxy_review_fill() {
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_proxy_review}"
+  local review_notes="${REVIEW_NOTES:-outputs/stage_b_margin_recovered_listening_notes/harness_stage_b_margin_recovered_listening_notes/listening_review_notes_template.json}"
+  print_header "Stage B margin-recovered MIDI proxy review fill"
+  "$PYTHON_BIN" scripts/fill_stage_b_margin_recovered_proxy_review.py \
+    --run_id "$run_id" \
+    --review_notes "$review_notes" \
+    --expected_keep_candidate_id margin_recovered_rank_2_seed_31_sample_5
 }
 
 run_stage_b_constrained_probe() {
@@ -1491,6 +1504,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-listening-notes)
     run_stage_b_margin_recovered_listening_notes
+    ;;
+  stage-b-margin-recovered-proxy-review-fill)
+    run_stage_b_margin_recovered_proxy_review_fill
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

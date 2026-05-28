@@ -51,7 +51,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #242 기준 model-core MVP:
+Issue #244 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -71,6 +71,7 @@ Issue #242 기준 model-core MVP:
 | candidate count recovery | 6 source files / 5 samples per seed / strict `12/15`, warning seed 없음 |
 | margin-recovered review export | seed별 best 후보 3개 objective metric table 추출, selected best seed `23` sample `1` |
 | listening review notes | margin-recovered 후보 3개 pending review template 생성, selected best count `1` |
+| MIDI proxy review fill | rank `2` seed `31` sample `5` proxy keep, rank `1` dead-air best는 needs_followup |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -91,6 +92,7 @@ MVP 근거:
 - samples per seed를 `3`에서 `5`로 늘려 6-file seed `17` strict margin을 `1/3`에서 `3/5`로 회복
 - 5-sample run의 seed별 best 후보를 review rank로 정리하고, dead-air 기준 selected best와 coverage가 높은 대안 후보를 분리
 - margin-recovered 후보 3개를 listening review notes template으로 묶고 실제 청감 판단 전 pending 상태로 보존
+- MIDI metric proxy review에서 dead-air 최저 후보보다 phrase/onset/sustained coverage가 높은 rank `2` 후보를 keep으로 분리
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
