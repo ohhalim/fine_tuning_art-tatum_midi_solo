@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #286, Stage B margin-recovered phrase/vocabulary qualified peer focused listening notes
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary qualified peer focused listening fill`
+- latest functional result: Issue #288, Stage B margin-recovered phrase/vocabulary qualified peer focused listening fill
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary two-candidate keep consolidation`
 
 현재 범위가 아닌 것:
 
@@ -1426,6 +1426,51 @@ Issue #286은 Issue #284 focused context keep peer 후보를 focused listening r
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_QUALIFIED_PEER_FOCUSED_LISTENING_NOTES_2026-05-28.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Qualified Peer Focused Listening Fill Result
+
+Issue #288은 Issue #286 peer focused listening notes를 MIDI/context evidence 기준으로 채운 작업이다.
+
+변경:
+
+- peer focused listening fill harness 추가
+- 기존 phrase/vocabulary focused listening fill script를 peer notes 경로에 재사용
+- peer candidate의 reviewed fields와 final decision 기록
+
+검증:
+
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-peer-focused-listening-fill`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_phrase_vocab_seed_61_topk_7_temp_082_n48_sample_25` |
+| reviewed count | `1` |
+| pending count | `0` |
+| timing | `acceptable` |
+| chord fit | `strong` |
+| phrase continuation | `acceptable` |
+| landing | `strong` |
+| jazz vocabulary | `acceptable` |
+| final decision | `keep` |
+| dead-air ratio | `0.333` |
+| sustained coverage | `0.594` |
+| adjacent pitch repeats | `0` |
+| max interval | `7` |
+| final landing | `C5` over `Fm7`, chord tone |
+| review risks | `sustained_coverage_review` |
+
+해석:
+
+- peer 후보도 MIDI/context evidence fill 기준 `keep`으로 기록됐다.
+- selected keep 후보와 peer 후보가 같은 focused context/listening metric boundary를 통과했다.
+- qualified rate는 `2/96`이므로 broad repeatability나 broad model quality로 주장하지 않는다.
+- human/audio proof는 아직 별도 검증이 필요하다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_QUALIFIED_PEER_FOCUSED_LISTENING_FILL_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
