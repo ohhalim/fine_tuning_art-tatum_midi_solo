@@ -43,8 +43,38 @@ def write_report(path: Path) -> None:
 
 def repair_summary(root: Path) -> dict:
     sample_path = root / "generation" / "samples" / "stage_b_sample_43.mid"
+    peer_path = root / "generation" / "samples" / "stage_b_sample_25.mid"
     write_midi(sample_path)
+    write_midi(peer_path)
     write_report(root / "generation" / "report.json")
+    selected = {
+        "candidate_id": "phrase_vocabulary_candidate",
+        "sample_index": 43,
+        "sample_seed": 85,
+        "source_run_id": "test_phrase_vocabulary_run",
+        "midi_path": str(sample_path),
+        "metrics": {
+            "note_count": 16,
+            "unique_pitch_count": 8,
+            "dead_air_ratio": 0.33333333333333337,
+        },
+        "temporal_coverage": {
+            "onset_coverage_ratio": 0.5,
+            "sustained_coverage_ratio": 0.59375,
+        },
+        "focused_solo_metrics": {
+            "focused_note_count": 13,
+            "focused_unique_pitch_count": 8,
+            "focused_adjacent_pitch_repeats": 0,
+            "focused_max_interval": 7,
+            "focused_duplicated_3_note_pitch_class_chunks": 0,
+        },
+        "phrase_vocabulary_gate": {
+            "qualified": True,
+            "flags": [],
+        },
+    }
+    peer = {**selected, "candidate_id": "phrase_vocabulary_peer", "sample_index": 25, "midi_path": str(peer_path)}
     return {
         "output_dir": str(root / "repair"),
         "repair_summary": {
@@ -55,33 +85,8 @@ def repair_summary(root: Path) -> dict:
             "focused_unique_pitch_delta_from_previous": 1,
             "focused_note_delta_from_previous": -1,
         },
-        "selected_candidate": {
-            "candidate_id": "phrase_vocabulary_candidate",
-            "sample_index": 43,
-            "sample_seed": 85,
-            "source_run_id": "test_phrase_vocabulary_run",
-            "midi_path": str(sample_path),
-            "metrics": {
-                "note_count": 16,
-                "unique_pitch_count": 8,
-                "dead_air_ratio": 0.33333333333333337,
-            },
-            "temporal_coverage": {
-                "onset_coverage_ratio": 0.5,
-                "sustained_coverage_ratio": 0.59375,
-            },
-            "focused_solo_metrics": {
-                "focused_note_count": 13,
-                "focused_unique_pitch_count": 8,
-                "focused_adjacent_pitch_repeats": 0,
-                "focused_max_interval": 7,
-                "focused_duplicated_3_note_pitch_class_chunks": 0,
-            },
-            "phrase_vocabulary_gate": {
-                "qualified": True,
-                "flags": [],
-            },
-        },
+        "selected_candidate": selected,
+        "candidates": [selected, peer],
     }
 
 
@@ -107,6 +112,27 @@ class StageBMarginRecoveredPhraseVocabularyFocusedPackageTest(unittest.TestCase)
             self.assertTrue(Path(candidate["review_files"]["context_midi_path"]).exists())
             self.assertEqual(candidate["listening"]["decision"], DEFAULT_DECISION)
             self.assertEqual(candidate["source_metrics"]["focused_max_interval"], 7)
+
+    def test_builds_focused_package_from_explicit_peer_candidate(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package = build_phrase_vocabulary_focused_package(
+                repair_summary(root),
+                output_dir=root / "package",
+                decision=DEFAULT_DECISION,
+                candidate_id="phrase_vocabulary_peer",
+            )
+            summary = validate_package(
+                package,
+                expected_candidate_id="phrase_vocabulary_peer",
+                min_candidates=1,
+            )
+
+            self.assertEqual(summary["candidate_count"], 1)
+            self.assertEqual(summary["candidate_ids"], ["phrase_vocabulary_peer"])
+            candidate = package["candidates"][0]
+            self.assertTrue(Path(candidate["review_files"]["midi_path"]).exists())
+            self.assertTrue(Path(candidate["review_files"]["context_midi_path"]).exists())
 
 
 if __name__ == "__main__":
