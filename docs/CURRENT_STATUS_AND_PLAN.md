@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #244, Stage B margin-recovered MIDI proxy review fill
-- 다음 권장 이슈: `Stage B margin-recovered proxy keep consolidation`
+- latest functional result: Issue #246, Stage B margin-recovered proxy keep consolidation
+- 다음 권장 이슈: `Stage B margin-recovered proxy keep focused package`
 
 현재 범위가 아닌 것:
 
@@ -490,6 +490,44 @@ Issue #244는 Issue #242의 pending notes를 MIDI metric 기반 proxy review로 
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PROXY_REVIEW_FILL_2026-05-28.md`
+
+## Current Margin-Recovered Proxy Keep Consolidation Result
+
+Issue #246은 Issue #244의 MIDI metric proxy review 결과를 README와 상태 문서에서 사용할 수 있는 claim boundary로 정리한 작업이다.
+
+변경:
+
+- rank `2` seed `31` sample `5`가 proxy keep으로 선택된 이유 문서화
+- rank `1` seed `23` sample `1`이 dead-air 기준 selected best였지만 needs_followup으로 내려간 이유 문서화
+- proxy keep이 human listening preference나 broad trained-model quality claim이 아님을 명시
+- README의 구현 범위 요약에 문제, 해결 방식, 검증 결과, 주장 경계를 추가
+
+검증:
+
+- `bash scripts/agent_harness.sh quick`
+
+결과:
+
+| 항목 | 결과 |
+|---|---|
+| proxy keep candidate | `margin_recovered_rank_2_seed_31_sample_5` |
+| proxy score | `0.698` |
+| decision | keep |
+| timing | acceptable |
+| phrase | strong |
+| vocabulary | acceptable |
+| rejected selected-best assumption | rank `1` dead-air best만으로 최종 선택 불가 |
+| claim boundary | MIDI metric proxy review, not human listening proof |
+
+해석:
+
+- dead-air gate는 필요하지만 단독 ranking 기준으로는 부족하다.
+- 현재 주장 가능한 것은 reviewable MIDI 후보를 검증하고 좁히는 pipeline이다.
+- 다음 작업은 rank `2` 후보를 focused solo/context review package로 격리하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PROXY_KEEP_CONSOLIDATION_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
