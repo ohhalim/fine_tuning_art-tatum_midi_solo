@@ -49,6 +49,15 @@ MVP가 끝났다고 볼 수 있는 조건:
 현재 MVP의 성공 기준은 "멋진 솔로"가 아니다.
 먼저 "말이 되는 solo-line 후보"를 안정적으로 만드는 것이다.
 
+2026-05-28 audit 기준:
+
+- pipeline MVP: 조건부 완료
+- unconstrained trained-model MVP: 미완료
+- 근거 문서: `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+- raw generation gate: `stage-b-generation-probe` 실패
+- constrained review gate: `stage-b-overlap-gate` 통과
+- focused candidate path: `stage-b-rhythm-phrase-variation` 통과
+
 ## 3. 지금까지의 핵심 판단
 
 ### 3.1 Stage A는 실패했다
