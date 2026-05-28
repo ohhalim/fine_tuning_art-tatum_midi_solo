@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #280, Stage B margin-recovered phrase/vocabulary keep consolidation.
+- Latest functional issue completed: Issue #282, Stage B margin-recovered phrase/vocabulary keep stability comparison.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary keep stability comparison.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary qualified peer focused context review.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -482,6 +482,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-focused
 ```
 
 This harness fills the focused listening review notes from MIDI/context evidence and records the keep/follow-up boundary.
+
+For Stage B margin-recovered phrase/vocabulary keep stability changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-keep-stability
+```
+
+This harness compares the filled keep candidate against qualified phrase/vocabulary sweep peers and records the stability boundary.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

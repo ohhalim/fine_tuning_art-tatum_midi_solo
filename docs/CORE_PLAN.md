@@ -85,6 +85,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - margin-recovered phrase/vocabulary focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered phrase/vocabulary keep consolidation 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_KEEP_CONSOLIDATION_2026-05-28.md`
+- margin-recovered phrase/vocabulary keep stability 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_KEEP_STABILITY_2026-05-28.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -115,6 +116,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary focused listening notes: candidate `1`, pending `1`, prior decision `keep_for_focused_listening`, risk `sustained_coverage_review`
 - margin-recovered phrase/vocabulary focused listening fill: reviewed `1`, decision `keep`, timing `acceptable`, phrase continuation `acceptable`, jazz vocabulary `acceptable`
 - margin-recovered phrase/vocabulary keep consolidation: current evidence keep candidate 정리, proven/not proven boundary 분리
+- margin-recovered phrase/vocabulary keep stability: qualified `2/96`, qualified source `2`, stability boundary `narrow_two_source_candidate_support`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -316,6 +318,7 @@ Stage B에서 명시하는 것:
 135. Stage B margin-recovered phrase/vocabulary focused listening notes
 136. Stage B margin-recovered phrase/vocabulary focused listening fill
 137. Stage B margin-recovered phrase/vocabulary keep consolidation
+138. Stage B margin-recovered phrase/vocabulary keep stability comparison
 
 가장 최근 의미 있는 결과:
 
@@ -501,6 +504,8 @@ Stage B에서 명시하는 것:
 - Issue #278 result: reviewed `1`, decision `keep`, timing `acceptable`, chord fit `strong`, phrase continuation `acceptable`, landing `strong`, jazz vocabulary `acceptable`; sustained coverage risk remains documented and this is not human/audio proof.
 - Issue #280 consolidates that result as the current margin-recovered evidence keep candidate.
 - Issue #280 result: candidate `margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43` is documented as evidence keep, while human/audio preference, broad trained-model quality, Brad style adaptation, and broader repeatability remain unproven.
+- Issue #282 compares that keep candidate against the Issue #272 phrase/vocabulary sweep.
+- Issue #282 result: qualified `2/96`, qualified source count `2`, selected keep plus peer `margin_recovered_phrase_vocab_seed_61_topk_7_temp_082_n48_sample_25`, stability boundary `narrow_two_source_candidate_support`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -519,8 +524,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #280은 phrase/vocabulary repair 후보를 current margin-recovered evidence keep candidate로 정리했다.
-다음 작업은 이 keep 후보가 단일 후보에 그치지 않는지 stability comparison 또는 listening comparison 경계를 별도 issue로 검증하는 것이다.
+Issue #282는 current keep 후보가 완전한 단일 sample은 아니며, 같은 sweep 안에 qualified peer가 있음을 확인했다.
+다음 작업은 qualified peer를 focused context/listening path로 넘겨 실제 fallback keep인지 확인하는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -1046,38 +1051,34 @@ Issue #280은 phrase/vocabulary repair 후보를 current margin-recovered eviden
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary keep consolidation
+Stage B margin-recovered phrase/vocabulary keep stability comparison
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_KEEP_CONSOLIDATION_2026-05-28.md`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_KEEP_STABILITY_2026-05-28.md`
 - selected candidate: `margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43`
-- decision path: objective repair -> focused context -> focused listening notes -> evidence fill
-- focused context decision: `keep_for_focused_listening`
-- filled listening decision: `keep`
-- note count: `13`
-- unique pitch count: `8`
-- range: `G4-E5`
-- phrase span: `7.000` beats
-- dead-air ratio: `0.333`
-- adjacent pitch repeats: `0`
-- max interval: `7`
-- final landing: `C5` over `Fm7`, chord tone
-- review risks: `sustained_coverage_review`
+- qualified peer: `margin_recovered_phrase_vocab_seed_61_topk_7_temp_082_n48_sample_25`
+- candidate count: `96`
+- qualified candidate count: `2`
+- qualified rate: `0.020833`
+- qualified source count: `2`
+- selected metrics: notes `13`, unique `8`, dead-air `0.333`, adjacent repeat `0`, max interval `7`
+- peer metrics: notes `13`, unique `8`, dead-air `0.333`, adjacent repeat `0`, max interval `7`
+- stability boundary: `narrow_two_source_candidate_support`
 
 판단:
 
-- current margin-recovered evidence keep candidate가 정리됐다.
-- 검증된 범위와 미검증 범위를 분리했다.
+- current keep 후보가 완전한 단일 sample은 아니다.
+- 다만 qualified rate가 낮으므로 broad repeatability로 주장하지 않는다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary keep stability comparison`으로 잡는다.
-- 단일 keep 후보가 broader seed/file 조건에서도 유지되는지 비교한다.
-- human/audio proof가 필요하면 별도 listening comparison issue로 분리한다.
-- broad training은 stability boundary를 먼저 본 뒤 결정한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary qualified peer focused context review`로 잡는다.
+- qualified peer를 solo/context package로 격리한다.
+- peer가 context/listening path에서도 fallback keep인지 확인한다.
+- broad training은 peer review boundary를 먼저 본 뒤 결정한다.
 
 ## 10. 한 문장 요약
 

@@ -76,6 +76,8 @@ Modes:
                 Build focused listening notes for the selected phrase/vocabulary candidate.
   stage-b-margin-recovered-phrase-vocabulary-focused-listening-fill
                 Fill the selected phrase/vocabulary focused listening review notes.
+  stage-b-margin-recovered-phrase-vocabulary-keep-stability
+                Compare the filled keep candidate against phrase/vocabulary sweep peers.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -220,6 +222,7 @@ run_quick() {
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_focused_package.py \
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_focused_listening_notes.py \
     scripts/fill_stage_b_margin_recovered_phrase_vocabulary_focused_listening_notes.py \
+    scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_keep_stability.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -841,6 +844,31 @@ run_stage_b_margin_recovered_phrase_vocabulary_focused_listening_fill() {
     --review_notes "$review_notes" \
     --expected_candidate_id "$candidate_id" \
     --expected_decision keep
+}
+
+run_stage_b_margin_recovered_phrase_vocabulary_keep_stability() {
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_repair}"
+  local fill_run_id="${FILL_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_focused_listening_fill}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_keep_stability}"
+  local candidate_id="margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43"
+  local repair_summary="outputs/stage_b_margin_recovered_phrase_vocabulary_repair/${repair_run_id}/phrase_vocabulary_repair_summary.json"
+  local filled_notes="outputs/stage_b_margin_recovered_phrase_vocabulary_focused_listening_fill/${fill_run_id}/focused_listening_review_notes_filled.json"
+  if [[ ! -f "$repair_summary" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary repair"
+    RUN_ID="$repair_run_id" run_stage_b_margin_recovered_phrase_vocabulary_repair
+  fi
+  if [[ ! -f "$filled_notes" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary focused listening fill"
+    RUN_ID="$fill_run_id" run_stage_b_margin_recovered_phrase_vocabulary_focused_listening_fill
+  fi
+  print_header "Stage B margin-recovered phrase/vocabulary keep stability"
+  "$PYTHON_BIN" scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_keep_stability.py \
+    --run_id "$run_id" \
+    --repair_summary "$repair_summary" \
+    --filled_notes "$filled_notes" \
+    --expected_selected_candidate_id "$candidate_id" \
+    --min_qualified_candidates 2 \
+    --require_qualified_peer
 }
 
 run_stage_b_constrained_probe() {
@@ -2028,6 +2056,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-focused-listening-fill)
     run_stage_b_margin_recovered_phrase_vocabulary_focused_listening_fill
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-keep-stability)
+    run_stage_b_margin_recovered_phrase_vocabulary_keep_stability
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
