@@ -268,9 +268,11 @@ run_stage_b_generation_probe() {
 
 run_stage_b_raw_generation_repeatability() {
   local run_id="${RUN_ID:-harness_stage_b_raw_generation_repeatability}"
+  local issue_number="${ISSUE_NUMBER:-0}"
   print_header "Stage B raw generation repeatability sweep"
   "$PYTHON_BIN" scripts/run_stage_b_raw_generation_repeatability_sweep.py \
     --run_id "$run_id" \
+    --issue_number "$issue_number" \
     --max_files 2 \
     --seeds 17,23,31 \
     --epochs 50 \
@@ -283,6 +285,8 @@ run_stage_b_raw_generation_repeatability() {
     --min_source_files 2 \
     --min_strict_samples_per_seed 1 \
     --min_overall_strict_rate 0.67 \
+    --dead_air_gate 0.8 \
+    --max_dead_air_outlier_rate 0.25 \
     --n_layers 1 \
     --num_heads 4 \
     --d_model 64 \
