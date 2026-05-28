@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #258, Stage B margin-recovered pitch vocabulary focused context review
-- 다음 권장 이슈: `Stage B margin-recovered pitch vocabulary focused listening notes`
+- latest functional result: Issue #260, Stage B margin-recovered pitch vocabulary focused listening notes
+- 다음 권장 이슈: `Stage B margin-recovered pitch vocabulary focused listening fill`
 
 현재 범위가 아닌 것:
 
@@ -788,6 +788,47 @@ Issue #258은 Issue #256 selected candidate를 solo/context package로 격리하
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_FOCUSED_CONTEXT_2026-05-28.md`
+
+## Current Margin-Recovered Pitch Vocabulary Focused Listening Notes Result
+
+Issue #260은 Issue #258 focused context keep 후보를 focused listening review notes template로 넘긴 작업이다.
+
+변경:
+
+- focused package와 focused context decision을 함께 읽는 notes wrapper 추가
+- prior decision `keep_for_focused_listening` 보존
+- focused context metrics와 review risks를 notes candidate에 추가
+- listening fields는 실제 review 전까지 모두 `pending` 유지
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_pitch_vocab_focused_listening_notes`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-pitch-vocab-focused-listening-notes`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_pitch_vocab_seed_17_topk_5_temp_09_n24_sample_4` |
+| candidate count | `1` |
+| reviewed count | `0` |
+| pending count | `1` |
+| prior decision | `keep_for_focused_listening` |
+| listening decision | `pending` |
+| review risks | `dead_air_ratio_at_gate`, `adjacent_pitch_repeats` |
+| dead-air ratio | `0.400` |
+| adjacent pitch repeats | `3` |
+| final note | `G#4` over `Fm7`, chord tone |
+
+해석:
+
+- focused listening notes 준비는 완료됐다.
+- 아직 실제 listening decision은 없다.
+- 다음 작업은 MIDI/context evidence를 기준으로 timing, phrase continuation, landing, vocabulary를 채우는 focused listening fill이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 

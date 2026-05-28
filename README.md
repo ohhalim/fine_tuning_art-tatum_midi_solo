@@ -36,6 +36,7 @@
 | margin-recovered 후보의 focused keep 실패 | 후보 3개 모두 pitch vocabulary 부족, rank 2는 dead-air도 높음 | 기존 seed31 checkpoint에서 top_k4 12-sample repair 후보 재선별 | sample 8에서 dead-air `0.444 -> 0.294`, focused unique pitch `4 -> 5`, remaining flag `low_pitch_variety` |
 | pitch vocabulary gate 미달 | Issue #254 후보가 dead-air는 낮지만 focused unique pitch `5`에 머무름 | seed/top-k sweep으로 48개 후보 재평가 | seed17 top_k5 sample 4에서 focused unique pitch `6`, dead-air `0.400`, qualified `1/48` |
 | context review 전 후보 과장 위험 | pitch vocabulary gate 통과만으로 listening 후보라고 보기 어려움 | selected candidate를 solo/context package로 격리해 focused context decision 실행 | decision `keep_for_focused_listening`, flags `{}`, max active `1`, final `G#4` over `Fm7` chord tone |
+| 청감 리뷰 기록 누락 위험 | context keep 후보라도 실제 timing/phrase/vocabulary 판단은 별도 기록 필요 | focused listening notes template 생성 | candidate `1`, pending `1`, risks `dead_air_ratio_at_gate`, `adjacent_pitch_repeats` |
 
 ## 파이프라인 구조
 
@@ -54,7 +55,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #258 기준 model-core MVP:
+Issue #260 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -82,6 +83,7 @@ Issue #258 기준 model-core MVP:
 | margin-recovered pitch/dead-air repair | top_k4 12-sample 재선별로 sample `8` 선택, dead-air `0.294`, focused unique pitch `5`, remaining flag `low_pitch_variety` |
 | margin-recovered pitch vocabulary sweep | seed17/31 top_k5 48개 후보 중 `1`개 qualified, selected focused unique pitch `6`, dead-air `0.400` |
 | margin-recovered pitch vocabulary focused context | selected qualified 후보를 context package로 격리, decision `keep_for_focused_listening`, flags `{}` |
+| margin-recovered pitch vocabulary focused listening notes | focused listening template 생성, candidate `1`, pending `1`, prior decision `keep_for_focused_listening` |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -113,6 +115,7 @@ MVP 근거:
 - Issue #256 후보는 Issue #254 대비 dead-air가 `+0.106`, adjacent repeat이 `+2`라서 focused context review 전 최종 후보로 승격하지 않음
 - selected pitch-vocab 후보를 focused context package로 격리해 context guide 존재, max active `1`, final landing chord tone, decision `keep_for_focused_listening` 확인
 - focused context keep은 listening review 진입 조건이며, dead-air `0.400`과 adjacent repeats `3`은 다음 review risk로 유지
+- focused listening notes template에 prior decision `keep_for_focused_listening`, pending fields, review risks `dead_air_ratio_at_gate` / `adjacent_pitch_repeats` 기록
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
