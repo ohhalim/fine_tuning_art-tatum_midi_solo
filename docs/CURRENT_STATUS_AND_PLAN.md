@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #232, Stage B larger source repeatability risk boundary
-- 다음 권장 이슈: `Stage B seed-level strict margin diagnostics`
+- latest functional result: Issue #234, Stage B seed-level strict margin diagnostics
+- 다음 권장 이슈: `Stage B per-seed strict margin warning gate`
 
 현재 범위가 아닌 것:
 
@@ -267,6 +267,49 @@ Issue #232는 source file 수를 `4`, `5`, `6`까지 늘렸을 때 repeatability
 Docs:
 
 - `docs/STAGE_B_LARGER_SOURCE_RISK_BOUNDARY_2026-05-28.md`
+
+## Current Seed Strict Margin Diagnostics Result
+
+Issue #234는 Issue #232의 6-file run에서 seed `17`만 strict `1/3`까지 내려간 원인을 sample 단위로 분리한 작업이다.
+
+변경:
+
+- repeatability summary와 seed별 generation report를 읽는 진단 스크립트 추가
+- seed별 strict margin warning, dead-air sample, unique-pitch sample, overlap sample 분류
+- `stage-b-seed-strict-margin-diagnostics` harness mode 추가
+
+검증:
+
+- `bash scripts/agent_harness.sh stage-b-seed-strict-margin-diagnostics`
+
+결과:
+
+- source run: `issue_232_stage_b_larger_source_risk_boundary_files6`
+- hard min strict per seed: `1`
+- warning min strict per seed: `2`
+- margin warning seeds: `17`
+- dead-air + unique-pitch overlap seeds: 없음
+- dead-air + unique-pitch separate seeds: `17`
+
+seed `17` sample breakdown:
+
+| sample | strict | issue |
+|---:|:---:|---|
+| `1` | false | dead-air ratio `0.857 >= 0.800` |
+| `2` | false | unique pitch count `2 < 3` |
+| `3` | true | strict-valid best candidate |
+
+해석:
+
+- 6-file 조건의 hard gate는 아직 유지된다.
+- seed `17`도 strict-valid 후보가 하나 남는다.
+- dead-air failure와 unique-pitch failure는 같은 후보에 겹친 collapse가 아니다.
+- aggregate strict pass-rate만 보면 seed별 margin 감소를 놓칠 수 있다.
+- 다음 작업은 per-seed strict margin을 hard gate와 분리된 warning/soft gate로 repeatability summary에 포함하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_SEED_STRICT_MARGIN_DIAGNOSTICS_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
