@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #266, Stage B margin-recovered timing/repetition focused context review
-- 다음 권장 이슈: `Stage B margin-recovered timing/repetition focused listening notes`
+- latest functional result: Issue #268, Stage B margin-recovered timing/repetition focused listening notes
+- 다음 권장 이슈: `Stage B margin-recovered timing/repetition focused listening fill`
 
 현재 범위가 아닌 것:
 
@@ -968,6 +968,50 @@ Issue #266은 Issue #264 selected candidate를 solo/context package로 격리하
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_CONTEXT_2026-05-28.md`
+
+## Current Margin-Recovered Timing/Repetition Focused Listening Notes Result
+
+Issue #268은 Issue #266 focused context keep 후보를 focused listening review notes template으로 넘긴 작업이다.
+
+변경:
+
+- timing/repetition focused listening notes builder 추가
+- focused context metrics, prior decision, review risks를 notes에 보존
+- JSON notes template과 Markdown summary 생성
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_timing_repetition_focused_listening_notes`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-timing-repetition-focused-listening-notes`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_timing_repetition_seed_37_topk_7_temp_086_n48_sample_39` |
+| candidate count | `1` |
+| reviewed count | `0` |
+| pending count | `1` |
+| prior decision | `keep_for_focused_listening` |
+| listening decision | `pending` |
+| review risks | `dead_air_ratio_remaining`, `adjacent_pitch_repeats`, `wide_interval_review` |
+| note count | `14` |
+| unique pitch count | `7` |
+| phrase span | `6.500` beats |
+| dead-air ratio | `0.353` |
+| adjacent pitch repeats | `2` |
+| max interval | `16` |
+| final landing | `A#4` over `Fm7`, tension |
+
+해석:
+
+- focused listening review 입력은 준비됐다.
+- timing, chord fit, phrase continuation, landing, jazz vocabulary, final decision은 pending이다.
+- dead-air, adjacent repeats, wide interval은 다음 fill에서 판단할 risk로 유지한다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
