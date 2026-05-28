@@ -54,6 +54,8 @@ Modes:
                 Run expanded top-k sampling and select a pitch/dead-air repair candidate.
   stage-b-margin-recovered-pitch-vocab-sweep
                 Run seed/top-k sweep and select a pitch-vocabulary qualified candidate.
+  stage-b-margin-recovered-pitch-vocab-focused-context
+                Package and review the selected pitch-vocabulary sweep candidate in context.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -187,6 +189,7 @@ run_quick() {
     scripts/review_stage_b_margin_recovered_focused_context.py \
     scripts/select_stage_b_margin_recovered_repair_candidate.py \
     scripts/summarize_stage_b_margin_recovered_pitch_vocab_sweep.py \
+    scripts/build_stage_b_margin_recovered_pitch_vocab_focused_package.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -517,6 +520,30 @@ run_stage_b_margin_recovered_pitch_vocab_sweep() {
     --require_qualified \
     --expected_source_run_id "$seed17_run_id" \
     --expected_sample_index 4
+}
+
+run_stage_b_margin_recovered_pitch_vocab_focused_context() {
+  local sweep_run_id="${SWEEP_RUN_ID:-harness_stage_b_margin_recovered_pitch_vocab_sweep}"
+  local package_run_id="${PACKAGE_RUN_ID:-harness_stage_b_margin_recovered_pitch_vocab_focused_package}"
+  local decision_run_id="${RUN_ID:-harness_stage_b_margin_recovered_pitch_vocab_focused_context_decision}"
+  local candidate_id="margin_recovered_pitch_vocab_seed_17_topk_5_temp_09_n24_sample_4"
+  local sweep_summary="outputs/stage_b_margin_recovered_pitch_vocab_sweep/${sweep_run_id}/pitch_vocab_sweep_summary.json"
+  if [[ ! -f "$sweep_summary" ]]; then
+    print_header "Stage B margin-recovered pitch vocabulary sweep"
+    RUN_ID="$sweep_run_id" run_stage_b_margin_recovered_pitch_vocab_sweep
+  fi
+  print_header "Stage B margin-recovered pitch vocabulary focused package"
+  "$PYTHON_BIN" scripts/build_stage_b_margin_recovered_pitch_vocab_focused_package.py \
+    --run_id "$package_run_id" \
+    --sweep_summary "$sweep_summary" \
+    --expected_candidate_id "$candidate_id"
+
+  print_header "Stage B margin-recovered pitch vocabulary focused context decision"
+  "$PYTHON_BIN" scripts/review_stage_b_margin_recovered_focused_context.py \
+    --run_id "$decision_run_id" \
+    --focused_package "outputs/stage_b_margin_recovered_pitch_vocab_focused_package/${package_run_id}/focused_review_package.json" \
+    --expected_candidate_id "$candidate_id" \
+    --expected_decision keep_for_focused_listening
 }
 
 run_stage_b_constrained_probe() {
@@ -1671,6 +1698,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-pitch-vocab-sweep)
     run_stage_b_margin_recovered_pitch_vocab_sweep
+    ;;
+  stage-b-margin-recovered-pitch-vocab-focused-context)
+    run_stage_b_margin_recovered_pitch_vocab_focused_context
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

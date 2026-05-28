@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #256, Stage B margin-recovered pitch vocabulary sweep
-- 다음 권장 이슈: `Stage B margin-recovered pitch vocabulary focused context review`
+- latest functional result: Issue #258, Stage B margin-recovered pitch vocabulary focused context review
+- 다음 권장 이슈: `Stage B margin-recovered pitch vocabulary focused listening notes`
 
 현재 범위가 아닌 것:
 
@@ -741,6 +741,53 @@ Issue #254 후보 대비:
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_SWEEP_2026-05-28.md`
+
+## Current Margin-Recovered Pitch Vocabulary Focused Context Result
+
+Issue #258은 Issue #256 selected candidate를 solo/context package로 격리하고 focused context decision을 실행한 작업이다.
+
+변경:
+
+- pitch vocabulary sweep summary selected candidate를 focused review notes 형태로 변환
+- 기존 margin-recovered focused package builder 재사용
+- solo-line MIDI와 chord/bass context MIDI 생성
+- focused context decision으로 keep/follow-up boundary 판단
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_pitch_vocab_focused_package`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-pitch-vocab-focused-context`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_pitch_vocab_seed_17_topk_5_temp_09_n24_sample_4` |
+| package candidate count | `1` |
+| copied MIDI files | `2` |
+| focused context decision | `keep_for_focused_listening` |
+| decision flags | `{}` |
+| source note count | `16` |
+| focused note count | `13` |
+| focused max active notes | `1` |
+| unique pitch count | `6` |
+| range | `D#4-C5` |
+| phrase span | `6.250` beats |
+| dead-air ratio | `0.400` |
+| adjacent pitch repeats | `3` |
+| duplicated 3-note chunks | `0` |
+| final note | `G#4` over `Fm7`, chord tone |
+| context tracks | chord guide / bass guide / solo present |
+
+해석:
+
+- pitch vocabulary selected candidate는 focused context metric gate를 통과했다.
+- 이 결과는 focused listening notes로 올릴 수 있다는 뜻이지 human/audio preference 증명이 아니다.
+- dead-air가 gate 상한 `0.400`에 붙어 있고 adjacent repeats `3`이 남아 있어 다음 review risk로 기록해야 한다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_FOCUSED_CONTEXT_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
