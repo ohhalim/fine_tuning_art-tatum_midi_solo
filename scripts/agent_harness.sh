@@ -48,6 +48,8 @@ Modes:
                 Build a focused solo/context package for the margin-recovered proxy keep.
   stage-b-margin-recovered-focused-context-decision
                 Review the margin-recovered focused package against solo/context MIDI metrics.
+  stage-b-margin-recovered-focused-fallback-comparison
+                Compare all margin-recovered candidates with focused context decisions.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -405,6 +407,23 @@ run_stage_b_margin_recovered_focused_context_decision() {
     --focused_package "$focused_package" \
     --expected_candidate_id margin_recovered_rank_2_seed_31_sample_5 \
     --expected_decision needs_followup
+}
+
+run_stage_b_margin_recovered_focused_fallback_comparison() {
+  local package_run_id="${PACKAGE_RUN_ID:-harness_stage_b_margin_recovered_focused_fallback_package}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_focused_fallback_decision}"
+  local review_notes="${REVIEW_NOTES:-outputs/stage_b_margin_recovered_proxy_review/harness_stage_b_margin_recovered_proxy_review/listening_review_notes_proxy_filled.json}"
+  print_header "Stage B margin-recovered all-candidate focused package"
+  "$PYTHON_BIN" scripts/build_stage_b_margin_recovered_focused_package.py \
+    --run_id "$package_run_id" \
+    --review_notes "$review_notes" \
+    --decision all \
+    --min_candidates 3
+  print_header "Stage B margin-recovered focused fallback comparison"
+  "$PYTHON_BIN" scripts/review_stage_b_margin_recovered_focused_context.py \
+    --run_id "$run_id" \
+    --focused_package "outputs/stage_b_margin_recovered_focused_package/${package_run_id}/focused_review_package.json" \
+    --expected_candidate_count 3
 }
 
 run_stage_b_constrained_probe() {
@@ -1550,6 +1569,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-focused-context-decision)
     run_stage_b_margin_recovered_focused_context_decision
+    ;;
+  stage-b-margin-recovered-focused-fallback-comparison)
+    run_stage_b_margin_recovered_focused_fallback_comparison
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

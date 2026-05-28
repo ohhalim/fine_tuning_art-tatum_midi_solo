@@ -63,7 +63,7 @@ def selected_review_candidates(review_notes: dict[str, Any], *, decision: str) -
         listening = candidate.get("listening")
         if not isinstance(listening, dict):
             raise FocusedReviewPackageError("candidate listening review must be an object")
-        if str(listening.get("decision") or "") == decision:
+        if str(decision) == "all" or str(listening.get("decision") or "") == decision:
             selected.append(candidate)
     selected.sort(
         key=lambda item: (

@@ -329,10 +329,13 @@ def validate_decision(
     *,
     expected_candidate_id: str | None,
     expected_decision: str | None,
+    expected_candidate_count: int | None = None,
 ) -> dict[str, Any]:
     candidates = report.get("candidates")
     if not isinstance(candidates, list) or not candidates:
         raise FocusedContextDecisionError("report candidates must be non-empty")
+    if expected_candidate_count is not None and len(candidates) != int(expected_candidate_count):
+        raise FocusedContextDecisionError(f"expected {expected_candidate_count} candidates, got {len(candidates)}")
     if expected_candidate_id:
         actual = [str(candidate.get("candidate_id") or "") for candidate in candidates]
         if actual != [expected_candidate_id]:
@@ -360,6 +363,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--expected_candidate_id", type=str, default="")
     parser.add_argument("--expected_decision", type=str, default="")
+    parser.add_argument("--expected_candidate_count", type=int, default=None)
     return parser
 
 
@@ -375,6 +379,7 @@ def main() -> int:
         report,
         expected_candidate_id=str(args.expected_candidate_id or ""),
         expected_decision=str(args.expected_decision or ""),
+        expected_candidate_count=args.expected_candidate_count,
     )
     output_dir.mkdir(parents=True, exist_ok=True)
     write_json(output_dir / "focused_context_decision.json", report)

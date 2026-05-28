@@ -87,6 +87,18 @@ class MarginRecoveredFocusedPackageTest(unittest.TestCase):
             self.assertTrue(Path(candidate["review_files"]["midi_path"]).exists())
             self.assertTrue(Path(candidate["review_files"]["context_midi_path"]).exists())
 
+    def test_build_package_supports_all_decision_filter(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package = build_margin_recovered_focused_package(
+                sample_review_notes(root),
+                output_dir=root / "focused",
+                decision="all",
+            )
+
+            self.assertEqual(package["decision_filter"], "all")
+            self.assertEqual(package["candidate_count"], 1)
+
     def test_validate_rejects_unexpected_candidate(self) -> None:
         package = {
             "candidates": [
