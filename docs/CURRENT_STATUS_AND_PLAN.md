@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #240, Stage B margin-recovered candidate review export
-- 다음 권장 이슈: `Stage B margin-recovered candidate listening review notes`
+- latest functional result: Issue #242, Stage B margin-recovered candidate listening review notes
+- 다음 권장 이슈: `Stage B margin-recovered MIDI proxy review fill`
 
 현재 범위가 아닌 것:
 
@@ -416,6 +416,47 @@ Issue #240은 Issue #238의 6-file / 5-sample repeatability 결과에서 seed별
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_CANDIDATE_REVIEW_EXPORT_2026-05-28.md`
+
+## Current Margin-Recovered Listening Review Notes Result
+
+Issue #242는 Issue #240의 margin-recovered review export를 기반으로 listening review notes template을 생성한 작업이다.
+
+변경:
+
+- margin-recovered candidate review export를 notes template으로 변환하는 script 추가
+- selected best 후보가 정확히 1개인지 검증
+- 후보별 metric, seed/sample/rank, MIDI path를 notes에 보존
+- listening fields는 실제 review 전까지 `pending` 유지
+
+검증:
+
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-listening-notes`
+
+결과:
+
+- candidate count: `3`
+- selected best count: `1`
+- reviewed count: `0`
+- pending count: `3`
+- decision counts: pending `3`
+
+후보:
+
+| candidate | selected | dead-air | notes | phrase | onset | sustained | decision |
+|---|:---:|---:|---:|---:|---:|---:|---|
+| `margin_recovered_rank_1_seed_23_sample_1` | true | `0.375` | `9` | `0.437` | `0.312` | `0.438` | pending |
+| `margin_recovered_rank_2_seed_31_sample_5` | false | `0.444` | `19` | `0.937` | `0.500` | `0.719` | pending |
+| `margin_recovered_rank_3_seed_17_sample_3` | false | `0.500` | `17` | `1.000` | `0.594` | `0.844` | pending |
+
+해석:
+
+- 이 단계는 review 준비이며 청감 품질 판정이 아니다.
+- rank `1`이 실제 listening preference에서도 best라고 확정한 것은 아니다.
+- 다음 작업은 MIDI note/context evidence 기준으로 pending fields를 채우는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_LISTENING_REVIEW_NOTES_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
