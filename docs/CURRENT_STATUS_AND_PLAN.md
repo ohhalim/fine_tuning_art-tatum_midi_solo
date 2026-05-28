@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #254, Stage B margin-recovered pitch/dead-air repair
-- 다음 권장 이슈: `Stage B margin-recovered pitch-vocabulary expansion sweep`
+- latest functional result: Issue #256, Stage B margin-recovered pitch vocabulary sweep
+- 다음 권장 이슈: `Stage B margin-recovered pitch vocabulary focused context review`
 
 현재 범위가 아닌 것:
 
@@ -690,6 +690,57 @@ Issue #254는 Issue #252에서 남은 low pitch variety / dead-air blocker를 br
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PITCH_DEAD_AIR_REPAIR_2026-05-28.md`
+
+## Current Margin-Recovered Pitch Vocabulary Sweep Result
+
+Issue #256은 Issue #254 후보의 low pitch variety blocker를 seed/top-k sweep으로 좁힌 작업이다.
+
+변경:
+
+- seed `17`, seed `31` top_k5 24-sample decode 실행
+- 총 `48`개 후보를 focused solo-line 기준으로 합산 평가
+- focused unique pitch, dead-air, focused note count, repeated cell hard gate 추가
+- Issue #254 후보 대비 dead-air / pitch vocabulary tradeoff 기록
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_pitch_vocab_sweep`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-pitch-vocab-sweep`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| report count | `2` |
+| candidate count | `48` |
+| qualified candidate count | `1` |
+| selected candidate | `margin_recovered_pitch_vocab_seed_17_topk_5_temp_09_n24_sample_4` |
+| selected sample seed | `20` |
+| focused notes | `13` |
+| focused unique pitches | `6` |
+| dead-air ratio | `0.400` |
+| onset coverage | `0.500` |
+| sustained coverage | `0.625` |
+| focused max active notes | `1` |
+| duplicated 3-note chunks | `0` |
+| adjacent pitch repeats | `3` |
+
+Issue #254 후보 대비:
+
+- focused unique pitch: `5 -> 6`
+- dead-air: `0.294 -> 0.400`
+- adjacent repeats: `1 -> 3`
+
+해석:
+
+- pitch vocabulary gate는 통과했다.
+- dead-air는 absolute gate에 들어왔지만 Issue #254보다 나빠졌다.
+- adjacent repeat도 늘었으므로 focused context review 전에는 최종 keep으로 승격하지 않는다.
+- 다음 작업은 이 qualified 후보를 focused context package로 격리해 context 위에서 체감 blocker인지 확인하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_SWEEP_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
