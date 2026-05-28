@@ -51,7 +51,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #230 기준 model-core MVP:
+Issue #232 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -65,6 +65,7 @@ Issue #230 기준 model-core MVP:
 | dead-air diagnostics | seed `31` sample `1`, dead-air `0.857`, collapse warning false |
 | candidate selection gate | selected best seed `17` sample `3`, dead-air `0.333` |
 | broader source gate | 3 source files / strict `7/9`, dead-air outlier rate `0.222`, selected best dead-air `0.222` |
+| larger source boundary | 4/5/6 source files hard gate 통과, 6-file seed `17` strict margin `1/3` |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -79,6 +80,7 @@ MVP 근거:
 - dead-air outlier가 collapse/postprocess 문제가 아니라 낮은 onset/sustained coverage 문제임을 분리
 - dead-air outlier rate `0.111`을 기록하고 strict-valid 후보 중 best candidate를 선택
 - 3-file repeatability에서 strict `7/9`, dead-air outlier rate `0.222 <= 0.250` 확인
+- 4/5/6-file repeatability hard gate 통과, 6-file seed `17`에서 strict `1/3` 및 unique pitch failure 확인
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -117,7 +119,7 @@ Issue #210 기준 current best focused review candidate:
 | 항목 | 상태 |
 |---|---|
 | broad unconstrained trained-model generation quality | 미검증 |
-| broad multi-seed model quality | 부분 검증 / 3-file 3-seed local sweep 통과 |
+| broad multi-seed model quality | 부분 검증 / 6-file 3-seed local sweep hard gate 통과, seed-level margin 리스크 존재 |
 | dead-air outlier control | 부분 검증 / candidate selection gate 추가, 생성 자체 억제는 미완료 |
 | human/audio listening preference | 미검증 |
 | Brad Mehldau style adaptation | 미검증 |

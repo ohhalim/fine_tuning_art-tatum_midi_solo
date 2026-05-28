@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-05-27
+작성일: 2026-05-28
 
 ## Current Focus
 
@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #230, Stage B broader source repeatability with candidate gate
-- 다음 권장 이슈: `Stage B larger source repeatability risk boundary`
+- latest functional result: Issue #232, Stage B larger source repeatability risk boundary
+- 다음 권장 이슈: `Stage B seed-level strict margin diagnostics`
 
 현재 범위가 아닌 것:
 
@@ -234,6 +234,39 @@ Issue #230은 source file 수를 `3`으로 늘린 상태에서 candidate gate가
 Docs:
 
 - `docs/STAGE_B_BROADER_SOURCE_CANDIDATE_GATE_2026-05-28.md`
+
+## Current Larger Source Risk Boundary Result
+
+Issue #232는 source file 수를 `4`, `5`, `6`까지 늘렸을 때 repeatability gate가 유지되는지 확인한 작업이다.
+
+검증:
+
+- `ISSUE_NUMBER=232 MAX_FILES=4 MIN_SOURCE_FILES=4 RUN_ID=issue_232_stage_b_larger_source_risk_boundary_files4 bash scripts/agent_harness.sh stage-b-raw-generation-repeatability`
+- `ISSUE_NUMBER=232 MAX_FILES=5 MIN_SOURCE_FILES=5 RUN_ID=issue_232_stage_b_larger_source_risk_boundary_files5 bash scripts/agent_harness.sh stage-b-raw-generation-repeatability`
+- `ISSUE_NUMBER=232 MAX_FILES=6 MIN_SOURCE_FILES=6 RUN_ID=issue_232_stage_b_larger_source_risk_boundary_files6 bash scripts/agent_harness.sh stage-b-raw-generation-repeatability`
+
+결과:
+
+| 항목 | 4 files | 5 files | 6 files |
+|---|---:|---:|---:|
+| repeatability gate | 통과 | 통과 | 통과 |
+| strict valid samples | `8/9` | `7/9` | `7/9` |
+| grammar gate samples | `9/9` | `9/9` | `9/9` |
+| dead-air outliers | `1` | `2` | `1` |
+| dead-air outlier rate | `0.111` | `0.222` | `0.111` |
+| selected best dead-air | `0.438` | `0.467` | `0.375` |
+
+해석:
+
+- 4/5/6-file 조건 모두 hard gate는 통과했다.
+- grammar gate는 모든 조건에서 `9/9`로 유지됐다.
+- 6-file 조건에서 seed `17`은 strict `1/3`까지 내려갔고 `unique pitch count too low` failure가 새로 발생했다.
+- 현재 boundary는 hard failure가 아니라 seed-level strict margin 감소다.
+- broad quality나 Brad style adaptation이 증명된 것은 아니다.
+
+Docs:
+
+- `docs/STAGE_B_LARGER_SOURCE_RISK_BOUNDARY_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
