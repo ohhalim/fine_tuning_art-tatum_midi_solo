@@ -214,6 +214,7 @@ Stage B에서 명시하는 것:
 102. Stage B focused timing vocabulary follow-up focused listening review fill
 103. Stage B focused timing vocabulary keep candidate consolidation
 104. 포트폴리오용 README 최종 정리
+105. README 사무형 문체 정리
 
 가장 최근 의미 있는 결과:
 
@@ -365,6 +366,8 @@ Stage B에서 명시하는 것:
 - Issue #210 result: current pipeline has a single focused keep candidate with objective-clean status, zero adjacent repeats, zero duplicated 3/4/8-note pitch-class chunks, and focused review `keep`; broad model quality, human/audio preference, multi-seed reliability, and style adaptation remain unproven.
 - Issue #212 rewrites README as a portfolio-facing Korean project document.
 - Issue #212 result: README now leads with problem definition, validation approach, current focused keep evidence, conservative claim boundaries, execution commands, and portfolio talking points.
+- Issue #214 rewrites README into a noun-based business style.
+- Issue #214 result: README now uses tables, bullets, and concise noun phrases instead of narrative paragraphs while preserving conservative claim boundaries.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
