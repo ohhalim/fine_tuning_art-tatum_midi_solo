@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #268, Stage B margin-recovered timing/repetition focused listening notes
-- 다음 권장 이슈: `Stage B margin-recovered timing/repetition focused listening fill`
+- latest functional result: Issue #270, Stage B margin-recovered timing/repetition focused listening fill
+- 다음 권장 이슈: `Stage B margin-recovered timing/repetition phrase/vocabulary follow-up repair`
 
 현재 범위가 아닌 것:
 
@@ -1012,6 +1012,52 @@ Issue #268은 Issue #266 focused context keep 후보를 focused listening review
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
+
+## Current Margin-Recovered Timing/Repetition Focused Listening Fill Result
+
+Issue #270은 Issue #268 pending notes를 MIDI/context evidence 기준으로 채운 작업이다.
+
+변경:
+
+- timing/repetition focused listening fill script 추가
+- pending notes를 reviewed 상태로 전환
+- timing, chord fit, phrase continuation, landing, jazz vocabulary, decision 기록
+- dead-air, adjacent repeat, max interval, final landing evidence 보존
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_timing_repetition_focused_listening_fill`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-timing-repetition-focused-listening-fill`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_timing_repetition_seed_37_topk_7_temp_086_n48_sample_39` |
+| reviewed count | `1` |
+| pending count | `0` |
+| prior decision | `keep_for_focused_listening` |
+| final decision | `needs_followup` |
+| timing | `acceptable` |
+| chord fit | `acceptable` |
+| phrase continuation | `weak` |
+| landing | `acceptable` |
+| jazz vocabulary | `thin` |
+| dead-air ratio | `0.353` |
+| adjacent pitch repeats | `2` |
+| max interval | `16` |
+| final landing | `A#4` over `Fm7`, tension |
+
+해석:
+
+- timing은 Issue #262의 `stiff`에서 `acceptable`로 개선됐다.
+- final landing은 outside가 아니라 tension이다.
+- adjacent repeats와 wide interval 때문에 phrase continuation과 vocabulary는 아직 blocker다.
+- 다음 작업은 adjacent repeats와 max interval을 줄이는 phrase/vocabulary follow-up repair다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
