@@ -13,7 +13,8 @@
 현재 active issue:
 
 - latest completed: Issue #218, README 하단 참조 섹션 제거
-- 다음 권장 이슈: `이력서 프로젝트 bullet 정리`
+- active audit: Issue #220, Stage B model-core MVP completion audit
+- 다음 권장 이슈: `Stage B unconstrained model generation gate repair`
 
 현재 범위가 아닌 것:
 
@@ -38,6 +39,33 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 - sparse/medium 일부에서 chord-tone 반응이 약함
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
+
+## Current MVP Audit Result
+
+Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 검증한 audit이다.
+
+판정:
+
+- 이 작업은 model-core 작업이 맞다.
+- pipeline MVP는 조건부 완료로 볼 수 있다.
+- unconstrained trained-model MVP는 아직 완료가 아니다.
+
+근거:
+
+- `stage-b-window-prepare`: samples `70`, train/val `63/7`, vocab size `547`, fits vocab `true`
+- `stage-b-generation-probe`: training path 실행, raw generated sample gate 실패, valid `0/1`, failure `note count too low: 3 < 6`
+- `stage-b-overlap-gate`: constrained generation strict review gate 통과, valid `1/1`, strict `1/1`, grammar `1/1`
+- `stage-b-rhythm-phrase-variation`: selected modes gate 통과, objective-clean candidates `6/6`, duplicate note sequences `0`
+
+해석:
+
+- dataset -> tokenization -> training -> generation -> decode -> objective review 연결은 검증됐다.
+- raw trained model generation은 Stage B grammar를 안정적으로 유지하지 못했다.
+- 지금 이력서/README claim은 "완성된 개인화 재즈 모델"이 아니라 "symbolic MIDI 생성 검증 파이프라인"이어야 한다.
+
+Docs:
+
+- `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
