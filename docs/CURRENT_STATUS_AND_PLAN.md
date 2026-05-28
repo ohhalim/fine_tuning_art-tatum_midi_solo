@@ -12,7 +12,7 @@
 
 현재 active issue:
 
-- latest completed: Issue #216, README 구현 내용 중심 재정리
+- latest completed: Issue #218, README 하단 참조 섹션 제거
 - 다음 권장 이슈: `이력서 프로젝트 bullet 정리`
 
 현재 범위가 아닌 것:
@@ -39,7 +39,26 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest README Implementation Focus Result
+## Latest README Footer Section Removal Result
+
+Issue #218은 README 하단의 참조성 섹션을 제거한 작업이다.
+
+Updated file:
+
+- `README.md`
+
+Result:
+
+- `주요 파일` 섹션 제거
+- `현재 상태` 섹션 제거
+- `문서` 섹션 제거
+- README 흐름을 구현 내용, 문제 해결, 검증 결과, 실행 방법 중심으로 유지
+
+Next recommended issue:
+
+- `이력서 프로젝트 bullet 정리`
+
+## Previous README Implementation Focus Result
 
 Issue #216은 README를 구현 내용과 문제 해결 흐름 중심으로 재정리한 작업이다.
 
