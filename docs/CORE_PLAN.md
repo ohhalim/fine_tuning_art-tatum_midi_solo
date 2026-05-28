@@ -79,6 +79,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered timing/repetition repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_REPAIR_2026-05-28.md`
 - margin-recovered timing/repetition focused context 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_CONTEXT_2026-05-28.md`
 - margin-recovered timing/repetition focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
+- margin-recovered timing/repetition focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -103,6 +104,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered timing/repetition repair: seed `37/41` top_k7 temp0.86 96개 후보 중 qualified `2`, selected sample `39`, dead-air `0.353`, adjacent repeats `2`
 - margin-recovered timing/repetition focused context: selected repair 후보 focused context decision `keep_for_focused_listening`, flags `{}`
 - margin-recovered timing/repetition focused listening notes: candidate `1`, pending `1`, prior decision `keep_for_focused_listening`, risks `dead_air_ratio_remaining` / `adjacent_pitch_repeats` / `wide_interval_review`
+- margin-recovered timing/repetition focused listening fill: reviewed `1`, decision `needs_followup`, timing `acceptable`, phrase continuation `weak`, jazz vocabulary `thin`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -298,6 +300,7 @@ Stage B에서 명시하는 것:
 129. Stage B margin-recovered pitch vocabulary timing/repetition follow-up repair
 130. Stage B margin-recovered timing/repetition focused context review
 131. Stage B margin-recovered timing/repetition focused listening notes
+132. Stage B margin-recovered timing/repetition focused listening fill
 
 가장 최근 의미 있는 결과:
 
@@ -471,6 +474,8 @@ Stage B에서 명시하는 것:
 - Issue #266 result: focused context decision `keep_for_focused_listening`, flags `{}`, note count `14`, unique pitch `7`, range `C#4-G5`, phrase span `6.5` beats, final `A#4` over `Fm7` tension.
 - Issue #268 creates focused listening notes for that context keep candidate.
 - Issue #268 result: candidate `1`, pending `1`, prior decision `keep_for_focused_listening`, review risks `dead_air_ratio_remaining`, `adjacent_pitch_repeats`, and `wide_interval_review`.
+- Issue #270 fills that focused listening note from MIDI/context evidence.
+- Issue #270 result: timing improves to `acceptable`, chord fit `acceptable`, landing `acceptable`, but phrase continuation is `weak`, jazz vocabulary is `thin`, and decision remains `needs_followup` because adjacent repeats `2` and max interval `16` remain.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -489,8 +494,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #268은 timing/repetition repair 후보를 focused listening notes template으로 넘겼다.
-다음 작업은 실제 timing, phrase continuation, vocabulary field를 다시 채우는 것이다.
+Issue #270은 timing/repetition repair 후보의 focused listening fill을 완료했고, 결과는 `needs_followup`이다.
+다음 작업은 adjacent repeats와 wide interval을 줄이는 phrase/vocabulary follow-up repair다.
 
 ## 6. 다음 단계 로드맵
 
@@ -1016,18 +1021,22 @@ Issue #268은 timing/repetition repair 후보를 focused listening notes templat
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered timing/repetition focused listening notes
+Stage B margin-recovered timing/repetition focused listening fill
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - selected candidate: `margin_recovered_timing_repetition_seed_37_topk_7_temp_086_n48_sample_39`
-- candidate count: `1`
-- reviewed count: `0`
-- pending count: `1`
+- reviewed count: `1`
+- pending count: `0`
 - prior decision: `keep_for_focused_listening`
-- listening decision: `pending`
+- final decision: `needs_followup`
+- timing: `acceptable`
+- chord fit: `acceptable`
+- phrase continuation: `weak`
+- landing: `acceptable`
+- jazz vocabulary: `thin`
 - review risks: `dead_air_ratio_remaining`, `adjacent_pitch_repeats`, `wide_interval_review`
 - dead-air ratio: `0.353`
 - adjacent pitch repeats: `2`
@@ -1038,16 +1047,15 @@ Stage B margin-recovered timing/repetition focused listening notes
 
 판단:
 
-- focused listening review 입력은 준비됐다.
-- 아직 focused listening fill을 다시 통과한 것은 아니다.
+- timing은 Issue #262보다 개선됐다.
+- phrase continuation과 vocabulary는 아직 blocker다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered timing/repetition focused listening fill`로 잡는다.
-- MIDI/context evidence 기준으로 timing, chord fit, phrase continuation, landing, vocabulary를 채운다.
-- risk 3개가 final decision에 어떤 영향을 주는지 기록한다.
-- focused listening fill에서 다시 keep이 나오기 전에는 최종 keep으로 주장하지 않는다.
+- 다음 issue는 `Stage B margin-recovered timing/repetition phrase/vocabulary follow-up repair`로 잡는다.
+- adjacent repeats와 max interval을 줄이면서 dead-air `< 0.400`, focused unique pitch `>= 6`, max active `1`을 유지한다.
+- focused listening fill에서 keep이 나오기 전에는 최종 keep으로 주장하지 않는다.
 
 ## 10. 한 문장 요약
 
