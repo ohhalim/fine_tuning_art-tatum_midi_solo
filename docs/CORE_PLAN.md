@@ -216,6 +216,7 @@ Stage B에서 명시하는 것:
 104. 포트폴리오용 README 최종 정리
 105. README 사무형 문체 정리
 106. README 구현 내용 중심 재정리
+107. README 하단 참조 섹션 제거
 
 가장 최근 의미 있는 결과:
 
@@ -371,6 +372,8 @@ Stage B에서 명시하는 것:
 - Issue #214 result: README now uses tables, bullets, and concise noun phrases instead of narrative paragraphs while preserving conservative claim boundaries.
 - Issue #216 rewrites README around implemented components and problem-solving evidence.
 - Issue #216 result: README now shows what was built, what failed, how it was fixed, and what the measured result is; the previous portfolio-point section is removed.
+- Issue #218 removes the README footer reference sections.
+- Issue #218 result: README now ends at execution commands and keeps the focus on implementation, problem solving, validation, and results.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
