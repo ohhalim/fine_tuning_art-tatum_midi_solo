@@ -1,38 +1,40 @@
 # Jazz Piano MIDI 생성 검증 파이프라인
 
-> Symbolic MIDI 생성 결과의 note-level 검증, 실패 원인 분리, review gate 구축 프로젝트
+> Symbolic MIDI 생성 모델의 출력 실패를 note-level metric으로 분석하고, reviewable solo-line 후보까지 좁히는 검증 파이프라인
 
-## 1. 프로젝트 개요
+## 프로젝트 한 줄 요약
 
-| 항목 | 내용 |
+재즈 피아노 솔로 MIDI 생성 실험에서 `.mid` 파일 생성만으로 성공을 판단하지 않도록, **tokenization, generation, decoding, objective review, focused review** 흐름을 구현한 프로젝트입니다.
+
+완성된 음악 생성 모델이 아니라, MIDI 생성 모델 개발을 위한 **실패 분석 및 검증 기반**이 핵심입니다.
+
+## 구현한 것
+
+| 구현 영역 | 구현 내용 |
 |---|---|
-| 주제 | Jazz piano solo-line MIDI 생성 검증 |
-| 목표 | reviewable jazz solo-line MIDI 생성을 위한 tokenization / generation / decoding / validation loop 검증 |
-| 핵심 관점 | `.mid` 파일 생성 여부가 아닌 note-level 품질 검증 |
-| 현재 범위 | model-core 실험, objective review, focused review |
-| 제외 범위 | broad model-quality claim, Brad Mehldau style adaptation claim, realtime DAW/plugin, backend/API, product MVP |
+| Dataset audit | jazz piano MIDI corpus 읽기 가능 여부, 후보 파일, Brad subset, 중복 여부 점검 |
+| Stage B tokenization | `BAR`, `POSITION`, `CHORD_ROOT`, `CHORD_QUALITY`, `NOTE_PITCH`, `NOTE_DURATION`, `VELOCITY` 기반 duration-explicit token 구조 |
+| Generation probe | grammar-constrained generation, coverage-aware generation, chord-aware pitch constraint, data-derived motif rhythm generation |
+| MIDI decode / postprocess | generated token sequence를 MIDI로 복원하고 overlap-free solo-line variant 생성 |
+| Objective MIDI review | note count, unique pitch, polyphony, phrase coverage, repeated cell, interval, chord/tension/outside ratio, final landing 검증 |
+| Focused review package | proxy keep 후보의 solo MIDI와 context MIDI를 분리해 focused review artifact 생성 |
+| Listening review notes | timing, chord fit, phrase continuation, landing, jazz vocabulary, decision을 structured field로 기록 |
+| Validation harness | unit test, compile check, whitespace check, Stage B probe 실행을 harness mode로 관리 |
+| Documentation | issue 단위 실험 결과, 실패 원인, repair target, remaining risk 문서화 |
 
-## 2. 문제 정의
+## 문제와 해결
 
-초기 Stage A 생성 결과의 주요 실패 유형:
+| 문제 | 원인 / 관찰 | 해결 | 결과 |
+|---|---|---|---|
+| `.mid` 파일은 생성되지만 solo-line으로 보기 어려움 | one-note collapse, long sustain block, chord block 출력 | `.mid exists`를 성공 조건에서 제외하고 objective MIDI review 추가 | 생성 결과를 note-level metric으로 재검증 |
+| Stage A 출력 품질 실패 | `NOTE_ON/OFF` 중심 representation에서 duration과 phrase 구조 제어 어려움 | Stage B duration-explicit tokenization으로 전환 | `POSITION`, `NOTE_DURATION`, chord context 기반 생성 probe 가능 |
+| 동시 발음 / chord block 위험 | 같은 onset의 note가 겹치며 solo-line 검증 불가 | overlap-free postprocess 및 max active notes 검증 | focused 후보 max active notes `1` 유지 |
+| 반복 pitch-cell 문제 | adjacent repeat, duplicated pitch-class chunk 발생 | pitch reuse 제한, fallback 후보 조정, repeated-cell metric 추가 | focused 후보 adjacent pitch repeats `0`, duplicated 3/4/8 chunks `0 / 0 / 0` |
+| final landing 검증 부족 | 마지막 음이 chord context와 맞는지 판단 어려움 | context MIDI, chord guide, bass root guide와 함께 focused context review 구성 | focused 후보 final landing `D5` over `Ebmaj7` 확인 |
+| 주관적 리뷰 기록 불일치 | "좋다/나쁘다" 식의 loose comment로 다음 repair target 불명확 | listening review notes schema 추가 | timing, chord fit, phrase continuation, landing, vocabulary, decision 분리 |
+| 실험 결과 과장 위험 | 단일 후보 keep을 모델 완성으로 오해 가능 | proven / not proven / remaining risk 문서화 | current best focused candidate와 broad quality claim 분리 |
 
-| 실패 유형 | 관찰 내용 |
-|---|---|
-| note sparsity | note count 부족 |
-| sustain collapse | 긴 sustain block 출력 |
-| chord block | solo-line이 아닌 동시 발음 구조 |
-| pitch repetition | 반복 pitch / pitch-class cell |
-| timing stiffness | grid-derived timing |
-| weak landing | 어색한 final landing |
-
-핵심 판단:
-
-- 모델 확장 전 실패 재현 및 측정 체계 필요
-- `.mid` 생성 성공과 음악적 성공의 분리 필요
-- representation 문제로 인한 Stage A 한계 확인
-- duration / position 명시형 Stage B tokenization 전환
-
-## 3. 접근 방식
+## 파이프라인 구조
 
 ```mermaid
 flowchart LR
@@ -41,63 +43,13 @@ flowchart LR
     C --> D["MIDI decode"]
     D --> E["Overlap-free postprocess"]
     E --> F["Objective MIDI review"]
-    F --> G["Proxy / focused review"]
-    G --> H["Repair or consolidate"]
+    F --> G["Proxy review"]
+    G --> H["Focused context package"]
+    H --> I["Focused listening notes"]
+    I --> J["Keep / follow-up decision"]
 ```
 
-작업 원칙:
-
-- 작은 probe 단위 실험
-- 실패 유형별 metric 분리
-- objective review와 focused review 분리
-- generated artifact와 문서화 결과 분리
-- 품질 주장보다 검증 근거 우선
-
-## 4. Stage 전환
-
-| 단계 | 방식 | 판단 |
-|---|---|---|
-| Stage A | `NOTE_ON/OFF` 중심 control token | runnable pipeline 확인, musical output 실패 |
-| Stage B | duration-explicit symbolic token | phrase/window 단위 생성 및 review gate 구축 |
-
-Stage B token family:
-
-- `BAR`
-- `POSITION`
-- `CHORD_ROOT`
-- `CHORD_QUALITY`
-- `NOTE_PITCH`
-- `NOTE_DURATION`
-- `VELOCITY`
-
-## 5. 검증 기준
-
-Objective MIDI review 기준:
-
-- non-zero note count
-- unique pitch count
-- max simultaneous notes
-- polyphonic tick ratio
-- phrase coverage
-- dead-air ratio
-- max note duration ratio
-- repeated pitch/cell ratio
-- max interval
-- unresolved large leap ratio
-- chord-tone/tension/outside/root ratio
-- final guide/chord landing
-- IOI/duration diversity
-
-성공 조건 제외:
-
-- `.mid` 파일 존재만으로 성공 처리
-- one-note / two-note output
-- long sustain block
-- chord block output
-- repeated-cell collapse
-- final landing 미검증 결과
-
-## 6. 핵심 결과
+## 핵심 결과
 
 Issue #210 기준 current best focused review candidate:
 
@@ -120,25 +72,53 @@ Issue #210 기준 current best focused review candidate:
 | focused landing | `strong` |
 | focused jazz vocabulary | `acceptable` |
 
-결과 의미:
+결과 해석:
 
 - reviewable MIDI outcome 확보
 - objective-clean focused candidate 확보
 - repeated-cell blocker 제거
 - proxy review -> focused context decision -> focused listening fill 경로 검증
-- 단일 후보 기준 current best candidate 정리
+- 단일 후보 기준 current best candidate 확보
 
-결과 한계:
+## 아직 증명하지 않은 것
 
-- broad multi-seed model quality 미증명
-- human/audio listening preference 미증명
-- Brad Mehldau style adaptation 미증명
-- realtime DAW/plugin readiness 미증명
-- backend/API/product MVP readiness 미증명
+| 항목 | 상태 |
+|---|---|
+| broad multi-seed model quality | 미검증 |
+| human/audio listening preference | 미검증 |
+| Brad Mehldau style adaptation | 미검증 |
+| generic jazz pianist base 완성 | 미검증 |
+| realtime DAW/plugin readiness | 범위 밖 |
+| backend/API/product MVP | 범위 밖 |
 
-## 7. 구현 범위
+## 주요 검증 기준
 
-### Dataset audit
+Objective MIDI review 기준:
+
+- non-zero note count
+- unique pitch count
+- max simultaneous notes
+- polyphonic tick ratio
+- phrase coverage
+- dead-air ratio
+- max note duration ratio
+- repeated pitch/cell ratio
+- max interval
+- unresolved large leap ratio
+- chord-tone/tension/outside/root ratio
+- final guide/chord landing
+- IOI/duration diversity
+
+성공 조건에서 제외한 항목:
+
+- `.mid` 파일 존재만으로 성공 처리
+- one-note / two-note output
+- long sustain block
+- chord block output
+- repeated-cell collapse
+- final landing 미검증 결과
+
+## Dataset audit 결과
 
 | 항목 | 값 |
 |---|---:|
@@ -151,24 +131,11 @@ Issue #210 기준 current best focused review candidate:
 
 Dataset 판단:
 
-- Brad dataset 직접 scratch training 제외
+- Brad subset 직접 scratch training 제외
 - generic jazz base 이후 adaptation / holdout 후보 분리
-- dataset audit 선행 후 generation probe 진행
+- generation 확장 전 dataset audit 선행
 
-### Generation / review probes
-
-- grammar-constrained generation
-- overlap/dedup gate
-- temporal coverage diagnostics
-- coverage-aware constrained generation
-- chord-aware pitch constrained generation
-- data-derived motif rhythm generation
-- phrase/cadence review baseline
-- register-safe final landing repair
-- focused context package
-- focused listening review notes/fill
-
-## 8. 실행 방법
+## 실행 방법
 
 환경 설치:
 
@@ -194,7 +161,7 @@ Focused listening review notes:
 bash scripts/agent_harness.sh stage-b-focused-listening-review-notes
 ```
 
-## 9. 주요 파일
+## 주요 파일
 
 ```text
 scripts/
@@ -217,39 +184,19 @@ docs/
   STAGE_B_FOCUSED_TIMING_VOCABULARY_KEEP_CANDIDATE_CONSOLIDATION_2026-05-27.md
 ```
 
-## 10. 포트폴리오 포인트
-
-- 모델 출력 실패의 원인 단위 분해
-- MIDI 파일 생성 여부와 품질 검증의 분리
-- Stage A 실패 후 representation 재설계
-- Stage B tokenization / constrained generation / review gate 구축
-- issue 단위 실험, 검증, 문서화 흐름
-- 품질 과장 없이 current best candidate와 한계 동시 기록
-
-## 11. 현재 한계
-
-| 구분 | 상태 |
-|---|---|
-| focused keep candidate | 단일 후보 |
-| multi-seed reliability | 미검증 |
-| timing / vocabulary | `acceptable`, strong claim 제외 |
-| source IOI diversity | 낮음 |
-| proxy risk | `too_mechanical` 잔존 |
-| style adaptation | 미주장 |
-| realtime/product scope | 범위 밖 |
-
-## 12. 현재 상태
+## 현재 상태
 
 | 항목 | 상태 |
 |---|---|
-| latest completed | Issue #214 |
+| latest completed | Issue #216 |
 | current best candidate evidence | Issue #210 consolidation |
+| model status | 생성 모델 검증 파이프라인 구축 단계 |
 | broad training | 미진행 |
 | Brad style adaptation | 미진행 |
-| next candidate task | 이력서 프로젝트 bullet 정리 |
+| next task | 이력서 프로젝트 bullet 정리 |
 | alternative research task | Stage B focused timing vocabulary keep repeatability sweep |
 
-## 13. 문서
+## 문서
 
 - [Current Status and Plan](docs/CURRENT_STATUS_AND_PLAN.md)
 - [Core Plan](docs/CORE_PLAN.md)
