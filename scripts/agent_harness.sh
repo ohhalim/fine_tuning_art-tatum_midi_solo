@@ -40,6 +40,8 @@ Modes:
                 Diagnose per-seed strict margin risk from a Stage B repeatability summary.
   stage-b-margin-recovered-review-export
                 Export review metrics from a margin-recovered Stage B repeatability summary.
+  stage-b-margin-recovered-listening-notes
+                Build pending listening notes for margin-recovered Stage B candidates.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -167,6 +169,7 @@ run_quick() {
     scripts/diagnose_stage_b_dead_air_outliers.py \
     scripts/diagnose_stage_b_seed_strict_margins.py \
     scripts/build_stage_b_margin_recovered_review_export.py \
+    scripts/build_stage_b_margin_recovered_listening_notes.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -341,6 +344,16 @@ run_stage_b_margin_recovered_review_export() {
   "$PYTHON_BIN" scripts/build_stage_b_margin_recovered_review_export.py \
     --run_id "$run_id" \
     --summary_path "$summary_path" \
+    --expected_candidate_count 3
+}
+
+run_stage_b_margin_recovered_listening_notes() {
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_listening_notes}"
+  local review_export="${REVIEW_EXPORT:-outputs/stage_b_margin_recovered_review_export/harness_stage_b_margin_recovered_review_export/candidate_review_export.json}"
+  print_header "Stage B margin-recovered listening review notes"
+  "$PYTHON_BIN" scripts/build_stage_b_margin_recovered_listening_notes.py \
+    --run_id "$run_id" \
+    --review_export "$review_export" \
     --expected_candidate_count 3
 }
 
@@ -1475,6 +1488,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-review-export)
     run_stage_b_margin_recovered_review_export
+    ;;
+  stage-b-margin-recovered-listening-notes)
+    run_stage_b_margin_recovered_listening_notes
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
