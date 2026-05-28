@@ -60,6 +60,8 @@ Issue #222 기준 model-core MVP:
 | raw generation gate | `stage-b-generation-probe` 통과 |
 | raw generation mode | `unconstrained` token sampling |
 | repair 조건 | 50 epoch tiny-overfit, top_k `4`, overlap postprocess |
+| repeatability sweep | 2 source files / 3 seeds / 9 samples |
+| repeatability result | strict `8/9`, grammar `9/9`, dead-air outlier `1` |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -70,6 +72,7 @@ MVP 근거:
 - raw generated samples valid/strict/grammar `5/5`
 - complete note groups `21-22`, invalid token count `0`
 - postprocess 후 note count `13-18`, unique pitch count `4-6`
+- 2-file/3-seed repeatability sweep에서 strict pass-rate `0.889`
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -108,7 +111,8 @@ Issue #210 기준 current best focused review candidate:
 | 항목 | 상태 |
 |---|---|
 | broad unconstrained trained-model generation quality | 미검증 |
-| broad multi-seed model quality | 미검증 |
+| broad multi-seed model quality | 부분 검증 / 2-file 3-seed local sweep 통과 |
+| dead-air outlier control | 미완료 |
 | human/audio listening preference | 미검증 |
 | Brad Mehldau style adaptation | 미검증 |
 | generic jazz pianist base 완성 | 미검증 |

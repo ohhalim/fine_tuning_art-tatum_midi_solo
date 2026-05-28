@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #222, Stage B raw generation gate repair
-- 다음 권장 이슈: `Stage B raw generation broader repeatability sweep`
+- latest functional result: Issue #224, Stage B raw generation broader repeatability sweep
+- 다음 권장 이슈: `Stage B raw generation dead-air outlier diagnostics`
 
 현재 범위가 아닌 것:
 
@@ -101,6 +101,42 @@ Issue #222는 Issue #220에서 실패한 raw generation gate를 repair한 작업
 Docs:
 
 - `docs/STAGE_B_RAW_GENERATION_GATE_REPAIR_2026-05-28.md`
+
+## Current Repeatability Sweep Result
+
+Issue #224는 raw generation gate를 2-file/3-seed 조건으로 넓혀 검증한 작업이다.
+
+검증:
+
+- `RUN_ID=issue_224_stage_b_raw_generation_repeatability_final2 bash scripts/agent_harness.sh stage-b-raw-generation-repeatability`
+
+조건:
+
+- source files: `2`
+- seeds: `17, 23, 31`
+- samples: `9`
+- epochs: `50`
+- top_k: `4`
+- overlap postprocess: enabled
+
+결과:
+
+- valid sample count: `8/9`
+- strict valid sample count: `8/9`
+- grammar gate sample count: `9/9`
+- strict pass-rate: `0.889`
+- max postprocess removal ratio: `0.429`
+- seed `31`에서 dead-air ratio outlier `1`개 발생
+
+해석:
+
+- model-core MVP는 2-file/3-seed local repeatability gate까지 통과했다.
+- broad model quality, human preference, Brad style adaptation은 아직 미검증이다.
+- 다음 작업은 dead-air outlier 원인 분리다.
+
+Docs:
+
+- `docs/STAGE_B_RAW_GENERATION_REPEATABILITY_SWEEP_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
