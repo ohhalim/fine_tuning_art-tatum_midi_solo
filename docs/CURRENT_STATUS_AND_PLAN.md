@@ -12,7 +12,7 @@
 
 현재 active issue:
 
-- latest completed: Issue #214, README 사무형 문체 정리
+- latest completed: Issue #216, README 구현 내용 중심 재정리
 - 다음 권장 이슈: `이력서 프로젝트 bullet 정리`
 
 현재 범위가 아닌 것:
@@ -39,7 +39,26 @@ Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
 따라서 지금의 목표는 "그럴듯한 제품 MVP"가 아니라, 전체 dataset 품질과 작은 probe를 통해 model training path를 검증하는 것이다.
 
-## Latest README Business Style Result
+## Latest README Implementation Focus Result
+
+Issue #216은 README를 구현 내용과 문제 해결 흐름 중심으로 재정리한 작업이다.
+
+Updated file:
+
+- `README.md`
+
+Result:
+
+- `구현한 것` 섹션을 추가해 dataset audit, tokenization, generation probe, MIDI decode, objective review, focused review, harness, documentation 범위를 명시했다.
+- `문제와 해결` 표를 추가해 문제, 원인/관찰, 해결, 결과를 한눈에 볼 수 있게 했다.
+- 평가형 섹션을 제거했다.
+- current best focused review candidate evidence와 conservative claim boundary는 유지했다.
+
+Next recommended issue:
+
+- `이력서 프로젝트 bullet 정리`
+
+## Previous README Business Style Result
 
 Issue #214는 README 문체를 서술형 설명에서 명사형, 사무형 구조로 정리한 작업이다.
 

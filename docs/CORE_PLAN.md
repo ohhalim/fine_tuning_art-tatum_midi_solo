@@ -215,6 +215,7 @@ Stage B에서 명시하는 것:
 103. Stage B focused timing vocabulary keep candidate consolidation
 104. 포트폴리오용 README 최종 정리
 105. README 사무형 문체 정리
+106. README 구현 내용 중심 재정리
 
 가장 최근 의미 있는 결과:
 
@@ -368,6 +369,8 @@ Stage B에서 명시하는 것:
 - Issue #212 result: README now leads with problem definition, validation approach, current focused keep evidence, conservative claim boundaries, execution commands, and portfolio talking points.
 - Issue #214 rewrites README into a noun-based business style.
 - Issue #214 result: README now uses tables, bullets, and concise noun phrases instead of narrative paragraphs while preserving conservative claim boundaries.
+- Issue #216 rewrites README around implemented components and problem-solving evidence.
+- Issue #216 result: README now shows what was built, what failed, how it was fixed, and what the measured result is; the previous portfolio-point section is removed.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
