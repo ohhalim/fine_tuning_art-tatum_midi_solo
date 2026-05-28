@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #274, Stage B margin-recovered phrase/vocabulary focused context review
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary focused listening notes`
+- latest functional result: Issue #276, Stage B margin-recovered phrase/vocabulary focused listening notes
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary focused listening fill`
 
 현재 범위가 아닌 것:
 
@@ -1158,6 +1158,52 @@ Issue #274는 Issue #272 selected candidate를 solo/context package로 격리하
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_FOCUSED_CONTEXT_2026-05-28.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Focused Listening Notes Result
+
+Issue #276은 Issue #274 focused context keep 후보를 focused listening review notes template으로 넘긴 작업이다.
+
+변경:
+
+- phrase/vocabulary focused package와 focused context decision을 함께 읽는 notes wrapper 추가
+- focused context metrics, prior decision, review risks를 notes candidate에 보존
+- adjacent repeat / wide interval repair 상태가 notes risk에 다시 올라오지 않는지 단위 테스트로 확인
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_phrase_vocabulary_focused_listening_notes`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-focused-listening-notes`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43` |
+| candidate count | `1` |
+| reviewed count | `0` |
+| pending count | `1` |
+| prior decision | `keep_for_focused_listening` |
+| listening decision | `pending` |
+| note count | `13` |
+| unique pitch count | `8` |
+| range | `G4-E5` |
+| phrase span | `7.000` beats |
+| dead-air ratio | `0.333` |
+| adjacent pitch repeats | `0` |
+| max interval | `7` |
+| final landing | `C5` over `Fm7`, chord tone |
+| review risks | `sustained_coverage_review` |
+
+해석:
+
+- focused context keep 후보를 listening notes template으로 넘겼다.
+- 실제 청감 판단 필드는 모두 `pending`이다.
+- Issue #270의 blocker였던 adjacent repeat와 wide interval은 notes risk로 재등장하지 않았다.
+- sustained coverage가 `0.594`라서 청감 fill에서 phrase continuity를 다시 확인해야 한다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 

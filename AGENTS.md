@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #274, Stage B margin-recovered phrase/vocabulary focused context review.
+- Latest functional issue completed: Issue #276, Stage B margin-recovered phrase/vocabulary focused listening notes.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary focused listening notes.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary focused listening fill.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -466,6 +466,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-focused
 ```
 
 This harness packages the selected phrase/vocabulary repair candidate with chord/bass context and verifies focused context decision readiness.
+
+For Stage B margin-recovered phrase/vocabulary focused listening notes changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-focused-listening-notes
+```
+
+This harness writes the focused listening review notes template for the selected phrase/vocabulary context keep candidate.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

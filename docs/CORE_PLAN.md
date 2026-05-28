@@ -82,6 +82,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered timing/repetition focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered phrase/vocabulary repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_REPAIR_2026-05-28.md`
 - margin-recovered phrase/vocabulary focused context 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_FOCUSED_CONTEXT_2026-05-28.md`
+- margin-recovered phrase/vocabulary focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -109,6 +110,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered timing/repetition focused listening fill: reviewed `1`, decision `needs_followup`, timing `acceptable`, phrase continuation `weak`, jazz vocabulary `thin`
 - margin-recovered phrase/vocabulary repair: seed `43/61` top_k7 temp0.82 96개 후보 중 qualified `2`, selected sample `43`, adjacent repeats `0`, max interval `7`, dead-air `0.333`
 - margin-recovered phrase/vocabulary focused context: selected repair 후보 focused context decision `keep_for_focused_listening`, flags `{}`, final `C5` over `Fm7` chord tone
+- margin-recovered phrase/vocabulary focused listening notes: candidate `1`, pending `1`, prior decision `keep_for_focused_listening`, risk `sustained_coverage_review`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -307,6 +309,7 @@ Stage B에서 명시하는 것:
 132. Stage B margin-recovered timing/repetition focused listening fill
 133. Stage B margin-recovered timing/repetition phrase/vocabulary follow-up repair
 134. Stage B margin-recovered phrase/vocabulary focused context review
+135. Stage B margin-recovered phrase/vocabulary focused listening notes
 
 가장 최근 의미 있는 결과:
 
@@ -486,6 +489,8 @@ Stage B에서 명시하는 것:
 - Issue #272 result: selected sample `43` keeps dead-air `< 0.400`, focused unique pitch `8`, focused notes `13`, max active `1`, dup3 `0`, and improves adjacent repeats `2 -> 0` plus max interval `16 -> 7`; focused context/listening 재검증은 아직 남아 있다.
 - Issue #274 isolates that phrase/vocabulary repair candidate into a focused solo/context package and reviews it against context MIDI.
 - Issue #274 result: focused context decision `keep_for_focused_listening`, flags `{}`, note count `13`, unique pitch `8`, range `G4-E5`, phrase span `7.0` beats, max active `1`, final `C5` over `Fm7` chord tone.
+- Issue #276 creates focused listening notes for that context keep candidate.
+- Issue #276 result: candidate `1`, pending `1`, prior decision `keep_for_focused_listening`, review risk `sustained_coverage_review`; adjacent repeat and wide interval risks do not reappear.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -504,8 +509,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #274는 phrase/vocabulary repair 후보를 focused solo/context package로 격리했고 context decision `keep_for_focused_listening`을 확인했다.
-다음 작업은 이 후보의 focused listening review notes를 만들고 timing, phrase continuation, landing, vocabulary 판단을 pending field로 넘기는 것이다.
+Issue #276은 phrase/vocabulary repair 후보의 focused listening notes template을 만들었고, 실제 청감 판단 필드는 pending으로 유지했다.
+다음 작업은 이 notes를 MIDI/context evidence 기준으로 채워 timing, phrase continuation, landing, vocabulary, final decision을 기록하는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -1031,38 +1036,40 @@ Issue #274는 phrase/vocabulary repair 후보를 focused solo/context package로
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary focused context review
+Stage B margin-recovered phrase/vocabulary focused listening notes
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_FOCUSED_CONTEXT_2026-05-28.md`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - selected candidate: `margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43`
-- copied MIDI files: `2`
-- focused context decision: `keep_for_focused_listening`
-- decision flags: `{}`
+- candidate count: `1`
+- reviewed count: `0`
+- pending count: `1`
+- prior decision: `keep_for_focused_listening`
+- listening decision: `pending`
 - note count: `13`
 - unique pitch count: `8`
 - range: `G4-E5`
 - phrase span: `7.000` beats
-- max active notes: `1`
 - dead-air ratio: `0.333`
 - adjacent pitch repeats: `0`
 - max interval: `7`
-- duplicated 3-note chunks: `0`
 - final landing: `C5` over `Fm7`, chord tone
+- review risks: `sustained_coverage_review`
 
 판단:
 
-- focused context blocker는 발견되지 않았다.
-- 이 결과는 focused listening review 진입 조건이다.
+- focused context keep 후보를 listening notes template으로 넘겼다.
+- 실제 청감 판단 필드는 모두 pending이다.
+- adjacent repeat와 wide interval risks는 재등장하지 않았다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary focused listening notes`로 잡는다.
-- focused package와 context decision을 listening review notes template으로 넘긴다.
-- timing, phrase continuation, landing, vocabulary, decision field를 pending으로 유지한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary focused listening fill`로 잡는다.
+- focused listening notes를 MIDI/context evidence 기준으로 채운다.
+- sustained coverage risk가 실제 phrase continuation blocker인지 판단한다.
 - focused listening fill에서 keep이 나오기 전에는 최종 keep으로 주장하지 않는다.
 
 ## 10. 한 문장 요약
