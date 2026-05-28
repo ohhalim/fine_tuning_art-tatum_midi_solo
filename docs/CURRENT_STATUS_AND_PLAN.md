@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #228, Stage B dead-air-aware candidate selection gate
-- 다음 권장 이슈: `Stage B broader source repeatability with candidate gate`
+- latest functional result: Issue #230, Stage B broader source repeatability with candidate gate
+- 다음 권장 이슈: `Stage B larger source repeatability risk boundary`
 
 현재 범위가 아닌 것:
 
@@ -199,6 +199,41 @@ Issue #228은 repeatability sweep에 dead-air outlier 집계와 strict-valid 후
 Docs:
 
 - `docs/STAGE_B_DEAD_AIR_AWARE_CANDIDATE_GATE_2026-05-28.md`
+
+## Current Broader Source Candidate Gate Result
+
+Issue #230은 source file 수를 `3`으로 늘린 상태에서 candidate gate가 유지되는지 검증한 작업이다.
+
+변경:
+
+- `stage-b-raw-generation-repeatability` harness에서 `MAX_FILES`, `SEEDS`, `EPOCHS`, `NUM_SAMPLES`, `TOP_K`, `TEMPERATURE`, `MAX_DEAD_AIR_OUTLIER_RATE`를 env로 조정 가능하게 변경
+
+검증:
+
+- `ISSUE_NUMBER=230 MAX_FILES=3 MIN_SOURCE_FILES=3 RUN_ID=issue_230_stage_b_broader_source_candidate_gate bash scripts/agent_harness.sh stage-b-raw-generation-repeatability`
+
+결과:
+
+- source files: `3`
+- total samples: `9`
+- strict valid sample count: `7/9`
+- grammar gate sample count: `9/9`
+- dead-air outlier count: `2`
+- dead-air outlier rate: `0.222`
+- max allowed outlier rate: `0.250`
+- selected best candidate: seed `17`, sample `3`
+- selected best dead-air ratio: `0.222`
+- seed별 strict-valid best candidate 존재: true
+
+해석:
+
+- 3-file 조건에서도 candidate gate는 통과했다.
+- strict pass-rate는 2-file `8/9`에서 3-file `7/9`로 낮아졌다.
+- 다음 작업은 source file 수를 더 늘릴 때 outlier rate가 gate를 넘는 경계를 확인하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_BROADER_SOURCE_CANDIDATE_GATE_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
