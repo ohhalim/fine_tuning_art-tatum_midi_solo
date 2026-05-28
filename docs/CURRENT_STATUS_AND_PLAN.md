@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #270, Stage B margin-recovered timing/repetition focused listening fill
-- 다음 권장 이슈: `Stage B margin-recovered timing/repetition phrase/vocabulary follow-up repair`
+- latest functional result: Issue #272, Stage B margin-recovered timing/repetition phrase/vocabulary follow-up repair
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary focused context review`
 
 현재 범위가 아닌 것:
 
@@ -1058,6 +1058,60 @@ Issue #270은 Issue #268 pending notes를 MIDI/context evidence 기준으로 채
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Repair Result
+
+Issue #272는 Issue #270에서 남은 adjacent repeat / wide interval blocker를 좁게 repair한 작업이다.
+
+변경:
+
+- phrase/vocabulary repair summary script 추가
+- seed `43/61`, top_k `7`, temperature `0.82`, n `48` generation harness 추가
+- qualified gate를 `dead_air < 0.400`, `adjacent repeats < 2`, `max interval < 12`, `focused unique pitch >= 6`, `focused notes >= 12`, `max active = 1`, `dup3 = 0`로 고정
+- Issue #270 후보 대비 adjacent repeat, max interval, dead-air, unique pitch delta 기록
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_phrase_vocabulary_repair`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-repair`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43` |
+| source run | `harness_stage_b_margin_recovered_phrase_vocab_seed43_topk7_temp082_n48` |
+| sample seed | `85` |
+| qualified candidates | `2/96` |
+| focused note count | `13` |
+| focused unique pitch count | `8` |
+| focused max active notes | `1` |
+| duplicated 3-note chunks | `0` |
+| dead-air ratio | `0.333` |
+| adjacent pitch repeats | `0` |
+| max interval | `7` |
+| remaining flags | `[]` |
+
+Issue #270 후보 대비:
+
+| 항목 | 이전 | 이번 | 변화 |
+|---|---:|---:|---:|
+| dead-air ratio | `0.353` | `0.333` | `+0.020` 개선 |
+| adjacent pitch repeats | `2` | `0` | `+2` 개선 |
+| max interval | `16` | `7` | `+9` 개선 |
+| focused unique pitch count | `7` | `8` | `+1` |
+| focused note count | `14` | `13` | `-1` |
+
+해석:
+
+- phrase/vocabulary objective blockers는 개선됐다.
+- dead-air와 pitch vocabulary gate는 유지됐다.
+- 아직 focused context package와 focused listening fill을 다시 통과한 것은 아니다.
+- 다음 작업은 selected candidate를 solo/context package로 격리하고 context decision을 다시 실행하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_REPAIR_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
