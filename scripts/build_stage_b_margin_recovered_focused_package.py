@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -113,6 +114,14 @@ def write_solo_line_midi(source_midi_path: Path, output_path: Path) -> dict[str,
     return summary
 
 
+def context_bars_for_solo(solo_midi_path: Path, *, bpm: float, min_bars: int) -> int:
+    notes = non_drum_notes(solo_midi_path)
+    if not notes:
+        return int(max(1, min_bars))
+    max_end_beats = max(float(note.end) * float(bpm) / 60.0 for note in notes)
+    return int(max(1, min_bars, math.ceil(max_end_beats / 4.0)))
+
+
 def selected_keep_candidates(review_notes: dict[str, Any], *, decision: str) -> list[dict[str, Any]]:
     candidates = review_notes.get("candidates")
     if not isinstance(candidates, list) or not candidates:
@@ -170,8 +179,9 @@ def enrich_review_notes_with_context(
         }
         report = read_json(candidate_report_path(candidate))
         chords, bpm, bars = request_context(report)
+        context_bars = context_bars_for_solo(solo_midi_path, bpm=bpm, min_bars=bars)
         context_path = context_source_dir / f"{candidate_id}_with_context.mid"
-        write_context_midi(solo_midi_path, context_path, chords, bpm=bpm, bars=bars)
+        write_context_midi(solo_midi_path, context_path, chords, bpm=bpm, bars=context_bars)
         files["source_midi_path"] = str(source_midi_path)
         files["midi_path"] = str(solo_midi_path)
         files["context_midi_path"] = str(context_path)
@@ -179,7 +189,8 @@ def enrich_review_notes_with_context(
             "solo_line_postprocess": solo_postprocess,
             "context_chords": chords,
             "context_bpm": bpm,
-            "context_bars": bars,
+            "request_context_bars": bars,
+            "context_bars": context_bars,
         }
         objective_report["candidates"].append(
             {

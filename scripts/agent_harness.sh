@@ -46,6 +46,8 @@ Modes:
                 Fill margin-recovered listening notes with MIDI-metric proxy review.
   stage-b-margin-recovered-proxy-keep-focused-package
                 Build a focused solo/context package for the margin-recovered proxy keep.
+  stage-b-margin-recovered-focused-context-decision
+                Review the margin-recovered focused package against solo/context MIDI metrics.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -176,6 +178,7 @@ run_quick() {
     scripts/build_stage_b_margin_recovered_listening_notes.py \
     scripts/fill_stage_b_margin_recovered_proxy_review.py \
     scripts/build_stage_b_margin_recovered_focused_package.py \
+    scripts/review_stage_b_margin_recovered_focused_context.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -387,6 +390,21 @@ run_stage_b_margin_recovered_proxy_keep_focused_package() {
     --review_notes "$review_notes" \
     --expected_candidate_id margin_recovered_rank_2_seed_31_sample_5 \
     --min_candidates 1
+}
+
+run_stage_b_margin_recovered_focused_context_decision() {
+  local focused_run_id="${FOCUSED_RUN_ID:-harness_stage_b_margin_recovered_proxy_keep_focused_package_context_decision}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_focused_context_decision}"
+  local focused_package="${FOCUSED_PACKAGE:-outputs/stage_b_margin_recovered_focused_package/${focused_run_id}/focused_review_package.json}"
+  if [[ ! -f "$focused_package" ]]; then
+    RUN_ID="$focused_run_id" run_stage_b_margin_recovered_proxy_keep_focused_package
+  fi
+  print_header "Stage B margin-recovered focused context decision"
+  "$PYTHON_BIN" scripts/review_stage_b_margin_recovered_focused_context.py \
+    --run_id "$run_id" \
+    --focused_package "$focused_package" \
+    --expected_candidate_id margin_recovered_rank_2_seed_31_sample_5 \
+    --expected_decision needs_followup
 }
 
 run_stage_b_constrained_probe() {
@@ -1529,6 +1547,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-proxy-keep-focused-package)
     run_stage_b_margin_recovered_proxy_keep_focused_package
+    ;;
+  stage-b-margin-recovered-focused-context-decision)
+    run_stage_b_margin_recovered_focused_context_decision
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
