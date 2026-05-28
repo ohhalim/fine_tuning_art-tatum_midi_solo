@@ -57,8 +57,10 @@ MVP가 끝났다고 볼 수 있는 조건:
 - 근거 문서: `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
 - repair 문서: `docs/STAGE_B_RAW_GENERATION_GATE_REPAIR_2026-05-28.md`
 - repeatability 문서: `docs/STAGE_B_RAW_GENERATION_REPEATABILITY_SWEEP_2026-05-28.md`
+- dead-air 진단 문서: `docs/STAGE_B_DEAD_AIR_OUTLIER_DIAGNOSTICS_2026-05-28.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
+- raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -232,6 +234,7 @@ Stage B에서 명시하는 것:
 107. README 하단 참조 섹션 제거
 108. Stage B raw generation gate repair
 109. Stage B raw generation broader repeatability sweep
+110. Stage B raw generation dead-air outlier diagnostics
 
 가장 최근 의미 있는 결과:
 

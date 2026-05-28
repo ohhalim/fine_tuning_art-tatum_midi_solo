@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #224, Stage B raw generation broader repeatability sweep
-- 다음 권장 이슈: `Stage B raw generation dead-air outlier diagnostics`
+- latest functional result: Issue #226, Stage B raw generation dead-air outlier diagnostics
+- 다음 권장 이슈: `Stage B dead-air-aware candidate selection gate`
 
 현재 범위가 아닌 것:
 
@@ -137,6 +137,38 @@ Issue #224는 raw generation gate를 2-file/3-seed 조건으로 넓혀 검증한
 Docs:
 
 - `docs/STAGE_B_RAW_GENERATION_REPEATABILITY_SWEEP_2026-05-28.md`
+
+## Current Dead-Air Outlier Diagnostics Result
+
+Issue #226은 Issue #224의 seed `31` dead-air outlier 원인을 분리한 작업이다.
+
+검증:
+
+- `REPORT_PATH=outputs/stage_b_generation_probe/issue_224_stage_b_raw_generation_repeatability_final2_seed31_files2/report.json RUN_ID=issue_226_stage_b_dead_air_diagnostics bash scripts/agent_harness.sh stage-b-dead-air-diagnostics`
+
+결과:
+
+- outlier sample: `1`
+- dead-air ratio: `0.857`
+- dead-air gate: `0.800`
+- phrase coverage: `0.469`
+- onset coverage: `0.250`
+- sustained coverage: `0.375`
+- tail empty steps: `11`
+- longest sustained empty run: `10`
+- dead-air start gaps: `6/7`
+- postprocess removal ratio: `0.273`
+- collapse warning: false
+
+해석:
+
+- 실패 원인은 collapse나 postprocess 과다 제거가 아니다.
+- phrase span은 일부 확보했지만 onset/sustained coverage가 낮아 180ms 이상 start gap 비율이 과도한 후보다.
+- 다음 작업은 raw 후보 중 dead-air가 낮은 strict-valid candidate를 우선 선택하는 gate다.
+
+Docs:
+
+- `docs/STAGE_B_DEAD_AIR_OUTLIER_DIAGNOSTICS_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
