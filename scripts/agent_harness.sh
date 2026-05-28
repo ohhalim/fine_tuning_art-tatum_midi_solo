@@ -68,6 +68,8 @@ Modes:
                 Build focused listening notes for the selected timing/repetition candidate.
   stage-b-margin-recovered-timing-repetition-focused-listening-fill
                 Fill the selected timing/repetition focused listening review notes.
+  stage-b-margin-recovered-phrase-vocabulary-repair
+                Run phrase/vocabulary repair sweep and select a reduced-repeat/interval candidate.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -208,6 +210,7 @@ run_quick() {
     scripts/build_stage_b_margin_recovered_timing_repetition_focused_package.py \
     scripts/build_stage_b_margin_recovered_timing_repetition_focused_listening_notes.py \
     scripts/fill_stage_b_margin_recovered_timing_repetition_focused_listening_notes.py \
+    scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_repair.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -714,6 +717,60 @@ run_stage_b_margin_recovered_timing_repetition_focused_listening_fill() {
     --review_notes "$review_notes" \
     --expected_candidate_id "$candidate_id" \
     --expected_decision needs_followup
+}
+
+run_stage_b_margin_recovered_phrase_vocabulary_repair() {
+  local seed43_run_id="${SEED43_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocab_seed43_topk7_temp082_n48}"
+  local seed61_run_id="${SEED61_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocab_seed61_topk7_temp082_n48}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_repair}"
+  local checkpoint_dir="${CHECKPOINT_DIR:-outputs/stage_b_generation_probe/issue_238_stage_b_candidate_count_margin_recovery_seed31_files6/checkpoints}"
+  print_header "Stage B margin-recovered phrase/vocabulary repair seed 43"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$seed43_run_id" \
+    --checkpoint_dir "$checkpoint_dir" \
+    --skip_prepare \
+    --skip_train \
+    --seed 43 \
+    --max_files 6 \
+    --max_sequence 96 \
+    --num_samples 48 \
+    --temperature 0.82 \
+    --top_k 7 \
+    --postprocess_overlap \
+    --max_simultaneous_notes 2 \
+    --require_valid_sample \
+    --require_strict_valid_sample \
+    --require_note_groups \
+    --issue_number 272
+
+  print_header "Stage B margin-recovered phrase/vocabulary repair seed 61"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$seed61_run_id" \
+    --checkpoint_dir "$checkpoint_dir" \
+    --skip_prepare \
+    --skip_train \
+    --seed 61 \
+    --max_files 6 \
+    --max_sequence 96 \
+    --num_samples 48 \
+    --temperature 0.82 \
+    --top_k 7 \
+    --postprocess_overlap \
+    --max_simultaneous_notes 2 \
+    --require_valid_sample \
+    --require_strict_valid_sample \
+    --require_note_groups \
+    --issue_number 272
+
+  print_header "Stage B margin-recovered phrase/vocabulary repair summary"
+  "$PYTHON_BIN" scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_repair.py \
+    --run_id "$run_id" \
+    --report_path "outputs/stage_b_generation_probe/${seed43_run_id}/report.json" \
+    --report_path "outputs/stage_b_generation_probe/${seed61_run_id}/report.json" \
+    --require_qualified \
+    --require_phrase_vocabulary_improvement \
+    --expected_source_run_id "$seed43_run_id" \
+    --expected_sample_index 43
 }
 
 run_stage_b_constrained_probe() {
@@ -1889,6 +1946,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-timing-repetition-focused-listening-fill)
     run_stage_b_margin_recovered_timing_repetition_focused_listening_fill
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-repair)
+    run_stage_b_margin_recovered_phrase_vocabulary_repair
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
