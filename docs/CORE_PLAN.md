@@ -51,10 +51,12 @@ MVP가 끝났다고 볼 수 있는 조건:
 
 2026-05-28 audit 기준:
 
-- pipeline MVP: 조건부 완료
-- unconstrained trained-model MVP: 미완료
+- pipeline MVP: 완료
+- raw trained-model local gate: 완료
+- broad trained-model quality: 미검증
 - 근거 문서: `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
-- raw generation gate: `stage-b-generation-probe` 실패
+- repair 문서: `docs/STAGE_B_RAW_GENERATION_GATE_REPAIR_2026-05-28.md`
+- raw generation gate: `stage-b-generation-probe` 통과
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -226,6 +228,7 @@ Stage B에서 명시하는 것:
 105. README 사무형 문체 정리
 106. README 구현 내용 중심 재정리
 107. README 하단 참조 섹션 제거
+108. Stage B raw generation gate repair
 
 가장 최근 의미 있는 결과:
 

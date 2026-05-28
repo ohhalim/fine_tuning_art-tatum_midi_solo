@@ -51,22 +51,25 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #220 기준 model-core MVP audit:
+Issue #222 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
 | core 여부 | dataset, tokenization, training, generation, decode, review gate가 연결된 model-core 작업 |
-| pipeline MVP | 조건부 완료 |
-| unconstrained trained-model MVP | 미완료 |
-| raw generation gate | `stage-b-generation-probe` 실패 |
+| pipeline MVP | 완료 |
+| raw generation gate | `stage-b-generation-probe` 통과 |
+| raw generation mode | `unconstrained` token sampling |
+| repair 조건 | 50 epoch tiny-overfit, top_k `4`, overlap postprocess |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
-Audit 해석:
+MVP 근거:
 
 - Stage B window/token dataset preparation 정상 동작
-- tiny training path 정상 실행
-- raw generated sample의 grammar/review gate 미통과
+- tiny training path 정상 실행, best validation loss `1.6905`
+- raw generated samples valid/strict/grammar `5/5`
+- complete note groups `21-22`, invalid token count `0`
+- postprocess 후 note count `13-18`, unique pitch count `4-6`
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -104,7 +107,7 @@ Issue #210 기준 current best focused review candidate:
 
 | 항목 | 상태 |
 |---|---|
-| unconstrained trained-model generation quality | 미검증 / gate 미통과 |
+| broad unconstrained trained-model generation quality | 미검증 |
 | broad multi-seed model quality | 미검증 |
 | human/audio listening preference | 미검증 |
 | Brad Mehldau style adaptation | 미검증 |

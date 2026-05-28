@@ -31,7 +31,7 @@ Modes:
   stage-b-window-prepare
                 Prepare Stage B phrase windows and verify token vocab fit.
   stage-b-generation-probe
-                Run a one-epoch Stage B decode/generation smoke.
+                Run a Stage B raw decode/generation gate probe.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -243,16 +243,21 @@ run_stage_b_generation_probe() {
   "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
     --run_id "$run_id" \
     --max_files 1 \
-    --epochs 1 \
+    --epochs 50 \
     --batch_size 8 \
     --max_sequence 96 \
-    --num_samples 1 \
+    --num_samples 5 \
     --n_layers 1 \
     --num_heads 4 \
     --d_model 64 \
     --dim_feedforward 128 \
     --lora_r 4 \
-    --lora_alpha 8
+    --lora_alpha 8 \
+    --top_k 4 \
+    --postprocess_overlap \
+    --require_note_groups \
+    --require_valid_sample \
+    --require_strict_valid_sample
 }
 
 run_stage_b_constrained_probe() {
@@ -1146,10 +1151,10 @@ run_stage_b_clean_review_package() {
 }
 
 run_stage_b_proxy_keep_focused_package() {
-  local source_run_id="${SOURCE_RUN_ID:-harness_stage_b_phrase_shape_tension_codex_proxy}"
+  local source_run_id="${SOURCE_RUN_ID:-harness_stage_b_phrase_shape_tension_proxy}"
   local objective_run_id="${OBJECTIVE_RUN_ID:-harness_stage_b_rhythm_phrase_variation}"
   local run_id="${RUN_ID:-harness_stage_b_proxy_keep_focused_package}"
-  local review_notes_file="${REVIEW_NOTES_FILE:-phrase_shape_tension_repaired_review_notes_codex_midi_proxy.json}"
+  local review_notes_file="${REVIEW_NOTES_FILE:-phrase_shape_tension_repaired_review_notes_midi_proxy.json}"
   local review_notes_path="${REVIEW_NOTES_PATH:-outputs/stage_b_listening_review_notes/${source_run_id}/${review_notes_file}}"
   local objective_report_path="outputs/stage_b_objective_midi_review/${objective_run_id}/objective_midi_note_review.json"
   if [[ ! -f "$review_notes_path" ]]; then
