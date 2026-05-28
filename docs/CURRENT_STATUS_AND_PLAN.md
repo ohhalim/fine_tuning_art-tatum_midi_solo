@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #236, Stage B per-seed strict margin warning gate
-- 다음 권장 이슈: `Stage B candidate count margin recovery sweep`
+- latest functional result: Issue #238, Stage B candidate count margin recovery sweep
+- 다음 권장 이슈: `Stage B margin-recovered candidate review export`
 
 현재 범위가 아닌 것:
 
@@ -349,6 +349,39 @@ Issue #236은 repeatability summary에 seed별 strict margin warning을 추가�
 Docs:
 
 - `docs/STAGE_B_SEED_STRICT_MARGIN_WARNING_GATE_2026-05-28.md`
+
+## Current Candidate Count Margin Recovery Result
+
+Issue #238은 6-file 조건에서 samples per seed를 `3`에서 `5`로 늘렸을 때 seed `17`의 strict margin warning이 회복되는지 확인한 작업이다.
+
+검증:
+
+- `ISSUE_NUMBER=238 MAX_FILES=6 MIN_SOURCE_FILES=6 NUM_SAMPLES=5 RUN_ID=issue_238_stage_b_candidate_count_margin_recovery bash scripts/agent_harness.sh stage-b-raw-generation-repeatability`
+
+결과:
+
+| 항목 | 3 samples/seed | 5 samples/seed |
+|---|---:|---:|
+| total samples | `9` | `15` |
+| strict valid samples | `7/9` | `12/15` |
+| strict pass-rate | `0.778` | `0.800` |
+| grammar gate samples | `9/9` | `15/15` |
+| dead-air outlier count | `1` | `2` |
+| dead-air outlier rate | `0.111` | `0.133` |
+| strict margin warning seeds | `17` | 없음 |
+| selected best candidate | seed `23`, sample `1` | seed `23`, sample `1` |
+
+해석:
+
+- candidate count를 `5`로 늘리면 seed strict margin warning이 사라진다.
+- seed `17`은 strict `1/3`에서 `3/5`로 회복했다.
+- hard gate는 계속 통과한다.
+- dead-air outlier count는 `1`에서 `2`로 늘었지만 rate `0.133`은 gate `0.250` 안에 있다.
+- 후보 수 증가는 selection 안정성은 높였지만 failure mode 자체를 제거하지는 않았다.
+
+Docs:
+
+- `docs/STAGE_B_CANDIDATE_COUNT_MARGIN_RECOVERY_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 

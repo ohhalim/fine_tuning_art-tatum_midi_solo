@@ -51,7 +51,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #236 기준 model-core MVP:
+Issue #238 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -68,6 +68,7 @@ Issue #236 기준 model-core MVP:
 | larger source boundary | 4/5/6 source files hard gate 통과, 6-file seed `17` strict margin `1/3` |
 | seed strict margin diagnostics | 6-file seed `17`: sample `1` dead-air, sample `2` unique pitch, sample `3` strict-valid |
 | seed margin warning gate | hard gate 유지, warning min strict per seed `2`, warning seed `17` 기록 |
+| candidate count recovery | 6 source files / 5 samples per seed / strict `12/15`, warning seed 없음 |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -85,6 +86,7 @@ MVP 근거:
 - 4/5/6-file repeatability hard gate 통과, 6-file seed `17`에서 strict `1/3` 및 unique pitch failure 확인
 - 6-file seed `17`의 dead-air failure와 unique-pitch failure가 서로 다른 후보에서 발생함을 sample 단위로 분리
 - per-seed strict margin warning을 repeatability summary에 추가해 aggregate pass-rate로 가려지는 후보 안정성 리스크 기록
+- samples per seed를 `3`에서 `5`로 늘려 6-file seed `17` strict margin을 `1/3`에서 `3/5`로 회복
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -123,7 +125,7 @@ Issue #210 기준 current best focused review candidate:
 | 항목 | 상태 |
 |---|---|
 | broad unconstrained trained-model generation quality | 미검증 |
-| broad multi-seed model quality | 부분 검증 / 6-file 3-seed local sweep hard gate 통과, seed-level margin 리스크 존재 |
+| broad multi-seed model quality | 부분 검증 / 6-file 3-seed 5-sample local sweep hard gate 통과, seed-level margin warning 해소 |
 | dead-air outlier control | 부분 검증 / candidate selection gate 추가, 생성 자체 억제는 미완료 |
 | human/audio listening preference | 미검증 |
 | Brad Mehldau style adaptation | 미검증 |
