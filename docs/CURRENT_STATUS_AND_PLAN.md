@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #284, Stage B margin-recovered phrase/vocabulary qualified peer focused context review
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary qualified peer focused listening notes`
+- latest functional result: Issue #286, Stage B margin-recovered phrase/vocabulary qualified peer focused listening notes
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary qualified peer focused listening fill`
 
 현재 범위가 아닌 것:
 
@@ -1381,6 +1381,51 @@ Issue #284는 Issue #282에서 확인한 qualified peer 후보를 solo/context p
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_QUALIFIED_PEER_FOCUSED_CONTEXT_2026-05-28.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Qualified Peer Focused Listening Notes Result
+
+Issue #286은 Issue #284 focused context keep peer 후보를 focused listening review notes template으로 넘긴 작업이다.
+
+변경:
+
+- peer focused listening notes harness 추가
+- 기존 phrase/vocabulary focused listening notes builder를 peer package/context decision 경로에 재사용
+- focused context metrics, prior decision, review risks를 notes candidate에 보존
+
+검증:
+
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-peer-focused-listening-notes`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_phrase_vocab_seed_61_topk_7_temp_082_n48_sample_25` |
+| candidate count | `1` |
+| reviewed count | `0` |
+| pending count | `1` |
+| prior decision | `keep_for_focused_listening` |
+| listening decision | `pending` |
+| note count | `13` |
+| unique pitch count | `8` |
+| range | `G4-E5` |
+| phrase span | `7.000` beats |
+| dead-air ratio | `0.333` |
+| adjacent pitch repeats | `0` |
+| max interval | `7` |
+| final landing | `C5` over `Fm7`, chord tone |
+| review risks | `sustained_coverage_review` |
+
+해석:
+
+- peer 후보도 focused listening notes template으로 넘어갔다.
+- 실제 청감 판단 필드는 모두 `pending`이다.
+- selected keep 후보와 같은 review risk만 남아 있다.
+- 아직 peer focused listening fill은 진행하지 않았다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_QUALIFIED_PEER_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 

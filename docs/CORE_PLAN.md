@@ -87,6 +87,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary keep consolidation 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_KEEP_CONSOLIDATION_2026-05-28.md`
 - margin-recovered phrase/vocabulary keep stability 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_KEEP_STABILITY_2026-05-28.md`
 - margin-recovered phrase/vocabulary qualified peer focused context 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_QUALIFIED_PEER_FOCUSED_CONTEXT_2026-05-28.md`
+- margin-recovered phrase/vocabulary qualified peer focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_QUALIFIED_PEER_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -119,6 +120,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary keep consolidation: current evidence keep candidate 정리, proven/not proven boundary 분리
 - margin-recovered phrase/vocabulary keep stability: qualified `2/96`, qualified source `2`, stability boundary `narrow_two_source_candidate_support`
 - margin-recovered phrase/vocabulary qualified peer focused context: peer candidate context decision `keep_for_focused_listening`, flags `{}`
+- margin-recovered phrase/vocabulary qualified peer focused listening notes: peer candidate `1`, pending `1`, prior decision `keep_for_focused_listening`, risk `sustained_coverage_review`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -322,6 +324,7 @@ Stage B에서 명시하는 것:
 137. Stage B margin-recovered phrase/vocabulary keep consolidation
 138. Stage B margin-recovered phrase/vocabulary keep stability comparison
 139. Stage B margin-recovered phrase/vocabulary qualified peer focused context review
+140. Stage B margin-recovered phrase/vocabulary qualified peer focused listening notes
 
 가장 최근 의미 있는 결과:
 
@@ -511,6 +514,8 @@ Stage B에서 명시하는 것:
 - Issue #282 result: qualified `2/96`, qualified source count `2`, selected keep plus peer `margin_recovered_phrase_vocab_seed_61_topk_7_temp_082_n48_sample_25`, stability boundary `narrow_two_source_candidate_support`.
 - Issue #284 isolates that qualified peer into a focused solo/context package and reviews it against context MIDI.
 - Issue #284 result: peer context decision `keep_for_focused_listening`, flags `{}`, note count `13`, unique pitch `8`, range `G4-E5`, phrase span `7.0` beats, final `C5` over `Fm7` chord tone.
+- Issue #286 creates focused listening notes for that peer context keep candidate.
+- Issue #286 result: candidate `1`, pending `1`, prior decision `keep_for_focused_listening`, review risk `sustained_coverage_review`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -529,8 +534,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #284는 qualified peer도 focused context 기준으로 통과함을 확인했다.
-다음 작업은 peer 후보를 focused listening notes/fill로 넘겨 실제 fallback keep인지 확인하는 것이다.
+Issue #286은 qualified peer를 focused listening notes template으로 넘겼다.
+다음 작업은 peer notes를 MIDI/context evidence 기준으로 채워 selected keep과 같은 filled keep인지 확인하는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -1056,16 +1061,18 @@ Issue #284는 qualified peer도 focused context 기준으로 통과함을 확인
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary qualified peer focused context review
+Stage B margin-recovered phrase/vocabulary qualified peer focused listening notes
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_QUALIFIED_PEER_FOCUSED_CONTEXT_2026-05-28.md`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_QUALIFIED_PEER_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - peer candidate: `margin_recovered_phrase_vocab_seed_61_topk_7_temp_082_n48_sample_25`
-- copied MIDI files: `2`
-- focused context decision: `keep_for_focused_listening`
-- decision flags: `{}`
+- candidate count: `1`
+- reviewed count: `0`
+- pending count: `1`
+- prior decision: `keep_for_focused_listening`
+- listening decision: `pending`
 - note count: `13`
 - unique pitch count: `8`
 - range: `G4-E5`
@@ -1078,15 +1085,16 @@ Stage B margin-recovered phrase/vocabulary qualified peer focused context review
 
 판단:
 
-- qualified peer도 focused context blocker 없이 통과했다.
-- selected keep과 peer가 context metric 기준으로 같은 수준이다.
+- peer 후보도 focused listening notes template으로 넘어갔다.
+- 실제 청감 판단 필드는 모두 pending이다.
+- selected keep과 같은 risk boundary를 보존했다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary qualified peer focused listening notes`로 잡는다.
-- peer focused package와 context decision을 listening notes template으로 넘긴다.
-- selected keep과 peer fallback keep의 listening fill 결과를 나중에 비교한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary qualified peer focused listening fill`로 잡는다.
+- peer focused listening notes를 MIDI/context evidence 기준으로 채운다.
+- selected keep과 peer fallback keep의 filled decision을 비교한다.
 - broad training은 peer review boundary를 먼저 본 뒤 결정한다.
 
 ## 10. 한 문장 요약

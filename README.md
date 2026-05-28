@@ -49,6 +49,7 @@
 | keep 후보 과장 위험 | evidence fill의 `keep`을 broad model quality로 오해할 수 있음 | proven / not proven / next boundary로 consolidation | current margin-recovered evidence keep candidate와 human/audio 미검증 범위 분리 |
 | keep 후보 안정성 미확인 | selected keep이 단일 sample일 수 있음 | 96개 sweep 후보에서 qualified peer 분포 비교 | qualified `2/96`, seed43/61 각각 1개, narrow two-source support |
 | qualified peer fallback 미검증 | peer 후보가 objective metric만 통과했을 수 있음 | peer 후보를 별도 solo/context package로 격리해 focused context decision 실행 | decision `keep_for_focused_listening`, flags `{}`, final `C5` over `Fm7` chord tone |
+| peer 청감 판단 보류 | peer context keep만으로 selected keep과 같은 fallback인지 판단 불가 | peer focused listening notes template 생성 | candidate `1`, pending `1`, risk `sustained_coverage_review` |
 
 ## 파이프라인 구조
 
@@ -67,7 +68,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #284 기준 model-core MVP:
+Issue #286 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -108,6 +109,7 @@ Issue #284 기준 model-core MVP:
 | margin-recovered phrase vocabulary keep consolidation | current evidence keep candidate 정리, human/audio proof와 broad quality claim boundary 분리 |
 | margin-recovered phrase vocabulary keep stability | qualified `2/96`, qualified source `2`, selected keep과 peer 후보 metric 동일 수준 |
 | margin-recovered phrase vocabulary peer focused context | qualified peer 후보 context decision `keep_for_focused_listening`, flags `{}` |
+| margin-recovered phrase vocabulary peer focused listening notes | peer focused listening template 생성, candidate `1`, pending `1`, review risk `sustained_coverage_review` |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -153,6 +155,7 @@ MVP 근거:
 - margin-recovered evidence keep candidate를 정리하고 broad trained-model quality, human/audio preference, Brad style adaptation은 아직 미검증으로 유지
 - phrase/vocabulary sweep 96개 후보 중 qualified `2`개를 확인하고 selected keep 외 qualified peer가 seed `61`에도 있음을 분리
 - qualified peer 후보도 focused context package에서 max active `1`, phrase span `7.0` beats, final `C5` over `Fm7` chord tone, context decision `keep_for_focused_listening` 확인
+- qualified peer 후보를 focused listening notes template으로 넘기고 selected keep과 같은 risk boundary를 보존
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -167,7 +170,7 @@ MVP 근거:
 | 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused context `keep_for_focused_listening`, phrase/vocabulary focused fill `keep` |
 | 주장 경계 | reviewable MIDI 후보 생성 검증 파이프라인까지 가능, human listening preference / Brad style adaptation / broad production quality는 미검증 |
 
-Issue #284 기준 current margin-recovered evidence keep candidate:
+Issue #286 기준 current margin-recovered evidence keep candidate:
 
 | 항목 | 결과 |
 |---|---|
