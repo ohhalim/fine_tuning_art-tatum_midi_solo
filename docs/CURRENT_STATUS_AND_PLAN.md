@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #262, Stage B margin-recovered pitch vocabulary focused listening fill
-- 다음 권장 이슈: `Stage B margin-recovered pitch vocabulary timing/repetition follow-up repair`
+- latest functional result: Issue #264, Stage B margin-recovered pitch vocabulary timing/repetition follow-up repair
+- 다음 권장 이슈: `Stage B margin-recovered timing/repetition focused context review`
 
 현재 범위가 아닌 것:
 
@@ -866,11 +866,63 @@ Issue #262는 Issue #260 pending notes를 MIDI/context evidence 기준으로 채
 
 - chord fit과 landing은 blocker가 아니다.
 - timing, phrase continuation, vocabulary가 blocker다.
-- 다음 작업은 pitch vocabulary gate를 유지하면서 dead-air와 adjacent repeats를 줄이는 follow-up repair다.
+- 이 결과가 Issue #264 timing/repetition follow-up repair의 입력이 됐다.
 
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_FOCUSED_LISTENING_FILL_2026-05-28.md`
+
+## Current Margin-Recovered Timing/Repetition Repair Result
+
+Issue #264는 Issue #262에서 남은 timing/repetition blocker를 focused metric 기준으로 좁게 repair한 작업이다.
+
+변경:
+
+- timing/repetition repair summary script 추가
+- seed `37/41`, top_k `7`, temperature `0.86`, n `48` generation harness 추가
+- qualified gate를 `dead_air < 0.400`, `adjacent repeats < 3`, `focused unique pitch >= 6`, `focused notes >= 12`, `max active = 1`, `dup3 = 0`로 고정
+- 이전 pitch-vocabulary 후보 대비 dead-air, adjacent repeat, unique pitch, note count delta 기록
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_timing_repetition_repair`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-timing-repetition-repair`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_timing_repetition_seed_37_topk_7_temp_086_n48_sample_39` |
+| source run | `harness_stage_b_margin_recovered_timing_repetition_seed37_topk7_temp086_n48` |
+| sample seed | `75` |
+| qualified candidates | `2/96` |
+| focused note count | `14` |
+| focused unique pitch count | `7` |
+| focused max active notes | `1` |
+| duplicated 3-note chunks | `0` |
+| dead-air ratio | `0.353` |
+| adjacent pitch repeats | `2` |
+| remaining flags | `[]` |
+
+Issue #262 후보 대비:
+
+| 항목 | 이전 | 이번 | 변화 |
+|---|---:|---:|---:|
+| dead-air ratio | `0.400` | `0.353` | `+0.047` 개선 |
+| adjacent pitch repeats | `3` | `2` | `+1` 개선 |
+| focused unique pitch count | `6` | `7` | `+1` |
+| focused note count | `13` | `14` | `+1` |
+
+해석:
+
+- pitch vocabulary gate를 유지하면서 dead-air와 adjacent repeat는 개선됐다.
+- selected candidate는 objective gate 기준 qualified candidate다.
+- 아직 focused context package와 focused listening fill을 다시 통과한 것은 아니다.
+- 다음 작업은 selected candidate를 solo/context package로 격리하고 context decision을 다시 실행하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_REPAIR_2026-05-28.md`
 
 ## Latest README Footer Section Removal Result
 
