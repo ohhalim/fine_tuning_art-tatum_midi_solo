@@ -76,6 +76,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered pitch vocabulary focused context 문서: `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_FOCUSED_CONTEXT_2026-05-28.md`
 - margin-recovered pitch vocabulary focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - margin-recovered pitch vocabulary focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_FOCUSED_LISTENING_FILL_2026-05-28.md`
+- margin-recovered timing/repetition repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_REPAIR_2026-05-28.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -97,6 +98,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered pitch vocabulary focused context: selected qualified 후보 focused context decision `keep_for_focused_listening`, flags `{}`
 - margin-recovered pitch vocabulary focused listening notes: candidate `1`, pending `1`, prior decision `keep_for_focused_listening`, risks `dead_air_ratio_at_gate` / `adjacent_pitch_repeats`
 - margin-recovered pitch vocabulary focused listening fill: reviewed `1`, decision `needs_followup`, timing `stiff`, chord fit `strong`, vocabulary `thin`
+- margin-recovered timing/repetition repair: seed `37/41` top_k7 temp0.86 96개 후보 중 qualified `2`, selected sample `39`, dead-air `0.353`, adjacent repeats `2`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -289,6 +291,7 @@ Stage B에서 명시하는 것:
 126. Stage B margin-recovered pitch vocabulary focused context review
 127. Stage B margin-recovered pitch vocabulary focused listening notes
 128. Stage B margin-recovered pitch vocabulary focused listening fill
+129. Stage B margin-recovered pitch vocabulary timing/repetition follow-up repair
 
 가장 최근 의미 있는 결과:
 
@@ -456,6 +459,8 @@ Stage B에서 명시하는 것:
 - Issue #260 result: candidate `1`, pending `1`, prior decision `keep_for_focused_listening`, risks `dead_air_ratio_at_gate` and `adjacent_pitch_repeats`.
 - Issue #262 fills the focused listening notes from MIDI/context evidence and downgrades the candidate to `needs_followup`.
 - Issue #262 result: timing `stiff`, chord fit `strong`, phrase continuation `weak`, landing `strong`, jazz vocabulary `thin`.
+- Issue #264 runs a top_k7 temperature `0.86` timing/repetition sweep over seed `37/41`.
+- Issue #264 result: selected sample `39` keeps focused unique pitch `7`, max active `1`, duplicated 3-note chunks `0`, and improves dead-air `0.400 -> 0.353` plus adjacent repeats `3 -> 2`; focused context/listening 재검증은 아직 남아 있다.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -474,8 +479,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #262는 focused listening fill에서 selected candidate를 `needs_followup`으로 내렸다.
-다음 작업은 pitch vocabulary gate를 유지하면서 dead-air와 adjacent repeats를 줄이는 timing/repetition follow-up repair다.
+Issue #264는 pitch vocabulary gate를 유지하면서 dead-air와 adjacent repeats를 줄인 qualified 후보를 찾았다.
+다음 작업은 이 후보를 focused solo/context package로 격리하고 context decision과 focused listening fill을 다시 실행하는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -1001,37 +1006,35 @@ Issue #262는 focused listening fill에서 selected candidate를 `needs_followup
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered pitch vocabulary focused listening fill
+Stage B margin-recovered pitch vocabulary timing/repetition follow-up repair
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_FOCUSED_LISTENING_FILL_2026-05-28.md`
-- selected candidate: `margin_recovered_pitch_vocab_seed_17_topk_5_temp_09_n24_sample_4`
-- reviewed count: `1`
-- pending count: `0`
-- prior decision: `keep_for_focused_listening`
-- final decision: `needs_followup`
-- timing: `stiff`
-- chord fit: `strong`
-- phrase continuation: `weak`
-- landing: `strong`
-- jazz vocabulary: `thin`
-- dead-air ratio: `0.400`
-- adjacent pitch repeats: `3`
-- final note: `G#4` over `Fm7`, chord tone
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_REPAIR_2026-05-28.md`
+- selected candidate: `margin_recovered_timing_repetition_seed_37_topk_7_temp_086_n48_sample_39`
+- selected source run: `harness_stage_b_margin_recovered_timing_repetition_seed37_topk7_temp086_n48`
+- selected sample seed: `75`
+- qualified candidates: `2/96`
+- dead-air ratio: `0.353`
+- adjacent pitch repeats: `2`
+- focused unique pitch count: `7`
+- focused note count: `14`
+- focused max active notes: `1`
+- duplicated 3-note chunks: `0`
+- remaining flags: `[]`
 
 판단:
 
-- chord fit과 landing은 blocker가 아니다.
-- timing, phrase continuation, vocabulary가 blocker다.
+- objective timing/repetition metric은 Issue #262 후보보다 개선됐다.
+- 아직 focused context package와 focused listening fill을 다시 통과한 것은 아니다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered pitch vocabulary timing/repetition follow-up repair`로 잡는다.
-- pitch vocabulary gate를 유지하면서 dead-air와 adjacent repeats를 줄인다.
-- max active `1`과 repeated-cell-free 조건은 유지한다.
+- 다음 issue는 `Stage B margin-recovered timing/repetition focused context review`로 잡는다.
+- selected candidate를 solo/context package로 격리한다.
+- final landing, phrase span, context guide, max active, repeated cell을 다시 검증한다.
 - focused listening fill에서 다시 keep이 나오기 전에는 최종 keep으로 주장하지 않는다.
 
 ## 10. 한 문장 요약

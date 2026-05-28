@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #111, Stage B clean context phrase diagnostics.
+- Latest functional issue completed: Issue #264, Stage B margin-recovered pitch vocabulary timing/repetition follow-up repair.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B clean listening review notes for the 3 objective-clean context candidates.
+- Recommended next issue: Stage B margin-recovered timing/repetition focused context review.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -418,6 +418,14 @@ bash scripts/agent_harness.sh stage-b-longer-phrase-probe
 ```
 
 This harness tests a 4-bar coverage+chord-aware constrained phrase and exports the top review MIDI candidates. It exists because short 2-bar candidates can be valid but still feel unfinished.
+
+For Stage B margin-recovered timing/repetition repair changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-timing-repetition-repair
+```
+
+This harness tests whether the selected pitch-vocabulary candidate can keep focused unique pitch coverage while reducing dead-air and adjacent pitch repetition.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
