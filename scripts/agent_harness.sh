@@ -128,6 +128,8 @@ Modes:
                 Review source vs duration fill from MIDI evidence only.
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-midi-evidence-consolidation
                 Consolidate MIDI evidence review claim boundaries.
+  stage-b-duration-coverage-broader-repeatability-sweep
+                Run broader duration/coverage fill repeatability over distinct source candidates.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1833,6 +1835,43 @@ run_stage_b_duration_coverage_next_decision() {
     --require_no_critical_user_input
 }
 
+run_stage_b_duration_coverage_broader_repeatability_sweep() {
+  local next_decision_run_id="${NEXT_DECISION_RUN_ID:-harness_stage_b_duration_coverage_fill_next_decision}"
+  local consolidation_run_id="${CONSOLIDATION_RUN_ID:-harness_stage_b_duration_coverage_fill_user_listening_review_consolidation}"
+  local duration_fill_run_id="${DURATION_FILL_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair}"
+  local distinct_sweep_run_id="${DISTINCT_SWEEP_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_broader_repeatability_sweep}"
+  local next_decision="outputs/stage_b_duration_coverage_fill_next_decision/${next_decision_run_id}/stage_b_duration_coverage_fill_next_decision.json"
+  local consolidation="outputs/stage_b_duration_coverage_fill_user_listening_review_consolidation/${consolidation_run_id}/stage_b_duration_coverage_fill_user_listening_review_consolidation.json"
+  local duration_fill_summary="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair/${duration_fill_run_id}/duration_coverage_fill_repair_summary.json"
+  local distinct_sweep="outputs/stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep/${distinct_sweep_run_id}/distinct_sample_seed_sweep_summary.json"
+  if [[ ! -f "$next_decision" ]]; then
+    print_header "Stage B duration/coverage fill next decision"
+    RUN_ID="$next_decision_run_id" run_stage_b_duration_coverage_next_decision
+  fi
+  if [[ ! -f "$consolidation" ]]; then
+    print_header "Stage B duration/coverage fill user listening review consolidation"
+    RUN_ID="$consolidation_run_id" run_stage_b_user_listening_review_consolidation
+  fi
+  if [[ ! -f "$duration_fill_summary" ]]; then
+    print_header "Stage B duration/coverage fill repair"
+    RUN_ID="$duration_fill_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair
+  fi
+  if [[ ! -f "$distinct_sweep" ]]; then
+    print_header "Stage B distinct sample-seed sweep"
+    RUN_ID="$distinct_sweep_run_id" run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep
+  fi
+  print_header "Stage B duration/coverage fill broader repeatability sweep"
+  "$PYTHON_BIN" scripts/summarize_stage_b_duration_coverage_fill_broader_repeatability_sweep.py \
+    --run_id "$run_id" \
+    --next_decision "$next_decision" \
+    --user_listening_consolidation "$consolidation" \
+    --duration_fill_summary "$duration_fill_summary" \
+    --distinct_sample_seed_sweep "$distinct_sweep" \
+    --expected_boundary qualified_gate_repeatability_with_partial_dead_air_gain \
+    --require_no_broad_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3120,6 +3159,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-next-decision)
     run_stage_b_duration_coverage_next_decision
+    ;;
+  stage-b-duration-coverage-broader-repeatability-sweep)
+    run_stage_b_duration_coverage_broader_repeatability_sweep
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

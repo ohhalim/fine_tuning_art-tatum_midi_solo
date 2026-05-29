@@ -119,6 +119,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill user listening review fill 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_USER_LISTENING_REVIEW_FILL_2026-05-29.md`
 - duration coverage fill user listening review consolidation 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_USER_LISTENING_REVIEW_CONSOLIDATION_2026-05-29.md`
 - duration coverage fill next decision 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_NEXT_DECISION_2026-05-29.md`
+- duration coverage fill broader repeatability sweep 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_BROADER_REPEATABILITY_SWEEP_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -176,6 +177,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill user listening review fill: preference `duration_coverage_fill_keep`, human/audio preference claim `true`, broad model quality claim `false`
 - duration coverage fill user listening review consolidation: MIDI evidence and single-user listening both support `duration_coverage_fill_keep`, broad model quality claim `false`
 - duration coverage fill next decision: next boundary `broader_repeatability_sweep`, critical user input `false`
+- duration coverage fill broader repeatability sweep: distinct sample-seed source `2`, qualified source `2`, variants `7/8`, dead-air improved source `1/2`, boundary `qualified_gate_repeatability_with_partial_dead_air_gain`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
