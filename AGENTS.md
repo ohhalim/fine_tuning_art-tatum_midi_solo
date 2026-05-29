@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #381, Stage B model-core portfolio bullet draft.
+- Latest functional issue completed: Issue #383, Muzig application resume wording.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Application-specific resume insertion or cover-letter wording.
+- Recommended next issue: Application resume HTML/content insertion outside this repository if requested.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

@@ -135,6 +135,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill outside-soloing repair final decision 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_OUTSIDE_SOLOING_REPAIR_FINAL_DECISION_2026-05-29.md`
 - model-core evidence README refresh: `README.md`
 - model-core portfolio bullet draft 문서: `docs/STAGE_B_MODEL_CORE_PORTFOLIO_BULLET_DRAFT_2026-05-29.md`
+- Muzig application resume wording 문서: `docs/MUZIG_APPLICATION_RESUME_WORDING_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -208,6 +209,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill outside-soloing repair final decision: final boundary `outside_soloing_repair_objective_path_complete`, next boundary `stage_b_model_core_evidence_readme_refresh`, preference claim `false`
 - model-core evidence README refresh: 구현 범위, 문제/해결/결과, 검증 결과, claim boundary 중심으로 README 재정리
 - model-core portfolio bullet draft: resume bullet `6`, metric 근거와 unsupported claim guard 분리
+- Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
