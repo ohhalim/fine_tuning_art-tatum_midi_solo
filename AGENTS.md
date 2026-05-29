@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #375, Stage B duration coverage fill outside-soloing repair repeatability consolidation.
+- Latest functional issue completed: Issue #377, Stage B duration coverage fill outside-soloing repair final decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair final decision.
+- Recommended next issue: Stage B model-core evidence README refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -858,6 +858,14 @@ bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-r
 ```
 
 This harness consolidates selected-source objective support, policy repeatability support, and the pending review boundary without claiming human/audio preference.
+
+For Stage B duration coverage fill outside-soloing repair final decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-final-decision
+```
+
+This harness records the objective-only final boundary and routes the next automatic task to model-core evidence README refresh without claiming human/audio preference.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

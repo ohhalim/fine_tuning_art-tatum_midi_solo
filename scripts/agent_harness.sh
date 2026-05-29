@@ -154,6 +154,8 @@ Modes:
                 Aggregate outside-soloing repair policy repeatability across sources.
   stage-b-duration-coverage-outside-soloing-repair-repeatability-consolidation
                 Consolidate outside-soloing repair objective repeatability boundaries.
+  stage-b-duration-coverage-outside-soloing-repair-final-decision
+                Decide final objective-only boundary after outside-soloing repair repeatability.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2174,6 +2176,26 @@ run_stage_b_duration_coverage_outside_soloing_repair_repeatability_consolidation
     --require_no_broad_quality_claim
 }
 
+run_stage_b_duration_coverage_outside_soloing_repair_final_decision() {
+  local repeatability_run_id="${REPEATABILITY_RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_repeatability_consolidation}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_final_decision}"
+  local repeatability_consolidation="outputs/stage_b_duration_coverage_fill_outside_soloing_repair_repeatability_consolidation/${repeatability_run_id}/stage_b_duration_coverage_fill_outside_soloing_repair_repeatability_consolidation.json"
+  if [[ ! -f "$repeatability_consolidation" ]]; then
+    print_header "Stage B duration/coverage fill outside-soloing repair repeatability consolidation"
+    RUN_ID="$repeatability_run_id" run_stage_b_duration_coverage_outside_soloing_repair_repeatability_consolidation
+  fi
+  print_header "Stage B duration/coverage fill outside-soloing repair final decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_duration_coverage_outside_soloing_repair_final_decision.py \
+    --run_id "$run_id" \
+    --repeatability_consolidation "$repeatability_consolidation" \
+    --expected_final_boundary outside_soloing_repair_objective_path_complete \
+    --expected_next_boundary stage_b_model_core_evidence_readme_refresh \
+    --require_auto_progress_allowed \
+    --require_no_critical_user_input \
+    --require_no_preference_claim \
+    --require_no_broad_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3500,6 +3522,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-outside-soloing-repair-repeatability-consolidation)
     run_stage_b_duration_coverage_outside_soloing_repair_repeatability_consolidation
+    ;;
+  stage-b-duration-coverage-outside-soloing-repair-final-decision)
+    run_stage_b_duration_coverage_outside_soloing_repair_final_decision
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
