@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #389, Stage B generic split duration-explicit window preparation smoke.
+- Latest functional issue completed: Issue #391, Stage B generic base tiny training smoke.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic base tiny training smoke.
+- Recommended next issue: Stage B generic tiny checkpoint generation probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -890,6 +890,14 @@ bash scripts/agent_harness.sh stage-b-generic-manifest-window-smoke
 ```
 
 This harness prepares a small generic manifest prefix as `stage_b_v1` duration-explicit windows and verifies train/val token records plus vocab fit without running broad training.
+
+For Stage B generic base tiny training smoke changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-base-tiny-training-smoke
+```
+
+This harness copies a small generic Stage B window token subset into the training path and verifies the training command succeeds without claiming broad model quality.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

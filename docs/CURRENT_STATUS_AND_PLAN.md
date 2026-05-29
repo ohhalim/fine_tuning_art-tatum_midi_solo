@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #389, Stage B generic split duration-explicit window preparation smoke
-- 다음 권장 이슈: `Stage B generic base tiny training smoke`
+- latest functional result: Issue #391, Stage B generic base tiny training smoke
+- 다음 권장 이슈: `Stage B generic tiny checkpoint generation probe`
 
 현재 범위가 아닌 것:
 
@@ -178,6 +178,44 @@ Issue #389는 Issue #387 generic manifest contract 결과를 사용해 작은 ge
 다음:
 
 - `Stage B generic base tiny training smoke`
+
+## Current Generic Base Tiny Training Smoke Result
+
+Issue #391은 Issue #389에서 만든 Stage B generic window token records 일부를 사용해 training path가 실제로 도는지 확인한 smoke 작업이다.
+
+변경:
+
+- generic base tiny training smoke script 추가
+- window smoke tokenized train/val 일부를 별도 smoke dataset으로 복사
+- `train_qlora.py` 1 epoch full-model tiny training path 실행
+- training returncode, best validation loss, vocab fit, claim guard 검증
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_BASE_TINY_TRAINING_SMOKE_2026-05-29.md`
+- selected train records: `32`
+- selected val records: `8`
+- token files: `40`
+- max token id: `544`
+- vocab size: `547`
+- fits vocab: `true`
+- training returncode: `0`
+- best validation loss: `6.1427`
+- tiny training smoke passed: `true`
+- broad training execution ready: `false`
+- broad trained-model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+
+판단:
+
+- generic Stage B window records가 tiny training path에 들어갈 수 있음
+- 아직 generation quality, multi-seed quality, broad trained-model quality는 미검증
+- 다음 작업은 tiny checkpoint generation probe
+
+다음:
+
+- `Stage B generic tiny checkpoint generation probe`
 
 ## Current Muzig Application Resume Wording Result
 

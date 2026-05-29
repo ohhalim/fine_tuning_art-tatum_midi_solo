@@ -162,6 +162,8 @@ Modes:
                 Build and validate generic/Brad split manifest contract before Stage B window preparation.
   stage-b-generic-manifest-window-smoke
                 Prepare Stage B duration-explicit windows from generic split manifest prefix.
+  stage-b-generic-base-tiny-training-smoke
+                Run a tiny training smoke from generic Stage B window records.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -317,6 +319,7 @@ run_quick() {
     scripts/assess_stage_b_generic_base_readiness.py \
     scripts/check_stage_b_generic_base_manifest_contract.py \
     scripts/run_stage_b_generic_manifest_window_smoke.py \
+    scripts/run_stage_b_generic_base_tiny_training_smoke.py \
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
     scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
     scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
@@ -2262,6 +2265,25 @@ run_stage_b_generic_manifest_window_smoke() {
     --require_no_brad_style_claim
 }
 
+run_stage_b_generic_base_tiny_training_smoke() {
+  local window_smoke_run_id="${WINDOW_SMOKE_RUN_ID:-harness_stage_b_generic_manifest_window_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_base_tiny_training_smoke}"
+  local source_tokenized_dir="outputs/stage_b_generic_manifest_window_smoke/${window_smoke_run_id}/roles/lead/tokenized"
+  if [[ ! -d "${source_tokenized_dir}/train" || ! -d "${source_tokenized_dir}/val" ]]; then
+    print_header "Stage B generic manifest window smoke"
+    RUN_ID="$window_smoke_run_id" run_stage_b_generic_manifest_window_smoke
+  fi
+  print_header "Stage B generic base tiny training smoke"
+  "$PYTHON_BIN" scripts/run_stage_b_generic_base_tiny_training_smoke.py \
+    --run_id "$run_id" \
+    --source_tokenized_dir "$source_tokenized_dir" \
+    --expected_boundary stage_b_generic_base_tiny_training_smoke \
+    --expected_next_boundary stage_b_generic_tiny_checkpoint_generation_probe \
+    --require_training_smoke_passed \
+    --require_no_broad_quality_claim \
+    --require_no_brad_style_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3600,6 +3622,9 @@ case "$MODE" in
     ;;
   stage-b-generic-manifest-window-smoke)
     run_stage_b_generic_manifest_window_smoke
+    ;;
+  stage-b-generic-base-tiny-training-smoke)
+    run_stage_b_generic_base_tiny_training_smoke
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
