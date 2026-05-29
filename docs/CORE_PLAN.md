@@ -123,6 +123,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill dead-air gain repeatability repair 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_DEAD_AIR_GAIN_REPEATABILITY_REPAIR_2026-05-29.md`
 - duration coverage fill repeatability consolidation 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_REPEATABILITY_CONSOLIDATION_2026-05-29.md`
 - duration coverage fill repeatability audio review package 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_REPEATABILITY_AUDIO_REVIEW_PACKAGE_2026-05-29.md`
+- duration coverage fill repeatability user listening review fill 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_REPEATABILITY_USER_LISTENING_REVIEW_FILL_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -184,6 +185,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill dead-air gain repeatability repair: selection rule `qualified_dead_air_gain_then_min_fill_additions`, dead-air gain source `2/2`, dead-air gain variants `6/8`, boundary `qualified_gate_repeatability_with_dead_air_gain`
 - duration coverage fill repeatability consolidation: current keep single-user preference `true`, distinct source MIDI/dead-air gain support `true`, boundary `current_keep_and_distinct_source_dead_air_gain_midi_support`
 - duration coverage fill repeatability audio review package: repeatability source WAV `2`, sample rate `44100`, status `ready_for_user_listening_review`, quality/preference claim `false`
+- duration coverage fill repeatability user listening review fill: overall decision `reject_all`, candidate decision `needs_followup`, timing/phrase/vocabulary `outside_or_unclear`, boundary `repeatability_audio_review_needs_followup`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 

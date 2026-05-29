@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #357, Stage B duration coverage fill repeatability audio review package.
+- Latest functional issue completed: Issue #359, Stage B duration coverage fill repeatability user listening review fill.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill repeatability user listening review fill.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -786,6 +786,14 @@ bash scripts/agent_harness.sh stage-b-duration-coverage-repeatability-audio-revi
 ```
 
 This harness renders repeatability source candidates to local WAV files and validates technical WAV metadata without claiming listening preference.
+
+For Stage B duration coverage fill repeatability user listening review changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-duration-coverage-repeatability-user-listening-review
+```
+
+This harness records user listening feedback for repeatability WAV files and keeps human/audio keep claims false when candidates need follow-up.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
