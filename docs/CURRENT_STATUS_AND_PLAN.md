@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #332, Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review consolidation
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill external human/audio review boundary`
+- latest functional result: Issue #335, Stage B margin-recovered phrase/vocabulary duration coverage fill external human/audio review boundary
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render package`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,38 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill External Human/Audio Boundary Result
+
+Issue #335는 Issue #332 MIDI evidence consolidation 이후 human/audio review claim 경계를 정리한 작업이다.
+
+변경:
+
+- external human/audio review boundary summary 추가
+- required external review input schema 정리
+- MIDI evidence preference와 human/audio preference claim 분리
+- pending external review 상태 검증
+
+결과:
+
+- source boundary: `midi_evidence_preference_support`
+- external boundary: `external_human_audio_review_required_for_human_preference_claim`
+- external review status: `pending_external_review_input`
+- MIDI evidence preference: `duration_coverage_fill_keep`
+- score delta fill-source: `+79.7311`
+- human/audio preference claimed: `false`
+- audio render used: `false`
+
+판단:
+
+- MIDI evidence preference는 review prioritization 근거로 한정
+- human/audio preference와 audio rendered quality는 external review input 전까지 미검증
+- broad trained-model quality와 Brad style adaptation은 아직 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render package`
+- 외부 review input 확보 시 `Stage B margin-recovered phrase/vocabulary duration coverage fill external review input fill`
 
 ## Current Duration Coverage Fill MIDI Evidence Consolidation Result
 
