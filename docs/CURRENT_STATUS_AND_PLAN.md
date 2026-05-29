@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #347, Stage B duration coverage fill user listening review consolidation
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill next repair or repeatability decision`
+- latest functional result: Issue #349, Stage B duration coverage fill next decision
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill broader repeatability sweep`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,34 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Next Decision Result
+
+Issue #349는 user listening review consolidation 이후 다음 작업 경계를 정리한 작업이다.
+
+변경:
+
+- next decision summary script 추가
+- repeatability vs repair decision rule 정의
+- single-candidate support와 broad-quality not-proven boundary 유지
+
+결과:
+
+- preferred candidate: `duration_coverage_fill_keep`
+- next boundary: `broader_repeatability_sweep`
+- auto progress allowed: `true`
+- critical user input required: `false`
+- broad model quality claimed: `false`
+
+판단:
+
+- fill candidate는 MIDI evidence와 single-user listening review에서 같은 방향으로 지지됨
+- 아직 multi-seed repeatability가 미검증
+- 다음 자동 작업은 broader repeatability sweep
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill broader repeatability sweep`
 
 ## Current Duration Coverage Fill User Listening Review Consolidation Result
 
