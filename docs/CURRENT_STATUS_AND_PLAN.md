@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #312, Stage B margin-recovered phrase/vocabulary coverage-aware adjacent-repeat constrained repair
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill repair`
+- latest functional result: Issue #314, Stage B margin-recovered phrase/vocabulary duration coverage fill repair
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,40 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Result
+
+Issue #314는 Issue #312 partial candidate의 `dead_air_not_repaired` blocker를 duration/coverage fill repair로 검토한 작업이다.
+
+변경:
+
+- selected source candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3`
+- fill variant count: `4`
+- qualified variant count: `2`
+- selected candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6`
+- selected fill additions: `6`
+
+결과:
+
+- baseline dead-air ratio: `0.5714`
+- selected dead-air ratio: `0.2941`
+- selected focused note count: `18`
+- selected focused unique pitch count: `15`
+- selected adjacent pitch repeats: `0`
+- selected duplicated 3-note pitch-class chunks: `0`
+- selected max interval: `7`
+- remaining flags: `[]`
+
+판단:
+
+- dead-air blocker objective gate 통과
+- adjacent repeat, repeated pitch-class cell, max interval guardrail 유지
+- claim boundary: `postprocess_duration_coverage_fill_candidate`
+- broad trained-model quality나 Brad style adaptation 성공 근거 아님
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review`
 
 ## Current Raw Generation Gate Result
 
