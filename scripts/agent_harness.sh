@@ -92,6 +92,8 @@ Modes:
                 Audit whether selected and peer keep candidates are duplicate outputs from shared sample seed.
   stage-b-margin-recovered-phrase-vocabulary-sample-seed-diversity
                 Repair distinct-output claim boundary for duplicate sample-seed candidates.
+  stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-sweep
+                Run a focused repair sweep with sample seed ranges outside the duplicate seed.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -241,6 +243,7 @@ run_quick() {
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
     scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
     scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
+    scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -1060,6 +1063,71 @@ run_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity() {
     --duplicate_audit "$duplicate_audit" \
     --expected_boundary single_distinct_sample_seed_keep_support \
     --require_duplicate_demoted
+}
+
+run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep() {
+  local seed109_run_id="${SEED109_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocab_seed109_topk7_temp082_n48}"
+  local seed157_run_id="${SEED157_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocab_seed157_topk7_temp082_n48}"
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_repair}"
+  local sample_seed_repair_run_id="${SAMPLE_SEED_REPAIR_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep}"
+  local checkpoint_dir="${CHECKPOINT_DIR:-outputs/stage_b_generation_probe/issue_238_stage_b_candidate_count_margin_recovery_seed31_files6/checkpoints}"
+  local sample_seed_repair="outputs/stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity_repair/${sample_seed_repair_run_id}/sample_seed_diversity_repair.json"
+  if [[ ! -f "$sample_seed_repair" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary sample-seed diversity repair"
+    RUN_ID="$sample_seed_repair_run_id" run_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity
+  fi
+  print_header "Stage B margin-recovered phrase/vocabulary distinct sample-seed repair seed 109"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$seed109_run_id" \
+    --checkpoint_dir "$checkpoint_dir" \
+    --skip_prepare \
+    --skip_train \
+    --seed 109 \
+    --max_files 6 \
+    --max_sequence 96 \
+    --num_samples 48 \
+    --temperature 0.82 \
+    --top_k 7 \
+    --postprocess_overlap \
+    --max_simultaneous_notes 2 \
+    --require_valid_sample \
+    --require_strict_valid_sample \
+    --require_note_groups \
+    --issue_number 298
+
+  print_header "Stage B margin-recovered phrase/vocabulary distinct sample-seed repair seed 157"
+  "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+    --run_id "$seed157_run_id" \
+    --checkpoint_dir "$checkpoint_dir" \
+    --skip_prepare \
+    --skip_train \
+    --seed 157 \
+    --max_files 6 \
+    --max_sequence 96 \
+    --num_samples 48 \
+    --temperature 0.82 \
+    --top_k 7 \
+    --postprocess_overlap \
+    --max_simultaneous_notes 2 \
+    --require_valid_sample \
+    --require_strict_valid_sample \
+    --require_note_groups \
+    --issue_number 298
+
+  print_header "Stage B margin-recovered phrase/vocabulary distinct sample-seed repair summary"
+  "$PYTHON_BIN" scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_repair.py \
+    --run_id "$repair_run_id" \
+    --report_path "outputs/stage_b_generation_probe/${seed109_run_id}/report.json" \
+    --report_path "outputs/stage_b_generation_probe/${seed157_run_id}/report.json"
+
+  print_header "Stage B margin-recovered phrase/vocabulary distinct sample-seed sweep"
+  "$PYTHON_BIN" scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep.py \
+    --run_id "$run_id" \
+    --repair_summary "outputs/stage_b_margin_recovered_phrase_vocabulary_repair/${repair_run_id}/phrase_vocabulary_repair_summary.json" \
+    --sample_seed_repair "$sample_seed_repair" \
+    --min_candidates 96 \
+    --expected_blocked_seed 85
 }
 
 run_stage_b_constrained_probe() {
@@ -2271,6 +2339,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-sample-seed-diversity)
     run_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-sweep)
+    run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

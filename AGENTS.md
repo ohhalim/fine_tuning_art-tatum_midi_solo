@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #296, Stage B margin-recovered phrase/vocabulary sample-seed diversity repair.
+- Latest functional issue completed: Issue #298, Stage B margin-recovered phrase/vocabulary distinct sample-seed repair sweep.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary distinct sample-seed repair sweep.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary distinct sample-seed focused context review.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -546,6 +546,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-sample-
 ```
 
 This harness demotes duplicate sample-seed peers from distinct-output support and records the repaired claim boundary.
+
+For Stage B margin-recovered phrase/vocabulary distinct sample-seed repair sweep changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-sweep
+```
+
+This harness runs a focused checkpoint-based sweep outside the duplicate sample seed range and reports whether a distinct sample-seed qualified candidate exists.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
