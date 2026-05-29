@@ -73,6 +73,7 @@
 | human/audio claim 경계 필요 | MIDI evidence preference가 외부 청감 선호로 오해될 수 있음 | external human/audio boundary 추가 | boundary `external_human_audio_review_required_for_human_preference_claim`, status `pending_external_review_input` |
 | local audio render 준비 상태 불명확 | source/fill MIDI는 준비됐지만 WAV render tooling과 audio quality claim이 분리되지 않음 | local audio render package 추가 | planned outputs `2`, render attempted `false`, audio quality claim `false` |
 | renderer/soundfont 준비 상태 불명확 | local render package는 준비됐지만 renderer가 없는 환경에서 render attempt를 진행할 위험 | tooling readiness check 추가 | `fluidsynth`/`timidity` 미탐지, system modification `false`, render attempted `false` |
+| renderer path decision 필요 | renderer unavailable 상태에서 설치/다운로드 없이 render attempt로 넘어갈 위험 | renderer path decision 추가 | decision `renderer_path_or_install_approval_required`, critical user input `true` |
 
 ## 파이프라인 구조
 
