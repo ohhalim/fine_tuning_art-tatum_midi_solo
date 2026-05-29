@@ -132,6 +132,8 @@ Modes:
                 Run broader duration/coverage fill repeatability over distinct source candidates.
   stage-b-duration-coverage-dead-air-gain-repeatability-repair
                 Repair duration/coverage fill repeatability selection to require dead-air gain.
+  stage-b-duration-coverage-repeatability-consolidation
+                Consolidate current keep and distinct-source repeatability evidence.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1897,6 +1899,29 @@ run_stage_b_duration_coverage_dead_air_gain_repeatability_repair() {
     --require_no_broad_quality_claim
 }
 
+run_stage_b_duration_coverage_repeatability_consolidation() {
+  local user_consolidation_run_id="${USER_CONSOLIDATION_RUN_ID:-harness_stage_b_duration_coverage_fill_user_listening_review_consolidation}"
+  local dead_air_repair_run_id="${DEAD_AIR_REPAIR_RUN_ID:-harness_stage_b_duration_coverage_fill_dead_air_gain_repeatability_repair}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_repeatability_consolidation}"
+  local user_consolidation="outputs/stage_b_duration_coverage_fill_user_listening_review_consolidation/${user_consolidation_run_id}/stage_b_duration_coverage_fill_user_listening_review_consolidation.json"
+  local dead_air_repair="outputs/stage_b_duration_coverage_fill_dead_air_gain_repeatability_repair/${dead_air_repair_run_id}/stage_b_duration_coverage_fill_dead_air_gain_repeatability_repair.json"
+  if [[ ! -f "$user_consolidation" ]]; then
+    print_header "Stage B duration/coverage fill user listening review consolidation"
+    RUN_ID="$user_consolidation_run_id" run_stage_b_user_listening_review_consolidation
+  fi
+  if [[ ! -f "$dead_air_repair" ]]; then
+    print_header "Stage B duration/coverage fill dead-air gain repeatability repair"
+    RUN_ID="$dead_air_repair_run_id" run_stage_b_duration_coverage_dead_air_gain_repeatability_repair
+  fi
+  print_header "Stage B duration/coverage fill repeatability consolidation"
+  "$PYTHON_BIN" scripts/summarize_stage_b_duration_coverage_fill_repeatability_consolidation.py \
+    --run_id "$run_id" \
+    --user_listening_consolidation "$user_consolidation" \
+    --dead_air_gain_repair "$dead_air_repair" \
+    --expected_boundary current_keep_and_distinct_source_dead_air_gain_midi_support \
+    --require_no_broad_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3190,6 +3215,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-dead-air-gain-repeatability-repair)
     run_stage_b_duration_coverage_dead_air_gain_repeatability_repair
+    ;;
+  stage-b-duration-coverage-repeatability-consolidation)
+    run_stage_b_duration_coverage_repeatability_consolidation
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

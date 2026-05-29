@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #353, Stage B duration coverage fill dead-air gain repeatability repair
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill repeatability consolidation`
+- latest functional result: Issue #355, Stage B duration coverage fill repeatability consolidation
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill repeatability audio review package`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,42 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Repeatability Consolidation Result
+
+Issue #355는 current keep anchor의 single-user listening support와 distinct source repeatability evidence를 하나의 claim boundary로 정리한 작업이다.
+
+변경:
+
+- repeatability consolidation summary script 추가
+- current keep anchor와 distinct source repeatability evidence 조인
+- proven / not proven claim boundary 분리
+
+결과:
+
+- boundary: `current_keep_and_distinct_source_dead_air_gain_midi_support`
+- current keep single-user preference: `true`
+- distinct source MIDI repeatability: `true`
+- distinct source dead-air gain: `true`
+- source candidates: `2`
+- qualified source candidates: `2`
+- dead-air gain source candidates: `2`
+- total variants: `8`
+- qualified variants: `7`
+- dead-air gain variants: `6`
+- new source human/audio preference claimed: `false`
+- broad model quality claimed: `false`
+
+판단:
+
+- current keep 후보는 MIDI evidence와 single-user listening review에서 지지
+- distinct source 후보 `2/2`는 MIDI gate와 selected dead-air gain 통과
+- 이 결과는 source 확장 MIDI evidence이며 broad trained-model quality proof가 아님
+- new source human/audio preference, multi-reviewer preference, Brad style adaptation은 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill repeatability audio review package`
 
 ## Current Duration Coverage Fill Dead-Air Gain Repeatability Repair Result
 
