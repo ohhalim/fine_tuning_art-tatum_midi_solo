@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #375, Stage B duration coverage fill outside-soloing repair repeatability consolidation
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair final decision`
+- latest functional result: Issue #377, Stage B duration coverage fill outside-soloing repair final decision
+- 다음 권장 이슈: `Stage B model-core evidence README refresh`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,40 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Outside-Soloing Repair Final Decision Result
+
+Issue #377은 outside-soloing repair path를 objective-only boundary로 닫고 다음 자동 작업 경계를 정리한 작업이다.
+
+변경:
+
+- outside-soloing repair final decision script 추가
+- repeatability consolidation 결과 검증
+- human/audio preference claim 금지 유지
+- 다음 자동 작업 boundary 정의
+
+결과:
+
+- input boundary: `outside_soloing_repair_objective_repeatability_support`
+- final boundary: `outside_soloing_repair_objective_path_complete`
+- next boundary: `stage_b_model_core_evidence_readme_refresh`
+- objective source support: `2/2`
+- policy repeatability support: `3/3`
+- qualified variants: `6/6`
+- review input present: `false`
+- human/audio preference claimed: `false`
+- broad model quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- outside-soloing repair objective path는 selected-source support와 policy repeatability support 기준 완료
+- 청취 선호는 review input 부재로 미인정
+- 다음 작업은 README의 model-core evidence claim boundary 갱신
+
+다음:
+
+- `Stage B model-core evidence README refresh`
 
 ## Current Duration Coverage Fill Outside-Soloing Repair Repeatability Consolidation Result
 
