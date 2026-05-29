@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #312, Stage B margin-recovered phrase/vocabulary coverage-aware adjacent-repeat constrained repair.
+- Latest functional issue completed: Issue #314, Stage B margin-recovered phrase/vocabulary duration coverage fill repair.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill repair.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -610,6 +610,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-coverag
 ```
 
 This harness runs coverage-aware constrained decoding to reduce adjacent pitch repeats and records the remaining dead-air boundary.
+
+For Stage B margin-recovered phrase/vocabulary duration coverage fill repair changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-repair
+```
+
+This harness builds duration/coverage fill variants for the constrained partial candidate and verifies the objective guardrails.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

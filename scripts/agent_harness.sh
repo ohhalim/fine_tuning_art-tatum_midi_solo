@@ -108,6 +108,8 @@ Modes:
                 Run a targeted sweep for distinct sample-seed dead-air and adjacent-repeat blockers.
   stage-b-margin-recovered-phrase-vocabulary-coverage-aware-adjacent-constrained-repair
                 Run coverage-aware constrained decoding for adjacent-repeat repair.
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-repair
+                Build duration/coverage fill repair variants for the constrained partial candidate.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1433,6 +1435,30 @@ run_stage_b_margin_recovered_phrase_vocabulary_coverage_aware_adjacent_constrain
     --max_interval_exclusive 12
 }
 
+run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair() {
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair}"
+  print_header "Stage B duration/coverage fill repair"
+  "$PYTHON_BIN" scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair.py \
+    --run_id "$run_id" \
+    --summary_path "outputs/stage_b_margin_recovered_phrase_vocabulary_repair/harness_stage_b_margin_recovered_phrase_vocabulary_coverage_aware_adjacent_constrained_repair/phrase_vocabulary_repair_summary.json" \
+    --fill_max_additions 4 \
+    --fill_max_additions 6 \
+    --fill_max_additions 8 \
+    --fill_max_additions 10 \
+    --dead_air_threshold_sec 0.18 \
+    --simultaneous_limit 1 \
+    --min_unique_pitch_count 7 \
+    --max_dead_air_ratio_exclusive 0.376 \
+    --min_note_count 12 \
+    --max_simultaneous_notes 1 \
+    --max_duplicated_3_note_chunks 0 \
+    --max_adjacent_pitch_repeats_exclusive 1 \
+    --max_interval_exclusive 12 \
+    --require_qualified \
+    --require_dead_air_improvement \
+    --expected_fill_addition_count 6
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -2666,6 +2692,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-coverage-aware-adjacent-constrained-repair)
     run_stage_b_margin_recovered_phrase_vocabulary_coverage_aware_adjacent_constrained_repair
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-repair)
+    run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

@@ -1112,38 +1112,38 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary coverage-aware adjacent-repeat constrained repair
+Stage B margin-recovered phrase/vocabulary duration coverage fill repair
 ```
 
 결과:
 
-- selected candidate: `margin_recovered_phrase_vocab_seed_109_topk_7_temp_082_n48_sample_47`
-- selected source seed: `109`
-- selected sample index: `47`
-- selected sample seed: `155`
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_COVERAGE_AWARE_ADJACENT_CONSTRAINED_REPAIR_2026-05-29.md`
-- repair sweep reports: `2`
-- repair sweep candidates: `48`
-- target-qualified candidate count: `0`
-- partial candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3`
-- partial sample seed: `355`
-- partial focused unique pitch count: `9`
-- partial dead-air ratio: `0.5714`
-- partial adjacent pitch repeats: `0`
-- partial focused max interval: `7`
-- remaining flags: `dead_air_not_repaired`
+- source candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3`
+- selected candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DURATION_COVERAGE_FILL_REPAIR_2026-05-29.md`
+- variant count: `4`
+- qualified variant count: `2`
+- selected fill additions: `6`
+- baseline dead-air ratio: `0.5714`
+- selected dead-air ratio: `0.2941`
+- selected focused note count: `18`
+- selected focused unique pitch count: `15`
+- selected adjacent pitch repeats: `0`
+- selected duplicated 3-note pitch-class chunks: `0`
+- selected max interval: `7`
+- remaining flags: `[]`
 
 판단:
 
-- constrained decoding은 adjacent repeat와 pitch variety를 개선했다.
-- dead-air가 `0.5714`로 악화되어 target-qualified 후보는 없다.
-- 남은 병목은 pitch/repeat sampling이 아니라 duration/coverage fill이다.
+- duration/coverage fill repair로 dead-air blocker를 objective gate 안으로 낮췄다.
+- adjacent repeat, duplicated pitch-class cell, max interval guardrail 유지.
+- selected variant는 threshold 통과에 필요한 최소 addition count 기준이다.
+- claim boundary: `postprocess_duration_coverage_fill_candidate`.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary duration coverage fill repair`로 잡는다.
-- adjacent repeat와 pitch variety guardrail을 유지하면서 dead-air를 낮추는 duration/coverage repair를 검토한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review`로 잡는다.
+- repaired candidate를 solo/context package로 격리해 context decision readiness를 검토한다.
 - broad training은 focused context/listening boundary를 먼저 본 뒤 결정한다.
 
 ## 10. 한 문장 요약
