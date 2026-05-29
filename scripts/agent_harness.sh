@@ -1742,6 +1742,24 @@ run_stage_b_renderer_path_decision() {
     --require_no_execution
 }
 
+run_stage_b_local_audio_render_attempt() {
+  local local_package_run_id="${LOCAL_AUDIO_PACKAGE_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_local_audio_render_package}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_local_audio_render_attempt}"
+  local local_audio_render_package="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_local_audio_render_package/${local_package_run_id}/duration_coverage_fill_local_audio_render_package.json"
+  local soundfont="${SOUNDFONT_PATH:-$HOME/.local/share/soundfonts/generaluser-gs/v1.471.sf2}"
+  if [[ ! -f "$local_audio_render_package" ]]; then
+    print_header "Stage B duration/coverage fill local audio render package"
+    RUN_ID="$local_package_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_local_audio_render_package
+  fi
+  print_header "Stage B duration/coverage fill local audio render attempt"
+  "$PYTHON_BIN" scripts/render_stage_b_duration_coverage_fill_audio.py \
+    --run_id "$run_id" \
+    --local_audio_render_package "$local_audio_render_package" \
+    --soundfont "$soundfont" \
+    --expected_file_count 2 \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3017,6 +3035,9 @@ case "$MODE" in
     ;;
   stage-b-renderer-path-decision)
     run_stage_b_renderer_path_decision
+    ;;
+  stage-b-local-audio-render-attempt)
+    run_stage_b_local_audio_render_attempt
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
