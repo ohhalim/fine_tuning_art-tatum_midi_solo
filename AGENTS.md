@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #318, Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening notes.
+- Latest functional issue completed: Issue #320, Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening fill.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening fill.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill keep consolidation.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -634,6 +634,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duratio
 ```
 
 This harness writes the focused listening review notes template for the selected duration/coverage fill candidate.
+
+For Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening fill changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-focused-listening-fill
+```
+
+This harness fills the selected duration/coverage fill focused listening review notes from MIDI/context evidence.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
