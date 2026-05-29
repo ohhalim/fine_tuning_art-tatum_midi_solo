@@ -142,6 +142,8 @@ Modes:
                 Decide next repair boundary after outside-soloing user review.
   stage-b-duration-coverage-outside-soloing-repair-sweep
                 Build pitch-role repair candidates for outside-soloing repeatability sources.
+  stage-b-duration-coverage-outside-soloing-repair-audio-review-package
+                Render outside-soloing repair candidates for user listening review.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -289,6 +291,7 @@ run_quick() {
     scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_keep_stability.py \
     scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep.py \
     scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_sweep.py \
+    scripts/render_stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package.py \
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
     scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
     scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
@@ -2023,6 +2026,24 @@ run_stage_b_duration_coverage_outside_soloing_repair_sweep() {
     --require_no_broad_quality_claim
 }
 
+run_stage_b_duration_coverage_outside_soloing_repair_audio_review_package() {
+  local repair_sweep_run_id="${REPAIR_SWEEP_RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_sweep}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package}"
+  local repair_sweep="outputs/stage_b_duration_coverage_fill_outside_soloing_repair_sweep/${repair_sweep_run_id}/stage_b_duration_coverage_fill_outside_soloing_repair_sweep.json"
+  local soundfont="${SOUNDFONT_PATH:-$HOME/.local/share/soundfonts/generaluser-gs/v1.471.sf2}"
+  if [[ ! -f "$repair_sweep" ]]; then
+    print_header "Stage B duration/coverage fill outside-soloing repair sweep"
+    RUN_ID="$repair_sweep_run_id" run_stage_b_duration_coverage_outside_soloing_repair_sweep
+  fi
+  print_header "Stage B duration/coverage fill outside-soloing repair audio review package"
+  "$PYTHON_BIN" scripts/render_stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package.py \
+    --run_id "$run_id" \
+    --outside_soloing_repair_sweep "$repair_sweep" \
+    --soundfont "$soundfont" \
+    --expected_file_count 2 \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3331,6 +3352,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-outside-soloing-repair-sweep)
     run_stage_b_duration_coverage_outside_soloing_repair_sweep
+    ;;
+  stage-b-duration-coverage-outside-soloing-repair-audio-review-package)
+    run_stage_b_duration_coverage_outside_soloing_repair_audio_review_package
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

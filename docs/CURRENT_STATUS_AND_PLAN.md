@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #363, Stage B duration coverage fill outside-soloing repair sweep
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair audio review package`
+- latest functional result: Issue #365, Stage B duration coverage fill outside-soloing repair audio review package
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair user listening review fill`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,43 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Outside-Soloing Repair Audio Review Package Result
+
+Issue #365는 outside-soloing repair 후보 `2`개를 WAV로 렌더하고 청취 리뷰 준비 상태를 검증한 작업이다.
+
+변경:
+
+- outside-soloing repair audio review package script 추가
+- Issue #363 selected repaired MIDI `2`개 WAV 렌더
+- WAV sample rate, duration, size, checksum 검증
+- audio quality / human preference claim guard 유지
+
+결과:
+
+- status: `ready_for_user_listening_review`
+- rendered audio file count: `2`
+- technical WAV validation: `true`
+- sample rate: `44100`
+- audio rendered quality claimed: `false`
+- human/audio preference claimed: `false`
+- broad model quality claimed: `false`
+
+rendered WAV:
+
+- sample seed `155`: `outputs/stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package/harness_stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package/audio/outside_repair_sample_seed_155_contour_resolution.wav`
+- sample seed `131`: `outputs/stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package/harness_stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package/audio/outside_repair_sample_seed_131_contour_resolution.wav`
+
+판단:
+
+- repaired 후보 `2`개는 청취 가능한 WAV artifact로 준비 완료
+- 이 결과는 기술적 렌더 검증이며 음악적 선호 proof가 아님
+- 다음 단계는 사용자 청취 리뷰 입력 기록
+- generated WAV files는 commit 대상에서 제외
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair user listening review fill`
 
 ## Current Duration Coverage Fill Outside-Soloing Repair Sweep Result
 
