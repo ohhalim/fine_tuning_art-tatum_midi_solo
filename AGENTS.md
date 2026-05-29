@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #369, Stage B duration coverage fill outside-soloing repair objective evidence consolidation.
+- Latest functional issue completed: Issue #371, Stage B duration coverage fill outside-soloing repair next decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair next decision.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair broader repeatability sweep.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -834,6 +834,14 @@ bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-o
 ```
 
 This harness consolidates repaired candidate objective evidence while keeping human/audio preference claims false.
+
+For Stage B duration coverage fill outside-soloing repair next decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-next-decision
+```
+
+This harness converts objective evidence support into the next repeatability sweep boundary.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
