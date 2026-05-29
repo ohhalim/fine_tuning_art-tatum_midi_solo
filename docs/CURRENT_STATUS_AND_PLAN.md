@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #345, Stage B duration coverage fill user listening review fill
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill user listening review consolidation`
+- latest functional result: Issue #347, Stage B duration coverage fill user listening review consolidation
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill next repair or repeatability decision`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,40 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill User Listening Review Consolidation Result
+
+Issue #347은 MIDI evidence, WAV render validation, user listening review를 하나의 claim boundary로 정리한 작업이다.
+
+변경:
+
+- user listening review consolidation script 추가
+- MIDI evidence / audio render / user review reports 조인
+- consolidated claim boundary 정의
+- proven / not proven / next decision 정리
+
+결과:
+
+- boundary: `midi_evidence_and_single_user_listening_support_duration_coverage_fill_keep`
+- preferred candidate: `duration_coverage_fill_keep`
+- MIDI evidence preference: `duration_coverage_fill_keep`
+- user listening preference: `duration_coverage_fill_keep`
+- same preferred candidate: `true`
+- rendered audio file count: `2`
+- technical WAV validation: `true`
+- single user review: `true`
+- broad model quality claimed: `false`
+
+판단:
+
+- MIDI metric, rendered WAV technical validation, single-user listening review가 같은 fill 후보를 지지
+- multi-reviewer preference, broad trained-model quality, Brad style adaptation은 미검증
+- production-ready improviser claim 금지
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill next repair or repeatability decision`
+- consolidated fill evidence를 기준으로 broader repeatability 또는 다음 repair target 분리
 
 ## Current Duration Coverage Fill User Listening Review Fill Result
 

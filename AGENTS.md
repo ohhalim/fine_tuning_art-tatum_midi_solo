@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #345, Stage B duration coverage fill user listening review fill.
+- Latest functional issue completed: Issue #347, Stage B duration coverage fill user listening review consolidation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill user listening review consolidation.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill next repair or repeatability decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -738,6 +738,14 @@ bash scripts/agent_harness.sh stage-b-user-listening-review-fill
 ```
 
 This harness applies a validated user listening review from rendered WAV files and keeps broad model quality unclaimed.
+
+For Stage B duration coverage fill user listening review consolidation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-user-listening-review-consolidation
+```
+
+This harness consolidates MIDI evidence, technical WAV validation, and single-user listening preference.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
