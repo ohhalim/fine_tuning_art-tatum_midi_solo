@@ -63,6 +63,8 @@
 | target-qualified 후보 미발견 | 추가 sampling에서도 pitch variety와 adjacent/dead-air target 동시 충족 실패 | seed `181/223`, top_k8, temp `0.90/0.86` sweep 실행 | target-qualified `0/96`, partial 후보 unique `9`, dead-air `0.3889`, adjacent repeat `1` |
 | sampling 조정 한계 | lower temperature/top_k에서도 dead-air와 adjacent repeat 동시 해결 실패 | seed `269/311`, top_k7, temp `0.80/0.78` sweep 실행 | target-qualified `0/96`, partial 후보 unique `7`, max interval `7`, dead-air `0.3889`, adjacent repeat `1` |
 | adjacent repeat 직접 제어 후 dead-air 악화 | constrained decoding으로 repeat는 줄었지만 duration/coverage 공백이 남음 | coverage-aware positions + chord-aware repeat window 적용 | adjacent repeat `0`, unique `9`, dead-air `0.5714`, target-qualified `0/48` |
+| constrained partial 후보의 coverage 공백 | adjacent repeat는 제거됐지만 dead-air `0.5714`로 target 미달 | duration/coverage fill variant 생성 | qualified `2/4`, selected fill additions `6`, dead-air `0.2941` |
+| duration fill keep 과장 위험 | focused listening fill decision `keep`은 단일 postprocess 후보 증거 | keep consolidation으로 claim boundary 분리 | boundary `single_postprocess_candidate_keep_support`, human/audio proof 미검증 |
 
 ## 파이프라인 구조
 
@@ -81,7 +83,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #320 기준 model-core MVP:
+Issue #322 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -199,6 +201,7 @@ MVP 근거:
 - duration/coverage fill focused context에서 decision `keep_for_focused_listening`, flags `{}`, final `F4` over `Fm7` chord tone 확인
 - duration/coverage fill focused listening notes에서 pending `1`, review risk `sustained_coverage_review`로 다음 evidence fill 경계 분리
 - duration/coverage fill focused listening fill에서 MIDI-derived coverage 반영 후 decision `keep`, review risks `{}` 확인
+- duration/coverage fill keep consolidation에서 single postprocess candidate boundary `single_postprocess_candidate_keep_support`로 정리
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -210,10 +213,10 @@ MVP 근거:
 | 만든 것 | symbolic MIDI 생성 모델의 dataset, tokenization, training, generation, decode, objective review, proxy review pipeline |
 | 겪은 문제 | `.mid` 파일 존재만으로 성공 판단 불가, one-note collapse, long sustain block, chord block, dead-air outlier, seed-level margin 부족 |
 | 해결 방식 | duration-explicit token 구조, grammar/coverage/chord-aware probe, overlap-free postprocess, repeatability sweep, dead-air diagnostics, proxy review scoring, repair candidate selection |
-| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, selected/peer duplicate output, constrained adjacent repair target-qualified `0/48`, duration/coverage fill qualified `2/4`, duration/coverage fill focused context `keep_for_focused_listening`, duration/coverage fill evidence decision `keep` |
+| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, selected/peer duplicate output, constrained adjacent repair target-qualified `0/48`, duration/coverage fill qualified `2/4`, duration/coverage fill focused context `keep_for_focused_listening`, duration/coverage fill evidence decision `keep`, duration/coverage fill keep boundary `single_postprocess_candidate_keep_support` |
 | 주장 경계 | reviewable MIDI 후보 생성 검증 파이프라인까지 가능, human listening preference / Brad style adaptation / broad production quality는 미검증 |
 
-Issue #320 기준 current margin-recovered evidence boundary:
+Issue #322 기준 current margin-recovered evidence boundary:
 
 | 항목 | 결과 |
 |---|---|
@@ -272,6 +275,9 @@ Issue #320 기준 current margin-recovered evidence boundary:
 | duration coverage focused listening fill | reviewed `1`, decision `keep`, risks `{}` |
 | duration coverage grid coverage | onset `0.5625`, sustained `0.6250` |
 | duration coverage filled fields | timing `acceptable`, chord fit `strong`, phrase `acceptable`, landing `strong`, vocabulary `acceptable` |
+| duration coverage keep consolidation | boundary `single_postprocess_candidate_keep_support` |
+| duration coverage proven boundary | MIDI/context evidence keep, dead-air repair, adjacent repeat repair, wide interval repair |
+| duration coverage not proven boundary | human/audio preference, broad trained-model quality, Brad style adaptation, broad repeatability |
 
 Issue #210 기준 current best focused review candidate:
 

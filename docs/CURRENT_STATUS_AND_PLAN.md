@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #320, Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening fill
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill keep consolidation`
+- latest functional result: Issue #322, Stage B margin-recovered phrase/vocabulary duration coverage fill keep consolidation
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio comparison boundary`
 
 현재 범위가 아닌 것:
 
@@ -66,6 +66,44 @@ Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
 
+## Current Duration Coverage Fill Keep Consolidation Result
+
+Issue #322는 Issue #320의 duration/coverage fill `keep` 결과를 claim boundary 기준으로 정리한 작업이다.
+
+변경:
+
+- duration fill repair summary와 focused listening filled notes 조인
+- single keep candidate 검증
+- postprocess claim boundary 검증
+- proven / not proven boundary 분리
+
+결과:
+
+- candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6`
+- decision: `keep`
+- boundary: `single_postprocess_candidate_keep_support`
+- postprocess claim boundary: `postprocess_duration_coverage_fill_candidate`
+- variant count: `4`
+- qualified variant count: `2`
+- fill additions: `6`
+- dead-air ratio: `0.5714 -> 0.2941`
+- onset coverage: `0.5625`
+- sustained coverage: `0.6250`
+- note count: `18`
+- unique pitch count: `15`
+- final note: `F4` over `Fm7`, chord tone
+
+판단:
+
+- MIDI/context evidence 기준 keep
+- adjacent repeat, wide interval blocker repair 유지
+- single postprocess candidate support로 claim boundary 제한
+- human/audio listening proof와 broad trained-model quality는 아직 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio comparison boundary`
+
 ## Current Duration Coverage Fill Focused Listening Fill Result
 
 Issue #320은 duration/coverage fill candidate의 focused listening notes를 MIDI/context evidence로 채운 작업이다.
@@ -99,12 +137,12 @@ Issue #320은 duration/coverage fill candidate의 focused listening notes를 MID
 판단:
 
 - MIDI/context evidence fill 기준 keep
-- adjacent repeat, wide interval blocker 유지
+- adjacent repeat, wide interval blocker repair 유지
 - human/audio listening proof는 아직 아님
 
-다음:
+후속:
 
-- `Stage B margin-recovered phrase/vocabulary duration coverage fill keep consolidation`
+- Issue #322 `Stage B margin-recovered phrase/vocabulary duration coverage fill keep consolidation` 완료
 
 ## Current Duration Coverage Fill Focused Listening Notes Result
 
