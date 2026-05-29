@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #385, Stage B generic base readiness audit.
+- Latest functional issue completed: Issue #387, Stage B generic base manifest contract.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic base manifest contract.
+- Recommended next issue: Stage B generic split duration-explicit window preparation smoke.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -874,6 +874,14 @@ bash scripts/agent_harness.sh stage-b-generic-base-readiness-audit
 ```
 
 This harness verifies that dataset pool evidence and Stage B objective-path evidence support Phase 4 preparation without claiming broad trained-model quality or Brad style adaptation.
+
+For Stage B generic jazz base manifest contract changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-base-manifest-contract
+```
+
+This harness verifies generic/Brad manifest split counts and leakage guards before Stage B duration-explicit window preparation, without claiming broad trained-model quality or Brad style adaptation.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

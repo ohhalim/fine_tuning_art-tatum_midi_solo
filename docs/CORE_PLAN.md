@@ -137,6 +137,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - model-core portfolio bullet draft 문서: `docs/STAGE_B_MODEL_CORE_PORTFOLIO_BULLET_DRAFT_2026-05-29.md`
 - Muzig application resume wording 문서: `docs/MUZIG_APPLICATION_RESUME_WORDING_2026-05-29.md`
 - generic base readiness audit 문서: `docs/STAGE_B_GENERIC_BASE_READINESS_AUDIT_2026-05-29.md`
+- generic base manifest contract 문서: `docs/STAGE_B_GENERIC_BASE_MANIFEST_CONTRACT_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -212,6 +213,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - model-core portfolio bullet draft: resume bullet `6`, metric 근거와 unsupported claim guard 분리
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
 - generic base readiness audit: phase4 prep ready `true`, broad training execution ready `false`, broad quality/Brad adaptation claim `false`
+- generic base manifest contract: generic split `2433/270`, Brad split `47/11/14`, leakage/overlap `0`, broad training execution ready `false`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1116,6 +1118,16 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - broad training execution ready: `false`
 - broad trained-model quality / Brad style adaptation claim: `false`
 - 다음 작업은 broad training 실행이 아니라 Stage B generic train/val manifest contract 갱신이다.
+
+현재 manifest contract:
+
+- Issue #387 result: generic_jazz_train `2433`, generic_jazz_val `270`, brad_adaptation_train `47`, brad_adaptation_val `11`, brad_test_holdout `14`
+- non-Brad split count: expected `2703`, actual `2703`
+- Brad split count: expected `72`, actual `72`
+- leakage/overlap: `0`
+- manifest contract ready: `true`
+- broad training execution ready: `false`
+- 다음 작업은 generic split manifest를 사용한 Stage B duration-explicit window preparation smoke다.
 
 ### Phase 5. Brad Style Adaptation
 
