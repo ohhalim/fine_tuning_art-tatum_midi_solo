@@ -90,6 +90,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary qualified peer focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_QUALIFIED_PEER_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - margin-recovered phrase/vocabulary qualified peer focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_QUALIFIED_PEER_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered phrase/vocabulary two-candidate keep consolidation 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_TWO_CANDIDATE_KEEP_CONSOLIDATION_2026-05-29.md`
+- margin-recovered phrase/vocabulary human listening comparison boundary 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_HUMAN_LISTENING_COMPARISON_BOUNDARY_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -125,6 +126,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary qualified peer focused listening notes: peer candidate `1`, pending `1`, prior decision `keep_for_focused_listening`, risk `sustained_coverage_review`
 - margin-recovered phrase/vocabulary qualified peer focused listening fill: peer decision `keep`, timing `acceptable`, phrase continuation `acceptable`, jazz vocabulary `acceptable`
 - margin-recovered phrase/vocabulary two-candidate keep: selected/peer keep `2`, qualified `2/96`, source `2`, boundary `two_candidate_midi_context_keep_support`
+- margin-recovered phrase/vocabulary human listening comparison: human status `pending`, note sequence match `true`, boundary `pending_human_review_same_midi_content`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -331,6 +333,7 @@ Stage B에서 명시하는 것:
 140. Stage B margin-recovered phrase/vocabulary qualified peer focused listening notes
 141. Stage B margin-recovered phrase/vocabulary qualified peer focused listening fill
 142. Stage B margin-recovered phrase/vocabulary two-candidate keep consolidation
+143. Stage B margin-recovered phrase/vocabulary human listening comparison boundary
 
 가장 최근 의미 있는 결과:
 
@@ -526,6 +529,8 @@ Stage B에서 명시하는 것:
 - Issue #288 result: peer decision `keep`, timing `acceptable`, chord fit `strong`, phrase continuation `acceptable`, landing `strong`, jazz vocabulary `acceptable`; selected and peer candidates now both have filled evidence keep decisions.
 - Issue #290 joins the keep stability summary with selected and peer filled notes.
 - Issue #290 result: keep candidates `2`, qualified `2/96`, qualified sources `2`, boundary `two_candidate_midi_context_keep_support`; this remains MIDI/context evidence, not human/audio proof.
+- Issue #292 prepares the selected/peer pair for human listening comparison and keeps preference fields pending.
+- Issue #292 result: note sequence match `true`, metric fingerprint match `true`, boundary `pending_human_review_same_midi_content`; same-render A/B preference is not meaningful until source divergence is audited.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -544,8 +549,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #290은 selected keep과 peer keep을 함께 묶어 two-candidate evidence keep boundary를 정리했다.
-다음 작업은 human listening 또는 audio-rendered comparison 기준으로 이 boundary를 별도 검증하는 것이다.
+Issue #292는 selected/peer pair를 human listening comparison boundary로 넘겼고, 두 후보가 같은 note sequence로 수렴했음을 확인했다.
+다음 작업은 duplicate-candidate source divergence를 audit해 source diversity가 output diversity로 이어지지 않은 원인을 분리하는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -1071,18 +1076,19 @@ Issue #290은 selected keep과 peer keep을 함께 묶어 two-candidate evidence
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary two-candidate keep consolidation
+Stage B margin-recovered phrase/vocabulary human listening comparison boundary
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_TWO_CANDIDATE_KEEP_CONSOLIDATION_2026-05-29.md`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_HUMAN_LISTENING_COMPARISON_BOUNDARY_2026-05-29.md`
 - selected candidate: `margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43`
 - peer candidate: `margin_recovered_phrase_vocab_seed_61_topk_7_temp_082_n48_sample_25`
-- keep candidate count: `2`
-- qualified candidate count: `2/96`
-- qualified source count: `2`
-- boundary: `two_candidate_midi_context_keep_support`
+- human listening status: `pending`
+- preference claimed: `false`
+- note sequence match: `true`
+- metric fingerprint match: `true`
+- boundary: `pending_human_review_same_midi_content`
 - timing: `acceptable`
 - chord fit: `strong`
 - phrase continuation: `acceptable`
@@ -1101,15 +1107,15 @@ Stage B margin-recovered phrase/vocabulary two-candidate keep consolidation
 
 판단:
 
-- selected keep 외 fallback keep 후보가 evidence 기준으로 확보됐고, 두 후보를 같은 summary boundary로 묶었다.
-- 단일 sample claim보다는 강하지만, qualified rate `2/96`이라 robust repeatability는 아니다.
+- selected/peer가 다른 source run에서 나왔지만 실제 note sequence와 metric fingerprint는 동일하다.
+- human listening comparison field는 pending이며, 같은 렌더 기준 A/B preference는 주장하지 않는다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary human listening comparison boundary`로 잡는다.
-- selected/peer keep 후보를 사람이 듣는 비교 기준 또는 audio-rendered review 기준으로 분리한다.
-- broad training은 이 boundary를 먼저 본 뒤 결정한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary duplicate-candidate source divergence audit`로 잡는다.
+- source run과 sample index가 다른데 같은 note sequence로 수렴한 원인을 분리한다.
+- broad training은 duplicate/source diversity boundary를 먼저 본 뒤 결정한다.
 
 ## 10. 한 문장 요약
 

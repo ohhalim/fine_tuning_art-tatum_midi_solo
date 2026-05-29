@@ -52,6 +52,7 @@
 | peer 청감 판단 보류 | peer context keep만으로 selected keep과 같은 fallback인지 판단 불가 | peer focused listening notes template 생성 | candidate `1`, pending `1`, risk `sustained_coverage_review` |
 | peer fallback keep 여부 미확정 | peer notes가 pending 상태라 selected keep과 비교 불가 | peer notes를 MIDI/context evidence 기준으로 fill | timing `acceptable`, phrase `acceptable`, vocabulary `acceptable`, decision `keep` |
 | two-candidate claim boundary 필요 | selected/peer 모두 keep이지만 broad model quality로 과장될 수 있음 | stability summary와 두 filled notes를 조인해 evidence boundary 정리 | keep `2`, qualified `2/96`, source `2`, boundary `two_candidate_midi_context_keep_support` |
+| human listening 비교 과장 위험 | selected/peer가 다른 source 후보여도 실제 MIDI content가 같을 수 있음 | human listening comparison boundary에서 note signature와 metric fingerprint 비교 | note sequence match `true`, human status `pending`, A/B 선호 claim 없음 |
 
 ## 파이프라인 구조
 
@@ -70,7 +71,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #290 기준 model-core MVP:
+Issue #292 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -114,6 +115,7 @@ Issue #290 기준 model-core MVP:
 | margin-recovered phrase vocabulary peer focused listening notes | peer focused listening template 생성, candidate `1`, pending `1`, review risk `sustained_coverage_review` |
 | margin-recovered phrase vocabulary peer focused listening fill | peer reviewed `1`, decision `keep`, timing `acceptable`, phrase `acceptable`, vocabulary `acceptable` |
 | margin-recovered phrase vocabulary two-candidate keep | selected/peer keep `2`, qualified `2/96`, source `2`, boundary `two_candidate_midi_context_keep_support` |
+| margin-recovered phrase vocabulary human listening comparison | human status `pending`, note sequence match `true`, boundary `pending_human_review_same_midi_content` |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -162,6 +164,7 @@ MVP 근거:
 - qualified peer 후보를 focused listening notes template으로 넘기고 selected keep과 같은 risk boundary를 보존
 - qualified peer 후보도 focused listening fill 기준 decision `keep`으로 기록해 selected keep 외 fallback keep 후보 확보
 - selected keep과 peer keep을 같은 summary로 조인해 two-candidate MIDI/context evidence boundary를 `two_candidate_midi_context_keep_support`로 기록
+- selected/peer 후보의 note signature가 동일함을 확인해 human listening comparison을 pending으로 두고 동일 렌더 A/B 선호 claim을 차단
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -173,10 +176,10 @@ MVP 근거:
 | 만든 것 | symbolic MIDI 생성 모델의 dataset, tokenization, training, generation, decode, objective review, proxy review pipeline |
 | 겪은 문제 | `.mid` 파일 존재만으로 성공 판단 불가, one-note collapse, long sustain block, chord block, dead-air outlier, seed-level margin 부족 |
 | 해결 방식 | duration-explicit token 구조, grammar/coverage/chord-aware probe, overlap-free postprocess, repeatability sweep, dead-air diagnostics, proxy review scoring, repair candidate selection |
-| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, two-candidate keep `2` |
+| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, two-candidate keep `2`, selected/peer note sequence match |
 | 주장 경계 | reviewable MIDI 후보 생성 검증 파이프라인까지 가능, human listening preference / Brad style adaptation / broad production quality는 미검증 |
 
-Issue #290 기준 current margin-recovered two-candidate evidence boundary:
+Issue #292 기준 current margin-recovered two-candidate evidence boundary:
 
 | 항목 | 결과 |
 |---|---|
@@ -200,6 +203,7 @@ Issue #290 기준 current margin-recovered two-candidate evidence boundary:
 | remaining risk | `sustained_coverage_review` |
 | evidence boundary | `two_candidate_midi_context_keep_support` |
 | claim boundary | human/audio proof, broad repeatability, Brad style adaptation 미검증 |
+| human comparison boundary | `pending_human_review_same_midi_content`, same-render A/B 선호 claim 불가 |
 
 Issue #210 기준 current best focused review candidate:
 

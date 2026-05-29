@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #290, Stage B margin-recovered phrase/vocabulary two-candidate keep consolidation.
+- Latest functional issue completed: Issue #292, Stage B margin-recovered phrase/vocabulary human listening comparison boundary.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary human listening comparison boundary.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duplicate-candidate source divergence audit.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -522,6 +522,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-two-can
 ```
 
 This harness joins selected and peer filled keep notes with the stability summary and records the two-candidate evidence boundary.
+
+For Stage B margin-recovered phrase/vocabulary human listening comparison boundary changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-human-listening-comparison
+```
+
+This harness prepares pending human listening fields and verifies whether selected and peer keep candidates are distinct enough for A/B listening comparison.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
