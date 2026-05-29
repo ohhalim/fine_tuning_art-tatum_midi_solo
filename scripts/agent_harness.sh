@@ -1816,6 +1816,23 @@ run_stage_b_user_listening_review_consolidation() {
     --require_no_broad_quality_claim
 }
 
+run_stage_b_duration_coverage_next_decision() {
+  local consolidation_run_id="${CONSOLIDATION_RUN_ID:-harness_stage_b_duration_coverage_fill_user_listening_review_consolidation}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_next_decision}"
+  local consolidation="outputs/stage_b_duration_coverage_fill_user_listening_review_consolidation/${consolidation_run_id}/stage_b_duration_coverage_fill_user_listening_review_consolidation.json"
+  if [[ ! -f "$consolidation" ]]; then
+    print_header "Stage B duration/coverage fill user listening review consolidation"
+    RUN_ID="$consolidation_run_id" run_stage_b_user_listening_review_consolidation
+  fi
+  print_header "Stage B duration/coverage fill next decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_duration_coverage_next_step.py \
+    --run_id "$run_id" \
+    --consolidation "$consolidation" \
+    --expected_next_boundary broader_repeatability_sweep \
+    --require_auto_progress_allowed \
+    --require_no_critical_user_input
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3100,6 +3117,9 @@ case "$MODE" in
     ;;
   stage-b-user-listening-review-consolidation)
     run_stage_b_user_listening_review_consolidation
+    ;;
+  stage-b-duration-coverage-next-decision)
+    run_stage_b_duration_coverage_next_decision
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
