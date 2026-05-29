@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #304, Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listening fill.
+- Latest functional issue completed: Issue #306, Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair target.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair target.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair sweep.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -578,6 +578,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-distinc
 ```
 
 This harness fills the distinct sample-seed focused listening review notes from MIDI/context evidence and records the keep/follow-up boundary.
+
+For Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-remaining-blocker
+```
+
+This harness summarizes the focused listening fill blockers and records the next repair target.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
