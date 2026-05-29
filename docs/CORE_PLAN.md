@@ -129,6 +129,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill outside-soloing repair audio review package 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_OUTSIDE_SOLOING_REPAIR_AUDIO_REVIEW_PACKAGE_2026-05-29.md`
 - duration coverage fill outside-soloing repair user listening review guard 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_OUTSIDE_SOLOING_REPAIR_USER_LISTENING_REVIEW_GUARD_2026-05-29.md`
 - duration coverage fill outside-soloing repair objective evidence consolidation 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_OUTSIDE_SOLOING_REPAIR_OBJECTIVE_EVIDENCE_CONSOLIDATION_2026-05-29.md`
+- duration coverage fill outside-soloing repair next decision 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_OUTSIDE_SOLOING_REPAIR_NEXT_DECISION_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -196,6 +197,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill outside-soloing repair audio review package: repaired candidate WAV `2`, sample rate `44100`, status `ready_for_user_listening_review`, quality/preference claim `false`
 - duration coverage fill outside-soloing repair user listening review guard: review input `false`, preference claim `false`, objective auto progress `true`, boundary `outside_soloing_repair_audio_review_pending`
 - duration coverage fill outside-soloing repair objective evidence consolidation: objective support source `2/2`, chord-tone pass `2/2`, non-chord run pass `2/2`, interval pass `2/2`, preference claim `false`
+- duration coverage fill outside-soloing repair next decision: next boundary `outside_soloing_repair_broader_repeatability_sweep`, auto progress `true`, critical user input `false`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 

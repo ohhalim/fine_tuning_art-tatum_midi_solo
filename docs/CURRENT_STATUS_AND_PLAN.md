@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #369, Stage B duration coverage fill outside-soloing repair objective evidence consolidation
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair next decision`
+- latest functional result: Issue #371, Stage B duration coverage fill outside-soloing repair next decision
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair broader repeatability sweep`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,46 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Outside-Soloing Repair Next Decision Result
+
+Issue #371은 outside-soloing repair objective evidence support를 다음 자동 작업 경계로 변환한 작업이다.
+
+변경:
+
+- outside-soloing repair next decision script 추가
+- objective support와 pending listening preference 경계 분리
+- broader repeatability sweep 자동 진행 여부 기록
+- human/audio preference claim false 유지
+
+결과:
+
+- input boundary: `outside_soloing_repair_objective_evidence_support`
+- next boundary: `outside_soloing_repair_broader_repeatability_sweep`
+- auto progress allowed: `true`
+- critical user input required: `false`
+- human/audio preference claimed: `false`
+- broad model quality claimed: `false`
+
+objective evidence:
+
+- source candidates: `2`
+- qualified source candidates: `2`
+- dead-air preserved source candidates: `2`
+- chord-tone pass source candidates: `2`
+- non-chord run pass source candidates: `2`
+- interval pass source candidates: `2`
+
+판단:
+
+- selected repaired source `2/2` objective support 확보
+- 청취 preference는 pending 상태 유지
+- 다음 작업은 broader repeatability sweep
+- preference 또는 broad model quality claim 금지
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair broader repeatability sweep`
 
 ## Current Duration Coverage Fill Outside-Soloing Repair Objective Evidence Consolidation Result
 

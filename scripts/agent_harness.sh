@@ -148,6 +148,8 @@ Modes:
                 Guard outside-soloing repair listening review when user input is absent.
   stage-b-duration-coverage-outside-soloing-repair-objective-evidence
                 Consolidate objective evidence for outside-soloing repair candidates.
+  stage-b-duration-coverage-outside-soloing-repair-next-decision
+                Decide next objective-only step after outside-soloing repair evidence.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -298,6 +300,7 @@ run_quick() {
     scripts/render_stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package.py \
     scripts/fill_stage_b_duration_coverage_outside_soloing_repair_user_listening_review.py \
     scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_objective_evidence_consolidation.py \
+    scripts/decide_stage_b_duration_coverage_outside_soloing_repair_next_step.py \
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
     scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
     scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
@@ -2092,6 +2095,24 @@ run_stage_b_duration_coverage_outside_soloing_repair_objective_evidence() {
     --require_no_broad_quality_claim
 }
 
+run_stage_b_duration_coverage_outside_soloing_repair_next_decision() {
+  local objective_run_id="${OBJECTIVE_RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_objective_evidence_consolidation}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_next_decision}"
+  local objective_evidence="outputs/stage_b_duration_coverage_fill_outside_soloing_repair_objective_evidence_consolidation/${objective_run_id}/stage_b_duration_coverage_fill_outside_soloing_repair_objective_evidence_consolidation.json"
+  if [[ ! -f "$objective_evidence" ]]; then
+    print_header "Stage B duration/coverage fill outside-soloing repair objective evidence"
+    RUN_ID="$objective_run_id" run_stage_b_duration_coverage_outside_soloing_repair_objective_evidence
+  fi
+  print_header "Stage B duration/coverage fill outside-soloing repair next decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_duration_coverage_outside_soloing_repair_next_step.py \
+    --run_id "$run_id" \
+    --objective_evidence "$objective_evidence" \
+    --expected_next_boundary outside_soloing_repair_broader_repeatability_sweep \
+    --require_auto_progress_allowed \
+    --require_no_critical_user_input \
+    --require_no_broad_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3409,6 +3430,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-outside-soloing-repair-objective-evidence)
     run_stage_b_duration_coverage_outside_soloing_repair_objective_evidence
+    ;;
+  stage-b-duration-coverage-outside-soloing-repair-next-decision)
+    run_stage_b_duration_coverage_outside_soloing_repair_next_decision
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
