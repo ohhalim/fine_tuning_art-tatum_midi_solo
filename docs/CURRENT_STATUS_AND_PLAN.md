@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #385, Stage B generic base readiness audit
-- 다음 권장 이슈: `Stage B generic base manifest contract`
+- latest functional result: Issue #387, Stage B generic base manifest contract
+- 다음 권장 이슈: `Stage B generic split duration-explicit window preparation smoke`
 
 현재 범위가 아닌 것:
 
@@ -103,6 +103,44 @@ Issue #385는 portfolio/application 정리 이후 Phase 4 generic jazz base 준�
 다음:
 
 - `Stage B generic base manifest contract`
+
+## Current Generic Base Manifest Contract Result
+
+Issue #387은 Phase 4 준비용 generic/Brad manifest split 계약을 검증한 작업이다.
+
+변경:
+
+- generic base manifest contract script 추가
+- readiness audit 결과와 dataset audit 기반 manifest split 연결
+- generic split Brad row 누수, Brad split non-Brad row 누수, split path overlap guard 추가
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_BASE_MANIFEST_CONTRACT_2026-05-29.md`
+- generic_jazz_train: `2433`
+- generic_jazz_val: `270`
+- expected / actual non-Brad split count: `2703` / `2703`
+- brad_adaptation_train: `47`
+- brad_adaptation_val: `11`
+- brad_test_holdout: `14`
+- expected / actual Brad split count: `72` / `72`
+- generic Brad leak count: `0`
+- Brad non-Brad leak count: `0`
+- overlap path count: `0`
+- duplicate exact hash group count: `0`
+- manifest contract ready: `true`
+- broad training execution ready: `false`
+
+판단:
+
+- generic/Brad split manifest contract는 Phase 4 준비 조건을 만족
+- 아직 Stage B duration-explicit window prepare smoke와 generic-base training run은 미실행
+- 다음 작업은 generic split manifest를 사용한 Stage B window preparation smoke
+
+다음:
+
+- `Stage B generic split duration-explicit window preparation smoke`
 
 ## Current Muzig Application Resume Wording Result
 

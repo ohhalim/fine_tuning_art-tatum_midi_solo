@@ -158,6 +158,8 @@ Modes:
                 Decide final objective-only boundary after outside-soloing repair repeatability.
   stage-b-generic-base-readiness-audit
                 Assess Stage B readiness before generic jazz base preparation.
+  stage-b-generic-base-manifest-contract
+                Build and validate generic/Brad split manifest contract before Stage B window preparation.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -311,6 +313,7 @@ run_quick() {
     scripts/decide_stage_b_duration_coverage_outside_soloing_repair_next_step.py \
     scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_broader_repeatability_sweep.py \
     scripts/assess_stage_b_generic_base_readiness.py \
+    scripts/check_stage_b_generic_base_manifest_contract.py \
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
     scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
     scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
@@ -2218,6 +2221,25 @@ run_stage_b_generic_base_readiness_audit() {
     --require_no_brad_style_claim
 }
 
+run_stage_b_generic_base_manifest_contract() {
+  local readiness_run_id="${READINESS_RUN_ID:-harness_stage_b_generic_base_readiness_audit}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_base_manifest_contract}"
+  local readiness_audit="outputs/stage_b_generic_base_readiness_audit/${readiness_run_id}/stage_b_generic_base_readiness_audit.json"
+  if [[ ! -f "$readiness_audit" ]]; then
+    print_header "Stage B generic base readiness audit"
+    RUN_ID="$readiness_run_id" run_stage_b_generic_base_readiness_audit
+  fi
+  print_header "Stage B generic base manifest contract"
+  "$PYTHON_BIN" scripts/check_stage_b_generic_base_manifest_contract.py \
+    --run_id "$run_id" \
+    --readiness_audit "$readiness_audit" \
+    --expected_boundary stage_b_generic_base_manifest_contract \
+    --expected_next_boundary stage_b_generic_stage_b_window_prepare_smoke \
+    --require_contract_ready \
+    --require_no_broad_quality_claim \
+    --require_no_brad_style_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3550,6 +3572,9 @@ case "$MODE" in
     ;;
   stage-b-generic-base-readiness-audit)
     run_stage_b_generic_base_readiness_audit
+    ;;
+  stage-b-generic-base-manifest-contract)
+    run_stage_b_generic_base_manifest_contract
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
