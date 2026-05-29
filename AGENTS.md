@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #322, Stage B margin-recovered phrase/vocabulary duration coverage fill keep consolidation.
+- Latest functional issue completed: Issue #324, Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio comparison boundary.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio comparison boundary.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio review fill.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -650,6 +650,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duratio
 ```
 
 This harness consolidates the selected duration/coverage fill keep candidate and records the single postprocess-candidate claim boundary.
+
+For Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio boundary changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-human-audio-boundary
+```
+
+This harness prepares the source-vs-fill human/audio review boundary and keeps preference fields pending.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

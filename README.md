@@ -65,6 +65,7 @@
 | adjacent repeat 직접 제어 후 dead-air 악화 | constrained decoding으로 repeat는 줄었지만 duration/coverage 공백이 남음 | coverage-aware positions + chord-aware repeat window 적용 | adjacent repeat `0`, unique `9`, dead-air `0.5714`, target-qualified `0/48` |
 | constrained partial 후보의 coverage 공백 | adjacent repeat는 제거됐지만 dead-air `0.5714`로 target 미달 | duration/coverage fill variant 생성 | qualified `2/4`, selected fill additions `6`, dead-air `0.2941` |
 | duration fill keep 과장 위험 | focused listening fill decision `keep`은 단일 postprocess 후보 증거 | keep consolidation으로 claim boundary 분리 | boundary `single_postprocess_candidate_keep_support`, human/audio proof 미검증 |
+| human/audio preference 과장 위험 | source vs fill MIDI가 달라도 청감 선호 입력은 없음 | human/audio boundary 생성 및 pending field 유지 | note sequence match `false`, preference claimed `false` |
 
 ## 파이프라인 구조
 
@@ -83,7 +84,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #322 기준 model-core MVP:
+Issue #324 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -202,6 +203,7 @@ MVP 근거:
 - duration/coverage fill focused listening notes에서 pending `1`, review risk `sustained_coverage_review`로 다음 evidence fill 경계 분리
 - duration/coverage fill focused listening fill에서 MIDI-derived coverage 반영 후 decision `keep`, review risks `{}` 확인
 - duration/coverage fill keep consolidation에서 single postprocess candidate boundary `single_postprocess_candidate_keep_support`로 정리
+- duration/coverage fill human/audio boundary에서 source vs fill MIDI content distinct, preference claim `false`, human/audio status `pending` 기록
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -213,10 +215,10 @@ MVP 근거:
 | 만든 것 | symbolic MIDI 생성 모델의 dataset, tokenization, training, generation, decode, objective review, proxy review pipeline |
 | 겪은 문제 | `.mid` 파일 존재만으로 성공 판단 불가, one-note collapse, long sustain block, chord block, dead-air outlier, seed-level margin 부족 |
 | 해결 방식 | duration-explicit token 구조, grammar/coverage/chord-aware probe, overlap-free postprocess, repeatability sweep, dead-air diagnostics, proxy review scoring, repair candidate selection |
-| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, selected/peer duplicate output, constrained adjacent repair target-qualified `0/48`, duration/coverage fill qualified `2/4`, duration/coverage fill focused context `keep_for_focused_listening`, duration/coverage fill evidence decision `keep`, duration/coverage fill keep boundary `single_postprocess_candidate_keep_support` |
+| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, selected/peer duplicate output, constrained adjacent repair target-qualified `0/48`, duration/coverage fill qualified `2/4`, duration/coverage fill focused context `keep_for_focused_listening`, duration/coverage fill evidence decision `keep`, duration/coverage fill keep boundary `single_postprocess_candidate_keep_support`, human/audio preference pending |
 | 주장 경계 | reviewable MIDI 후보 생성 검증 파이프라인까지 가능, human listening preference / Brad style adaptation / broad production quality는 미검증 |
 
-Issue #322 기준 current margin-recovered evidence boundary:
+Issue #324 기준 current margin-recovered evidence boundary:
 
 | 항목 | 결과 |
 |---|---|
@@ -278,6 +280,8 @@ Issue #322 기준 current margin-recovered evidence boundary:
 | duration coverage keep consolidation | boundary `single_postprocess_candidate_keep_support` |
 | duration coverage proven boundary | MIDI/context evidence keep, dead-air repair, adjacent repeat repair, wide interval repair |
 | duration coverage not proven boundary | human/audio preference, broad trained-model quality, Brad style adaptation, broad repeatability |
+| duration coverage human/audio boundary | `pending_human_audio_review_source_vs_fill_distinct_midi_content` |
+| duration coverage human/audio status | pending, preference claimed `false`, note sequence match `false` |
 
 Issue #210 기준 current best focused review candidate:
 

@@ -118,6 +118,8 @@ Modes:
                 Fill focused listening notes for the duration/coverage fill candidate.
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-keep-consolidation
                 Consolidate the duration/coverage fill keep candidate boundary.
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-human-audio-boundary
+                Build pending human/audio review boundary for source vs duration fill.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1558,6 +1560,32 @@ run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_keep_conso
     --require_postprocess_claim_boundary postprocess_duration_coverage_fill_candidate
 }
 
+run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audio_boundary() {
+  local keep_run_id="${KEEP_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_keep_consolidation}"
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audio_boundary}"
+  local candidate_id="margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6"
+  local keep_consolidation="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_keep_consolidation/${keep_run_id}/duration_coverage_fill_keep_consolidation.json"
+  local duration_fill_summary="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair/${repair_run_id}/duration_coverage_fill_repair_summary.json"
+  if [[ ! -f "$keep_consolidation" ]]; then
+    print_header "Stage B duration/coverage fill keep consolidation"
+    RUN_ID="$keep_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_keep_consolidation
+  fi
+  if [[ ! -f "$duration_fill_summary" ]]; then
+    print_header "Stage B duration/coverage fill repair"
+    RUN_ID="$repair_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair
+  fi
+  print_header "Stage B duration/coverage fill human/audio boundary"
+  "$PYTHON_BIN" scripts/build_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audio_boundary.py \
+    --run_id "$run_id" \
+    --keep_consolidation "$keep_consolidation" \
+    --duration_fill_summary "$duration_fill_summary" \
+    --expected_candidate_id "$candidate_id" \
+    --require_pending \
+    --require_no_preference \
+    --expect_distinct_midi_content
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -2806,6 +2834,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-keep-consolidation)
     run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_keep_consolidation
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-human-audio-boundary)
+    run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audio_boundary
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

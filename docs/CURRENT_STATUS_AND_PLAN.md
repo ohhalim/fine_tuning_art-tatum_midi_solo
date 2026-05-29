@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #322, Stage B margin-recovered phrase/vocabulary duration coverage fill keep consolidation
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio comparison boundary`
+- latest functional result: Issue #324, Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio comparison boundary
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio review fill`
 
 현재 범위가 아닌 것:
 
@@ -66,6 +66,41 @@ Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
 
+## Current Duration Coverage Fill Human/Audio Boundary Result
+
+Issue #324는 duration/coverage fill keep 후보의 human/audio review boundary를 정의한 작업이다.
+
+변경:
+
+- source constrained partial MIDI와 duration fill keep MIDI 비교
+- note sequence / metric summary match 여부 기록
+- human/audio review field pending 유지
+- preference claim 차단
+
+결과:
+
+- review item count: `2`
+- human/audio status: `pending`
+- boundary: `pending_human_audio_review_source_vs_fill_distinct_midi_content`
+- preference claimed: `false`
+- note sequence match: `false`
+- metric summary match: `false`
+- fill additions: `6`
+- dead-air delta: `0.2773`
+- source note signature count: `15`
+- selected note signature count: `18`
+
+판단:
+
+- source vs fill MIDI content distinct
+- human/audio review status pending
+- audio render quality와 human/audio preference는 아직 미검증
+- broad trained-model quality와 Brad style adaptation은 아직 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio review fill`
+
 ## Current Duration Coverage Fill Keep Consolidation Result
 
 Issue #322는 Issue #320의 duration/coverage fill `keep` 결과를 claim boundary 기준으로 정리한 작업이다.
@@ -100,9 +135,9 @@ Issue #322는 Issue #320의 duration/coverage fill `keep` 결과를 claim bounda
 - single postprocess candidate support로 claim boundary 제한
 - human/audio listening proof와 broad trained-model quality는 아직 미검증
 
-다음:
+후속:
 
-- `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio comparison boundary`
+- Issue #324 `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio comparison boundary` 완료
 
 ## Current Duration Coverage Fill Focused Listening Fill Result
 
