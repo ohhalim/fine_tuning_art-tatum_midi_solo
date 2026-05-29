@@ -126,6 +126,8 @@ Modes:
                 Build source/fill MIDI review package and input template.
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-midi-evidence-review
                 Review source vs duration fill from MIDI evidence only.
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-midi-evidence-consolidation
+                Consolidate MIDI evidence review claim boundaries.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1654,6 +1656,24 @@ run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evide
     --require_audio_not_rendered
 }
 
+run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_consolidation() {
+  local review_run_id="${REVIEW_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_review}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_consolidation}"
+  local candidate_id="margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6"
+  local midi_evidence_review="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_review/${review_run_id}/duration_coverage_fill_midi_evidence_review.json"
+  if [[ ! -f "$midi_evidence_review" ]]; then
+    print_header "Stage B duration/coverage fill MIDI evidence review"
+    RUN_ID="$review_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_review
+  fi
+  print_header "Stage B duration/coverage fill MIDI evidence consolidation"
+  "$PYTHON_BIN" scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_consolidation.py \
+    --run_id "$run_id" \
+    --midi_evidence_review "$midi_evidence_review" \
+    --expected_candidate_id "$candidate_id" \
+    --expected_boundary midi_evidence_preference_support \
+    --require_no_human_audio_preference
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -2914,6 +2934,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-midi-evidence-review)
     run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_review
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-midi-evidence-consolidation)
+    run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_consolidation
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

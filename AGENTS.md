@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #330, Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review.
+- Latest functional issue completed: Issue #332, Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review consolidation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review consolidation.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill external human/audio review boundary.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -682,6 +682,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duratio
 ```
 
 This harness reviews source vs fill from MIDI evidence only and does not claim human/audio preference.
+
+For Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence consolidation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-midi-evidence-consolidation
+```
+
+This harness consolidates MIDI evidence preference and keeps human/audio preference unclaimed.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

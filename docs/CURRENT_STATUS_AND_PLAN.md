@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #330, Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review consolidation`
+- latest functional result: Issue #332, Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review consolidation
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill external human/audio review boundary`
 
 현재 범위가 아닌 것:
 
@@ -66,6 +66,40 @@ Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
 
+## Current Duration Coverage Fill MIDI Evidence Consolidation Result
+
+Issue #332는 Issue #330 MIDI evidence review 결과의 claim boundary를 정리한 작업이다.
+
+변경:
+
+- MIDI evidence review consolidation script 추가
+- proven / not proven boundary 분리
+- human/audio preference claim guard 유지
+- next boundary 명시
+
+결과:
+
+- boundary: `midi_evidence_preference_support`
+- preference: `duration_coverage_fill_keep`
+- source score: `91.857`
+- fill score: `171.588`
+- score delta fill-source: `79.7311`
+- dead-air delta fill-source: `-0.2773`
+- focused note count delta: `+6`
+- focused unique pitch count delta: `+6`
+- max simultaneous notes delta: `-1`
+- human/audio preference claimed: `false`
+
+판단:
+
+- MIDI metric preference for duration/coverage fill candidate 확인
+- human/audio preference와 audio rendered quality는 아직 미검증
+- broad trained-model quality와 Brad style adaptation은 아직 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill external human/audio review boundary`
+
 ## Current Duration Coverage Fill MIDI Evidence Review Result
 
 Issue #330은 source constrained partial과 duration/coverage fill 후보를 MIDI evidence 기준으로 비교한 작업이다.
@@ -95,9 +129,9 @@ Issue #330은 source constrained partial과 duration/coverage fill 후보를 MID
 - human/audio preference와 audio rendered quality는 아직 미검증
 - broad trained-model quality와 Brad style adaptation은 아직 미검증
 
-다음:
+후속:
 
-- `Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review consolidation`
+- Issue #332 `Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review consolidation` 완료
 
 ## Current Duration Coverage Fill Audio Review Package Result
 
