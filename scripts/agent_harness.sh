@@ -90,6 +90,8 @@ Modes:
                 Build pending human-listening comparison boundary for selected and peer keep candidates.
   stage-b-margin-recovered-phrase-vocabulary-duplicate-source-divergence
                 Audit whether selected and peer keep candidates are duplicate outputs from shared sample seed.
+  stage-b-margin-recovered-phrase-vocabulary-sample-seed-diversity
+                Repair distinct-output claim boundary for duplicate sample-seed candidates.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -238,6 +240,7 @@ run_quick() {
     scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep.py \
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
     scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
+    scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -1034,6 +1037,29 @@ run_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence() {
     --require_shared_sample_seed \
     --require_duplicate_output \
     --expected_boundary shared_sample_seed_duplicate_output
+}
+
+run_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity() {
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_repair}"
+  local duplicate_run_id="${DUPLICATE_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity}"
+  local repair_summary="outputs/stage_b_margin_recovered_phrase_vocabulary_repair/${repair_run_id}/phrase_vocabulary_repair_summary.json"
+  local duplicate_audit="outputs/stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence/${duplicate_run_id}/duplicate_source_divergence_audit.json"
+  if [[ ! -f "$repair_summary" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary repair"
+    RUN_ID="$repair_run_id" run_stage_b_margin_recovered_phrase_vocabulary_repair
+  fi
+  if [[ ! -f "$duplicate_audit" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary duplicate source divergence"
+    RUN_ID="$duplicate_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence
+  fi
+  print_header "Stage B margin-recovered phrase/vocabulary sample-seed diversity repair"
+  "$PYTHON_BIN" scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
+    --run_id "$run_id" \
+    --repair_summary "$repair_summary" \
+    --duplicate_audit "$duplicate_audit" \
+    --expected_boundary single_distinct_sample_seed_keep_support \
+    --require_duplicate_demoted
 }
 
 run_stage_b_constrained_probe() {
@@ -2242,6 +2268,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-duplicate-source-divergence)
     run_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-sample-seed-diversity)
+    run_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

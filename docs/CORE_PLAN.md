@@ -92,6 +92,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary two-candidate keep consolidation 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_TWO_CANDIDATE_KEEP_CONSOLIDATION_2026-05-29.md`
 - margin-recovered phrase/vocabulary human listening comparison boundary 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_HUMAN_LISTENING_COMPARISON_BOUNDARY_2026-05-29.md`
 - margin-recovered phrase/vocabulary duplicate source divergence audit 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DUPLICATE_SOURCE_DIVERGENCE_AUDIT_2026-05-29.md`
+- margin-recovered phrase/vocabulary sample-seed diversity repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_SAMPLE_SEED_DIVERSITY_REPAIR_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -129,6 +130,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary two-candidate keep: selected/peer keep `2`, qualified `2/96`, source `2`, boundary `two_candidate_midi_context_keep_support`
 - margin-recovered phrase/vocabulary human listening comparison: human status `pending`, note sequence match `true`, boundary `pending_human_review_same_midi_content`
 - margin-recovered phrase/vocabulary duplicate source divergence: source seed diff `true`, shared sample seed `85`, output diversity `absent`
+- margin-recovered phrase/vocabulary sample-seed diversity repair: qualified sample seed `1`, distinct peer `0`, boundary `single_distinct_sample_seed_keep_support`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -337,6 +339,7 @@ Stage B에서 명시하는 것:
 142. Stage B margin-recovered phrase/vocabulary two-candidate keep consolidation
 143. Stage B margin-recovered phrase/vocabulary human listening comparison boundary
 144. Stage B margin-recovered phrase/vocabulary duplicate-candidate source divergence audit
+145. Stage B margin-recovered phrase/vocabulary sample-seed diversity repair
 
 가장 최근 의미 있는 결과:
 
@@ -536,6 +539,8 @@ Stage B에서 명시하는 것:
 - Issue #292 result: note sequence match `true`, metric fingerprint match `true`, boundary `pending_human_review_same_midi_content`; same-render A/B preference is not meaningful until source divergence is audited.
 - Issue #294 audits source divergence for the duplicate selected/peer pair.
 - Issue #294 result: source seed diff `true`, sample index diff `true`, shared sample seed `85`, note sequence match `true`, boundary `shared_sample_seed_duplicate_output`; this is not two distinct musical outputs.
+- Issue #296 repairs the sample-seed diversity claim boundary.
+- Issue #296 result: qualified source seed count `2`, qualified sample seed count `1`, distinct peer count `0`, boundary `single_distinct_sample_seed_keep_support`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -554,8 +559,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #294는 selected/peer pair가 같은 sample seed `85`에서 나온 duplicate output임을 확인했다.
-다음 작업은 sample seed diversity repair를 통해 source-qualified 후보가 output diversity도 갖도록 selection boundary를 고친다.
+Issue #296은 duplicate sample-seed peer를 distinct-output support에서 제외하고, 현재 claim을 single distinct sample-seed keep support로 낮췄다.
+다음 작업은 distinct sample-seed repair sweep으로 새 qualified output을 찾는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -1081,22 +1086,22 @@ Issue #294는 selected/peer pair가 같은 sample seed `85`에서 나온 duplica
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary duplicate-candidate source divergence audit
+Stage B margin-recovered phrase/vocabulary sample-seed diversity repair
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DUPLICATE_SOURCE_DIVERGENCE_AUDIT_2026-05-29.md`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_SAMPLE_SEED_DIVERSITY_REPAIR_2026-05-29.md`
 - selected candidate: `margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43`
 - peer candidate: `margin_recovered_phrase_vocab_seed_61_topk_7_temp_082_n48_sample_25`
-- source seed diff: `true`
-- sample index diff: `true`
-- shared sample seed: `true`
+- qualified candidate count: `2`
+- qualified source seed count: `2`
+- qualified sample seed count: `1`
 - sample seed: `85`
-- note sequence match: `true`
-- metric fingerprint match: `true`
-- boundary: `shared_sample_seed_duplicate_output`
-- claim boundary: `two_source_qualified_but_not_two_distinct_outputs`
+- distinct peer candidate count: `0`
+- boundary: `single_distinct_sample_seed_keep_support`
+- action: `demote_duplicate_peer_from_distinct_output_support`
+- claim boundary: `single_distinct_sample_seed_keep_support_until_new_sampling`
 - timing: `acceptable`
 - chord fit: `strong`
 - phrase continuation: `acceptable`
@@ -1115,15 +1120,15 @@ Stage B margin-recovered phrase/vocabulary duplicate-candidate source divergence
 
 판단:
 
-- selected/peer가 다른 source run에서 나왔지만 sample seed `85`를 공유해 실제 note sequence와 metric fingerprint가 동일하다.
-- 현재 result는 two-source qualified evidence이지 two-distinct-output diversity evidence가 아니다.
+- qualified source seed는 2개지만 qualified sample seed는 1개뿐이다.
+- 현재 result는 single distinct sample-seed keep support이며, duplicate peer는 distinct-output support에서 제외한다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary sample-seed diversity repair`로 잡는다.
-- sample seed duplicate를 diversity warning 또는 exclusion 조건으로 분리한다.
-- broad training은 sample-seed/output diversity boundary를 먼저 본 뒤 결정한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary distinct sample-seed repair sweep`으로 잡는다.
+- sample seed가 다른 qualified 후보를 찾거나, 없으면 현재 sampling 설정의 output diversity 한계를 기록한다.
+- broad training은 distinct sample-seed output boundary를 먼저 본 뒤 결정한다.
 
 ## 10. 한 문장 요약
 
