@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #324, Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio comparison boundary
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio review fill`
+- latest functional result: Issue #326, Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio review input guard
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill audio review package`
 
 현재 범위가 아닌 것:
 
@@ -66,6 +66,37 @@ Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
 
+## Current Duration Coverage Fill Human/Audio Review Input Guard Result
+
+Issue #326은 duration/coverage fill human/audio review fill에서 review input 없이 preference가 채워지는 것을 막는 작업이다.
+
+변경:
+
+- human/audio review fill guard script 추가
+- review input absent 상태의 pending 유지 검증
+- review input present 상태의 reviewer/audio_render/preference schema 검증
+- invalid review input rejection test 추가
+
+결과:
+
+- candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6`
+- review input present: `false`
+- fill status: `pending_review_input`
+- human/audio status: `pending`
+- preference: `pending`
+- preference claimed: `false`
+- audio render used: `false`
+
+판단:
+
+- review input absent 상태에서 preference claim 차단
+- pending status 유지
+- human/audio preference와 audio rendered quality는 아직 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill audio review package`
+
 ## Current Duration Coverage Fill Human/Audio Boundary Result
 
 Issue #324는 duration/coverage fill keep 후보의 human/audio review boundary를 정의한 작업이다.
@@ -97,9 +128,9 @@ Issue #324는 duration/coverage fill keep 후보의 human/audio review boundary�
 - audio render quality와 human/audio preference는 아직 미검증
 - broad trained-model quality와 Brad style adaptation은 아직 미검증
 
-다음:
+후속:
 
-- `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio review fill`
+- Issue #326 `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio review input guard` 완료
 
 ## Current Duration Coverage Fill Keep Consolidation Result
 
