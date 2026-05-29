@@ -86,6 +86,8 @@ Modes:
                 Fill the qualified phrase/vocabulary peer focused listening review notes.
   stage-b-margin-recovered-phrase-vocabulary-two-candidate-keep
                 Consolidate selected and peer phrase/vocabulary keep candidates.
+  stage-b-margin-recovered-phrase-vocabulary-human-listening-comparison
+                Build pending human-listening comparison boundary for selected and peer keep candidates.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -232,6 +234,7 @@ run_quick() {
     scripts/fill_stage_b_margin_recovered_phrase_vocabulary_focused_listening_notes.py \
     scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_keep_stability.py \
     scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep.py \
+    scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -972,6 +975,38 @@ run_stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep() {
     --min_qualified_sources 2 \
     --max_qualified_rate 0.05 \
     --require_not_human_audio_review
+}
+
+run_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison() {
+  local two_candidate_run_id="${TWO_CANDIDATE_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep}"
+  local selected_fill_run_id="${SELECTED_FILL_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_focused_listening_fill}"
+  local peer_fill_run_id="${PEER_FILL_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_peer_focused_listening_fill}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison}"
+  local two_candidate_keep="outputs/stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep/${two_candidate_run_id}/two_candidate_keep_summary.json"
+  local selected_filled_notes="outputs/stage_b_margin_recovered_phrase_vocabulary_focused_listening_fill/${selected_fill_run_id}/focused_listening_review_notes_filled.json"
+  local peer_filled_notes="outputs/stage_b_margin_recovered_phrase_vocabulary_focused_listening_fill/${peer_fill_run_id}/focused_listening_review_notes_filled.json"
+  if [[ ! -f "$two_candidate_keep" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary two-candidate keep"
+    RUN_ID="$two_candidate_run_id" run_stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep
+  fi
+  if [[ ! -f "$selected_filled_notes" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary focused listening fill"
+    RUN_ID="$selected_fill_run_id" run_stage_b_margin_recovered_phrase_vocabulary_focused_listening_fill
+  fi
+  if [[ ! -f "$peer_filled_notes" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary peer focused listening fill"
+    RUN_ID="$peer_fill_run_id" run_stage_b_margin_recovered_phrase_vocabulary_peer_focused_listening_fill
+  fi
+  print_header "Stage B margin-recovered phrase/vocabulary human listening comparison boundary"
+  "$PYTHON_BIN" scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
+    --run_id "$run_id" \
+    --two_candidate_keep "$two_candidate_keep" \
+    --selected_filled_notes "$selected_filled_notes" \
+    --peer_filled_notes "$peer_filled_notes" \
+    --min_candidates 2 \
+    --require_pending \
+    --require_no_preference \
+    --expect_note_sequence_match
 }
 
 run_stage_b_constrained_probe() {
@@ -2174,6 +2209,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-two-candidate-keep)
     run_stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-human-listening-comparison)
+    run_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

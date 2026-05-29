@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #290, Stage B margin-recovered phrase/vocabulary two-candidate keep consolidation
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary human listening comparison boundary`
+- latest functional result: Issue #292, Stage B margin-recovered phrase/vocabulary human listening comparison boundary
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duplicate-candidate source divergence audit`
 
 현재 범위가 아닌 것:
 
@@ -1526,6 +1526,51 @@ Issue #290은 selected keep 후보와 qualified peer keep 후보를 하나의 ev
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_TWO_CANDIDATE_KEEP_CONSOLIDATION_2026-05-29.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Human Listening Comparison Boundary Result
+
+Issue #292는 selected keep 후보와 peer keep 후보를 human/audio review 대상으로 넘기기 전에, 비교 가능한 후보인지 확인하고 사람 평가 필드를 `pending`으로 분리한 작업이다.
+
+변경:
+
+- human listening comparison boundary script 추가
+- selected/peer filled notes와 two-candidate keep summary를 조인하는 harness mode 추가
+- selected/peer 후보의 MIDI 경로, context MIDI 경로, pending human listening fields 기록
+- note signature와 metric fingerprint 동일 여부를 objective comparison으로 기록
+- README와 handoff docs 업데이트
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-human-listening-comparison`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate count | `2` |
+| human listening status | `pending` |
+| preference claimed | `false` |
+| note sequence match | `true` |
+| metric fingerprint match | `true` |
+| complete note signature | `true` |
+| selected note count | `13` |
+| peer note count | `13` |
+| selected candidate | `margin_recovered_phrase_vocab_seed_43_topk_7_temp_082_n48_sample_43` |
+| peer candidate | `margin_recovered_phrase_vocab_seed_61_topk_7_temp_082_n48_sample_25` |
+| boundary | `pending_human_review_same_midi_content` |
+| listenability | `not_meaningful_as_ab_if_same_render` |
+
+해석:
+
+- selected 후보와 peer 후보는 source run과 sample index는 다르지만 note signature와 metric fingerprint가 동일하다.
+- human listening field는 모두 `pending`이며 선호 판단은 기록하지 않았다.
+- 동일 MIDI content를 같은 악기/템포/context로 렌더한다면 A/B 청감 비교는 의미가 약하다.
+- 다음은 source diversity가 output diversity로 이어지지 않은 원인을 audit하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_HUMAN_LISTENING_COMPARISON_BOUNDARY_2026-05-29.md`
 
 ## Latest README Footer Section Removal Result
 
