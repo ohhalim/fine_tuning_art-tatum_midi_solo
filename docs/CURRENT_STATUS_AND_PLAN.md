@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #361, Stage B duration coverage fill outside-soloing repair decision
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair sweep`
+- latest functional result: Issue #363, Stage B duration coverage fill outside-soloing repair sweep
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair audio review package`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,47 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Outside-Soloing Repair Sweep Result
+
+Issue #363은 repeatability source 후보 `2`개에 pitch-role / chord-fit 보정 sweep을 적용한 작업이다.
+
+변경:
+
+- outside-soloing repair sweep script 추가
+- chord tone / guide tone 중심 pitch 보정 variant 생성
+- dead-air gain, monophonic, chord-tone ratio, non-chord run, max interval gate 분리
+- 전용 harness와 unit test 추가
+
+결과:
+
+- boundary: `outside_soloing_pitch_role_repair_candidates`
+- source candidates: `2`
+- repaired source candidates: `2`
+- dead-air preserved source candidates: `2`
+- total variants: `6`
+- qualified variants: `6`
+- selected policy: `contour_resolution`
+- selected min chord-tone ratio: `1.000`
+- selected max non-chord run: `0`
+- selected max interval: `7`
+- broad model quality claimed: `false`
+
+source별 selected 결과:
+
+- sample seed `155`: dead-air `0.3333`, unique pitch `10`, max interval `7`, chord-tone ratio `1.000`
+- sample seed `131`: dead-air `0.3529`, unique pitch `9`, max interval `5`, chord-tone ratio `1.000`
+
+판단:
+
+- 사용자 청취에서 지적된 outside-soloing 문제를 pitch-role objective boundary로 1차 보정
+- 기존 dead-air gain과 monophonic gate 유지
+- 이 결과는 MIDI objective repair 후보이며 청취 선호 proof가 아님
+- human/audio preference, multi-reviewer preference, broad trained-model quality claim 금지
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair audio review package`
 
 ## Current Duration Coverage Fill Outside-Soloing Repair Decision Result
 

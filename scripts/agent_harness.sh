@@ -140,6 +140,8 @@ Modes:
                 Fill user listening review for repeatability source WAV files.
   stage-b-duration-coverage-outside-soloing-repair-decision
                 Decide next repair boundary after outside-soloing user review.
+  stage-b-duration-coverage-outside-soloing-repair-sweep
+                Build pitch-role repair candidates for outside-soloing repeatability sources.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -286,6 +288,7 @@ run_quick() {
     scripts/fill_stage_b_margin_recovered_phrase_vocabulary_focused_listening_notes.py \
     scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_keep_stability.py \
     scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep.py \
+    scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_sweep.py \
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
     scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
     scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
@@ -1997,6 +2000,29 @@ run_stage_b_duration_coverage_outside_soloing_repair_decision() {
     --require_no_broad_quality_claim
 }
 
+run_stage_b_duration_coverage_outside_soloing_repair_sweep() {
+  local outside_decision_run_id="${OUTSIDE_DECISION_RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_decision}"
+  local dead_air_repair_run_id="${DEAD_AIR_REPAIR_RUN_ID:-harness_stage_b_duration_coverage_fill_dead_air_gain_repeatability_repair}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_sweep}"
+  local outside_decision="outputs/stage_b_duration_coverage_fill_outside_soloing_repair_decision/${outside_decision_run_id}/stage_b_duration_coverage_fill_outside_soloing_repair_decision.json"
+  local dead_air_repair="outputs/stage_b_duration_coverage_fill_dead_air_gain_repeatability_repair/${dead_air_repair_run_id}/stage_b_duration_coverage_fill_dead_air_gain_repeatability_repair.json"
+  if [[ ! -f "$outside_decision" ]]; then
+    print_header "Stage B duration/coverage fill outside-soloing repair decision"
+    RUN_ID="$outside_decision_run_id" run_stage_b_duration_coverage_outside_soloing_repair_decision
+  fi
+  if [[ ! -f "$dead_air_repair" ]]; then
+    print_header "Stage B duration/coverage fill dead-air gain repeatability repair"
+    RUN_ID="$dead_air_repair_run_id" run_stage_b_duration_coverage_dead_air_gain_repeatability_repair
+  fi
+  print_header "Stage B duration/coverage fill outside-soloing repair sweep"
+  "$PYTHON_BIN" scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_sweep.py \
+    --run_id "$run_id" \
+    --outside_soloing_decision "$outside_decision" \
+    --dead_air_gain_repair "$dead_air_repair" \
+    --expected_boundary outside_soloing_pitch_role_repair_candidates \
+    --require_no_broad_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3302,6 +3328,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-outside-soloing-repair-decision)
     run_stage_b_duration_coverage_outside_soloing_repair_decision
+    ;;
+  stage-b-duration-coverage-outside-soloing-repair-sweep)
+    run_stage_b_duration_coverage_outside_soloing_repair_sweep
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
