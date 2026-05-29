@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #379, Stage B model-core evidence README refresh.
+- Latest functional issue completed: Issue #381, Stage B model-core portfolio bullet draft.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B model-core portfolio bullet draft.
+- Recommended next issue: Application-specific resume insertion or cover-letter wording.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
