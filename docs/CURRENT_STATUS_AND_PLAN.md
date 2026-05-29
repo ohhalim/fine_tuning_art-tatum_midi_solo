@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #326, Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio review input guard
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill audio review package`
+- latest functional result: Issue #328, Stage B margin-recovered phrase/vocabulary duration coverage fill audio review package
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill external review input fill`
 
 현재 범위가 아닌 것:
 
@@ -66,6 +66,42 @@ Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
 
+## Current Duration Coverage Fill Audio Review Package Result
+
+Issue #328은 duration/coverage fill 후보의 외부 review input 전 package를 만든 작업이다.
+
+변경:
+
+- source/fill MIDI path manifest 생성
+- selected fill context MIDI path 포함
+- required file existence and checksum validation
+- review input template export
+- preference claim remains false
+
+결과:
+
+- review item count: `2`
+- package status: `ready_for_external_review_input`
+- audio render status: `not_rendered_by_harness`
+- preference claimed: `false`
+- required file count: `3`
+- source MIDI exists: `true`
+- selected MIDI exists: `true`
+- selected context MIDI exists: `true`
+- source MIDI sha256 prefix: `8429ccb789ba`
+- selected MIDI sha256 prefix: `b517b822a919`
+
+판단:
+
+- external review input 전 package 준비 완료
+- harness audio render 미수행
+- preference claim 없음
+- human/audio preference와 audio rendered quality는 아직 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill external review input fill`
+
 ## Current Duration Coverage Fill Human/Audio Review Input Guard Result
 
 Issue #326은 duration/coverage fill human/audio review fill에서 review input 없이 preference가 채워지는 것을 막는 작업이다.
@@ -93,9 +129,9 @@ Issue #326은 duration/coverage fill human/audio review fill에서 review input 
 - pending status 유지
 - human/audio preference와 audio rendered quality는 아직 미검증
 
-다음:
+후속:
 
-- `Stage B margin-recovered phrase/vocabulary duration coverage fill audio review package`
+- Issue #328 `Stage B margin-recovered phrase/vocabulary duration coverage fill audio review package` 완료
 
 ## Current Duration Coverage Fill Human/Audio Boundary Result
 
