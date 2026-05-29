@@ -1693,6 +1693,31 @@ run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_external_h
     --require_pending_external_review
 }
 
+run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_local_audio_render_package() {
+  local external_boundary_run_id="${EXTERNAL_BOUNDARY_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_external_human_audio_boundary}"
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_audio_review_package}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_local_audio_render_package}"
+  local candidate_id="margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6"
+  local external_boundary="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_external_human_audio_boundary/${external_boundary_run_id}/duration_coverage_fill_external_human_audio_boundary.json"
+  local audio_review_package="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_audio_review_package/${audio_package_run_id}/duration_coverage_fill_audio_review_package.json"
+  if [[ ! -f "$external_boundary" ]]; then
+    print_header "Stage B duration/coverage fill external human/audio boundary"
+    RUN_ID="$external_boundary_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_external_human_audio_boundary
+  fi
+  if [[ ! -f "$audio_review_package" ]]; then
+    print_header "Stage B duration/coverage fill audio review package"
+    RUN_ID="$audio_package_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_audio_review_package
+  fi
+  print_header "Stage B duration/coverage fill local audio render package"
+  "$PYTHON_BIN" scripts/build_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_local_audio_render_package.py \
+    --run_id "$run_id" \
+    --external_human_audio_boundary "$external_boundary" \
+    --audio_review_package "$audio_review_package" \
+    --expected_candidate_id "$candidate_id" \
+    --require_required_midi_exists \
+    --require_no_audio_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -2959,6 +2984,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-external-human-audio-boundary)
     run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_external_human_audio_boundary
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-local-audio-render-package)
+    run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_local_audio_render_package
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
