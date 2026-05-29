@@ -110,6 +110,8 @@ Modes:
                 Run coverage-aware constrained decoding for adjacent-repeat repair.
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-repair
                 Build duration/coverage fill repair variants for the constrained partial candidate.
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-focused-context
+                Package and review the duration/coverage fill candidate in context.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1459,6 +1461,31 @@ run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair() {
     --expected_fill_addition_count 6
 }
 
+run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_context() {
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair}"
+  local package_run_id="${PACKAGE_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_package}"
+  local decision_run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_context_decision}"
+  local candidate_id="margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6"
+  local repair_summary="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair/${repair_run_id}/duration_coverage_fill_repair_summary.json"
+  if [[ ! -f "$repair_summary" ]]; then
+    print_header "Stage B duration/coverage fill repair"
+    RUN_ID="$repair_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair
+  fi
+  print_header "Stage B duration/coverage fill focused package"
+  "$PYTHON_BIN" scripts/build_stage_b_margin_recovered_phrase_vocabulary_focused_package.py \
+    --run_id "$package_run_id" \
+    --repair_summary "$repair_summary" \
+    --decision phrase_vocabulary_duration_coverage_fill_qualified \
+    --expected_candidate_id "$candidate_id"
+
+  print_header "Stage B duration/coverage fill focused context decision"
+  "$PYTHON_BIN" scripts/review_stage_b_margin_recovered_focused_context.py \
+    --run_id "$decision_run_id" \
+    --focused_package "outputs/stage_b_margin_recovered_phrase_vocabulary_focused_package/${package_run_id}/focused_review_package.json" \
+    --expected_candidate_id "$candidate_id" \
+    --expected_decision keep_for_focused_listening
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -2695,6 +2722,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-repair)
     run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_repair
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-focused-context)
+    run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_context
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

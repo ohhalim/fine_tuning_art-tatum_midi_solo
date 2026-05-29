@@ -90,6 +90,46 @@ def repair_summary(root: Path) -> dict:
     }
 
 
+def duration_fill_summary(root: Path) -> dict:
+    sample_path = root / "duration" / "midi" / "duration_fill.mid"
+    write_midi(sample_path)
+    source_report_path = root / "duration" / "source_report.json"
+    write_report(source_report_path)
+    selected = {
+        "candidate_id": "duration_fill_candidate",
+        "midi_path": str(sample_path),
+        "metrics": {
+            "note_count": 18,
+            "unique_pitch_count": 15,
+            "dead_air_ratio": 0.29411764705882354,
+        },
+        "focused_solo_metrics": {
+            "focused_note_count": 18,
+            "focused_unique_pitch_count": 15,
+            "focused_adjacent_pitch_repeats": 0,
+            "focused_max_interval": 7,
+            "focused_duplicated_3_note_pitch_class_chunks": 0,
+        },
+        "duration_coverage_gate": {
+            "qualified": True,
+            "flags": [],
+        },
+    }
+    return {
+        "output_dir": str(root / "duration"),
+        "source_candidate": {
+            "source_report_path": str(source_report_path),
+        },
+        "repair_summary": {
+            "selected_candidate_id": "duration_fill_candidate",
+            "dead_air_delta_from_baseline": 0.277311,
+            "selected_fill_addition_count": 6,
+        },
+        "selected_candidate": selected,
+        "variants": [selected],
+    }
+
+
 class StageBMarginRecoveredPhraseVocabularyFocusedPackageTest(unittest.TestCase):
     def test_builds_focused_package_from_selected_repair_candidate(self) -> None:
         with TemporaryDirectory() as temp_dir:
@@ -133,6 +173,31 @@ class StageBMarginRecoveredPhraseVocabularyFocusedPackageTest(unittest.TestCase)
             candidate = package["candidates"][0]
             self.assertTrue(Path(candidate["review_files"]["midi_path"]).exists())
             self.assertTrue(Path(candidate["review_files"]["context_midi_path"]).exists())
+
+    def test_builds_focused_package_from_duration_coverage_fill_candidate(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            package = build_phrase_vocabulary_focused_package(
+                duration_fill_summary(root),
+                output_dir=root / "package",
+                decision="phrase_vocabulary_duration_coverage_fill_qualified",
+            )
+            summary = validate_package(
+                package,
+                expected_candidate_id="duration_fill_candidate",
+                min_candidates=1,
+            )
+
+            self.assertEqual(summary["candidate_count"], 1)
+            candidate = package["candidates"][0]
+            self.assertTrue(Path(candidate["review_files"]["midi_path"]).exists())
+            self.assertTrue(Path(candidate["review_files"]["context_midi_path"]).exists())
+            self.assertEqual(
+                candidate["listening"]["decision"],
+                "phrase_vocabulary_duration_coverage_fill_qualified",
+            )
+            self.assertEqual(candidate["source_metrics"]["fill_addition_count"], 6)
+            self.assertTrue(candidate["objective_review"]["qualified"])
 
 
 if __name__ == "__main__":

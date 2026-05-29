@@ -34,6 +34,14 @@ def read_json(path: Path) -> dict[str, Any]:
 
 def candidate_report_path(candidate: dict[str, Any]) -> Path:
     files = candidate.get("review_files") if isinstance(candidate.get("review_files"), dict) else {}
+    report_path_text = str(files.get("report_path") or "").strip()
+    if report_path_text:
+        report_path = Path(report_path_text)
+        if not report_path.exists():
+            raise MarginRecoveredFocusedPackageError(
+                f"{candidate.get('candidate_id')}.review_files.report_path does not exist: {report_path}"
+            )
+        return report_path
     midi_path_text = str(files.get("midi_path") or "").strip()
     if not midi_path_text:
         raise MarginRecoveredFocusedPackageError(f"{candidate.get('candidate_id')}.review_files.midi_path is required")
