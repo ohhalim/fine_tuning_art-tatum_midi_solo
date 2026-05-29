@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #308, Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair sweep
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary distinct sample-seed dead-air adjacent-repeat targeted repair`
+- latest functional result: Issue #310, Stage B margin-recovered phrase/vocabulary distinct sample-seed dead-air adjacent-repeat targeted repair
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary coverage-aware adjacent-repeat constrained repair`
 
 현재 범위가 아닌 것:
 
@@ -1950,6 +1950,54 @@ Issue #308은 Issue #306 repair target을 기준으로 checkpoint 기반 추가 
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REMAINING_BLOCKER_REPAIR_SWEEP_2026-05-29.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Distinct Sample-Seed Dead-Air Adjacent Repair Result
+
+Issue #310은 Issue #308 partial candidate에서 남은 dead-air와 adjacent repeat blocker를 낮추기 위한 추가 targeted sampling sweep이다.
+
+변경:
+
+- distinct sample-seed dead-air/adjacent repair harness 추가
+- seed `269`, `311`, top_k `7`, temperature `0.80/0.78`, 각 48 samples 조건으로 checkpoint reuse generation 실행
+- Issue #306 target threshold로 repair summary 재평가
+- README와 handoff docs 업데이트
+
+검증:
+
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-dead-air-adjacent-repair`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| report count | `2` |
+| candidate count | `96` |
+| target-qualified candidate count | `0` |
+| selected partial candidate | `margin_recovered_phrase_vocab_seed_311_topk_7_temp_078_n48_sample_31` |
+| selected source seed | `311` |
+| selected sample index | `31` |
+| selected sample seed | `341` |
+| selected focused note count | `15` |
+| selected focused unique pitch count | `7` |
+| selected dead-air ratio | `0.3889` |
+| selected onset coverage | `0.59375` |
+| selected sustained coverage | `0.71875` |
+| selected adjacent pitch repeats | `1` |
+| selected focused max interval | `7` |
+| qualified | `false` |
+| remaining flags | `dead_air_not_repaired`, `adjacent_repetition_not_repaired` |
+
+해석:
+
+- lower temperature/top_k 조합에서도 target-qualified 후보는 없다.
+- best partial candidate는 note count `15`, unique pitch `7`, max interval `7`로 일부 guardrail은 회복했다.
+- dead-air `0.3889`가 target `<= 0.376`보다 높고, adjacent repeat `1`이 남아 있다.
+- 같은 checkpoint sampling 조정만으로는 dead-air와 adjacent repeat를 동시에 제거하기 어렵다.
+- 다음 경계는 sampling 반복이 아니라 decoding/postprocess 또는 grammar constraint에서 adjacent repeat와 coverage를 직접 제어하는 방향이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_DEAD_AIR_ADJACENT_REPAIR_2026-05-29.md`
 
 ## Latest README Footer Section Removal Result
 

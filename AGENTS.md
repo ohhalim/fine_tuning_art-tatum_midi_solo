@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #308, Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair sweep.
+- Latest functional issue completed: Issue #310, Stage B margin-recovered phrase/vocabulary distinct sample-seed dead-air adjacent-repeat targeted repair.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary distinct sample-seed dead-air adjacent-repeat targeted repair.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary coverage-aware adjacent-repeat constrained repair.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -594,6 +594,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-distinc
 ```
 
 This harness runs an additional checkpoint-based sampling sweep against the remaining blocker target and records whether a target-qualified candidate exists.
+
+For Stage B margin-recovered phrase/vocabulary distinct sample-seed dead-air adjacent repair changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-dead-air-adjacent-repair
+```
+
+This harness runs a lower-temperature checkpoint-based sampling sweep against the dead-air and adjacent-repeat target.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
