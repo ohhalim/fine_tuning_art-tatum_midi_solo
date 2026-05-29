@@ -95,6 +95,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary sample-seed diversity repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_SAMPLE_SEED_DIVERSITY_REPAIR_2026-05-29.md`
 - margin-recovered phrase/vocabulary distinct sample-seed repair sweep 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REPAIR_SWEEP_2026-05-29.md`
 - margin-recovered phrase/vocabulary distinct sample-seed focused context 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_CONTEXT_2026-05-29.md`
+- margin-recovered phrase/vocabulary distinct sample-seed focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_LISTENING_NOTES_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -549,6 +550,8 @@ Stage B에서 명시하는 것:
 - Issue #298 result: qualified `2/96`, distinct sample-seed qualified `2`, selected sample seed `155`, boundary `distinct_sample_seed_qualified_candidate_found`.
 - Issue #300 packages the selected distinct sample-seed candidate into focused solo/context artifacts and runs context decision.
 - Issue #300 result: decision `keep_for_focused_listening`, flags `{}`, final `D5` over `Fm7` tension, max active `1`.
+- Issue #302 writes focused listening notes for the distinct sample-seed context keep candidate.
+- Issue #302 result: candidate `1`, pending `1`, review risks `dead_air_ratio_remaining` and `adjacent_pitch_repeats`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -567,8 +570,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #300은 duplicate seed `85`와 겹치지 않는 후보를 focused context package로 격리하고 context decision을 통과시켰다.
-다음 작업은 distinct sample-seed 후보를 focused listening notes/fill 경로로 넘겨 timing, phrase, vocabulary 판단을 기록하는 것이다.
+Issue #302는 duplicate seed `85`와 겹치지 않는 context keep 후보를 focused listening notes template으로 넘겼다.
+다음 작업은 notes를 MIDI/context evidence로 채워 timing, phrase, vocabulary 판단을 기록하는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -1094,7 +1097,7 @@ Issue #300은 duplicate seed `85`와 겹치지 않는 후보를 focused context 
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary distinct sample-seed focused context review
+Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listening notes
 ```
 
 결과:
@@ -1103,31 +1106,35 @@ Stage B margin-recovered phrase/vocabulary distinct sample-seed focused context 
 - selected source seed: `109`
 - selected sample index: `47`
 - selected sample seed: `155`
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_CONTEXT_2026-05-29.md`
-- focused context decision: `keep_for_focused_listening`
-- decision flags: `{}`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_LISTENING_NOTES_2026-05-29.md`
+- candidate count: `1`
+- reviewed count: `0`
+- pending count: `1`
+- prior decision: `keep_for_focused_listening`
+- listening decision: `pending`
 - note count: `13`
 - unique pitch count: `6`
 - range: `A#4-D#5`
 - phrase span: `6.750` beats
-- max active notes: `1`
 - dead-air ratio: `0.375`
 - onset coverage: `0.5625`
 - sustained coverage: `0.78125`
 - adjacent repeats: `1`
 - max interval: `3`
 - final landing: `D5` over `Fm7`, tension
+- review risks: `dead_air_ratio_remaining`, `adjacent_pitch_repeats`
 
 판단:
 
-- distinct sample-seed 후보의 focused context blocker는 발견되지 않았다.
-- focused unique pitch `6`은 gate 하한이고 adjacent repeat `1`이 남아 있어 listening fill 전 최종 keep으로 보지 않는다.
+- distinct sample-seed context keep 후보를 listening notes template으로 넘겼다.
+- 실제 청감 판단 필드는 모두 `pending`이다.
+- focused unique pitch `6`, dead-air `0.375`, adjacent repeat `1`은 fill 단계 risk로 유지한다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listening notes`로 잡는다.
-- distinct sample-seed focused context keep 후보를 focused listening notes/fill로 넘겨 timing, phrase, vocabulary 판단을 기록한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listening fill`로 잡는다.
+- distinct sample-seed notes를 MIDI/context evidence로 채워 timing, phrase, vocabulary 판단을 기록한다.
 - broad training은 focused context/listening boundary를 먼저 본 뒤 결정한다.
 
 ## 10. 한 문장 요약
