@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #371, Stage B duration coverage fill outside-soloing repair next decision
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair broader repeatability sweep`
+- latest functional result: Issue #373, Stage B duration coverage fill outside-soloing repair broader repeatability sweep
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair repeatability consolidation`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,47 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Outside-Soloing Repair Broader Repeatability Sweep Result
+
+Issue #373은 outside-soloing repair policy variant 전체를 source별로 집계해 objective repeatability를 확인한 작업이다.
+
+변경:
+
+- outside-soloing repair broader repeatability sweep script 추가
+- `chord_tone_snap`, `guide_tone_landing`, `contour_resolution` policy별 source repeatability 집계
+- dead-air preservation, chord-tone ratio, non-chord run, interval gate 반복성 측정
+- human/audio preference claim false 유지
+
+결과:
+
+- boundary: `outside_soloing_repair_policy_repeatability_support`
+- source candidates: `2`
+- repair policies: `3`
+- supported repair policies: `3`
+- total variants: `6`
+- qualified variants: `6`
+- selected min chord-tone ratio: `1.000`
+- selected max non-chord run: `0`
+- selected max interval: `7`
+- human/audio preference claimed: `false`
+- broad model quality claimed: `false`
+
+policy별 결과:
+
+- `chord_tone_snap`: source `2`, qualified `2/2`, chord-tone min `1.000`, non-chord max `0`, interval max `7`
+- `guide_tone_landing`: source `2`, qualified `2/2`, chord-tone min `1.000`, non-chord max `0`, interval max `7`
+- `contour_resolution`: source `2`, qualified `2/2`, chord-tone min `1.000`, non-chord max `0`, interval max `7`
+
+판단:
+
+- outside-soloing repair policy `3/3`에서 source `2/2` objective repeatability support
+- 청취 선호는 아직 미검증
+- 다음 단계는 repeatability consolidation
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair repeatability consolidation`
 
 ## Current Duration Coverage Fill Outside-Soloing Repair Next Decision Result
 
