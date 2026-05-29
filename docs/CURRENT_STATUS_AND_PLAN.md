@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #296, Stage B margin-recovered phrase/vocabulary sample-seed diversity repair
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary distinct sample-seed repair sweep`
+- latest functional result: Issue #298, Stage B margin-recovered phrase/vocabulary distinct sample-seed repair sweep
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary distinct sample-seed focused context review`
 
 현재 범위가 아닌 것:
 
@@ -1658,6 +1658,54 @@ Issue #296은 duplicate sample-seed 후보를 distinct output support로 세지 
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_SAMPLE_SEED_DIVERSITY_REPAIR_2026-05-29.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Distinct Sample-Seed Repair Sweep Result
+
+Issue #298은 duplicate sample seed `85`와 겹치지 않는 seed range에서 phrase/vocabulary repair sweep을 다시 실행한 작업이다.
+
+변경:
+
+- distinct sample-seed sweep summary script 추가
+- 기존 checkpoint 기반 generation harness 추가
+- seed `109`, `157`, top_k `7`, temperature `0.82`, 각 48 samples 조건으로 sweep 실행
+- blocked sample seed `85`를 제외한 qualified 후보 집계
+- README와 handoff docs 업데이트
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-sweep`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate count | `96` |
+| qualified candidate count | `2` |
+| blocked sample seeds | `85` |
+| distinct sample-seed qualified count | `2` |
+| qualified sample seed counts | `131: 1`, `155: 1` |
+| selected candidate | `margin_recovered_phrase_vocab_seed_109_topk_7_temp_082_n48_sample_47` |
+| selected source seed | `109` |
+| selected sample index | `47` |
+| selected sample seed | `155` |
+| selected focused note count | `13` |
+| selected focused unique pitch count | `6` |
+| selected dead-air ratio | `0.375` |
+| selected adjacent repeats | `1` |
+| selected focused max interval | `3` |
+| boundary | `distinct_sample_seed_qualified_candidate_found` |
+
+해석:
+
+- duplicate sample seed `85` 없이도 qualified 후보 `2`개가 나왔다.
+- selected distinct candidate는 sample seed `155`이며, focused max interval `3`으로 기존 wide interval risk는 낮다.
+- focused unique pitch는 `6`으로 gate 하한이고, dead-air ratio는 `0.375`로 gate 근처다.
+- 아직 focused context decision, focused listening fill, human/audio proof는 진행하지 않았다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REPAIR_SWEEP_2026-05-29.md`
 
 ## Latest README Footer Section Removal Result
 
