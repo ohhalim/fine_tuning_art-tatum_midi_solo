@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #337, Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render package
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render tooling setup`
+- latest functional result: Issue #339, Stage B local audio render tooling setup
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill renderer path decision`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,38 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Local Audio Render Tooling Setup Result
+
+Issue #339는 local audio render attempt 전 renderer/soundfont readiness를 점검한 작업이다.
+
+변경:
+
+- local audio render tooling readiness script 추가
+- renderer/soundfont probe summary 추가
+- system modification, package install, download, audio render attempt를 모두 `false`로 검증
+
+결과:
+
+- tooling status: current local probe `renderer_unavailable`
+- fluidsynth available: `false`
+- timidity available: `false`
+- soundfont exists: `false`
+- system modified: `false`
+- package install executed: `false`
+- download executed: `false`
+- audio render attempted: `false`
+
+판단:
+
+- renderer/soundfont 준비 전 audio render attempt 금지
+- package manager install 자동 실행 제외
+- audio rendered quality와 human/audio preference는 미검증 유지
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill renderer path decision`
+- renderer/soundfont 준비 후 `Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render attempt`
 
 ## Current Duration Coverage Fill Local Audio Render Package Result
 

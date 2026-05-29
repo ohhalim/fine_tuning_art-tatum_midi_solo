@@ -1718,6 +1718,14 @@ run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_local_audi
     --require_no_audio_claim
 }
 
+run_stage_b_local_audio_render_tooling() {
+  local run_id="${RUN_ID:-harness_stage_b_local_audio_render_tooling}"
+  print_header "Stage B local audio render tooling"
+  "$PYTHON_BIN" scripts/check_stage_b_local_audio_render_tooling.py \
+    --run_id "$run_id" \
+    --require_no_system_modification
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -2987,6 +2995,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-local-audio-render-package)
     run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_local_audio_render_package
+    ;;
+  stage-b-local-audio-render-tooling)
+    run_stage_b_local_audio_render_tooling
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
