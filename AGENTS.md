@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #335, Stage B margin-recovered phrase/vocabulary duration coverage fill external human/audio review boundary.
+- Latest functional issue completed: Issue #337, Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render package.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render tooling setup.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -698,6 +698,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duratio
 ```
 
 This harness records the external review input requirement before any human/audio preference claim.
+
+For Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-local-audio-render-package
+```
+
+This harness packages local audio render readiness without claiming rendered audio quality.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
