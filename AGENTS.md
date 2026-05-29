@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #373, Stage B duration coverage fill outside-soloing repair broader repeatability sweep.
+- Latest functional issue completed: Issue #375, Stage B duration coverage fill outside-soloing repair repeatability consolidation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair repeatability consolidation.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair final decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -850,6 +850,14 @@ bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-b
 ```
 
 This harness aggregates policy-level objective repeatability across selected outside-soloing repair sources.
+
+For Stage B duration coverage fill outside-soloing repair repeatability consolidation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-repeatability-consolidation
+```
+
+This harness consolidates selected-source objective support, policy repeatability support, and the pending review boundary without claiming human/audio preference.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

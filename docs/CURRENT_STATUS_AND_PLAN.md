@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #373, Stage B duration coverage fill outside-soloing repair broader repeatability sweep
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair repeatability consolidation`
+- latest functional result: Issue #375, Stage B duration coverage fill outside-soloing repair repeatability consolidation
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair final decision`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,43 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Outside-Soloing Repair Repeatability Consolidation Result
+
+Issue #375는 outside-soloing repair objective evidence와 policy repeatability를 하나의 objective-only claim boundary로 정리한 작업이다.
+
+변경:
+
+- outside-soloing repair repeatability consolidation script 추가
+- selected-source objective support와 policy repeatability support 조인
+- pending user listening review boundary 보존
+- human/audio preference claim false 유지
+
+결과:
+
+- boundary: `outside_soloing_repair_objective_repeatability_support`
+- objective source candidates: `2`
+- qualified source candidates: `2`
+- dead-air preserved source candidates: `2`
+- chord-tone pass source candidates: `2`
+- non-chord run pass source candidates: `2`
+- interval pass source candidates: `2`
+- supported repair policies: `3`
+- total variants: `6`
+- qualified variants: `6`
+- review input present: `false`
+- human/audio preference claimed: `false`
+- broad model quality claimed: `false`
+
+판단:
+
+- outside-soloing repair는 objective selected-source support와 policy repeatability support를 동시에 만족
+- 청취 선호는 아직 미검증
+- broad trained-model quality는 아직 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair final decision`
 
 ## Current Duration Coverage Fill Outside-Soloing Repair Broader Repeatability Sweep Result
 
