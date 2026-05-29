@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #387, Stage B generic base manifest contract.
+- Latest functional issue completed: Issue #389, Stage B generic split duration-explicit window preparation smoke.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic split duration-explicit window preparation smoke.
+- Recommended next issue: Stage B generic base tiny training smoke.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -882,6 +882,14 @@ bash scripts/agent_harness.sh stage-b-generic-base-manifest-contract
 ```
 
 This harness verifies generic/Brad manifest split counts and leakage guards before Stage B duration-explicit window preparation, without claiming broad trained-model quality or Brad style adaptation.
+
+For Stage B generic split duration-explicit window preparation smoke changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-manifest-window-smoke
+```
+
+This harness prepares a small generic manifest prefix as `stage_b_v1` duration-explicit windows and verifies train/val token records plus vocab fit without running broad training.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

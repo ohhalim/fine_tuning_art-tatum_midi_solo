@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #387, Stage B generic base manifest contract
-- 다음 권장 이슈: `Stage B generic split duration-explicit window preparation smoke`
+- latest functional result: Issue #389, Stage B generic split duration-explicit window preparation smoke
+- 다음 권장 이슈: `Stage B generic base tiny training smoke`
 
 현재 범위가 아닌 것:
 
@@ -141,6 +141,43 @@ Issue #387은 Phase 4 준비용 generic/Brad manifest split 계약을 검증한 
 다음:
 
 - `Stage B generic split duration-explicit window preparation smoke`
+
+## Current Generic Split Window Preparation Smoke Result
+
+Issue #389는 Issue #387 generic manifest contract 결과를 사용해 작은 generic train/val prefix를 `stage_b_v1` duration-explicit window records로 준비한 smoke 작업이다.
+
+변경:
+
+- generic manifest window smoke script 추가
+- generic_jazz_train/val prefix를 smoke manifest로 복사
+- `prepare_role_dataset.py`를 `stage_b_v1`, 2-bar window, 2-bar stride로 실행
+- tokenized train/val record, max token id, vocab fit 검증
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_MANIFEST_WINDOW_SMOKE_2026-05-29.md`
+- selected train files: `6`
+- selected val files: `3`
+- tokenized train files: `556`
+- tokenized val files: `191`
+- max token id: `544`
+- vocab size: `547`
+- fits vocab: `true`
+- stage_b window prepare smoke ready: `true`
+- generic base training execution ready: `false`
+- broad trained-model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+
+판단:
+
+- generic manifest split이 Stage B duration-explicit window preparation 경로와 호환됨
+- 아직 generic-base training run, multi-seed quality, Brad style adaptation은 미실행
+- 다음 작업은 broad training이 아니라 generic base tiny training smoke
+
+다음:
+
+- `Stage B generic base tiny training smoke`
 
 ## Current Muzig Application Resume Wording Result
 
