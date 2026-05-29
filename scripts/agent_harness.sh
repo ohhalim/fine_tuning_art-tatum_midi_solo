@@ -144,6 +144,8 @@ Modes:
                 Build pitch-role repair candidates for outside-soloing repeatability sources.
   stage-b-duration-coverage-outside-soloing-repair-audio-review-package
                 Render outside-soloing repair candidates for user listening review.
+  stage-b-duration-coverage-outside-soloing-repair-user-listening-review
+                Guard outside-soloing repair listening review when user input is absent.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -292,6 +294,7 @@ run_quick() {
     scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep.py \
     scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_sweep.py \
     scripts/render_stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package.py \
+    scripts/fill_stage_b_duration_coverage_outside_soloing_repair_user_listening_review.py \
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
     scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
     scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
@@ -2044,6 +2047,24 @@ run_stage_b_duration_coverage_outside_soloing_repair_audio_review_package() {
     --require_no_quality_claim
 }
 
+run_stage_b_duration_coverage_outside_soloing_repair_user_listening_review() {
+  local audio_review_run_id="${AUDIO_REVIEW_RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_user_listening_review_fill}"
+  local audio_review_package="outputs/stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package/${audio_review_run_id}/stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package.json"
+  if [[ ! -f "$audio_review_package" ]]; then
+    print_header "Stage B duration/coverage fill outside-soloing repair audio review package"
+    RUN_ID="$audio_review_run_id" run_stage_b_duration_coverage_outside_soloing_repair_audio_review_package
+  fi
+  print_header "Stage B duration/coverage fill outside-soloing repair user listening review"
+  "$PYTHON_BIN" scripts/fill_stage_b_duration_coverage_outside_soloing_repair_user_listening_review.py \
+    --run_id "$run_id" \
+    --audio_review_package "$audio_review_package" \
+    --expected_boundary outside_soloing_repair_audio_review_pending \
+    --require_pending_without_input \
+    --require_no_preference_without_input \
+    --require_objective_auto_progress_allowed
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3355,6 +3376,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-outside-soloing-repair-audio-review-package)
     run_stage_b_duration_coverage_outside_soloing_repair_audio_review_package
+    ;;
+  stage-b-duration-coverage-outside-soloing-repair-user-listening-review)
+    run_stage_b_duration_coverage_outside_soloing_repair_user_listening_review
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #365, Stage B duration coverage fill outside-soloing repair audio review package
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair user listening review fill`
+- latest functional result: Issue #367, Stage B duration coverage fill outside-soloing repair user listening review input guard
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair objective evidence consolidation`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,39 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Outside-Soloing Repair User Listening Review Guard Result
+
+Issue #367은 outside-soloing repair WAV 후보 `2`개에 대한 청취 입력 부재 상태를 preference claim 없이 기록한 작업이다.
+
+변경:
+
+- outside-soloing repair user listening review fill script 추가
+- review input absent 상태를 `pending_review_input`으로 기록
+- human/audio preference claim guard 유지
+- objective-only 후속 진행 가능 여부와 human preference claim 필요 조건 분리
+
+결과:
+
+- boundary: `outside_soloing_repair_audio_review_pending`
+- review input present: `false`
+- fill status: `pending_review_input`
+- user listening status: `pending_review_input`
+- overall decision: `pending`
+- human/audio preference claimed: `false`
+- objective auto progress allowed: `true`
+- critical user input required: `false`
+
+판단:
+
+- 청취 선호는 아직 미검증
+- 사용자 청취 입력 없이 human/audio preference claim 금지
+- objective-only evidence consolidation은 계속 진행 가능
+- broad trained-model quality, Brad style adaptation, production-ready improviser claim 금지
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair objective evidence consolidation`
 
 ## Current Duration Coverage Fill Outside-Soloing Repair Audio Review Package Result
 
