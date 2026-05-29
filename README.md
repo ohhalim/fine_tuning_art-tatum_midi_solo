@@ -72,6 +72,7 @@
 | MIDI evidence claim boundary 필요 | MIDI 기반 우세와 human/audio proof를 혼동할 가능성 | MIDI evidence consolidation 추가 | boundary `midi_evidence_preference_support`, human/audio preference claimed `false` |
 | human/audio claim 경계 필요 | MIDI evidence preference가 외부 청감 선호로 오해될 수 있음 | external human/audio boundary 추가 | boundary `external_human_audio_review_required_for_human_preference_claim`, status `pending_external_review_input` |
 | local audio render 준비 상태 불명확 | source/fill MIDI는 준비됐지만 WAV render tooling과 audio quality claim이 분리되지 않음 | local audio render package 추가 | planned outputs `2`, render attempted `false`, audio quality claim `false` |
+| renderer/soundfont 준비 상태 불명확 | local render package는 준비됐지만 renderer가 없는 환경에서 render attempt를 진행할 위험 | tooling readiness check 추가 | `fluidsynth`/`timidity` 미탐지, system modification `false`, render attempted `false` |
 
 ## 파이프라인 구조
 

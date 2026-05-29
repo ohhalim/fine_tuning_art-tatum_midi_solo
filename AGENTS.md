@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #337, Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render package.
+- Latest functional issue completed: Issue #339, Stage B local audio render tooling setup.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render tooling setup.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill renderer path decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -706,6 +706,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duratio
 ```
 
 This harness packages local audio render readiness without claiming rendered audio quality.
+
+For Stage B local audio render tooling setup changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-local-audio-render-tooling
+```
+
+This harness checks renderer/soundfont readiness without installing packages or rendering audio.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
