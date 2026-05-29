@@ -122,6 +122,8 @@ Modes:
                 Build pending human/audio review boundary for source vs duration fill.
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-human-audio-review-input-guard
                 Guard human/audio review fill against missing review input.
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-audio-review-package
+                Build source/fill MIDI review package and input template.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1606,6 +1608,31 @@ run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audi
     --require_no_preference_without_input
 }
 
+run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_audio_review_package() {
+  local boundary_run_id="${BOUNDARY_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audio_boundary}"
+  local guard_run_id="${GUARD_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audio_review_input_guard}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_audio_review_package}"
+  local candidate_id="margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6"
+  local human_audio_boundary="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audio_boundary/${boundary_run_id}/duration_coverage_fill_human_audio_boundary.json"
+  local review_fill_guard="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audio_review_fill/${guard_run_id}/duration_coverage_fill_human_audio_review_fill.json"
+  if [[ ! -f "$human_audio_boundary" ]]; then
+    print_header "Stage B duration/coverage fill human/audio boundary"
+    RUN_ID="$boundary_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audio_boundary
+  fi
+  if [[ ! -f "$review_fill_guard" ]]; then
+    print_header "Stage B duration/coverage fill human/audio review input guard"
+    RUN_ID="$guard_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audio_review_input_guard
+  fi
+  print_header "Stage B duration/coverage fill audio review package"
+  "$PYTHON_BIN" scripts/build_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_audio_review_package.py \
+    --run_id "$run_id" \
+    --human_audio_boundary "$human_audio_boundary" \
+    --review_fill_guard "$review_fill_guard" \
+    --expected_candidate_id "$candidate_id" \
+    --require_files_exist \
+    --require_no_preference
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -2860,6 +2887,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-human-audio-review-input-guard)
     run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_human_audio_review_input_guard
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-audio-review-package)
+    run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_audio_review_package
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

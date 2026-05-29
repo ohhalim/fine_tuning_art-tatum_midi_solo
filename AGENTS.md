@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #326, Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio review input guard.
+- Latest functional issue completed: Issue #328, Stage B margin-recovered phrase/vocabulary duration coverage fill audio review package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill audio review package.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill external review input fill.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -666,6 +666,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duratio
 ```
 
 This harness verifies that human/audio preference remains pending without validated review input.
+
+For Stage B margin-recovered phrase/vocabulary duration coverage fill audio review package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-audio-review-package
+```
+
+This harness builds the source/fill MIDI review package and input template without claiming a preference.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
