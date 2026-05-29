@@ -138,6 +138,8 @@ Modes:
                 Render repeatability source candidates for user listening review.
   stage-b-duration-coverage-repeatability-user-listening-review
                 Fill user listening review for repeatability source WAV files.
+  stage-b-duration-coverage-outside-soloing-repair-decision
+                Decide next repair boundary after outside-soloing user review.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1977,6 +1979,24 @@ run_stage_b_duration_coverage_repeatability_user_listening_review() {
     --require_no_broad_quality_claim
 }
 
+run_stage_b_duration_coverage_outside_soloing_repair_decision() {
+  local user_review_run_id="${USER_REVIEW_RUN_ID:-harness_stage_b_duration_coverage_fill_repeatability_user_listening_review_fill}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_decision}"
+  local user_review="outputs/stage_b_duration_coverage_fill_repeatability_user_listening_review_fill/${user_review_run_id}/stage_b_duration_coverage_fill_repeatability_user_listening_review_fill.json"
+  if [[ ! -f "$user_review" ]]; then
+    print_header "Stage B duration/coverage fill repeatability user listening review"
+    RUN_ID="$user_review_run_id" run_stage_b_duration_coverage_repeatability_user_listening_review
+  fi
+  print_header "Stage B duration/coverage fill outside-soloing repair decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_duration_coverage_outside_soloing_repair.py \
+    --run_id "$run_id" \
+    --user_listening_review "$user_review" \
+    --expected_next_boundary outside_soloing_pitch_role_phrase_clarity_repair \
+    --require_auto_progress_allowed \
+    --require_no_critical_user_input \
+    --require_no_broad_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3279,6 +3299,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-repeatability-user-listening-review)
     run_stage_b_duration_coverage_repeatability_user_listening_review
+    ;;
+  stage-b-duration-coverage-outside-soloing-repair-decision)
+    run_stage_b_duration_coverage_outside_soloing_repair_decision
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
