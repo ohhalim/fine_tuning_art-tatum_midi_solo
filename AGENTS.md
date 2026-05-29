@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #367, Stage B duration coverage fill outside-soloing repair user listening review input guard.
+- Latest functional issue completed: Issue #369, Stage B duration coverage fill outside-soloing repair objective evidence consolidation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair objective evidence consolidation.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair next decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -826,6 +826,14 @@ bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-u
 ```
 
 This harness records missing listening review input as pending while allowing objective-only follow-up without claiming human preference.
+
+For Stage B duration coverage fill outside-soloing repair objective evidence changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-objective-evidence
+```
+
+This harness consolidates repaired candidate objective evidence while keeping human/audio preference claims false.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

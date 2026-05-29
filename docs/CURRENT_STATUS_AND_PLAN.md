@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #367, Stage B duration coverage fill outside-soloing repair user listening review input guard
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair objective evidence consolidation`
+- latest functional result: Issue #369, Stage B duration coverage fill outside-soloing repair objective evidence consolidation
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair next decision`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,48 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Outside-Soloing Repair Objective Evidence Consolidation Result
+
+Issue #369는 outside-soloing repair 후보의 objective evidence를 하나의 claim boundary로 정리한 작업이다.
+
+변경:
+
+- outside-soloing repair objective evidence consolidation script 추가
+- selected repaired 후보 `2`개 objective gate 집계
+- dead-air preservation, chord-tone ratio, non-chord run, max interval 경계 분리
+- human/audio preference claim false 유지
+
+결과:
+
+- boundary: `outside_soloing_repair_objective_evidence_support`
+- source candidates: `2`
+- qualified source candidates: `2`
+- dead-air preserved source candidates: `2`
+- chord-tone pass source candidates: `2`
+- non-chord run pass source candidates: `2`
+- interval pass source candidates: `2`
+- selected min chord-tone ratio: `1.000`
+- selected max non-chord run: `0`
+- selected max interval: `7`
+- human/audio preference claimed: `false`
+- broad model quality claimed: `false`
+
+source별 selected 결과:
+
+- sample seed `155`: dead-air `0.3333`, chord-tone ratio `1.000`, max interval `6 -> 7`
+- sample seed `131`: dead-air `0.3529`, chord-tone ratio `1.000`, max interval `11 -> 5`
+
+판단:
+
+- pitch-role objective evidence는 selected repaired source `2/2`에서 support
+- dead-air gain과 interval gate 유지
+- 청취 선호는 아직 미검증
+- 다음 단계는 objective evidence 기반 next decision
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair next decision`
 
 ## Current Duration Coverage Fill Outside-Soloing Repair User Listening Review Guard Result
 
