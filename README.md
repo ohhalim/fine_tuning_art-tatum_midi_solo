@@ -70,6 +70,7 @@
 | 외부 review 입력 준비 부족 | reviewer가 확인할 source/fill MIDI와 입력 schema가 분리됨 | audio review package 생성 | package status `ready_for_external_review_input`, required files `3`, preference claimed `false` |
 | MIDI evidence 기반 보고 필요 | source/fill MIDI를 사람이 듣기 전에도 구조 차이를 판단해야 함 | MIDI metric and note-structure review 실행 | preference `duration_coverage_fill_keep`, score delta `+79.731`, human/audio preference 미주장 |
 | MIDI evidence claim boundary 필요 | MIDI 기반 우세와 human/audio proof를 혼동할 가능성 | MIDI evidence consolidation 추가 | boundary `midi_evidence_preference_support`, human/audio preference claimed `false` |
+| human/audio claim 경계 필요 | MIDI evidence preference가 외부 청감 선호로 오해될 수 있음 | external human/audio boundary 추가 | boundary `external_human_audio_review_required_for_human_preference_claim`, status `pending_external_review_input` |
 
 ## 파이프라인 구조
 

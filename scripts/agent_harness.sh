@@ -1674,6 +1674,25 @@ run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evide
     --require_no_human_audio_preference
 }
 
+run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_external_human_audio_boundary() {
+  local consolidation_run_id="${CONSOLIDATION_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_consolidation}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_external_human_audio_boundary}"
+  local candidate_id="margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6"
+  local midi_evidence_consolidation="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_consolidation/${consolidation_run_id}/duration_coverage_fill_midi_evidence_consolidation.json"
+  if [[ ! -f "$midi_evidence_consolidation" ]]; then
+    print_header "Stage B duration/coverage fill MIDI evidence consolidation"
+    RUN_ID="$consolidation_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_consolidation
+  fi
+  print_header "Stage B duration/coverage fill external human/audio boundary"
+  "$PYTHON_BIN" scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_external_human_audio_boundary.py \
+    --run_id "$run_id" \
+    --midi_evidence_consolidation "$midi_evidence_consolidation" \
+    --expected_candidate_id "$candidate_id" \
+    --expected_boundary external_human_audio_review_required_for_human_preference_claim \
+    --require_no_human_audio_preference \
+    --require_pending_external_review
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -2937,6 +2956,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-midi-evidence-consolidation)
     run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_consolidation
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-external-human-audio-boundary)
+    run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_external_human_audio_boundary
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
