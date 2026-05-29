@@ -68,6 +68,7 @@
 | human/audio preference 과장 위험 | source vs fill MIDI가 달라도 청감 선호 입력은 없음 | human/audio boundary 생성 및 pending field 유지 | note sequence match `false`, preference claimed `false` |
 | review input 없는 preference 기록 위험 | human/audio review fill에서 입력 없이 결론 작성 가능 | review input guard 추가 | fill status `pending_review_input`, preference `pending`, preference claimed `false` |
 | 외부 review 입력 준비 부족 | reviewer가 확인할 source/fill MIDI와 입력 schema가 분리됨 | audio review package 생성 | package status `ready_for_external_review_input`, required files `3`, preference claimed `false` |
+| MIDI evidence 기반 보고 필요 | source/fill MIDI를 사람이 듣기 전에도 구조 차이를 판단해야 함 | MIDI metric and note-structure review 실행 | preference `duration_coverage_fill_keep`, score delta `+79.731`, human/audio preference 미주장 |
 
 ## 파이프라인 구조
 
@@ -208,6 +209,7 @@ MVP 근거:
 - duration/coverage fill human/audio boundary에서 source vs fill MIDI content distinct, preference claim `false`, human/audio status `pending` 기록
 - duration/coverage fill human/audio review input guard에서 review input absent 상태의 pending 유지 검증
 - duration/coverage fill audio review package에서 source/fill MIDI checksum과 review input template 생성
+- duration/coverage fill MIDI evidence review에서 fill 후보가 source 대비 dead-air `-0.2773`, focused notes `+6`, focused unique pitch `+6` 우세로 기록
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -219,7 +221,7 @@ MVP 근거:
 | 만든 것 | symbolic MIDI 생성 모델의 dataset, tokenization, training, generation, decode, objective review, proxy review pipeline |
 | 겪은 문제 | `.mid` 파일 존재만으로 성공 판단 불가, one-note collapse, long sustain block, chord block, dead-air outlier, seed-level margin 부족 |
 | 해결 방식 | duration-explicit token 구조, grammar/coverage/chord-aware probe, overlap-free postprocess, repeatability sweep, dead-air diagnostics, proxy review scoring, repair candidate selection |
-| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, selected/peer duplicate output, constrained adjacent repair target-qualified `0/48`, duration/coverage fill qualified `2/4`, duration/coverage fill focused context `keep_for_focused_listening`, duration/coverage fill evidence decision `keep`, duration/coverage fill keep boundary `single_postprocess_candidate_keep_support`, human/audio preference pending, review input guard pending 유지, audio review package ready |
+| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, selected/peer duplicate output, constrained adjacent repair target-qualified `0/48`, duration/coverage fill qualified `2/4`, duration/coverage fill focused context `keep_for_focused_listening`, duration/coverage fill evidence decision `keep`, duration/coverage fill keep boundary `single_postprocess_candidate_keep_support`, human/audio preference pending, review input guard pending 유지, audio review package ready, MIDI evidence preference fill 후보 우세 |
 | 주장 경계 | reviewable MIDI 후보 생성 검증 파이프라인까지 가능, human listening preference / Brad style adaptation / broad production quality는 미검증 |
 
 Issue #324 기준 current margin-recovered evidence boundary:
@@ -288,6 +290,7 @@ Issue #324 기준 current margin-recovered evidence boundary:
 | duration coverage human/audio status | pending, preference claimed `false`, note sequence match `false` |
 | duration coverage review input guard | review input present `false`, fill status `pending_review_input`, preference `pending` |
 | duration coverage audio review package | status `ready_for_external_review_input`, required files `3`, audio render `not_rendered_by_harness` |
+| duration coverage MIDI evidence review | preference `duration_coverage_fill_keep`, score delta `+79.731`, human/audio preference claimed `false` |
 
 Issue #210 기준 current best focused review candidate:
 
