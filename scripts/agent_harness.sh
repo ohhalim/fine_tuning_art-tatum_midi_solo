@@ -136,6 +136,8 @@ Modes:
                 Consolidate current keep and distinct-source repeatability evidence.
   stage-b-duration-coverage-repeatability-audio-review-package
                 Render repeatability source candidates for user listening review.
+  stage-b-duration-coverage-repeatability-user-listening-review
+                Fill user listening review for repeatability source WAV files.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1949,6 +1951,32 @@ run_stage_b_duration_coverage_repeatability_audio_review_package() {
     --require_no_quality_claim
 }
 
+run_stage_b_duration_coverage_repeatability_user_listening_review() {
+  local audio_review_run_id="${AUDIO_REVIEW_RUN_ID:-harness_stage_b_duration_coverage_fill_repeatability_audio_review_package}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_repeatability_user_listening_review_fill}"
+  local audio_review_package="outputs/stage_b_duration_coverage_fill_repeatability_audio_review_package/${audio_review_run_id}/stage_b_duration_coverage_fill_repeatability_audio_review_package.json"
+  if [[ ! -f "$audio_review_package" ]]; then
+    print_header "Stage B duration/coverage fill repeatability audio review package"
+    RUN_ID="$audio_review_run_id" run_stage_b_duration_coverage_repeatability_audio_review_package
+  fi
+  print_header "Stage B duration/coverage fill repeatability user listening review"
+  "$PYTHON_BIN" scripts/fill_stage_b_duration_coverage_repeatability_user_listening_review.py \
+    --run_id "$run_id" \
+    --audio_review_package "$audio_review_package" \
+    --reviewer "user" \
+    --overall_decision reject_all \
+    --candidate_decision needs_followup \
+    --timing outside_or_unclear \
+    --phrase outside_or_unclear \
+    --vocabulary outside_or_unclear \
+    --assessment "both candidates sound difficult and outside-soloing-like" \
+    --notes "user listened to both repeatability WAV files; both felt difficult and outside-soloing-like" \
+    --expected_boundary repeatability_audio_review_needs_followup \
+    --expected_overall_decision reject_all \
+    --require_no_keep_claim \
+    --require_no_broad_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3248,6 +3276,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-repeatability-audio-review-package)
     run_stage_b_duration_coverage_repeatability_audio_review_package
+    ;;
+  stage-b-duration-coverage-repeatability-user-listening-review)
+    run_stage_b_duration_coverage_repeatability_user_listening_review
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
