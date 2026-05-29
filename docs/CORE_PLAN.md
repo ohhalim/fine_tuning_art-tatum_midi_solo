@@ -1112,16 +1112,19 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review
+Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening notes
 ```
 
 결과:
 
 - selected candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6`
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DURATION_COVERAGE_FILL_FOCUSED_CONTEXT_2026-05-29.md`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DURATION_COVERAGE_FILL_FOCUSED_LISTENING_NOTES_2026-05-29.md`
 - candidate count: `1`
-- focused context decision: `keep_for_focused_listening`
-- decision flags: `[]`
+- prior decision: `keep_for_focused_listening`
+- listening decision: `pending`
+- reviewed count: `0`
+- pending count: `1`
+- review risks: `sustained_coverage_review`
 - note count: `18`
 - unique pitch count: `15`
 - range: `D#4-G#5`
@@ -1135,16 +1138,17 @@ Stage B margin-recovered phrase/vocabulary duration coverage fill focused contex
 
 판단:
 
-- focused context blocker는 관측되지 않았다.
-- chord guide, bass guide, solo track context MIDI 생성 확인.
-- selected candidate는 focused listening notes로 넘길 수 있다.
+- focused listening review template 생성 완료.
+- listening fields는 pending 상태로 유지한다.
+- notes template은 human/audio listening proof가 아니다.
+- 남은 review risk는 `sustained_coverage_review`다.
 - claim boundary: `postprocess_duration_coverage_fill_candidate`.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening notes`로 잡는다.
-- focused listening fields를 pending 상태로 만들고 evidence fill 또는 human review 경계를 분리한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening fill`로 잡는다.
+- evidence fill에서 timing, phrase continuation, landing, vocabulary decision을 기록한다.
 - broad training은 focused context/listening boundary를 먼저 본 뒤 결정한다.
 
 ## 10. 한 문장 요약
