@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from collections import Counter
 from datetime import datetime, timezone
@@ -83,6 +84,31 @@ def infer_bpm(midi_path: Path, fallback_bpm: float = 124.0) -> float:
 
 def seconds_to_beats(seconds: float, bpm: float) -> float:
     return float(seconds) * float(bpm) / 60.0
+
+
+def grid_coverage_metrics(notes: list[pretty_midi.Note], *, bpm: float, bars: int) -> dict[str, Any]:
+    total_steps = max(1, int(bars) * 16)
+    onset_occupied = [False] * total_steps
+    sustained_occupied = [False] * total_steps
+    for note in notes:
+        start_beat = seconds_to_beats(float(note.start), bpm)
+        end_beat = seconds_to_beats(float(note.end), bpm)
+        start_step = int(round(start_beat * 4.0))
+        end_step = max(start_step + 1, int(math.ceil(end_beat * 4.0)))
+        if 0 <= start_step < total_steps:
+            onset_occupied[start_step] = True
+        for step in range(max(0, start_step), min(total_steps, end_step)):
+            sustained_occupied[step] = True
+    return {
+        "onset_coverage_ratio": float(sum(1 for value in onset_occupied if value) / total_steps),
+        "sustained_coverage_ratio": float(sum(1 for value in sustained_occupied if value) / total_steps),
+    }
+
+
+def metric_or_default(source_metrics: dict[str, Any], key: str, default: float) -> float:
+    if key in source_metrics and source_metrics.get(key) is not None:
+        return float(source_metrics.get(key) or 0.0)
+    return float(default)
 
 
 def parse_chord(chord: str) -> tuple[str, str]:
@@ -202,6 +228,7 @@ def analyze_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
     final_chord = chord_at_beat(final_start_beats, chords[:bars] or chords)
     final_role = pitch_role(int(final_note.pitch), final_chord)
     source_metrics = candidate.get("source_metrics") if isinstance(candidate.get("source_metrics"), dict) else {}
+    coverage = grid_coverage_metrics(notes, bpm=bpm, bars=bars)
     metrics = {
         "note_count": int(len(notes)),
         "unique_pitch_count": int(len(set(pitches))),
@@ -217,8 +244,16 @@ def analyze_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
         "duplicated_3_note_pitch_class_chunks": duplicated_pitch_class_chunks(pitches, 3),
         "max_simultaneous_notes": max_simultaneous_notes(notes),
         "dead_air_ratio": float(source_metrics.get("dead_air_ratio", 0.0) or 0.0),
-        "onset_coverage_ratio": float(source_metrics.get("onset_coverage_ratio", 0.0) or 0.0),
-        "sustained_coverage_ratio": float(source_metrics.get("sustained_coverage_ratio", 0.0) or 0.0),
+        "onset_coverage_ratio": metric_or_default(
+            source_metrics,
+            "onset_coverage_ratio",
+            coverage["onset_coverage_ratio"],
+        ),
+        "sustained_coverage_ratio": metric_or_default(
+            source_metrics,
+            "sustained_coverage_ratio",
+            coverage["sustained_coverage_ratio"],
+        ),
         "final_note": pitch_name(int(final_note.pitch)),
         "final_start_beats": round(float(final_start_beats), 3),
         "final_chord": final_chord,

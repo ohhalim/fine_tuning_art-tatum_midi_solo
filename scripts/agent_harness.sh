@@ -114,6 +114,8 @@ Modes:
                 Package and review the duration/coverage fill candidate in context.
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-focused-listening-notes
                 Build focused listening notes for the duration/coverage fill candidate.
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-focused-listening-fill
+                Fill focused listening notes for the duration/coverage fill candidate.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1508,6 +1510,26 @@ run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_li
     --expected_prior_decision keep_for_focused_listening
 }
 
+run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_listening_fill() {
+  local package_run_id="${PACKAGE_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_package}"
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_context_decision_with_midi_coverage}"
+  local notes_run_id="${NOTES_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_listening_notes_with_midi_coverage}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_listening_fill}"
+  local candidate_id="margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6"
+  local review_notes="outputs/stage_b_margin_recovered_phrase_vocabulary_focused_listening_notes/${notes_run_id}/focused_listening_review_notes_template.json"
+  if [[ ! -f "$review_notes" ]]; then
+    print_header "Stage B duration/coverage fill focused listening notes"
+    PACKAGE_RUN_ID="$package_run_id" DECISION_RUN_ID="$decision_run_id" RUN_ID="$notes_run_id" \
+      run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_listening_notes
+  fi
+  print_header "Stage B duration/coverage fill focused listening fill"
+  "$PYTHON_BIN" scripts/fill_stage_b_margin_recovered_phrase_vocabulary_focused_listening_notes.py \
+    --run_id "$run_id" \
+    --review_notes "$review_notes" \
+    --expected_candidate_id "$candidate_id" \
+    --expected_decision keep
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -2750,6 +2772,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-focused-listening-notes)
     run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_listening_notes
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-focused-listening-fill)
+    run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_focused_listening_fill
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

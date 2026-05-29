@@ -81,7 +81,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #318 기준 model-core MVP:
+Issue #320 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -198,6 +198,7 @@ MVP 근거:
 - duration/coverage fill repair에서 selected fill additions `6`, dead-air `0.5714 -> 0.2941`, focused unique pitch `15`, adjacent repeat `0`, duplicated 3-note pitch-class chunks `0`
 - duration/coverage fill focused context에서 decision `keep_for_focused_listening`, flags `{}`, final `F4` over `Fm7` chord tone 확인
 - duration/coverage fill focused listening notes에서 pending `1`, review risk `sustained_coverage_review`로 다음 evidence fill 경계 분리
+- duration/coverage fill focused listening fill에서 MIDI-derived coverage 반영 후 decision `keep`, review risks `{}` 확인
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -209,10 +210,10 @@ MVP 근거:
 | 만든 것 | symbolic MIDI 생성 모델의 dataset, tokenization, training, generation, decode, objective review, proxy review pipeline |
 | 겪은 문제 | `.mid` 파일 존재만으로 성공 판단 불가, one-note collapse, long sustain block, chord block, dead-air outlier, seed-level margin 부족 |
 | 해결 방식 | duration-explicit token 구조, grammar/coverage/chord-aware probe, overlap-free postprocess, repeatability sweep, dead-air diagnostics, proxy review scoring, repair candidate selection |
-| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, selected/peer duplicate output, constrained adjacent repair target-qualified `0/48`, duration/coverage fill qualified `2/4`, duration/coverage fill focused context `keep_for_focused_listening`, duration/coverage fill listening notes pending `1` |
+| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, selected/peer duplicate output, constrained adjacent repair target-qualified `0/48`, duration/coverage fill qualified `2/4`, duration/coverage fill focused context `keep_for_focused_listening`, duration/coverage fill evidence decision `keep` |
 | 주장 경계 | reviewable MIDI 후보 생성 검증 파이프라인까지 가능, human listening preference / Brad style adaptation / broad production quality는 미검증 |
 
-Issue #318 기준 current margin-recovered evidence boundary:
+Issue #320 기준 current margin-recovered evidence boundary:
 
 | 항목 | 결과 |
 |---|---|
@@ -268,6 +269,9 @@ Issue #318 기준 current margin-recovered evidence boundary:
 | duration coverage focused context final | `F4` over `Fm7`, chord tone |
 | duration coverage focused listening notes | pending `1`, reviewed `0` |
 | duration coverage focused listening risk | `sustained_coverage_review` |
+| duration coverage focused listening fill | reviewed `1`, decision `keep`, risks `{}` |
+| duration coverage grid coverage | onset `0.5625`, sustained `0.6250` |
+| duration coverage filled fields | timing `acceptable`, chord fit `strong`, phrase `acceptable`, landing `strong`, vocabulary `acceptable` |
 
 Issue #210 기준 current best focused review candidate:
 

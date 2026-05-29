@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #318, Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening notes
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening fill`
+- latest functional result: Issue #320, Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening fill
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill keep consolidation`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,46 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Focused Listening Fill Result
+
+Issue #320은 duration/coverage fill candidate의 focused listening notes를 MIDI/context evidence로 채운 작업이다.
+
+변경:
+
+- source coverage metric 부재 시 solo MIDI grid 기반 coverage 산출
+- focused context decision 재생성
+- focused listening notes 재생성
+- focused listening evidence fill 실행
+
+결과:
+
+- candidate count: `1`
+- reviewed count: `1`
+- pending count: `0`
+- decision: `keep`
+- review risks: `[]`
+- timing: `acceptable`
+- chord fit: `strong`
+- phrase continuation: `acceptable`
+- landing: `strong`
+- jazz vocabulary: `acceptable`
+- onset coverage: `0.5625`
+- sustained coverage: `0.6250`
+- dead-air ratio: `0.2941`
+- adjacent pitch repeats: `0`
+- max interval: `7`
+- final note: `F4` over `Fm7`, chord tone
+
+판단:
+
+- MIDI/context evidence fill 기준 keep
+- adjacent repeat, wide interval blocker 유지
+- human/audio listening proof는 아직 아님
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill keep consolidation`
 
 ## Current Duration Coverage Fill Focused Listening Notes Result
 

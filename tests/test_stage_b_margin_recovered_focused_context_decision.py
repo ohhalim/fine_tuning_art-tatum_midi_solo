@@ -68,6 +68,52 @@ def sample_package(root: Path, *, pitches: list[int], dead_air: float) -> dict:
     }
 
 
+def package_without_source_coverage(root: Path) -> dict:
+    solo_path = root / "midi" / "coverage_candidate.mid"
+    context_path = root / "context" / "coverage_candidate_context.mid"
+    midi = pretty_midi.PrettyMIDI(initial_tempo=124)
+    solo = pretty_midi.Instrument(program=0, is_drum=False, name="Solo")
+    rows = [
+        (70, 0.120967, 0.241935),
+        (71, 0.241935, 0.362903),
+        (73, 0.362903, 0.483871),
+        (74, 0.483871, 0.604838),
+        (76, 0.604838, 0.725805),
+        (77, 0.725805, 0.846773),
+        (78, 0.846773, 0.967740),
+        (75, 0.967740, 1.088708),
+        (80, 1.088708, 1.209675),
+        (79, 1.209675, 1.572578),
+    ]
+    for pitch, start, end in rows:
+        solo.notes.append(pretty_midi.Note(velocity=84, pitch=pitch, start=start, end=end))
+    midi.instruments.append(solo)
+    solo_path.parent.mkdir(parents=True, exist_ok=True)
+    midi.write(str(solo_path))
+    write_context(context_path, solo_path)
+    return {
+        "output_dir": str(root),
+        "candidates": [
+            {
+                "candidate_id": "coverage_candidate",
+                "review_files": {
+                    "midi_path": str(solo_path),
+                    "context_midi_path": str(context_path),
+                },
+                "source_metrics": {
+                    "dead_air_ratio": 0.29411764705882354,
+                },
+                "listening": {"decision": "keep_for_focused_listening"},
+                "focused_package_transform": {
+                    "context_chords": ["Cm7", "Fm7"],
+                    "context_bpm": 124,
+                    "context_bars": 2,
+                },
+            }
+        ],
+    }
+
+
 class MarginRecoveredFocusedContextDecisionTest(unittest.TestCase):
     def test_low_pitch_variety_candidate_needs_followup(self) -> None:
         with TemporaryDirectory() as temp_dir:
@@ -101,6 +147,18 @@ class MarginRecoveredFocusedContextDecisionTest(unittest.TestCase):
             )
 
             self.assertEqual(summary["decisions"], ["keep_for_focused_listening"])
+
+    def test_derives_grid_coverage_when_source_metrics_are_missing(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            report = build_focused_context_decision(
+                package_without_source_coverage(root),
+                output_dir=root / "decision",
+            )
+
+            metrics = report["candidates"][0]["metrics"]
+            self.assertGreater(metrics["onset_coverage_ratio"], 0.0)
+            self.assertGreater(metrics["sustained_coverage_ratio"], 0.0)
 
 
 if __name__ == "__main__":
