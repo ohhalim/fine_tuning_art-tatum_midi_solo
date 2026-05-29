@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #359, Stage B duration coverage fill repeatability user listening review fill
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair decision`
+- latest functional result: Issue #361, Stage B duration coverage fill outside-soloing repair decision
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair sweep`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,46 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Outside-Soloing Repair Decision Result
+
+Issue #361은 repeatability source 청취 리뷰의 `needs_followup` 결과를 다음 repair target으로 변환한 작업이다.
+
+변경:
+
+- outside-soloing repair decision script 추가
+- user review boundary를 repair target으로 변환
+- auto progress 가능 여부와 critical user input 필요 여부 분리
+
+결과:
+
+- input boundary: `repeatability_audio_review_needs_followup`
+- next boundary: `outside_soloing_pitch_role_phrase_clarity_repair`
+- auto progress allowed: `true`
+- critical user input required: `false`
+- repair target count: `5`
+- human/audio keep claimed: `false`
+- broad model quality claimed: `false`
+
+repair targets:
+
+- `reduce_outside_sounding_pitch_choices`
+- `increase_chord_tone_or_guide_tone_landing`
+- `limit_non_chord_tone_run_length`
+- `penalize_large_interval_after_fill`
+- `prefer_phrase_contour_resolution_over_density`
+
+판단:
+
+- MIDI/dead-air repeatability는 유지
+- 청취 기준 문제는 density 자체보다 pitch-role / chord-fit / phrase clarity 축으로 분리
+- 다음 repair는 dead-air gain과 monophonic gate를 유지하면서 outside-sounding pitch 선택을 제한
+- repair 후 audio review 필요
+- broad trained-model quality, Brad style adaptation, production-ready improviser claim 금지
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair sweep`
 
 ## Current Duration Coverage Fill Repeatability User Listening Review Fill Result
 
