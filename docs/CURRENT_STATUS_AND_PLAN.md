@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #328, Stage B margin-recovered phrase/vocabulary duration coverage fill audio review package
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill external review input fill`
+- latest functional result: Issue #330, Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review consolidation`
 
 현재 범위가 아닌 것:
 
@@ -66,6 +66,39 @@ Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
 
+## Current Duration Coverage Fill MIDI Evidence Review Result
+
+Issue #330은 source constrained partial과 duration/coverage fill 후보를 MIDI evidence 기준으로 비교한 작업이다.
+
+변경:
+
+- MIDI metric and note-structure review script 추가
+- source vs fill score 비교
+- MIDI evidence preference 기록
+- human/audio preference claim 차단
+
+결과:
+
+- review basis: `midi_metric_and_note_structure`
+- MIDI evidence preference: `duration_coverage_fill_keep`
+- score delta fill-source: `79.7311`
+- dead-air delta fill-source: `-0.2773`
+- focused note count delta: `+6`
+- focused unique pitch count delta: `+6`
+- max simultaneous notes delta: `-1`
+- human/audio preference claimed: `false`
+- audio render used: `false`
+
+판단:
+
+- MIDI evidence 기준 fill 후보 우세
+- human/audio preference와 audio rendered quality는 아직 미검증
+- broad trained-model quality와 Brad style adaptation은 아직 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review consolidation`
+
 ## Current Duration Coverage Fill Audio Review Package Result
 
 Issue #328은 duration/coverage fill 후보의 외부 review input 전 package를 만든 작업이다.
@@ -98,9 +131,9 @@ Issue #328은 duration/coverage fill 후보의 외부 review input 전 package�
 - preference claim 없음
 - human/audio preference와 audio rendered quality는 아직 미검증
 
-다음:
+후속:
 
-- `Stage B margin-recovered phrase/vocabulary duration coverage fill external review input fill`
+- Issue #330 `Stage B margin-recovered phrase/vocabulary duration coverage fill MIDI evidence review` 완료
 
 ## Current Duration Coverage Fill Human/Audio Review Input Guard Result
 
