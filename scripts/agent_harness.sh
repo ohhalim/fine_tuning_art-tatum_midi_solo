@@ -1785,6 +1785,37 @@ run_stage_b_user_listening_review_fill() {
     --require_no_broad_quality_claim
 }
 
+run_stage_b_user_listening_review_consolidation() {
+  local midi_evidence_run_id="${MIDI_EVIDENCE_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_consolidation}"
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_duration_coverage_fill_local_audio_render_attempt}"
+  local user_review_run_id="${USER_REVIEW_RUN_ID:-harness_stage_b_duration_coverage_fill_user_listening_review_fill}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_user_listening_review_consolidation}"
+  local midi_evidence="outputs/stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_consolidation/${midi_evidence_run_id}/duration_coverage_fill_midi_evidence_consolidation.json"
+  local audio_render_report="outputs/stage_b_duration_coverage_fill_local_audio_render_attempt/${audio_render_run_id}/stage_b_duration_coverage_fill_local_audio_render_attempt.json"
+  local user_review="outputs/stage_b_duration_coverage_fill_user_listening_review_fill/${user_review_run_id}/stage_b_duration_coverage_fill_user_listening_review_fill.json"
+  if [[ ! -f "$midi_evidence" ]]; then
+    print_header "Stage B duration/coverage fill MIDI evidence consolidation"
+    RUN_ID="$midi_evidence_run_id" run_stage_b_margin_recovered_phrase_vocabulary_duration_coverage_fill_midi_evidence_consolidation
+  fi
+  if [[ ! -f "$audio_render_report" ]]; then
+    print_header "Stage B duration/coverage fill local audio render attempt"
+    RUN_ID="$audio_render_run_id" run_stage_b_local_audio_render_attempt
+  fi
+  if [[ ! -f "$user_review" ]]; then
+    print_header "Stage B duration/coverage fill user listening review fill"
+    RUN_ID="$user_review_run_id" run_stage_b_user_listening_review_fill
+  fi
+  print_header "Stage B duration/coverage fill user listening review consolidation"
+  "$PYTHON_BIN" scripts/summarize_stage_b_duration_coverage_user_listening_consolidation.py \
+    --run_id "$run_id" \
+    --midi_evidence_consolidation "$midi_evidence" \
+    --audio_render_attempt "$audio_render_report" \
+    --user_listening_review_fill "$user_review" \
+    --expected_boundary midi_evidence_and_single_user_listening_support_duration_coverage_fill_keep \
+    --expected_preferred_candidate duration_coverage_fill_keep \
+    --require_no_broad_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3066,6 +3097,9 @@ case "$MODE" in
     ;;
   stage-b-user-listening-review-fill)
     run_stage_b_user_listening_review_fill
+    ;;
+  stage-b-user-listening-review-consolidation)
+    run_stage_b_user_listening_review_consolidation
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
