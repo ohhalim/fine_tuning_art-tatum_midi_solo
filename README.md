@@ -57,6 +57,7 @@
 | distinct output support 과장 위험 | qualified source seed는 2개지만 qualified sample seed는 1개뿐임 | sample-seed diversity repair로 duplicate peer를 distinct-output support에서 제외 | boundary `single_distinct_sample_seed_keep_support`, distinct peer `0` |
 | distinct sample-seed 후보 필요 | sample seed `85` 중복 후보만으로는 output diversity claim 불가 | seed `109/157` checkpoint sweep으로 blocked seed `85`와 겹치지 않는 후보 탐색 | distinct qualified `2`, selected sample seed `155`, boundary `distinct_sample_seed_qualified_candidate_found` |
 | distinct sample-seed context 검증 필요 | distinct 후보도 focused context decision 전에는 keep 후보로 보기 어려움 | selected distinct candidate를 solo/context package로 격리해 focused context decision 실행 | decision `keep_for_focused_listening`, flags `{}`, final `D5` over `Fm7` tension |
+| distinct sample-seed 청감 판단 보류 | context keep만으로 timing/phrase/vocabulary 판단 불가 | focused listening notes template 생성 | candidate `1`, pending `1`, risks `dead_air_ratio_remaining`, `adjacent_pitch_repeats` |
 
 ## 파이프라인 구조
 
@@ -75,7 +76,7 @@ flowchart LR
 
 ## 핵심 결과
 
-Issue #300 기준 model-core MVP:
+Issue #302 기준 model-core MVP:
 
 | 항목 | 결과 |
 |---|---|
@@ -124,6 +125,7 @@ Issue #300 기준 model-core MVP:
 | margin-recovered phrase vocabulary sample-seed diversity repair | qualified sample seed `1`, distinct peer `0`, boundary `single_distinct_sample_seed_keep_support` |
 | margin-recovered phrase vocabulary distinct sample-seed sweep | blocked seed `85` 제외, distinct qualified `2`, selected sample seed `155` |
 | margin-recovered phrase vocabulary distinct sample-seed focused context | selected distinct 후보를 context package로 격리, decision `keep_for_focused_listening`, flags `{}` |
+| margin-recovered phrase vocabulary distinct sample-seed focused listening notes | focused listening template 생성, candidate `1`, pending `1`, review risks `2` |
 | constrained review gate | `stage-b-overlap-gate` 통과 |
 | focused candidate path | `stage-b-rhythm-phrase-variation` 통과 |
 
@@ -177,6 +179,7 @@ MVP 근거:
 - duplicate sample-seed peer를 distinct-output support에서 제외하고 current claim을 single distinct sample-seed keep support로 낮춤
 - seed `109/157` sweep에서 sample seed `155`, `131` qualified 후보를 찾아 distinct sample-seed output boundary를 회복
 - sample seed `155` 후보를 focused context package로 격리해 max active `1`, phrase span `6.75` beats, final `D5` over `Fm7` tension, context decision `keep_for_focused_listening` 확인
+- distinct sample-seed context keep 후보를 focused listening notes template으로 넘기고 timing, phrase continuation, landing, vocabulary, final decision을 pending으로 유지
 - constrained/postprocessed generation의 strict review gate 통과
 - objective-clean focused candidates `6/6`
 - listening review pending `6`
@@ -188,10 +191,10 @@ MVP 근거:
 | 만든 것 | symbolic MIDI 생성 모델의 dataset, tokenization, training, generation, decode, objective review, proxy review pipeline |
 | 겪은 문제 | `.mid` 파일 존재만으로 성공 판단 불가, one-note collapse, long sustain block, chord block, dead-air outlier, seed-level margin 부족 |
 | 해결 방식 | duration-explicit token 구조, grammar/coverage/chord-aware probe, overlap-free postprocess, repeatability sweep, dead-air diagnostics, proxy review scoring, repair candidate selection |
-| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, selected/peer duplicate output, distinct sample-seed focused context `keep_for_focused_listening` |
+| 검증 결과 | raw generation local gate 통과, 6-file 5-sample recovery strict `12/15`, margin-recovered fallback focused keep `0/3`, pitch-vocab focused context `keep_for_focused_listening`, timing/repetition repair qualified `2/96`, phrase/vocabulary focused fill `keep`, selected/peer duplicate output, distinct sample-seed focused notes pending `1` |
 | 주장 경계 | reviewable MIDI 후보 생성 검증 파이프라인까지 가능, human listening preference / Brad style adaptation / broad production quality는 미검증 |
 
-Issue #300 기준 current margin-recovered evidence boundary:
+Issue #302 기준 current margin-recovered evidence boundary:
 
 | 항목 | 결과 |
 |---|---|
@@ -224,6 +227,8 @@ Issue #300 기준 current margin-recovered evidence boundary:
 | distinct sample-seed context decision | `keep_for_focused_listening`, flags `{}` |
 | distinct sample-seed final landing | `D5` over `Fm7`, tension |
 | distinct sample-seed remaining risk | focused unique pitch `6`, dead-air `0.375`, adjacent repeat `1` |
+| distinct sample-seed listening notes | pending `1`, reviewed `0` |
+| distinct sample-seed review risks | `dead_air_ratio_remaining`, `adjacent_pitch_repeats` |
 
 Issue #210 기준 current best focused review candidate:
 
