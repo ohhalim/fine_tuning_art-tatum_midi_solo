@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #349, Stage B duration coverage fill next decision.
+- Latest functional issue completed: Issue #353, Stage B duration coverage fill dead-air gain repeatability repair.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill broader repeatability sweep.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill repeatability consolidation.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -754,6 +754,22 @@ bash scripts/agent_harness.sh stage-b-duration-coverage-next-decision
 ```
 
 This harness selects the next auto-progress boundary after consolidated fill evidence.
+
+For Stage B duration coverage fill broader repeatability sweep changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-duration-coverage-broader-repeatability-sweep
+```
+
+This harness applies duration/coverage fill gate checks to distinct source candidates and records repeatability boundaries.
+
+For Stage B duration coverage fill dead-air gain repeatability repair changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-duration-coverage-dead-air-gain-repeatability-repair
+```
+
+This harness requires selected distinct source candidates to keep the MIDI gate while reducing dead-air.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

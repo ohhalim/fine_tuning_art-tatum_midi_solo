@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #351, Stage B duration coverage fill broader repeatability sweep
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill dead-air gain repeatability repair`
+- latest functional result: Issue #353, Stage B duration coverage fill dead-air gain repeatability repair
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill repeatability consolidation`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,41 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Dead-Air Gain Repeatability Repair Result
+
+Issue #353은 duration coverage fill 반복성 sweep에서 dead-air gain이 부분적으로만 관측된 원인을 selected variant 기준으로 보정한 작업이다.
+
+변경:
+
+- dead-air gain repeatability repair summary script 추가
+- selection rule: `qualified_dead_air_gain_then_min_fill_additions`
+- source별 full fill variant report 저장
+- selected variant 기준 dead-air gain 재측정
+
+결과:
+
+- previous boundary: `qualified_gate_repeatability_with_partial_dead_air_gain`
+- repaired boundary: `qualified_gate_repeatability_with_dead_air_gain`
+- source candidates: `2`
+- qualified source candidates: `2`
+- dead-air gain source candidates: `2`
+- total variants: `8`
+- qualified variants: `7`
+- dead-air gain variants: `6`
+- selected fill additions: `[6]`
+- broad model quality claimed: `false`
+
+판단:
+
+- 이전 partial boundary의 원인: qualified variant 중 fill addition 최소값 우선 선택
+- repair 기준: qualified + dead-air gain 후보만 우선 선택
+- selected distinct source `2/2`에서 dead-air gain 관측
+- new source human/audio preference, multi-reviewer preference, broad trained-model quality는 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill repeatability consolidation`
 
 ## Current Duration Coverage Fill Broader Repeatability Sweep Result
 

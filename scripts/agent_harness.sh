@@ -130,6 +130,8 @@ Modes:
                 Consolidate MIDI evidence review claim boundaries.
   stage-b-duration-coverage-broader-repeatability-sweep
                 Run broader duration/coverage fill repeatability over distinct source candidates.
+  stage-b-duration-coverage-dead-air-gain-repeatability-repair
+                Repair duration/coverage fill repeatability selection to require dead-air gain.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1872,6 +1874,29 @@ run_stage_b_duration_coverage_broader_repeatability_sweep() {
     --require_no_broad_quality_claim
 }
 
+run_stage_b_duration_coverage_dead_air_gain_repeatability_repair() {
+  local broader_repeatability_run_id="${BROADER_REPEATABILITY_RUN_ID:-harness_stage_b_duration_coverage_fill_broader_repeatability_sweep}"
+  local distinct_sweep_run_id="${DISTINCT_SWEEP_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_dead_air_gain_repeatability_repair}"
+  local broader_repeatability="outputs/stage_b_duration_coverage_fill_broader_repeatability_sweep/${broader_repeatability_run_id}/stage_b_duration_coverage_fill_broader_repeatability_sweep.json"
+  local distinct_sweep="outputs/stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep/${distinct_sweep_run_id}/distinct_sample_seed_sweep_summary.json"
+  if [[ ! -f "$broader_repeatability" ]]; then
+    print_header "Stage B duration/coverage fill broader repeatability sweep"
+    RUN_ID="$broader_repeatability_run_id" run_stage_b_duration_coverage_broader_repeatability_sweep
+  fi
+  if [[ ! -f "$distinct_sweep" ]]; then
+    print_header "Stage B distinct sample-seed sweep"
+    RUN_ID="$distinct_sweep_run_id" run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep
+  fi
+  print_header "Stage B duration/coverage fill dead-air gain repeatability repair"
+  "$PYTHON_BIN" scripts/summarize_stage_b_duration_coverage_fill_dead_air_gain_repeatability_repair.py \
+    --run_id "$run_id" \
+    --broader_repeatability_sweep "$broader_repeatability" \
+    --distinct_sample_seed_sweep "$distinct_sweep" \
+    --expected_boundary qualified_gate_repeatability_with_dead_air_gain \
+    --require_no_broad_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3162,6 +3187,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-broader-repeatability-sweep)
     run_stage_b_duration_coverage_broader_repeatability_sweep
+    ;;
+  stage-b-duration-coverage-dead-air-gain-repeatability-repair)
+    run_stage_b_duration_coverage_dead_air_gain_repeatability_repair
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
