@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #341, Stage B renderer path decision
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render attempt after renderer path is available`
+- latest functional result: Issue #343, Stage B duration coverage fill local audio render attempt
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill user listening review fill`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,45 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Local Audio Render Attempt Result
+
+Issue #343은 source/fill MIDI를 FluidSynth와 GeneralUser GS soundfont로 WAV 렌더한 작업이다.
+
+변경:
+
+- local audio render attempt script 추가
+- source/fill WAV 생성
+- WAV sample rate, channel count, duration, size, sha256 검증
+- rendered audio file path summary 기록
+- audio quality/human preference claim guard 유지
+
+결과:
+
+- render attempted: `true`
+- rendered audio file count: `2`
+- technical WAV validation: `true`
+- sample rate: `44100`
+- source duration seconds: `6.474`
+- fill duration seconds: `6.474`
+- audio rendered quality claimed: `false`
+- human/audio preference claimed: `false`
+
+로컬 WAV:
+
+- source: `outputs/stage_b_duration_coverage_fill_local_audio_render_attempt/harness_stage_b_duration_coverage_fill_local_audio_render_attempt/audio/source_constrained_partial.wav`
+- fill: `outputs/stage_b_duration_coverage_fill_local_audio_render_attempt/harness_stage_b_duration_coverage_fill_local_audio_render_attempt/audio/duration_coverage_fill_keep.wav`
+
+판단:
+
+- user listening review 입력 전까지 preference claim 금지
+- technical WAV validation은 음악적 품질 proof가 아님
+- generated WAV files는 commit 대상에서 제외
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill user listening review fill`
+- user review input 필요: source/fill preference, timing, phrase, vocabulary, notes
 
 ## Current Renderer Path Decision Result
 

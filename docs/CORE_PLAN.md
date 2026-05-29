@@ -115,6 +115,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary duration coverage fill local audio render package 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DURATION_COVERAGE_FILL_LOCAL_AUDIO_RENDER_PACKAGE_2026-05-29.md`
 - local audio render tooling setup 문서: `docs/STAGE_B_LOCAL_AUDIO_RENDER_TOOLING_SETUP_2026-05-29.md`
 - renderer path decision 문서: `docs/STAGE_B_RENDERER_PATH_DECISION_2026-05-29.md`
+- duration coverage fill local audio render attempt 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_LOCAL_AUDIO_RENDER_ATTEMPT_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -168,6 +169,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary duration coverage fill local audio render package: planned audio outputs `2`, render attempted `false`, audio quality claim `false`
 - local audio render tooling setup: renderer `unavailable`, system modification `false`, audio render attempted `false`
 - renderer path decision: decision `renderer_path_or_install_approval_required`, critical user input `true`
+- duration coverage fill local audio render attempt: rendered WAV files `2`, sample rate `44100`, duration `6.474s`, preference claim `false`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 

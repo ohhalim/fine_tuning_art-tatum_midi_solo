@@ -74,6 +74,7 @@
 | local audio render 준비 상태 불명확 | source/fill MIDI는 준비됐지만 WAV render tooling과 audio quality claim이 분리되지 않음 | local audio render package 추가 | planned outputs `2`, render attempted `false`, audio quality claim `false` |
 | renderer/soundfont 준비 상태 불명확 | local render package는 준비됐지만 renderer가 없는 환경에서 render attempt를 진행할 위험 | tooling readiness check 추가 | `fluidsynth`/`timidity` 미탐지, system modification `false`, render attempted `false` |
 | renderer path decision 필요 | renderer unavailable 상태에서 설치/다운로드 없이 render attempt로 넘어갈 위험 | renderer path decision 추가 | decision `renderer_path_or_install_approval_required`, critical user input `true` |
+| user listening review artifact 필요 | MIDI evidence는 있지만 사용자가 직접 들을 WAV가 없음 | FluidSynth + GeneralUser GS로 source/fill WAV 렌더 | rendered files `2`, duration `6.474s`, technical WAV validation `true`, preference claim `false` |
 
 ## 파이프라인 구조
 
