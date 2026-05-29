@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #343, Stage B duration coverage fill local audio render attempt
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill user listening review fill`
+- latest functional result: Issue #345, Stage B duration coverage fill user listening review fill
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill user listening review consolidation`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,43 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill User Listening Review Fill Result
+
+Issue #345는 rendered source/fill WAV에 대한 user listening review 입력을 반영한 작업이다.
+
+변경:
+
+- user listening review fill script 추가
+- audio render report와 review input schema 검증
+- single-user human/audio preference claim 기록
+- source assessment / fill assessment 분리
+- broad model quality claim guard 유지
+
+결과:
+
+- review status: `reviewed`
+- preference: `duration_coverage_fill_keep`
+- timing: `duration_coverage_fill_keep`
+- phrase: `duration_coverage_fill_keep`
+- vocabulary: `duration_coverage_fill_keep`
+- source assessment: source 후보는 이해하기 어렵고 random notes처럼 들림
+- fill assessment: fill 후보가 훨씬 jazz-like soloing으로 들림
+- human/audio preference claimed: `true`
+- single user review: `true`
+- broad model quality claimed: `false`
+- audio rendered quality claimed: `false`
+
+판단:
+
+- MIDI evidence preference와 user listening preference가 같은 fill 후보를 지지
+- 단일 사용자 리뷰이므로 broad trained-model quality claim 금지
+- Brad style adaptation과 production-ready improviser claim 금지
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill user listening review consolidation`
+- MIDI evidence, technical WAV validation, user listening preference를 하나의 claim boundary로 정리
 
 ## Current Duration Coverage Fill Local Audio Render Attempt Result
 
