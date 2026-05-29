@@ -152,6 +152,8 @@ Modes:
                 Decide next objective-only step after outside-soloing repair evidence.
   stage-b-duration-coverage-outside-soloing-repair-broader-repeatability
                 Aggregate outside-soloing repair policy repeatability across sources.
+  stage-b-duration-coverage-outside-soloing-repair-repeatability-consolidation
+                Consolidate outside-soloing repair objective repeatability boundaries.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2140,6 +2142,38 @@ run_stage_b_duration_coverage_outside_soloing_repair_broader_repeatability() {
     --require_no_broad_quality_claim
 }
 
+run_stage_b_duration_coverage_outside_soloing_repair_repeatability_consolidation() {
+  local objective_run_id="${OBJECTIVE_RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_objective_evidence_consolidation}"
+  local repeatability_run_id="${REPEATABILITY_RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_broader_repeatability_sweep}"
+  local review_fill_run_id="${REVIEW_FILL_RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_user_listening_review_fill}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_repeatability_consolidation}"
+  local objective_evidence="outputs/stage_b_duration_coverage_fill_outside_soloing_repair_objective_evidence_consolidation/${objective_run_id}/stage_b_duration_coverage_fill_outside_soloing_repair_objective_evidence_consolidation.json"
+  local broader_repeatability="outputs/stage_b_duration_coverage_fill_outside_soloing_repair_broader_repeatability_sweep/${repeatability_run_id}/stage_b_duration_coverage_fill_outside_soloing_repair_broader_repeatability_sweep.json"
+  local review_fill="outputs/stage_b_duration_coverage_fill_outside_soloing_repair_user_listening_review_fill/${review_fill_run_id}/stage_b_duration_coverage_fill_outside_soloing_repair_user_listening_review_fill.json"
+  if [[ ! -f "$objective_evidence" ]]; then
+    print_header "Stage B duration/coverage fill outside-soloing repair objective evidence"
+    RUN_ID="$objective_run_id" run_stage_b_duration_coverage_outside_soloing_repair_objective_evidence
+  fi
+  if [[ ! -f "$broader_repeatability" ]]; then
+    print_header "Stage B duration/coverage fill outside-soloing repair broader repeatability"
+    RUN_ID="$repeatability_run_id" run_stage_b_duration_coverage_outside_soloing_repair_broader_repeatability
+  fi
+  if [[ ! -f "$review_fill" ]]; then
+    print_header "Stage B duration/coverage fill outside-soloing repair user listening review"
+    RUN_ID="$review_fill_run_id" run_stage_b_duration_coverage_outside_soloing_repair_user_listening_review
+  fi
+  print_header "Stage B duration/coverage fill outside-soloing repair repeatability consolidation"
+  "$PYTHON_BIN" scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_repeatability_consolidation.py \
+    --run_id "$run_id" \
+    --objective_evidence "$objective_evidence" \
+    --broader_repeatability "$broader_repeatability" \
+    --user_review_fill "$review_fill" \
+    --expected_boundary outside_soloing_repair_objective_repeatability_support \
+    --require_pending_review_guard \
+    --require_no_preference_claim \
+    --require_no_broad_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3463,6 +3497,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-outside-soloing-repair-broader-repeatability)
     run_stage_b_duration_coverage_outside_soloing_repair_broader_repeatability
+    ;;
+  stage-b-duration-coverage-outside-soloing-repair-repeatability-consolidation)
+    run_stage_b_duration_coverage_outside_soloing_repair_repeatability_consolidation
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

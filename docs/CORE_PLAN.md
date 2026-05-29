@@ -131,6 +131,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill outside-soloing repair objective evidence consolidation 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_OUTSIDE_SOLOING_REPAIR_OBJECTIVE_EVIDENCE_CONSOLIDATION_2026-05-29.md`
 - duration coverage fill outside-soloing repair next decision 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_OUTSIDE_SOLOING_REPAIR_NEXT_DECISION_2026-05-29.md`
 - duration coverage fill outside-soloing repair broader repeatability sweep 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_OUTSIDE_SOLOING_REPAIR_BROADER_REPEATABILITY_SWEEP_2026-05-29.md`
+- duration coverage fill outside-soloing repair repeatability consolidation 문서: `docs/STAGE_B_DURATION_COVERAGE_FILL_OUTSIDE_SOLOING_REPAIR_REPEATABILITY_CONSOLIDATION_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -200,6 +201,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill outside-soloing repair objective evidence consolidation: objective support source `2/2`, chord-tone pass `2/2`, non-chord run pass `2/2`, interval pass `2/2`, preference claim `false`
 - duration coverage fill outside-soloing repair next decision: next boundary `outside_soloing_repair_broader_repeatability_sweep`, auto progress `true`, critical user input `false`
 - duration coverage fill outside-soloing repair broader repeatability sweep: policy support `3/3`, variants qualified `6/6`, chord-tone min `1.000`, non-chord max `0`, preference claim `false`
+- duration coverage fill outside-soloing repair repeatability consolidation: objective source support `2/2`, policy support `3/3`, variants qualified `6/6`, pending review preserved, preference claim `false`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
