@@ -94,6 +94,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary duplicate source divergence audit 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DUPLICATE_SOURCE_DIVERGENCE_AUDIT_2026-05-29.md`
 - margin-recovered phrase/vocabulary sample-seed diversity repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_SAMPLE_SEED_DIVERSITY_REPAIR_2026-05-29.md`
 - margin-recovered phrase/vocabulary distinct sample-seed repair sweep 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REPAIR_SWEEP_2026-05-29.md`
+- margin-recovered phrase/vocabulary distinct sample-seed focused context 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_CONTEXT_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -546,6 +547,8 @@ Stage B에서 명시하는 것:
 - Issue #296 result: qualified source seed count `2`, qualified sample seed count `1`, distinct peer count `0`, boundary `single_distinct_sample_seed_keep_support`.
 - Issue #298 runs a focused checkpoint-based sweep with sample seed ranges outside duplicate seed `85`.
 - Issue #298 result: qualified `2/96`, distinct sample-seed qualified `2`, selected sample seed `155`, boundary `distinct_sample_seed_qualified_candidate_found`.
+- Issue #300 packages the selected distinct sample-seed candidate into focused solo/context artifacts and runs context decision.
+- Issue #300 result: decision `keep_for_focused_listening`, flags `{}`, final `D5` over `Fm7` tension, max active `1`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -564,8 +567,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #298은 duplicate seed `85`와 겹치지 않는 sweep에서 distinct sample-seed qualified 후보를 찾았다.
-다음 작업은 distinct sample-seed 후보를 focused context package로 격리해 context decision을 검증하는 것이다.
+Issue #300은 duplicate seed `85`와 겹치지 않는 후보를 focused context package로 격리하고 context decision을 통과시켰다.
+다음 작업은 distinct sample-seed 후보를 focused listening notes/fill 경로로 넘겨 timing, phrase, vocabulary 판단을 기록하는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -1091,37 +1094,40 @@ Issue #298은 duplicate seed `85`와 겹치지 않는 sweep에서 distinct sampl
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary distinct sample-seed repair sweep
+Stage B margin-recovered phrase/vocabulary distinct sample-seed focused context review
 ```
 
 결과:
 
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REPAIR_SWEEP_2026-05-29.md`
-- candidate count: `96`
-- qualified candidate count: `2`
-- blocked sample seed: `85`
-- distinct sample-seed qualified count: `2`
 - selected candidate: `margin_recovered_phrase_vocab_seed_109_topk_7_temp_082_n48_sample_47`
 - selected source seed: `109`
 - selected sample index: `47`
 - selected sample seed: `155`
-- selected focused note count: `13`
-- selected focused unique pitch count: `6`
-- selected dead-air ratio: `0.375`
-- selected adjacent repeats: `1`
-- selected focused max interval: `3`
-- boundary: `distinct_sample_seed_qualified_candidate_found`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_CONTEXT_2026-05-29.md`
+- focused context decision: `keep_for_focused_listening`
+- decision flags: `{}`
+- note count: `13`
+- unique pitch count: `6`
+- range: `A#4-D#5`
+- phrase span: `6.750` beats
+- max active notes: `1`
+- dead-air ratio: `0.375`
+- onset coverage: `0.5625`
+- sustained coverage: `0.78125`
+- adjacent repeats: `1`
+- max interval: `3`
+- final landing: `D5` over `Fm7`, tension
 
 판단:
 
-- duplicate sample seed `85` 없이도 qualified 후보 `2`개가 나왔다.
-- selected distinct candidate는 gate를 통과하지만 focused unique pitch `6`, dead-air `0.375`라 context/listening 검증 전 최종 keep으로 보지 않는다.
+- distinct sample-seed 후보의 focused context blocker는 발견되지 않았다.
+- focused unique pitch `6`은 gate 하한이고 adjacent repeat `1`이 남아 있어 listening fill 전 최종 keep으로 보지 않는다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary distinct sample-seed focused context review`로 잡는다.
-- distinct sample-seed 후보를 solo/context package로 격리하고 context decision을 검증한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listening notes`로 잡는다.
+- distinct sample-seed focused context keep 후보를 focused listening notes/fill로 넘겨 timing, phrase, vocabulary 판단을 기록한다.
 - broad training은 focused context/listening boundary를 먼저 본 뒤 결정한다.
 
 ## 10. 한 문장 요약
