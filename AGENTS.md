@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #288, Stage B margin-recovered phrase/vocabulary qualified peer focused listening fill.
+- Latest functional issue completed: Issue #290, Stage B margin-recovered phrase/vocabulary two-candidate keep consolidation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary two-candidate keep consolidation.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary human listening comparison boundary.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -514,6 +514,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-peer-fo
 ```
 
 This harness fills the qualified peer focused listening review notes from MIDI/context evidence and records the fallback keep boundary.
+
+For Stage B margin-recovered phrase/vocabulary two-candidate keep consolidation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-two-candidate-keep
+```
+
+This harness joins selected and peer filled keep notes with the stability summary and records the two-candidate evidence boundary.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
