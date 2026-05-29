@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #316, Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening notes`
+- latest functional result: Issue #318, Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening notes
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening fill`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,42 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Focused Listening Notes Result
+
+Issue #318은 Issue #316 focused context keep candidate의 focused listening notes template을 생성한 작업이다.
+
+변경:
+
+- focused listening notes template 생성
+- prior decision `keep_for_focused_listening` 연결
+- listening fields pending 유지
+
+결과:
+
+- candidate count: `1`
+- reviewed count: `0`
+- pending count: `1`
+- prior decision: `keep_for_focused_listening`
+- listening decision: `pending`
+- review risks: `sustained_coverage_review`
+- note count: `18`
+- unique pitch count: `15`
+- phrase span: `7.000` beats
+- dead-air ratio: `0.2941`
+- adjacent pitch repeats: `0`
+- max interval: `7`
+- final note: `F4` over `Fm7`, chord tone
+
+판단:
+
+- focused listening review template 생성 완료
+- pending 상태 유지
+- notes template은 human/audio listening proof가 아님
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening fill`
 
 ## Current Duration Coverage Fill Focused Context Result
 
