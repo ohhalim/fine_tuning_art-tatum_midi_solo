@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #355, Stage B duration coverage fill repeatability consolidation.
+- Latest functional issue completed: Issue #357, Stage B duration coverage fill repeatability audio review package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill repeatability audio review package.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill repeatability user listening review fill.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -778,6 +778,14 @@ bash scripts/agent_harness.sh stage-b-duration-coverage-repeatability-consolidat
 ```
 
 This harness consolidates current keep listening support and distinct-source MIDI/dead-air gain evidence.
+
+For Stage B duration coverage fill repeatability audio review package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-duration-coverage-repeatability-audio-review-package
+```
+
+This harness renders repeatability source candidates to local WAV files and validates technical WAV metadata without claiming listening preference.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

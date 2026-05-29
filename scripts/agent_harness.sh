@@ -134,6 +134,8 @@ Modes:
                 Repair duration/coverage fill repeatability selection to require dead-air gain.
   stage-b-duration-coverage-repeatability-consolidation
                 Consolidate current keep and distinct-source repeatability evidence.
+  stage-b-duration-coverage-repeatability-audio-review-package
+                Render repeatability source candidates for user listening review.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1922,6 +1924,31 @@ run_stage_b_duration_coverage_repeatability_consolidation() {
     --require_no_broad_quality_claim
 }
 
+run_stage_b_duration_coverage_repeatability_audio_review_package() {
+  local repeatability_consolidation_run_id="${REPEATABILITY_CONSOLIDATION_RUN_ID:-harness_stage_b_duration_coverage_fill_repeatability_consolidation}"
+  local dead_air_repair_run_id="${DEAD_AIR_REPAIR_RUN_ID:-harness_stage_b_duration_coverage_fill_dead_air_gain_repeatability_repair}"
+  local run_id="${RUN_ID:-harness_stage_b_duration_coverage_fill_repeatability_audio_review_package}"
+  local repeatability_consolidation="outputs/stage_b_duration_coverage_fill_repeatability_consolidation/${repeatability_consolidation_run_id}/stage_b_duration_coverage_fill_repeatability_consolidation.json"
+  local dead_air_repair="outputs/stage_b_duration_coverage_fill_dead_air_gain_repeatability_repair/${dead_air_repair_run_id}/stage_b_duration_coverage_fill_dead_air_gain_repeatability_repair.json"
+  local soundfont="${SOUNDFONT_PATH:-$HOME/.local/share/soundfonts/generaluser-gs/v1.471.sf2}"
+  if [[ ! -f "$repeatability_consolidation" ]]; then
+    print_header "Stage B duration/coverage fill repeatability consolidation"
+    RUN_ID="$repeatability_consolidation_run_id" run_stage_b_duration_coverage_repeatability_consolidation
+  fi
+  if [[ ! -f "$dead_air_repair" ]]; then
+    print_header "Stage B duration/coverage fill dead-air gain repeatability repair"
+    RUN_ID="$dead_air_repair_run_id" run_stage_b_duration_coverage_dead_air_gain_repeatability_repair
+  fi
+  print_header "Stage B duration/coverage fill repeatability audio review package"
+  "$PYTHON_BIN" scripts/render_stage_b_duration_coverage_fill_repeatability_audio_review_package.py \
+    --run_id "$run_id" \
+    --repeatability_consolidation "$repeatability_consolidation" \
+    --dead_air_gain_repair "$dead_air_repair" \
+    --soundfont "$soundfont" \
+    --expected_file_count 2 \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3218,6 +3245,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-repeatability-consolidation)
     run_stage_b_duration_coverage_repeatability_consolidation
+    ;;
+  stage-b-duration-coverage-repeatability-audio-review-package)
+    run_stage_b_duration_coverage_repeatability_audio_review_package
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
