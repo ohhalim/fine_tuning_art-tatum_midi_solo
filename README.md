@@ -75,6 +75,7 @@
 | renderer/soundfont 준비 상태 불명확 | local render package는 준비됐지만 renderer가 없는 환경에서 render attempt를 진행할 위험 | tooling readiness check 추가 | `fluidsynth`/`timidity` 미탐지, system modification `false`, render attempted `false` |
 | renderer path decision 필요 | renderer unavailable 상태에서 설치/다운로드 없이 render attempt로 넘어갈 위험 | renderer path decision 추가 | decision `renderer_path_or_install_approval_required`, critical user input `true` |
 | user listening review artifact 필요 | MIDI evidence는 있지만 사용자가 직접 들을 WAV가 없음 | FluidSynth + GeneralUser GS로 source/fill WAV 렌더 | rendered files `2`, duration `6.474s`, technical WAV validation `true`, preference claim `false` |
+| user listening preference 기록 필요 | WAV 리뷰 후에도 선호와 claim boundary가 문서화되지 않으면 다음 판단 근거가 분리됨 | user listening review fill 추가 | preference `duration_coverage_fill_keep`, source random-like, fill jazz-like soloing, broad quality claim `false` |
 
 ## 파이프라인 구조
 

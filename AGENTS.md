@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #343, Stage B duration coverage fill local audio render attempt.
+- Latest functional issue completed: Issue #345, Stage B duration coverage fill user listening review fill.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill user listening review fill.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill user listening review consolidation.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -730,6 +730,14 @@ bash scripts/agent_harness.sh stage-b-local-audio-render-attempt
 ```
 
 This harness renders source/fill MIDI to local WAV files and validates technical WAV metadata without claiming listening preference.
+
+For Stage B duration coverage fill user listening review fill changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-user-listening-review-fill
+```
+
+This harness applies a validated user listening review from rendered WAV files and keeps broad model quality unclaimed.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
