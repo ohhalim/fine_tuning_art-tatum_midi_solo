@@ -160,6 +160,8 @@ Modes:
                 Assess Stage B readiness before generic jazz base preparation.
   stage-b-generic-base-manifest-contract
                 Build and validate generic/Brad split manifest contract before Stage B window preparation.
+  stage-b-generic-manifest-window-smoke
+                Prepare Stage B duration-explicit windows from generic split manifest prefix.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -314,6 +316,7 @@ run_quick() {
     scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_broader_repeatability_sweep.py \
     scripts/assess_stage_b_generic_base_readiness.py \
     scripts/check_stage_b_generic_base_manifest_contract.py \
+    scripts/run_stage_b_generic_manifest_window_smoke.py \
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
     scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
     scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
@@ -2240,6 +2243,25 @@ run_stage_b_generic_base_manifest_contract() {
     --require_no_brad_style_claim
 }
 
+run_stage_b_generic_manifest_window_smoke() {
+  local manifest_contract_run_id="${MANIFEST_CONTRACT_RUN_ID:-harness_stage_b_generic_base_manifest_contract}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_manifest_window_smoke}"
+  local manifests_dir="outputs/stage_b_generic_base_manifest_contract/${manifest_contract_run_id}/manifests"
+  if [[ ! -f "${manifests_dir}/generic_jazz_train.txt" || ! -f "${manifests_dir}/generic_jazz_val.txt" ]]; then
+    print_header "Stage B generic base manifest contract"
+    RUN_ID="$manifest_contract_run_id" run_stage_b_generic_base_manifest_contract
+  fi
+  print_header "Stage B generic manifest window smoke"
+  "$PYTHON_BIN" scripts/run_stage_b_generic_manifest_window_smoke.py \
+    --run_id "$run_id" \
+    --manifests_dir "$manifests_dir" \
+    --expected_boundary stage_b_generic_stage_b_window_prepare_smoke \
+    --expected_next_boundary stage_b_generic_base_tiny_training_smoke \
+    --require_smoke_ready \
+    --require_no_broad_quality_claim \
+    --require_no_brad_style_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3575,6 +3597,9 @@ case "$MODE" in
     ;;
   stage-b-generic-base-manifest-contract)
     run_stage_b_generic_base_manifest_contract
+    ;;
+  stage-b-generic-manifest-window-smoke)
+    run_stage_b_generic_manifest_window_smoke
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
