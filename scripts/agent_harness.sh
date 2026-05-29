@@ -102,6 +102,8 @@ Modes:
                 Fill the selected distinct sample-seed focused listening review notes.
   stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-remaining-blocker
                 Summarize remaining blockers for the distinct sample-seed needs-followup candidate.
+  stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-remaining-blocker-repair-sweep
+                Run a target sweep for the distinct sample-seed remaining blockers.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1215,6 +1217,71 @@ run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_remaining_bl
     --filled_notes "$filled_notes" \
     --expected_decision needs_followup \
     --require_remaining_blockers
+}
+
+run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_remaining_blocker_repair_sweep() {
+  local seed181_run_id="${SEED181_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocab_seed181_topk8_temp090_n48}"
+  local seed223_run_id="${SEED223_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocab_seed223_topk8_temp086_n48}"
+  local repair_run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_remaining_blocker_repair}"
+  local checkpoint_dir="${CHECKPOINT_DIR:-outputs/stage_b_generation_probe/issue_238_stage_b_candidate_count_margin_recovery_seed31_files6/checkpoints}"
+  if [[ ! -f "outputs/stage_b_generation_probe/${seed181_run_id}/report.json" ]]; then
+    print_header "Stage B distinct sample-seed remaining blocker repair seed 181"
+    "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+      --run_id "$seed181_run_id" \
+      --checkpoint_dir "$checkpoint_dir" \
+      --skip_prepare \
+      --skip_train \
+      --seed 181 \
+      --max_files 6 \
+      --max_sequence 96 \
+      --num_samples 48 \
+      --temperature 0.90 \
+      --top_k 8 \
+      --postprocess_overlap \
+      --max_simultaneous_notes 2 \
+      --require_valid_sample \
+      --require_strict_valid_sample \
+      --require_note_groups \
+      --issue_number 308
+  fi
+  if [[ ! -f "outputs/stage_b_generation_probe/${seed223_run_id}/report.json" ]]; then
+    print_header "Stage B distinct sample-seed remaining blocker repair seed 223"
+    "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+      --run_id "$seed223_run_id" \
+      --checkpoint_dir "$checkpoint_dir" \
+      --skip_prepare \
+      --skip_train \
+      --seed 223 \
+      --max_files 6 \
+      --max_sequence 96 \
+      --num_samples 48 \
+      --temperature 0.86 \
+      --top_k 8 \
+      --postprocess_overlap \
+      --max_simultaneous_notes 2 \
+      --require_valid_sample \
+      --require_strict_valid_sample \
+      --require_note_groups \
+      --issue_number 308
+  fi
+  print_header "Stage B distinct sample-seed remaining blocker repair summary"
+  "$PYTHON_BIN" scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_repair.py \
+    --run_id "$repair_run_id" \
+    --report_path "outputs/stage_b_generation_probe/${seed181_run_id}/report.json" \
+    --report_path "outputs/stage_b_generation_probe/${seed223_run_id}/report.json" \
+    --previous_candidate_id margin_recovered_phrase_vocab_seed_109_topk_7_temp_082_n48_sample_47 \
+    --previous_dead_air 0.375 \
+    --previous_unique_pitch_count 6 \
+    --previous_note_count 13 \
+    --previous_adjacent_pitch_repeats 1 \
+    --previous_max_interval 3 \
+    --min_unique_pitch_count 7 \
+    --max_dead_air_ratio_exclusive 0.376 \
+    --min_note_count 12 \
+    --max_simultaneous_notes 1 \
+    --max_duplicated_3_note_chunks 0 \
+    --max_adjacent_pitch_repeats_exclusive 1 \
+    --max_interval_exclusive 12
 }
 
 run_stage_b_constrained_probe() {
@@ -2441,6 +2508,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-remaining-blocker)
     run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_remaining_blocker
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-remaining-blocker-repair-sweep)
+    run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_remaining_blocker_repair_sweep
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
