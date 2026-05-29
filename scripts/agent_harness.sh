@@ -100,6 +100,8 @@ Modes:
                 Build focused listening notes for the selected distinct sample-seed candidate.
   stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-focused-listening-fill
                 Fill the selected distinct sample-seed focused listening review notes.
+  stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-remaining-blocker
+                Summarize remaining blockers for the distinct sample-seed needs-followup candidate.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1197,6 +1199,22 @@ run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_list
     --review_notes "$review_notes" \
     --expected_candidate_id "$candidate_id" \
     --expected_decision needs_followup
+}
+
+run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_remaining_blocker() {
+  local fill_run_id="${FILL_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_listening_fill}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_remaining_blocker}"
+  local filled_notes="outputs/stage_b_margin_recovered_phrase_vocabulary_focused_listening_fill/${fill_run_id}/focused_listening_review_notes_filled.json"
+  if [[ ! -f "$filled_notes" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listening fill"
+    RUN_ID="$fill_run_id" run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_listening_fill
+  fi
+  print_header "Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker"
+  "$PYTHON_BIN" scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_remaining_blocker.py \
+    --run_id "$run_id" \
+    --filled_notes "$filled_notes" \
+    --expected_decision needs_followup \
+    --require_remaining_blockers
 }
 
 run_stage_b_constrained_probe() {
@@ -2420,6 +2438,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-focused-listening-fill)
     run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_listening_fill
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-remaining-blocker)
+    run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_remaining_blocker
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

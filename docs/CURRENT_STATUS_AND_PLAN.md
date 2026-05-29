@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #304, Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listening fill
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair target`
+- latest functional result: Issue #306, Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair target
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair sweep`
 
 현재 범위가 아닌 것:
 
@@ -1857,6 +1857,51 @@ Issue #304는 Issue #302 focused listening notes를 MIDI/context evidence 기준
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_LISTENING_FILL_2026-05-29.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Distinct Sample-Seed Remaining Blocker Result
+
+Issue #306은 Issue #304 `needs_followup` 결과를 다음 repair sweep target으로 정리한 작업이다.
+
+변경:
+
+- distinct sample-seed remaining blocker summary script 추가
+- filled notes 기반 repair target과 keep guardrail 분리
+- unit test와 harness mode 추가
+- README와 handoff docs 업데이트
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_remaining_blocker`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-remaining-blocker`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_phrase_vocab_seed_109_topk_7_temp_082_n48_sample_47` |
+| sample seed | `155` |
+| final decision | `needs_followup` |
+| repair boundary | `distinct_sample_seed_candidate_needs_phrase_vocabulary_repair` |
+| remaining blockers | `phrase_continuation_weak`, `jazz_vocabulary_thin`, `short_phrase_span`, `pitch_variety_floor`, `adjacent_pitch_repeats` |
+| secondary risks | `dead_air_ratio_remaining` |
+| target phrase span beats | `>= 7.0` |
+| target unique pitch count | `>= 7` |
+| target adjacent pitch repeats | `0` |
+| preferred dead-air ratio | `<= 0.35` |
+| preserve max interval | `< 12` |
+| preserve max active notes | `<= 1` |
+| preserve final note role | chord tone or tension |
+
+해석:
+
+- 새 repair는 phrase span, pitch variety, adjacent repeat를 같이 개선해야 한다.
+- timing, landing, max interval, max active notes는 guardrail로 유지한다.
+- sample seed `85`는 duplicate output boundary로 제외한다.
+- 이 문서는 다음 sweep 조건 정의이며 새 generated-quality claim이 아니다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REMAINING_BLOCKER_2026-05-29.md`
 
 ## Latest README Footer Section Removal Result
 

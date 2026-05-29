@@ -97,6 +97,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary distinct sample-seed focused context 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_CONTEXT_2026-05-29.md`
 - margin-recovered phrase/vocabulary distinct sample-seed focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_LISTENING_NOTES_2026-05-29.md`
 - margin-recovered phrase/vocabulary distinct sample-seed focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_LISTENING_FILL_2026-05-29.md`
+- margin-recovered phrase/vocabulary distinct sample-seed remaining blocker 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REMAINING_BLOCKER_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -555,6 +556,8 @@ Stage B에서 명시하는 것:
 - Issue #302 result: candidate `1`, pending `1`, review risks `dead_air_ratio_remaining` and `adjacent_pitch_repeats`.
 - Issue #304 fills the distinct sample-seed notes from MIDI/context evidence.
 - Issue #304 result: decision `needs_followup`, phrase continuation `weak`, jazz vocabulary `thin`; timing and landing remain acceptable.
+- Issue #306 summarizes the remaining blockers into the next repair target.
+- Issue #306 result: blockers `phrase_continuation_weak`, `jazz_vocabulary_thin`, `short_phrase_span`, `pitch_variety_floor`, `adjacent_pitch_repeats`; target phrase span `>= 7.0`, unique pitch `>= 7`, adjacent repeats `0`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -573,8 +576,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #304는 duplicate seed `85`와 겹치지 않는 후보를 focused listening fill까지 보냈지만 `needs_followup`으로 판정했다.
-다음 작업은 distinct sample-seed 유지 상태에서 phrase span, pitch variety, adjacent repeat를 함께 개선하는 repair target을 정리하는 것이다.
+Issue #306은 duplicate seed `85`와 겹치지 않는 후보의 remaining blocker를 다음 repair target으로 고정했다.
+다음 작업은 distinct sample-seed 유지 상태에서 phrase span, pitch variety, adjacent repeat를 함께 개선하는 repair sweep이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -1100,7 +1103,7 @@ Issue #304는 duplicate seed `85`와 겹치지 않는 후보를 focused listenin
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listening fill
+Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair target
 ```
 
 결과:
@@ -1109,37 +1112,30 @@ Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listenin
 - selected source seed: `109`
 - selected sample index: `47`
 - selected sample seed: `155`
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_LISTENING_FILL_2026-05-29.md`
-- reviewed count: `1`
-- pending count: `0`
-- timing: `acceptable`
-- chord fit: `acceptable`
-- phrase continuation: `weak`
-- landing: `acceptable`
-- jazz vocabulary: `thin`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REMAINING_BLOCKER_2026-05-29.md`
 - final decision: `needs_followup`
-- unique pitch count: `6`
-- range: `A#4-D#5`
-- phrase span: `6.750` beats
-- dead-air ratio: `0.375`
-- onset coverage: `0.5625`
-- sustained coverage: `0.78125`
-- adjacent repeats: `1`
-- max interval: `3`
-- final landing: `D5` over `Fm7`, tension
-- review risks: `dead_air_ratio_remaining`, `adjacent_pitch_repeats`
+- remaining blockers: `phrase_continuation_weak`, `jazz_vocabulary_thin`, `short_phrase_span`, `pitch_variety_floor`, `adjacent_pitch_repeats`
+- secondary risk: `dead_air_ratio_remaining`
+- repair boundary: `distinct_sample_seed_candidate_needs_phrase_vocabulary_repair`
+- target phrase span beats: `>= 7.0`
+- target unique pitch count: `>= 7`
+- target adjacent pitch repeats: `0`
+- preferred dead-air ratio: `<= 0.35`
+- preserve max interval: `< 12`
+- preserve max active notes: `<= 1`
+- preserve final note role: chord tone or tension
 
 판단:
 
-- distinct sample-seed 후보는 context blocker 없이 listening fill까지 갔지만 keep으로 승격하지 않았다.
-- timing과 landing은 acceptable이나 phrase continuation과 jazz vocabulary가 남은 blocker다.
-- remaining blocker는 phrase span `6.750`, unique pitch `6`, adjacent repeat `1`이다.
+- 다음 sweep은 phrase span, pitch variety, adjacent repeat를 같이 개선해야 한다.
+- timing, landing, max interval, max active notes는 guardrail로 유지한다.
+- sample seed `85`는 duplicate output boundary로 제외한다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair target`으로 잡는다.
-- distinct sample-seed 유지 상태에서 phrase span, pitch variety, adjacent repeat를 같이 개선하는 sweep 조건을 정리한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair sweep`으로 잡는다.
+- target과 guardrail을 적용해 새 distinct sample-seed 후보를 찾는다.
 - broad training은 focused context/listening boundary를 먼저 본 뒤 결정한다.
 
 ## 10. 한 문장 요약
