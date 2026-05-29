@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #349, Stage B duration coverage fill next decision
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill broader repeatability sweep`
+- latest functional result: Issue #351, Stage B duration coverage fill broader repeatability sweep
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill dead-air gain repeatability repair`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,39 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Broader Repeatability Sweep Result
+
+Issue #351은 duration coverage fill 후보의 반복성 경계를 distinct sample-seed 후보 기준으로 재검토한 작업이다.
+
+변경:
+
+- broader repeatability sweep summary script 추가
+- distinct sample-seed qualified 후보 `2`개에 duration/coverage fill gate 재적용
+- current keep anchor와 distinct source sweep 결과 분리
+- uniform dead-air gain 여부와 qualified MIDI gate 여부 분리
+
+결과:
+
+- boundary: `qualified_gate_repeatability_with_partial_dead_air_gain`
+- source candidates: `2`
+- distinct sample seeds: `2`
+- qualified source candidates: `2`
+- dead-air improved source candidates: `1`
+- total variants: `8`
+- qualified variants: `7`
+- broad model quality claimed: `false`
+
+판단:
+
+- distinct sample-seed 후보 `2/2`에서 selected fill 후보가 MIDI gate 통과
+- dead-air gain은 `1/2` 후보에서만 관측
+- qualified gate 반복성은 관측, uniform dead-air gain은 미검증
+- new source human/audio preference, multi-reviewer preference, broad trained-model quality는 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill dead-air gain repeatability repair`
 
 ## Current Duration Coverage Fill Next Decision Result
 
