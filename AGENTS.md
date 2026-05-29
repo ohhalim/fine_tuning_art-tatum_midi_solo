@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #361, Stage B duration coverage fill outside-soloing repair decision.
+- Latest functional issue completed: Issue #363, Stage B duration coverage fill outside-soloing repair sweep.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair sweep.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill outside-soloing repair audio review package.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -802,6 +802,14 @@ bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-d
 ```
 
 This harness converts repeatability user listening follow-up into pitch-role and phrase-clarity repair targets.
+
+For Stage B duration coverage fill outside-soloing repair sweep changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-sweep
+```
+
+This harness builds pitch-role repair candidates for repeatability sources while preserving dead-air gain and monophonic gates.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
