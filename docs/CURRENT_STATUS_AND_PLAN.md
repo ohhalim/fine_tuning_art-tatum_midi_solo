@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #298, Stage B margin-recovered phrase/vocabulary distinct sample-seed repair sweep
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary distinct sample-seed focused context review`
+- latest functional result: Issue #300, Stage B margin-recovered phrase/vocabulary distinct sample-seed focused context review
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listening notes`
 
 현재 범위가 아닌 것:
 
@@ -1706,6 +1706,58 @@ Issue #298은 duplicate sample seed `85`와 겹치지 않는 seed range에서 ph
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REPAIR_SWEEP_2026-05-29.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Distinct Sample-Seed Focused Context Result
+
+Issue #300은 Issue #298 selected distinct sample-seed candidate를 solo/context package로 격리하고 focused context decision을 실행한 작업이다.
+
+변경:
+
+- distinct sample-seed repair summary 기반 focused package harness 추가
+- selected candidate의 solo-line MIDI와 context MIDI 복사/생성
+- 기존 focused context decision 기준으로 final landing, context guide, max active, repeated cell 재검증
+- README와 handoff docs 업데이트
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_margin_recovered_phrase_vocabulary_focused_package tests.test_stage_b_margin_recovered_focused_context_decision`
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-focused-context`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| candidate | `margin_recovered_phrase_vocab_seed_109_topk_7_temp_082_n48_sample_47` |
+| source seed | `109` |
+| sample index | `47` |
+| sample seed | `155` |
+| copied MIDI files | `2` |
+| focused context decision | `keep_for_focused_listening` |
+| decision flags | `{}` |
+| note count | `13` |
+| unique pitch count | `6` |
+| range | `A#4-D#5` |
+| phrase span | `6.750` beats |
+| max active notes | `1` |
+| dead-air ratio | `0.375` |
+| onset coverage | `0.5625` |
+| sustained coverage | `0.78125` |
+| adjacent pitch repeats | `1` |
+| max interval | `3` |
+| duplicated 3-note pitch-class chunks | `0` |
+| final landing | `D5` over `Fm7`, tension |
+
+해석:
+
+- focused context blocker는 발견되지 않았다.
+- context MIDI에는 chord guide, bass root guide, solo track이 있다.
+- final note는 `Fm7` 위 tension으로 처리되어 outside landing blocker가 아니다.
+- focused unique pitch `6`은 gate 하한이고 adjacent repeat `1`이 남아 있어 focused listening fill 전 최종 keep으로 보지 않는다.
+- human/audio proof, broad trained-model quality, Brad style adaptation은 아직 미검증이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_FOCUSED_CONTEXT_2026-05-29.md`
 
 ## Latest README Footer Section Removal Result
 

@@ -94,6 +94,8 @@ Modes:
                 Repair distinct-output claim boundary for duplicate sample-seed candidates.
   stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-sweep
                 Run a focused repair sweep with sample seed ranges outside the duplicate seed.
+  stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-focused-context
+                Package and review the selected distinct sample-seed phrase/vocabulary candidate in context.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1128,6 +1130,32 @@ run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep() {
     --sample_seed_repair "$sample_seed_repair" \
     --min_candidates 96 \
     --expected_blocked_seed 85
+}
+
+run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_context() {
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_repair}"
+  local sweep_run_id="${SWEEP_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep}"
+  local package_run_id="${PACKAGE_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_package}"
+  local decision_run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_context_decision}"
+  local candidate_id="margin_recovered_phrase_vocab_seed_109_topk_7_temp_082_n48_sample_47"
+  local repair_summary="outputs/stage_b_margin_recovered_phrase_vocabulary_repair/${repair_run_id}/phrase_vocabulary_repair_summary.json"
+  if [[ ! -f "$repair_summary" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary distinct sample-seed sweep"
+    REPAIR_RUN_ID="$repair_run_id" RUN_ID="$sweep_run_id" run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep
+  fi
+  print_header "Stage B margin-recovered phrase/vocabulary distinct sample-seed focused package"
+  "$PYTHON_BIN" scripts/build_stage_b_margin_recovered_phrase_vocabulary_focused_package.py \
+    --run_id "$package_run_id" \
+    --repair_summary "$repair_summary" \
+    --candidate_id "$candidate_id" \
+    --expected_candidate_id "$candidate_id"
+
+  print_header "Stage B margin-recovered phrase/vocabulary distinct sample-seed focused context decision"
+  "$PYTHON_BIN" scripts/review_stage_b_margin_recovered_focused_context.py \
+    --run_id "$decision_run_id" \
+    --focused_package "outputs/stage_b_margin_recovered_phrase_vocabulary_focused_package/${package_run_id}/focused_review_package.json" \
+    --expected_candidate_id "$candidate_id" \
+    --expected_decision keep_for_focused_listening
 }
 
 run_stage_b_constrained_probe() {
@@ -2342,6 +2370,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-sweep)
     run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-focused-context)
+    run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_context
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
