@@ -101,6 +101,11 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair sweep 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REMAINING_BLOCKER_REPAIR_SWEEP_2026-05-29.md`
 - margin-recovered phrase/vocabulary distinct sample-seed dead-air adjacent repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_DEAD_AIR_ADJACENT_REPAIR_2026-05-29.md`
 - margin-recovered phrase/vocabulary coverage-aware adjacent constrained repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_COVERAGE_AWARE_ADJACENT_CONSTRAINED_REPAIR_2026-05-29.md`
+- margin-recovered phrase/vocabulary duration coverage fill repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DURATION_COVERAGE_FILL_REPAIR_2026-05-29.md`
+- margin-recovered phrase/vocabulary duration coverage fill focused context 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DURATION_COVERAGE_FILL_FOCUSED_CONTEXT_2026-05-29.md`
+- margin-recovered phrase/vocabulary duration coverage fill focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DURATION_COVERAGE_FILL_FOCUSED_LISTENING_NOTES_2026-05-29.md`
+- margin-recovered phrase/vocabulary duration coverage fill focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DURATION_COVERAGE_FILL_FOCUSED_LISTENING_FILL_2026-05-29.md`
+- margin-recovered phrase/vocabulary duration coverage fill keep consolidation 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DURATION_COVERAGE_FILL_KEEP_CONSOLIDATION_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -140,6 +145,11 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary duplicate source divergence: source seed diff `true`, shared sample seed `85`, output diversity `absent`
 - margin-recovered phrase/vocabulary sample-seed diversity repair: qualified sample seed `1`, distinct peer `0`, boundary `single_distinct_sample_seed_keep_support`
 - margin-recovered phrase/vocabulary distinct sample-seed repair sweep: blocked seed `85` 제외, distinct qualified `2`, selected sample seed `155`
+- margin-recovered phrase/vocabulary coverage-aware adjacent constrained repair: target-qualified `0/48`, adjacent repeat `0`, dead-air `0.5714`
+- margin-recovered phrase/vocabulary duration coverage fill repair: qualified `2/4`, fill additions `6`, dead-air `0.5714 -> 0.2941`
+- margin-recovered phrase/vocabulary duration coverage fill focused context: decision `keep_for_focused_listening`, flags `{}`, final `F4` over `Fm7` chord tone
+- margin-recovered phrase/vocabulary duration coverage fill focused listening fill: reviewed `1`, decision `keep`, review risks `{}`
+- margin-recovered phrase/vocabulary duration coverage fill keep consolidation: boundary `single_postprocess_candidate_keep_support`, human/audio proof 미검증
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1147,16 +1157,51 @@ Stage B margin-recovered phrase/vocabulary duration coverage fill focused listen
 
 - MIDI/context evidence fill 기준 keep.
 - source coverage metric 부재 시 solo MIDI 기반 coverage를 산출하도록 보정.
-- adjacent repeat, wide interval blocker 유지.
+- adjacent repeat, wide interval blocker repair 유지.
 - human/audio listening proof는 아직 아니다.
 - claim boundary: `postprocess_duration_coverage_fill_candidate`.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary duration coverage fill keep consolidation`로 잡는다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio comparison boundary`로 잡는다.
 - postprocess candidate boundary, human review boundary, broad training boundary를 분리한다.
 - broad training은 focused context/listening boundary를 먼저 본 뒤 결정한다.
+
+## 9.1 Stage B margin-recovered phrase/vocabulary duration coverage fill keep consolidation
+
+Issue #322는 Issue #320의 `keep` 결과를 claim boundary 기준으로 정리한 작업이다.
+
+결과:
+
+- candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6`
+- decision: `keep`
+- evidence boundary: `single_postprocess_candidate_keep_support`
+- postprocess claim boundary: `postprocess_duration_coverage_fill_candidate`
+- variant count: `4`
+- qualified variant count: `2`
+- fill additions: `6`
+- dead-air ratio: `0.5714 -> 0.2941`
+- onset coverage: `0.5625`
+- sustained coverage: `0.6250`
+- note count: `18`
+- unique pitch count: `15`
+- final note: `F4` over `Fm7`, chord tone
+
+판단:
+
+- MIDI/context evidence keep은 확인했다.
+- adjacent repeat blocker와 wide interval blocker는 repair 상태다.
+- single postprocess candidate support이므로 broad repeatability는 아직 아니다.
+- human/audio preference, broad trained-model quality, Brad style adaptation은 아직 미검증이다.
+
+검증:
+
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-keep-consolidation`
+
+다음 작업:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill human/audio comparison boundary`
 
 ## 10. 한 문장 요약
 
