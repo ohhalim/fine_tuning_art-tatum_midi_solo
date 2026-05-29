@@ -88,6 +88,8 @@ Modes:
                 Consolidate selected and peer phrase/vocabulary keep candidates.
   stage-b-margin-recovered-phrase-vocabulary-human-listening-comparison
                 Build pending human-listening comparison boundary for selected and peer keep candidates.
+  stage-b-margin-recovered-phrase-vocabulary-duplicate-source-divergence
+                Audit whether selected and peer keep candidates are duplicate outputs from shared sample seed.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -235,6 +237,7 @@ run_quick() {
     scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_keep_stability.py \
     scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep.py \
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
+    scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
     scripts/run_stage_b_sampling_sweep.py \
     scripts/run_stage_b_coverage_ab_sweep.py \
     scripts/run_stage_b_pitch_mode_compare.py \
@@ -1007,6 +1010,30 @@ run_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison() {
     --require_pending \
     --require_no_preference \
     --expect_note_sequence_match
+}
+
+run_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence() {
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_repair}"
+  local human_run_id="${HUMAN_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence}"
+  local repair_summary="outputs/stage_b_margin_recovered_phrase_vocabulary_repair/${repair_run_id}/phrase_vocabulary_repair_summary.json"
+  local human_comparison="outputs/stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison/${human_run_id}/human_listening_comparison_boundary.json"
+  if [[ ! -f "$repair_summary" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary repair"
+    RUN_ID="$repair_run_id" run_stage_b_margin_recovered_phrase_vocabulary_repair
+  fi
+  if [[ ! -f "$human_comparison" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary human listening comparison boundary"
+    RUN_ID="$human_run_id" run_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison
+  fi
+  print_header "Stage B margin-recovered phrase/vocabulary duplicate source divergence"
+  "$PYTHON_BIN" scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
+    --run_id "$run_id" \
+    --repair_summary "$repair_summary" \
+    --human_comparison "$human_comparison" \
+    --require_shared_sample_seed \
+    --require_duplicate_output \
+    --expected_boundary shared_sample_seed_duplicate_output
 }
 
 run_stage_b_constrained_probe() {
@@ -2212,6 +2239,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-human-listening-comparison)
     run_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-duplicate-source-divergence)
+    run_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

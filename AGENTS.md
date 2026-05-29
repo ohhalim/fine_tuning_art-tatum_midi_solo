@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #292, Stage B margin-recovered phrase/vocabulary human listening comparison boundary.
+- Latest functional issue completed: Issue #294, Stage B margin-recovered phrase/vocabulary duplicate-candidate source divergence audit.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duplicate-candidate source divergence audit.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary sample-seed diversity repair.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -530,6 +530,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-human-l
 ```
 
 This harness prepares pending human listening fields and verifies whether selected and peer keep candidates are distinct enough for A/B listening comparison.
+
+For Stage B margin-recovered phrase/vocabulary duplicate-candidate source divergence changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duplicate-source-divergence
+```
+
+This harness audits whether selected and peer keep candidates are distinct outputs or duplicate MIDI content from a shared sample seed.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
