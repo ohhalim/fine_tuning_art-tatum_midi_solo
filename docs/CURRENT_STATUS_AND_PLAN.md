@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #314, Stage B margin-recovered phrase/vocabulary duration coverage fill repair
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review`
+- latest functional result: Issue #316, Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening notes`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,42 @@ Issue #220은 현재 작업이 core인지, MVP 완료로 볼 수 있는지를 �
 Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
+
+## Current Duration Coverage Fill Focused Context Result
+
+Issue #316은 Issue #314 selected duration/coverage fill candidate를 solo/context package로 격리하고 focused context decision을 검토한 작업이다.
+
+변경:
+
+- `review_files.report_path` 기반 context source report 연결
+- `duration_coverage_gate` 기반 focused package objective review 연결
+- focused package 생성 및 context decision harness 추가
+
+결과:
+
+- selected candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6`
+- focused context decision: `keep_for_focused_listening`
+- decision flags: `[]`
+- note count: `18`
+- unique pitch count: `15`
+- range: `D#4-G#5`
+- phrase span: `7.000` beats
+- max active notes: `1`
+- dead-air ratio: `0.2941`
+- adjacent pitch repeats: `0`
+- duplicated 3-note pitch-class chunks: `0`
+- max interval: `7`
+- final note: `F4` over `Fm7`, chord tone
+
+판단:
+
+- focused context blocker 미관측
+- focused listening notes 이동 가능
+- human/audio preference와 broad trained-model quality는 여전히 미검증
+
+다음:
+
+- `Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening notes`
 
 ## Current Duration Coverage Fill Result
 

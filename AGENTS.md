@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #314, Stage B margin-recovered phrase/vocabulary duration coverage fill repair.
+- Latest functional issue completed: Issue #316, Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening notes.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -618,6 +618,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duratio
 ```
 
 This harness builds duration/coverage fill variants for the constrained partial candidate and verifies the objective guardrails.
+
+For Stage B margin-recovered phrase/vocabulary duration coverage fill focused context changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-duration-coverage-fill-focused-context
+```
+
+This harness packages the selected duration/coverage fill candidate with chord/bass context and verifies focused context decision readiness.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

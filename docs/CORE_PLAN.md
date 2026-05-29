@@ -1112,38 +1112,39 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary duration coverage fill repair
+Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review
 ```
 
 결과:
 
-- source candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3`
 - selected candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3_duration_fill_maxadd_6`
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DURATION_COVERAGE_FILL_REPAIR_2026-05-29.md`
-- variant count: `4`
-- qualified variant count: `2`
-- selected fill additions: `6`
-- baseline dead-air ratio: `0.5714`
-- selected dead-air ratio: `0.2941`
-- selected focused note count: `18`
-- selected focused unique pitch count: `15`
-- selected adjacent pitch repeats: `0`
-- selected duplicated 3-note pitch-class chunks: `0`
-- selected max interval: `7`
-- remaining flags: `[]`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DURATION_COVERAGE_FILL_FOCUSED_CONTEXT_2026-05-29.md`
+- candidate count: `1`
+- focused context decision: `keep_for_focused_listening`
+- decision flags: `[]`
+- note count: `18`
+- unique pitch count: `15`
+- range: `D#4-G#5`
+- phrase span: `7.000` beats
+- max active notes: `1`
+- dead-air ratio: `0.2941`
+- adjacent pitch repeats: `0`
+- duplicated 3-note pitch-class chunks: `0`
+- max interval: `7`
+- final note: `F4` over `Fm7`, chord tone
 
 판단:
 
-- duration/coverage fill repair로 dead-air blocker를 objective gate 안으로 낮췄다.
-- adjacent repeat, duplicated pitch-class cell, max interval guardrail 유지.
-- selected variant는 threshold 통과에 필요한 최소 addition count 기준이다.
+- focused context blocker는 관측되지 않았다.
+- chord guide, bass guide, solo track context MIDI 생성 확인.
+- selected candidate는 focused listening notes로 넘길 수 있다.
 - claim boundary: `postprocess_duration_coverage_fill_candidate`.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary duration coverage fill focused context review`로 잡는다.
-- repaired candidate를 solo/context package로 격리해 context decision readiness를 검토한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary duration coverage fill focused listening notes`로 잡는다.
+- focused listening fields를 pending 상태로 만들고 evidence fill 또는 human review 경계를 분리한다.
 - broad training은 focused context/listening boundary를 먼저 본 뒤 결정한다.
 
 ## 10. 한 문장 요약

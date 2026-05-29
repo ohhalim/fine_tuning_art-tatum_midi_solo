@@ -63,12 +63,19 @@ def review_notes_from_repair(
     metrics = dict(candidate.get("metrics") or {})
     temporal = dict(candidate.get("temporal_coverage") or {})
     focused = dict(candidate.get("focused_solo_metrics") or {})
-    gate = (
-        candidate.get("phrase_vocabulary_gate")
-        if isinstance(candidate.get("phrase_vocabulary_gate"), dict)
-        else {}
-    )
+    gate = candidate.get("phrase_vocabulary_gate") if isinstance(candidate.get("phrase_vocabulary_gate"), dict) else {}
+    if not gate and isinstance(candidate.get("duration_coverage_gate"), dict):
+        gate = dict(candidate["duration_coverage_gate"])
     summary = repair_summary.get("repair_summary") if isinstance(repair_summary.get("repair_summary"), dict) else {}
+    source_candidate = (
+        repair_summary.get("source_candidate") if isinstance(repair_summary.get("source_candidate"), dict) else {}
+    )
+    source_report_path = str(candidate.get("source_report_path") or source_candidate.get("source_report_path") or "")
+    mode = (
+        "margin_recovered_phrase_vocabulary_duration_coverage_fill_repair"
+        if candidate.get("duration_coverage_gate")
+        else "margin_recovered_phrase_vocabulary_repair"
+    )
     return {
         "schema_version": "stage_b_margin_recovered_phrase_vocabulary_focused_review_notes_v1",
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
@@ -77,7 +84,7 @@ def review_notes_from_repair(
             {
                 "candidate_id": candidate_id,
                 "review_metadata": {
-                    "mode": "margin_recovered_phrase_vocabulary_repair",
+                    "mode": mode,
                     "review_rank": 1,
                     "source_run_id": str(candidate.get("source_run_id") or ""),
                     "sample_index": int(candidate.get("sample_index", 0) or 0),
@@ -85,6 +92,7 @@ def review_notes_from_repair(
                 },
                 "review_files": {
                     "midi_path": midi_path,
+                    "report_path": source_report_path,
                 },
                 "source_metrics": {
                     **metrics,
@@ -105,6 +113,8 @@ def review_notes_from_repair(
                         summary.get("focused_unique_pitch_delta_from_previous", 0) or 0
                     ),
                     "previous_note_delta": int(summary.get("focused_note_delta_from_previous", 0) or 0),
+                    "baseline_dead_air_delta": float(summary.get("dead_air_delta_from_baseline", 0.0) or 0.0),
+                    "fill_addition_count": int(summary.get("selected_fill_addition_count", 0) or 0),
                 },
                 "listening": {
                     "decision": str(decision),
