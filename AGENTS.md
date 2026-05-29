@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #339, Stage B local audio render tooling setup.
+- Latest functional issue completed: Issue #341, Stage B renderer path decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill renderer path decision.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill local audio render attempt after renderer path is available.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -714,6 +714,14 @@ bash scripts/agent_harness.sh stage-b-local-audio-render-tooling
 ```
 
 This harness checks renderer/soundfont readiness without installing packages or rendering audio.
+
+For Stage B renderer path decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-renderer-path-decision
+```
+
+This harness records whether renderer path or install approval is required before local audio render attempt.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

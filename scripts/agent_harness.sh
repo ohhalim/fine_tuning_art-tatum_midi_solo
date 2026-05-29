@@ -1726,6 +1726,22 @@ run_stage_b_local_audio_render_tooling() {
     --require_no_system_modification
 }
 
+run_stage_b_renderer_path_decision() {
+  local tooling_run_id="${TOOLING_RUN_ID:-harness_stage_b_local_audio_render_tooling}"
+  local run_id="${RUN_ID:-harness_stage_b_renderer_path_decision}"
+  local tooling_report="outputs/stage_b_local_audio_render_tooling/${tooling_run_id}/stage_b_local_audio_render_tooling.json"
+  if [[ ! -f "$tooling_report" ]]; then
+    print_header "Stage B local audio render tooling"
+    RUN_ID="$tooling_run_id" run_stage_b_local_audio_render_tooling
+  fi
+  print_header "Stage B renderer path decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_renderer_path.py \
+    --run_id "$run_id" \
+    --tooling_report "$tooling_report" \
+    --expected_decision renderer_path_or_install_approval_required \
+    --require_no_execution
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -2998,6 +3014,9 @@ case "$MODE" in
     ;;
   stage-b-local-audio-render-tooling)
     run_stage_b_local_audio_render_tooling
+    ;;
+  stage-b-renderer-path-decision)
+    run_stage_b_renderer_path_decision
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
