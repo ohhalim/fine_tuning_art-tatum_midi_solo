@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #310, Stage B margin-recovered phrase/vocabulary distinct sample-seed dead-air adjacent-repeat targeted repair.
+- Latest functional issue completed: Issue #312, Stage B margin-recovered phrase/vocabulary coverage-aware adjacent-repeat constrained repair.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B margin-recovered phrase/vocabulary coverage-aware adjacent-repeat constrained repair.
+- Recommended next issue: Stage B margin-recovered phrase/vocabulary duration coverage fill repair.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -602,6 +602,14 @@ bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-distinc
 ```
 
 This harness runs a lower-temperature checkpoint-based sampling sweep against the dead-air and adjacent-repeat target.
+
+For Stage B margin-recovered phrase/vocabulary coverage-aware adjacent constrained repair changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-coverage-aware-adjacent-constrained-repair
+```
+
+This harness runs coverage-aware constrained decoding to reduce adjacent pitch repeats and records the remaining dead-air boundary.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

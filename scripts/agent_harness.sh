@@ -106,6 +106,8 @@ Modes:
                 Run a target sweep for the distinct sample-seed remaining blockers.
   stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-dead-air-adjacent-repair
                 Run a targeted sweep for distinct sample-seed dead-air and adjacent-repeat blockers.
+  stage-b-margin-recovered-phrase-vocabulary-coverage-aware-adjacent-constrained-repair
+                Run coverage-aware constrained decoding for adjacent-repeat repair.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1351,6 +1353,86 @@ run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_dead_air_adj
     --max_interval_exclusive 12
 }
 
+run_stage_b_margin_recovered_phrase_vocabulary_coverage_aware_adjacent_constrained_repair() {
+  local seed353_run_id="${SEED353_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocab_coverage_adjacent_seed353_groups8}"
+  local seed397_run_id="${SEED397_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocab_coverage_adjacent_seed397_groups10_duration}"
+  local repair_run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_coverage_aware_adjacent_constrained_repair}"
+  local checkpoint_dir="${CHECKPOINT_DIR:-outputs/stage_b_generation_probe/issue_238_stage_b_candidate_count_margin_recovery_seed31_files6/checkpoints}"
+  if [[ ! -f "outputs/stage_b_generation_probe/${seed353_run_id}/report.json" ]]; then
+    print_header "Stage B coverage-aware adjacent constrained seed 353"
+    "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+      --run_id "$seed353_run_id" \
+      --checkpoint_dir "$checkpoint_dir" \
+      --skip_prepare \
+      --skip_train \
+      --seed 353 \
+      --max_files 6 \
+      --max_sequence 96 \
+      --num_samples 24 \
+      --temperature 0.82 \
+      --top_k 7 \
+      --generation_mode constrained \
+      --coverage_aware_positions \
+      --coverage_position_window 1 \
+      --chord_aware_pitches \
+      --chord_pitch_mode tones_tensions \
+      --chord_pitch_repeat_window 4 \
+      --constrained_note_groups_per_bar 8 \
+      --postprocess_overlap \
+      --max_simultaneous_notes 2 \
+      --require_valid_sample \
+      --require_strict_valid_sample \
+      --require_note_groups \
+      --issue_number 312
+  fi
+  if [[ ! -f "outputs/stage_b_generation_probe/${seed397_run_id}/report.json" ]]; then
+    print_header "Stage B coverage-aware adjacent constrained seed 397"
+    "$PYTHON_BIN" scripts/run_stage_b_generation_probe.py \
+      --run_id "$seed397_run_id" \
+      --checkpoint_dir "$checkpoint_dir" \
+      --skip_prepare \
+      --skip_train \
+      --seed 397 \
+      --max_files 6 \
+      --max_sequence 96 \
+      --num_samples 24 \
+      --temperature 0.82 \
+      --top_k 7 \
+      --generation_mode constrained \
+      --coverage_aware_positions \
+      --coverage_position_window 1 \
+      --chord_aware_pitches \
+      --chord_pitch_mode tones_tensions \
+      --chord_pitch_repeat_window 4 \
+      --jazz_duration_tokens \
+      --constrained_note_groups_per_bar 10 \
+      --postprocess_overlap \
+      --max_simultaneous_notes 2 \
+      --require_valid_sample \
+      --require_strict_valid_sample \
+      --require_note_groups \
+      --issue_number 312
+  fi
+  print_header "Stage B coverage-aware adjacent constrained repair summary"
+  "$PYTHON_BIN" scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_repair.py \
+    --run_id "$repair_run_id" \
+    --report_path "outputs/stage_b_generation_probe/${seed353_run_id}/report.json" \
+    --report_path "outputs/stage_b_generation_probe/${seed397_run_id}/report.json" \
+    --previous_candidate_id margin_recovered_phrase_vocab_seed_109_topk_7_temp_082_n48_sample_47 \
+    --previous_dead_air 0.375 \
+    --previous_unique_pitch_count 6 \
+    --previous_note_count 13 \
+    --previous_adjacent_pitch_repeats 1 \
+    --previous_max_interval 3 \
+    --min_unique_pitch_count 7 \
+    --max_dead_air_ratio_exclusive 0.376 \
+    --min_note_count 12 \
+    --max_simultaneous_notes 1 \
+    --max_duplicated_3_note_chunks 0 \
+    --max_adjacent_pitch_repeats_exclusive 1 \
+    --max_interval_exclusive 12
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -2581,6 +2663,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-dead-air-adjacent-repair)
     run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_dead_air_adjacent_repair
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-coverage-aware-adjacent-constrained-repair)
+    run_stage_b_margin_recovered_phrase_vocabulary_coverage_aware_adjacent_constrained_repair
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

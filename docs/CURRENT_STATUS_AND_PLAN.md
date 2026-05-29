@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #310, Stage B margin-recovered phrase/vocabulary distinct sample-seed dead-air adjacent-repeat targeted repair
-- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary coverage-aware adjacent-repeat constrained repair`
+- latest functional result: Issue #312, Stage B margin-recovered phrase/vocabulary coverage-aware adjacent-repeat constrained repair
+- 다음 권장 이슈: `Stage B margin-recovered phrase/vocabulary duration coverage fill repair`
 
 현재 범위가 아닌 것:
 
@@ -1998,6 +1998,56 @@ Issue #310은 Issue #308 partial candidate에서 남은 dead-air와 adjacent rep
 Docs:
 
 - `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_DEAD_AIR_ADJACENT_REPAIR_2026-05-29.md`
+
+## Current Margin-Recovered Phrase/Vocabulary Coverage-Aware Adjacent Constrained Repair Result
+
+Issue #312는 sampling 반복 대신 constrained decoding에서 coverage와 adjacent pitch repeat를 직접 제어한 작업이다.
+
+변경:
+
+- coverage-aware adjacent constrained repair harness 추가
+- seed `353`, `397`, constrained decoding 조건으로 checkpoint reuse generation 실행
+- seed `353`: coverage-aware positions, chord-aware pitches, repeat window `4`, groups per bar `8`
+- seed `397`: 위 조건에 jazz duration tokens와 groups per bar `10` 추가
+- Issue #306 target threshold로 repair summary 재평가
+- README와 handoff docs 업데이트
+
+검증:
+
+- `bash scripts/agent_harness.sh stage-b-margin-recovered-phrase-vocabulary-coverage-aware-adjacent-constrained-repair`
+
+결과:
+
+| 항목 | 값 |
+|---|---|
+| report count | `2` |
+| candidate count | `48` |
+| target-qualified candidate count | `0` |
+| selected partial candidate | `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3` |
+| selected source seed | `353` |
+| selected sample index | `3` |
+| selected sample seed | `355` |
+| selected focused note count | `12` |
+| selected focused unique pitch count | `9` |
+| selected dead-air ratio | `0.5714` |
+| selected onset coverage | `0.4375` |
+| selected sustained coverage | `0.59375` |
+| selected adjacent pitch repeats | `0` |
+| selected focused max interval | `7` |
+| qualified | `false` |
+| remaining flags | `dead_air_not_repaired` |
+
+해석:
+
+- constrained decoding은 adjacent repeat를 `1 -> 0`으로 낮췄다.
+- pitch variety도 `6 -> 9`로 개선됐다.
+- 그러나 dead-air가 `0.5714`로 악화되어 target-qualified 후보는 없다.
+- dead-air blocker는 단순 sampling/top_k 조정이나 pitch repeat window만으로 해결되지 않는다.
+- 다음 경계는 duration/coverage postprocess 또는 constrained duration/onset fill을 별도 repair로 검토하는 것이다.
+
+Docs:
+
+- `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_COVERAGE_AWARE_ADJACENT_CONSTRAINED_REPAIR_2026-05-29.md`
 
 ## Latest README Footer Section Removal Result
 

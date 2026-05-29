@@ -100,6 +100,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered phrase/vocabulary distinct sample-seed remaining blocker 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REMAINING_BLOCKER_2026-05-29.md`
 - margin-recovered phrase/vocabulary distinct sample-seed remaining blocker repair sweep 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_REMAINING_BLOCKER_REPAIR_SWEEP_2026-05-29.md`
 - margin-recovered phrase/vocabulary distinct sample-seed dead-air adjacent repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_DEAD_AIR_ADJACENT_REPAIR_2026-05-29.md`
+- margin-recovered phrase/vocabulary coverage-aware adjacent constrained repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_COVERAGE_AWARE_ADJACENT_CONSTRAINED_REPAIR_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -564,6 +565,8 @@ Stage B에서 명시하는 것:
 - Issue #308 result: target-qualified `0/96`; best partial candidate sample seed `250`, focused unique pitch `9`, dead-air `0.3889`, adjacent repeats `1`.
 - Issue #310 runs a lower-temperature/top_k targeted repair sweep for dead-air and adjacent repeats.
 - Issue #310 result: target-qualified `0/96`; best partial candidate sample seed `341`, focused unique pitch `7`, dead-air `0.3889`, adjacent repeats `1`, max interval `7`.
+- Issue #312 runs coverage-aware constrained decoding with chord-aware repeat window.
+- Issue #312 result: target-qualified `0/48`; best partial candidate sample seed `355`, focused unique pitch `9`, dead-air `0.5714`, adjacent repeats `0`, max interval `7`.
 - 이것은 아직 unconstrained model quality나 Brad style adaptation 성공을 의미하지 않는다.
 
 중요한 해석:
@@ -582,8 +585,8 @@ Stage B에서 명시하는 것:
 - 하지만 `top_k=1`에서는 같은 position/pitch 반복 collapse가 발생한다.
 
 따라서 다음 단계도 곧바로 broad training이 아니다.
-Issue #310은 lower-temperature/top_k sampling 조정에서도 target-qualified 후보를 찾지 못했다.
-다음 작업은 sampling 반복이 아니라 generation/decoding 단계에서 coverage와 adjacent repeat를 직접 제어하는 constrained repair다.
+Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-air가 악화되어 target-qualified 후보를 찾지 못했다.
+다음 작업은 duration/coverage fill repair로 dead-air를 직접 낮추는 것이다.
 
 ## 6. 다음 단계 로드맵
 
@@ -1109,7 +1112,7 @@ Issue #310은 lower-temperature/top_k sampling 조정에서도 target-qualified 
 완료된 바로 전 작업:
 
 ```text
-Stage B margin-recovered phrase/vocabulary distinct sample-seed dead-air adjacent-repeat targeted repair
+Stage B margin-recovered phrase/vocabulary coverage-aware adjacent-repeat constrained repair
 ```
 
 결과:
@@ -1118,29 +1121,29 @@ Stage B margin-recovered phrase/vocabulary distinct sample-seed dead-air adjacen
 - selected source seed: `109`
 - selected sample index: `47`
 - selected sample seed: `155`
-- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_DISTINCT_SAMPLE_SEED_DEAD_AIR_ADJACENT_REPAIR_2026-05-29.md`
+- docs: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_COVERAGE_AWARE_ADJACENT_CONSTRAINED_REPAIR_2026-05-29.md`
 - repair sweep reports: `2`
-- repair sweep candidates: `96`
+- repair sweep candidates: `48`
 - target-qualified candidate count: `0`
-- partial candidate: `margin_recovered_phrase_vocab_seed_311_topk_7_temp_078_n48_sample_31`
-- partial sample seed: `341`
-- partial focused unique pitch count: `7`
-- partial dead-air ratio: `0.3889`
-- partial adjacent pitch repeats: `1`
+- partial candidate: `margin_recovered_phrase_vocab_seed_353_topk_7_temp_082_n24_sample_3`
+- partial sample seed: `355`
+- partial focused unique pitch count: `9`
+- partial dead-air ratio: `0.5714`
+- partial adjacent pitch repeats: `0`
 - partial focused max interval: `7`
-- remaining flags: `dead_air_not_repaired`, `adjacent_repetition_not_repaired`
+- remaining flags: `dead_air_not_repaired`
 
 판단:
 
-- lower-temperature/top_k 조정도 target-qualified 후보를 찾지 못했다.
-- best partial candidate는 max interval guardrail을 회복했지만 dead-air와 adjacent repeat가 남아 있다.
-- 같은 checkpoint sampling 반복만으로는 dead-air와 adjacent repeat 동시 해결 가능성이 낮다.
+- constrained decoding은 adjacent repeat와 pitch variety를 개선했다.
+- dead-air가 `0.5714`로 악화되어 target-qualified 후보는 없다.
+- 남은 병목은 pitch/repeat sampling이 아니라 duration/coverage fill이다.
 - broad trained-model quality, human listening preference, Brad style adaptation은 아직 미검증이다.
 
 다음 작업:
 
-- 다음 issue는 `Stage B margin-recovered phrase/vocabulary coverage-aware adjacent-repeat constrained repair`로 잡는다.
-- post-sampling 후보 선택이 아니라 generation/decoding 단계에서 coverage와 adjacent repeat를 직접 제어한다.
+- 다음 issue는 `Stage B margin-recovered phrase/vocabulary duration coverage fill repair`로 잡는다.
+- adjacent repeat와 pitch variety guardrail을 유지하면서 dead-air를 낮추는 duration/coverage repair를 검토한다.
 - broad training은 focused context/listening boundary를 먼저 본 뒤 결정한다.
 
 ## 10. 한 문장 요약
