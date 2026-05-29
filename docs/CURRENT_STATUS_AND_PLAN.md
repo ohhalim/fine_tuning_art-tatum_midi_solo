@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #383, Muzig application resume wording
-- 다음 권장 이슈: `Application resume HTML/content insertion outside this repository if requested`
+- latest functional result: Issue #385, Stage B generic base readiness audit
+- 다음 권장 이슈: `Stage B generic base manifest contract`
 
 현재 범위가 아닌 것:
 
@@ -66,6 +66,44 @@ Docs:
 
 - `docs/STAGE_B_MODEL_CORE_MVP_COMPLETION_AUDIT_2026-05-28.md`
 
+## Current Generic Base Readiness Audit Result
+
+Issue #385는 portfolio/application 정리 이후 Phase 4 generic jazz base 준비로 넘어갈 수 있는지 dataset evidence와 Stage B objective evidence를 분리한 audit이다.
+
+변경:
+
+- generic base readiness audit script 추가
+- dataset audit summary와 outside-soloing repair final decision 결과 연결
+- Phase 4 preparation readiness와 broad training execution readiness 분리
+- broad trained-model quality, Brad style adaptation, production-ready improviser claim guard 유지
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_BASE_READINESS_AUDIT_2026-05-29.md`
+- dataset readable: `2777`
+- candidate non-Brad files: `2703`
+- Brad holdout candidates: `72`
+- duplicate exact hash groups: `0`
+- Stage B objective path: `outside_soloing_repair_objective_path_complete`
+- objective source candidates: `2/2`
+- supported repair policies: `3`
+- qualified variants: `6`
+- phase4 prep ready: `true`
+- broad training execution ready: `false`
+- broad trained-model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+
+판단:
+
+- generic jazz base 준비 단계로 넘어갈 dataset pool과 Stage B objective path 근거는 있음
+- 실제 generic-base training run, multi-seed quality, Brad style adaptation은 아직 미실행
+- 다음 작업은 broad training 실행이 아니라 Stage B generic train/val manifest contract 갱신
+
+다음:
+
+- `Stage B generic base manifest contract`
+
 ## Current Muzig Application Resume Wording Result
 
 Issue #383은 Muzig 지원 맥락에 맞춘 이력서/자기소개 문장을 정리한 작업이다.
@@ -89,11 +127,11 @@ Issue #383은 Muzig 지원 맥락에 맞춘 이력서/자기소개 문장을 정
 
 - 지원 공고 맞춤 이력서 문장 초안 작성 완료
 - repository 내부 claim boundary는 model-core validation pipeline으로 유지
-- 실제 이력서 HTML/개인 문서 반영은 별도 workspace 작업으로 분리
+- 실제 이력서 HTML/개인 문서 반영은 별도 workspace 작업으로 완료
 
 다음:
 
-- `Application resume HTML/content insertion outside this repository if requested`
+- `Stage B generic base readiness audit`
 
 ## Current Model-Core Portfolio Bullet Draft Result
 

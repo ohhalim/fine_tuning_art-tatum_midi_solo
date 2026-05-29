@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #383, Muzig application resume wording.
+- Latest functional issue completed: Issue #385, Stage B generic base readiness audit.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Application resume HTML/content insertion outside this repository if requested.
+- Recommended next issue: Stage B generic base manifest contract.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -866,6 +866,14 @@ bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-f
 ```
 
 This harness records the objective-only final boundary and routes the next automatic task to model-core evidence README refresh without claiming human/audio preference.
+
+For Stage B generic jazz base readiness audit changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-base-readiness-audit
+```
+
+This harness verifies that dataset pool evidence and Stage B objective-path evidence support Phase 4 preparation without claiming broad trained-model quality or Brad style adaptation.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

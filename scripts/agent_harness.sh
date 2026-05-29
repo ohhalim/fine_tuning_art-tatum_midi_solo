@@ -156,6 +156,8 @@ Modes:
                 Consolidate outside-soloing repair objective repeatability boundaries.
   stage-b-duration-coverage-outside-soloing-repair-final-decision
                 Decide final objective-only boundary after outside-soloing repair repeatability.
+  stage-b-generic-base-readiness-audit
+                Assess Stage B readiness before generic jazz base preparation.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -308,6 +310,7 @@ run_quick() {
     scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_objective_evidence_consolidation.py \
     scripts/decide_stage_b_duration_coverage_outside_soloing_repair_next_step.py \
     scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_broader_repeatability_sweep.py \
+    scripts/assess_stage_b_generic_base_readiness.py \
     scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
     scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
     scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
@@ -2196,6 +2199,25 @@ run_stage_b_duration_coverage_outside_soloing_repair_final_decision() {
     --require_no_broad_quality_claim
 }
 
+run_stage_b_generic_base_readiness_audit() {
+  local final_decision_run_id="${FINAL_DECISION_RUN_ID:-harness_stage_b_duration_coverage_fill_outside_soloing_repair_final_decision}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_base_readiness_audit}"
+  local final_decision="outputs/stage_b_duration_coverage_fill_outside_soloing_repair_final_decision/${final_decision_run_id}/stage_b_duration_coverage_fill_outside_soloing_repair_final_decision.json"
+  if [[ ! -f "$final_decision" ]]; then
+    print_header "Stage B duration/coverage fill outside-soloing repair final decision"
+    RUN_ID="$final_decision_run_id" run_stage_b_duration_coverage_outside_soloing_repair_final_decision
+  fi
+  print_header "Stage B generic base readiness audit"
+  "$PYTHON_BIN" scripts/assess_stage_b_generic_base_readiness.py \
+    --run_id "$run_id" \
+    --final_decision "$final_decision" \
+    --expected_boundary stage_b_generic_base_readiness_audit \
+    --expected_next_boundary stage_b_generic_base_manifest_contract \
+    --require_phase4_prep_ready \
+    --require_no_broad_quality_claim \
+    --require_no_brad_style_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3525,6 +3547,9 @@ case "$MODE" in
     ;;
   stage-b-duration-coverage-outside-soloing-repair-final-decision)
     run_stage_b_duration_coverage_outside_soloing_repair_final_decision
+    ;;
+  stage-b-generic-base-readiness-audit)
+    run_stage_b_generic_base_readiness_audit
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
