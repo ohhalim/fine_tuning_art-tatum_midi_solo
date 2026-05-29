@@ -98,6 +98,8 @@ Modes:
                 Package and review the selected distinct sample-seed phrase/vocabulary candidate in context.
   stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-focused-listening-notes
                 Build focused listening notes for the selected distinct sample-seed candidate.
+  stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-focused-listening-fill
+                Fill the selected distinct sample-seed focused listening review notes.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -1178,6 +1180,23 @@ run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_list
     --focused_context_decision "$decision_path" \
     --expected_candidate_id "$candidate_id" \
     --expected_prior_decision keep_for_focused_listening
+}
+
+run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_listening_fill() {
+  local notes_run_id="${NOTES_RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_listening_notes}"
+  local run_id="${RUN_ID:-harness_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_listening_fill}"
+  local candidate_id="margin_recovered_phrase_vocab_seed_109_topk_7_temp_082_n48_sample_47"
+  local review_notes="outputs/stage_b_margin_recovered_phrase_vocabulary_focused_listening_notes/${notes_run_id}/focused_listening_review_notes_template.json"
+  if [[ ! -f "$review_notes" ]]; then
+    print_header "Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listening notes"
+    RUN_ID="$notes_run_id" run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_listening_notes
+  fi
+  print_header "Stage B margin-recovered phrase/vocabulary distinct sample-seed focused listening fill"
+  "$PYTHON_BIN" scripts/fill_stage_b_margin_recovered_phrase_vocabulary_focused_listening_notes.py \
+    --run_id "$run_id" \
+    --review_notes "$review_notes" \
+    --expected_candidate_id "$candidate_id" \
+    --expected_decision needs_followup
 }
 
 run_stage_b_constrained_probe() {
@@ -2398,6 +2417,9 @@ case "$MODE" in
     ;;
   stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-focused-listening-notes)
     run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_listening_notes
+    ;;
+  stage-b-margin-recovered-phrase-vocabulary-distinct-sample-seed-focused-listening-fill)
+    run_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_focused_listening_fill
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
