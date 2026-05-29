@@ -139,6 +139,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic base readiness audit 문서: `docs/STAGE_B_GENERIC_BASE_READINESS_AUDIT_2026-05-29.md`
 - generic base manifest contract 문서: `docs/STAGE_B_GENERIC_BASE_MANIFEST_CONTRACT_2026-05-29.md`
 - generic manifest window smoke 문서: `docs/STAGE_B_GENERIC_MANIFEST_WINDOW_SMOKE_2026-05-29.md`
+- generic base tiny training smoke 문서: `docs/STAGE_B_GENERIC_BASE_TINY_TRAINING_SMOKE_2026-05-29.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -216,6 +217,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic base readiness audit: phase4 prep ready `true`, broad training execution ready `false`, broad quality/Brad adaptation claim `false`
 - generic base manifest contract: generic split `2433/270`, Brad split `47/11/14`, leakage/overlap `0`, broad training execution ready `false`
 - generic manifest window smoke: selected files `6/3`, tokenized train/val `556/191`, max token id `544 < 547`, broad training execution ready `false`
+- generic base tiny training smoke: selected records `32/8`, best validation loss `6.1427`, training returncode `0`, broad quality claim `false`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1140,6 +1142,17 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - Stage B window prepare smoke ready: `true`
 - generic base training execution ready: `false`
 - 다음 작업은 generic base tiny training smoke다.
+
+현재 generic tiny training smoke:
+
+- Issue #391 result: selected train/val records `32/8`
+- token files: `40`
+- max token id / vocab size: `544/547`
+- training returncode: `0`
+- best validation loss: `6.1427`
+- tiny training smoke passed: `true`
+- broad trained-model quality / Brad style adaptation claim: `false`
+- 다음 작업은 tiny checkpoint generation probe다.
 
 ### Phase 5. Brad Style Adaptation
 
