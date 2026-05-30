@@ -1413,6 +1413,18 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - human audio keep / musical quality claim: `false` / `false`
 - 다음 작업은 range interval guard rejection analysis다.
 
+현재 generic tiny checkpoint repair phrase continuation range interval guard rejection analysis:
+
+- Issue #431 result: boundary `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_rejection_analysis`
+- source boundary: `generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_audio_review_reject_all`
+- next boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sparse_phrase_repair_decision`
+- analyzed candidates: `3`
+- common evidence flag: `high_dead_air_or_sparse_phrase`
+- evidence flag counts: `high_dead_air_or_sparse_phrase=3`, `long_internal_gap_present=2`, `octave_or_larger_interval_present=2`, `adjacent_pitch_repeat_present=2`
+- primary next repair target: `sparse_phrase_continuity_after_range_interval_guard`
+- quality root cause / musical quality claim: `false` / `false`
+- 다음 작업은 sparse phrase repair decision이다.
+
 ### Phase 5. Brad Style Adaptation
 
 목표:

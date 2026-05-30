@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #429, Stage B generic tiny checkpoint repair phrase continuation range interval guard user listening review input.
+- Latest functional issue completed: Issue #431, Stage B generic tiny checkpoint repair phrase continuation range interval guard rejection analysis.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation range interval guard rejection analysis.
+- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase repair decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1050,6 +1050,14 @@ bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-cont
 ```
 
 This harness records user listening rejection for range/interval guard WAV files without claiming audio quality.
+
+For Stage B generic tiny checkpoint repair phrase continuation range interval guard rejection analysis changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-rejection-analysis
+```
+
+This harness analyzes rejected range/interval guard MIDI candidates and records evidence flags without claiming a musical-quality root cause.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

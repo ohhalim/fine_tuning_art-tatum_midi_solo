@@ -2820,6 +2820,41 @@ run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_gu
     --require_no_quality_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_rejection_analysis() {
+  local range_user_review_run_id="${RANGE_USER_REVIEW_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_user_listening_review}"
+  local range_local_audio_run_id="${RANGE_LOCAL_AUDIO_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_local_audio_render_attempt}"
+  local range_audio_package_run_id="${RANGE_AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_audio_render_package}"
+  local range_sweep_run_id="${RANGE_SWEEP_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sweep}"
+  local range_decision_run_id="${RANGE_DECISION_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_decision}"
+  local failure_review_run_id="${FAILURE_REVIEW_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_review}"
+  local local_audio_run_id="${LOCAL_AUDIO_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_local_audio_render_attempt}"
+  local phrase_audio_package_run_id="${PHRASE_AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_audio_render_package}"
+  local sweep_run_id="${SWEEP_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_sweep}"
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision}"
+  local user_review_run_id="${USER_REVIEW_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_user_listening_review}"
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt}"
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_audio_render_package}"
+  local listening_fill_run_id="${LISTENING_FILL_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_fill}"
+  local listening_notes_run_id="${LISTENING_NOTES_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_notes}"
+  local training_smoke_run_id="${TRAINING_SMOKE_RUN_ID:-harness_stage_b_generic_base_tiny_training_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_rejection_analysis}"
+  local range_user_review_report="outputs/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_user_listening_review/${range_user_review_run_id}/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_user_listening_review.json"
+  if [[ ! -f "$range_user_review_report" ]]; then
+    print_header "Stage B generic tiny checkpoint repair phrase continuation range interval guard user listening review"
+    RUN_ID="$range_user_review_run_id" RANGE_LOCAL_AUDIO_RUN_ID="$range_local_audio_run_id" RANGE_AUDIO_PACKAGE_RUN_ID="$range_audio_package_run_id" RANGE_SWEEP_RUN_ID="$range_sweep_run_id" RANGE_DECISION_RUN_ID="$range_decision_run_id" FAILURE_REVIEW_RUN_ID="$failure_review_run_id" LOCAL_AUDIO_RUN_ID="$local_audio_run_id" PHRASE_AUDIO_PACKAGE_RUN_ID="$phrase_audio_package_run_id" SWEEP_RUN_ID="$sweep_run_id" DECISION_RUN_ID="$decision_run_id" USER_REVIEW_RUN_ID="$user_review_run_id" AUDIO_RENDER_RUN_ID="$audio_render_run_id" AUDIO_PACKAGE_RUN_ID="$audio_package_run_id" LISTENING_FILL_RUN_ID="$listening_fill_run_id" LISTENING_NOTES_RUN_ID="$listening_notes_run_id" TRAINING_SMOKE_RUN_ID="$training_smoke_run_id" run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_user_listening_review
+  fi
+  print_header "Stage B generic tiny checkpoint repair phrase continuation range interval guard rejection analysis"
+  "$PYTHON_BIN" scripts/analyze_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_rejection.py \
+    --run_id "$run_id" \
+    --user_listening_review_report "$range_user_review_report" \
+    --doc_path docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_REJECTION_ANALYSIS_2026-05-30.md \
+    --expected_boundary stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_rejection_analysis \
+    --expected_candidate_count 3 \
+    --require_reject_all_source \
+    --require_no_quality_claim \
+    --min_common_evidence_flags 1
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4218,6 +4253,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-user-listening-review)
     run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_user_listening_review
+    ;;
+  stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-rejection-analysis)
+    run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_rejection_analysis
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
