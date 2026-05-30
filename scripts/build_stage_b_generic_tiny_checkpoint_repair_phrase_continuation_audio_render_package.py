@@ -15,7 +15,6 @@ sys.path.insert(0, str(ROOT_DIR))
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
 from scripts.build_stage_b_generic_tiny_checkpoint_repair_audio_render_package import (  # noqa: E402
     file_meta,
-    render_command,
     renderer_probe,
 )
 from scripts.run_stage_b_generic_tiny_checkpoint_generation_probe import (  # noqa: E402
@@ -91,6 +90,27 @@ def compact_candidate(candidate: dict[str, Any], *, review_rank: int) -> dict[st
 
 def item_output_stem(item: dict[str, Any]) -> str:
     return f"rank_{item['review_rank']:02d}_seed_{item['sample_seed']}_sample_{item['sample_index']}"
+
+
+def render_command(probe: dict[str, Any], midi_path: str, output_wav_path: str) -> list[str]:
+    renderer_name = str(probe.get("selected_renderer_name") or "")
+    renderer = str(probe.get("selected_renderer") or "")
+    if str(probe.get("status") or "") != "ready_for_local_render" or not renderer:
+        return []
+    if renderer_name == "fluidsynth":
+        return [
+            renderer,
+            "-ni",
+            "-F",
+            output_wav_path,
+            "-r",
+            "44100",
+            str(probe.get("soundfont_path") or ""),
+            midi_path,
+        ]
+    if renderer_name == "timidity":
+        return [renderer, midi_path, "-Ow", "-o", output_wav_path]
+    return []
 
 
 def build_audio_render_package(
