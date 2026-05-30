@@ -174,6 +174,8 @@ Modes:
                 Package strict-valid generic tiny checkpoint repair candidates for review.
   stage-b-generic-tiny-checkpoint-repair-listening-notes
                 Build pending listening notes for generic tiny checkpoint repair candidates.
+  stage-b-generic-tiny-checkpoint-repair-listening-fill
+                Guard or fill generic tiny checkpoint repair listening notes.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2387,6 +2389,26 @@ run_stage_b_generic_tiny_checkpoint_repair_listening_notes() {
     --require_no_brad_style_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_repair_listening_fill() {
+  local listening_notes_run_id="${LISTENING_NOTES_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_notes}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_fill}"
+  local listening_notes_report="outputs/stage_b_generic_tiny_checkpoint_repair_listening_notes/${listening_notes_run_id}/stage_b_generic_tiny_checkpoint_repair_listening_notes.json"
+  if [[ ! -f "$listening_notes_report" ]]; then
+    print_header "Stage B generic tiny checkpoint repair listening notes"
+    RUN_ID="$listening_notes_run_id" run_stage_b_generic_tiny_checkpoint_repair_listening_notes
+  fi
+  print_header "Stage B generic tiny checkpoint repair listening fill"
+  "$PYTHON_BIN" scripts/fill_stage_b_generic_tiny_checkpoint_repair_listening_notes.py \
+    --run_id "$run_id" \
+    --listening_notes_report "$listening_notes_report" \
+    --expected_boundary stage_b_generic_tiny_checkpoint_repair_listening_fill \
+    --require_pending_without_input \
+    --require_no_quality_without_input \
+    --require_objective_auto_progress_allowed \
+    --require_no_broad_quality_claim \
+    --require_no_brad_style_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3743,6 +3765,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-repair-listening-notes)
     run_stage_b_generic_tiny_checkpoint_repair_listening_notes
+    ;;
+  stage-b-generic-tiny-checkpoint-repair-listening-fill)
+    run_stage_b_generic_tiny_checkpoint_repair_listening_fill
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
