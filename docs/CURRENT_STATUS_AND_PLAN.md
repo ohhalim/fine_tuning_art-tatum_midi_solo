@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #397, Stage B generic tiny checkpoint repair repeatability probe
-- 다음 권장 이슈: `Stage B generic tiny checkpoint repair review package`
+- latest functional result: Issue #399, Stage B generic tiny checkpoint repair review package
+- 다음 권장 이슈: `Stage B generic tiny checkpoint repair listening notes`
 
 현재 범위가 아닌 것:
 
@@ -339,6 +339,47 @@ Issue #397은 Issue #395의 constrained + jazz-duration repair 조건을 seed �
 다음:
 
 - `Stage B generic tiny checkpoint repair review package`
+
+## Current Generic Tiny Checkpoint Repair Review Package Result
+
+Issue #399는 Issue #397 repeatability 결과의 strict-valid repair candidates를 review package로 정리한 작업이다.
+
+변경:
+
+- generic tiny checkpoint repair review package script 추가
+- strict-valid 후보 `5`개 추출 및 review rank 부여
+- 후보별 MIDI path, sample seed, dead-air, coverage, chord-tone 지표 기록
+- 실패 sample `1`개 reason 유지
+- musical quality, broad trained-model quality, Brad style adaptation claim guard 유지
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_REVIEW_PACKAGE_2026-05-30.md`
+- source sample count: `6`
+- source strict valid sample count: `5`
+- source grammar gate sample count: `6`
+- candidate count: `5`
+- failed candidate count: `1`
+- midi dir: `outputs/stage_b_generic_tiny_checkpoint_repair_review_package/issue_399_stage_b_generic_tiny_checkpoint_repair_review_package/midi`
+- rank 1: seed `47`, sample `6`, dead-air `0.5`, coverage `0.6562486875`, chord-tone `0.5714285714285714`
+- rank 2: seed `45`, sample `4`, dead-air `0.5714285714285714`, coverage `0.8437483124999999`, chord-tone `0.5`
+- rank 3: seed `42`, sample `1`, dead-air `0.6666666666666666`, coverage `0.9062481875`, chord-tone `0.42857142857142855`
+- failed row: seed `44`, sample `3`, reason `dead-air ratio too high: 1.000 >= 0.800`
+- musical quality claimed: `false`
+- broad trained-model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+
+판단:
+
+- strict-valid repair candidates `5`개 review 대상 정리 완료
+- local MIDI review package 생성 완료
+- 현재 결과는 listening 대상 package이며, musical quality 판정은 아님
+- 다음 작업은 listening notes boundary
+
+다음:
+
+- `Stage B generic tiny checkpoint repair listening notes`
 
 ## Current Muzig Application Resume Wording Result
 
