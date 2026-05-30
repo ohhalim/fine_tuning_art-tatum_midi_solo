@@ -178,6 +178,8 @@ Modes:
                 Guard or fill generic tiny checkpoint repair listening notes.
   stage-b-generic-tiny-checkpoint-repair-audio-render-package
                 Package generic tiny checkpoint repair candidates for local audio rendering.
+  stage-b-generic-tiny-checkpoint-repair-local-audio-render-attempt
+                Render generic tiny checkpoint repair candidates to local WAV files.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2432,6 +2434,27 @@ run_stage_b_generic_tiny_checkpoint_repair_audio_render_package() {
     --require_no_audio_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt() {
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_audio_render_package}"
+  local listening_fill_run_id="${LISTENING_FILL_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_fill}"
+  local listening_notes_run_id="${LISTENING_NOTES_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_notes}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt}"
+  local local_audio_render_package="outputs/stage_b_generic_tiny_checkpoint_repair_audio_render_package/${audio_package_run_id}/stage_b_generic_tiny_checkpoint_repair_audio_render_package.json"
+  local soundfont="${SOUNDFONT_PATH:-$HOME/.local/share/soundfonts/generaluser-gs/v1.471.sf2}"
+  if [[ ! -f "$local_audio_render_package" ]]; then
+    print_header "Stage B generic tiny checkpoint repair audio render package"
+    RUN_ID="$audio_package_run_id" LISTENING_FILL_RUN_ID="$listening_fill_run_id" LISTENING_NOTES_RUN_ID="$listening_notes_run_id" run_stage_b_generic_tiny_checkpoint_repair_audio_render_package
+  fi
+  print_header "Stage B generic tiny checkpoint repair local audio render attempt"
+  "$PYTHON_BIN" scripts/render_stage_b_generic_tiny_checkpoint_repair_audio.py \
+    --run_id "$run_id" \
+    --local_audio_render_package "$local_audio_render_package" \
+    --soundfont "$soundfont" \
+    --expected_boundary stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt \
+    --expected_file_count 5 \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3794,6 +3817,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-repair-audio-render-package)
     run_stage_b_generic_tiny_checkpoint_repair_audio_render_package
+    ;;
+  stage-b-generic-tiny-checkpoint-repair-local-audio-render-attempt)
+    run_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
