@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #423, Stage B generic tiny checkpoint repair phrase continuation range interval guard sweep.
+- Latest functional issue completed: Issue #425, Stage B generic tiny checkpoint repair phrase continuation range interval guard audio render package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation range interval guard audio render package.
+- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation range interval guard local audio render attempt.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1026,6 +1026,14 @@ bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-cont
 ```
 
 This harness runs constrained interval-cap sweeps and verifies actual MIDI note range/interval guard candidates without claiming listening quality.
+
+For Stage B generic tiny checkpoint repair phrase continuation range interval guard audio render package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-audio-render-package
+```
+
+This harness packages range/interval guard candidates for local WAV rendering without attempting render or claiming listening quality.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
