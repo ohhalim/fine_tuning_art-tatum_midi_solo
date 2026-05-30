@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #433, Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase repair decision
-- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase repair sweep`
+- latest functional result: Issue #435, Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase repair sweep
+- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase audio render package`
 
 현재 범위가 아닌 것:
 
@@ -975,6 +975,43 @@ Issue #433은 Issue #431 rejection analysis를 다음 sparse phrase repair sweep
 다음:
 
 - `Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase repair sweep`
+
+## Stage B Generic Tiny Checkpoint Repair Phrase Continuation Range Interval Guard Sparse Phrase Repair Sweep
+
+Issue #435는 Issue #433 sparse phrase repair decision 기준으로 coverage-aware constrained generation sweep을 실행한 작업이다.
+
+변경:
+
+- sparse phrase repair decision report 입력 검증 추가
+- coverage-aware position 기반 generation sweep script 추가
+- gap ratio, max internal gap, range/interval guard, target-qualified candidate ranking 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SPARSE_PHRASE_REPAIR_SWEEP_2026-05-30.md`
+- boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sparse_phrase_repair_sweep`
+- next boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sparse_phrase_audio_render_package`
+- target passed: `true`
+- target qualified count / candidate count: `18` / `24`
+- generation runs: interval cap `9`, `7`, `5`
+- top candidate: interval cap `5`, sample seed `86`, sample `7`
+- top note count: `12`
+- top gap ratio / source max: `0.2188` / `0.5312`
+- top max internal gap / source max: `0.5` / `1.5`
+- top max abs interval: `8`
+- musical quality / human audio preference claim: `false` / `false`
+
+판단:
+
+- sparse phrase objective target 통과 후보 존재
+- source reject_all 후보 대비 gap ratio와 max internal gap 감소
+- tail_empty decision target `0`은 top 후보에서 `1`로 남아 soft failure로 기록
+- audio/listening quality는 미검증
+
+다음:
+
+- `Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase audio render package`
 
 ## Current Muzig Application Resume Wording Result
 

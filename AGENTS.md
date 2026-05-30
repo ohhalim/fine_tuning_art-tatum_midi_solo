@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #433, Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase repair decision.
+- Latest functional issue completed: Issue #435, Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase repair sweep.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase repair sweep.
+- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase audio render package.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1066,6 +1066,14 @@ bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-cont
 ```
 
 This harness converts sparse phrase evidence into the next repair sweep boundary without claiming musical quality.
+
+For Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase repair sweep changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-sparse-phrase-repair-sweep
+```
+
+This harness runs coverage-aware sparse phrase repair generation and verifies objective gap reduction without claiming listening quality.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
