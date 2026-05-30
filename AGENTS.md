@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #413, Stage B generic tiny checkpoint repair phrase continuation sweep.
+- Latest functional issue completed: Issue #415, Stage B generic tiny checkpoint repair phrase continuation audio render package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation audio render package.
+- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation local audio render attempt.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -986,6 +986,14 @@ bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-cont
 ```
 
 This harness runs a chord-aware phrase-continuation repair sweep and requires at least one objective-qualified candidate without claiming quality.
+
+For Stage B generic tiny checkpoint repair phrase continuation audio render package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-continuation-audio-render-package
+```
+
+This harness packages the selected phrase-continuation repair candidate for local WAV rendering without claiming audio quality.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
