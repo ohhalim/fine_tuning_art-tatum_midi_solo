@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #391, Stage B generic base tiny training smoke.
+- Latest functional issue completed: Issue #393, Stage B generic tiny checkpoint generation probe.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint generation probe.
+- Recommended next issue: Stage B generic tiny checkpoint grammar repair.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -898,6 +898,14 @@ bash scripts/agent_harness.sh stage-b-generic-base-tiny-training-smoke
 ```
 
 This harness copies a small generic Stage B window token subset into the training path and verifies the training command succeeds without claiming broad model quality.
+
+For Stage B generic tiny checkpoint generation probe changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-generation-probe
+```
+
+This harness loads the generic tiny checkpoint into the Stage B generation/decode path and records gate results without claiming broad model quality.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
