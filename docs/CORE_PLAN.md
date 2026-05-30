@@ -145,6 +145,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair repeatability 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_REPEATABILITY_2026-05-30.md`
 - generic tiny checkpoint repair review package 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_REVIEW_PACKAGE_2026-05-30.md`
 - generic tiny checkpoint repair listening notes 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_LISTENING_NOTES_2026-05-30.md`
+- generic tiny checkpoint repair listening fill 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_LISTENING_FILL_2026-05-30.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -228,6 +229,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair repeatability: sample `6`, valid/strict/grammar `5/5/6`, constrained quality claim `false`
 - generic tiny checkpoint repair review package: strict-valid candidates `5`, failed rows `1`, musical quality claim `false`
 - generic tiny checkpoint repair listening notes: candidate notes `5`, status `pending_human_review`, musical quality claim `false`
+- generic tiny checkpoint repair listening fill: review input `false`, fill status `pending_review_input`, candidate `5`, auto progress `true`, musical quality claim `false`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1221,6 +1223,17 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - human review filled: `false`
 - musical quality / broad trained-model quality / Brad style adaptation claim: `false/false/false`
 - 다음 작업은 repair listening fill이다.
+
+현재 generic tiny checkpoint repair listening fill:
+
+- Issue #403 result: review input present `false`
+- fill status: `pending_review_input`
+- listening fill status: `pending_review_input`
+- candidate count / keep count: `5/0`
+- human review filled: `false`
+- musical quality / broad trained-model quality / Brad style adaptation claim: `false/false/false`
+- objective-only auto progress allowed: `true`
+- 다음 작업은 repair audio render package다.
 
 ### Phase 5. Brad Style Adaptation
 

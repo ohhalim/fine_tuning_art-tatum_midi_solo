@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #401, Stage B generic tiny checkpoint repair listening notes.
+- Latest functional issue completed: Issue #403, Stage B generic tiny checkpoint repair listening fill.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint repair listening fill.
+- Recommended next issue: Stage B generic tiny checkpoint repair audio render package.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -938,6 +938,14 @@ bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-listening-n
 ```
 
 This harness builds pending human-review listening notes for packaged repair candidates without filling or claiming musical quality.
+
+For Stage B generic tiny checkpoint repair listening fill changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-listening-fill
+```
+
+This harness guards listening-note fill when human review input is absent and keeps musical quality claims blocked.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
