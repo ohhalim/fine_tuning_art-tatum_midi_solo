@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #407, Stage B generic tiny checkpoint repair local audio render attempt.
+- Latest functional issue completed: Issue #409, Stage B generic tiny checkpoint repair user listening review input.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint repair user listening review input.
+- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation repair decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -962,6 +962,14 @@ bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-local-audio
 ```
 
 This harness renders the packaged repair candidates to local WAV files and validates WAV metadata without claiming listening quality.
+
+For Stage B generic tiny checkpoint repair user listening review changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-user-listening-review
+```
+
+This harness records the single-user reject-all listening result and routes the plunk-and-stop failure to the next repair decision.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

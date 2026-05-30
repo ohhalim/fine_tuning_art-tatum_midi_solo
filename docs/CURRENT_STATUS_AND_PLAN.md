@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #407, Stage B generic tiny checkpoint repair local audio render attempt
-- 다음 권장 이슈: `Stage B generic tiny checkpoint repair user listening review input`
+- latest functional result: Issue #409, Stage B generic tiny checkpoint repair user listening review input
+- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation repair decision`
 
 현재 범위가 아닌 것:
 
@@ -523,6 +523,43 @@ Issue #407은 Issue #405 audio render package 후보 `5`개를 FluidSynth와 Gen
 다음:
 
 - `Stage B generic tiny checkpoint repair user listening review input`
+
+## Current Generic Tiny Checkpoint Repair User Listening Review Result
+
+Issue #409는 Issue #407 WAV `5`개에 대한 user listening review 입력을 반영한 작업이다.
+
+변경:
+
+- generic tiny checkpoint repair user listening review fill script 추가
+- user listening input을 `reject_all`로 기록
+- 후보별 decision을 `reject`로 기록
+- primary failure를 `plunk_and_stop`으로 기록
+- timing, phrase, vocabulary failure boundary 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_USER_LISTENING_REVIEW_2026-05-30.md`
+- reviewed audio file count: `5`
+- overall decision: `reject_all`
+- candidate decision: `reject`
+- primary failure: `plunk_and_stop`
+- timing: `too_short_or_stiff`
+- phrase: `fragmented`
+- vocabulary: `not_musical`
+- human/audio keep claimed: `false`
+- musical quality claimed: `false`
+- auto progress allowed: `true`
+
+판단:
+
+- 현재 후보 `5`개는 keep 후보 아님
+- 실패 지점은 outside soloing 해석보다 짧은 fragment, phrase continuation 부족, plunk-and-stop output
+- 다음 작업은 해당 실패를 repair target으로 바꾸는 decision boundary
+
+다음:
+
+- `Stage B generic tiny checkpoint repair phrase continuation repair decision`
 
 ## Current Muzig Application Resume Wording Result
 
