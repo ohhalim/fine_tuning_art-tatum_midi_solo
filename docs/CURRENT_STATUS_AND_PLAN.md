@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #393, Stage B generic tiny checkpoint generation probe
-- 다음 권장 이슈: `Stage B generic tiny checkpoint grammar repair`
+- latest functional result: Issue #395, Stage B generic tiny checkpoint grammar repair
+- 다음 권장 이슈: `Stage B generic tiny checkpoint repair repeatability probe`
 
 현재 범위가 아닌 것:
 
@@ -256,6 +256,47 @@ Issue #393은 Issue #391에서 생성한 tiny checkpoint를 Stage B generation/d
 다음:
 
 - `Stage B generic tiny checkpoint grammar repair`
+
+## Current Generic Tiny Checkpoint Grammar Repair Result
+
+Issue #395는 Issue #393의 raw grammar failure를 같은 checkpoint의 constrained + jazz-duration generation과 비교한 작업이다.
+
+변경:
+
+- generic tiny checkpoint grammar repair script 추가
+- baseline: unconstrained + overlap postprocess
+- repair: constrained generation + jazz duration tokens + overlap postprocess
+- baseline/repair valid, strict, grammar gate delta 기록
+- broad trained-model quality, Brad style adaptation claim guard 유지
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_GRAMMAR_REPAIR_2026-05-30.md`
+- baseline valid/strict/grammar: `0/0/0`
+- repair valid/strict/grammar: `2/2/2`
+- grammar gate delta: `2`
+- valid sample delta: `2`
+- strict valid sample delta: `2`
+- repair collapse warning sample rate: `0.0`
+- repair avg postprocess removal ratio: `0.125`
+- repair avg onset coverage ratio: `0.1875`
+- repair avg sustained coverage ratio: `0.375`
+- raw generation quality claimed: `false`
+- constrained generation quality claimed: `false`
+- broad trained-model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+
+판단:
+
+- raw token stream grammar failure는 constrained Stage B grammar path에서 회복
+- jazz duration token 선택으로 long-note/postprocess 제거 문제 완화
+- 현재 결과는 constrained repair boundary 통과이며, raw trained-model quality나 musical quality claim은 아님
+- 다음 작업은 동일 repair 조건의 repeatability probe
+
+다음:
+
+- `Stage B generic tiny checkpoint repair repeatability probe`
 
 ## Current Muzig Application Resume Wording Result
 

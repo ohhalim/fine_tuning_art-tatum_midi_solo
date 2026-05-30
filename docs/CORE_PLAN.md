@@ -141,6 +141,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic manifest window smoke 문서: `docs/STAGE_B_GENERIC_MANIFEST_WINDOW_SMOKE_2026-05-29.md`
 - generic base tiny training smoke 문서: `docs/STAGE_B_GENERIC_BASE_TINY_TRAINING_SMOKE_2026-05-29.md`
 - generic tiny checkpoint generation probe 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_GENERATION_PROBE_2026-05-30.md`
+- generic tiny checkpoint grammar repair 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_GRAMMAR_REPAIR_2026-05-30.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -220,6 +221,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic manifest window smoke: selected files `6/3`, tokenized train/val `556/191`, max token id `544 < 547`, broad training execution ready `false`
 - generic base tiny training smoke: selected records `32/8`, best validation loss `6.1427`, training returncode `0`, broad quality claim `false`
 - generic tiny checkpoint generation probe: command returncode `0`, sample `2`, valid/strict/grammar `0/0/0`, next boundary `grammar repair`
+- generic tiny checkpoint grammar repair: baseline valid/strict/grammar `0/0/0`, repair `2/2/2`, constrained quality claim `false`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1168,6 +1170,18 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - raw generation quality ready: `false`
 - broad trained-model quality / Brad style adaptation claim: `false`
 - 다음 작업은 tiny checkpoint grammar repair다.
+
+현재 generic tiny checkpoint grammar repair:
+
+- Issue #395 result: baseline valid/strict/grammar `0/0/0`
+- repair valid/strict/grammar: `2/2/2`
+- grammar / valid / strict delta: `2/2/2`
+- repair collapse warning sample rate: `0.0`
+- repair avg postprocess removal ratio: `0.125`
+- repair avg onset / sustained coverage ratio: `0.1875/0.375`
+- raw generation quality / constrained generation quality claim: `false/false`
+- broad trained-model quality / Brad style adaptation claim: `false`
+- 다음 작업은 repair repeatability probe다.
 
 ### Phase 5. Brad Style Adaptation
 
