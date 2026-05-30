@@ -166,6 +166,8 @@ Modes:
                 Run a tiny training smoke from generic Stage B window records.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
+  stage-b-generic-tiny-checkpoint-grammar-repair
+                Compare raw and grammar-repaired generation from the generic tiny checkpoint.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2304,6 +2306,24 @@ run_stage_b_generic_tiny_checkpoint_generation_probe() {
     --require_no_brad_style_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_grammar_repair() {
+  local training_smoke_run_id="${TRAINING_SMOKE_RUN_ID:-harness_stage_b_generic_base_tiny_training_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_grammar_repair}"
+  local checkpoint_dir="outputs/stage_b_generic_base_tiny_training_smoke/${training_smoke_run_id}/checkpoints"
+  if [[ ! -f "${checkpoint_dir}/checkpoint_epoch1.pt" ]]; then
+    print_header "Stage B generic base tiny training smoke"
+    RUN_ID="$training_smoke_run_id" run_stage_b_generic_base_tiny_training_smoke
+  fi
+  print_header "Stage B generic tiny checkpoint grammar repair"
+  "$PYTHON_BIN" scripts/run_stage_b_generic_tiny_checkpoint_grammar_repair.py \
+    --run_id "$run_id" \
+    --checkpoint_dir "$checkpoint_dir" \
+    --expected_boundary stage_b_generic_tiny_checkpoint_grammar_repair \
+    --require_repair_passed \
+    --require_no_broad_quality_claim \
+    --require_no_brad_style_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3648,6 +3668,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
+    ;;
+  stage-b-generic-tiny-checkpoint-grammar-repair)
+    run_stage_b_generic_tiny_checkpoint_grammar_repair
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
