@@ -172,6 +172,8 @@ Modes:
                 Run a seed-expanded repeatability probe for the generic tiny checkpoint repair.
   stage-b-generic-tiny-checkpoint-repair-review-package
                 Package strict-valid generic tiny checkpoint repair candidates for review.
+  stage-b-generic-tiny-checkpoint-repair-listening-notes
+                Build pending listening notes for generic tiny checkpoint repair candidates.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2365,6 +2367,26 @@ run_stage_b_generic_tiny_checkpoint_repair_review_package() {
     --require_no_brad_style_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_repair_listening_notes() {
+  local review_package_run_id="${REVIEW_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_review_package}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_notes}"
+  local review_package_report="outputs/stage_b_generic_tiny_checkpoint_repair_review_package/${review_package_run_id}/stage_b_generic_tiny_checkpoint_repair_review_package.json"
+  if [[ ! -f "$review_package_report" ]]; then
+    print_header "Stage B generic tiny checkpoint repair review package"
+    RUN_ID="$review_package_run_id" run_stage_b_generic_tiny_checkpoint_repair_review_package
+  fi
+  print_header "Stage B generic tiny checkpoint repair listening notes"
+  "$PYTHON_BIN" scripts/build_stage_b_generic_tiny_checkpoint_repair_listening_notes.py \
+    --run_id "$run_id" \
+    --review_package_report "$review_package_report" \
+    --expected_boundary stage_b_generic_tiny_checkpoint_repair_listening_notes \
+    --require_listening_notes_ready \
+    --require_pending_human_review \
+    --require_no_musical_quality_claim \
+    --require_no_broad_quality_claim \
+    --require_no_brad_style_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3718,6 +3740,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-repair-review-package)
     run_stage_b_generic_tiny_checkpoint_repair_review_package
+    ;;
+  stage-b-generic-tiny-checkpoint-repair-listening-notes)
+    run_stage_b_generic_tiny_checkpoint_repair_listening_notes
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe

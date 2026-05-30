@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #399, Stage B generic tiny checkpoint repair review package
-- 다음 권장 이슈: `Stage B generic tiny checkpoint repair listening notes`
+- latest functional result: Issue #401, Stage B generic tiny checkpoint repair listening notes
+- 다음 권장 이슈: `Stage B generic tiny checkpoint repair listening fill`
 
 현재 범위가 아닌 것:
 
@@ -380,6 +380,40 @@ Issue #399는 Issue #397 repeatability 결과의 strict-valid repair candidates�
 다음:
 
 - `Stage B generic tiny checkpoint repair listening notes`
+
+## Current Generic Tiny Checkpoint Repair Listening Notes Result
+
+Issue #401은 Issue #399 review package 후보 `5`개를 pending listening notes로 정리한 작업이다.
+
+변경:
+
+- generic tiny checkpoint repair listening notes script 추가
+- 후보별 MIDI path와 objective context를 listening note에 연결
+- human review fields를 pending 상태로 생성
+- musical quality, broad trained-model quality, Brad style adaptation claim guard 유지
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_LISTENING_NOTES_2026-05-30.md`
+- source candidate count: `5`
+- source failed candidate count: `1`
+- notes candidate count: `5`
+- notes status: `pending_human_review`
+- human review filled: `false`
+- musical quality claimed: `false`
+- broad trained-model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+
+판단:
+
+- review package 후보 `5`개에 대한 listening notes template 생성 완료
+- 현재 결과는 청취 입력 대기 상태이며, musical quality 판정은 아님
+- 다음 작업은 listening fill이나 WAV render package
+
+다음:
+
+- `Stage B generic tiny checkpoint repair listening fill`
 
 ## Current Muzig Application Resume Wording Result
 

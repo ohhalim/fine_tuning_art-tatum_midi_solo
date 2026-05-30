@@ -144,6 +144,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint grammar repair 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_GRAMMAR_REPAIR_2026-05-30.md`
 - generic tiny checkpoint repair repeatability 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_REPEATABILITY_2026-05-30.md`
 - generic tiny checkpoint repair review package 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_REVIEW_PACKAGE_2026-05-30.md`
+- generic tiny checkpoint repair listening notes 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_LISTENING_NOTES_2026-05-30.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -226,6 +227,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint grammar repair: baseline valid/strict/grammar `0/0/0`, repair `2/2/2`, constrained quality claim `false`
 - generic tiny checkpoint repair repeatability: sample `6`, valid/strict/grammar `5/5/6`, constrained quality claim `false`
 - generic tiny checkpoint repair review package: strict-valid candidates `5`, failed rows `1`, musical quality claim `false`
+- generic tiny checkpoint repair listening notes: candidate notes `5`, status `pending_human_review`, musical quality claim `false`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1210,6 +1212,15 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - failed row: seed `44`, sample `3`, reason `dead-air ratio too high: 1.000 >= 0.800`
 - musical quality / broad trained-model quality / Brad style adaptation claim: `false/false/false`
 - 다음 작업은 repair listening notes다.
+
+현재 generic tiny checkpoint repair listening notes:
+
+- Issue #401 result: source candidate count `5`
+- notes candidate count: `5`
+- notes status: `pending_human_review`
+- human review filled: `false`
+- musical quality / broad trained-model quality / Brad style adaptation claim: `false/false/false`
+- 다음 작업은 repair listening fill이다.
 
 ### Phase 5. Brad Style Adaptation
 
