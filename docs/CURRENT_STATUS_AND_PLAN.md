@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #419, Stage B generic tiny checkpoint repair phrase continuation MIDI note failure review
-- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation range interval guard decision`
+- latest functional result: Issue #421, Stage B generic tiny checkpoint repair phrase continuation range interval guard decision
+- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation range interval guard sweep`
 
 현재 범위가 아닌 것:
 
@@ -738,6 +738,40 @@ Issue #419는 Issue #417에서 렌더한 selected candidate를 user rejection과
 다음:
 
 - `Stage B generic tiny checkpoint repair phrase continuation range interval guard decision`
+
+## Current Generic Tiny Checkpoint Repair Phrase Continuation Range Interval Guard Decision Result
+
+Issue #421은 Issue #419의 MIDI note failure를 다음 repair sweep target으로 변환한 작업이다.
+
+변경:
+
+- range/interval guard decision script 추가
+- pitch span, adjacent interval, large interval ratio, severe interval count target 정의
+- repair targets와 다음 sweep boundary 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_DECISION_2026-05-30.md`
+- boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_decision`
+- next boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sweep`
+- observed pitch span / target: `60` / `24`
+- observed max abs interval / target: `60` / `12`
+- observed large interval ratio / target: `0.875` / `0.35`
+- observed severe interval count / target: `6` / `0`
+- preferred pitch range: `48-84`
+- repair target count: `5`
+- musical quality claimed: `false`
+
+판단:
+
+- 다음 sweep은 phrase coverage보다 range/interval guard를 우선 gate로 적용
+- audio package 단계 전에 range/interval guard failure를 차단
+- repaired candidate 존재 여부는 미검증
+
+다음:
+
+- `Stage B generic tiny checkpoint repair phrase continuation range interval guard sweep`
 
 ## Current Muzig Application Resume Wording Result
 
