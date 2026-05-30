@@ -198,6 +198,8 @@ Modes:
                 Run constrained range/interval cap sweep and audit actual MIDI notes.
   stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-audio-render-package
                 Package range/interval guard candidates for local audio rendering.
+  stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-local-audio-render-attempt
+                Render range/interval guard candidates to local WAV files.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2739,6 +2741,39 @@ run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_gu
     --require_no_audio_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_local_audio_render_attempt() {
+  local range_audio_package_run_id="${RANGE_AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_audio_render_package}"
+  local range_sweep_run_id="${RANGE_SWEEP_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sweep}"
+  local range_decision_run_id="${RANGE_DECISION_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_decision}"
+  local failure_review_run_id="${FAILURE_REVIEW_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_review}"
+  local local_audio_run_id="${LOCAL_AUDIO_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_local_audio_render_attempt}"
+  local phrase_audio_package_run_id="${PHRASE_AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_audio_render_package}"
+  local sweep_run_id="${SWEEP_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_sweep}"
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision}"
+  local user_review_run_id="${USER_REVIEW_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_user_listening_review}"
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt}"
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_audio_render_package}"
+  local listening_fill_run_id="${LISTENING_FILL_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_fill}"
+  local listening_notes_run_id="${LISTENING_NOTES_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_notes}"
+  local training_smoke_run_id="${TRAINING_SMOKE_RUN_ID:-harness_stage_b_generic_base_tiny_training_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_local_audio_render_attempt}"
+  local range_audio_package="outputs/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_audio_render_package/${range_audio_package_run_id}/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_audio_render_package.json"
+  local soundfont="${SOUNDFONT_PATH:-$HOME/.local/share/soundfonts/generaluser-gs/v1.471.sf2}"
+  if [[ ! -f "$range_audio_package" ]]; then
+    print_header "Stage B generic tiny checkpoint repair phrase continuation range interval guard audio render package"
+    RUN_ID="$range_audio_package_run_id" RANGE_SWEEP_RUN_ID="$range_sweep_run_id" RANGE_DECISION_RUN_ID="$range_decision_run_id" FAILURE_REVIEW_RUN_ID="$failure_review_run_id" LOCAL_AUDIO_RUN_ID="$local_audio_run_id" PHRASE_AUDIO_PACKAGE_RUN_ID="$phrase_audio_package_run_id" SWEEP_RUN_ID="$sweep_run_id" DECISION_RUN_ID="$decision_run_id" USER_REVIEW_RUN_ID="$user_review_run_id" AUDIO_RENDER_RUN_ID="$audio_render_run_id" AUDIO_PACKAGE_RUN_ID="$audio_package_run_id" LISTENING_FILL_RUN_ID="$listening_fill_run_id" LISTENING_NOTES_RUN_ID="$listening_notes_run_id" TRAINING_SMOKE_RUN_ID="$training_smoke_run_id" run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_audio_render_package
+  fi
+  print_header "Stage B generic tiny checkpoint repair phrase continuation range interval guard local audio render attempt"
+  "$PYTHON_BIN" scripts/render_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_audio.py \
+    --run_id "$run_id" \
+    --local_audio_render_package "$range_audio_package" \
+    --soundfont "$soundfont" \
+    --doc_path docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_LOCAL_AUDIO_RENDER_ATTEMPT_2026-05-30.md \
+    --expected_boundary stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_local_audio_render_attempt \
+    --expected_file_count 3 \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4131,6 +4166,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-audio-render-package)
     run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_audio_render_package
+    ;;
+  stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-local-audio-render-attempt)
+    run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_local_audio_render_attempt
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
