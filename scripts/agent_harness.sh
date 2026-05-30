@@ -182,6 +182,8 @@ Modes:
                 Render generic tiny checkpoint repair candidates to local WAV files.
   stage-b-generic-tiny-checkpoint-repair-user-listening-review
                 Record user listening rejection for generic tiny checkpoint repair WAV files.
+  stage-b-generic-tiny-checkpoint-repair-phrase-continuation-decision
+                Route plunk-and-stop rejection to phrase-continuation repair targets.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2489,6 +2491,28 @@ run_stage_b_generic_tiny_checkpoint_repair_user_listening_review() {
     --require_no_quality_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision() {
+  local user_review_run_id="${USER_REVIEW_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_user_listening_review}"
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt}"
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_audio_render_package}"
+  local listening_fill_run_id="${LISTENING_FILL_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_fill}"
+  local listening_notes_run_id="${LISTENING_NOTES_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_notes}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision}"
+  local user_review="outputs/stage_b_generic_tiny_checkpoint_repair_user_listening_review/${user_review_run_id}/stage_b_generic_tiny_checkpoint_repair_user_listening_review.json"
+  if [[ ! -f "$user_review" ]]; then
+    print_header "Stage B generic tiny checkpoint repair user listening review"
+    RUN_ID="$user_review_run_id" AUDIO_RENDER_RUN_ID="$audio_render_run_id" AUDIO_PACKAGE_RUN_ID="$audio_package_run_id" LISTENING_FILL_RUN_ID="$listening_fill_run_id" LISTENING_NOTES_RUN_ID="$listening_notes_run_id" run_stage_b_generic_tiny_checkpoint_repair_user_listening_review
+  fi
+  print_header "Stage B generic tiny checkpoint repair phrase continuation decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_generic_tiny_checkpoint_repair_phrase_continuation.py \
+    --run_id "$run_id" \
+    --user_listening_review "$user_review" \
+    --expected_next_boundary stage_b_generic_tiny_checkpoint_repair_phrase_continuation_repair_sweep \
+    --require_auto_progress_allowed \
+    --require_no_critical_user_input \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3857,6 +3881,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-repair-user-listening-review)
     run_stage_b_generic_tiny_checkpoint_repair_user_listening_review
+    ;;
+  stage-b-generic-tiny-checkpoint-repair-phrase-continuation-decision)
+    run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
