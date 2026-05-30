@@ -190,6 +190,8 @@ Modes:
                 Package the phrase-continuation repair candidate for local audio rendering.
   stage-b-generic-tiny-checkpoint-repair-phrase-continuation-local-audio-render-attempt
                 Render the phrase-continuation repair candidate to a local WAV file.
+  stage-b-generic-tiny-checkpoint-repair-phrase-continuation-midi-note-failure-review
+                Record phrase-continuation rejection with MIDI note sequence failure evidence.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2603,6 +2605,38 @@ run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_local_audio_rende
     --require_no_quality_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_review() {
+  local local_audio_run_id="${LOCAL_AUDIO_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_local_audio_render_attempt}"
+  local phrase_audio_package_run_id="${PHRASE_AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_audio_render_package}"
+  local sweep_run_id="${SWEEP_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_sweep}"
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision}"
+  local user_review_run_id="${USER_REVIEW_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_user_listening_review}"
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt}"
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_audio_render_package}"
+  local listening_fill_run_id="${LISTENING_FILL_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_fill}"
+  local listening_notes_run_id="${LISTENING_NOTES_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_notes}"
+  local training_smoke_run_id="${TRAINING_SMOKE_RUN_ID:-harness_stage_b_generic_base_tiny_training_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_review}"
+  local audio_render_report="outputs/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_local_audio_render_attempt/${local_audio_run_id}/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_local_audio_render_attempt.json"
+  if [[ ! -f "$audio_render_report" ]]; then
+    print_header "Stage B generic tiny checkpoint repair phrase continuation local audio render attempt"
+    RUN_ID="$local_audio_run_id" PHRASE_AUDIO_PACKAGE_RUN_ID="$phrase_audio_package_run_id" SWEEP_RUN_ID="$sweep_run_id" DECISION_RUN_ID="$decision_run_id" USER_REVIEW_RUN_ID="$user_review_run_id" AUDIO_RENDER_RUN_ID="$audio_render_run_id" AUDIO_PACKAGE_RUN_ID="$audio_package_run_id" LISTENING_FILL_RUN_ID="$listening_fill_run_id" LISTENING_NOTES_RUN_ID="$listening_notes_run_id" TRAINING_SMOKE_RUN_ID="$training_smoke_run_id" run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_local_audio_render_attempt
+  fi
+  print_header "Stage B generic tiny checkpoint repair phrase continuation MIDI note failure review"
+  "$PYTHON_BIN" scripts/fill_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_review.py \
+    --run_id "$run_id" \
+    --audio_render_report "$audio_render_report" \
+    --reviewer "user" \
+    --assessment "candidate is not musical; MIDI notes show random large register jumps" \
+    --notes "user rejected the rendered WAV as non-musical and requested MIDI note-level review" \
+    --expected_boundary generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_reject_all \
+    --expected_primary_failure midi_note_random_large_leaps \
+    --expected_file_count 1 \
+    --min_max_interval 24 \
+    --require_no_keep_claim \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3983,6 +4017,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-repair-phrase-continuation-local-audio-render-attempt)
     run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_local_audio_render_attempt
+    ;;
+  stage-b-generic-tiny-checkpoint-repair-phrase-continuation-midi-note-failure-review)
+    run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_review
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
