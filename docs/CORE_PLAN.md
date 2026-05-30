@@ -142,6 +142,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic base tiny training smoke 문서: `docs/STAGE_B_GENERIC_BASE_TINY_TRAINING_SMOKE_2026-05-29.md`
 - generic tiny checkpoint generation probe 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_GENERATION_PROBE_2026-05-30.md`
 - generic tiny checkpoint grammar repair 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_GRAMMAR_REPAIR_2026-05-30.md`
+- generic tiny checkpoint repair repeatability 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_REPEATABILITY_2026-05-30.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -222,6 +223,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic base tiny training smoke: selected records `32/8`, best validation loss `6.1427`, training returncode `0`, broad quality claim `false`
 - generic tiny checkpoint generation probe: command returncode `0`, sample `2`, valid/strict/grammar `0/0/0`, next boundary `grammar repair`
 - generic tiny checkpoint grammar repair: baseline valid/strict/grammar `0/0/0`, repair `2/2/2`, constrained quality claim `false`
+- generic tiny checkpoint repair repeatability: sample `6`, valid/strict/grammar `5/5/6`, constrained quality claim `false`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1182,6 +1184,18 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - raw generation quality / constrained generation quality claim: `false/false`
 - broad trained-model quality / Brad style adaptation claim: `false`
 - 다음 작업은 repair repeatability probe다.
+
+현재 generic tiny checkpoint repair repeatability:
+
+- Issue #397 result: sample count `6`
+- valid / strict / grammar gate sample count: `5/5/6`
+- valid / strict / grammar rate: `0.8333333333333334/0.8333333333333334/1.0`
+- collapse warning sample rate: `0.0`
+- avg postprocess removal ratio: `0.08333333333333333`
+- failure reason: `dead-air ratio too high: 1.000 >= 0.800` `1`
+- raw generation quality / constrained generation quality claim: `false/false`
+- broad trained-model quality / Brad style adaptation claim: `false`
+- 다음 작업은 repair review package다.
 
 ### Phase 5. Brad Style Adaptation
 
