@@ -143,6 +143,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint generation probe 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_GENERATION_PROBE_2026-05-30.md`
 - generic tiny checkpoint grammar repair 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_GRAMMAR_REPAIR_2026-05-30.md`
 - generic tiny checkpoint repair repeatability 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_REPEATABILITY_2026-05-30.md`
+- generic tiny checkpoint repair review package 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_REVIEW_PACKAGE_2026-05-30.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -224,6 +225,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint generation probe: command returncode `0`, sample `2`, valid/strict/grammar `0/0/0`, next boundary `grammar repair`
 - generic tiny checkpoint grammar repair: baseline valid/strict/grammar `0/0/0`, repair `2/2/2`, constrained quality claim `false`
 - generic tiny checkpoint repair repeatability: sample `6`, valid/strict/grammar `5/5/6`, constrained quality claim `false`
+- generic tiny checkpoint repair review package: strict-valid candidates `5`, failed rows `1`, musical quality claim `false`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1196,6 +1198,18 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - raw generation quality / constrained generation quality claim: `false/false`
 - broad trained-model quality / Brad style adaptation claim: `false`
 - 다음 작업은 repair review package다.
+
+현재 generic tiny checkpoint repair review package:
+
+- Issue #399 result: source sample count `6`
+- strict-valid review candidates: `5`
+- failed candidate count: `1`
+- rank 1: seed `47`, sample `6`, dead-air `0.5`, coverage `0.6562486875`
+- rank 2: seed `45`, sample `4`, dead-air `0.5714285714285714`, coverage `0.8437483124999999`
+- rank 3: seed `42`, sample `1`, dead-air `0.6666666666666666`, coverage `0.9062481875`
+- failed row: seed `44`, sample `3`, reason `dead-air ratio too high: 1.000 >= 0.800`
+- musical quality / broad trained-model quality / Brad style adaptation claim: `false/false/false`
+- 다음 작업은 repair listening notes다.
 
 ### Phase 5. Brad Style Adaptation
 

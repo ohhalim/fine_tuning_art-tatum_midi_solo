@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #397, Stage B generic tiny checkpoint repair repeatability probe.
+- Latest functional issue completed: Issue #399, Stage B generic tiny checkpoint repair review package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint repair review package.
+- Recommended next issue: Stage B generic tiny checkpoint repair listening notes.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -922,6 +922,14 @@ bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-repeatabili
 ```
 
 This harness runs a seed-expanded constrained + jazz-duration repair probe and records repeatability gates without claiming broad model quality.
+
+For Stage B generic tiny checkpoint repair review package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-review-package
+```
+
+This harness packages strict-valid repair candidates for review and records MIDI paths without claiming musical quality.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
