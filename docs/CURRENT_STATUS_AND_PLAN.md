@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-05-29
+작성일: 2026-05-30
 
 ## Current Focus
 
@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #391, Stage B generic base tiny training smoke
-- 다음 권장 이슈: `Stage B generic tiny checkpoint generation probe`
+- latest functional result: Issue #393, Stage B generic tiny checkpoint generation probe
+- 다음 권장 이슈: `Stage B generic tiny checkpoint grammar repair`
 
 현재 범위가 아닌 것:
 
@@ -216,6 +216,46 @@ Issue #391은 Issue #389에서 만든 Stage B generic window token records 일�
 다음:
 
 - `Stage B generic tiny checkpoint generation probe`
+
+## Current Generic Tiny Checkpoint Generation Probe Result
+
+Issue #393은 Issue #391에서 생성한 tiny checkpoint를 Stage B generation/decode 경로에 연결해 raw sample gate를 확인한 작업이다.
+
+변경:
+
+- generic tiny checkpoint generation probe script 추가
+- #391 checkpoint를 `run_stage_b_generation_probe.py`에 `skip_prepare`, `skip_train` 조건으로 연결
+- generation command returncode, sample count, valid/strict/grammar gate, failure reason 기록
+- broad trained-model quality, Brad style adaptation claim guard 유지
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_GENERATION_PROBE_2026-05-30.md`
+- generation command returncode: `0`
+- sample count: `2`
+- valid sample count: `0`
+- strict valid sample count: `0`
+- grammar gate sample count: `0`
+- collapse warning sample rate: `0.5`
+- avg onset coverage ratio: `0.046875`
+- avg sustained coverage ratio: `0.09375`
+- max longest sustained empty run steps: `26`
+- diagnostic failure reasons: `note count too low: 4 < 6` `1`, `note count too low: 3 < 6; collapse=single_pitch,single_position` `1`
+- broad training execution ready: `false`
+- broad trained-model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+
+판단:
+
+- tiny checkpoint load와 generation/decode/report 경로는 실행 가능
+- raw generation sample은 MIDI review gate와 grammar gate 미통과
+- 현재 실패는 broad training 결론이 아니라 tiny checkpoint grammar repair 검토 대상
+- 다음 작업은 tiny checkpoint raw grammar repair
+
+다음:
+
+- `Stage B generic tiny checkpoint grammar repair`
 
 ## Current Muzig Application Resume Wording Result
 
