@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #421, Stage B generic tiny checkpoint repair phrase continuation range interval guard decision
-- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation range interval guard sweep`
+- latest functional result: Issue #423, Stage B generic tiny checkpoint repair phrase continuation range interval guard sweep
+- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation range interval guard audio render package`
 
 현재 범위가 아닌 것:
 
@@ -772,6 +772,39 @@ Issue #421은 Issue #419의 MIDI note failure를 다음 repair sweep target으�
 다음:
 
 - `Stage B generic tiny checkpoint repair phrase continuation range interval guard sweep`
+
+## Current Generic Tiny Checkpoint Repair Phrase Continuation Range Interval Guard Sweep Result
+
+Issue #423은 range/interval guard decision을 실제 constrained generation sweep에 적용한 작업이다.
+
+변경:
+
+- generation probe pitch range / adjacent interval cap 인자 추가
+- interval cap `12/9/7/5` sweep script 추가
+- actual MIDI note audit 기반 target qualification 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SWEEP_2026-05-30.md`
+- boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sweep`
+- next boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_audio_render_package`
+- target qualified: `3/48`
+- top candidate: interval cap `9`, sample seed `70`, sample `9`
+- top note count / coverage / tail empty: `11` / `1.0` / `0`
+- top pitch span / max interval / large interval ratio: `21` / `9` / `0.0`
+- musical quality claimed: `false`
+
+판단:
+
+- `cap=12`는 target candidate `0`으로 range/interval guard 미충족
+- `cap=9`는 target candidate `2`, `cap=7`은 target candidate `1`
+- audio package 단계 전 actual MIDI note guard 통과 후보 확보
+- listening quality와 human/audio keep claim은 미검증
+
+다음:
+
+- `Stage B generic tiny checkpoint repair phrase continuation range interval guard audio render package`
 
 ## Current Muzig Application Resume Wording Result
 

@@ -848,6 +848,9 @@ def chord_aware_pitch_tokens(
     recent_pitches: Sequence[int] | None = None,
     repeat_window: int = 2,
     group_index: int | None = None,
+    pitch_min: int | None = None,
+    pitch_max: int | None = None,
+    max_adjacent_interval: int | None = None,
 ) -> list[int]:
     if pitch_mode == "approach_tensions":
         resolving_group = bool(group_index is not None and int(group_index) % 2 == 1)
@@ -857,13 +860,18 @@ def chord_aware_pitch_tokens(
             pitch_classes = chord_approach_pitch_classes(chord)
     else:
         pitch_classes = chord_pitch_classes(chord, pitch_mode=pitch_mode)
+    lower = max(int(PIANO_PITCH_MIN), int(pitch_min) if pitch_min is not None else int(PIANO_PITCH_MIN))
+    upper = min(int(PIANO_PITCH_MAX), int(pitch_max) if pitch_max is not None else int(PIANO_PITCH_MAX))
+    if lower > upper:
+        raise ValueError(f"invalid pitch range: {lower}>{upper}")
+
     tokens = [
         note_pitch_token(pitch)
-        for pitch in range(int(PIANO_PITCH_MIN), int(PIANO_PITCH_MAX) + 1)
+        for pitch in range(lower, upper + 1)
         if pitch % 12 in pitch_classes
     ]
     if not tokens:
-        return list(range(TOKEN_NOTE_PITCH_START, TOKEN_NOTE_PITCH_END + 1))
+        tokens = [note_pitch_token(pitch) for pitch in range(lower, upper + 1)]
 
     if pitch_mode == "approach_tensions" and recent_pitches and group_index is not None and int(group_index) % 2 == 1:
         last_pitch = int(list(recent_pitches)[-1])
@@ -872,6 +880,14 @@ def chord_aware_pitch_tokens(
         ]
         if near_resolution_tokens:
             tokens = near_resolution_tokens
+
+    if recent_pitches and max_adjacent_interval is not None and int(max_adjacent_interval) >= 0:
+        last_pitch = int(list(recent_pitches)[-1])
+        interval_filtered = [
+            token for token in tokens if abs(pitch_from_token(token) - last_pitch) <= int(max_adjacent_interval)
+        ]
+        if interval_filtered:
+            tokens = interval_filtered
 
     window = max(0, int(repeat_window))
     if not recent_pitches or window == 0:
@@ -897,6 +913,9 @@ def generate_stage_b_constrained_tokens(
     chord_aware_pitches: bool = False,
     chord_pitch_mode: str = "tones_tensions",
     chord_pitch_repeat_window: int = 2,
+    pitch_min: int | None = None,
+    pitch_max: int | None = None,
+    max_adjacent_interval: int | None = None,
     jazz_rhythm_positions: bool = False,
     jazz_duration_tokens: bool = False,
     jazz_rhythm_profile: str = "swing_motif",
@@ -942,6 +961,9 @@ def generate_stage_b_constrained_tokens(
                         recent_pitches=recent_pitches,
                         repeat_window=chord_pitch_repeat_window,
                         group_index=group_index,
+                        pitch_min=pitch_min,
+                        pitch_max=pitch_max,
+                        max_adjacent_interval=max_adjacent_interval,
                     )
                 if jazz_duration_tokens and family_index == 3:
                     allowed = jazz_rhythm_duration_tokens(
@@ -1356,6 +1378,9 @@ def build_parser() -> argparse.ArgumentParser:
         default="tones_tensions",
     )
     parser.add_argument("--chord_pitch_repeat_window", type=int, default=2)
+    parser.add_argument("--constrained_pitch_min", type=int, default=None)
+    parser.add_argument("--constrained_pitch_max", type=int, default=None)
+    parser.add_argument("--constrained_max_adjacent_interval", type=int, default=None)
     parser.add_argument("--jazz_rhythm_positions", action="store_true")
     parser.add_argument("--jazz_duration_tokens", action="store_true")
     parser.add_argument("--jazz_rhythm_profile", choices=("swing_motif",), default="swing_motif")
@@ -1438,6 +1463,9 @@ def main() -> int:
         "chord_aware_pitches": bool(args.chord_aware_pitches),
         "chord_pitch_mode": args.chord_pitch_mode,
         "chord_pitch_repeat_window": int(args.chord_pitch_repeat_window),
+        "constrained_pitch_min": args.constrained_pitch_min,
+        "constrained_pitch_max": args.constrained_pitch_max,
+        "constrained_max_adjacent_interval": args.constrained_max_adjacent_interval,
         "jazz_rhythm_positions": bool(args.jazz_rhythm_positions),
         "jazz_duration_tokens": bool(args.jazz_duration_tokens),
         "jazz_rhythm_profile": args.jazz_rhythm_profile,
@@ -1503,6 +1531,9 @@ def main() -> int:
                 chord_aware_pitches=args.chord_aware_pitches,
                 chord_pitch_mode=args.chord_pitch_mode,
                 chord_pitch_repeat_window=args.chord_pitch_repeat_window,
+                pitch_min=args.constrained_pitch_min,
+                pitch_max=args.constrained_pitch_max,
+                max_adjacent_interval=args.constrained_max_adjacent_interval,
                 jazz_rhythm_positions=args.jazz_rhythm_positions,
                 jazz_duration_tokens=args.jazz_duration_tokens,
                 jazz_rhythm_profile=args.jazz_rhythm_profile,

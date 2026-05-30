@@ -277,6 +277,35 @@ class StageBGenerationProbeTest(unittest.TestCase):
         self.assertNotIn(note_pitch_token(72), tokens)
         self.assertIn(note_pitch_token(60), tokens)
 
+    def test_chord_aware_pitch_tokens_can_limit_pitch_range(self) -> None:
+        tokens = chord_aware_pitch_tokens(
+            "Cm7",
+            pitch_mode="tones",
+            repeat_window=0,
+            pitch_min=48,
+            pitch_max=60,
+        )
+        pitches = {pitch_from_token(token) for token in tokens}
+
+        self.assertTrue(pitches)
+        self.assertLessEqual(max(pitches), 60)
+        self.assertGreaterEqual(min(pitches), 48)
+
+    def test_chord_aware_pitch_tokens_can_limit_adjacent_interval(self) -> None:
+        tokens = chord_aware_pitch_tokens(
+            "Cm7",
+            pitch_mode="tones_tensions",
+            recent_pitches=[60],
+            repeat_window=0,
+            pitch_min=48,
+            pitch_max=84,
+            max_adjacent_interval=5,
+        )
+        pitches = {pitch_from_token(token) for token in tokens}
+
+        self.assertTrue(pitches)
+        self.assertTrue(all(abs(pitch - 60) <= 5 for pitch in pitches))
+
     def test_chord_pitch_classes_can_include_tensions(self) -> None:
         self.assertEqual(chord_pitch_classes("Cmaj7", pitch_mode="tones"), {0, 4, 7, 11})
         self.assertIn(2, chord_pitch_classes("Cmaj7", pitch_mode="tones_tensions"))
