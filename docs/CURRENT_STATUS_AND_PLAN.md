@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #395, Stage B generic tiny checkpoint grammar repair
-- 다음 권장 이슈: `Stage B generic tiny checkpoint repair repeatability probe`
+- latest functional result: Issue #397, Stage B generic tiny checkpoint repair repeatability probe
+- 다음 권장 이슈: `Stage B generic tiny checkpoint repair review package`
 
 현재 범위가 아닌 것:
 
@@ -297,6 +297,48 @@ Issue #395는 Issue #393의 raw grammar failure를 같은 checkpoint의 constrai
 다음:
 
 - `Stage B generic tiny checkpoint repair repeatability probe`
+
+## Current Generic Tiny Checkpoint Repair Repeatability Result
+
+Issue #397은 Issue #395의 constrained + jazz-duration repair 조건을 seed 확장 조건으로 재검증한 작업이다.
+
+변경:
+
+- generic tiny checkpoint repair repeatability script 추가
+- same checkpoint, constrained generation, jazz duration tokens, overlap postprocess 조건 유지
+- `6` sample 기준 valid, strict, grammar gate와 collapse warning rate 기록
+- broad trained-model quality, Brad style adaptation claim guard 유지
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_REPEATABILITY_2026-05-30.md`
+- sample count: `6`
+- valid sample count: `5`
+- strict valid sample count: `5`
+- grammar gate sample count: `6`
+- valid / strict / grammar rate: `0.8333333333333334/0.8333333333333334/1.0`
+- collapse warning sample rate: `0.0`
+- avg postprocess removal ratio: `0.08333333333333333`
+- avg onset coverage ratio: `0.21354166666666666`
+- avg sustained coverage ratio: `0.40625`
+- failure reason: `dead-air ratio too high: 1.000 >= 0.800` `1`
+- raw generation quality claimed: `false`
+- constrained generation quality claimed: `false`
+- broad trained-model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+
+판단:
+
+- constrained repair 조건은 `6` sample 중 `5` sample strict review gate 통과
+- grammar gate는 `6/6` 유지
+- 잔여 실패는 dead-air 단일 sample로 분리
+- 현재 결과는 repair repeatability boundary 통과이며, musical quality claim은 아님
+- 다음 작업은 review package 구성
+
+다음:
+
+- `Stage B generic tiny checkpoint repair review package`
 
 ## Current Muzig Application Resume Wording Result
 
