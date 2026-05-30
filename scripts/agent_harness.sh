@@ -184,6 +184,8 @@ Modes:
                 Record user listening rejection for generic tiny checkpoint repair WAV files.
   stage-b-generic-tiny-checkpoint-repair-phrase-continuation-decision
                 Route plunk-and-stop rejection to phrase-continuation repair targets.
+  stage-b-generic-tiny-checkpoint-repair-phrase-continuation-sweep
+                Run phrase-continuation repair sweep from the generic tiny checkpoint.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2513,6 +2515,35 @@ run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision() {
     --require_no_quality_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_sweep() {
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision}"
+  local user_review_run_id="${USER_REVIEW_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_user_listening_review}"
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt}"
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_audio_render_package}"
+  local listening_fill_run_id="${LISTENING_FILL_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_fill}"
+  local listening_notes_run_id="${LISTENING_NOTES_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_notes}"
+  local training_smoke_run_id="${TRAINING_SMOKE_RUN_ID:-harness_stage_b_generic_base_tiny_training_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_sweep}"
+  local checkpoint_dir="outputs/stage_b_generic_base_tiny_training_smoke/${training_smoke_run_id}/checkpoints"
+  local decision_report="outputs/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision/${decision_run_id}/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision.json"
+  if [[ ! -f "${checkpoint_dir}/checkpoint_epoch1.pt" ]]; then
+    print_header "Stage B generic base tiny training smoke"
+    RUN_ID="$training_smoke_run_id" run_stage_b_generic_base_tiny_training_smoke
+  fi
+  if [[ ! -f "$decision_report" ]]; then
+    print_header "Stage B generic tiny checkpoint repair phrase continuation decision"
+    RUN_ID="$decision_run_id" USER_REVIEW_RUN_ID="$user_review_run_id" AUDIO_RENDER_RUN_ID="$audio_render_run_id" AUDIO_PACKAGE_RUN_ID="$audio_package_run_id" LISTENING_FILL_RUN_ID="$listening_fill_run_id" LISTENING_NOTES_RUN_ID="$listening_notes_run_id" run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision
+  fi
+  print_header "Stage B generic tiny checkpoint repair phrase continuation sweep"
+  "$PYTHON_BIN" scripts/run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_sweep.py \
+    --run_id "$run_id" \
+    --checkpoint_dir "$checkpoint_dir" \
+    --decision_report "$decision_report" \
+    --expected_boundary stage_b_generic_tiny_checkpoint_repair_phrase_continuation_repair_sweep \
+    --min_target_qualified 1 \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3884,6 +3915,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-repair-phrase-continuation-decision)
     run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision
+    ;;
+  stage-b-generic-tiny-checkpoint-repair-phrase-continuation-sweep)
+    run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_sweep
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
