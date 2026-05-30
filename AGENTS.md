@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #417, Stage B generic tiny checkpoint repair phrase continuation local audio render attempt.
+- Latest functional issue completed: Issue #419, Stage B generic tiny checkpoint repair phrase continuation MIDI note failure review.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation user listening review input.
+- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation range interval guard decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1002,6 +1002,14 @@ bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-cont
 ```
 
 This harness renders the selected phrase-continuation repair candidate to local WAV and validates technical metadata without claiming listening quality.
+
+For Stage B generic tiny checkpoint repair phrase continuation MIDI note failure review changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-continuation-midi-note-failure-review
+```
+
+This harness records the user rejection with MIDI note-sequence evidence and routes the next repair target to range/interval guard work.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

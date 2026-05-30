@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #417, Stage B generic tiny checkpoint repair phrase continuation local audio render attempt
-- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation user listening review input`
+- latest functional result: Issue #419, Stage B generic tiny checkpoint repair phrase continuation MIDI note failure review
+- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation range interval guard decision`
 
 현재 범위가 아닌 것:
 
@@ -700,6 +700,44 @@ Issue #417은 Issue #415 render package의 selected objective candidate를 실�
 다음:
 
 - `Stage B generic tiny checkpoint repair phrase continuation user listening review input`
+
+## Current Generic Tiny Checkpoint Repair Phrase Continuation MIDI Note Failure Review Result
+
+Issue #419는 Issue #417에서 렌더한 selected candidate를 user rejection과 MIDI note evidence 기준으로 실패 처리한 작업이다.
+
+변경:
+
+- phrase continuation MIDI note failure review script 추가
+- rendered WAV source MIDI note sequence audit
+- pitch range, adjacent interval, severe register jump 기준 실패 원인 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_MIDI_NOTE_FAILURE_REVIEW_2026-05-30.md`
+- boundary: `generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_reject_all`
+- next boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_decision`
+- overall decision: `reject_all`
+- primary failure: `midi_note_random_large_leaps`
+- note count: `9`
+- pitch range: `29-89`
+- pitch span: `60`
+- max abs interval: `60`
+- intervals: `[15, -24, 60, -60, 34, -3, 27, -34]`
+- large interval ratio: `0.875`
+- severe interval count: `6`
+- human/audio keep claimed: `false`
+- musical quality claimed: `false`
+
+판단:
+
+- 이전 candidate는 음악 후보가 아니라 range/interval guard 실패로 판정
+- 기존 objective gate가 phrase coverage와 일부 chord-role만 보고 register jump를 놓친 상태
+- 다음 repair target은 pitch range 제한, adjacent interval 제한, severe register jump penalty
+
+다음:
+
+- `Stage B generic tiny checkpoint repair phrase continuation range interval guard decision`
 
 ## Current Muzig Application Resume Wording Result
 
