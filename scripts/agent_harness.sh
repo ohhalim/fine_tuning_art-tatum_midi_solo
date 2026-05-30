@@ -176,6 +176,8 @@ Modes:
                 Build pending listening notes for generic tiny checkpoint repair candidates.
   stage-b-generic-tiny-checkpoint-repair-listening-fill
                 Guard or fill generic tiny checkpoint repair listening notes.
+  stage-b-generic-tiny-checkpoint-repair-audio-render-package
+                Package generic tiny checkpoint repair candidates for local audio rendering.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2409,6 +2411,27 @@ run_stage_b_generic_tiny_checkpoint_repair_listening_fill() {
     --require_no_brad_style_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_repair_audio_render_package() {
+  local listening_fill_run_id="${LISTENING_FILL_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_fill}"
+  local listening_notes_run_id="${LISTENING_NOTES_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_notes}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_audio_render_package}"
+  local listening_fill_report="outputs/stage_b_generic_tiny_checkpoint_repair_listening_fill/${listening_fill_run_id}/stage_b_generic_tiny_checkpoint_repair_listening_fill.json"
+  local soundfont="${SOUNDFONT_PATH:-$HOME/.local/share/soundfonts/generaluser-gs/v1.471.sf2}"
+  if [[ ! -f "$listening_fill_report" ]]; then
+    print_header "Stage B generic tiny checkpoint repair listening fill"
+    RUN_ID="$listening_fill_run_id" LISTENING_NOTES_RUN_ID="$listening_notes_run_id" run_stage_b_generic_tiny_checkpoint_repair_listening_fill
+  fi
+  print_header "Stage B generic tiny checkpoint repair audio render package"
+  "$PYTHON_BIN" scripts/build_stage_b_generic_tiny_checkpoint_repair_audio_render_package.py \
+    --run_id "$run_id" \
+    --listening_fill_report "$listening_fill_report" \
+    --soundfont "$soundfont" \
+    --expected_boundary stage_b_generic_tiny_checkpoint_repair_audio_render_package \
+    --min_planned_outputs 5 \
+    --require_required_midi_exists \
+    --require_no_audio_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3768,6 +3791,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-repair-listening-fill)
     run_stage_b_generic_tiny_checkpoint_repair_listening_fill
+    ;;
+  stage-b-generic-tiny-checkpoint-repair-audio-render-package)
+    run_stage_b_generic_tiny_checkpoint_repair_audio_render_package
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
