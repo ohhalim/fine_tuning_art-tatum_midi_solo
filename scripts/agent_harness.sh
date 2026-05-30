@@ -180,6 +180,8 @@ Modes:
                 Package generic tiny checkpoint repair candidates for local audio rendering.
   stage-b-generic-tiny-checkpoint-repair-local-audio-render-attempt
                 Render generic tiny checkpoint repair candidates to local WAV files.
+  stage-b-generic-tiny-checkpoint-repair-user-listening-review
+                Record user listening rejection for generic tiny checkpoint repair WAV files.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2455,6 +2457,38 @@ run_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt() {
     --require_no_quality_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_repair_user_listening_review() {
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt}"
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_audio_render_package}"
+  local listening_fill_run_id="${LISTENING_FILL_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_fill}"
+  local listening_notes_run_id="${LISTENING_NOTES_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_notes}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_user_listening_review}"
+  local audio_render_report="outputs/stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt/${audio_render_run_id}/stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt.json"
+  if [[ ! -f "$audio_render_report" ]]; then
+    print_header "Stage B generic tiny checkpoint repair local audio render attempt"
+    RUN_ID="$audio_render_run_id" AUDIO_PACKAGE_RUN_ID="$audio_package_run_id" LISTENING_FILL_RUN_ID="$listening_fill_run_id" LISTENING_NOTES_RUN_ID="$listening_notes_run_id" run_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt
+  fi
+  print_header "Stage B generic tiny checkpoint repair user listening review"
+  "$PYTHON_BIN" scripts/fill_stage_b_generic_tiny_checkpoint_repair_user_listening_review.py \
+    --run_id "$run_id" \
+    --audio_render_report "$audio_render_report" \
+    --reviewer "user" \
+    --overall_decision reject_all \
+    --candidate_decision reject \
+    --primary_failure plunk_and_stop \
+    --timing too_short_or_stiff \
+    --phrase fragmented \
+    --vocabulary not_musical \
+    --assessment "all candidates only plunk briefly and end" \
+    --notes "user listened to all five WAV files; all candidates felt like short plunk-and-stop fragments" \
+    --expected_boundary generic_tiny_checkpoint_repair_audio_review_reject_all \
+    --expected_overall_decision reject_all \
+    --expected_primary_failure plunk_and_stop \
+    --expected_file_count 5 \
+    --require_no_keep_claim \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -3820,6 +3854,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-repair-local-audio-render-attempt)
     run_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt
+    ;;
+  stage-b-generic-tiny-checkpoint-repair-user-listening-review)
+    run_stage_b_generic_tiny_checkpoint_repair_user_listening_review
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
