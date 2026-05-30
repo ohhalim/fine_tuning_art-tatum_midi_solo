@@ -1425,6 +1425,19 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - quality root cause / musical quality claim: `false` / `false`
 - 다음 작업은 sparse phrase repair decision이다.
 
+현재 generic tiny checkpoint repair phrase continuation range interval guard sparse phrase repair decision:
+
+- Issue #433 result: boundary `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sparse_phrase_repair_decision`
+- source boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_rejection_analysis`
+- next boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sparse_phrase_repair_sweep`
+- observed gap ratio max: `0.5312`
+- observed max internal gap max: `1.5`
+- target max gap ratio / max internal gap: `0.4` / `0.75`
+- target min note count / min phrase coverage: `10` / `0.9`
+- primary repair target: `sparse_phrase_continuity_after_range_interval_guard`
+- quality root cause / musical quality claim: `false` / `false`
+- 다음 작업은 sparse phrase repair sweep이다.
+
 ### Phase 5. Brad Style Adaptation
 
 목표:
