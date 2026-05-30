@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #411, Stage B generic tiny checkpoint repair phrase continuation decision
-- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation repair sweep`
+- latest functional result: Issue #413, Stage B generic tiny checkpoint repair phrase continuation sweep
+- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation audio render package`
 
 현재 범위가 아닌 것:
 
@@ -593,6 +593,41 @@ Issue #411은 Issue #409 user listening rejection을 다음 repair sweep target�
 다음:
 
 - `Stage B generic tiny checkpoint repair phrase continuation repair sweep`
+
+## Current Generic Tiny Checkpoint Repair Phrase Continuation Sweep Result
+
+Issue #413은 Issue #409 user listening rejection과 Issue #411 repair target을 기준으로 `plunk_and_stop` 후보를 줄이기 위한 chord-aware phrase-continuation sweep 작업이다.
+
+변경:
+
+- phrase continuation repair sweep script 추가
+- constrained generation 조건: note groups per bar `8`, chord-aware pitches, jazz duration tokens, overlap postprocess
+- target qualification 조건 정의: note count, phrase coverage, tail empty, chord-tone role, postprocess removal, monophonic
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_SWEEP_2026-05-30.md`
+- boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_repair_sweep`
+- next boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_audio_render_package`
+- sample count: `6`
+- valid / strict / grammar: `3/1/6`
+- target qualified count: `1`
+- selected objective candidate: sample `1`, seed `62`
+- selected note count / coverage / tail empty: `9` / `0.9062481875` / `2`
+- selected chord-role ratio / postprocess removal: `0.5625` / `0.4375`
+- musical quality claimed: `false`
+- broad trained-model quality claimed: `false`
+
+판단:
+
+- 이전 후보군의 `plunk_and_stop` 실패 판정은 reject-all로 유지
+- 이번 결과는 audio review 전 objective repair candidate 1개 확보까지만 의미
+- 음악적 선호, human/audio keep, broad model quality는 미검증
+
+다음:
+
+- `Stage B generic tiny checkpoint repair phrase continuation audio render package`
 
 ## Current Muzig Application Resume Wording Result
 
