@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #409, Stage B generic tiny checkpoint repair user listening review input
-- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation repair decision`
+- latest functional result: Issue #411, Stage B generic tiny checkpoint repair phrase continuation decision
+- 다음 권장 이슈: `Stage B generic tiny checkpoint repair phrase continuation repair sweep`
 
 현재 범위가 아닌 것:
 
@@ -560,6 +560,39 @@ Issue #409는 Issue #407 WAV `5`개에 대한 user listening review 입력을 �
 다음:
 
 - `Stage B generic tiny checkpoint repair phrase continuation repair decision`
+
+## Current Generic Tiny Checkpoint Repair Phrase Continuation Decision Result
+
+Issue #411은 Issue #409 user listening rejection을 다음 repair sweep target으로 변환한 작업이다.
+
+변경:
+
+- phrase continuation repair decision script 추가
+- `plunk_and_stop` failure를 repair target으로 변환
+- phrase continuation, terminal dead-air, single-cell output, cadence/contour resolution target 정의
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_DECISION_2026-05-30.md`
+- input boundary: `generic_tiny_checkpoint_repair_audio_review_reject_all`
+- next boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_repair_sweep`
+- repair target count: `6`
+- auto progress allowed: `true`
+- critical user input required: `false`
+- human/audio keep claimed: `false`
+- musical quality claimed: `false`
+- broad trained-model quality claimed: `false`
+
+판단:
+
+- 다음 자동 작업은 repair sweep
+- sweep target은 isolated hits 제거, phrase continuation 확보, terminal dead-air 제한
+- broad model quality와 Brad style adaptation claim은 여전히 미검증
+
+다음:
+
+- `Stage B generic tiny checkpoint repair phrase continuation repair sweep`
 
 ## Current Muzig Application Resume Wording Result
 

@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #409, Stage B generic tiny checkpoint repair user listening review input.
+- Latest functional issue completed: Issue #411, Stage B generic tiny checkpoint repair phrase continuation decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation repair decision.
+- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation repair sweep.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -970,6 +970,14 @@ bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-user-listen
 ```
 
 This harness records the single-user reject-all listening result and routes the plunk-and-stop failure to the next repair decision.
+
+For Stage B generic tiny checkpoint repair phrase continuation decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-continuation-decision
+```
+
+This harness converts the plunk-and-stop listening rejection into phrase-continuation repair targets without claiming quality.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

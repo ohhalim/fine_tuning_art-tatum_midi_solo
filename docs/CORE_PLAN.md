@@ -149,6 +149,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair audio render package 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_AUDIO_RENDER_PACKAGE_2026-05-30.md`
 - generic tiny checkpoint repair local audio render attempt 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_LOCAL_AUDIO_RENDER_ATTEMPT_2026-05-30.md`
 - generic tiny checkpoint repair user listening review 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_USER_LISTENING_REVIEW_2026-05-30.md`
+- generic tiny checkpoint repair phrase continuation decision 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_DECISION_2026-05-30.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -236,6 +237,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair audio render package: planned audio outputs `5`, render status `ready_for_local_render`, audio quality claim `false`
 - generic tiny checkpoint repair local audio render attempt: rendered WAV files `5`, technical WAV validation `true`, audio quality claim `false`
 - generic tiny checkpoint repair user listening review: overall `reject_all`, candidate `reject`, primary failure `plunk_and_stop`, keep claim `false`
+- generic tiny checkpoint repair phrase continuation decision: repair target `6`, next boundary `phrase_continuation_repair_sweep`, quality claim `false`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1269,6 +1271,15 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - timing / phrase / vocabulary: `too_short_or_stiff` / `fragmented` / `not_musical`
 - human/audio keep claim: `false`
 - 다음 작업은 repair phrase continuation decision이다.
+
+현재 generic tiny checkpoint repair phrase continuation decision:
+
+- Issue #411 result: input boundary `generic_tiny_checkpoint_repair_audio_review_reject_all`
+- next boundary: `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_repair_sweep`
+- repair target count: `6`
+- auto progress allowed: `true`
+- human/audio keep / musical quality / broad model quality claim: `false/false/false`
+- 다음 작업은 repair phrase continuation sweep이다.
 
 ### Phase 5. Brad Style Adaptation
 
