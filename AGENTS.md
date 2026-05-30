@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #419, Stage B generic tiny checkpoint repair phrase continuation MIDI note failure review.
+- Latest functional issue completed: Issue #421, Stage B generic tiny checkpoint repair phrase continuation range interval guard decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation range interval guard decision.
+- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation range interval guard sweep.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1010,6 +1010,14 @@ bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-cont
 ```
 
 This harness records the user rejection with MIDI note-sequence evidence and routes the next repair target to range/interval guard work.
+
+For Stage B generic tiny checkpoint repair phrase continuation range interval guard decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-decision
+```
+
+This harness converts the MIDI note failure evidence into range/interval guard targets without claiming repaired candidate quality.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 

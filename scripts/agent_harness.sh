@@ -192,6 +192,8 @@ Modes:
                 Render the phrase-continuation repair candidate to a local WAV file.
   stage-b-generic-tiny-checkpoint-repair-phrase-continuation-midi-note-failure-review
                 Record phrase-continuation rejection with MIDI note sequence failure evidence.
+  stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-decision
+                Convert MIDI note failure evidence into range/interval guard targets.
   stage-b-constrained-probe
                 Run a constrained Stage B note-group smoke.
   stage-b-overlap-gate
@@ -2637,6 +2639,33 @@ run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure
     --require_no_quality_claim
 }
 
+run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_decision() {
+  local failure_review_run_id="${FAILURE_REVIEW_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_review}"
+  local local_audio_run_id="${LOCAL_AUDIO_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_local_audio_render_attempt}"
+  local phrase_audio_package_run_id="${PHRASE_AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_audio_render_package}"
+  local sweep_run_id="${SWEEP_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_sweep}"
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_decision}"
+  local user_review_run_id="${USER_REVIEW_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_user_listening_review}"
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_local_audio_render_attempt}"
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_audio_render_package}"
+  local listening_fill_run_id="${LISTENING_FILL_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_fill}"
+  local listening_notes_run_id="${LISTENING_NOTES_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_listening_notes}"
+  local training_smoke_run_id="${TRAINING_SMOKE_RUN_ID:-harness_stage_b_generic_base_tiny_training_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_decision}"
+  local failure_review_report="outputs/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_review/${failure_review_run_id}/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_review.json"
+  if [[ ! -f "$failure_review_report" ]]; then
+    print_header "Stage B generic tiny checkpoint repair phrase continuation MIDI note failure review"
+    RUN_ID="$failure_review_run_id" LOCAL_AUDIO_RUN_ID="$local_audio_run_id" PHRASE_AUDIO_PACKAGE_RUN_ID="$phrase_audio_package_run_id" SWEEP_RUN_ID="$sweep_run_id" DECISION_RUN_ID="$decision_run_id" USER_REVIEW_RUN_ID="$user_review_run_id" AUDIO_RENDER_RUN_ID="$audio_render_run_id" AUDIO_PACKAGE_RUN_ID="$audio_package_run_id" LISTENING_FILL_RUN_ID="$listening_fill_run_id" LISTENING_NOTES_RUN_ID="$listening_notes_run_id" TRAINING_SMOKE_RUN_ID="$training_smoke_run_id" run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_review
+  fi
+  print_header "Stage B generic tiny checkpoint repair phrase continuation range interval guard decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard.py \
+    --run_id "$run_id" \
+    --failure_review_report "$failure_review_report" \
+    --expected_boundary stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_decision \
+    --expected_next_boundary stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sweep \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4020,6 +4049,9 @@ case "$MODE" in
     ;;
   stage-b-generic-tiny-checkpoint-repair-phrase-continuation-midi-note-failure-review)
     run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_midi_note_failure_review
+    ;;
+  stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-decision)
+    run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_decision
     ;;
   stage-b-constrained-probe)
     run_stage_b_constrained_probe
