@@ -250,7 +250,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill outside-soloing repair broader repeatability sweep: policy support `3/3`, variants qualified `6/6`, chord-tone min `1.000`, non-chord max `0`, preference claim `false`
 - duration coverage fill outside-soloing repair repeatability consolidation: objective source support `2/2`, policy support `3/3`, variants qualified `6/6`, pending review preserved, preference claim `false`
 - duration coverage fill outside-soloing repair final decision: final boundary `outside_soloing_repair_objective_path_complete`, next boundary `stage_b_model_core_evidence_readme_refresh`, preference claim `false`
-- model-core evidence README refresh: 구현 범위, 문제/해결/결과, 검증 결과, claim boundary 중심으로 README 재정리
+- model-core evidence README refresh: generic base scale checkpoint repeatability consolidation 기준 README 갱신, objective repeatability `9/9/9`, quality claim `false`
 - model-core portfolio bullet draft: resume bullet `6`, metric 근거와 unsupported claim guard 분리
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
 - generic base readiness audit: phase4 prep ready `true`, broad training execution ready `false`, broad quality/Brad adaptation claim `false`

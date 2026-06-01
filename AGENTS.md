@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #471, Stage B generic base scale checkpoint repeatability consolidation.
+- Latest functional issue completed: Issue #473, Stage B model-core evidence README refresh.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B model-core evidence README refresh.
+- Recommended next issue: Stage B model-core portfolio bullet refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
