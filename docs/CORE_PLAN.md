@@ -168,6 +168,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SPARSE_PHRASE_MODEL_CORE_REVIEW_DECISION_2026-06-01.md`
 - generic model-core training data plan 문서: `docs/STAGE_B_GENERIC_MODEL_CORE_TRAINING_DATA_PLAN_2026-06-01.md`
 - generic full manifest window preparation 문서: `docs/STAGE_B_GENERIC_FULL_MANIFEST_WINDOW_PREPARATION_2026-06-01.md`
+- generic base training scale smoke 문서: `docs/STAGE_B_GENERIC_BASE_TRAINING_SCALE_SMOKE_2026-06-01.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -274,6 +275,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision: continue repair loop `false`, tiny checkpoint `diagnostic_only`, next boundary `generic_model_core_training_data_plan`
 - generic model-core training data plan: generic train/val `2433/270`, repair loop `stopped`, next boundary `generic_full_manifest_window_preparation`
 - generic full manifest window preparation: tokenized train/val `154136/21845`, max token id/vocab `544/547`, next boundary `generic_base_training_scale_smoke`
+- generic base training scale smoke: selected train/val records `128/32`, best validation loss `5.9031`, checkpoint count `1`, next boundary `generic_base_scale_checkpoint_generation_probe`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1557,6 +1559,21 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - broad trained model quality claim: `false`
 - output size: 약 `2.7GB`
 - 다음 작업은 generic base training scale smoke다.
+
+현재 generic base training scale smoke:
+
+- Issue #451 result: boundary `stage_b_generic_base_training_scale_smoke`
+- source tokenized train / val files: `154136` / `21845`
+- selected train / val records: `128` / `32`
+- token files: `160`
+- max token id / vocab size: `544` / `547`
+- fits vocab: `true`
+- training returncode: `0`
+- best validation loss: `5.9031`
+- checkpoint count: `1`
+- full generic training executed: `false`
+- broad trained model quality / Brad style adaptation claim: `false` / `false`
+- 다음 작업은 generic base scale checkpoint generation probe다.
 
 ### Phase 5. Brad Style Adaptation
 
