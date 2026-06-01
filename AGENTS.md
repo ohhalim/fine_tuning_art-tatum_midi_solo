@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #475, Stage B model-core portfolio bullet refresh.
+- Latest functional issue completed: Issue #477, Muzig application resume wording refresh.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Muzig application resume wording refresh.
+- Recommended next issue: Muzig application final review package.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

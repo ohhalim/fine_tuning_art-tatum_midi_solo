@@ -136,6 +136,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - model-core evidence README refresh: `README.md`
 - model-core portfolio bullet draft 문서: `docs/STAGE_B_MODEL_CORE_PORTFOLIO_BULLET_DRAFT_2026-05-29.md`
 - model-core portfolio bullet refresh 문서: `docs/STAGE_B_MODEL_CORE_PORTFOLIO_BULLET_REFRESH_2026-06-01.md`
+- Muzig application wording refresh 문서: `docs/MUZIG_APPLICATION_RESUME_WORDING_REFRESH_2026-06-01.md`
 - Muzig application resume wording 문서: `docs/MUZIG_APPLICATION_RESUME_WORDING_2026-05-29.md`
 - generic base readiness audit 문서: `docs/STAGE_B_GENERIC_BASE_READINESS_AUDIT_2026-05-29.md`
 - generic base manifest contract 문서: `docs/STAGE_B_GENERIC_BASE_MANIFEST_CONTRACT_2026-05-29.md`
@@ -253,6 +254,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill outside-soloing repair final decision: final boundary `outside_soloing_repair_objective_path_complete`, next boundary `stage_b_model_core_evidence_readme_refresh`, preference claim `false`
 - model-core evidence README refresh: generic base scale checkpoint repeatability consolidation 기준 README 갱신, objective repeatability `9/9/9`, quality claim `false`
 - model-core portfolio bullet refresh: resume bullet `6`, short bullet `3`, generic base checkpoint repeatability `9/9/9`, unsupported claim guard 유지
+- Muzig application wording refresh: resume project bullet `5`, short bullet `3`, 자기소개 section `3`, AI 음악 실험/검증 claim만 사용
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
 - generic base readiness audit: phase4 prep ready `true`, broad training execution ready `false`, broad quality/Brad adaptation claim `false`
 - generic base manifest contract: generic split `2433/270`, Brad split `47/11/14`, leakage/overlap `0`, broad training execution ready `false`
