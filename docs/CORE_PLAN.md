@@ -174,6 +174,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic base scale checkpoint density coverage repair probe 문서: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_DENSITY_COVERAGE_REPAIR_PROBE_2026-06-01.md`
 - generic base scale checkpoint density coverage remaining blocker decision 문서: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_DENSITY_COVERAGE_REMAINING_BLOCKER_DECISION_2026-06-01.md`
 - generic base scale checkpoint duration long-note repair probe 문서: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_DURATION_LONG_NOTE_REPAIR_PROBE_2026-06-01.md`
+- generic base scale checkpoint duration long-note remaining blocker decision 문서: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_DURATION_LONG_NOTE_REMAINING_BLOCKER_DECISION_2026-06-01.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -286,6 +287,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic base scale checkpoint density coverage repair probe: repair valid/strict/grammar `1/1/3`, note-count failure delta `3`, coverage delta `0.1042/0.5417`, next boundary `generic_base_scale_checkpoint_density_coverage_remaining_blocker_decision`
 - generic base scale checkpoint density coverage remaining blocker decision: selected target `duration_long_note_ratio_repair`, long-note failures `2`, next boundary `generic_base_scale_checkpoint_duration_long_note_repair_probe`
 - generic base scale checkpoint duration long-note repair probe: repair valid/strict/grammar `2/2/3`, long-note failure delta `2`, coverage delta `0.0208/-0.2708`, next boundary `generic_base_scale_checkpoint_duration_long_note_remaining_blocker_decision`
+- generic base scale checkpoint duration long-note remaining blocker decision: selected target `sustained_coverage_dead_air_repair`, dead-air failures `1`, coverage regression `true`, next boundary `generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1654,6 +1656,21 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - remaining failure reason: `dead-air ratio too high: 0.800 >= 0.800` `1`
 - raw generation quality / broad model quality / Brad style adaptation claim: `false` / `false` / `false`
 - 다음 작업은 generic base scale checkpoint duration long-note remaining blocker decision이다.
+
+현재 generic base scale checkpoint duration long-note remaining blocker decision:
+
+- Issue #463 result: boundary `stage_b_generic_base_scale_checkpoint_duration_long_note_remaining_blocker_decision`
+- decision: `select_sustained_coverage_dead_air_repair_probe`
+- selected target: `sustained_coverage_dead_air_repair`
+- remaining blocker: `sustained_coverage_dead_air`
+- valid / strict / grammar gate sample count: `2` / `2` / `3`
+- long-note failure count: `0`
+- dead-air failure count: `1`
+- coverage regression observed: `true`
+- onset / sustained coverage delta: `0.020833333333333343` / `-0.2708333333333333`
+- audio review selected: `false`
+- musical quality / broad model quality / Brad style adaptation claim: `false` / `false` / `false`
+- 다음 작업은 generic base scale checkpoint sustained coverage dead-air repair probe다.
 
 ### Phase 5. Brad Style Adaptation
 

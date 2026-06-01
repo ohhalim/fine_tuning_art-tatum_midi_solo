@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #461, Stage B generic base scale checkpoint duration long-note repair probe
-- 다음 권장 이슈: `Stage B generic base scale checkpoint duration long-note remaining blocker decision`
+- latest functional result: Issue #463, Stage B generic base scale checkpoint duration long-note remaining blocker decision
+- 다음 권장 이슈: `Stage B generic base scale checkpoint sustained coverage dead-air repair probe`
 
 현재 범위가 아닌 것:
 
@@ -1508,6 +1508,48 @@ Issue #461은 #459에서 선택한 duration/long-note target을 scale checkpoint
 다음:
 
 - `Stage B generic base scale checkpoint duration long-note remaining blocker decision`
+
+## Stage B Generic Base Scale Checkpoint Duration Long-Note Remaining Blocker Decision
+
+Issue #463은 #461 duration/long-note repair 이후 남은 failure reason을 다음 수리 target으로 분리한 작업이다.
+
+변경:
+
+- duration long-note remaining blocker decision script 추가
+- duration/long-note repair probe report 입력 검증
+- long-note failure 제거 상태 확인
+- dead-air failure와 sustained coverage regression 기반 target 선택
+- audio review 제외, quality claim guard 유지
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_DURATION_LONG_NOTE_REMAINING_BLOCKER_DECISION_2026-06-01.md`
+- boundary: `stage_b_generic_base_scale_checkpoint_duration_long_note_remaining_blocker_decision`
+- decision: `select_sustained_coverage_dead_air_repair_probe`
+- selected target: `sustained_coverage_dead_air_repair`
+- remaining blocker: `sustained_coverage_dead_air`
+- sample count: `3`
+- valid / strict / grammar gate sample count: `2` / `2` / `3`
+- long-note failure count: `0`
+- dead-air failure count: `1`
+- coverage regression observed: `true`
+- onset / sustained coverage delta: `0.020833333333333343` / `-0.2708333333333333`
+- audio review selected: `false`
+- musical quality claimed: `false`
+- broad trained model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+- next boundary: `stage_b_generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe`
+
+판단:
+
+- duration/long-note target은 통과했지만 sustained coverage와 dead-air 측면에서 잔여 blocker 존재
+- 다음 단계는 duration token 제약 유지 여부와 coverage/dead-air 회복 여부를 함께 검증하는 repair probe
+- strict-valid candidate 존재만으로 musical quality 또는 human/audio preference claim 불가
+
+다음:
+
+- `Stage B generic base scale checkpoint sustained coverage dead-air repair probe`
 
 ## Current Muzig Application Resume Wording Result
 
