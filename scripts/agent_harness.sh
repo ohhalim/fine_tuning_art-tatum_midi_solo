@@ -168,6 +168,8 @@ Modes:
                 Build the generic model-core training data plan after repair-loop stop.
   stage-b-generic-full-manifest-window-preparation
                 Prepare full generic train/val manifests as Stage B window records.
+  stage-b-generic-base-training-scale-smoke
+                Run a larger-than-tiny training smoke from full generic Stage B window records.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3226,6 +3228,26 @@ run_stage_b_generic_full_manifest_window_preparation() {
     --min_tokenized_val_files 1
 }
 
+run_stage_b_generic_base_training_scale_smoke() {
+  local full_window_run_id="${FULL_WINDOW_RUN_ID:-harness_stage_b_generic_full_manifest_window_preparation}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_base_training_scale_smoke}"
+  local full_window_preparation="outputs/stage_b_generic_full_manifest_window_preparation/${full_window_run_id}/stage_b_generic_full_manifest_window_preparation.json"
+  if [[ ! -f "$full_window_preparation" ]]; then
+    print_header "Stage B generic full manifest window preparation"
+    RUN_ID="$full_window_run_id" run_stage_b_generic_full_manifest_window_preparation
+  fi
+  print_header "Stage B generic base training scale smoke"
+  "$PYTHON_BIN" scripts/run_stage_b_generic_base_training_scale_smoke.py \
+    --run_id "$run_id" \
+    --full_window_preparation "$full_window_preparation" \
+    --doc_path docs/STAGE_B_GENERIC_BASE_TRAINING_SCALE_SMOKE_2026-06-01.md \
+    --expected_boundary stage_b_generic_base_training_scale_smoke \
+    --expected_next_boundary stage_b_generic_base_scale_checkpoint_generation_probe \
+    --require_training_scale_smoke_passed \
+    --require_no_broad_quality_claim \
+    --require_no_brad_style_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4573,6 +4595,9 @@ case "$MODE" in
     ;;
   stage-b-generic-full-manifest-window-preparation)
     run_stage_b_generic_full_manifest_window_preparation
+    ;;
+  stage-b-generic-base-training-scale-smoke)
+    run_stage_b_generic_base_training_scale_smoke
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

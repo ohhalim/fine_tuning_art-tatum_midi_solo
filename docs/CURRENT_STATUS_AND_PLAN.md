@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #449, Stage B generic full manifest window preparation
-- 다음 권장 이슈: `Stage B generic base training scale smoke`
+- latest functional result: Issue #451, Stage B generic base training scale smoke
+- 다음 권장 이슈: `Stage B generic base scale checkpoint generation probe`
 
 현재 범위가 아닌 것:
 
@@ -1259,6 +1259,45 @@ Issue #449는 #447 계획에 따라 full non-Brad generic train/val manifest를 
 다음:
 
 - `Stage B generic base training scale smoke`
+
+## Stage B Generic Base Training Scale Smoke
+
+Issue #451은 #449 full window output을 larger-than-tiny local training subset으로 연결한 작업이다.
+
+변경:
+
+- generic base training scale smoke script 추가
+- full window preparation report 입력 검증 추가
+- full generic tokenized output에서 `128/32` train/val record subset 선택
+- existing Stage B training command 실행 및 checkpoint/loss evidence 기록
+- full generic training 미실행, broad quality claim guard 유지
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_BASE_TRAINING_SCALE_SMOKE_2026-06-01.md`
+- boundary: `stage_b_generic_base_training_scale_smoke`
+- source tokenized train / val files: `154136` / `21845`
+- selected train / val records: `128` / `32`
+- token files: `160`
+- max token id / vocab size: `544` / `547`
+- fits vocab: `true`
+- training returncode: `0`
+- best validation loss: `5.9031`
+- checkpoint count: `1`
+- full generic training executed: `false`
+- broad trained model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+- next boundary: `stage_b_generic_base_scale_checkpoint_generation_probe`
+
+판단:
+
+- full generic Stage B window output의 larger-than-tiny training path 진입 가능
+- checkpoint artifact와 validation loss evidence 확보
+- 아직 generation quality, multi-seed quality, Brad style adaptation 증거 아님
+
+다음:
+
+- `Stage B generic base scale checkpoint generation probe`
 
 ## Current Muzig Application Resume Wording Result
 

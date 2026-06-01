@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #449, Stage B generic full manifest window preparation.
+- Latest functional issue completed: Issue #451, Stage B generic base training scale smoke.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic base training scale smoke.
+- Recommended next issue: Stage B generic base scale checkpoint generation probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -914,6 +914,14 @@ bash scripts/agent_harness.sh stage-b-generic-full-manifest-window-preparation
 ```
 
 This harness prepares the full generic train/val manifests as Stage B window records and validates token/vocab guards without running training.
+
+For Stage B generic base training scale smoke changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-base-training-scale-smoke
+```
+
+This harness runs a larger-than-tiny local training smoke from the full generic Stage B window records and validates checkpoint/loss evidence without claiming broad trained-model quality.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
