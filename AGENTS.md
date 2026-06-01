@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #451, Stage B generic base training scale smoke.
+- Latest functional issue completed: Issue #453, Stage B generic base scale checkpoint generation probe.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic base scale checkpoint generation probe.
+- Recommended next issue: Stage B generic base scale checkpoint grammar representation decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -922,6 +922,14 @@ bash scripts/agent_harness.sh stage-b-generic-base-training-scale-smoke
 ```
 
 This harness runs a larger-than-tiny local training smoke from the full generic Stage B window records and validates checkpoint/loss evidence without claiming broad trained-model quality.
+
+For Stage B generic base scale checkpoint generation probe changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-base-scale-checkpoint-generation-probe
+```
+
+This harness loads the generic-base scale checkpoint into the Stage B generation/decode path and records raw gate results without claiming broad trained-model quality or Brad style adaptation.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
