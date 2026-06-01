@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #465, Stage B generic base scale checkpoint sustained coverage dead-air repair probe.
+- Latest functional issue completed: Issue #467, Stage B generic base scale checkpoint objective gate consolidation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic base scale checkpoint objective gate consolidation.
+- Recommended next issue: Stage B generic base scale checkpoint objective gate repeatability sweep.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -978,6 +978,14 @@ bash scripts/agent_harness.sh stage-b-generic-base-scale-checkpoint-sustained-co
 ```
 
 This harness increases constrained note-group density while preserving duration-token guardrails, then verifies dead-air failure removal, sustained coverage recovery, and no broad model quality claim.
+
+For Stage B generic base scale checkpoint objective gate consolidation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-base-scale-checkpoint-objective-gate-consolidation
+```
+
+This harness consolidates current seed-set objective gate support and routes the next boundary to repeatability without claiming musical quality or human/audio preference.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
