@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #457, Stage B generic base scale checkpoint density coverage repair probe
-- 다음 권장 이슈: `Stage B generic base scale checkpoint density coverage remaining blocker decision`
+- latest functional result: Issue #459, Stage B generic base scale checkpoint density coverage remaining blocker decision
+- 다음 권장 이슈: `Stage B generic base scale checkpoint duration long-note repair probe`
 
 현재 범위가 아닌 것:
 
@@ -1427,6 +1427,46 @@ Issue #457은 #455에서 선택한 `target_density_coverage_repair`를 scale che
 다음:
 
 - `Stage B generic base scale checkpoint density coverage remaining blocker decision`
+
+## Stage B Generic Base Scale Checkpoint Density Coverage Remaining Blocker Decision
+
+Issue #459는 #457 density/coverage repair 이후 남은 failure reason을 다음 수리 target으로 분리한 작업이다.
+
+변경:
+
+- density/coverage remaining blocker decision script 추가
+- density/coverage repair probe report 입력 검증
+- remaining failure reason 기반 duration/long-note target 선택
+- audio review 제외, quality claim guard 유지
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_DENSITY_COVERAGE_REMAINING_BLOCKER_DECISION_2026-06-01.md`
+- boundary: `stage_b_generic_base_scale_checkpoint_density_coverage_remaining_blocker_decision`
+- decision: `select_duration_long_note_repair_probe`
+- selected target: `duration_long_note_ratio_repair`
+- remaining blocker: `duration_long_note_ratio`
+- sample count: `3`
+- valid / strict / grammar gate sample count: `1` / `1` / `3`
+- long-note failure count: `2`
+- note count failure delta: `3`
+- onset / sustained coverage delta: `0.10416666666666666` / `0.5416666666666666`
+- audio review selected: `false`
+- musical quality claimed: `false`
+- broad trained model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+- next boundary: `stage_b_generic_base_scale_checkpoint_duration_long_note_repair_probe`
+
+판단:
+
+- density/coverage target은 통과했지만 long-note ratio failure가 남음
+- strict-valid candidate 존재만으로 listening review 단계 진입하지 않음
+- 다음 단계는 duration/long-note ratio repair probe
+
+다음:
+
+- `Stage B generic base scale checkpoint duration long-note repair probe`
 
 ## Current Muzig Application Resume Wording Result
 
