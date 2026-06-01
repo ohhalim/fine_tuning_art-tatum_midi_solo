@@ -170,6 +170,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic full manifest window preparation 문서: `docs/STAGE_B_GENERIC_FULL_MANIFEST_WINDOW_PREPARATION_2026-06-01.md`
 - generic base training scale smoke 문서: `docs/STAGE_B_GENERIC_BASE_TRAINING_SCALE_SMOKE_2026-06-01.md`
 - generic base scale checkpoint generation probe 문서: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_GENERATION_PROBE_2026-06-01.md`
+- generic base scale checkpoint grammar representation decision 문서: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_GRAMMAR_REPRESENTATION_DECISION_2026-06-01.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -278,6 +279,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic full manifest window preparation: tokenized train/val `154136/21845`, max token id/vocab `544/547`, next boundary `generic_base_training_scale_smoke`
 - generic base training scale smoke: selected train/val records `128/32`, best validation loss `5.9031`, checkpoint count `1`, next boundary `generic_base_scale_checkpoint_generation_probe`
 - generic base scale checkpoint generation probe: sample `3`, valid/strict/grammar `0/0/0`, avg onset/sustained coverage `0.0625/0.09375`, next boundary `generic_base_scale_checkpoint_grammar_representation_decision`
+- generic base scale checkpoint grammar representation decision: selected target `target_density_coverage_repair`, note-count failures `3/3`, next boundary `generic_base_scale_checkpoint_density_coverage_repair_probe`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1590,6 +1592,21 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - raw generation quality ready: `false`
 - broad trained model quality / Brad style adaptation claim: `false` / `false`
 - 다음 작업은 generic base scale checkpoint grammar representation decision이다.
+
+현재 generic base scale checkpoint grammar representation decision:
+
+- Issue #455 result: boundary `stage_b_generic_base_scale_checkpoint_grammar_representation_decision`
+- decision: `select_density_coverage_repair_probe`
+- selected target: `target_density_coverage_repair`
+- sample count: `3`
+- valid / strict / grammar gate sample count: `0` / `0` / `0`
+- note count failure count: `3`
+- all samples note-count failed: `true`
+- avg onset / sustained coverage ratio: `0.0625` / `0.09375`
+- collapse warning not primary: `true`
+- postprocess-only repair / audio review selected: `false` / `false`
+- quality root cause / broad model quality / Brad style adaptation claim: `false` / `false` / `false`
+- 다음 작업은 generic base scale checkpoint density coverage repair probe다.
 
 ### Phase 5. Brad Style Adaptation
 
