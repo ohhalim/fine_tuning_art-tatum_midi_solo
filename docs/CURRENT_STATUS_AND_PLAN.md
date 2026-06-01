@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #473, Stage B model-core evidence README refresh
-- 다음 권장 이슈: `Stage B model-core portfolio bullet refresh`
+- latest functional result: Issue #475, Stage B model-core portfolio bullet refresh
+- 다음 권장 이슈: `Muzig application resume wording refresh`
 
 현재 범위가 아닌 것:
 
@@ -1746,6 +1746,40 @@ Issue #473은 README를 #471 repeatability consolidation 기준으로 갱신한 
 다음:
 
 - `Stage B model-core portfolio bullet refresh`
+
+## Stage B Model-Core Portfolio Bullet Refresh
+
+Issue #475는 #473 README evidence를 이력서 bullet과 면접 답변 근거로 압축한 작업이다.
+
+변경:
+
+- portfolio bullet refresh 문서 추가
+- project entry, resume bullets, short resume version, interview summary 작성
+- generic base scale checkpoint repeatability consolidation 수치 반영
+- unsupported claim guard 유지
+
+결과:
+
+- document: `docs/STAGE_B_MODEL_CORE_PORTFOLIO_BULLET_REFRESH_2026-06-01.md`
+- resume bullets: `6`
+- short resume bullets: `3`
+- interview summary rows: `5`
+- claim boundary: 사용 가능 `5`, 사용 금지 `5`
+- generic train/val: `2433/270`
+- tokenized records: `154136/21845`
+- scale smoke best validation loss: `5.9031`
+- constrained objective repair: valid/strict/grammar `3/3/3`
+- repeatability sweep: valid/strict/grammar `9/9/9`
+
+판단:
+
+- 이력서 claim 가능 범위는 model-core validation pipeline, objective MIDI review gate, configured seed sweep objective repeatability
+- 완성된 재즈 피아노 생성 모델, Brad style adaptation, broad trained-model quality, human/audio preference claim 제외
+- 다음 작업은 Muzig 지원 문구에 최신 bullet 반영
+
+다음:
+
+- `Muzig application resume wording refresh`
 
 ## Current Muzig Application Resume Wording Result
 
