@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #477, Muzig application resume wording refresh
-- 다음 권장 이슈: `Muzig application final review package`
+- latest functional result: Issue #479, Muzig application final review package
+- 다음 권장 이슈: `manual application submission review`
 
 현재 범위가 아닌 것:
 
@@ -1814,6 +1814,35 @@ Issue #477은 #475 portfolio bullet refresh를 Muzig 지원 문맥에 맞춘 문
 다음:
 
 - `Muzig application final review package`
+
+## Muzig Application Final Review Package
+
+Issue #479는 Muzig 지원용 제출 후보 문구를 한 문서로 모은 작업이다.
+
+변경:
+
+- final review package 문서 추가
+- 제출용 프로젝트 제목, long bullet, short bullet, 1분 자기소개, 지원 동기 후보 정리
+- 최종 claim check 유지
+
+결과:
+
+- document: `docs/MUZIG_APPLICATION_FINAL_REVIEW_PACKAGE_2026-06-01.md`
+- long bullet candidates: `5`
+- short bullet candidates: `3`
+- self-introduction paragraphs: `3`
+- motivation paragraphs: `2`
+- final claim check usable claims: `5`
+- final claim check forbidden claims: `5`
+
+판단:
+
+- 자동 문서화 범위는 제출 후보 정리까지 완료
+- 실제 지원서 입력, 최종 문장 선택, 개인정보/지원 플랫폼 제출은 사용자 판단 영역
+
+다음:
+
+- `manual application submission review`
 
 ## Current Muzig Application Resume Wording Result
 
