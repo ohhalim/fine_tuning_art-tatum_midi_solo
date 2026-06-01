@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #459, Stage B generic base scale checkpoint density coverage remaining blocker decision.
+- Latest functional issue completed: Issue #461, Stage B generic base scale checkpoint duration long-note repair probe.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic base scale checkpoint duration long-note repair probe.
+- Recommended next issue: Stage B generic base scale checkpoint duration long-note remaining blocker decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -954,6 +954,14 @@ bash scripts/agent_harness.sh stage-b-generic-base-scale-checkpoint-density-cove
 ```
 
 This harness selects the duration/long-note repair target after density/coverage qualification while keeping musical quality and listening preference unclaimed.
+
+For Stage B generic base scale checkpoint duration/long-note repair probe changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-base-scale-checkpoint-duration-long-note-repair-probe
+```
+
+This harness runs a duration-token constrained repair probe from the scale checkpoint and compares long-note failure count plus coverage deltas against the density/coverage repair baseline without claiming broad model quality.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
