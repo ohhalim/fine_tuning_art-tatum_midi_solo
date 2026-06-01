@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #445, Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision.
+- Latest functional issue completed: Issue #447, Stage B generic model-core training data plan.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic model-core training data plan.
+- Recommended next issue: Stage B generic full manifest window preparation.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -898,6 +898,14 @@ bash scripts/agent_harness.sh stage-b-generic-base-tiny-training-smoke
 ```
 
 This harness copies a small generic Stage B window token subset into the training path and verifies the training command succeeds without claiming broad model quality.
+
+For Stage B generic model-core training data plan changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-model-core-training-data-plan
+```
+
+This harness consolidates the repair-loop stop decision, manifest contract, window smoke, and tiny training smoke into the next full-window preparation plan without claiming broad trained-model quality.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 

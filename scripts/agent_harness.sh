@@ -164,6 +164,8 @@ Modes:
                 Prepare Stage B duration-explicit windows from generic split manifest prefix.
   stage-b-generic-base-tiny-training-smoke
                 Run a tiny training smoke from generic Stage B window records.
+  stage-b-generic-model-core-training-data-plan
+                Build the generic model-core training data plan after repair-loop stop.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3151,6 +3153,48 @@ run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_gu
     --require_no_quality_claim
 }
 
+run_stage_b_generic_model_core_training_data_plan() {
+  local model_core_run_id="${MODEL_CORE_RUN_ID:-harness_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sparse_phrase_model_core_review_decision}"
+  local manifest_contract_run_id="${MANIFEST_CONTRACT_RUN_ID:-harness_stage_b_generic_base_manifest_contract}"
+  local window_smoke_run_id="${WINDOW_SMOKE_RUN_ID:-harness_stage_b_generic_manifest_window_smoke}"
+  local training_smoke_run_id="${TRAINING_SMOKE_RUN_ID:-harness_stage_b_generic_base_tiny_training_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_model_core_training_data_plan}"
+  local model_core_decision="outputs/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sparse_phrase_model_core_review_decision/${model_core_run_id}/stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sparse_phrase_model_core_review_decision.json"
+  local manifest_contract="outputs/stage_b_generic_base_manifest_contract/${manifest_contract_run_id}/stage_b_generic_base_manifest_contract.json"
+  local window_smoke="outputs/stage_b_generic_manifest_window_smoke/${window_smoke_run_id}/stage_b_generic_manifest_window_smoke.json"
+  local tiny_training_smoke="outputs/stage_b_generic_base_tiny_training_smoke/${training_smoke_run_id}/stage_b_generic_base_tiny_training_smoke.json"
+  if [[ ! -f "$model_core_decision" ]]; then
+    print_header "Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review"
+    RUN_ID="$model_core_run_id" run_stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sparse_phrase_model_core_review
+  fi
+  if [[ ! -f "$manifest_contract" ]]; then
+    print_header "Stage B generic base manifest contract"
+    RUN_ID="$manifest_contract_run_id" run_stage_b_generic_base_manifest_contract
+  fi
+  if [[ ! -f "$window_smoke" ]]; then
+    print_header "Stage B generic manifest window smoke"
+    RUN_ID="$window_smoke_run_id" MANIFEST_CONTRACT_RUN_ID="$manifest_contract_run_id" run_stage_b_generic_manifest_window_smoke
+  fi
+  if [[ ! -f "$tiny_training_smoke" ]]; then
+    print_header "Stage B generic base tiny training smoke"
+    RUN_ID="$training_smoke_run_id" WINDOW_SMOKE_RUN_ID="$window_smoke_run_id" run_stage_b_generic_base_tiny_training_smoke
+  fi
+  print_header "Stage B generic model-core training data plan"
+  "$PYTHON_BIN" scripts/plan_stage_b_generic_model_core_training_data.py \
+    --run_id "$run_id" \
+    --model_core_decision "$model_core_decision" \
+    --manifest_contract "$manifest_contract" \
+    --window_smoke "$window_smoke" \
+    --tiny_training_smoke "$tiny_training_smoke" \
+    --doc_path docs/STAGE_B_GENERIC_MODEL_CORE_TRAINING_DATA_PLAN_2026-06-01.md \
+    --expected_boundary stage_b_generic_model_core_training_data_plan \
+    --expected_next_boundary stage_b_generic_full_manifest_window_preparation \
+    --min_generic_train_files 2000 \
+    --min_generic_val_files 200 \
+    --require_stop_repair_loop \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4492,6 +4536,9 @@ case "$MODE" in
     ;;
   stage-b-generic-base-tiny-training-smoke)
     run_stage_b_generic_base_tiny_training_smoke
+    ;;
+  stage-b-generic-model-core-training-data-plan)
+    run_stage_b_generic_model_core_training_data_plan
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

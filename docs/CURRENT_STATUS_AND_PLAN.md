@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #445, Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision
-- 다음 권장 이슈: `Stage B generic model-core training data plan`
+- latest functional result: Issue #447, Stage B generic model-core training data plan
+- 다음 권장 이슈: `Stage B generic full manifest window preparation`
 
 현재 범위가 아닌 것:
 
@@ -1184,6 +1184,44 @@ Issue #445는 Issue #443 objective proxy gap 결과를 기준으로 constraint/p
 다음:
 
 - `Stage B generic model-core training data plan`
+
+## Stage B Generic Model-Core Training Data Plan
+
+Issue #447은 constraint/postprocess repair loop 중단 이후 generic model-core 경로를 다시 정렬한 작업이다.
+
+변경:
+
+- model-core review decision report 입력 검증 추가
+- generic/Brad manifest contract, generic window smoke, tiny training smoke 결과 연결
+- repair loop status를 `stopped`로 유지
+- tiny checkpoint 역할을 `diagnostic_only`로 유지
+- full window preparation과 full training 미실행 claim guard 유지
+- 다음 경계를 full generic Stage B window preparation으로 지정
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_MODEL_CORE_TRAINING_DATA_PLAN_2026-06-01.md`
+- boundary: `stage_b_generic_model_core_training_data_plan`
+- repair loop status: `stopped`
+- tiny checkpoint role: `diagnostic_only`
+- generic train / val files: `2433` / `270`
+- Brad split: `47` / `11` / `14`
+- window smoke token max / vocab: `544` / `547`
+- tiny training selected records: `32` / `8`
+- best validation loss: `6.1427`
+- full window preparation / full training executed: `false` / `false`
+- broad trained model quality claimed: `false`
+- next boundary: `stage_b_generic_full_manifest_window_preparation`
+
+판단:
+
+- 현재 방법론은 후처리 후보 수리 중단
+- 다음 실행 단위는 full generic train/val manifest의 Stage B window preparation
+- full training과 Brad adaptation은 full window/token guard 이후 판단
+
+다음:
+
+- `Stage B generic full manifest window preparation`
 
 ## Current Muzig Application Resume Wording Result
 
