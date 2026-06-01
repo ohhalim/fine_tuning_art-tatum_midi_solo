@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #453, Stage B generic base scale checkpoint generation probe
-- 다음 권장 이슈: `Stage B generic base scale checkpoint grammar representation decision`
+- latest functional result: Issue #455, Stage B generic base scale checkpoint grammar representation decision
+- 다음 권장 이슈: `Stage B generic base scale checkpoint density coverage repair probe`
 
 현재 범위가 아닌 것:
 
@@ -1342,6 +1342,49 @@ Issue #453은 #451 scale training smoke checkpoint를 Stage B generation/decode 
 다음:
 
 - `Stage B generic base scale checkpoint grammar representation decision`
+
+## Stage B Generic Base Scale Checkpoint Grammar Representation Decision
+
+Issue #455는 #453 raw generation failure를 다음 수리 경계로 분류한 작업이다.
+
+변경:
+
+- grammar/representation decision script 추가
+- scale checkpoint generation probe report 입력 검증 추가
+- failure reason, coverage, collapse warning 근거 기반 target selection
+- postprocess-only repair, audio review 제외
+- quality root cause, broad quality, Brad adaptation claim guard 유지
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_GRAMMAR_REPRESENTATION_DECISION_2026-06-01.md`
+- boundary: `stage_b_generic_base_scale_checkpoint_grammar_representation_decision`
+- decision: `select_density_coverage_repair_probe`
+- selected target: `target_density_coverage_repair`
+- sample count: `3`
+- valid / strict / grammar gate sample count: `0` / `0` / `0`
+- note count failure count: `3`
+- all samples note-count failed: `true`
+- avg onset / sustained coverage ratio: `0.0625` / `0.09375`
+- max longest sustained empty run steps: `25`
+- collapse warning not primary: `true`
+- postprocess-only repair selected: `false`
+- audio review selected: `false`
+- quality root cause claimed: `false`
+- broad trained model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+- next boundary: `stage_b_generic_base_scale_checkpoint_density_coverage_repair_probe`
+
+판단:
+
+- raw generation failure의 직접 신호는 note count/coverage 부족
+- collapse warning은 현재 primary blocker가 아님
+- 음악 품질 또는 root cause 단정 없이 density/coverage repair target 선택
+- 다음 단계는 generation output 후처리가 아니라 density/coverage repair probe
+
+다음:
+
+- `Stage B generic base scale checkpoint density coverage repair probe`
 
 ## Current Muzig Application Resume Wording Result
 

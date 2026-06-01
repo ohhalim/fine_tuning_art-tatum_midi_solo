@@ -172,6 +172,8 @@ Modes:
                 Run a larger-than-tiny training smoke from full generic Stage B window records.
   stage-b-generic-base-scale-checkpoint-generation-probe
                 Probe generation/decode from the generic-base scale checkpoint.
+  stage-b-generic-base-scale-checkpoint-grammar-representation-decision
+                Decide the next repair target after scale-checkpoint raw generation failure.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3269,6 +3271,25 @@ run_stage_b_generic_base_scale_checkpoint_generation_probe() {
     --require_no_brad_style_claim
 }
 
+run_stage_b_generic_base_scale_checkpoint_grammar_representation_decision() {
+  local generation_probe_run_id="${GENERATION_PROBE_RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_generation_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_grammar_representation_decision}"
+  local generation_probe="outputs/stage_b_generic_base_scale_checkpoint_generation_probe/${generation_probe_run_id}/stage_b_generic_base_scale_checkpoint_generation_probe.json"
+  if [[ ! -f "$generation_probe" ]]; then
+    print_header "Stage B generic base scale checkpoint generation probe"
+    RUN_ID="$generation_probe_run_id" run_stage_b_generic_base_scale_checkpoint_generation_probe
+  fi
+  print_header "Stage B generic base scale checkpoint grammar representation decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_generic_base_scale_checkpoint_grammar_representation.py \
+    --run_id "$run_id" \
+    --generation_probe "$generation_probe" \
+    --doc_path docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_GRAMMAR_REPRESENTATION_DECISION_2026-06-01.md \
+    --expected_boundary stage_b_generic_base_scale_checkpoint_grammar_representation_decision \
+    --expected_next_boundary stage_b_generic_base_scale_checkpoint_density_coverage_repair_probe \
+    --require_density_coverage_target \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4622,6 +4643,9 @@ case "$MODE" in
     ;;
   stage-b-generic-base-scale-checkpoint-generation-probe)
     run_stage_b_generic_base_scale_checkpoint_generation_probe
+    ;;
+  stage-b-generic-base-scale-checkpoint-grammar-representation-decision)
+    run_stage_b_generic_base_scale_checkpoint_grammar_representation_decision
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #453, Stage B generic base scale checkpoint generation probe.
+- Latest functional issue completed: Issue #455, Stage B generic base scale checkpoint grammar representation decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic base scale checkpoint grammar representation decision.
+- Recommended next issue: Stage B generic base scale checkpoint density coverage repair probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -930,6 +930,14 @@ bash scripts/agent_harness.sh stage-b-generic-base-scale-checkpoint-generation-p
 ```
 
 This harness loads the generic-base scale checkpoint into the Stage B generation/decode path and records raw gate results without claiming broad trained-model quality or Brad style adaptation.
+
+For Stage B generic base scale checkpoint grammar/representation decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-base-scale-checkpoint-grammar-representation-decision
+```
+
+This harness classifies the scale-checkpoint raw generation failure and selects the next density/coverage repair target without claiming root cause or musical quality.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
