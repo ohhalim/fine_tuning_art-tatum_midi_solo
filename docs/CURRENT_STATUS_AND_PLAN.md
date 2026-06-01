@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #463, Stage B generic base scale checkpoint duration long-note remaining blocker decision
-- 다음 권장 이슈: `Stage B generic base scale checkpoint sustained coverage dead-air repair probe`
+- latest functional result: Issue #465, Stage B generic base scale checkpoint sustained coverage dead-air repair probe
+- 다음 권장 이슈: `Stage B generic base scale checkpoint objective gate consolidation`
 
 현재 범위가 아닌 것:
 
@@ -1550,6 +1550,48 @@ Issue #463은 #461 duration/long-note repair 이후 남은 failure reason을 다
 다음:
 
 - `Stage B generic base scale checkpoint sustained coverage dead-air repair probe`
+
+## Stage B Generic Base Scale Checkpoint Sustained Coverage Dead-Air Repair Probe
+
+Issue #465는 #463에서 선택한 sustained coverage/dead-air target을 scale checkpoint constrained path에서 검증한 작업이다.
+
+변경:
+
+- sustained coverage/dead-air repair probe script 추가
+- duration long-note repair report와 remaining blocker decision report 입력 검증
+- duration-token 제약 유지
+- constrained note groups per bar `4 -> 8` 상향
+- dead-air failure, sustained coverage, long-note failure 재발 여부 비교
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_SUSTAINED_COVERAGE_DEAD_AIR_REPAIR_PROBE_2026-06-01.md`
+- boundary: `stage_b_generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe`
+- sustained coverage dead-air target qualified: `true`
+- baseline valid / strict / grammar gate sample count: `2` / `2` / `3`
+- repair valid / strict / grammar gate sample count: `3` / `3` / `3`
+- baseline dead-air / long-note failure count: `1` / `0`
+- repair dead-air / long-note failure count: `0` / `0`
+- dead-air failure delta: `1`
+- valid / strict sample delta: `1` / `1`
+- onset / sustained coverage delta: `0.19791666666666669` / `0.2708333333333333`
+- max longest sustained empty run steps: `8 -> 4`
+- remaining failure reason: none
+- raw generation quality claimed: `false`
+- broad trained model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+- next boundary: `stage_b_generic_base_scale_checkpoint_objective_gate_consolidation`
+
+판단:
+
+- note group density 상향은 이번 seed set에서 dead-air failure 제거와 sustained coverage 회복에 효과 있음
+- duration-token long-note guardrail은 재발 없이 유지됨
+- objective gate 통과는 musical quality 또는 human/audio preference 증거가 아니므로 consolidation 단계 필요
+
+다음:
+
+- `Stage B generic base scale checkpoint objective gate consolidation`
 
 ## Current Muzig Application Resume Wording Result
 

@@ -182,6 +182,8 @@ Modes:
                 Run duration/long-note repair probe for the generic-base scale checkpoint.
   stage-b-generic-base-scale-checkpoint-duration-long-note-remaining-blocker-decision
                 Decide the remaining blocker after duration/long-note repair qualification.
+  stage-b-generic-base-scale-checkpoint-sustained-coverage-dead-air-repair-probe
+                Run sustained coverage/dead-air repair probe for the generic-base scale checkpoint.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3388,6 +3390,32 @@ run_stage_b_generic_base_scale_checkpoint_duration_long_note_remaining_blocker_d
     --require_no_quality_claim
 }
 
+run_stage_b_generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe() {
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_duration_long_note_remaining_blocker_decision}"
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_duration_long_note_repair_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe}"
+  local remaining_blocker_decision="outputs/stage_b_generic_base_scale_checkpoint_duration_long_note_remaining_blocker_decision/${decision_run_id}/stage_b_generic_base_scale_checkpoint_duration_long_note_remaining_blocker_decision.json"
+  local duration_long_note_repair="outputs/stage_b_generic_base_scale_checkpoint_duration_long_note_repair_probe/${repair_run_id}/stage_b_generic_base_scale_checkpoint_duration_long_note_repair_probe.json"
+  if [[ ! -f "$duration_long_note_repair" ]]; then
+    print_header "Stage B generic base scale checkpoint duration long-note repair probe"
+    RUN_ID="$repair_run_id" run_stage_b_generic_base_scale_checkpoint_duration_long_note_repair_probe
+  fi
+  if [[ ! -f "$remaining_blocker_decision" ]]; then
+    print_header "Stage B generic base scale checkpoint duration long-note remaining blocker decision"
+    RUN_ID="$decision_run_id" REPAIR_RUN_ID="$repair_run_id" run_stage_b_generic_base_scale_checkpoint_duration_long_note_remaining_blocker_decision
+  fi
+  print_header "Stage B generic base scale checkpoint sustained coverage dead-air repair probe"
+  "$PYTHON_BIN" scripts/run_stage_b_generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe.py \
+    --run_id "$run_id" \
+    --remaining_blocker_decision "$remaining_blocker_decision" \
+    --duration_long_note_repair "$duration_long_note_repair" \
+    --doc_path docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_SUSTAINED_COVERAGE_DEAD_AIR_REPAIR_PROBE_2026-06-01.md \
+    --expected_boundary stage_b_generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe \
+    --expected_next_boundary stage_b_generic_base_scale_checkpoint_objective_gate_consolidation \
+    --require_target_qualified \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4756,6 +4784,9 @@ case "$MODE" in
     ;;
   stage-b-generic-base-scale-checkpoint-duration-long-note-remaining-blocker-decision)
     run_stage_b_generic_base_scale_checkpoint_duration_long_note_remaining_blocker_decision
+    ;;
+  stage-b-generic-base-scale-checkpoint-sustained-coverage-dead-air-repair-probe)
+    run_stage_b_generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
