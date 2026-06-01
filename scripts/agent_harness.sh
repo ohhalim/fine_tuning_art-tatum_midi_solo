@@ -186,6 +186,8 @@ Modes:
                 Run sustained coverage/dead-air repair probe for the generic-base scale checkpoint.
   stage-b-generic-base-scale-checkpoint-objective-gate-consolidation
                 Consolidate current seed-set objective gate support before repeatability.
+  stage-b-generic-base-scale-checkpoint-objective-gate-repeatability-sweep
+                Run objective gate repeatability sweep for the generic-base scale checkpoint.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3437,6 +3439,32 @@ run_stage_b_generic_base_scale_checkpoint_objective_gate_consolidation() {
     --require_no_quality_claim
 }
 
+run_stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep() {
+  local consolidation_run_id="${CONSOLIDATION_RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_objective_gate_consolidation}"
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep}"
+  local consolidation="outputs/stage_b_generic_base_scale_checkpoint_objective_gate_consolidation/${consolidation_run_id}/stage_b_generic_base_scale_checkpoint_objective_gate_consolidation.json"
+  local repair_probe="outputs/stage_b_generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe/${repair_run_id}/stage_b_generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe.json"
+  if [[ ! -f "$repair_probe" ]]; then
+    print_header "Stage B generic base scale checkpoint sustained coverage dead-air repair probe"
+    RUN_ID="$repair_run_id" run_stage_b_generic_base_scale_checkpoint_sustained_coverage_dead_air_repair_probe
+  fi
+  if [[ ! -f "$consolidation" ]]; then
+    print_header "Stage B generic base scale checkpoint objective gate consolidation"
+    RUN_ID="$consolidation_run_id" REPAIR_RUN_ID="$repair_run_id" run_stage_b_generic_base_scale_checkpoint_objective_gate_consolidation
+  fi
+  print_header "Stage B generic base scale checkpoint objective gate repeatability sweep"
+  "$PYTHON_BIN" scripts/run_stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep.py \
+    --run_id "$run_id" \
+    --consolidation "$consolidation" \
+    --repair_probe "$repair_probe" \
+    --doc_path docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_OBJECTIVE_GATE_REPEATABILITY_SWEEP_2026-06-01.md \
+    --expected_boundary stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep \
+    --expected_next_boundary stage_b_generic_base_scale_checkpoint_repeatability_consolidation \
+    --require_target_qualified \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4811,6 +4839,9 @@ case "$MODE" in
     ;;
   stage-b-generic-base-scale-checkpoint-objective-gate-consolidation)
     run_stage_b_generic_base_scale_checkpoint_objective_gate_consolidation
+    ;;
+  stage-b-generic-base-scale-checkpoint-objective-gate-repeatability-sweep)
+    run_stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
