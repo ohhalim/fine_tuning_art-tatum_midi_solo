@@ -166,6 +166,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase user listening review 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SPARSE_PHRASE_USER_LISTENING_REVIEW_2026-06-01.md`
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase rejection analysis 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SPARSE_PHRASE_REJECTION_ANALYSIS_2026-06-01.md`
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SPARSE_PHRASE_MODEL_CORE_REVIEW_DECISION_2026-06-01.md`
+- generic model-core training data plan 문서: `docs/STAGE_B_GENERIC_MODEL_CORE_TRAINING_DATA_PLAN_2026-06-01.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -270,6 +271,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase user listening review: overall `reject_all`, candidate `reject`, primary failure `subjective_not_musical`, keep claim `false`, next boundary `sparse_phrase_rejection_analysis`
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase rejection analysis: candidates without objective flags `1/3`, objective proxy gap `true`, next boundary `sparse_phrase_model_core_review_decision`
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision: continue repair loop `false`, tiny checkpoint `diagnostic_only`, next boundary `generic_model_core_training_data_plan`
+- generic model-core training data plan: generic train/val `2433/270`, repair loop `stopped`, next boundary `generic_full_manifest_window_preparation`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1527,6 +1529,19 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - candidate without objective flags: `1`
 - musical quality / broad trained model quality claim: `false` / `false`
 - 다음 작업은 generic model-core training data plan이다.
+
+현재 generic model-core training data plan:
+
+- Issue #447 result: boundary `stage_b_generic_model_core_training_data_plan`
+- repair loop status: `stopped`
+- tiny checkpoint role: `diagnostic_only`
+- generic train / val files: `2433` / `270`
+- Brad split: `47` / `11` / `14`
+- window smoke token max / vocab: `544` / `547`
+- tiny training selected records: `32` / `8`
+- full window preparation / full training executed: `false` / `false`
+- broad trained model quality claim: `false`
+- 다음 작업은 generic full manifest window preparation이다.
 
 ### Phase 5. Brad Style Adaptation
 
