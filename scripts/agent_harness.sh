@@ -188,6 +188,8 @@ Modes:
                 Consolidate current seed-set objective gate support before repeatability.
   stage-b-generic-base-scale-checkpoint-objective-gate-repeatability-sweep
                 Run objective gate repeatability sweep for the generic-base scale checkpoint.
+  stage-b-generic-base-scale-checkpoint-repeatability-consolidation
+                Consolidate objective gate repeatability evidence for the generic-base scale checkpoint.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3465,6 +3467,24 @@ run_stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep() {
     --require_no_quality_claim
 }
 
+run_stage_b_generic_base_scale_checkpoint_repeatability_consolidation() {
+  local sweep_run_id="${SWEEP_RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_repeatability_consolidation}"
+  local repeatability_sweep="outputs/stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep/${sweep_run_id}/stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep.json"
+  if [[ ! -f "$repeatability_sweep" ]]; then
+    print_header "Stage B generic base scale checkpoint objective gate repeatability sweep"
+    RUN_ID="$sweep_run_id" run_stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep
+  fi
+  print_header "Stage B generic base scale checkpoint repeatability consolidation"
+  "$PYTHON_BIN" scripts/consolidate_stage_b_generic_base_scale_checkpoint_repeatability.py \
+    --run_id "$run_id" \
+    --repeatability_sweep "$repeatability_sweep" \
+    --doc_path docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_REPEATABILITY_CONSOLIDATION_2026-06-01.md \
+    --expected_boundary stage_b_generic_base_scale_checkpoint_repeatability_consolidation \
+    --expected_next_boundary stage_b_model_core_evidence_readme_refresh \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4842,6 +4862,9 @@ case "$MODE" in
     ;;
   stage-b-generic-base-scale-checkpoint-objective-gate-repeatability-sweep)
     run_stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep
+    ;;
+  stage-b-generic-base-scale-checkpoint-repeatability-consolidation)
+    run_stage_b_generic_base_scale_checkpoint_repeatability_consolidation
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

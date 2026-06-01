@@ -178,6 +178,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic base scale checkpoint sustained coverage dead-air repair probe 문서: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_SUSTAINED_COVERAGE_DEAD_AIR_REPAIR_PROBE_2026-06-01.md`
 - generic base scale checkpoint objective gate consolidation 문서: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_OBJECTIVE_GATE_CONSOLIDATION_2026-06-01.md`
 - generic base scale checkpoint objective gate repeatability sweep 문서: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_OBJECTIVE_GATE_REPEATABILITY_SWEEP_2026-06-01.md`
+- generic base scale checkpoint repeatability consolidation 문서: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_REPEATABILITY_CONSOLIDATION_2026-06-01.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -294,6 +295,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic base scale checkpoint sustained coverage dead-air repair probe: repair valid/strict/grammar `3/3/3`, dead-air failure delta `1`, sustained coverage delta `0.2708`, next boundary `generic_base_scale_checkpoint_objective_gate_consolidation`
 - generic base scale checkpoint objective gate consolidation: objective gate support `true`, single seed set only `true`, repeatability claim `false`, next boundary `generic_base_scale_checkpoint_objective_gate_repeatability_sweep`
 - generic base scale checkpoint objective gate repeatability sweep: seeds `44/52/60`, valid/strict/grammar `9/9/9`, repeatability claim `true`, quality claim `false`, next boundary `generic_base_scale_checkpoint_repeatability_consolidation`
+- generic base scale checkpoint repeatability consolidation: objective MIDI gate repeatability claim `true`, configured seed sweep repeatability claim `true`, quality claim `false`, next boundary `stage_b_model_core_evidence_readme_refresh`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 

@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #469, Stage B generic base scale checkpoint objective gate repeatability sweep.
+- Latest functional issue completed: Issue #471, Stage B generic base scale checkpoint repeatability consolidation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic base scale checkpoint repeatability consolidation.
+- Recommended next issue: Stage B model-core evidence README refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -994,6 +994,14 @@ bash scripts/agent_harness.sh stage-b-generic-base-scale-checkpoint-objective-ga
 ```
 
 This harness repeats the objective gate probe across multiple seed starts and records repeatability while keeping musical quality and human/audio preference unclaimed.
+
+For Stage B generic base scale checkpoint repeatability consolidation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-base-scale-checkpoint-repeatability-consolidation
+```
+
+This harness consolidates objective MIDI gate repeatability evidence and routes the next boundary to README evidence refresh without claiming musical quality or human/audio preference.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
