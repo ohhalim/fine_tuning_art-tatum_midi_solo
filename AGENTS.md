@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #441, Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase user listening review input.
+- Latest functional issue completed: Issue #443, Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase rejection analysis.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase rejection analysis.
+- Recommended next issue: Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1098,6 +1098,14 @@ bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-cont
 ```
 
 This harness records user listening rejection for sparse phrase repair WAV files without claiming audio quality.
+
+For Stage B generic tiny checkpoint repair phrase continuation range interval guard sparse phrase rejection analysis changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-tiny-checkpoint-repair-phrase-continuation-range-interval-guard-sparse-phrase-rejection-analysis
+```
+
+This harness analyzes rejected sparse phrase MIDI candidates and records whether objective proxy evidence is insufficient before routing to model-core review.
 
 If a harness mode is too slow or fails for an environment reason, record the reason clearly in the final answer.
 
