@@ -165,6 +165,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase local audio render attempt 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SPARSE_PHRASE_LOCAL_AUDIO_RENDER_ATTEMPT_2026-05-30.md`
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase user listening review 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SPARSE_PHRASE_USER_LISTENING_REVIEW_2026-06-01.md`
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase rejection analysis 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SPARSE_PHRASE_REJECTION_ANALYSIS_2026-06-01.md`
+- generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SPARSE_PHRASE_MODEL_CORE_REVIEW_DECISION_2026-06-01.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -268,6 +269,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase local audio render attempt: rendered WAV files `3`, technical validation `true`, duration range `6.792s-7.094s`, next boundary `sparse_phrase_user_listening_review_input`
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase user listening review: overall `reject_all`, candidate `reject`, primary failure `subjective_not_musical`, keep claim `false`, next boundary `sparse_phrase_rejection_analysis`
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase rejection analysis: candidates without objective flags `1/3`, objective proxy gap `true`, next boundary `sparse_phrase_model_core_review_decision`
+- generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision: continue repair loop `false`, tiny checkpoint `diagnostic_only`, next boundary `generic_model_core_training_data_plan`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1513,6 +1515,18 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - musical quality / quality cause claim: `false` / `false`
 - 판단: 추가 후처리 규칙 반복보다 model core, dataset, training boundary 검토 필요
 - 다음 작업은 sparse phrase model core review decision이다.
+
+현재 generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision:
+
+- Issue #445 result: boundary `stage_b_generic_tiny_checkpoint_repair_phrase_continuation_range_interval_guard_sparse_phrase_model_core_review_decision`
+- decision: `stop_constraint_postprocess_repair_loop`
+- continue constraint/postprocess repair loop: `false`
+- tiny checkpoint role: `diagnostic_only`
+- model core transition required: `true`
+- objective proxy gap recorded: `true`
+- candidate without objective flags: `1`
+- musical quality / broad trained model quality claim: `false` / `false`
+- 다음 작업은 generic model-core training data plan이다.
 
 ### Phase 5. Brad Style Adaptation
 
