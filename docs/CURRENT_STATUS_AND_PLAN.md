@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #451, Stage B generic base training scale smoke
-- 다음 권장 이슈: `Stage B generic base scale checkpoint generation probe`
+- latest functional result: Issue #453, Stage B generic base scale checkpoint generation probe
+- 다음 권장 이슈: `Stage B generic base scale checkpoint grammar representation decision`
 
 현재 범위가 아닌 것:
 
@@ -1298,6 +1298,50 @@ Issue #451은 #449 full window output을 larger-than-tiny local training subset�
 다음:
 
 - `Stage B generic base scale checkpoint generation probe`
+
+## Stage B Generic Base Scale Checkpoint Generation Probe
+
+Issue #453은 #451 scale training smoke checkpoint를 Stage B generation/decode path에 연결한 작업이다.
+
+변경:
+
+- generic base scale checkpoint generation probe script 추가
+- scale training smoke report 입력 검증 추가
+- checkpoint artifact 존재 여부와 training scale evidence 연결
+- existing Stage B generation probe 실행
+- raw generation gate 결과와 failure reason 기록
+- broad quality, human/audio preference, Brad adaptation claim guard 유지
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_GENERATION_PROBE_2026-06-01.md`
+- boundary: `stage_b_generic_base_scale_checkpoint_generation_probe`
+- source tokenized train / val records: `154136` / `21845`
+- selected train / val records: `128` / `32`
+- best validation loss: `5.9031`
+- checkpoint count: `1`
+- generation command returncode: `0`
+- sample count: `3`
+- valid / strict / grammar gate sample count: `0` / `0` / `0`
+- collapse warning sample rate: `0.0`
+- avg onset / sustained coverage ratio: `0.0625` / `0.09375`
+- max longest sustained empty run steps: `25`
+- failure reasons: `note count too low: 4 < 6`, `3 < 6`, `2 < 6`
+- raw generation quality ready: `false`
+- broad trained model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+- next boundary: `stage_b_generic_base_scale_checkpoint_grammar_representation_decision`
+
+판단:
+
+- scale checkpoint load와 generation/decode path 실행은 가능
+- larger-than-tiny training subset만으로 raw generation quality 개선 근거 없음
+- 실패 지점은 note count/coverage 부족 중심
+- 다음 단계는 추가 후처리보다 grammar/representation/training target decision
+
+다음:
+
+- `Stage B generic base scale checkpoint grammar representation decision`
 
 ## Current Muzig Application Resume Wording Result
 

@@ -170,6 +170,8 @@ Modes:
                 Prepare full generic train/val manifests as Stage B window records.
   stage-b-generic-base-training-scale-smoke
                 Run a larger-than-tiny training smoke from full generic Stage B window records.
+  stage-b-generic-base-scale-checkpoint-generation-probe
+                Probe generation/decode from the generic-base scale checkpoint.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3248,6 +3250,25 @@ run_stage_b_generic_base_training_scale_smoke() {
     --require_no_brad_style_claim
 }
 
+run_stage_b_generic_base_scale_checkpoint_generation_probe() {
+  local scale_training_run_id="${SCALE_TRAINING_RUN_ID:-harness_stage_b_generic_base_training_scale_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_generation_probe}"
+  local training_scale_smoke="outputs/stage_b_generic_base_training_scale_smoke/${scale_training_run_id}/stage_b_generic_base_training_scale_smoke.json"
+  if [[ ! -f "$training_scale_smoke" ]]; then
+    print_header "Stage B generic base training scale smoke"
+    RUN_ID="$scale_training_run_id" run_stage_b_generic_base_training_scale_smoke
+  fi
+  print_header "Stage B generic base scale checkpoint generation probe"
+  "$PYTHON_BIN" scripts/run_stage_b_generic_base_scale_checkpoint_generation_probe.py \
+    --run_id "$run_id" \
+    --training_scale_smoke "$training_scale_smoke" \
+    --doc_path docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_GENERATION_PROBE_2026-06-01.md \
+    --expected_boundary stage_b_generic_base_scale_checkpoint_generation_probe \
+    --require_probe_completed \
+    --require_no_broad_quality_claim \
+    --require_no_brad_style_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4598,6 +4619,9 @@ case "$MODE" in
     ;;
   stage-b-generic-base-training-scale-smoke)
     run_stage_b_generic_base_training_scale_smoke
+    ;;
+  stage-b-generic-base-scale-checkpoint-generation-probe)
+    run_stage_b_generic_base_scale_checkpoint_generation_probe
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
