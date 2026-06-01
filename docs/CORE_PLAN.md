@@ -167,6 +167,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase rejection analysis 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SPARSE_PHRASE_REJECTION_ANALYSIS_2026-06-01.md`
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision 문서: `docs/STAGE_B_GENERIC_TINY_CHECKPOINT_REPAIR_PHRASE_CONTINUATION_RANGE_INTERVAL_GUARD_SPARSE_PHRASE_MODEL_CORE_REVIEW_DECISION_2026-06-01.md`
 - generic model-core training data plan 문서: `docs/STAGE_B_GENERIC_MODEL_CORE_TRAINING_DATA_PLAN_2026-06-01.md`
+- generic full manifest window preparation 문서: `docs/STAGE_B_GENERIC_FULL_MANIFEST_WINDOW_PREPARATION_2026-06-01.md`
 - raw generation gate: `stage-b-generation-probe` 통과
 - raw generation repeatability gate: 2-file/3-seed sweep 통과, strict `8/9`
 - raw generation dead-air outlier diagnostics: seed `31` sample `1`, dead-air `0.857`, collapse warning false
@@ -272,6 +273,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase rejection analysis: candidates without objective flags `1/3`, objective proxy gap `true`, next boundary `sparse_phrase_model_core_review_decision`
 - generic tiny checkpoint repair phrase continuation range interval guard sparse phrase model core review decision: continue repair loop `false`, tiny checkpoint `diagnostic_only`, next boundary `generic_model_core_training_data_plan`
 - generic model-core training data plan: generic train/val `2433/270`, repair loop `stopped`, next boundary `generic_full_manifest_window_preparation`
+- generic full manifest window preparation: tokenized train/val `154136/21845`, max token id/vocab `544/547`, next boundary `generic_base_training_scale_smoke`
 - constrained review gate: `stage-b-overlap-gate` 통과
 - focused candidate path: `stage-b-rhythm-phrase-variation` 통과
 
@@ -1542,6 +1544,19 @@ Issue #312는 constrained decoding으로 adjacent repeat를 줄였지만 dead-ai
 - full window preparation / full training executed: `false` / `false`
 - broad trained model quality claim: `false`
 - 다음 작업은 generic full manifest window preparation이다.
+
+현재 generic full manifest window preparation:
+
+- Issue #449 result: boundary `stage_b_generic_full_manifest_window_preparation`
+- train / val manifest files: `2433` / `270`
+- generated samples: `175981`
+- tokenized train / val files: `154136` / `21845`
+- max token id / vocab size: `544` / `547`
+- fits vocab: `true`
+- full training executed: `false`
+- broad trained model quality claim: `false`
+- output size: 약 `2.7GB`
+- 다음 작업은 generic base training scale smoke다.
 
 ### Phase 5. Brad Style Adaptation
 

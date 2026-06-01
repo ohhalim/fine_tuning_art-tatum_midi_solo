@@ -166,6 +166,8 @@ Modes:
                 Run a tiny training smoke from generic Stage B window records.
   stage-b-generic-model-core-training-data-plan
                 Build the generic model-core training data plan after repair-loop stop.
+  stage-b-generic-full-manifest-window-preparation
+                Prepare full generic train/val manifests as Stage B window records.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3195,6 +3197,35 @@ run_stage_b_generic_model_core_training_data_plan() {
     --require_no_quality_claim
 }
 
+run_stage_b_generic_full_manifest_window_preparation() {
+  local plan_run_id="${PLAN_RUN_ID:-harness_stage_b_generic_model_core_training_data_plan}"
+  local manifest_contract_run_id="${MANIFEST_CONTRACT_RUN_ID:-harness_stage_b_generic_base_manifest_contract}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_full_manifest_window_preparation}"
+  local training_data_plan="outputs/stage_b_generic_model_core_training_data_plan/${plan_run_id}/stage_b_generic_model_core_training_data_plan.json"
+  local manifests_dir="outputs/stage_b_generic_base_manifest_contract/${manifest_contract_run_id}/manifests"
+  if [[ ! -f "$training_data_plan" ]]; then
+    print_header "Stage B generic model-core training data plan"
+    RUN_ID="$plan_run_id" MANIFEST_CONTRACT_RUN_ID="$manifest_contract_run_id" run_stage_b_generic_model_core_training_data_plan
+  fi
+  if [[ ! -f "${manifests_dir}/generic_jazz_train.txt" || ! -f "${manifests_dir}/generic_jazz_val.txt" ]]; then
+    print_header "Stage B generic base manifest contract"
+    RUN_ID="$manifest_contract_run_id" run_stage_b_generic_base_manifest_contract
+  fi
+  print_header "Stage B generic full manifest window preparation"
+  "$PYTHON_BIN" scripts/run_stage_b_generic_full_manifest_window_preparation.py \
+    --run_id "$run_id" \
+    --training_data_plan "$training_data_plan" \
+    --manifests_dir "$manifests_dir" \
+    --doc_path docs/STAGE_B_GENERIC_FULL_MANIFEST_WINDOW_PREPARATION_2026-06-01.md \
+    --expected_boundary stage_b_generic_full_manifest_window_preparation \
+    --expected_next_boundary stage_b_generic_base_training_scale_smoke \
+    --require_ready \
+    --require_no_training_claim \
+    --require_no_quality_claim \
+    --min_tokenized_train_files 1 \
+    --min_tokenized_val_files 1
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4539,6 +4570,9 @@ case "$MODE" in
     ;;
   stage-b-generic-model-core-training-data-plan)
     run_stage_b_generic_model_core_training_data_plan
+    ;;
+  stage-b-generic-full-manifest-window-preparation)
+    run_stage_b_generic_full_manifest_window_preparation
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

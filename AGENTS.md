@@ -11,9 +11,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #447, Stage B generic model-core training data plan.
+- Latest functional issue completed: Issue #449, Stage B generic full manifest window preparation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B generic full manifest window preparation.
+- Recommended next issue: Stage B generic base training scale smoke.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -906,6 +906,14 @@ bash scripts/agent_harness.sh stage-b-generic-model-core-training-data-plan
 ```
 
 This harness consolidates the repair-loop stop decision, manifest contract, window smoke, and tiny training smoke into the next full-window preparation plan without claiming broad trained-model quality.
+
+For Stage B generic full manifest window preparation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-generic-full-manifest-window-preparation
+```
+
+This harness prepares the full generic train/val manifests as Stage B window records and validates token/vocab guards without running training.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
