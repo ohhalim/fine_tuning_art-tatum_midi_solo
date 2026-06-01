@@ -174,6 +174,8 @@ Modes:
                 Probe generation/decode from the generic-base scale checkpoint.
   stage-b-generic-base-scale-checkpoint-grammar-representation-decision
                 Decide the next repair target after scale-checkpoint raw generation failure.
+  stage-b-generic-base-scale-checkpoint-density-coverage-repair-probe
+                Run density/coverage repair probe for the generic-base scale checkpoint.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3290,6 +3292,32 @@ run_stage_b_generic_base_scale_checkpoint_grammar_representation_decision() {
     --require_no_quality_claim
 }
 
+run_stage_b_generic_base_scale_checkpoint_density_coverage_repair_probe() {
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_grammar_representation_decision}"
+  local generation_probe_run_id="${GENERATION_PROBE_RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_generation_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_generic_base_scale_checkpoint_density_coverage_repair_probe}"
+  local decision_report="outputs/stage_b_generic_base_scale_checkpoint_grammar_representation_decision/${decision_run_id}/stage_b_generic_base_scale_checkpoint_grammar_representation_decision.json"
+  local baseline_generation_probe="outputs/stage_b_generic_base_scale_checkpoint_generation_probe/${generation_probe_run_id}/stage_b_generic_base_scale_checkpoint_generation_probe.json"
+  if [[ ! -f "$decision_report" ]]; then
+    print_header "Stage B generic base scale checkpoint grammar representation decision"
+    RUN_ID="$decision_run_id" GENERATION_PROBE_RUN_ID="$generation_probe_run_id" run_stage_b_generic_base_scale_checkpoint_grammar_representation_decision
+  fi
+  if [[ ! -f "$baseline_generation_probe" ]]; then
+    print_header "Stage B generic base scale checkpoint generation probe"
+    RUN_ID="$generation_probe_run_id" run_stage_b_generic_base_scale_checkpoint_generation_probe
+  fi
+  print_header "Stage B generic base scale checkpoint density coverage repair probe"
+  "$PYTHON_BIN" scripts/run_stage_b_generic_base_scale_checkpoint_density_coverage_repair_probe.py \
+    --run_id "$run_id" \
+    --decision_report "$decision_report" \
+    --baseline_generation_probe "$baseline_generation_probe" \
+    --doc_path docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_DENSITY_COVERAGE_REPAIR_PROBE_2026-06-01.md \
+    --expected_boundary stage_b_generic_base_scale_checkpoint_density_coverage_repair_probe \
+    --expected_next_boundary stage_b_generic_base_scale_checkpoint_density_coverage_remaining_blocker_decision \
+    --require_target_qualified \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4646,6 +4674,9 @@ case "$MODE" in
     ;;
   stage-b-generic-base-scale-checkpoint-grammar-representation-decision)
     run_stage_b_generic_base_scale_checkpoint_grammar_representation_decision
+    ;;
+  stage-b-generic-base-scale-checkpoint-density-coverage-repair-probe)
+    run_stage_b_generic_base_scale_checkpoint_density_coverage_repair_probe
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
