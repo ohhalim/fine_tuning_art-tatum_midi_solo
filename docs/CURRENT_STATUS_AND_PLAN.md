@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #469, Stage B generic base scale checkpoint objective gate repeatability sweep
-- 다음 권장 이슈: `Stage B generic base scale checkpoint repeatability consolidation`
+- latest functional result: Issue #471, Stage B generic base scale checkpoint repeatability consolidation
+- 다음 권장 이슈: `Stage B model-core evidence README refresh`
 
 현재 범위가 아닌 것:
 
@@ -1672,6 +1672,44 @@ Issue #469는 #467에서 선택한 objective gate repeatability target을 seed �
 다음:
 
 - `Stage B generic base scale checkpoint repeatability consolidation`
+
+## Stage B Generic Base Scale Checkpoint Repeatability Consolidation
+
+Issue #471은 #469 seed sweep 결과를 objective MIDI gate repeatability claim으로 통합하고, quality claim 제외 범위를 고정한 작업이다.
+
+변경:
+
+- repeatability consolidation script 추가
+- objective gate repeatability sweep report 입력 검증
+- configured seed sweep repeatability claim과 quality claim 제외 범위 분리
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_REPEATABILITY_CONSOLIDATION_2026-06-01.md`
+- boundary: `stage_b_generic_base_scale_checkpoint_repeatability_consolidation`
+- next boundary: `stage_b_model_core_evidence_readme_refresh`
+- objective MIDI gate repeatability claimed: `true`
+- configured seed sweep repeatability claimed: `true`
+- seeds: `[44, 52, 60]`
+- sample count: `9`
+- valid / strict / grammar gate sample count: `9` / `9` / `9`
+- avg onset / sustained coverage: `0.4236111111111111` / `0.6805555555555556`
+- max longest sustained empty run steps: `4`
+- raw generation quality claimed: `false`
+- human/audio preference claimed: `false`
+- broad trained-model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+
+판단:
+
+- 현재 claim 가능 범위는 configured seed sweep의 objective MIDI gate repeatability
+- musical quality, human/audio preference, broad trained-model quality는 미검증
+- 다음 작업은 README evidence refresh로 이동 가능
+
+다음:
+
+- `Stage B model-core evidence README refresh`
 
 ## Current Muzig Application Resume Wording Result
 
