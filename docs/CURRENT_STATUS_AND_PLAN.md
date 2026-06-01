@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #447, Stage B generic model-core training data plan
-- 다음 권장 이슈: `Stage B generic full manifest window preparation`
+- latest functional result: Issue #449, Stage B generic full manifest window preparation
+- 다음 권장 이슈: `Stage B generic base training scale smoke`
 
 현재 범위가 아닌 것:
 
@@ -1222,6 +1222,43 @@ Issue #447은 constraint/postprocess repair loop 중단 이후 generic model-cor
 다음:
 
 - `Stage B generic full manifest window preparation`
+
+## Stage B Generic Full Manifest Window Preparation
+
+Issue #449는 #447 계획에 따라 full non-Brad generic train/val manifest를 Stage B window records로 준비한 작업이다.
+
+변경:
+
+- full generic manifest window preparation script 추가
+- training data plan 입력 검증 추가
+- generic train/val manifest 전체 복사 및 explicit split boundary 보존
+- `prepare_role_dataset.py` 기반 Stage B window/tokenized records 생성
+- full training 미실행, broad quality claim guard 유지
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_FULL_MANIFEST_WINDOW_PREPARATION_2026-06-01.md`
+- boundary: `stage_b_generic_full_manifest_window_preparation`
+- train / val manifest files: `2433` / `270`
+- generated samples: `175981`
+- tokenized train / val files: `154136` / `21845`
+- max token id / vocab size: `544` / `547`
+- fits vocab: `true`
+- full training executed: `false`
+- broad trained model quality claimed: `false`
+- output size: 약 `2.7GB`
+- next boundary: `stage_b_generic_base_training_scale_smoke`
+
+판단:
+
+- full generic Stage B window preparation 가능
+- train/val split 유지
+- 다음 단계는 controlled training scale smoke
+- 아직 broad trained model quality 또는 Brad style adaptation 증거 아님
+
+다음:
+
+- `Stage B generic base training scale smoke`
 
 ## Current Muzig Application Resume Wording Result
 
