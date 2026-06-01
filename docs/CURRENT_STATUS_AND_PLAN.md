@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #465, Stage B generic base scale checkpoint sustained coverage dead-air repair probe
-- 다음 권장 이슈: `Stage B generic base scale checkpoint objective gate consolidation`
+- latest functional result: Issue #467, Stage B generic base scale checkpoint objective gate consolidation
+- 다음 권장 이슈: `Stage B generic base scale checkpoint objective gate repeatability sweep`
 
 현재 범위가 아닌 것:
 
@@ -1592,6 +1592,46 @@ Issue #465는 #463에서 선택한 sustained coverage/dead-air target을 scale c
 다음:
 
 - `Stage B generic base scale checkpoint objective gate consolidation`
+
+## Stage B Generic Base Scale Checkpoint Objective Gate Consolidation
+
+Issue #467은 #465 repair 결과를 objective gate support로 통합하고, repeatability claim을 분리한 작업이다.
+
+변경:
+
+- objective gate consolidation script 추가
+- sustained coverage/dead-air repair probe report 입력 검증
+- valid/strict/grammar all-pass, failure reason absence, long-note guardrail 유지 확인
+- repeatability, musical quality, human/audio preference claim guard 유지
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_GENERIC_BASE_SCALE_CHECKPOINT_OBJECTIVE_GATE_CONSOLIDATION_2026-06-01.md`
+- boundary: `stage_b_generic_base_scale_checkpoint_objective_gate_consolidation`
+- decision: `select_objective_gate_repeatability_sweep`
+- selected target: `objective_gate_repeatability_sweep`
+- objective gate support: `true`
+- single seed set only: `true`
+- sample count: `3`
+- valid / strict / grammar gate sample count: `3` / `3` / `3`
+- dead-air / long-note failure count: `0` / `0`
+- avg onset / sustained coverage: `0.3854166666666667` / `0.6354166666666666`
+- repeatability claimed: `false`
+- musical quality claimed: `false`
+- broad trained model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+- next boundary: `stage_b_generic_base_scale_checkpoint_objective_gate_repeatability_sweep`
+
+판단:
+
+- 현재 seed set에서는 objective MIDI gate support 존재
+- repeatability와 listening quality는 아직 미검증
+- 다음 단계는 같은 조건을 seed 범위로 넓힌 repeatability sweep
+
+다음:
+
+- `Stage B generic base scale checkpoint objective gate repeatability sweep`
 
 ## Current Muzig Application Resume Wording Result
 
