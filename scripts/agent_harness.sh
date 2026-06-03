@@ -194,6 +194,8 @@ Modes:
                 Define the MIDI-to-solo MVP input/output contract and run plan.
   stage-b-midi-to-solo-context-extraction
                 Extract MIDI-to-solo context rows from an input MIDI fixture.
+  stage-b-midi-to-solo-training-resource-probe
+                Check MIDI-to-solo context, Stage B windows, and scale-smoke checkpoint resources.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3513,6 +3515,39 @@ run_stage_b_midi_to_solo_context_extraction() {
     --require_no_final_claim
 }
 
+run_stage_b_midi_to_solo_training_resource_probe() {
+  local context_run_id="${CONTEXT_RUN_ID:-harness_stage_b_midi_to_solo_context_extraction}"
+  local full_window_run_id="${FULL_WINDOW_RUN_ID:-harness_stage_b_generic_full_manifest_window_preparation}"
+  local scale_training_run_id="${SCALE_TRAINING_RUN_ID:-harness_stage_b_generic_base_training_scale_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_training_resource_probe}"
+  local context_report="outputs/stage_b_midi_to_solo_context_extraction/${context_run_id}/stage_b_midi_to_solo_context_extraction.json"
+  local full_window_preparation="outputs/stage_b_generic_full_manifest_window_preparation/${full_window_run_id}/stage_b_generic_full_manifest_window_preparation.json"
+  local training_scale_smoke="outputs/stage_b_generic_base_training_scale_smoke/${scale_training_run_id}/stage_b_generic_base_training_scale_smoke.json"
+  if [[ ! -f "$context_report" ]]; then
+    print_header "Stage B MIDI-to-solo context extraction MVP"
+    RUN_ID="$context_run_id" run_stage_b_midi_to_solo_context_extraction
+  fi
+  if [[ ! -f "$full_window_preparation" ]]; then
+    print_header "Stage B generic full manifest window preparation"
+    RUN_ID="$full_window_run_id" run_stage_b_generic_full_manifest_window_preparation
+  fi
+  if [[ ! -f "$training_scale_smoke" ]]; then
+    print_header "Stage B generic base training scale smoke"
+    RUN_ID="$scale_training_run_id" FULL_WINDOW_RUN_ID="$full_window_run_id" run_stage_b_generic_base_training_scale_smoke
+  fi
+  print_header "Stage B MIDI-to-solo training resource probe"
+  "$PYTHON_BIN" scripts/check_stage_b_midi_to_solo_training_resource_probe.py \
+    --run_id "$run_id" \
+    --context_report "$context_report" \
+    --full_window_preparation "$full_window_preparation" \
+    --training_scale_smoke "$training_scale_smoke" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TRAINING_RESOURCE_PROBE_2026-06-03.md \
+    --expected_boundary stage_b_midi_to_solo_training_resource_probe \
+    --expected_next_boundary stage_b_midi_to_solo_conditioned_generation_probe \
+    --require_ready \
+    --require_no_final_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4899,6 +4934,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-context-extraction)
     run_stage_b_midi_to_solo_context_extraction
+    ;;
+  stage-b-midi-to-solo-training-resource-probe)
+    run_stage_b_midi_to_solo_training_resource_probe
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #483, Stage B MIDI-to-solo context extraction MVP.
+- Latest functional issue completed: Issue #485, Stage B MIDI-to-solo training resource probe.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo training resource probe.
+- Recommended next issue: Stage B MIDI-to-solo conditioned generation probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1019,6 +1019,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-context-extraction
 ```
 
 This harness extracts bar/position/chord/bass context rows from an input MIDI fixture without claiming harmony-analysis quality or completed MIDI-to-solo generation.
+
+For Stage B MIDI-to-solo training resource probe changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-training-resource-probe
+```
+
+This harness checks context extraction, full Stage B window records, and scale-smoke checkpoint resources before conditioned generation without claiming final MIDI-to-solo output quality.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
