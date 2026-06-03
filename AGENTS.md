@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #501, Stage B MIDI-to-solo model-direct audio render package.
+- Latest functional issue completed: Issue #503, Stage B MIDI-to-solo model-direct audio evidence consolidation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-direct audio evidence consolidation.
+- Recommended next issue: Stage B MIDI-to-solo model-direct phrase quality diagnostics.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1091,6 +1091,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-audio-render-pac
 ```
 
 This harness renders repaired model-direct MIDI candidates to WAV files and validates technical WAV metadata without claiming audio quality, model quality, or human preference.
+
+For Stage B MIDI-to-solo model-direct audio evidence consolidation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-audio-evidence-consolidation
+```
+
+This harness consolidates model-direct objective MIDI evidence and WAV render evidence without claiming model quality, musical quality, or human preference.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
