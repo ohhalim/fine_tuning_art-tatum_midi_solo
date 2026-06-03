@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #481, Stage B MIDI-to-solo MVP input contract and run plan.
+- Latest functional issue completed: Issue #483, Stage B MIDI-to-solo context extraction MVP.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo context extraction MVP.
+- Recommended next issue: Stage B MIDI-to-solo training resource probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1011,6 +1011,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-contract
 ```
 
 This harness defines the input MIDI to ranked jazz solo MIDI candidate contract, including constrained decoding, candidate ranking, and retrieval fallback boundaries.
+
+For Stage B MIDI-to-solo context extraction changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-context-extraction
+```
+
+This harness extracts bar/position/chord/bass context rows from an input MIDI fixture without claiming harmony-analysis quality or completed MIDI-to-solo generation.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
