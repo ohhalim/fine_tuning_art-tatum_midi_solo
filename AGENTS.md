@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #512, Stage B MIDI-to-solo model-direct listening review package.
+- Latest functional issue completed: Issue #514, Stage B MIDI-to-solo model-direct user listening review input guard.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-direct user listening review fill.
+- Recommended next issue: Stage B MIDI-to-solo model-direct objective-only next decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1131,6 +1131,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-listening-review
 ```
 
 This harness packages timing-repaired MIDI candidates as MIDI/WAV review files, writes the pending review input template, and keeps listening preference unclaimed.
+
+For Stage B MIDI-to-solo model-direct user listening review input guard changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-user-listening-review-input-guard
+```
+
+This harness verifies that pending review input blocks preference fill and keeps listening preference unclaimed.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
