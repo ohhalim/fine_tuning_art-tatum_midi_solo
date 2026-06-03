@@ -218,6 +218,8 @@ Modes:
                 Diagnose model-direct MIDI phrase risks from note-level evidence.
   stage-b-midi-to-solo-model-direct-pitch-contour-repair
                 Repair model-direct pitch/register contour with range and interval guards.
+  stage-b-midi-to-solo-model-direct-timing-phrase-repair
+                Repair model-direct timing phrase gaps with compact onset and duration fill.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3915,6 +3917,48 @@ run_stage_b_midi_to_solo_model_direct_pitch_contour_repair() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_direct_timing_phrase_repair() {
+  local pitch_repair_run_id="${PITCH_REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_pitch_contour_repair}"
+  local diagnostics_run_id="${DIAGNOSTICS_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_phrase_quality_diagnostics}"
+  local evidence_run_id="${EVIDENCE_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_audio_evidence_consolidation}"
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_audio_render_package}"
+  local overlap_repair_run_id="${OVERLAP_REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair}"
+  local previous_direct_run_id="${PREVIOUS_DIRECT_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_8bar_generation_probe}"
+  local sequence_budget_run_id="${SEQUENCE_BUDGET_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke}"
+  local context_run_id="${CONTEXT_RUN_ID:-harness_stage_b_midi_to_solo_context_extraction}"
+  local scale_run_id="${SCALE_RUN_ID:-max_sequence_160}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_direct_timing_phrase_repair}"
+  local pitch_repair="outputs/stage_b_midi_to_solo_model_direct_pitch_contour_repetition_repair/${pitch_repair_run_id}/stage_b_midi_to_solo_model_direct_pitch_contour_repetition_repair.json"
+  local sequence_budget_repair="outputs/stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke/${sequence_budget_run_id}/stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke.json"
+  local context_report="outputs/stage_b_midi_to_solo_context_extraction/${context_run_id}/stage_b_midi_to_solo_context_extraction.json"
+  local repaired_training_scale_smoke="outputs/stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke/${sequence_budget_run_id}/scale_smoke/${scale_run_id}/stage_b_generic_base_training_scale_smoke.json"
+  if [[ ! -f "$pitch_repair" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct pitch contour repair"
+    RUN_ID="$pitch_repair_run_id" DIAGNOSTICS_RUN_ID="$diagnostics_run_id" EVIDENCE_RUN_ID="$evidence_run_id" AUDIO_RENDER_RUN_ID="$audio_render_run_id" OVERLAP_REPAIR_RUN_ID="$overlap_repair_run_id" PREVIOUS_DIRECT_RUN_ID="$previous_direct_run_id" SEQUENCE_BUDGET_RUN_ID="$sequence_budget_run_id" CONTEXT_RUN_ID="$context_run_id" SCALE_RUN_ID="$scale_run_id" run_stage_b_midi_to_solo_model_direct_pitch_contour_repair
+  fi
+  if [[ ! -f "$sequence_budget_repair" || ! -f "$repaired_training_scale_smoke" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct sequence budget repair smoke"
+    RUN_ID="$sequence_budget_run_id" SCALE_RUN_ID="$scale_run_id" run_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke
+  fi
+  if [[ ! -f "$context_report" ]]; then
+    print_header "Stage B MIDI-to-solo context extraction MVP"
+    RUN_ID="$context_run_id" run_stage_b_midi_to_solo_context_extraction
+  fi
+  print_header "Stage B MIDI-to-solo model-direct timing phrase repair"
+  "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_model_direct_timing_phrase_repair.py \
+    --run_id "$run_id" \
+    --source_pitch_repair "$pitch_repair" \
+    --sequence_budget_repair "$sequence_budget_repair" \
+    --context_report "$context_report" \
+    --repaired_training_scale_smoke "$repaired_training_scale_smoke" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_TIMING_PHRASE_REPAIR_2026-06-03.md \
+    --expected_boundary stage_b_midi_to_solo_model_direct_timing_phrase_repair \
+    --expected_next_boundary stage_b_midi_to_solo_model_direct_listening_review_package \
+    --require_repair_completed \
+    --require_timing_repair_passed \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -5337,6 +5381,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-direct-pitch-contour-repair)
     run_stage_b_midi_to_solo_model_direct_pitch_contour_repair
+    ;;
+  stage-b-midi-to-solo-model-direct-timing-phrase-repair)
+    run_stage_b_midi_to_solo_model_direct_timing_phrase_repair
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
