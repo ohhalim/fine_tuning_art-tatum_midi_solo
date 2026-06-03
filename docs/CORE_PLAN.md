@@ -116,8 +116,14 @@ MVP가 끝났다고 볼 수 있는 조건:
 - model-direct timing phrase repair max dead-air ratio: `0.6522 -> 0.2258`
 - model-direct timing phrase repair max interval guard: `9 -> 9`
 - model-direct timing phrase repair quality/preference claim: `false`
-- next review target: `stage_b_midi_to_solo_model_direct_listening_review_package`
-- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_TIMING_PHRASE_REPAIR_2026-06-03.md`
+- model-direct listening review package candidate count: `3`
+- model-direct listening review package rendered WAV files: `3`
+- model-direct listening review package WAV duration range: `18.926s-19.030s`
+- model-direct listening review input template written: `true`
+- model-direct listening review completed: `false`
+- model-direct human/audio preference claim: `false`
+- next review target: `stage_b_midi_to_solo_model_direct_user_listening_review_fill`
+- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_LISTENING_REVIEW_PACKAGE_2026-06-03.md`
 - margin-recovered timing/repetition focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - margin-recovered timing/repetition focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered phrase/vocabulary repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_REPAIR_2026-05-28.md`
@@ -310,6 +316,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo model-direct phrase quality diagnostics: candidates `3`, flags `dead_air_gap=3`, `wide_interval_contour=3`, `wide_register_span=3`, max interval `82`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_direct_pitch_contour_repetition_repair`
 - MIDI-to-solo model-direct pitch contour repair: strict `3/3`, max interval `82 -> 9`, wide interval/register flags `3 -> 0`, dead-air flag `3 -> 3`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_direct_timing_phrase_repair`
 - MIDI-to-solo model-direct timing phrase repair: strict `3/3`, dead-air flags `3 -> 0`, max dead-air ratio `0.6522 -> 0.2258`, max interval guard `9 -> 9`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_direct_listening_review_package`
+- MIDI-to-solo model-direct listening review package: candidates `3`, rendered WAV `3`, duration range `18.926s-19.030s`, review input template `true`, listening review/preference claim `false`, next boundary `stage_b_midi_to_solo_model_direct_user_listening_review_fill`
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
 - generic base readiness audit: phase4 prep ready `true`, broad training execution ready `false`, broad quality/Brad adaptation claim `false`
 - generic base manifest contract: generic split `2433/270`, Brad split `47/11/14`, leakage/overlap `0`, broad training execution ready `false`
