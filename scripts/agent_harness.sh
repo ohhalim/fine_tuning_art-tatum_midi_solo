@@ -200,6 +200,8 @@ Modes:
                 Export ranked context-conditioned MIDI-to-solo candidates.
   stage-b-midi-to-solo-candidate-audio-render-package
                 Render exported MIDI-to-solo candidates to local WAV files.
+  stage-b-midi-to-solo-mvp-execution-consolidation
+                Consolidate input-to-MIDI-to-WAV technical execution evidence.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3596,6 +3598,53 @@ run_stage_b_midi_to_solo_candidate_audio_render_package() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_mvp_execution_consolidation() {
+  local contract_run_id="${CONTRACT_RUN_ID:-harness_stage_b_midi_to_solo_mvp_contract}"
+  local context_run_id="${CONTEXT_RUN_ID:-harness_stage_b_midi_to_solo_context_extraction}"
+  local resource_run_id="${RESOURCE_RUN_ID:-harness_stage_b_midi_to_solo_training_resource_probe}"
+  local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_conditioned_generation_probe}"
+  local audio_run_id="${AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_candidate_audio_render_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_execution_consolidation}"
+  local contract_report="outputs/stage_b_midi_to_solo_mvp_contract/${contract_run_id}/stage_b_midi_to_solo_mvp_contract.json"
+  local context_report="outputs/stage_b_midi_to_solo_context_extraction/${context_run_id}/stage_b_midi_to_solo_context_extraction.json"
+  local resource_probe="outputs/stage_b_midi_to_solo_training_resource_probe/${resource_run_id}/stage_b_midi_to_solo_training_resource_probe.json"
+  local generation_probe="outputs/stage_b_midi_to_solo_conditioned_generation_probe/${generation_run_id}/stage_b_midi_to_solo_conditioned_generation_probe.json"
+  local audio_render="outputs/stage_b_midi_to_solo_candidate_audio_render_package/${audio_run_id}/stage_b_midi_to_solo_candidate_audio_render_package.json"
+  if [[ ! -f "$contract_report" ]]; then
+    print_header "Stage B MIDI-to-solo MVP input contract"
+    RUN_ID="$contract_run_id" run_stage_b_midi_to_solo_mvp_contract
+  fi
+  if [[ ! -f "$context_report" ]]; then
+    print_header "Stage B MIDI-to-solo context extraction MVP"
+    RUN_ID="$context_run_id" run_stage_b_midi_to_solo_context_extraction
+  fi
+  if [[ ! -f "$resource_probe" ]]; then
+    print_header "Stage B MIDI-to-solo training resource probe"
+    RUN_ID="$resource_run_id" CONTEXT_RUN_ID="$context_run_id" run_stage_b_midi_to_solo_training_resource_probe
+  fi
+  if [[ ! -f "$generation_probe" ]]; then
+    print_header "Stage B MIDI-to-solo conditioned generation probe"
+    RUN_ID="$generation_run_id" CONTEXT_RUN_ID="$context_run_id" RESOURCE_RUN_ID="$resource_run_id" run_stage_b_midi_to_solo_conditioned_generation_probe
+  fi
+  if [[ ! -f "$audio_render" ]]; then
+    print_header "Stage B MIDI-to-solo candidate audio render package"
+    RUN_ID="$audio_run_id" GENERATION_RUN_ID="$generation_run_id" run_stage_b_midi_to_solo_candidate_audio_render_package
+  fi
+  print_header "Stage B MIDI-to-solo MVP execution consolidation"
+  "$PYTHON_BIN" scripts/consolidate_stage_b_midi_to_solo_mvp_execution.py \
+    --run_id "$run_id" \
+    --contract_report "$contract_report" \
+    --context_report "$context_report" \
+    --resource_probe "$resource_probe" \
+    --generation_probe "$generation_probe" \
+    --audio_render "$audio_render" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_EXECUTION_CONSOLIDATION_2026-06-03.md \
+    --expected_boundary stage_b_midi_to_solo_mvp_execution_consolidation \
+    --expected_next_boundary stage_b_midi_to_solo_model_direct_generation_repair \
+    --require_technical_mvp \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4991,6 +5040,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-candidate-audio-render-package)
     run_stage_b_midi_to_solo_candidate_audio_render_package
+    ;;
+  stage-b-midi-to-solo-mvp-execution-consolidation)
+    run_stage_b_midi_to_solo_mvp_execution_consolidation
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
