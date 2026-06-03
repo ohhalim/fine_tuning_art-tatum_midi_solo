@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #485, Stage B MIDI-to-solo training resource probe
-- 다음 권장 이슈: `Stage B MIDI-to-solo conditioned generation probe`
+- latest functional result: Issue #487, Stage B MIDI-to-solo conditioned generation probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo candidate audio render package`
 
 현재 범위가 아닌 것:
 
@@ -156,6 +156,60 @@ Issue #485는 MIDI-to-solo context extraction 결과를 기존 Stage B full wind
 다음:
 
 - `Stage B MIDI-to-solo conditioned generation probe`
+
+## Stage B MIDI-to-Solo Conditioned Generation Probe Result
+
+Issue #487은 입력 MIDI context에서 chord progression을 추출해 ranked MIDI solo candidate를 export한 작업이다.
+
+변경:
+
+- MIDI-to-solo conditioned generation probe script 추가
+- context 기반 chord progression 생성
+- context-conditioned fallback candidate 생성 및 monophonic postprocess 적용
+- objective gate 기반 ranking과 top MIDI export 추가
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONDITIONED_GENERATION_PROBE_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_conditioned_generation_probe`
+- next boundary: `stage_b_midi_to_solo_candidate_audio_render_package`
+- generation source: `context_conditioned_fallback`
+- chord progression: `Cmaj7, F7, G7, Cmaj7, Cmaj7, Cmaj7, Cmaj7, Cmaj7`
+- candidate count: `8`
+- qualified candidate count: `8`
+- exported candidate count: `3`
+- exported qualified candidate count: `3`
+- best score: `1.890847`
+- best note count: `60`
+- best unique pitch count: `14`
+- best max simultaneous notes: `1`
+- best chord-tone ratio: `1.0`
+- MIDI-to-solo MVP claimed: `false`
+- human/audio preference claimed: `false`
+- critical user input required: `false`
+
+Exported MIDI:
+
+- rank 1: `outputs/stage_b_midi_to_solo_conditioned_generation_probe/harness_stage_b_midi_to_solo_conditioned_generation_probe/midi/rank_01_seed_489.mid`
+- rank 2: `outputs/stage_b_midi_to_solo_conditioned_generation_probe/harness_stage_b_midi_to_solo_conditioned_generation_probe/midi/rank_02_seed_488.mid`
+- rank 3: `outputs/stage_b_midi_to_solo_conditioned_generation_probe/harness_stage_b_midi_to_solo_conditioned_generation_probe/midi/rank_03_seed_487.mid`
+
+판단:
+
+- `input.mid -> context -> ranked MIDI candidates` 경로는 objective gate 기준 실행 가능
+- scale-smoke checkpoint 직접 8-bar generation 품질은 아직 claim하지 않음
+- 현재 후보는 listening/audio preference 없이 MIDI objective gate만 통과
+- 다음 작업은 exported MIDI 후보의 audio render package
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_conditioned_generation_probe`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-conditioned-generation-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo candidate audio render package`
 
 ## Previous Model Decision
 
