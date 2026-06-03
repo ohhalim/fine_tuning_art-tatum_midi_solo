@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #507, Stage B MIDI-to-solo model-direct pitch contour repetition repair
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct timing phrase repair`
+- latest functional result: Issue #510, Stage B MIDI-to-solo model-direct timing phrase repair
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct listening review package`
 
 현재 범위가 아닌 것:
 
@@ -680,6 +680,48 @@ Issue #507은 #505에서 분리한 wide interval/register blocker를 constrained
 다음:
 
 - `Stage B MIDI-to-solo model-direct timing phrase repair`
+
+## Stage B MIDI-to-Solo Model-Direct Timing Phrase Repair Result
+
+Issue #510은 #507 이후 남은 dead-air gap blocker를 compact onset pattern과 duration fill로 수리한 작업이다.
+
+변경:
+
+- compact phrase rhythm profile 추가
+- direct generation command에 jazz rhythm profile / duration fill option 전달 추가
+- note group density `4/bar`, profile `compact_phrase`, duration fill 조건으로 repaired direct MIDI 생성
+- #507 pitch contour repair 대비 before/after 지표 비교
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_TIMING_PHRASE_REPAIR_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_model_direct_timing_phrase_repair`
+- next boundary: `stage_b_midi_to_solo_model_direct_listening_review_package`
+- strict valid sample count: `3`
+- dead-air flag count: `3` -> `0`
+- max dead-air ratio: `0.6522` -> `0.2258`
+- max interval max: `9` -> `9`
+- timing phrase repair passed: `true`
+- model-direct generation quality claimed: `false`
+- human/audio preference claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- pitch/register guard 유지 상태에서 dead-air diagnostic 제거
+- compact onset pattern과 duration fill 조합 필요
+- 다음 boundary는 listening review package
+- 이 결과는 objective timing repair evidence이며, 음악적 품질 claim은 아님
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_generation_probe tests.test_stage_b_midi_to_solo_model_direct_pitch_contour_repair tests.test_stage_b_midi_to_solo_model_direct_timing_phrase_repair`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-timing-phrase-repair`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct listening review package`
 
 ## Previous Model Decision
 

@@ -219,6 +219,14 @@ def build_generation_command(
     ]
     if bool(getattr(args, "cap_duration_to_next_position", False)):
         command.append("--cap_duration_to_next_position")
+    if bool(getattr(args, "fill_duration_to_next_position", False)):
+        command.append("--fill_duration_to_next_position")
+    if bool(getattr(args, "jazz_rhythm_positions", False)):
+        command.append("--jazz_rhythm_positions")
+    if bool(getattr(args, "jazz_duration_tokens", False)):
+        command.append("--jazz_duration_tokens")
+    if getattr(args, "jazz_rhythm_profile", None):
+        command.extend(["--jazz_rhythm_profile", str(args.jazz_rhythm_profile)])
     if getattr(args, "constrained_pitch_min", None) is not None:
         command.extend(["--constrained_pitch_min", str(args.constrained_pitch_min)])
     if getattr(args, "constrained_pitch_max", None) is not None:

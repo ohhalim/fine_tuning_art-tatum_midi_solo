@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #507, Stage B MIDI-to-solo model-direct pitch contour repetition repair.
+- Latest functional issue completed: Issue #510, Stage B MIDI-to-solo model-direct timing phrase repair.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-direct timing phrase repair.
+- Recommended next issue: Stage B MIDI-to-solo model-direct listening review package.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1115,6 +1115,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-pitch-contour-re
 ```
 
 This harness applies model-direct pitch range and adjacent interval guards, compares note-level diagnostics before/after, and keeps musical quality and human preference unclaimed.
+
+For Stage B MIDI-to-solo model-direct timing phrase repair changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-timing-phrase-repair
+```
+
+This harness applies compact timing positions and duration fill, compares note-level dead-air diagnostics before/after, and keeps musical quality and human preference unclaimed.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 

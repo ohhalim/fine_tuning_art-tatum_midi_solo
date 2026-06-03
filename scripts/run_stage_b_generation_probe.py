@@ -570,6 +570,12 @@ JAZZ_RHYTHM_POSITION_PATTERNS = {
         [0, 2, 5, 6, 8, 11, 13, 14],
         [2, 4, 5, 8, 10, 12, 13, 15],
     ],
+    "compact_phrase": [
+        [0, 1, 4, 7],
+        [1, 2, 5, 8],
+        [0, 1, 3, 6],
+        [2, 3, 6, 9],
+    ],
 }
 
 JAZZ_RHYTHM_DURATION_PATTERNS = {
@@ -578,6 +584,12 @@ JAZZ_RHYTHM_DURATION_PATTERNS = {
         [1, 3, 1, 2, 2, 1, 3, 2],
         [3, 1, 2, 1, 4, 1, 2, 2],
         [1, 2, 2, 3, 1, 2, 1, 4],
+    ],
+    "compact_phrase": [
+        [1, 2, 2, 3],
+        [2, 1, 2, 3],
+        [1, 2, 3, 2],
+        [2, 1, 3, 2],
     ],
 }
 
@@ -690,6 +702,30 @@ def cap_duration_tokens_to_next_position(
         if is_note_duration_token(token) and duration_steps_from_token(token) <= max_duration_steps
     ]
     return filtered or [note_duration_token(max_duration_steps)]
+
+
+def fill_duration_token_to_next_position(
+    *,
+    current_position: int | None,
+    bar_index: int,
+    group_index: int,
+    note_groups_per_bar: int,
+    coverage_aware_positions: bool = False,
+    coverage_position_window: int = 0,
+    jazz_rhythm_positions: bool = False,
+    jazz_rhythm_profile: str = "swing_motif",
+) -> list[int]:
+    return cap_duration_tokens_to_next_position(
+        [note_duration_token(step) for step in range(1, int(MAX_DURATION_STEPS) + 1)],
+        current_position=current_position,
+        bar_index=bar_index,
+        group_index=group_index,
+        note_groups_per_bar=note_groups_per_bar,
+        coverage_aware_positions=coverage_aware_positions,
+        coverage_position_window=coverage_position_window,
+        jazz_rhythm_positions=jazz_rhythm_positions,
+        jazz_rhythm_profile=jazz_rhythm_profile,
+    )[-1:]
 
 
 def chord_pitch_classes(chord: str | None, pitch_mode: str = "tones_tensions") -> set[int]:
@@ -991,6 +1027,7 @@ def generate_stage_b_constrained_tokens(
     jazz_duration_tokens: bool = False,
     jazz_rhythm_profile: str = "swing_motif",
     cap_duration_to_next_position: bool = False,
+    fill_duration_to_next_position: bool = False,
 ) -> list[int]:
     tokens = [int(token) for token in primer_tokens]
     recent_pitches: list[int] = []
@@ -1042,7 +1079,18 @@ def generate_stage_b_constrained_tokens(
                         note_groups_per_bar=note_groups_per_bar,
                         profile=jazz_rhythm_profile,
                     )
-                if cap_duration_to_next_position and family_index == 3:
+                if fill_duration_to_next_position and family_index == 3:
+                    allowed = fill_duration_token_to_next_position(
+                        current_position=current_position,
+                        bar_index=bar_index,
+                        group_index=group_index,
+                        note_groups_per_bar=note_groups_per_bar,
+                        coverage_aware_positions=coverage_aware_positions,
+                        coverage_position_window=coverage_position_window,
+                        jazz_rhythm_positions=jazz_rhythm_positions,
+                        jazz_rhythm_profile=jazz_rhythm_profile,
+                    )
+                elif cap_duration_to_next_position and family_index == 3:
                     allowed = cap_duration_tokens_to_next_position(
                         allowed,
                         current_position=current_position,
@@ -1467,8 +1515,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--constrained_max_adjacent_interval", type=int, default=None)
     parser.add_argument("--jazz_rhythm_positions", action="store_true")
     parser.add_argument("--jazz_duration_tokens", action="store_true")
-    parser.add_argument("--jazz_rhythm_profile", choices=("swing_motif",), default="swing_motif")
+    parser.add_argument(
+        "--jazz_rhythm_profile",
+        choices=tuple(sorted(JAZZ_RHYTHM_POSITION_PATTERNS)),
+        default="swing_motif",
+    )
     parser.add_argument("--cap_duration_to_next_position", action="store_true")
+    parser.add_argument("--fill_duration_to_next_position", action="store_true")
     parser.add_argument("--postprocess_overlap", action="store_true")
     parser.add_argument("--max_simultaneous_notes", type=int, default=2)
     parser.add_argument("--min_valid_samples", type=int, default=1)
@@ -1555,6 +1608,7 @@ def main() -> int:
         "jazz_duration_tokens": bool(args.jazz_duration_tokens),
         "jazz_rhythm_profile": args.jazz_rhythm_profile,
         "cap_duration_to_next_position": bool(args.cap_duration_to_next_position),
+        "fill_duration_to_next_position": bool(args.fill_duration_to_next_position),
         "postprocess_overlap": bool(args.postprocess_overlap),
     }
 
@@ -1624,6 +1678,7 @@ def main() -> int:
                 jazz_duration_tokens=args.jazz_duration_tokens,
                 jazz_rhythm_profile=args.jazz_rhythm_profile,
                 cap_duration_to_next_position=args.cap_duration_to_next_position,
+                fill_duration_to_next_position=args.fill_duration_to_next_position,
             )
         else:
             generated_tokens = generate_stage_b_tokens(
