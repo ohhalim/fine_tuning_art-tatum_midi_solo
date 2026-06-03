@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #481, Stage B MIDI-to-solo MVP input contract and run plan
-- 다음 권장 이슈: `Stage B MIDI-to-solo context extraction MVP`
+- latest functional result: Issue #483, Stage B MIDI-to-solo context extraction MVP
+- 다음 권장 이슈: `Stage B MIDI-to-solo training resource probe`
 
 현재 범위가 아닌 것:
 
@@ -66,6 +66,51 @@ Issue #481은 입력 MIDI를 받아 jazz solo MIDI 후보를 출력하는 MVP의
 다음:
 
 - `Stage B MIDI-to-solo context extraction MVP`
+
+## Stage B MIDI-to-Solo Context Extraction MVP Result
+
+Issue #483은 입력 MIDI에서 생성 conditioning에 필요한 bar/position/chord/bass context rows를 추출하는 MVP 작업이다.
+
+변경:
+
+- MIDI-to-solo context extraction script 추가
+- fixture MIDI 생성 경로 추가
+- pitch-class/bass 기반 chord root/quality inference 추가
+- 빈 마디 chord carry-forward 처리 추가
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTEXT_EXTRACTION_MVP_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_context_extraction_mvp`
+- next boundary: `stage_b_midi_to_solo_training_resource_probe`
+- context bars: `8`
+- positions per bar: `16`
+- context event count: `128`
+- inferred chord bars: `4`
+- carry-forward chord bars: `4`
+- unknown chord bars: `0`
+- low-confidence bars: `4`
+- bass-note bars: `4`
+- MIDI-to-solo MVP claimed: `false`
+- harmony analysis quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 입력 MIDI 기반 generation context row 생성 가능
+- explicit chord event가 있으면 pitch-class inference보다 우선 적용
+- 빈 마디는 직전 chord carry-forward와 낮은 confidence로 기록
+- chord inference 품질은 최종 claim이 아니라 다음 candidate ranking penalty 대상
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_context_extraction`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-context-extraction`
+
+다음:
+
+- `Stage B MIDI-to-solo training resource probe`
 
 ## Previous Model Decision
 
