@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #491, Stage B MIDI-to-solo MVP execution consolidation
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct generation repair`
+- latest functional result: Issue #493, Stage B MIDI-to-solo model-direct generation repair
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct sequence budget repair smoke`
 
 현재 범위가 아닌 것:
 
@@ -302,6 +302,51 @@ Issue #491은 #481, #483, #485, #487, #489 결과를 묶어 `input MIDI -> conte
 다음:
 
 - `Stage B MIDI-to-solo model-direct generation repair`
+
+## Stage B MIDI-to-Solo Model-Direct Generation Repair Result
+
+Issue #493은 #491에서 남긴 model-direct generation repair 경계를 sequence budget 기준으로 분리한 작업이다.
+
+변경:
+
+- model-direct generation repair diagnostic script 추가
+- Stage B token accounting 기반 direct generation 최소 sequence budget 계산
+- MVP 8-bar / 24-note contract와 scale-smoke checkpoint `max_sequence` 비교
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_GENERATION_REPAIR_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_model_direct_generation_repair`
+- next boundary: `stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke`
+- current generation source: `context_conditioned_fallback`
+- required generation source: `model_checkpoint_direct`
+- current checkpoint max sequence: `96`
+- overhead tokens: `27`
+- minimum contract tokens: `123`
+- direct note capacity under current budget: `17`
+- target min note count: `24`
+- current checkpoint sequence budget sufficient: `false`
+- recommended max sequence: `160`
+- model-direct generation quality claimed: `false`
+- human/audio preference claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- #491 기술 MVP 실행 경로는 유지
+- 현재 scale-smoke checkpoint는 8-bar / 24-note 직접 생성 계약을 만족하기에 sequence budget 부족
+- 다음 작업은 `max_sequence=160` 수준의 direct generation repair smoke
+- broad trained-model quality, Brad style adaptation, human/audio preference는 미청구
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_generation_repair`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-generation-repair`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct sequence budget repair smoke`
 
 ## Previous Model Decision
 

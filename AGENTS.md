@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #491, Stage B MIDI-to-solo MVP execution consolidation.
+- Latest functional issue completed: Issue #493, Stage B MIDI-to-solo model-direct generation repair.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-direct generation repair.
+- Recommended next issue: Stage B MIDI-to-solo model-direct sequence budget repair smoke.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1051,6 +1051,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-execution-consolidation
 ```
 
 This harness consolidates the input-to-context-to-MIDI-to-WAV technical path while keeping musical quality, model-direct generation quality, and human preference unclaimed.
+
+For Stage B MIDI-to-solo model-direct generation repair changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-generation-repair
+```
+
+This harness compares the current scale-smoke checkpoint sequence budget with the 8-bar / 24-note MIDI-to-solo contract and defines the sequence-budget repair boundary without claiming direct model quality.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 

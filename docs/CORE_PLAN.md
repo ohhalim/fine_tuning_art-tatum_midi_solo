@@ -78,6 +78,17 @@ MVP가 끝났다고 볼 수 있는 조건:
 - margin-recovered pitch vocabulary focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_PITCH_VOCAB_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered timing/repetition repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_REPAIR_2026-05-28.md`
 - margin-recovered timing/repetition focused context 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_CONTEXT_2026-05-28.md`
+
+2026-06-03 MIDI-to-solo execution 기준:
+
+- input MIDI -> context -> ranked MIDI -> WAV technical path: 완료
+- current generation source: `context_conditioned_fallback`
+- model-direct 8-bar generation: 수리 대상
+- current scale-smoke checkpoint max_sequence: `96`
+- 8-bar / 24-note minimum contract tokens: `123`
+- direct note capacity under current budget: `17`
+- next repair target: `stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke`
+- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_GENERATION_REPAIR_2026-06-03.md`
 - margin-recovered timing/repetition focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - margin-recovered timing/repetition focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered phrase/vocabulary repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_REPAIR_2026-05-28.md`
