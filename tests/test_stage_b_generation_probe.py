@@ -7,6 +7,7 @@ from pathlib import Path
 import pretty_midi
 import torch
 
+from inference.app.metrics import max_simultaneous_notes
 from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_collapse,
     analyze_stage_b_note_grammar,
@@ -17,6 +18,7 @@ from scripts.run_stage_b_generation_probe import (
     analyze_stage_b_temporal_coverage,
     build_probe_summary,
     build_stage_b_primer,
+    cap_duration_tokens_to_next_position,
     chord_aware_pitch_tokens,
     chord_pitch_classes,
     coverage_aware_position_tokens,
@@ -264,6 +266,63 @@ class StageBGenerationProbeTest(unittest.TestCase):
         for expected, allowed in zip([2, 1, 3, 1, 2, 2, 1, 4], durations, strict=True):
             self.assertIn(expected, allowed)
         self.assertGreater(len({tuple(allowed) for allowed in durations}), 1)
+
+    def test_duration_cap_limits_to_next_coverage_position(self) -> None:
+        allowed = [note_duration_token(step) for step in (1, 2, 7, 8, 16)]
+
+        first_group = cap_duration_tokens_to_next_position(
+            allowed,
+            current_position=0,
+            bar_index=0,
+            group_index=0,
+            note_groups_per_bar=3,
+            coverage_aware_positions=True,
+        )
+        second_group = cap_duration_tokens_to_next_position(
+            allowed,
+            current_position=1,
+            bar_index=0,
+            group_index=1,
+            note_groups_per_bar=3,
+            coverage_aware_positions=True,
+        )
+        last_group = cap_duration_tokens_to_next_position(
+            allowed,
+            current_position=8,
+            bar_index=0,
+            group_index=2,
+            note_groups_per_bar=3,
+            coverage_aware_positions=True,
+        )
+
+        self.assertEqual([duration_steps_from_token(token) for token in first_group], [1])
+        self.assertEqual([duration_steps_from_token(token) for token in second_group], [1, 2, 7])
+        self.assertEqual([duration_steps_from_token(token) for token in last_group], [1, 2, 7, 8])
+
+    def test_duration_cap_keeps_constrained_midi_monophonic(self) -> None:
+        primer = build_stage_b_primer(["Cm7"], bpm=120)
+
+        tokens = generate_stage_b_constrained_tokens(
+            model=FakeConstrainedModel(),
+            primer_tokens=primer,
+            chords=["Cm7"],
+            bpm=120,
+            bars=1,
+            note_groups_per_bar=3,
+            max_sequence=64,
+            temperature=1.0,
+            top_k=1,
+            coverage_aware_positions=True,
+            cap_duration_to_next_position=True,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            midi_path = Path(tmp_dir) / "cap_duration.mid"
+            decode_tokens_to_midi(tokens, midi_path, bpm=120)
+            midi = pretty_midi.PrettyMIDI(str(midi_path))
+            notes = midi.instruments[0].notes
+            self.assertEqual(len(notes), 3)
+            self.assertLessEqual(max_simultaneous_notes(notes), 1)
 
     def test_chord_aware_pitch_tokens_limit_to_chord_tones(self) -> None:
         tokens = chord_aware_pitch_tokens("Cm7", pitch_mode="tones", repeat_window=0)

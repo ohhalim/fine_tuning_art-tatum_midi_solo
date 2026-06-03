@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #497, Stage B MIDI-to-solo model-direct 8-bar generation probe.
+- Latest functional issue completed: Issue #499, Stage B MIDI-to-solo model-direct monophonic overlap repair.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-direct monophonic overlap repair.
+- Recommended next issue: Stage B MIDI-to-solo model-direct audio render package.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1075,6 +1075,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-8bar-generation-
 ```
 
 This harness generates fallback-free 8-bar MIDI from the repaired checkpoint, records grammar/review gate evidence, and routes overlap-heavy failures to the monophonic overlap repair boundary without claiming model quality.
+
+For Stage B MIDI-to-solo model-direct monophonic overlap repair changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-monophonic-overlap-repair
+```
+
+This harness caps generated durations to the next planned position, compares the repaired outputs against the prior 8-bar probe, and records review-gate evidence without claiming model quality or human preference.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 

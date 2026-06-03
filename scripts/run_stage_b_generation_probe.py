@@ -621,6 +621,77 @@ def jazz_rhythm_duration_tokens(
     return [note_duration_token(step) for step in duration_steps]
 
 
+def planned_position_tokens(
+    *,
+    bar_index: int,
+    group_index: int,
+    note_groups_per_bar: int,
+    coverage_aware_positions: bool = False,
+    coverage_position_window: int = 0,
+    jazz_rhythm_positions: bool = False,
+    jazz_rhythm_profile: str = "swing_motif",
+) -> list[int] | None:
+    if jazz_rhythm_positions:
+        return jazz_rhythm_position_tokens(
+            bar_index=bar_index,
+            group_index=group_index,
+            note_groups_per_bar=note_groups_per_bar,
+            profile=jazz_rhythm_profile,
+            position_window=coverage_position_window,
+        )
+    if coverage_aware_positions:
+        return coverage_aware_position_tokens(
+            group_index,
+            note_groups_per_bar=note_groups_per_bar,
+            position_window=coverage_position_window,
+        )
+    return None
+
+
+def cap_duration_tokens_to_next_position(
+    allowed_tokens: Sequence[int],
+    *,
+    current_position: int | None,
+    bar_index: int,
+    group_index: int,
+    note_groups_per_bar: int,
+    coverage_aware_positions: bool = False,
+    coverage_position_window: int = 0,
+    jazz_rhythm_positions: bool = False,
+    jazz_rhythm_profile: str = "swing_motif",
+) -> list[int]:
+    allowed = [int(token) for token in allowed_tokens]
+    if current_position is None:
+        return allowed
+    position = max(0, min(int(POSITIONS_PER_BAR) - 1, int(current_position)))
+    groups_per_bar = max(1, int(note_groups_per_bar))
+    if int(group_index) + 1 < groups_per_bar:
+        next_tokens = planned_position_tokens(
+            bar_index=bar_index,
+            group_index=int(group_index) + 1,
+            note_groups_per_bar=groups_per_bar,
+            coverage_aware_positions=coverage_aware_positions,
+            coverage_position_window=coverage_position_window,
+            jazz_rhythm_positions=jazz_rhythm_positions,
+            jazz_rhythm_profile=jazz_rhythm_profile,
+        )
+        next_positions = [
+            position_from_token(token)
+            for token in (next_tokens or [])
+            if is_position_token(token) and position_from_token(token) > position
+        ]
+        next_position = min(next_positions) if next_positions else position + 1
+    else:
+        next_position = int(POSITIONS_PER_BAR)
+    max_duration_steps = max(1, min(int(MAX_DURATION_STEPS), int(next_position) - position))
+    filtered = [
+        token
+        for token in allowed
+        if is_note_duration_token(token) and duration_steps_from_token(token) <= max_duration_steps
+    ]
+    return filtered or [note_duration_token(max_duration_steps)]
+
+
 def chord_pitch_classes(chord: str | None, pitch_mode: str = "tones_tensions") -> set[int]:
     root, quality = parse_chord_symbol(chord)
     root_pc = ROOT_TO_PC.get(root)
@@ -919,6 +990,7 @@ def generate_stage_b_constrained_tokens(
     jazz_rhythm_positions: bool = False,
     jazz_duration_tokens: bool = False,
     jazz_rhythm_profile: str = "swing_motif",
+    cap_duration_to_next_position: bool = False,
 ) -> list[int]:
     tokens = [int(token) for token in primer_tokens]
     recent_pitches: list[int] = []
@@ -935,25 +1007,23 @@ def generate_stage_b_constrained_tokens(
             tokens.append(TOKEN_BAR)
             tokens.extend(chord_tokens(chord))
         for group_index in range(max(1, int(note_groups_per_bar))):
+            current_position: int | None = None
             for family_index, allowed_tokens in enumerate(families):
                 if len(tokens) >= int(max_sequence) - 1:
                     tokens.append(TOKEN_END)
                     return tokens
                 allowed = list(allowed_tokens)
-                if jazz_rhythm_positions and family_index == 0:
-                    allowed = jazz_rhythm_position_tokens(
-                        bar_index=bar_index,
-                        group_index=group_index,
-                        note_groups_per_bar=note_groups_per_bar,
-                        profile=jazz_rhythm_profile,
-                        position_window=coverage_position_window,
-                    )
-                elif coverage_aware_positions and family_index == 0:
-                    allowed = coverage_aware_position_tokens(
-                        group_index,
-                        note_groups_per_bar=note_groups_per_bar,
-                        position_window=coverage_position_window,
-                    )
+                planned_positions = planned_position_tokens(
+                    bar_index=bar_index,
+                    group_index=group_index,
+                    note_groups_per_bar=note_groups_per_bar,
+                    coverage_aware_positions=coverage_aware_positions,
+                    coverage_position_window=coverage_position_window,
+                    jazz_rhythm_positions=jazz_rhythm_positions,
+                    jazz_rhythm_profile=jazz_rhythm_profile,
+                )
+                if planned_positions is not None and family_index == 0:
+                    allowed = planned_positions
                 if chord_aware_pitches and family_index == 2:
                     allowed = chord_aware_pitch_tokens(
                         chord,
@@ -972,6 +1042,18 @@ def generate_stage_b_constrained_tokens(
                         note_groups_per_bar=note_groups_per_bar,
                         profile=jazz_rhythm_profile,
                     )
+                if cap_duration_to_next_position and family_index == 3:
+                    allowed = cap_duration_tokens_to_next_position(
+                        allowed,
+                        current_position=current_position,
+                        bar_index=bar_index,
+                        group_index=group_index,
+                        note_groups_per_bar=note_groups_per_bar,
+                        coverage_aware_positions=coverage_aware_positions,
+                        coverage_position_window=coverage_position_window,
+                        jazz_rhythm_positions=jazz_rhythm_positions,
+                        jazz_rhythm_profile=jazz_rhythm_profile,
+                    )
                 token = next_token_from_model(
                     model,
                     tokens=tokens,
@@ -980,6 +1062,8 @@ def generate_stage_b_constrained_tokens(
                     top_k=top_k,
                 )
                 tokens.append(token)
+                if family_index == 0 and is_position_token(token):
+                    current_position = position_from_token(token)
                 if family_index == 2 and is_note_pitch_token(token):
                     recent_pitches.append(pitch_from_token(token))
 
@@ -1384,6 +1468,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--jazz_rhythm_positions", action="store_true")
     parser.add_argument("--jazz_duration_tokens", action="store_true")
     parser.add_argument("--jazz_rhythm_profile", choices=("swing_motif",), default="swing_motif")
+    parser.add_argument("--cap_duration_to_next_position", action="store_true")
     parser.add_argument("--postprocess_overlap", action="store_true")
     parser.add_argument("--max_simultaneous_notes", type=int, default=2)
     parser.add_argument("--min_valid_samples", type=int, default=1)
@@ -1469,6 +1554,7 @@ def main() -> int:
         "jazz_rhythm_positions": bool(args.jazz_rhythm_positions),
         "jazz_duration_tokens": bool(args.jazz_duration_tokens),
         "jazz_rhythm_profile": args.jazz_rhythm_profile,
+        "cap_duration_to_next_position": bool(args.cap_duration_to_next_position),
         "postprocess_overlap": bool(args.postprocess_overlap),
     }
 
@@ -1537,6 +1623,7 @@ def main() -> int:
                 jazz_rhythm_positions=args.jazz_rhythm_positions,
                 jazz_duration_tokens=args.jazz_duration_tokens,
                 jazz_rhythm_profile=args.jazz_rhythm_profile,
+                cap_duration_to_next_position=args.cap_duration_to_next_position,
             )
         else:
             generated_tokens = generate_stage_b_tokens(

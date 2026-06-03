@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #497, Stage B MIDI-to-solo model-direct 8-bar generation probe
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct monophonic overlap repair`
+- latest functional result: Issue #499, Stage B MIDI-to-solo model-direct monophonic overlap repair
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct audio render package`
 
 현재 범위가 아닌 것:
 
@@ -452,6 +452,52 @@ Issue #497은 #495 repaired checkpoint를 사용해 fallback 없는 model-direct
 다음:
 
 - `Stage B MIDI-to-solo model-direct monophonic overlap repair`
+
+## Stage B MIDI-to-Solo Model-Direct Monophonic Overlap Repair Result
+
+Issue #499는 #497 direct 8-bar generation의 review gate 실패를 duration overlap 기준으로 수리한 작업이다.
+
+변경:
+
+- constrained generation의 duration token 후보를 다음 planned position 또는 bar end까지로 제한
+- coverage/jazz position 계획을 duration cap 계산에 재사용
+- #497 direct probe와 #499 repaired probe의 before/after 지표 비교
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_MONOPHONIC_OVERLAP_REPAIR_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_model_direct_monophonic_overlap_repair`
+- next boundary: `stage_b_midi_to_solo_model_direct_audio_render_package`
+- cap duration to next position: `true`
+- sample count: `3`
+- valid sample count: `0` -> `3`
+- strict valid sample count: `0` -> `3`
+- avg postprocess removal ratio: `0.5417` -> `0.0`
+- collapse warning sample rate: `1.0` -> `0.0`
+- min postprocess note count: `10` -> `24`
+- direct generation review gate passed: `true`
+- model-direct generation quality claimed: `false`
+- human/audio preference claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- #497 실패 원인은 checkpoint 부재가 아니라 duration overlap으로 인한 monophonic postprocess 제거 과다로 분리
+- duration cap 적용 후 fallback 없는 model-direct 8-bar MIDI가 grammar/valid/strict gate 통과
+- 이 결과는 objective review gate 통과이며, 음악적 선호나 최종 품질 claim은 아님
+- 다음 작업은 repaired direct MIDI 후보의 WAV render package 구성
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_generation_probe tests.test_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair tests.test_stage_b_midi_to_solo_model_direct_8bar_generation_probe`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_generation_probe.py scripts/run_stage_b_midi_to_solo_model_direct_8bar_generation_probe.py scripts/run_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-monophonic-overlap-repair`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct audio render package`
 
 ## Previous Model Decision
 
