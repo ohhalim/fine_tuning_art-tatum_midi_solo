@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #503, Stage B MIDI-to-solo model-direct audio evidence consolidation
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct phrase quality diagnostics`
+- latest functional result: Issue #505, Stage B MIDI-to-solo model-direct phrase quality diagnostics
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct pitch contour repetition repair`
 
 현재 범위가 아닌 것:
 
@@ -592,6 +592,50 @@ Issue #503은 #499 objective gate evidence와 #501 WAV render evidence를 하나
 다음:
 
 - `Stage B MIDI-to-solo model-direct phrase quality diagnostics`
+
+## Stage B MIDI-to-Solo Model-Direct Phrase Quality Diagnostics Result
+
+Issue #505는 #503 model-direct MIDI 후보 3개를 note-level 지표로 진단해 다음 repair target을 분리한 작업이다.
+
+변경:
+
+- model-direct audio evidence report 입력 검증 추가
+- MIDI note 기반 pitch range, interval, adjacent repeat, duration, IOI, dead-air 지표 계산
+- candidate-level diagnostic flags 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_PHRASE_QUALITY_DIAGNOSTICS_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_model_direct_phrase_quality_diagnostics`
+- next boundary: `stage_b_midi_to_solo_model_direct_pitch_contour_repetition_repair`
+- candidate count: `3`
+- flag counts: `dead_air_gap=3`, `wide_interval_contour=3`, `wide_register_span=3`
+- max interval max: `82`
+- adjacent pitch repeat total: `0`
+- max duration most-common ratio: `0.4167`
+- max dead-air ratio: `0.6522`
+- model-direct generation quality claimed: `false`
+- human/audio preference claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 현재 direct MIDI 후보는 objective gate와 WAV render는 통과했지만, note-level 진단에서 넓은 도약과 넓은 register span이 모든 후보에서 관측
+- dead-air gap도 모든 후보에서 관측
+- 다음 repair target은 pitch contour/register/repetition 계열
+- 이 결과는 문제 지표 분리이며, 음악적 품질 claim은 아님
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_phrase_quality_diagnostics`
+- `.venv/bin/python -m py_compile scripts/diagnose_stage_b_midi_to_solo_model_direct_phrase_quality.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-phrase-quality-diagnostics`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct pitch contour repetition repair`
 
 ## Previous Model Decision
 
