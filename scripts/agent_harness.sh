@@ -198,6 +198,8 @@ Modes:
                 Check MIDI-to-solo context, Stage B windows, and scale-smoke checkpoint resources.
   stage-b-midi-to-solo-conditioned-generation-probe
                 Export ranked context-conditioned MIDI-to-solo candidates.
+  stage-b-midi-to-solo-candidate-audio-render-package
+                Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3576,6 +3578,24 @@ run_stage_b_midi_to_solo_conditioned_generation_probe() {
     --require_no_final_claim
 }
 
+run_stage_b_midi_to_solo_candidate_audio_render_package() {
+  local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_conditioned_generation_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_candidate_audio_render_package}"
+  local generation_report="outputs/stage_b_midi_to_solo_conditioned_generation_probe/${generation_run_id}/stage_b_midi_to_solo_conditioned_generation_probe.json"
+  if [[ ! -f "$generation_report" ]]; then
+    print_header "Stage B MIDI-to-solo conditioned generation probe"
+    RUN_ID="$generation_run_id" run_stage_b_midi_to_solo_conditioned_generation_probe
+  fi
+  print_header "Stage B MIDI-to-solo candidate audio render package"
+  "$PYTHON_BIN" scripts/render_stage_b_midi_to_solo_candidate_audio.py \
+    --run_id "$run_id" \
+    --conditioned_generation_report "$generation_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CANDIDATE_AUDIO_RENDER_PACKAGE_2026-06-03.md \
+    --expected_boundary stage_b_midi_to_solo_candidate_audio_render_package \
+    --expected_file_count 3 \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4968,6 +4988,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-conditioned-generation-probe)
     run_stage_b_midi_to_solo_conditioned_generation_probe
+    ;;
+  stage-b-midi-to-solo-candidate-audio-render-package)
+    run_stage_b_midi_to_solo_candidate_audio_render_package
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
