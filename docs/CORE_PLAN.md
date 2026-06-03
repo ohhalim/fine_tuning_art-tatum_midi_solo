@@ -84,14 +84,19 @@ MVP가 끝났다고 볼 수 있는 조건:
 - input MIDI -> context -> ranked MIDI -> WAV technical path: 완료
 - current generation source: `context_conditioned_fallback`
 - model-direct sequence budget repair: 완료
-- model-direct 8-bar generated MIDI: 미검증
+- model-direct 8-bar generated MIDI: 생성 완료
+- model-direct 8-bar review gate: 실패
 - previous scale-smoke checkpoint max_sequence: `96`
 - repaired scale-smoke checkpoint max_sequence: `160`
 - 8-bar / 24-note minimum contract tokens: `123`
 - direct note capacity under previous budget: `17`
 - direct note capacity under repaired budget: `33`
-- next repair target: `stage_b_midi_to_solo_model_direct_8bar_generation_probe`
-- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_SEQUENCE_BUDGET_REPAIR_SMOKE_2026-06-03.md`
+- direct 8-bar grammar gate sample count: `3/3`
+- direct 8-bar valid sample count: `0/3`
+- min postprocess note count: `10`
+- avg postprocess removal ratio: `0.5417`
+- next repair target: `stage_b_midi_to_solo_model_direct_monophonic_overlap_repair`
+- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_8BAR_GENERATION_PROBE_2026-06-03.md`
 - margin-recovered timing/repetition focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - margin-recovered timing/repetition focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered phrase/vocabulary repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_REPAIR_2026-05-28.md`

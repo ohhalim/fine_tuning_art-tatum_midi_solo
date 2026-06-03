@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #495, Stage B MIDI-to-solo model-direct sequence budget repair smoke
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct 8-bar generation probe`
+- latest functional result: Issue #497, Stage B MIDI-to-solo model-direct 8-bar generation probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct monophonic overlap repair`
 
 현재 범위가 아닌 것:
 
@@ -397,6 +397,61 @@ Issue #495는 #493에서 분리한 sequence budget blocker를 `max_sequence=160`
 다음:
 
 - `Stage B MIDI-to-solo model-direct 8-bar generation probe`
+
+## Stage B MIDI-to-Solo Model-Direct 8-Bar Generation Probe Result
+
+Issue #497은 #495 repaired checkpoint를 사용해 fallback 없는 model-direct 8-bar MIDI 생성을 검증한 작업이다.
+
+변경:
+
+- #495 `max_sequence=160` checkpoint 기반 direct generation wrapper 추가
+- context extraction chord progression 기반 `bars=8` constrained model decoding 실행
+- generated MIDI file existence, grammar gate, review gate, postprocess removal 지표 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_8BAR_GENERATION_PROBE_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_model_direct_8bar_generation_probe`
+- next boundary: `stage_b_midi_to_solo_model_direct_monophonic_overlap_repair`
+- generation source: `model_checkpoint_direct_constrained`
+- target bars: `8`
+- note groups per bar: `3`
+- max sequence: `160`
+- sample count: `3`
+- grammar gate sample count: `3`
+- valid sample count: `0`
+- strict valid sample count: `0`
+- direct generated MIDI written: `true`
+- direct generation grammar gate passed: `true`
+- direct generation review gate passed: `false`
+- min / max pre-postprocess note groups: `24` / `24`
+- min / max postprocess note count: `10` / `12`
+- avg postprocess removal ratio: `0.5417`
+- collapse warning sample rate: `1.0`
+- checkpoint best validation loss: `6.1293`
+- model-direct generation quality claimed: `false`
+- human/audio preference claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- fallback 없는 checkpoint direct path에서 8-bar MIDI 파일 생성 완료
+- constrained grammar 기준 24 note group 생성 완료
+- review gate 실패 원인: monophonic postprocess에서 note 제거 과다
+- 다음 작업은 direct generation의 overlap/timing 구조 수리
+- broad trained-model quality, Brad style adaptation, human/audio preference는 미청구
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_8bar_generation_probe`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_model_direct_8bar_generation_probe.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-8bar-generation-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct monophonic overlap repair`
 
 ## Previous Model Decision
 
