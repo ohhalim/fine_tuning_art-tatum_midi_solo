@@ -202,6 +202,8 @@ Modes:
                 Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-mvp-execution-consolidation
                 Consolidate input-to-MIDI-to-WAV technical execution evidence.
+  stage-b-midi-to-solo-model-direct-generation-repair
+                Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3645,6 +3647,33 @@ run_stage_b_midi_to_solo_mvp_execution_consolidation() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_direct_generation_repair() {
+  local mvp_run_id="${MVP_RUN_ID:-harness_stage_b_midi_to_solo_mvp_execution_consolidation}"
+  local scale_smoke_run_id="${SCALE_SMOKE_RUN_ID:-harness_stage_b_generic_base_training_scale_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_direct_generation_repair}"
+  local mvp_execution="outputs/stage_b_midi_to_solo_mvp_execution_consolidation/${mvp_run_id}/stage_b_midi_to_solo_mvp_execution_consolidation.json"
+  local training_scale_smoke="outputs/stage_b_generic_base_training_scale_smoke/${scale_smoke_run_id}/stage_b_generic_base_training_scale_smoke.json"
+  if [[ ! -f "$mvp_execution" ]]; then
+    print_header "Stage B MIDI-to-solo MVP execution consolidation"
+    RUN_ID="$mvp_run_id" run_stage_b_midi_to_solo_mvp_execution_consolidation
+  fi
+  if [[ ! -f "$training_scale_smoke" ]]; then
+    print_header "Stage B generic base training scale smoke"
+    RUN_ID="$scale_smoke_run_id" run_stage_b_generic_base_training_scale_smoke
+  fi
+  print_header "Stage B MIDI-to-solo model-direct generation repair"
+  "$PYTHON_BIN" scripts/check_stage_b_midi_to_solo_model_direct_generation_repair.py \
+    --run_id "$run_id" \
+    --mvp_execution "$mvp_execution" \
+    --training_scale_smoke "$training_scale_smoke" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_GENERATION_REPAIR_2026-06-03.md \
+    --expected_boundary stage_b_midi_to_solo_model_direct_generation_repair \
+    --expected_next_boundary stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke \
+    --require_technical_mvp \
+    --require_sequence_budget_gap \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -5043,6 +5072,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-mvp-execution-consolidation)
     run_stage_b_midi_to_solo_mvp_execution_consolidation
+    ;;
+  stage-b-midi-to-solo-model-direct-generation-repair)
+    run_stage_b_midi_to_solo_model_direct_generation_repair
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
