@@ -4,7 +4,7 @@
 
 ## Current Focus
 
-현재 이 저장소의 우선순위는 전체 jazz piano MIDI corpus를 audit하고, generic jazz pianist base를 만든 뒤 Brad Mehldau style adaptation으로 좁힐 수 있는지 검증하는 것이다.
+현재 이 저장소의 우선순위는 입력 MIDI를 받아 jazz solo MIDI 후보를 출력하는 Stage B MIDI-to-solo MVP를 완성하는 것이다.
 
 현재 브랜치:
 
@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #479, Muzig application final review package
-- 다음 권장 이슈: `manual application submission review`
+- latest functional result: Issue #481, Stage B MIDI-to-solo MVP input contract and run plan
+- 다음 권장 이슈: `Stage B MIDI-to-solo context extraction MVP`
 
 현재 범위가 아닌 것:
 
@@ -26,6 +26,48 @@
 위 문서들은 `docs/archive/`로 이동했다.
 
 ## Current Decision
+
+현재 목표는 완성형 jazz model claim이 아니라, `input.mid -> ranked solo MIDI candidates` 실행 경로를 만드는 것이다.
+
+## Stage B MIDI-to-Solo MVP Input Contract Result
+
+Issue #481은 입력 MIDI를 받아 jazz solo MIDI 후보를 출력하는 MVP의 입출력 계약과 2026-06-11까지의 run plan을 고정한 작업이다.
+
+변경:
+
+- MIDI-to-solo MVP contract script 추가
+- input contract, output contract, generation stack, objective gate, fallback trigger 정의
+- 전용 harness mode와 unit test 추가
+- hybrid 구조 고정: model-conditioned generation + constrained decoder + candidate ranking + retrieval fallback
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_INPUT_CONTRACT_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_mvp_input_contract`
+- next boundary: `stage_b_midi_to_solo_context_extraction_mvp`
+- target date: `2026-06-11`
+- candidate count: `32`
+- exported MIDI candidates: `3`
+- target solo bars: `8`
+- min note count: `24`
+- min unique pitch count: `8`
+- max simultaneous notes: `1`
+- fallback path: `phrase_retrieval_data_motif_hybrid`
+- MIDI-to-solo MVP claimed: `false`
+- Brad style fine-tuning completed: `false`
+- critical user input required: `false`
+
+판단:
+
+- neural-only 성공을 필수 조건으로 두지 않음
+- 모델이 실패해도 constrained decoder와 retrieval fallback으로 후보 생성을 유지
+- 다음 작업은 입력 MIDI에서 bar/position/chord/bass context를 추출하는 MVP
+
+다음:
+
+- `Stage B MIDI-to-solo context extraction MVP`
+
+## Previous Model Decision
 
 Stage A는 아직 실사용 가능한 jazz solo model이 아니다.
 
