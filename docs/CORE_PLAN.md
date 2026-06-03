@@ -261,6 +261,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo MVP input contract: target date `2026-06-11`, candidate count `32`, exported MIDI `3`, target solo bars `8`, fallback `phrase_retrieval_data_motif_hybrid`, next boundary `stage_b_midi_to_solo_context_extraction_mvp`
 - MIDI-to-solo context extraction MVP: context bars `8`, context events `128`, inferred/carried/unknown chord bars `4/4/0`, bass-note bars `4`, next boundary `stage_b_midi_to_solo_training_resource_probe`
 - MIDI-to-solo training resource probe: ready `true`, context events `128`, full tokenized train/val `154136/21845`, scale-smoke train/val `128/32`, checkpoint count `1`, next boundary `stage_b_midi_to_solo_conditioned_generation_probe`
+- MIDI-to-solo conditioned generation probe: source `context_conditioned_fallback`, candidates `8`, exported/qualified `3/3`, best note/unique/max-sim `60/14/1`, next boundary `stage_b_midi_to_solo_candidate_audio_render_package`
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
 - generic base readiness audit: phase4 prep ready `true`, broad training execution ready `false`, broad quality/Brad adaptation claim `false`
 - generic base manifest contract: generic split `2433/270`, Brad split `47/11/14`, leakage/overlap `0`, broad training execution ready `false`
