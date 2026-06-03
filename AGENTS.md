@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #516, Stage B MIDI-to-solo model-direct user listening review fill.
+- Latest functional issue completed: Issue #518, Stage B MIDI-to-solo model-direct songlike melody rejection analysis.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-direct songlike melody rejection analysis.
+- Recommended next issue: Stage B MIDI-to-solo model-direct jazz phrase vocabulary repair decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -875,6 +875,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-user-listening-r
 ```
 
 This harness records single-user listening input for the rendered model-direct WAV candidates without claiming human/audio keep preference or broad MIDI-to-solo musical quality.
+
+For Stage B MIDI-to-solo model-direct songlike melody rejection analysis changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-songlike-rejection-analysis
+```
+
+This harness analyzes rejected model-direct MIDI candidates for fixed density, repeated rhythm templates, and interval-cap compression before routing to jazz phrase vocabulary repair planning.
 
 For Stage B generic jazz base readiness audit changes, run:
 

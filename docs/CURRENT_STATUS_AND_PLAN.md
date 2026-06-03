@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #516, Stage B MIDI-to-solo model-direct user listening review fill
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct songlike melody rejection analysis`
+- latest functional result: Issue #518, Stage B MIDI-to-solo model-direct songlike melody rejection analysis
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct jazz phrase vocabulary repair decision`
 
 현재 범위가 아닌 것:
 
@@ -859,6 +859,53 @@ Issue #516은 #512 WAV 후보 3개에 대한 single-user listening review 입력
 다음:
 
 - `Stage B MIDI-to-solo model-direct songlike melody rejection analysis`
+
+## Stage B MIDI-to-Solo Model-Direct Songlike Melody Rejection Analysis Result
+
+Issue #518은 #516 reject_all 청음 결과를 MIDI note evidence로 분리한 작업이다.
+
+변경:
+
+- songlike melody rejection analysis script 추가
+- reviewed MIDI 후보 3개 note/bar, duration, IOI, interval, rhythm cycle 분석
+- fixed density / repeated rhythm template / safe interval cap 신호 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_SONGLIKE_MELODY_REJECTION_ANALYSIS_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_model_direct_songlike_melody_rejection_analysis`
+- source boundary: `stage_b_midi_to_solo_model_direct_user_listening_review_fill`
+- next boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_decision`
+- candidate count: `3`
+- uniform bar density count: `3`
+- four-notes-per-bar template count: `3`
+- duration template monotony count: `3`
+- IOI template monotony count: `3`
+- safe interval cap compression count: `3`
+- four-bar rhythm cycle repeated count: `3`
+- shared rhythm signature count: `3`
+- max abs interval max: `9`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 현재 불합격 원인은 dead-air / wide interval 잔여보다 fixed rhythm template 쪽 신호가 큼
+- 8마디 32음, 마디당 4음, 반복 duration/IOI, 4마디 cycle 반복 구조가 songlike melody 인지와 일치
+- max interval cap `9`는 wide interval을 제거했지만 solo vocabulary 다양성도 같이 압축
+- 다음 검토 대상은 jazz phrase vocabulary, articulation, rhythm density variation repair decision
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_songlike_rejection_analysis`
+- `.venv/bin/python -m py_compile scripts/analyze_stage_b_midi_to_solo_model_direct_songlike_rejection.py`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-songlike-rejection-analysis`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct jazz phrase vocabulary repair decision`
 
 ## Previous Model Decision
 
