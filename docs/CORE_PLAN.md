@@ -82,21 +82,23 @@ MVP가 끝났다고 볼 수 있는 조건:
 2026-06-03 MIDI-to-solo execution 기준:
 
 - input MIDI -> context -> ranked MIDI -> WAV technical path: 완료
-- current generation source: `context_conditioned_fallback`
+- current generation source: `model_checkpoint_direct_constrained`
 - model-direct sequence budget repair: 완료
 - model-direct 8-bar generated MIDI: 생성 완료
-- model-direct 8-bar review gate: 실패
+- model-direct 8-bar review gate: 통과
 - previous scale-smoke checkpoint max_sequence: `96`
 - repaired scale-smoke checkpoint max_sequence: `160`
 - 8-bar / 24-note minimum contract tokens: `123`
 - direct note capacity under previous budget: `17`
 - direct note capacity under repaired budget: `33`
 - direct 8-bar grammar gate sample count: `3/3`
-- direct 8-bar valid sample count: `0/3`
-- min postprocess note count: `10`
-- avg postprocess removal ratio: `0.5417`
-- next repair target: `stage_b_midi_to_solo_model_direct_monophonic_overlap_repair`
-- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_8BAR_GENERATION_PROBE_2026-06-03.md`
+- direct 8-bar valid sample count: `3/3`
+- direct 8-bar strict valid sample count: `3/3`
+- min postprocess note count: `24`
+- avg postprocess removal ratio: `0.0`
+- collapse warning sample rate: `0.0`
+- next repair target: `stage_b_midi_to_solo_model_direct_audio_render_package`
+- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_MONOPHONIC_OVERLAP_REPAIR_2026-06-03.md`
 - margin-recovered timing/repetition focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - margin-recovered timing/repetition focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered phrase/vocabulary repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_REPAIR_2026-05-28.md`
@@ -283,6 +285,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo conditioned generation probe: source `context_conditioned_fallback`, candidates `8`, exported/qualified `3/3`, best note/unique/max-sim `60/14/1`, next boundary `stage_b_midi_to_solo_candidate_audio_render_package`
 - MIDI-to-solo candidate audio render package: rendered WAV `3`, sample rate `44100`, technical validation `true`, preference claim `false`, next boundary `stage_b_midi_to_solo_mvp_execution_consolidation`
 - MIDI-to-solo MVP execution consolidation: technical path `true`, source `context_conditioned_fallback`, exported/rendered `3/3`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_direct_generation_repair`
+- MIDI-to-solo model-direct monophonic overlap repair: source `model_checkpoint_direct_constrained`, valid/strict `3/3`, avg postprocess removal ratio `0.0`, collapse warning sample rate `0.0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_direct_audio_render_package`
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
 - generic base readiness audit: phase4 prep ready `true`, broad training execution ready `false`, broad quality/Brad adaptation claim `false`
 - generic base manifest contract: generic split `2433/270`, Brad split `47/11/14`, leakage/overlap `0`, broad training execution ready `false`

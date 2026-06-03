@@ -176,7 +176,7 @@ def build_generation_command(
     generation_run_id: str,
     context_summary: dict[str, Any],
 ) -> list[str]:
-    return [
+    command = [
         sys.executable,
         "scripts/run_stage_b_generation_probe.py",
         "--output_root",
@@ -217,6 +217,9 @@ def build_generation_command(
         "--min_strict_valid_samples",
         str(args.min_strict_valid_samples),
     ]
+    if bool(getattr(args, "cap_duration_to_next_position", False)):
+        command.append("--cap_duration_to_next_position")
+    return command
 
 
 def generation_sample_paths(generation_report: dict[str, Any]) -> list[str]:
