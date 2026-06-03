@@ -97,8 +97,12 @@ MVP가 끝났다고 볼 수 있는 조건:
 - min postprocess note count: `24`
 - avg postprocess removal ratio: `0.0`
 - collapse warning sample rate: `0.0`
-- next repair target: `stage_b_midi_to_solo_model_direct_audio_render_package`
-- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_MONOPHONIC_OVERLAP_REPAIR_2026-06-03.md`
+- model-direct rendered WAV files: `3`
+- model-direct WAV sample rate: `44100`
+- model-direct WAV duration range: `19.585s-22.390s`
+- model-direct technical WAV validation: `true`
+- next repair target: `stage_b_midi_to_solo_model_direct_audio_evidence_consolidation`
+- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_AUDIO_RENDER_PACKAGE_2026-06-03.md`
 - margin-recovered timing/repetition focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - margin-recovered timing/repetition focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered phrase/vocabulary repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_REPAIR_2026-05-28.md`
@@ -286,6 +290,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo candidate audio render package: rendered WAV `3`, sample rate `44100`, technical validation `true`, preference claim `false`, next boundary `stage_b_midi_to_solo_mvp_execution_consolidation`
 - MIDI-to-solo MVP execution consolidation: technical path `true`, source `context_conditioned_fallback`, exported/rendered `3/3`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_direct_generation_repair`
 - MIDI-to-solo model-direct monophonic overlap repair: source `model_checkpoint_direct_constrained`, valid/strict `3/3`, avg postprocess removal ratio `0.0`, collapse warning sample rate `0.0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_direct_audio_render_package`
+- MIDI-to-solo model-direct audio render package: rendered WAV `3`, sample rate `44100`, duration range `19.585s-22.390s`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_direct_audio_evidence_consolidation`
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
 - generic base readiness audit: phase4 prep ready `true`, broad training execution ready `false`, broad quality/Brad adaptation claim `false`
 - generic base manifest contract: generic split `2433/270`, Brad split `47/11/14`, leakage/overlap `0`, broad training execution ready `false`
