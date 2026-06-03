@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #483, Stage B MIDI-to-solo context extraction MVP
-- 다음 권장 이슈: `Stage B MIDI-to-solo training resource probe`
+- latest functional result: Issue #485, Stage B MIDI-to-solo training resource probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo conditioned generation probe`
 
 현재 범위가 아닌 것:
 
@@ -111,6 +111,51 @@ Issue #483은 입력 MIDI에서 생성 conditioning에 필요한 bar/position/ch
 다음:
 
 - `Stage B MIDI-to-solo training resource probe`
+
+## Stage B MIDI-to-Solo Training Resource Probe Result
+
+Issue #485는 MIDI-to-solo context extraction 결과를 기존 Stage B full window resource와 scale-smoke checkpoint evidence에 연결한 readiness probe 작업이다.
+
+변경:
+
+- MIDI-to-solo training resource probe script 추가
+- context extraction report, full window preparation report, training scale smoke report 연결
+- conditioned generation probe 준비 여부 검증
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_TRAINING_RESOURCE_PROBE_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_training_resource_probe`
+- next boundary: `stage_b_midi_to_solo_conditioned_generation_probe`
+- training resource ready: `true`
+- conditioned generation probe ready: `true`
+- context event count: `128`
+- context bars: `8`
+- full tokenized train / val files: `154136` / `21845`
+- scale-smoke selected train / val records: `128` / `32`
+- scale-smoke best validation loss: `5.9031`
+- scale-smoke checkpoint count: `1`
+- MIDI-to-solo MVP claimed: `false`
+- conditioned generation completed: `false`
+- broad training executed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 입력 MIDI context rows와 Stage B window/token resource 연결 가능
+- scale-smoke checkpoint resource 존재
+- 다음 작업은 completed model claim이 아니라 conditioned generation probe
+- broad training, Brad style adaptation, musical quality claim 제외
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_training_resource_probe`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-training-resource-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo conditioned generation probe`
 
 ## Previous Model Decision
 
