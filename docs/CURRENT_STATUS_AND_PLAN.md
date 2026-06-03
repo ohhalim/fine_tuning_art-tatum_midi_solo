@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #512, Stage B MIDI-to-solo model-direct listening review package
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct user listening review fill`
+- latest functional result: Issue #514, Stage B MIDI-to-solo model-direct user listening review input guard
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct objective-only next decision`
 
 현재 범위가 아닌 것:
 
@@ -772,6 +772,47 @@ Rendered WAV:
 다음:
 
 - `Stage B MIDI-to-solo model-direct user listening review fill`
+
+## Stage B MIDI-to-Solo Model-Direct User Listening Review Input Guard Result
+
+Issue #514는 #512 listening review package의 review input template이 아직 pending 상태인지 검증하고 preference fill을 차단한 작업이다.
+
+변경:
+
+- listening review input template parser 추가
+- reviewer / preferred_rank / reject_all / candidate decision pending 상태 검증
+- validated input 부재 시 human/audio preference fill 차단
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_USER_LISTENING_REVIEW_INPUT_GUARD_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_model_direct_user_listening_review_input_guard`
+- next boundary: `stage_b_midi_to_solo_model_direct_objective_only_next_decision`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- pending status field count: `4`
+- pending candidate decision count: `3`
+- pending candidate field count: `9`
+- human/audio preference claimed: `false`
+- model-direct generation quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- review input 없이 human/audio preference claim 불가
+- user listening review fill은 validated input 수신 전까지 차단
+- 자동 진행은 objective-only next decision 경계로 이동
+- 이 결과는 preference guard evidence이며, 음악적 품질 claim은 아님
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_user_listening_review_input_guard`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-user-listening-review-input-guard`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct objective-only next decision`
 
 ## Previous Model Decision
 
