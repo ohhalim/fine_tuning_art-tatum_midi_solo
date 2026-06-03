@@ -2,18 +2,19 @@
 
 ## Project Focus
 
-This repository is currently focused on Stage B symbolic MIDI generation probes.
+This repository is currently focused on a Stage B MIDI-to-solo generation MVP.
 
 Primary goal:
 
-- Build a reliable local MIDI generation and validation pipeline.
-- Prove model behavior with small, reproducible experiments before expanding scope.
+- Build a reliable local pipeline that accepts an input MIDI file and exports ranked jazz solo MIDI candidates.
+- Keep the implementation hybrid: model-conditioned generation, constrained decoding, candidate ranking, and retrieval fallback.
+- Prove behavior with small, reproducible experiments before broad training or Brad style adaptation claims.
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #479, Muzig application final review package.
+- Latest functional issue completed: Issue #481, Stage B MIDI-to-solo MVP input contract and run plan.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: manual application submission review.
+- Recommended next issue: Stage B MIDI-to-solo context extraction MVP.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1002,6 +1003,14 @@ bash scripts/agent_harness.sh stage-b-generic-base-scale-checkpoint-repeatabilit
 ```
 
 This harness consolidates objective MIDI gate repeatability evidence and routes the next boundary to README evidence refresh without claiming musical quality or human/audio preference.
+
+For Stage B MIDI-to-solo MVP input contract changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-contract
+```
+
+This harness defines the input MIDI to ranked jazz solo MIDI candidate contract, including constrained decoding, candidate ranking, and retrieval fallback boundaries.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 

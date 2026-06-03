@@ -190,6 +190,8 @@ Modes:
                 Run objective gate repeatability sweep for the generic-base scale checkpoint.
   stage-b-generic-base-scale-checkpoint-repeatability-consolidation
                 Consolidate objective gate repeatability evidence for the generic-base scale checkpoint.
+  stage-b-midi-to-solo-mvp-contract
+                Define the MIDI-to-solo MVP input/output contract and run plan.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3485,6 +3487,18 @@ run_stage_b_generic_base_scale_checkpoint_repeatability_consolidation() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_mvp_contract() {
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_contract}"
+  print_header "Stage B MIDI-to-solo MVP input contract"
+  "$PYTHON_BIN" scripts/define_stage_b_midi_to_solo_mvp_contract.py \
+    --run_id "$run_id" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_INPUT_CONTRACT_2026-06-03.md \
+    --expected_boundary stage_b_midi_to_solo_mvp_input_contract \
+    --expected_next_boundary stage_b_midi_to_solo_context_extraction_mvp \
+    --require_fallback \
+    --require_no_final_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -4865,6 +4879,9 @@ case "$MODE" in
     ;;
   stage-b-generic-base-scale-checkpoint-repeatability-consolidation)
     run_stage_b_generic_base_scale_checkpoint_repeatability_consolidation
+    ;;
+  stage-b-midi-to-solo-mvp-contract)
+    run_stage_b_midi_to_solo_mvp_contract
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
