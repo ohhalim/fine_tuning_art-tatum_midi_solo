@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #493, Stage B MIDI-to-solo model-direct generation repair
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct sequence budget repair smoke`
+- latest functional result: Issue #495, Stage B MIDI-to-solo model-direct sequence budget repair smoke
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct 8-bar generation probe`
 
 현재 범위가 아닌 것:
 
@@ -347,6 +347,56 @@ Issue #493은 #491에서 남긴 model-direct generation repair 경계를 sequenc
 다음:
 
 - `Stage B MIDI-to-solo model-direct sequence budget repair smoke`
+
+## Stage B MIDI-to-Solo Model-Direct Sequence Budget Repair Smoke Result
+
+Issue #495는 #493에서 분리한 sequence budget blocker를 `max_sequence=160` scale-smoke checkpoint로 수리 가능한지 검증한 작업이다.
+
+변경:
+
+- `max_sequence=160` scale-smoke training 실행 경로 추가
+- previous repair report와 repaired scale-smoke report 통합
+- 8-bar / 24-note direct generation contract 기준 sequence budget 재계산
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_SEQUENCE_BUDGET_REPAIR_SMOKE_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke`
+- next boundary: `stage_b_midi_to_solo_model_direct_8bar_generation_probe`
+- previous max sequence: `96`
+- repaired max sequence: `160`
+- minimum contract tokens: `123`
+- previous direct note capacity: `17`
+- repaired direct note capacity: `33`
+- target min note count: `24`
+- even note groups per bar capacity: `4`
+- sequence budget repaired: `true`
+- model-direct 8-bar generation probe ready: `true`
+- selected train / val records: `128` / `32`
+- best validation loss: `6.1293`
+- checkpoint count: `1`
+- model-direct generation quality claimed: `false`
+- human/audio preference claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- `max_sequence=160` smoke checkpoint는 8-bar / 24-note 최소 token budget을 충족
+- sequence budget blocker는 direct 8-bar generation probe 진입 기준으로 수리
+- 직접 생성 MIDI 산출물과 품질은 아직 미검증
+- broad trained-model quality, Brad style adaptation, human/audio preference는 미청구
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke`
+- `.venv/bin/python -m py_compile scripts/consolidate_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct 8-bar generation probe`
 
 ## Previous Model Decision
 
