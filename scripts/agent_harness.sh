@@ -4020,6 +4020,55 @@ run_stage_b_midi_to_solo_model_direct_user_listening_review_input_guard() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_direct_user_listening_review_fill() {
+  local review_package_run_id="${REVIEW_PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_listening_review_package}"
+  local input_guard_run_id="${INPUT_GUARD_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_user_listening_review_input_guard}"
+  local timing_repair_run_id="${TIMING_REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_timing_phrase_repair}"
+  local pitch_repair_run_id="${PITCH_REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_pitch_contour_repair}"
+  local diagnostics_run_id="${DIAGNOSTICS_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_phrase_quality_diagnostics}"
+  local evidence_run_id="${EVIDENCE_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_audio_evidence_consolidation}"
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_audio_render_package}"
+  local overlap_repair_run_id="${OVERLAP_REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair}"
+  local previous_direct_run_id="${PREVIOUS_DIRECT_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_8bar_generation_probe}"
+  local sequence_budget_run_id="${SEQUENCE_BUDGET_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke}"
+  local context_run_id="${CONTEXT_RUN_ID:-harness_stage_b_midi_to_solo_context_extraction}"
+  local scale_run_id="${SCALE_RUN_ID:-max_sequence_160}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_direct_user_listening_review_fill}"
+  local review_package="outputs/stage_b_midi_to_solo_model_direct_listening_review_package/${review_package_run_id}/stage_b_midi_to_solo_model_direct_listening_review_package.json"
+  local input_guard="outputs/stage_b_midi_to_solo_model_direct_user_listening_review_input_guard/${input_guard_run_id}/stage_b_midi_to_solo_model_direct_user_listening_review_input_guard.json"
+  if [[ ! -f "$review_package" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct listening review package"
+    RUN_ID="$review_package_run_id" TIMING_REPAIR_RUN_ID="$timing_repair_run_id" PITCH_REPAIR_RUN_ID="$pitch_repair_run_id" DIAGNOSTICS_RUN_ID="$diagnostics_run_id" EVIDENCE_RUN_ID="$evidence_run_id" AUDIO_RENDER_RUN_ID="$audio_render_run_id" OVERLAP_REPAIR_RUN_ID="$overlap_repair_run_id" PREVIOUS_DIRECT_RUN_ID="$previous_direct_run_id" SEQUENCE_BUDGET_RUN_ID="$sequence_budget_run_id" CONTEXT_RUN_ID="$context_run_id" SCALE_RUN_ID="$scale_run_id" run_stage_b_midi_to_solo_model_direct_listening_review_package
+  fi
+  if [[ ! -f "$input_guard" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct user listening review input guard"
+    RUN_ID="$input_guard_run_id" REVIEW_PACKAGE_RUN_ID="$review_package_run_id" TIMING_REPAIR_RUN_ID="$timing_repair_run_id" PITCH_REPAIR_RUN_ID="$pitch_repair_run_id" DIAGNOSTICS_RUN_ID="$diagnostics_run_id" EVIDENCE_RUN_ID="$evidence_run_id" AUDIO_RENDER_RUN_ID="$audio_render_run_id" OVERLAP_REPAIR_RUN_ID="$overlap_repair_run_id" PREVIOUS_DIRECT_RUN_ID="$previous_direct_run_id" SEQUENCE_BUDGET_RUN_ID="$sequence_budget_run_id" CONTEXT_RUN_ID="$context_run_id" SCALE_RUN_ID="$scale_run_id" run_stage_b_midi_to_solo_model_direct_user_listening_review_input_guard
+  fi
+  print_header "Stage B MIDI-to-solo model-direct user listening review fill"
+  "$PYTHON_BIN" scripts/fill_stage_b_midi_to_solo_model_direct_user_listening_review.py \
+    --run_id "$run_id" \
+    --listening_review_package "$review_package" \
+    --input_guard_report "$input_guard" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_USER_LISTENING_REVIEW_FILL_2026-06-03.md \
+    --reviewer user \
+    --preferred_rank 3 \
+    --overall_decision reject_all \
+    --candidate_decision relative_best_needs_followup \
+    --timing songlike_not_soloing \
+    --phrase songlike_not_soloing \
+    --vocabulary songlike_not_soloing \
+    --primary_failure songlike_melody_not_soloing \
+    --assessment "rank 3 is relatively best, but all candidates sound like simple song melody rather than jazz soloing" \
+    --notes "single user listening review of three rendered WAV files" \
+    --expected_boundary stage_b_midi_to_solo_model_direct_user_listening_review_fill \
+    --expected_next_boundary stage_b_midi_to_solo_model_direct_songlike_melody_rejection_analysis \
+    --expected_overall_decision reject_all \
+    --expected_preferred_rank 3 \
+    --require_review_completed \
+    --require_no_keep_claim \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -5451,6 +5500,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-direct-user-listening-review-input-guard)
     run_stage_b_midi_to_solo_model_direct_user_listening_review_input_guard
+    ;;
+  stage-b-midi-to-solo-model-direct-user-listening-review-fill)
+    run_stage_b_midi_to_solo_model_direct_user_listening_review_fill
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

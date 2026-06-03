@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-06-01
+작성일: 2026-06-03
 
 ## Current Focus
 
@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #514, Stage B MIDI-to-solo model-direct user listening review input guard
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct objective-only next decision`
+- latest functional result: Issue #516, Stage B MIDI-to-solo model-direct user listening review fill
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct songlike melody rejection analysis`
 
 현재 범위가 아닌 것:
 
@@ -813,6 +813,52 @@ Issue #514는 #512 listening review package의 review input template이 아직 p
 다음:
 
 - `Stage B MIDI-to-solo model-direct objective-only next decision`
+
+## Stage B MIDI-to-Solo Model-Direct User Listening Review Fill Result
+
+Issue #516은 #512 WAV 후보 3개에 대한 single-user listening review 입력을 반영한 작업이다.
+
+변경:
+
+- user listening review fill script 추가
+- rank 3 relative best 입력 기록
+- 전체 후보 reject 판단과 `songlike_melody_not_soloing` 실패 유형 기록
+- human/audio keep claim과 MIDI-to-solo musical quality claim 차단
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_USER_LISTENING_REVIEW_FILL_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_model_direct_user_listening_review_fill`
+- claim boundary: `model_direct_listening_review_songlike_rejection`
+- next boundary: `stage_b_midi_to_solo_model_direct_songlike_melody_rejection_analysis`
+- review status: `reviewed`
+- preferred rank: `3`
+- overall decision: `reject_all`
+- candidate decision for preferred rank: `relative_best_needs_followup`
+- primary failure: `songlike_melody_not_soloing`
+- timing / phrase / vocabulary: `songlike_not_soloing`
+- reviewed candidate count: `3`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 3번 후보는 상대적으로 가장 낫지만 keep 후보 아님
+- 현재 후보군은 jazz soloing보다 단순 songlike melody로 인지
+- 이전 timing/objective repair는 dead-air와 interval guard 개선 evidence로 제한
+- 다음 검토 대상은 songlike contour, phrase vocabulary, jazz articulation repair
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_user_listening_review_fill`
+- `.venv/bin/python -m py_compile scripts/fill_stage_b_midi_to_solo_model_direct_user_listening_review.py`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-user-listening-review-fill`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct songlike melody rejection analysis`
 
 ## Previous Model Decision
 
