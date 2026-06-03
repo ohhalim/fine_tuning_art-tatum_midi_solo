@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #489, Stage B MIDI-to-solo candidate audio render package
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP execution consolidation`
+- latest functional result: Issue #491, Stage B MIDI-to-solo MVP execution consolidation
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct generation repair`
 
 현재 범위가 아닌 것:
 
@@ -256,6 +256,52 @@ Rendered WAV:
 다음:
 
 - `Stage B MIDI-to-solo MVP execution consolidation`
+
+## Stage B MIDI-to-Solo MVP Execution Consolidation Result
+
+Issue #491은 #481, #483, #485, #487, #489 결과를 묶어 `input MIDI -> context -> ranked MIDI -> WAV` 실행 경로를 통합 검증한 작업이다.
+
+변경:
+
+- MIDI-to-solo MVP execution consolidation script 추가
+- contract, context, resource, generation, audio render report 연결
+- MIDI/WAV artifact existence 검증
+- technical MVP completion과 musical quality claim 분리
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_EXECUTION_CONSOLIDATION_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_mvp_execution_consolidation`
+- next boundary: `stage_b_midi_to_solo_model_direct_generation_repair`
+- technical execution path completed: `true`
+- MIDI-to-solo technical MVP completed: `true`
+- input to ranked MIDI completed: `true`
+- input to rendered audio completed: `true`
+- generation source: `context_conditioned_fallback`
+- exported candidate count: `3`
+- rendered audio file count: `3`
+- technical WAV validation: `true`
+- musical quality claimed: `false`
+- model checkpoint direct generation quality claimed: `false`
+- human/audio preference claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 기술 실행 경로 기준 MVP는 완료
+- 현재 후보 생성 source는 `context_conditioned_fallback`
+- 모델 checkpoint 직접 8-bar generation 품질은 아직 미검증
+- 다음 작업은 model-direct generation repair
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_execution_consolidation`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-execution-consolidation`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct generation repair`
 
 ## Previous Model Decision
 
