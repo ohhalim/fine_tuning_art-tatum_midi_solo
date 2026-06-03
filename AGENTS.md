@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #499, Stage B MIDI-to-solo model-direct monophonic overlap repair.
+- Latest functional issue completed: Issue #501, Stage B MIDI-to-solo model-direct audio render package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-direct audio render package.
+- Recommended next issue: Stage B MIDI-to-solo model-direct audio evidence consolidation.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1083,6 +1083,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-monophonic-overl
 ```
 
 This harness caps generated durations to the next planned position, compares the repaired outputs against the prior 8-bar probe, and records review-gate evidence without claiming model quality or human preference.
+
+For Stage B MIDI-to-solo model-direct audio render package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-audio-render-package
+```
+
+This harness renders repaired model-direct MIDI candidates to WAV files and validates technical WAV metadata without claiming audio quality, model quality, or human preference.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 

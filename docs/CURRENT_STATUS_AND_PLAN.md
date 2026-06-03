@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #499, Stage B MIDI-to-solo model-direct monophonic overlap repair
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct audio render package`
+- latest functional result: Issue #501, Stage B MIDI-to-solo model-direct audio render package
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct audio evidence consolidation`
 
 현재 범위가 아닌 것:
 
@@ -498,6 +498,55 @@ Issue #499는 #497 direct 8-bar generation의 review gate 실패를 duration ove
 다음:
 
 - `Stage B MIDI-to-solo model-direct audio render package`
+
+## Stage B MIDI-to-Solo Model-Direct Audio Render Package Result
+
+Issue #501은 #499 repaired model-direct MIDI 후보 3개를 WAV로 렌더하고 기술 metadata를 검증한 작업이다.
+
+변경:
+
+- model-direct overlap repair report 입력 검증 추가
+- repaired direct MIDI 3개 WAV render script 추가
+- WAV sample rate, frame count, size, sha256 metadata 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_AUDIO_RENDER_PACKAGE_2026-06-03.md`
+- boundary: `stage_b_midi_to_solo_model_direct_audio_render_package`
+- source boundary: `stage_b_midi_to_solo_model_direct_monophonic_overlap_repair`
+- next boundary: `stage_b_midi_to_solo_model_direct_audio_evidence_consolidation`
+- rendered audio file count: `3`
+- sample rate: `44100`
+- duration range: `19.585s` - `22.390s`
+- technical WAV validation: `true`
+- audio rendered quality claimed: `false`
+- human/audio preference claimed: `false`
+- model-direct generation quality claimed: `false`
+- critical user input required: `false`
+
+WAV:
+
+- `outputs/stage_b_midi_to_solo_model_direct_audio_render_package/harness_stage_b_midi_to_solo_model_direct_audio_render_package/audio/model_direct_sample_01.wav`
+- `outputs/stage_b_midi_to_solo_model_direct_audio_render_package/harness_stage_b_midi_to_solo_model_direct_audio_render_package/audio/model_direct_sample_02.wav`
+- `outputs/stage_b_midi_to_solo_model_direct_audio_render_package/harness_stage_b_midi_to_solo_model_direct_audio_render_package/audio/model_direct_sample_03.wav`
+
+판단:
+
+- fallback 없는 model-direct MIDI 후보의 MIDI -> WAV local render 경로 확인
+- technical WAV validation은 출력 파일 검증이며, 음악적 품질이나 선호 claim은 아님
+- 다음 작업은 #499 objective evidence와 #501 audio render evidence의 claim boundary 통합
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_audio_render`
+- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_model_direct_audio.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-audio-render-package`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct audio evidence consolidation`
 
 ## Previous Model Decision
 

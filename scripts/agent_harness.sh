@@ -210,6 +210,8 @@ Modes:
                 Run fallback-free model-direct 8-bar MIDI generation and record review gate evidence.
   stage-b-midi-to-solo-model-direct-monophonic-overlap-repair
                 Repair model-direct overlap by capping duration to the next planned position.
+  stage-b-midi-to-solo-model-direct-audio-render-package
+                Render repaired model-direct MIDI candidates to WAV and validate technical metadata.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3791,6 +3793,28 @@ run_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_direct_audio_render_package() {
+  local overlap_repair_run_id="${OVERLAP_REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair}"
+  local previous_direct_run_id="${PREVIOUS_DIRECT_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_8bar_generation_probe}"
+  local sequence_budget_run_id="${SEQUENCE_BUDGET_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke}"
+  local context_run_id="${CONTEXT_RUN_ID:-harness_stage_b_midi_to_solo_context_extraction}"
+  local scale_run_id="${SCALE_RUN_ID:-max_sequence_160}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_direct_audio_render_package}"
+  local overlap_repair="outputs/stage_b_midi_to_solo_model_direct_monophonic_overlap_repair/${overlap_repair_run_id}/stage_b_midi_to_solo_model_direct_monophonic_overlap_repair.json"
+  if [[ ! -f "$overlap_repair" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct monophonic overlap repair"
+    RUN_ID="$overlap_repair_run_id" PREVIOUS_DIRECT_RUN_ID="$previous_direct_run_id" SEQUENCE_BUDGET_RUN_ID="$sequence_budget_run_id" CONTEXT_RUN_ID="$context_run_id" SCALE_RUN_ID="$scale_run_id" run_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair
+  fi
+  print_header "Stage B MIDI-to-solo model-direct audio render package"
+  "$PYTHON_BIN" scripts/render_stage_b_midi_to_solo_model_direct_audio.py \
+    --run_id "$run_id" \
+    --model_direct_overlap_repair "$overlap_repair" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_AUDIO_RENDER_PACKAGE_2026-06-03.md \
+    --expected_boundary stage_b_midi_to_solo_model_direct_audio_render_package \
+    --expected_file_count 3 \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -5201,6 +5225,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-direct-monophonic-overlap-repair)
     run_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair
+    ;;
+  stage-b-midi-to-solo-model-direct-audio-render-package)
+    run_stage_b_midi_to_solo_model_direct_audio_render_package
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
