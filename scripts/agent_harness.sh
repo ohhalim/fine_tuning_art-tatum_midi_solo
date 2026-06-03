@@ -204,6 +204,8 @@ Modes:
                 Consolidate input-to-MIDI-to-WAV technical execution evidence.
   stage-b-midi-to-solo-model-direct-generation-repair
                 Define the model-direct generation repair boundary from sequence budget evidence.
+  stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
+                Run a max_sequence 160 smoke and verify direct 8-bar sequence budget readiness.
   stage-b-generic-tiny-checkpoint-generation-probe
                 Probe generation/decode from the generic tiny checkpoint.
   stage-b-generic-tiny-checkpoint-grammar-repair
@@ -3674,6 +3676,49 @@ run_stage_b_midi_to_solo_model_direct_generation_repair() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke() {
+  local previous_repair_run_id="${PREVIOUS_REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_generation_repair}"
+  local full_window_run_id="${FULL_WINDOW_RUN_ID:-harness_stage_b_generic_full_manifest_window_preparation}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke}"
+  local scale_run_id="${SCALE_RUN_ID:-max_sequence_160}"
+  local previous_repair="outputs/stage_b_midi_to_solo_model_direct_generation_repair/${previous_repair_run_id}/stage_b_midi_to_solo_model_direct_generation_repair.json"
+  local full_window_preparation="outputs/stage_b_generic_full_manifest_window_preparation/${full_window_run_id}/stage_b_generic_full_manifest_window_preparation.json"
+  local scale_output_root="outputs/stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke/${run_id}/scale_smoke"
+  local repaired_training_scale_smoke="${scale_output_root}/${scale_run_id}/stage_b_generic_base_training_scale_smoke.json"
+  if [[ ! -f "$previous_repair" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct generation repair"
+    RUN_ID="$previous_repair_run_id" run_stage_b_midi_to_solo_model_direct_generation_repair
+  fi
+  if [[ ! -f "$full_window_preparation" ]]; then
+    print_header "Stage B generic full manifest window preparation"
+    RUN_ID="$full_window_run_id" run_stage_b_generic_full_manifest_window_preparation
+  fi
+  if [[ ! -f "$repaired_training_scale_smoke" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct max_sequence 160 scale smoke"
+    "$PYTHON_BIN" scripts/run_stage_b_generic_base_training_scale_smoke.py \
+      --run_id "$scale_run_id" \
+      --output_root "$scale_output_root" \
+      --full_window_preparation "$full_window_preparation" \
+      --max_sequence 160 \
+      --expected_boundary stage_b_generic_base_training_scale_smoke \
+      --expected_next_boundary stage_b_generic_base_scale_checkpoint_generation_probe \
+      --require_training_scale_smoke_passed \
+      --require_no_broad_quality_claim \
+      --require_no_brad_style_claim
+  fi
+  print_header "Stage B MIDI-to-solo model-direct sequence budget repair smoke"
+  "$PYTHON_BIN" scripts/consolidate_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke.py \
+    --run_id "$run_id" \
+    --previous_repair "$previous_repair" \
+    --repaired_training_scale_smoke "$repaired_training_scale_smoke" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_SEQUENCE_BUDGET_REPAIR_SMOKE_2026-06-03.md \
+    --expected_boundary stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke \
+    --expected_next_boundary stage_b_midi_to_solo_model_direct_8bar_generation_probe \
+    --require_sequence_budget_sufficient \
+    --require_probe_ready \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -5075,6 +5120,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-direct-generation-repair)
     run_stage_b_midi_to_solo_model_direct_generation_repair
+    ;;
+  stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke)
+    run_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

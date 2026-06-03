@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #493, Stage B MIDI-to-solo model-direct generation repair.
+- Latest functional issue completed: Issue #495, Stage B MIDI-to-solo model-direct sequence budget repair smoke.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-direct sequence budget repair smoke.
+- Recommended next issue: Stage B MIDI-to-solo model-direct 8-bar generation probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1059,6 +1059,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-generation-repai
 ```
 
 This harness compares the current scale-smoke checkpoint sequence budget with the 8-bar / 24-note MIDI-to-solo contract and defines the sequence-budget repair boundary without claiming direct model quality.
+
+For Stage B MIDI-to-solo model-direct sequence budget repair smoke changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
+```
+
+This harness runs a `max_sequence=160` smoke checkpoint and verifies that its direct Stage B sequence budget can enter the 8-bar generation probe without claiming model quality.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 

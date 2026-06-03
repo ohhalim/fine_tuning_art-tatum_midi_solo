@@ -83,12 +83,15 @@ MVP가 끝났다고 볼 수 있는 조건:
 
 - input MIDI -> context -> ranked MIDI -> WAV technical path: 완료
 - current generation source: `context_conditioned_fallback`
-- model-direct 8-bar generation: 수리 대상
-- current scale-smoke checkpoint max_sequence: `96`
+- model-direct sequence budget repair: 완료
+- model-direct 8-bar generated MIDI: 미검증
+- previous scale-smoke checkpoint max_sequence: `96`
+- repaired scale-smoke checkpoint max_sequence: `160`
 - 8-bar / 24-note minimum contract tokens: `123`
-- direct note capacity under current budget: `17`
-- next repair target: `stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke`
-- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_GENERATION_REPAIR_2026-06-03.md`
+- direct note capacity under previous budget: `17`
+- direct note capacity under repaired budget: `33`
+- next repair target: `stage_b_midi_to_solo_model_direct_8bar_generation_probe`
+- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_SEQUENCE_BUDGET_REPAIR_SMOKE_2026-06-03.md`
 - margin-recovered timing/repetition focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - margin-recovered timing/repetition focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered phrase/vocabulary repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_REPAIR_2026-05-28.md`
