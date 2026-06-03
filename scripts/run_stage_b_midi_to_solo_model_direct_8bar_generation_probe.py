@@ -219,6 +219,14 @@ def build_generation_command(
     ]
     if bool(getattr(args, "cap_duration_to_next_position", False)):
         command.append("--cap_duration_to_next_position")
+    if getattr(args, "constrained_pitch_min", None) is not None:
+        command.extend(["--constrained_pitch_min", str(args.constrained_pitch_min)])
+    if getattr(args, "constrained_pitch_max", None) is not None:
+        command.extend(["--constrained_pitch_max", str(args.constrained_pitch_max)])
+    if getattr(args, "constrained_max_adjacent_interval", None) is not None:
+        command.extend(
+            ["--constrained_max_adjacent_interval", str(args.constrained_max_adjacent_interval)]
+        )
     return command
 
 
