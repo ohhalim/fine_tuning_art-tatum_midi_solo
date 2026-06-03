@@ -131,8 +131,14 @@ MVP가 끝났다고 볼 수 있는 조건:
 - model-direct user listening review primary failure: `songlike_melody_not_soloing`
 - model-direct human/audio keep claim: `false`
 - model-direct MIDI-to-solo musical quality claim: `false`
-- next review target: `stage_b_midi_to_solo_model_direct_songlike_melody_rejection_analysis`
-- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_USER_LISTENING_REVIEW_FILL_2026-06-03.md`
+- model-direct songlike rejection analysis uniform bar density count: `3`
+- model-direct songlike rejection analysis four-notes-per-bar template count: `3`
+- model-direct songlike rejection analysis duration/IOI monotony count: `3/3`
+- model-direct songlike rejection analysis four-bar rhythm cycle repeated count: `3`
+- model-direct songlike rejection analysis shared rhythm signature count: `3`
+- model-direct songlike rejection analysis max abs interval max: `9`
+- next review target: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_decision`
+- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_SONGLIKE_MELODY_REJECTION_ANALYSIS_2026-06-03.md`
 - margin-recovered timing/repetition focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - margin-recovered timing/repetition focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered phrase/vocabulary repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_REPAIR_2026-05-28.md`
@@ -328,6 +334,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo model-direct listening review package: candidates `3`, rendered WAV `3`, duration range `18.926s-19.030s`, review input template `true`, listening review/preference claim `false`, next boundary `stage_b_midi_to_solo_model_direct_user_listening_review_fill`
 - MIDI-to-solo model-direct user listening review input guard: validated input `false`, preference fill allowed `false`, pending status/candidate decision/candidate field `4/3/9`, preference claim `false`, next boundary `stage_b_midi_to_solo_model_direct_objective_only_next_decision`
 - MIDI-to-solo model-direct user listening review fill: preferred rank `3`, overall `reject_all`, primary failure `songlike_melody_not_soloing`, keep/quality claim `false`, next boundary `stage_b_midi_to_solo_model_direct_songlike_melody_rejection_analysis`
+- MIDI-to-solo model-direct songlike melody rejection analysis: uniform density / four-notes template / duration monotony / IOI monotony / interval cap / 4-bar cycle counts `3/3/3/3/3/3`, shared rhythm signature `3`, max interval `9`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_decision`
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
 - generic base readiness audit: phase4 prep ready `true`, broad training execution ready `false`, broad quality/Brad adaptation claim `false`
 - generic base manifest contract: generic split `2433/270`, Brad split `47/11/14`, leakage/overlap `0`, broad training execution ready `false`
