@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #487, Stage B MIDI-to-solo conditioned generation probe.
+- Latest functional issue completed: Issue #489, Stage B MIDI-to-solo candidate audio render package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo candidate audio render package.
+- Recommended next issue: Stage B MIDI-to-solo MVP execution consolidation.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1035,6 +1035,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-conditioned-generation-probe
 ```
 
 This harness exports ranked context-conditioned MIDI candidates and verifies objective gates without claiming completed MVP quality or human/audio preference.
+
+For Stage B MIDI-to-solo candidate audio render package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-candidate-audio-render-package
+```
+
+This harness renders exported MIDI-to-solo candidates to local WAV files and validates technical WAV metadata without claiming audio quality or human preference.
 
 For Stage B generic tiny checkpoint generation probe changes, run:
 
