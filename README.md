@@ -34,6 +34,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled dead-air repeatability temperature guard audio review package | rendered WAV `3`, duration `6.747s-6.861s`, technical validation `true`, preference claim `false` |
 | controlled dead-air repeatability temperature guard listening review | review template `true`, pending fields `4 / 3 / 9`, preference fill `false` |
 | controlled dead-air repeatability temperature guard objective next | objective path support `true`, valid / strict / grammar `9 / 9 / 9`, next training scale decision |
+| controlled scale checkpoint training scale decision | selected train / val `2048 / 512`, current `512 / 128`, local bounded smoke |
 | human/audio preference | 미검증 |
 | MIDI-to-solo musical quality | 미검증 |
 | broad trained-model quality | 미주장 |
@@ -43,11 +44,12 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 최신 판단:
 
 - evidence boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_objective_path_complete`
-- documentation status: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_objective_only_next_decision`
-- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision`
+- documentation status: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision`
+- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke`
 - objective MIDI repeatability path support: `true`
 - objective temperature guard path support: `true`
 - controlled training scale smoke ready: `true`
+- selected next training scale: `2048 / 512`
 - input MIDI to ranked candidate technical path: `true`
 - musical quality claim: `false`
 - human/audio preference claim: `false`
@@ -107,6 +109,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled dead-air repeatability temperature guard audio review | seed별 대표 MIDI 후보 `3`개 | fluidsynth 기반 WAV 렌더와 technical metadata 검증 | rendered WAV `3`, duration `6.747s-6.861s`, listening review pending |
 | controlled dead-air repeatability listening review pending | WAV 후보 `3`개, validated review input `false` | review input template 생성, preference fill 차단 | pending fields `4/3/9`, next objective-only decision |
 | controlled temperature guard objective path 정리 | strict `9/9`, dead-air/collapse `0/0`, validated review input `false` | preference/quality claim 차단 상태로 objective-only 경계 완료 | next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision` |
+| controlled training scale 확장 필요 | current smoke `512/128`, objective path support `true`, full records `154136/21845` | local bounded `2048/512`, max_sequence `160`, 1 epoch 선택 | full training/cloud spend 제외, next training smoke |
 | 음악 품질 claim 과장 위험 | objective MIDI gate와 청감 품질의 분리 필요 | listening review guard와 claim boundary 문서화 | pending fields `4/6/18`, musical quality/human preference/broad quality claim `false` |
 
 ## 주요 검증 결과
