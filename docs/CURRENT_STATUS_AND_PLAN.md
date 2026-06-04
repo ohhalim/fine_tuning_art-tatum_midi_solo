@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #528, Stage B MIDI-to-solo model-direct jazz phrase vocabulary repair objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repair`
+- latest functional result: Issue #530, Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repair
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape audio package`
 
 현재 범위가 아닌 것:
 
@@ -1159,6 +1159,60 @@ Selected repair targets:
 다음:
 
 - `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repair`
+
+## Stage B MIDI-to-Solo Model-Direct Jazz Phrase Vocabulary Contour Phrase-Shape Repair Result
+
+Issue #530은 #528 objective-only decision에서 선택한 stepwise contour bias repair target을 MIDI 후보 생성 경로에 반영한 작업이다.
+
+변경:
+
+- contour phrase-shape repair script 추가
+- 기존 density / rhythm / duration 패턴 재사용
+- leap, enclosure, tension-release pitch cell 기반 후보 생성
+- stepwise contour bias reduction gate 추가
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_JAZZ_PHRASE_VOCABULARY_CONTOUR_PHRASE_SHAPE_REPAIR_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair`
+- source boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_audio_package`
+- target passed: `true`
+- generated MIDI file count: `3`
+- stepwise contour bias: `3 -> 0`
+- max small interval ratio <=4: `0.1714`
+- max abs interval max: `11`
+- shared rhythm signature count: `1`
+- uniform bar density count: `0`
+- no overlap: `true`
+- phrase vocabulary source: `contour_phrase_shape_cells`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+Generated MIDI:
+
+- rank 1: `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair/midi/contour_phrase_shape_rank_01.mid`
+- rank 2: `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair/midi/contour_phrase_shape_rank_02.mid`
+- rank 3: `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair/midi/contour_phrase_shape_rank_03.mid`
+
+판단:
+
+- #528의 잔여 objective signal인 stepwise contour bias는 gate 기준으로 분리
+- density variation, interval guard, no-overlap 유지
+- 현재 결과는 MIDI objective repair evidence이며 청음 품질 claim 아님
+- 다음 검토 대상은 repaired MIDI 후보의 WAV render package
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair tests.test_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_next`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair.py scripts/decide_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_next.py`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-contour-phrase-shape-repair`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape audio package`
 
 ## Previous Model Decision
 

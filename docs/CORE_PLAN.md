@@ -163,8 +163,14 @@ MVP가 끝났다고 볼 수 있는 조건:
 - model-direct jazz phrase vocabulary repair objective-only distinct density pattern count: `3`
 - model-direct jazz phrase vocabulary repair objective-only max abs interval max: `12`
 - model-direct jazz phrase vocabulary repair objective-only targets: `reduce_stepwise_contour_bias`, `add_phrase_shape_tension_release`, `add_approach_enclosure_cells`, `preserve_density_variation`, `preserve_interval_guard`, `preserve_no_quality_claim`
-- next review target: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair`
-- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_JAZZ_PHRASE_VOCABULARY_REPAIR_OBJECTIVE_NEXT_DECISION_2026-06-04.md`
+- model-direct jazz phrase vocabulary contour phrase-shape repair target passed: `true`
+- model-direct jazz phrase vocabulary contour phrase-shape repair stepwise contour bias: `3 -> 0`
+- model-direct jazz phrase vocabulary contour phrase-shape repair max small interval ratio <=4: `0.1714`
+- model-direct jazz phrase vocabulary contour phrase-shape repair max abs interval max: `11`
+- model-direct jazz phrase vocabulary contour phrase-shape repair no overlap: `true`
+- model-direct jazz phrase vocabulary contour phrase-shape repair quality claim: `false`
+- next review target: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_audio_package`
+- 근거 문서: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_JAZZ_PHRASE_VOCABULARY_CONTOUR_PHRASE_SHAPE_REPAIR_2026-06-04.md`
 - margin-recovered timing/repetition focused listening notes 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_NOTES_2026-05-28.md`
 - margin-recovered timing/repetition focused listening fill 문서: `docs/STAGE_B_MARGIN_RECOVERED_TIMING_REPETITION_FOCUSED_LISTENING_FILL_2026-05-28.md`
 - margin-recovered phrase/vocabulary repair 문서: `docs/STAGE_B_MARGIN_RECOVERED_PHRASE_VOCABULARY_REPAIR_2026-05-28.md`
@@ -366,6 +372,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo model-direct jazz phrase vocabulary repair audio package: rendered WAV `3`, duration range `18.975s-18.988s`, technical validation `true`, listening review/preference/quality claim `false`, next boundary `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_listening_review`
 - MIDI-to-solo model-direct jazz phrase vocabulary repair listening review: template `true`, validated input `false`, preference fill `false`, pending fields `4/3/9`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_only_next_decision`
 - MIDI-to-solo model-direct jazz phrase vocabulary repair objective-only next decision: stepwise contour bias `3/3`, distinct density pattern `3`, max interval `12`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair`
+- MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repair: target `true`, stepwise contour bias `3 -> 0`, max interval `11`, no overlap `true`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_audio_package`
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
 - generic base readiness audit: phase4 prep ready `true`, broad training execution ready `false`, broad quality/Brad adaptation claim `false`
 - generic base manifest contract: generic split `2433/270`, Brad split `47/11/14`, leakage/overlap `0`, broad training execution ready `false`

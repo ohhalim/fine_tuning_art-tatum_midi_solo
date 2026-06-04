@@ -4245,6 +4245,30 @@ run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_ne
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair() {
+  local objective_next_run_id="${OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_next}"
+  local listening_review_run_id="${LISTENING_REVIEW_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_listening_review}"
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_audio_package}"
+  local repair_probe_run_id="${REPAIR_PROBE_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair}"
+  local objective_next="outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_next/${objective_next_run_id}/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_next.json"
+  if [[ ! -f "$objective_next" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct jazz phrase vocabulary repair objective-only next decision"
+    RUN_ID="$objective_next_run_id" LISTENING_REVIEW_RUN_ID="$listening_review_run_id" AUDIO_PACKAGE_RUN_ID="$audio_package_run_id" REPAIR_PROBE_RUN_ID="$repair_probe_run_id" run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_next
+  fi
+  print_header "Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repair"
+  "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair.py \
+    --run_id "$run_id" \
+    --objective_next "$objective_next" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_JAZZ_PHRASE_VOCABULARY_CONTOUR_PHRASE_SHAPE_REPAIR_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair \
+    --expected_next_boundary stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_audio_package \
+    --require_repair_completed \
+    --require_target_passed \
+    --require_stepwise_reduced \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -5697,6 +5721,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-repair-objective-next)
     run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_next
+    ;;
+  stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-contour-phrase-shape-repair)
+    run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
