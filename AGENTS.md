@@ -924,6 +924,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-t
 
 This harness repeats the selected repair condition across seeds and routes remaining dead-air separately without claiming musical quality.
 
+For Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air remaining blocker decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-dead-air-remaining-blocker-decision
+```
+
+This harness selects the selected-scale dead-air repair target after density/grammar/collapse repeatability support without claiming musical quality.
+
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 
 ```bash
