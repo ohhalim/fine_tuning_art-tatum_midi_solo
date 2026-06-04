@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #550, Stage B MIDI-to-solo training scale expansion decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled training scale smoke`
+- latest functional result: Issue #552, Stage B MIDI-to-solo controlled training scale smoke
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint generation probe`
 
 현재 범위가 아닌 것:
 
@@ -1711,6 +1711,49 @@ Issue #550은 #548 이후 다음 학습 작업을 broad training이 아니라 bo
 다음:
 
 - `Stage B MIDI-to-solo controlled training scale smoke`
+
+## Stage B MIDI-to-Solo Controlled Training Scale Smoke Result
+
+Issue #552는 #550 decision에서 정의한 selected `512/128`, `max_sequence=160` 조건으로 local controlled training smoke를 실행한 작업이다.
+
+변경:
+
+- controlled training scale smoke harness mode 추가
+- existing generic training scale smoke를 MIDI-to-solo selected scale 조건으로 실행
+- training smoke 결과를 MIDI-to-solo boundary로 요약하는 summary script 추가
+- 전용 unit test와 문서 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_TRAINING_SCALE_SMOKE_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_training_scale_smoke`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe`
+- train / val records: `512` / `128`
+- max sequence: `160`
+- training returncode: `0`
+- best validation loss: `5.1061`
+- checkpoint count: `1`
+- fits vocab: `true`
+- checkpoint generation probe ready: `true`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- 기존 `128/32` smoke보다 큰 `512/128` local controlled smoke 성공
+- checkpoint artifact가 존재하므로 다음 작업은 generation probe
+- validation loss 개선은 관측값이며 generation quality claim은 아직 불가
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_training_scale_smoke tests.test_stage_b_midi_to_solo_training_scale_expansion_decision`
+- `.venv/bin/python -m py_compile scripts/summarize_stage_b_midi_to_solo_controlled_training_scale_smoke.py scripts/decide_stage_b_midi_to_solo_training_scale_expansion.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-training-scale-smoke`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint generation probe`
 
 ## Previous Model Decision
 
