@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #522, Stage B MIDI-to-solo model-direct jazz phrase vocabulary repair probe.
+- Latest functional issue completed: Issue #524, Stage B MIDI-to-solo model-direct jazz phrase vocabulary repair audio package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-direct jazz phrase vocabulary repair audio package.
+- Recommended next issue: Stage B MIDI-to-solo model-direct jazz phrase vocabulary repair listening review.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -899,6 +899,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-jazz-phrase-voca
 ```
 
 This harness generates repaired MIDI candidates and verifies fixed-density, repeated-rhythm, interval-cap, and overlap guardrails without claiming listening quality.
+
+For Stage B MIDI-to-solo model-direct jazz phrase vocabulary repair audio package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-repair-audio-package
+```
+
+This harness renders repaired MIDI candidates to local WAV files and validates technical WAV metadata without claiming listening quality.
 
 For Stage B generic jazz base readiness audit changes, run:
 
