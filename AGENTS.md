@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #574, Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard listening review.
+- Latest functional issue completed: Issue #576, Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard objective-only next decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard objective-only next decision.
+- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint training scale expansion decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -867,6 +867,14 @@ bash scripts/agent_harness.sh stage-b-duration-coverage-outside-soloing-repair-f
 ```
 
 This harness records the objective-only final boundary and routes the next automatic task to model-core evidence README refresh without claiming human/audio preference.
+
+For Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard objective-only next decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-repeatability-temperature-guard-objective-next
+```
+
+This harness closes the controlled checkpoint temperature-guard objective path and routes the next boundary to controlled training scale expansion without claiming human/audio preference or musical quality.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 
