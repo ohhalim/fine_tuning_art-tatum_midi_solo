@@ -218,6 +218,8 @@ Modes:
                 Run constrained density/collapse repair probe for the controlled checkpoint.
   stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-remaining-blocker-decision
                 Decide the remaining dead-air blocker after controlled density/collapse repair.
+  stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-repair-probe
+                Run constrained dead-air repair probe for the controlled checkpoint.
   stage-b-midi-to-solo-model-direct-8bar-generation-probe
                 Run fallback-free model-direct 8-bar MIDI generation and record review gate evidence.
   stage-b-midi-to-solo-model-direct-monophonic-overlap-repair
@@ -4716,6 +4718,40 @@ run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe() {
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision}"
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_density_collapse_repair_probe}"
+  local controlled_training_run_id="${CONTROLLED_TRAINING_RUN_ID:-harness_stage_b_midi_to_solo_controlled_training_scale_smoke}"
+  local training_run_id="${TRAINING_RUN_ID:-controlled_512_128_maxseq160}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe}"
+  local decision_report="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision/${decision_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision.json"
+  local baseline_repair="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_density_collapse_repair_probe/${repair_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_density_collapse_repair_probe.json"
+  local checkpoint_dir="outputs/stage_b_midi_to_solo_controlled_training_scale_smoke/${controlled_training_run_id}/training_smoke/${training_run_id}/checkpoints"
+  if [[ ! -f "$baseline_repair" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint density/collapse repair probe"
+    RUN_ID="$repair_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_density_collapse_repair_probe
+  fi
+  if [[ ! -f "$decision_report" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint dead-air remaining blocker decision"
+    RUN_ID="$decision_run_id" REPAIR_RUN_ID="$repair_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision
+  fi
+  if [[ ! -f "${checkpoint_dir}/checkpoint_epoch1.pt" ]]; then
+    print_header "Stage B MIDI-to-solo controlled training scale smoke"
+    RUN_ID="$controlled_training_run_id" TRAINING_RUN_ID="$training_run_id" run_stage_b_midi_to_solo_controlled_training_scale_smoke
+  fi
+  print_header "Stage B MIDI-to-solo controlled scale checkpoint dead-air repair probe"
+  "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe.py \
+    --run_id "$run_id" \
+    --decision_report "$decision_report" \
+    --baseline_repair "$baseline_repair" \
+    --checkpoint_dir "$checkpoint_dir" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_DEAD_AIR_REPAIR_PROBE_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe \
+    --expected_next_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_repeatability_probe \
+    --require_target_qualified \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -6213,6 +6249,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-remaining-blocker-decision)
     run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision
+    ;;
+  stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-repair-probe)
+    run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

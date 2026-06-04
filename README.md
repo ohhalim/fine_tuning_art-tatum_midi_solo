@@ -12,7 +12,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 |---|---|
 | pipeline MVP | 완료 |
 | MIDI-to-solo execution path | 입력 MIDI -> context -> ranked MIDI -> WAV technical path 검증 |
-| current evidence boundary | `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision` |
+| current evidence boundary | `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe` |
 | generation source | `controlled_scale_checkpoint_generation_probe` |
 | full generic window preparation | train `154136` / val `21845` tokenized records |
 | scale checkpoint training smoke | train `128` / val `32`, best validation loss `5.9031`, checkpoint `1` |
@@ -26,6 +26,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled scale checkpoint repair decision | selected target `target_density_collapse_postprocess_repair`, next density/collapse repair probe |
 | controlled density/collapse repair probe | note-count failure `3 -> 0`, collapse warning `3 -> 0`, avg postprocess removal `0.8090 -> 0.2292`, valid / strict / grammar `0 / 0 / 3` |
 | controlled dead-air remaining blocker decision | selected target `dead_air_sustained_coverage_repair`, dead-air failure `3`, next dead-air repair probe |
+| controlled dead-air repair probe | note groups/bar `12`, valid / strict / grammar `3 / 3 / 3`, dead-air failure `3 -> 0`, repeatability 필요 |
 | human/audio preference | 미검증 |
 | MIDI-to-solo musical quality | 미검증 |
 | broad trained-model quality | 미주장 |
@@ -34,9 +35,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 
 최신 판단:
 
-- evidence boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision`
-- documentation status: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision`
-- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe`
+- evidence boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe`
+- documentation status: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe`
+- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_repeatability_probe`
 - objective MIDI repeatability path support: `true`
 - controlled training scale smoke ready: `true`
 - input MIDI to ranked candidate technical path: `true`
@@ -90,6 +91,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | repair target 혼선 위험 | grammar gate `3/3` 통과, valid/strict `0/0`, postprocess removal high | postprocess-only/training-scale/audio-review 제외, density/collapse/postprocess repair target 선택 | selected target `target_density_collapse_postprocess_repair` |
 | controlled density/collapse repair 후 잔여 병목 | note-count failure `0`, collapse warning `0`, dead-air failure `3` | coverage-aware position, chord-aware pitch, jazz rhythm/duration token, duration fill 적용 | avg postprocess removal `0.8090 -> 0.2292`, avg onset/sustained `0.0833/0.1667 -> 0.4583/0.7188`, strict gate 미회복 |
 | dead-air repair target 분리 필요 | density/collapse target support `true`, strict gate recovered `false`, dead-air failure `3/3` | audio review/training-scale change 제외, dead-air sustained coverage repair target 선택 | next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe` |
+| controlled dead-air repair 반복성 미검증 | 단일 seed-set에서 valid/strict/grammar `3/3/3`, dead-air failure `3 -> 0` | note groups/bar `8 -> 12`, 같은 chord/rhythm/duration guard 유지 | avg onset/sustained `0.4583/0.7188 -> 0.5729/0.7292`, next repeatability probe |
 | 음악 품질 claim 과장 위험 | objective MIDI gate와 청감 품질의 분리 필요 | listening review guard와 claim boundary 문서화 | pending fields `4/6/18`, musical quality/human preference/broad quality claim `false` |
 
 ## 주요 검증 결과
@@ -134,6 +136,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled density/collapse repair deltas | note-count failure `3`, collapse warning `3`, postprocess removal `0.5798761423761424` |
 | controlled density/collapse coverage delta | onset/sustained `0.375 / 0.5520833333333334` |
 | controlled dead-air remaining blocker decision | selected target `dead_air_sustained_coverage_repair`, audio/training-scale selected `false/false` |
+| controlled dead-air repair probe | sample `3`, valid/strict/grammar `3/3/3`, note-count/dead-air/collapse failure `0/0/0` |
+| controlled dead-air repair deltas | dead-air failure `3`, valid/strict sample `3/3`, postprocess removal `+0.10416666666666666` |
 | raw generation probe | sample `3`, valid/strict/grammar `0/0/0` |
 | density/coverage repair | valid/strict/grammar `1/1/3`, note-count failure delta `3` |
 | duration/long-note repair | valid/strict/grammar `2/2/3`, long-note failure delta `2` |
@@ -160,6 +164,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled scale checkpoint repair target | density/collapse/postprocess repair 범위 결정 |
 | controlled scale checkpoint density/collapse repair target | note-count/collapse/postprocess 개선, dead-air 잔여 병목 분리 |
 | controlled scale checkpoint dead-air repair target | dead-air sustained coverage repair target 선택 |
+| controlled scale checkpoint dead-air repair single-seed support | valid/strict `3/3`, repeatability 미검증 |
 | `.mid` 파일 존재 기반 성공 판정 제거 | 검증 |
 | one-note / long sustain / chord block 실패 감지 | 검증 |
 | human/audio preference | 미검증 |
@@ -229,4 +234,10 @@ MIDI-to-solo controlled scale checkpoint dead-air remaining blocker decision:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-remaining-blocker-decision
+```
+
+MIDI-to-solo controlled scale checkpoint dead-air repair probe:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-repair-probe
 ```
