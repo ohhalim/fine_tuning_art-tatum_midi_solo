@@ -900,6 +900,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-t
 
 This harness probes generation from the selected-scale checkpoint and routes the next boundary by objective strict-gate outcome without claiming musical quality.
 
+For Stage B MIDI-to-solo controlled scale checkpoint training scale repair decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-repair-decision
+```
+
+This harness selects the next repair target after selected-scale checkpoint generation failure without claiming musical quality.
+
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 
 ```bash
