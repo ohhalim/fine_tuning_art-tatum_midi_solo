@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #546, Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability objective-only next decision.
+- Latest functional issue completed: Issue #548, Stage B model-core evidence README refresh.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B model-core evidence README refresh.
+- Recommended next issue: Stage B MIDI-to-solo training scale expansion decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
