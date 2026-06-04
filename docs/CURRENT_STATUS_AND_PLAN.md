@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #562, Stage B MIDI-to-solo controlled scale checkpoint dead-air repair probe
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint dead-air repair repeatability probe`
+- latest functional result: Issue #564, Stage B MIDI-to-solo controlled scale checkpoint dead-air repair repeatability probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard decision`
 
 현재 범위가 아닌 것:
 
@@ -1993,6 +1993,56 @@ Issue #562는 #560에서 선택한 `dead_air_sustained_coverage_repair` target�
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint dead-air repair repeatability probe`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Dead-Air Repair Repeatability Probe Result
+
+Issue #564는 #562 dead-air repair 조건을 seed `44/52/60`에 반복 적용한 작업이다.
+
+변경:
+
+- controlled scale checkpoint dead-air repair repeatability probe script 추가
+- #562 repair report 입력 검증
+- seed `44/52/60` generation report 집계
+- valid/strict/grammar, failure reason, collapse warning, postprocess guard 집계
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_DEAD_AIR_REPAIR_REPEATABILITY_PROBE_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_repeatability_probe`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_decision`
+- seed count: `3`
+- sample count: `9`
+- valid / strict / grammar: `7` / `7` / `9`
+- all seed gate passed: `true`
+- all samples strict valid: `false`
+- collapse warning sample count: `1`
+- avg postprocess removal ratio: `0.375`
+- avg onset / sustained coverage ratio: `0.5486111111111112` / `0.7222222222222222`
+- seed `44`: valid / strict / grammar `3` / `3` / `3`
+- seed `52`: valid / strict / grammar `3` / `3` / `3`
+- seed `60`: valid / strict / grammar `1` / `1` / `3`
+- repeatability target qualified: `false`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- #562 조건은 seed `44`, `52`에서 유지
+- seed `60`에서 dead-air와 postprocess collapse warning 재발
+- all seed gate는 최소 기준 통과지만 all samples strict valid는 미충족
+- 다음 작업은 품질 claim이 아니라 temperature guard decision
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_repeatability_probe tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_repeatability_probe.py scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-repair-repeatability-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard decision`
 
 ## Previous Model Decision
 
