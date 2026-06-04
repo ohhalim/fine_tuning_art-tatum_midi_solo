@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #576, Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale expansion decision`
+- latest functional result: Issue #578, Stage B MIDI-to-solo controlled scale checkpoint training scale expansion decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale smoke`
 
 현재 범위가 아닌 것:
 
@@ -2343,6 +2343,54 @@ Issue #576은 #574 pending listening review와 #570 temperature guard consolidat
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint training scale expansion decision`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Training Scale Expansion Decision Result
+
+Issue #578은 #576 controlled objective path와 기존 #552 controlled training smoke를 근거로 다음 local bounded training scale을 정한 작업이다.
+
+변경:
+
+- controlled scale checkpoint training scale expansion decision script 추가
+- #576 objective path support 검증
+- #552 `512/128` current smoke artifact 검증
+- full tokenized resource `154136/21845` 확인
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_EXPANSION_DECISION_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke`
+- current train / val records: `512 / 128`
+- selected train / val records: `2048 / 512`
+- scale multiplier train / val: `4.0 / 4.0`
+- max sequence: `160`
+- epochs / batch size / seed: `1 / 16 / 47`
+- current best validation loss: `5.1061`
+- objective sample / strict: `9 / 9`
+- rendered audio file count: `3`
+- controlled training scale smoke ready: `true`
+- cloud or GPU spend required: `false`
+- full training selected: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 기존 `512/128` smoke 이후 바로 full training으로 확장하지 않음
+- 9일 실행 범위에서는 local bounded `2048/512` smoke로 checkpoint evidence를 추가
+- 다음 작업은 selected scale training smoke 실행
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-expansion-decision`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint training scale smoke`
 
 ## Previous Model Decision
 
