@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #578, Stage B MIDI-to-solo controlled scale checkpoint training scale expansion decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale smoke`
+- latest functional result: Issue #580, Stage B MIDI-to-solo controlled scale checkpoint training scale smoke
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale generation probe`
 
 현재 범위가 아닌 것:
 
@@ -2391,6 +2391,51 @@ Issue #578은 #576 controlled objective path와 기존 #552 controlled training 
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint training scale smoke`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Training Scale Smoke Result
+
+Issue #580은 #578 decision에서 선택한 `2048/512`, max_sequence `160` 조건으로 local bounded training smoke를 실행한 작업이다.
+
+변경:
+
+- selected scale training smoke summary script 추가
+- `2048/512` raw training smoke 실행
+- validation loss, vocab fit, checkpoint artifact 검증
+- 전용 harness mode와 unit test 추가
+- handoff docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_SMOKE_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe`
+- train / val records: `2048 / 512`
+- max sequence: `160`
+- epochs / batch size: `1 / 16`
+- training returncode: `0`
+- best validation loss: `3.0396`
+- checkpoint count: `1`
+- fits vocab: `true`
+- checkpoint generation probe ready: `true`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- `512/128` smoke 대비 더 큰 local bounded training evidence 확보
+- validation loss 개선은 관측값이며 generation quality claim은 아직 불가
+- 다음 작업은 selected-scale checkpoint generation probe
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision`
+- `.venv/bin/python -m py_compile scripts/summarize_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke.py scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-smoke`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint training scale generation probe`
 
 ## Previous Model Decision
 

@@ -4986,6 +4986,56 @@ run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_de
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke() {
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision}"
+  local full_window_run_id="${FULL_WINDOW_RUN_ID:-harness_stage_b_generic_full_manifest_window_preparation}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke}"
+  local training_run_id="${TRAINING_RUN_ID:-controlled_2048_512_maxseq160}"
+  local decision_report="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision/${decision_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision.json"
+  local full_window_preparation="outputs/stage_b_generic_full_manifest_window_preparation/${full_window_run_id}/stage_b_generic_full_manifest_window_preparation.json"
+  local output_root="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke"
+  local training_output_root="${output_root}/${run_id}/training_smoke"
+  local training_smoke="${training_output_root}/${training_run_id}/stage_b_generic_base_training_scale_smoke.json"
+  if [[ ! -f "$decision_report" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale expansion decision"
+    RUN_ID="$decision_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision
+  fi
+  if [[ ! -f "$full_window_preparation" ]]; then
+    print_header "Stage B generic full manifest window preparation"
+    RUN_ID="$full_window_run_id" run_stage_b_generic_full_manifest_window_preparation
+  fi
+  if [[ ! -f "$training_smoke" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale raw run"
+    "$PYTHON_BIN" scripts/run_stage_b_generic_base_training_scale_smoke.py \
+      --run_id "$training_run_id" \
+      --output_root "$training_output_root" \
+      --full_window_preparation "$full_window_preparation" \
+      --train_records 2048 \
+      --val_records 512 \
+      --min_train_records 2048 \
+      --min_val_records 512 \
+      --max_sequence 160 \
+      --seed 47 \
+      --expected_boundary stage_b_generic_base_training_scale_smoke \
+      --expected_next_boundary stage_b_generic_base_scale_checkpoint_generation_probe \
+      --require_training_scale_smoke_passed \
+      --require_no_broad_quality_claim \
+      --require_no_brad_style_claim
+  fi
+  print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale smoke"
+  "$PYTHON_BIN" scripts/summarize_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke.py \
+    --run_id "$run_id" \
+    --decision_report "$decision_report" \
+    --training_smoke "$training_smoke" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_SMOKE_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke \
+    --expected_next_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe \
+    --min_train_records 2048 \
+    --min_val_records 512 \
+    --require_checkpoint \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -6510,6 +6560,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-expansion-decision)
     run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision
+    ;;
+  stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-smoke)
+    run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
