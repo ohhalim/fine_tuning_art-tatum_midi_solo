@@ -5158,6 +5158,25 @@ run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_gram
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_remaining_blocker_decision() {
+  local repeatability_run_id="${REPEATABILITY_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repeatability_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_remaining_blocker_decision}"
+  local repeatability_probe="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repeatability_probe/${repeatability_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repeatability_probe.json"
+  if [[ ! -f "$repeatability_probe" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale density/grammar/collapse repeatability probe"
+    RUN_ID="$repeatability_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repeatability_probe
+  fi
+  print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air remaining blocker decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_remaining_blocker.py \
+    --run_id "$run_id" \
+    --repeatability_probe "$repeatability_probe" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_DEAD_AIR_REMAINING_BLOCKER_DECISION_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_dead_air_remaining_blocker_decision \
+    --expected_next_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_probe \
+    --require_dead_air_target \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -6697,6 +6716,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-density-grammar-collapse-repeatability-probe)
     run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repeatability_probe
+    ;;
+  stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-dead-air-remaining-blocker-decision)
+    run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_remaining_blocker_decision
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
