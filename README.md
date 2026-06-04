@@ -12,7 +12,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 |---|---|
 | pipeline MVP | 완료 |
 | MIDI-to-solo execution path | 입력 MIDI -> context -> ranked MIDI -> WAV technical path 검증 |
-| current evidence boundary | `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_probe` |
+| current evidence boundary | `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_consolidation` |
 | generation source | `controlled_scale_checkpoint_generation_probe` |
 | full generic window preparation | train `154136` / val `21845` tokenized records |
 | scale checkpoint training smoke | train `128` / val `32`, best validation loss `5.9031`, checkpoint `1` |
@@ -30,6 +30,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled dead-air repair repeatability probe | seeds `44/52/60`, valid / strict / grammar `7 / 7 / 9`, seed `60` partial failure, temperature guard decision 필요 |
 | controlled dead-air repeatability temperature guard decision | selected target `lower_temperature_repeatability_guard_repair`, source/selected temp `0.9 -> 0.75`, top_k `4` 유지 |
 | controlled dead-air repeatability temperature guard repair probe | temp `0.75`, seeds `44/52/60`, valid / strict / grammar `9 / 9 / 9`, dead-air/collapse failure `0 / 0` |
+| controlled dead-air repeatability temperature guard repair consolidation | objective MIDI support `true`, audio review package required `true`, quality claim `false` |
 | human/audio preference | 미검증 |
 | MIDI-to-solo musical quality | 미검증 |
 | broad trained-model quality | 미주장 |
@@ -38,9 +39,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 
 최신 판단:
 
-- evidence boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_probe`
-- documentation status: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_probe`
-- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_consolidation`
+- evidence boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_consolidation`
+- documentation status: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_consolidation`
+- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_audio_review_package`
 - objective MIDI repeatability path support: `true`
 - controlled training scale smoke ready: `true`
 - input MIDI to ranked candidate technical path: `true`
@@ -98,6 +99,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled dead-air repair 반복성 partial | seeds `44/52/60`, strict `7/9`, collapse warning `1` | 동일 #562 조건으로 seed sweep 실행 | seed `60` failure `2`, next temperature guard decision |
 | controlled dead-air repeatability temperature guard 필요 | source temp/top_k `0.9/4`, strict shortfall `2`, failed seed `[60]` | temp `0.75`, top_k `4` 고정 guard 선택 | next temperature guard repair probe |
 | controlled dead-air repeatability temperature guard repair | temp `0.75`, top_k `4`, seeds `44/52/60` | lower-temperature guard 조건으로 seed sweep 재실행 | valid/strict/grammar `9/9/9`, dead-air/collapse `0/0`, next consolidation |
+| controlled dead-air repeatability temperature guard support 정리 | strict shortfall `2 -> 0`, dead-air/collapse `2/1 -> 0/0` | objective MIDI support와 quality claim boundary 분리 | audio review package required `true`, musical quality claim `false` |
 | 음악 품질 claim 과장 위험 | objective MIDI gate와 청감 품질의 분리 필요 | listening review guard와 claim boundary 문서화 | pending fields `4/6/18`, musical quality/human preference/broad quality claim `false` |
 
 ## 주요 검증 결과
@@ -149,6 +151,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled dead-air repeatability temperature guard decision | selected target `lower_temperature_repeatability_guard_repair`, source/selected temp `0.9/0.75`, top_k `4` |
 | controlled dead-air temperature guard evidence | strict shortfall `2`, failed seed `[60]`, dead-air failure `2`, collapse warning `1` |
 | controlled dead-air temperature guard repair probe | temp `0.75`, seeds `44/52/60`, valid/strict/grammar `9/9/9`, dead-air/collapse `0/0` |
+| controlled dead-air temperature guard consolidation | objective support `true`, audio review package required `true`, quality claim `false` |
 | raw generation probe | sample `3`, valid/strict/grammar `0/0/0` |
 | density/coverage repair | valid/strict/grammar `1/1/3`, note-count failure delta `3` |
 | duration/long-note repair | valid/strict/grammar `2/2/3`, long-note failure delta `2` |
@@ -179,6 +182,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled scale checkpoint dead-air repeatability boundary | seed `60` partial failure 분리, temperature guard decision 완료 |
 | controlled scale checkpoint temperature guard target | lower-temperature repeatability guard 선택, source/selected temp `0.9 -> 0.75` |
 | controlled scale checkpoint temperature guard repair target | temp `0.75`, top_k `4` 조건에서 strict `9/9`, failure reasons none |
+| controlled scale checkpoint temperature guard support | objective MIDI 범위 통과, audio review package required |
 | `.mid` 파일 존재 기반 성공 판정 제거 | 검증 |
 | one-note / long sustain / chord block 실패 감지 | 검증 |
 | human/audio preference | 미검증 |

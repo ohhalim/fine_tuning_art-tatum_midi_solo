@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #568, Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard repair probe
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard repair consolidation`
+- latest functional result: Issue #570, Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard repair consolidation
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard audio review package`
 
 현재 범위가 아닌 것:
 
@@ -2144,6 +2144,56 @@ Issue #568은 #566에서 선택한 temp `0.75`, top_k `4` guard config를 실제
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard repair consolidation`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Dead-Air Repeatability Temperature Guard Repair Consolidation Result
+
+Issue #570은 #568 temperature guard repair probe 결과를 objective MIDI support 범위로 consolidation한 작업이다.
+
+변경:
+
+- temperature guard repair consolidation script 추가
+- #568 repair probe report 입력 검증
+- objective temperature guard support, audio review package requirement, claim boundary 정리
+- 전용 harness mode와 unit test 추가
+- README, CORE_PLAN, CURRENT_STATUS_AND_PLAN 현재 boundary 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_DEAD_AIR_REPEATABILITY_TEMPERATURE_GUARD_REPAIR_CONSOLIDATION_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_consolidation`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_audio_review_package`
+- objective temperature guard support: `true`
+- audio review package required: `true`
+- seed count: `3`
+- sample count: `9`
+- valid / strict / grammar: `9` / `9` / `9`
+- source / repair temperature: `0.9` / `0.75`
+- top_k: `4`
+- strict valid sample delta: `2`
+- strict sample shortfall: `2 -> 0`
+- dead-air failure count: `2 -> 0`
+- collapse warning sample count: `1 -> 0`
+- additional repair required: `false`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- human audio preference claimed: `false`
+
+판단:
+
+- lower-temperature guard repair는 objective MIDI gate 기준 support로 정리
+- 현재 근거는 MIDI objective 지표이며 청감 품질 claim 아님
+- 다음 작업은 selected candidates의 audio review package 구성
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_consolidation tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_probe`
+- `.venv/bin/python -m py_compile scripts/consolidate_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair.py scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_probe.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-repeatability-temperature-guard-repair-consolidation`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard audio review package`
 
 ## Previous Model Decision
 
