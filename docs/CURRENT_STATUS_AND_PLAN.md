@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #548, Stage B model-core evidence README refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo training scale expansion decision`
+- latest functional result: Issue #550, Stage B MIDI-to-solo training scale expansion decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled training scale smoke`
 
 현재 범위가 아닌 것:
 
@@ -1665,6 +1665,52 @@ Issue #548은 README의 현재 상태를 #546 MIDI-to-solo objective path 기준
 다음:
 
 - `Stage B MIDI-to-solo training scale expansion decision`
+
+## Stage B MIDI-to-Solo Training Scale Expansion Decision Result
+
+Issue #550은 #548 이후 다음 학습 작업을 broad training이 아니라 bounded controlled scale smoke로 제한한 decision 작업이다.
+
+변경:
+
+- training scale expansion decision script 추가
+- training resource probe, sequence budget repair, #546 objective path decision 입력 검증
+- 다음 controlled training smoke size를 `512/128` records로 정의
+- broad training, musical quality, Brad style adaptation claim guard 유지
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_TRAINING_SCALE_EXPANSION_DECISION_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_training_scale_expansion_decision`
+- next boundary: `stage_b_midi_to_solo_controlled_training_scale_smoke`
+- selected train / val records: `512` / `128`
+- prior train / val records: `128` / `32`
+- scale multiplier train / val: `4.0` / `4.0`
+- max sequence: `160`
+- objective sample / qualified: `6` / `6`
+- objective clean pass rate: `1.0000`
+- rendered audio file count: `6`
+- controlled training scale smoke ready: `true`
+- cloud or GPU spend required: `false`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- full tokenized resource와 `max_sequence=160` repair evidence 기준 controlled scale smoke 진행 가능
+- 실행 범위는 local bounded smoke이며 broad training 또는 Brad adaptation 아님
+- 다음 작업은 selected `512/128` records 조건으로 controlled training smoke 실행
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_training_scale_expansion_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_training_scale_expansion.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-training-scale-expansion-decision`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled training scale smoke`
 
 ## Previous Model Decision
 

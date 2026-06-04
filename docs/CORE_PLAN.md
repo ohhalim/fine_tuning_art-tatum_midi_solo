@@ -360,6 +360,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - duration coverage fill outside-soloing repair repeatability consolidation: objective source support `2/2`, policy support `3/3`, variants qualified `6/6`, pending review preserved, preference claim `false`
 - duration coverage fill outside-soloing repair final decision: final boundary `outside_soloing_repair_objective_path_complete`, next boundary `stage_b_model_core_evidence_readme_refresh`, preference claim `false`
 - model-core evidence README refresh: MIDI-to-solo repeatability objective path 기준 README 갱신, generated/qualified `6/6`, flags/overlap `0/0`, quality claim `false`, next boundary `stage_b_midi_to_solo_training_scale_expansion_decision`
+- MIDI-to-solo training scale expansion decision: selected train/val `512/128`, max_sequence `160`, objective generated/qualified `6/6`, GPU/cloud spend required `false`, quality claim `false`, next boundary `stage_b_midi_to_solo_controlled_training_scale_smoke`
 - model-core portfolio bullet refresh: resume bullet `6`, short bullet `3`, generic base checkpoint repeatability `9/9/9`, unsupported claim guard 유지
 - Muzig application wording refresh: resume project bullet `5`, short bullet `3`, 자기소개 section `3`, AI 음악 실험/검증 claim만 사용
 - Muzig application final review package: long bullet `5`, short bullet `3`, 자기소개 paragraph `3`, 지원 동기 paragraph `2`, 최종 claim check 포함
@@ -394,6 +395,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability listening review: template `true`, validated input `false`, preference fill `false`, pending fields `4/6/18`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_only_next_decision`
 - MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability objective-only next decision: objective path support `true`, generated/qualified `6/6`, flags/overlap `0/0`, pending fields `4/6/18`, preference/quality claim `false`, next boundary `stage_b_model_core_evidence_readme_refresh`
 - Stage B model-core evidence README refresh: evidence boundary를 MIDI-to-solo objective path로 갱신, rendered WAV `6`, pending fields `4/6/18`, quality claim `false`, next boundary `stage_b_midi_to_solo_training_scale_expansion_decision`
+- Stage B MIDI-to-solo training scale expansion decision: selected train/val `512/128`, prior `128/32`, max_sequence `160`, controlled smoke ready `true`, quality claim `false`, next boundary `stage_b_midi_to_solo_controlled_training_scale_smoke`
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
 - generic base readiness audit: phase4 prep ready `true`, broad training execution ready `false`, broad quality/Brad adaptation claim `false`
 - generic base manifest contract: generic split `2433/270`, Brad split `47/11/14`, leakage/overlap `0`, broad training execution ready `false`

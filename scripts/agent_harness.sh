@@ -206,6 +206,8 @@ Modes:
                 Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
                 Run a max_sequence 160 smoke and verify direct 8-bar sequence budget readiness.
+  stage-b-midi-to-solo-training-scale-expansion-decision
+                Decide the next bounded MIDI-to-solo training scale smoke after objective path support.
   stage-b-midi-to-solo-model-direct-8bar-generation-probe
                 Run fallback-free model-direct 8-bar MIDI generation and record review gate evidence.
   stage-b-midi-to-solo-model-direct-monophonic-overlap-repair
@@ -4504,6 +4506,43 @@ run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shap
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_training_scale_expansion_decision() {
+  local training_resource_run_id="${TRAINING_RESOURCE_RUN_ID:-harness_stage_b_midi_to_solo_training_resource_probe}"
+  local sequence_budget_run_id="${SEQUENCE_BUDGET_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke}"
+  local objective_path_run_id="${OBJECTIVE_PATH_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_next}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_training_scale_expansion_decision}"
+  local training_resource="outputs/stage_b_midi_to_solo_training_resource_probe/${training_resource_run_id}/stage_b_midi_to_solo_training_resource_probe.json"
+  local sequence_budget="outputs/stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke/${sequence_budget_run_id}/stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke.json"
+  local objective_path="outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_next/${objective_path_run_id}/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_next.json"
+  if [[ ! -f "$training_resource" ]]; then
+    print_header "Stage B MIDI-to-solo training resource probe"
+    RUN_ID="$training_resource_run_id" run_stage_b_midi_to_solo_training_resource_probe
+  fi
+  if [[ ! -f "$sequence_budget" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct sequence budget repair smoke"
+    RUN_ID="$sequence_budget_run_id" run_stage_b_midi_to_solo_model_direct_sequence_budget_repair_smoke
+  fi
+  if [[ ! -f "$objective_path" ]]; then
+    print_header "Stage B MIDI-to-solo repeatability objective-only next decision"
+    RUN_ID="$objective_path_run_id" run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_next
+  fi
+  print_header "Stage B MIDI-to-solo training scale expansion decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_training_scale_expansion.py \
+    --run_id "$run_id" \
+    --training_resource "$training_resource" \
+    --sequence_budget "$sequence_budget" \
+    --objective_path "$objective_path" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TRAINING_SCALE_EXPANSION_DECISION_2026-06-04.md \
+    --target_train_records 512 \
+    --target_val_records 128 \
+    --expected_boundary stage_b_midi_to_solo_training_scale_expansion_decision \
+    --expected_next_boundary stage_b_midi_to_solo_controlled_training_scale_smoke \
+    --min_selected_train_records 512 \
+    --min_selected_val_records 128 \
+    --require_scale_ready \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -5983,6 +6022,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-contour-phrase-shape-repeatability-objective-next)
     run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_next
+    ;;
+  stage-b-midi-to-solo-training-scale-expansion-decision)
+    run_stage_b_midi_to_solo_training_scale_expansion_decision
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
