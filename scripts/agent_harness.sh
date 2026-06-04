@@ -4836,6 +4836,32 @@ run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temp
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_consolidation() {
+  local repair_probe_run_id="${REPAIR_PROBE_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_probe}"
+  local guard_run_id="${GUARD_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_decision}"
+  local repeatability_run_id="${REPEATABILITY_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_repeatability_probe}"
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe}"
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision}"
+  local baseline_run_id="${BASELINE_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_density_collapse_repair_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_consolidation}"
+  local repair_report="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_probe/${repair_probe_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_probe.json"
+  if [[ ! -f "$repair_report" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard repair probe"
+    RUN_ID="$repair_probe_run_id" GUARD_RUN_ID="$guard_run_id" REPEATABILITY_RUN_ID="$repeatability_run_id" REPAIR_RUN_ID="$repair_run_id" DECISION_RUN_ID="$decision_run_id" BASELINE_RUN_ID="$baseline_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_probe
+  fi
+  print_header "Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard repair consolidation"
+  "$PYTHON_BIN" scripts/consolidate_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair.py \
+    --run_id "$run_id" \
+    --repair_report "$repair_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_DEAD_AIR_REPEATABILITY_TEMPERATURE_GUARD_REPAIR_CONSOLIDATION_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_consolidation \
+    --expected_next_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_audio_review_package \
+    --min_sample_count 9 \
+    --require_objective_support \
+    --require_audio_review_required \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -6345,6 +6371,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-repeatability-temperature-guard-repair-probe)
     run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_probe
+    ;;
+  stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-repeatability-temperature-guard-repair-consolidation)
+    run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_repair_consolidation
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
