@@ -1,0 +1,37 @@
+# Stage B MIDI-to-Solo Model-Direct Jazz Phrase Vocabulary Contour Phrase-Shape Repeatability Consolidation
+
+## Summary
+
+- boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_clean_repeatability_consolidation`
+- source boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_clean_repeatability_sweep`
+- next boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_audio_review_package`
+- sample count: `6`
+- generated MIDI file count: `6`
+- qualified candidate count: `6`
+- objective-clean pass rate: `1.0000`
+- current analysis flag count: `0`
+- overlap detected count: `0`
+- distinct density pattern count: `6`
+- max abs interval max: `12`
+- max small interval ratio <=4: `0.1765`
+- objective repeatability support: `true`
+- audio review package required: `true`
+- MIDI-to-solo musical quality claimed: `false`
+
+## MIDI Files
+
+- `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_01.mid`
+- `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_02.mid`
+- `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_03.mid`
+- `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_04.mid`
+- `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_05.mid`
+- `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_06.mid`
+
+## Not Proven
+
+- `listening_review_completed`
+- `human_audio_preference`
+- `model_direct_generation_quality`
+- `midi_to_solo_musical_quality`
+- `broad_trained_model_quality`
+- `brad_style_adaptation`
