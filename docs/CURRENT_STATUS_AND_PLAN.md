@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #584, Stage B MIDI-to-solo controlled scale checkpoint training scale repair decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale density grammar collapse repair probe`
+- latest functional result: Issue #586, Stage B MIDI-to-solo controlled scale checkpoint training scale density grammar collapse repair probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale density grammar collapse repeatability probe`
 
 현재 범위가 아닌 것:
 
@@ -2530,6 +2530,56 @@ Issue #584는 #582 selected-scale checkpoint generation 실패를 다음 repair 
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint training scale density grammar collapse repair probe`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Training Scale Density Grammar Collapse Repair Probe Result
+
+Issue #586은 #584 repair decision에서 선택한 `target_density_grammar_collapse_postprocess_repair`를 selected-scale checkpoint 조건에 적용한 작업이다.
+
+변경:
+
+- selected-scale checkpoint density/grammar/collapse repair probe script 추가
+- constrained generation 조건으로 note density, grammar gate, collapse/postprocess 지표 재측정
+- repair decision 대비 delta 집계
+- 전용 harness mode와 unit test 추가
+- handoff docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_DENSITY_GRAMMAR_COLLAPSE_REPAIR_PROBE_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repair_probe`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repeatability_probe`
+- sample count: `3`
+- valid / strict / grammar: `1` / `1` / `3`
+- note count failure count: `0`
+- grammar failure count: `0`
+- dead-air failure count: `2`
+- collapse warning sample count / rate: `0` / `0.0`
+- avg onset / sustained coverage ratio: `0.46875` / `0.6145833333333334`
+- avg / max postprocess removal ratio: `0.1875` / `0.25`
+- note count / grammar / collapse failure delta: `3` / `1` / `3`
+- postprocess removal delta: `0.603409090909091`
+- density/grammar/collapse target supported: `true`
+- strict gate recovered: `true`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- note-count, partial grammar, collapse/postprocess target은 sample `3` 기준 지원
+- strict gate는 `1/3` 기준 회복이나 반복성 미검증
+- dead-air failure `2/3` 잔존
+- 다음 작업은 selected-scale repair repeatability probe
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repair_probe tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repair_probe.py scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-density-grammar-collapse-repair-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint training scale density grammar collapse repeatability probe`
 
 ## Previous Model Decision
 
