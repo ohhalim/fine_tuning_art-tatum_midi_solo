@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #560, Stage B MIDI-to-solo controlled scale checkpoint dead-air remaining blocker decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint dead-air repair probe`
+- latest functional result: Issue #562, Stage B MIDI-to-solo controlled scale checkpoint dead-air repair probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint dead-air repair repeatability probe`
 
 현재 범위가 아닌 것:
 
@@ -1944,6 +1944,55 @@ Issue #560은 #558 density/collapse repair 이후 남은 strict gate 실패를 d
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint dead-air repair probe`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Dead-Air Repair Probe Result
+
+Issue #562는 #560에서 선택한 `dead_air_sustained_coverage_repair` target을 controlled checkpoint generation 조건에 적용한 작업이다.
+
+변경:
+
+- controlled scale checkpoint dead-air repair probe script 추가
+- #560 decision report와 #558 density/collapse repair baseline 입력 검증
+- constrained note groups per bar `8 -> 12` 조건 적용
+- dead-air failure, strict gate, coverage, collapse/postprocess guard 비교
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_DEAD_AIR_REPAIR_PROBE_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_repeatability_probe`
+- sample count: `3`
+- valid / strict / grammar: `3` / `3` / `3`
+- note count failure count: `0`
+- dead-air failure count: `0`
+- collapse warning sample count: `0`
+- avg postprocess removal ratio: `0.3333333333333333`
+- avg onset / sustained coverage ratio: `0.5729166666666666` / `0.7291666666666666`
+- dead-air failure delta: `3`
+- valid / strict sample delta: `3` / `3`
+- postprocess removal delta: `0.10416666666666666`
+- dead-air target qualified: `true`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- `12` constrained note groups per bar 조건에서 dead-air failure 제거
+- note-count failure와 collapse warning 재발 없음
+- postprocess removal ratio는 `0.2292 -> 0.3333`으로 증가했으므로 다음 repeatability에서 guardrail 유지 필요
+- 단일 seed-set objective support이며 musical quality claim은 제외
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe.py scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-repair-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint dead-air repair repeatability probe`
 
 ## Previous Model Decision
 
