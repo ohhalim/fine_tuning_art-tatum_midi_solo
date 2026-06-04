@@ -36,6 +36,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled dead-air repeatability temperature guard objective next | objective path support `true`, valid / strict / grammar `9 / 9 / 9`, next training scale decision |
 | controlled scale checkpoint training scale decision | selected train / val `2048 / 512`, current `512 / 128`, local bounded smoke |
 | controlled scale checkpoint training scale smoke | train / val `2048 / 512`, best validation loss `3.0396`, checkpoint `1` |
+| controlled scale checkpoint training scale generation probe | sample `3`, valid / strict / grammar `0 / 0 / 2`, collapse warning `3` |
 | human/audio preference | 미검증 |
 | MIDI-to-solo musical quality | 미검증 |
 | broad trained-model quality | 미주장 |
@@ -45,13 +46,14 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 최신 판단:
 
 - evidence boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_objective_path_complete`
-- documentation status: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke`
-- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe`
+- documentation status: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe`
+- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision`
 - objective MIDI repeatability path support: `true`
 - objective temperature guard path support: `true`
 - controlled training scale smoke ready: `true`
 - selected next training scale: `2048 / 512`
 - selected scale training smoke result: validation loss `3.0396`, checkpoint `1`
+- selected scale generation probe result: valid / strict / grammar `0 / 0 / 2`
 - input MIDI to ranked candidate technical path: `true`
 - musical quality claim: `false`
 - human/audio preference claim: `false`
@@ -113,6 +115,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled temperature guard objective path 정리 | strict `9/9`, dead-air/collapse `0/0`, validated review input `false` | preference/quality claim 차단 상태로 objective-only 경계 완료 | next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_expansion_decision` |
 | controlled training scale 확장 필요 | current smoke `512/128`, objective path support `true`, full records `154136/21845` | local bounded `2048/512`, max_sequence `160`, 1 epoch 선택 | full training/cloud spend 제외, next training smoke |
 | selected training scale 실행 필요 | selected `2048/512`, max_sequence `160`, 1 epoch | local bounded training smoke 실행 | returncode `0`, best validation loss `3.0396`, checkpoint `1`, next generation probe |
+| selected scale generation 실패 | sample `3`, valid/strict `0/0`, collapse warning `3/3` | checkpoint generation probe 결과를 repair decision으로 라우팅 | postprocess removal avg/max `0.7909/0.8`, next repair decision |
 | 음악 품질 claim 과장 위험 | objective MIDI gate와 청감 품질의 분리 필요 | listening review guard와 claim boundary 문서화 | pending fields `4/6/18`, musical quality/human preference/broad quality claim `false` |
 
 ## 주요 검증 결과

@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #580, Stage B MIDI-to-solo controlled scale checkpoint training scale smoke
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale generation probe`
+- latest functional result: Issue #582, Stage B MIDI-to-solo controlled scale checkpoint training scale generation probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale repair decision`
 
 현재 범위가 아닌 것:
 
@@ -2436,6 +2436,52 @@ Issue #580은 #578 decision에서 선택한 `2048/512`, max_sequence `160` 조�
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint training scale generation probe`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Training Scale Generation Probe Result
+
+Issue #582는 #580 `2048/512` selected-scale checkpoint에서 generation probe를 실행한 작업이다.
+
+변경:
+
+- selected-scale checkpoint generation probe summary script 추가
+- `2048/512` checkpoint 기반 sample `3` 생성
+- valid/strict/grammar gate와 collapse/postprocess removal 지표 집계
+- 전용 harness mode와 unit test 추가
+- handoff docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_GENERATION_PROBE_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision`
+- train / val records: `2048 / 512`
+- best validation loss: `3.0396`
+- sample count: `3`
+- valid / strict / grammar: `0 / 0 / 2`
+- collapse warning sample count / rate: `3 / 1.0`
+- avg onset / sustained coverage ratio: `0.1146 / 0.1458`
+- avg / max postprocess removal ratio: `0.7909 / 0.8`
+- failure reason: `note count too low: 4 < 6`, `note count too low: 5 < 6`
+- raw generation quality ready: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- `2048/512` 학습 smoke는 checkpoint를 만들었지만 raw generation gate는 회복하지 못함
+- 잔여 병목은 학습 실행 여부가 아니라 generation grammar, density, postprocess collapse 경계
+- 다음 작업은 selected-scale checkpoint training scale repair decision
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke`
+- `.venv/bin/python -m py_compile scripts/summarize_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe.py scripts/summarize_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-generation-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint training scale repair decision`
 
 ## Previous Model Decision
 
