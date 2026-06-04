@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #550, Stage B MIDI-to-solo training scale expansion decision.
+- Latest functional issue completed: Issue #552, Stage B MIDI-to-solo controlled training scale smoke.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo controlled training scale smoke.
+- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint generation probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1003,6 +1003,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-training-scale-expansion-deci
 ```
 
 This harness selects the next bounded training scale smoke without running broad training or claiming model quality.
+
+For Stage B MIDI-to-solo controlled training scale smoke changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-training-scale-smoke
+```
+
+This harness runs the bounded `512/128`, `max_sequence=160` local training smoke and summarizes checkpoint readiness without claiming model quality.
 
 For Stage B generic jazz base readiness audit changes, run:
 
