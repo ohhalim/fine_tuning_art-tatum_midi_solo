@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #556, Stage B MIDI-to-solo controlled scale checkpoint repair decision.
+- Latest functional issue completed: Issue #558, Stage B MIDI-to-solo controlled scale checkpoint density collapse repair probe.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint density collapse repair probe.
+- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint dead-air remaining blocker decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1027,6 +1027,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-r
 ```
 
 This harness converts controlled checkpoint generation gate failure into a density/collapse/postprocess repair target without claiming model quality.
+
+For Stage B MIDI-to-solo controlled scale checkpoint density/collapse repair probe changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-density-collapse-repair-probe
+```
+
+This harness runs constrained density/collapse repair on the controlled checkpoint and routes any remaining strict-gate blocker without claiming model quality.
 
 For Stage B generic jazz base readiness audit changes, run:
 
