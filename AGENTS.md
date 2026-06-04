@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #544, Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability listening review.
+- Latest functional issue completed: Issue #546, Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability objective-only next decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability objective-only next decision.
+- Recommended next issue: Stage B model-core evidence README refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -987,6 +987,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-jazz-phrase-voca
 ```
 
 This harness prepares pending repeatability listening review input and blocks preference fill while review input is missing.
+
+For Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability objective-only next decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-contour-phrase-shape-repeatability-objective-next
+```
+
+This harness closes the repeatability objective path and routes to evidence refresh without claiming listening quality.
 
 For Stage B generic jazz base readiness audit changes, run:
 

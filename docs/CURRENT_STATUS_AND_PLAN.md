@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #544, Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability listening review
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability objective-only next decision`
+- latest functional result: Issue #546, Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability objective-only next decision
+- 다음 권장 이슈: `Stage B model-core evidence README refresh`
 
 현재 범위가 아닌 것:
 
@@ -1577,6 +1577,52 @@ Review input:
 다음:
 
 - `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability objective-only next decision`
+
+## Stage B MIDI-to-Solo Model-Direct Jazz Phrase Vocabulary Contour Phrase-Shape Repeatability Objective-Only Next Decision Result
+
+Issue #546은 #544 pending listening review와 #540 repeatability consolidation evidence를 연결해 MIDI-to-solo objective path의 완료 경계를 정리한 작업이다.
+
+변경:
+
+- repeatability objective-only next decision script 추가
+- #544 listening review pending guard 검증
+- repeatability consolidation의 objective support `6/6` 검증
+- quality/preference claim 차단 유지
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_JAZZ_PHRASE_VOCABULARY_CONTOUR_PHRASE_SHAPE_REPEATABILITY_OBJECTIVE_NEXT_DECISION_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_only_next_decision`
+- final boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_path_complete`
+- next boundary: `stage_b_model_core_evidence_readme_refresh`
+- candidate count / rendered audio file count: `6` / `6`
+- sample count / qualified candidate count: `6` / `6`
+- objective-clean pass rate: `1.0000`
+- current analysis flag count: `0`
+- overlap detected count: `0`
+- pending status / candidate decision / candidate field: `4` / `6` / `18`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- objective MIDI evidence 기준 repeatability path는 완료 경계로 정리 가능
+- 실제 청음 입력이 없으므로 preference와 musical quality claim 차단 유지
+- 다음 작업은 README evidence refresh에서 현재 claim 가능 범위와 제외 범위를 갱신
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_next`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_next.py`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-contour-phrase-shape-repeatability-objective-next`
+
+다음:
+
+- `Stage B model-core evidence README refresh`
 
 ## Previous Model Decision
 
