@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #536, Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-clean repeatability sweep`
+- latest functional result: Issue #538, Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-clean repeatability sweep
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-clean repeatability consolidation`
 
 현재 범위가 아닌 것:
 
@@ -1366,6 +1366,63 @@ Issue #536은 #534 pending listening review 상태와 #530 contour phrase-shape 
 다음:
 
 - `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-clean repeatability sweep`
+
+## Stage B MIDI-to-Solo Model-Direct Jazz Phrase Vocabulary Contour Phrase-Shape Objective-Clean Repeatability Sweep Result
+
+Issue #538은 #536 objective-clean decision을 기준으로 distinct density/root variant 후보의 반복성을 검증한 작업이다.
+
+변경:
+
+- contour phrase-shape repeatability sweep script 추가
+- distinct density/root variant MIDI 후보 6개 생성
+- 후보별 objective-clean gate 평가
+- repeatability pass/failure next boundary 분기 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_JAZZ_PHRASE_VOCABULARY_CONTOUR_PHRASE_SHAPE_REPEATABILITY_SWEEP_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_clean_repeatability_sweep`
+- source boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_clean_repeatability_consolidation`
+- sample count: `6`
+- generated MIDI file count: `6`
+- qualified candidate count: `6`
+- objective-clean pass rate: `1.0000`
+- repeatability passed: `true`
+- current analysis flag count: `0`
+- overlap detected count: `0`
+- distinct density pattern count: `6`
+- max abs interval max: `12`
+- max small interval ratio <=4: `0.1765`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+Generated MIDI:
+
+- rank 1: `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_01.mid`
+- rank 2: `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_02.mid`
+- rank 3: `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_03.mid`
+- rank 4: `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_04.mid`
+- rank 5: `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_05.mid`
+- rank 6: `outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep/midi/contour_phrase_shape_repeatability_seed_06.mid`
+
+판단:
+
+- objective-clean gate가 6개 distinct variant에서 반복 통과
+- 실패 후보가 없어 immediate repair decision보다 consolidation 우선
+- 실제 청음 입력이 없으므로 human/audio preference와 musical quality claim 차단
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep.py`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-contour-phrase-shape-repeatability-sweep`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-clean repeatability consolidation`
 
 ## Previous Model Decision
 
