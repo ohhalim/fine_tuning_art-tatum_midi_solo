@@ -5078,6 +5078,25 @@ run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_p
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision() {
+  local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision}"
+  local generation_probe="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe/${generation_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe.json"
+  if [[ ! -f "$generation_probe" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale generation probe"
+    RUN_ID="$generation_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe
+  fi
+  print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale repair decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair.py \
+    --run_id "$run_id" \
+    --generation_probe "$generation_probe" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_REPAIR_DECISION_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision \
+    --expected_next_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repair_probe \
+    --require_repair_target \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -6608,6 +6627,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-generation-probe)
     run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe
+    ;;
+  stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-repair-decision)
+    run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
