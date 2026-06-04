@@ -4435,6 +4435,36 @@ run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shap
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_listening_review() {
+  local repeatability_audio_run_id="${REPEATABILITY_AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_audio_package}"
+  local repeatability_consolidation_run_id="${REPEATABILITY_CONSOLIDATION_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_consolidation}"
+  local repeatability_sweep_run_id="${REPEATABILITY_SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_sweep}"
+  local contour_objective_run_id="${CONTOUR_OBJECTIVE_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_next}"
+  local contour_listening_run_id="${CONTOUR_LISTENING_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_listening_review}"
+  local contour_audio_run_id="${CONTOUR_AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_audio_package}"
+  local contour_repair_run_id="${CONTOUR_REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair}"
+  local objective_next_run_id="${OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_next}"
+  local listening_review_run_id="${LISTENING_REVIEW_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_listening_review}"
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_audio_package}"
+  local repair_probe_run_id="${REPAIR_PROBE_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_listening_review}"
+  local repeatability_audio="outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_audio_package/${repeatability_audio_run_id}/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_audio_package.json"
+  if [[ ! -f "$repeatability_audio" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability audio package"
+    RUN_ID="$repeatability_audio_run_id" REPEATABILITY_CONSOLIDATION_RUN_ID="$repeatability_consolidation_run_id" REPEATABILITY_SWEEP_RUN_ID="$repeatability_sweep_run_id" CONTOUR_OBJECTIVE_RUN_ID="$contour_objective_run_id" CONTOUR_LISTENING_RUN_ID="$contour_listening_run_id" CONTOUR_AUDIO_RUN_ID="$contour_audio_run_id" CONTOUR_REPAIR_RUN_ID="$contour_repair_run_id" OBJECTIVE_NEXT_RUN_ID="$objective_next_run_id" LISTENING_REVIEW_RUN_ID="$listening_review_run_id" AUDIO_PACKAGE_RUN_ID="$audio_package_run_id" REPAIR_PROBE_RUN_ID="$repair_probe_run_id" run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_audio_package
+  fi
+  print_header "Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability listening review"
+  "$PYTHON_BIN" scripts/build_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_listening_review.py \
+    --run_id "$run_id" \
+    --audio_package "$repeatability_audio" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_JAZZ_PHRASE_VOCABULARY_CONTOUR_PHRASE_SHAPE_REPEATABILITY_LISTENING_REVIEW_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_listening_review \
+    --expected_next_boundary stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_only_next_decision \
+    --expected_file_count 6 \
+    --require_pending_review \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -5908,6 +5938,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-contour-phrase-shape-repeatability-audio-package)
     run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_audio_package
+    ;;
+  stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-contour-phrase-shape-repeatability-listening-review)
+    run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_listening_review
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
