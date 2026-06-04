@@ -12,8 +12,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 |---|---|
 | pipeline MVP | 완료 |
 | MIDI-to-solo execution path | 입력 MIDI -> context -> ranked MIDI -> WAV technical path 검증 |
-| current evidence boundary | `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_path_complete` |
-| generation source | `model_checkpoint_direct_constrained` |
+| current evidence boundary | `stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe` |
+| generation source | `controlled_scale_checkpoint_generation_probe` |
 | full generic window preparation | train `154136` / val `21845` tokenized records |
 | scale checkpoint training smoke | train `128` / val `32`, best validation loss `5.9031`, checkpoint `1` |
 | sequence budget repair | max sequence `96 -> 160`, direct note capacity `17 -> 33` |
@@ -22,6 +22,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | rendered review WAV | `6` files, duration `18.865s-19.000s` |
 | listening review input | pending fields `4 / 6 / 18` |
 | controlled training scale smoke | train / val `512 / 128`, max sequence `160`, best validation loss `5.1061`, checkpoint `1` |
+| controlled scale checkpoint generation probe | sample `3`, valid / strict / grammar `0 / 0 / 3`, collapse warning `3`, repair decision 필요 |
 | human/audio preference | 미검증 |
 | MIDI-to-solo musical quality | 미검증 |
 | broad trained-model quality | 미주장 |
@@ -30,9 +31,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 
 최신 판단:
 
-- evidence boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_path_complete`
-- documentation status: `stage_b_model_core_evidence_readme_refresh`
-- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe`
+- evidence boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe`
+- documentation status: `stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe`
+- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_repair_decision`
 - objective MIDI repeatability path support: `true`
 - controlled training scale smoke ready: `true`
 - input MIDI to ranked candidate technical path: `true`
@@ -82,6 +83,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | dead-air 잔여 병목 | dead-air failure `1`, sustained coverage regression 관측 | sustained coverage/dead-air repair, constrained note groups per bar `8` | repair valid/strict/grammar `3/3/3`, dead-air/long-note `0/0` |
 | 단일 seed 과장 위험 | objective gate support가 single seed set에 한정 | objective gate repeatability sweep 추가 | seeds `44/52/60`, valid/strict/grammar `9/9/9`, failure reasons none |
 | MIDI-to-solo 반복성 과장 위험 | contour phrase candidate 3개만으로는 반복성 부족 | repeatability sweep과 consolidation 추가 | generated/qualified `6/6`, flags/overlap `0/0`, pass rate `1.0000` |
+| controlled checkpoint raw generation 실패 | sample `3`, valid/strict/grammar `0/0/3`, collapse warning rate `1.0`, avg/max postprocess removal `0.8090/0.8636` | generation probe와 repair decision 경계 분리 | note count `3-4 < 6`, quality claim 제외 |
 | 음악 품질 claim 과장 위험 | objective MIDI gate와 청감 품질의 분리 필요 | listening review guard와 claim boundary 문서화 | pending fields `4/6/18`, musical quality/human preference/broad quality claim `false` |
 
 ## 주요 검증 결과
@@ -118,6 +120,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled scale smoke max sequence | `160` |
 | controlled scale smoke best validation loss | `5.1061` |
 | controlled scale smoke checkpoint count | `1` |
+| controlled checkpoint generation probe | sample `3`, valid/strict/grammar `0/0/3` |
+| controlled checkpoint collapse warning | count/rate `3/1.0` |
+| controlled checkpoint avg/max postprocess removal | `0.809042809042809 / 0.8636363636363636` |
 | raw generation probe | sample `3`, valid/strict/grammar `0/0/0` |
 | density/coverage repair | valid/strict/grammar `1/1/3`, note-count failure delta `3` |
 | duration/long-note repair | valid/strict/grammar `2/2/3`, long-note failure delta `2` |
@@ -139,6 +144,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | model-direct 8-bar candidate generation | objective gate 범위 검증 |
 | model-direct contour phrase repeatability | generated/qualified `6/6` 범위 검증 |
 | controlled training scale smoke | `512/128`, max_sequence `160`, checkpoint `1` 범위 검증 |
+| controlled scale checkpoint generation/decode path | sample `3`, grammar `3/3` 범위 검증 |
+| controlled scale checkpoint review gate | valid/strict `0/0`, repair decision 필요 |
 | `.mid` 파일 존재 기반 성공 판정 제거 | 검증 |
 | one-note / long sustain / chord block 실패 감지 | 검증 |
 | human/audio preference | 미검증 |
@@ -184,4 +191,10 @@ MIDI-to-solo controlled training scale smoke:
 
 ```bash
 bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-training-scale-smoke
+```
+
+MIDI-to-solo controlled scale checkpoint generation probe:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-generation-probe
 ```

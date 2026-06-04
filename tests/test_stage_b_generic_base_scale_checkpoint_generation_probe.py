@@ -139,6 +139,8 @@ class StageBGenericBaseScaleCheckpointGenerationProbeTest(unittest.TestCase):
                         "valid_sample_count": 0,
                         "strict_valid_sample_count": 0,
                         "grammar_gate_sample_count": 0,
+                        "avg_postprocess_removal_ratio": 0.82,
+                        "max_postprocess_removal_ratio": 0.9,
                         "diagnostic_failure_reasons": {"Stage B generated samples did not satisfy gate": 3},
                     },
                 },
@@ -146,6 +148,8 @@ class StageBGenericBaseScaleCheckpointGenerationProbeTest(unittest.TestCase):
             )
 
         self.assertEqual(report["decision"]["next_boundary"], FAIL_NEXT_BOUNDARY)
+        self.assertEqual(report["generation_summary"]["avg_postprocess_removal_ratio"], 0.82)
+        self.assertEqual(report["generation_summary"]["max_postprocess_removal_ratio"], 0.9)
         self.assertFalse(report["readiness"]["raw_generation_quality_ready"])
         self.assertFalse(report["readiness"]["broad_trained_model_quality_claimed"])
 

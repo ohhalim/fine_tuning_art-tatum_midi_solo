@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #552, Stage B MIDI-to-solo controlled training scale smoke
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint generation probe`
+- latest functional result: Issue #554, Stage B MIDI-to-solo controlled scale checkpoint generation probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint repair decision`
 
 현재 범위가 아닌 것:
 
@@ -1754,6 +1754,51 @@ Issue #552는 #550 decision에서 정의한 selected `512/128`, `max_sequence=16
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint generation probe`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Generation Probe Result
+
+Issue #554는 #552 controlled `512/128`, `max_sequence=160` checkpoint로 generation/decode probe를 실행한 작업이다.
+
+변경:
+
+- controlled scale checkpoint generation probe harness mode 추가
+- existing generic scale checkpoint generation probe를 MIDI-to-solo controlled checkpoint 입력으로 실행
+- controlled training smoke와 generation probe 결과를 MIDI-to-solo boundary로 요약하는 summary script 추가
+- generation command returncode, grammar gate, collapse warning, postprocess removal ratio 전달
+- 전용 unit test와 문서 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_GENERATION_PROBE_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_repair_decision`
+- train / val records: `512` / `128`
+- best validation loss: `5.1061`
+- sample count: `3`
+- valid / strict / grammar: `0` / `0` / `3`
+- collapse warning sample count / rate: `3` / `1.0`
+- avg onset / sustained coverage ratio: `0.08333333333333333` / `0.16666666666666666`
+- max longest sustained empty run steps: `32`
+- avg / max postprocess removal ratio: `0.809042809042809` / `0.8636363636363636`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- checkpoint load와 generation/decode 실행 경로 동작
+- grammar gate는 통과했지만 MIDI review gate는 note count `3-4 < 6`과 collapse warning으로 실패
+- controlled training smoke 성공은 generation quality claim으로 연결 불가
+- 다음 작업은 repair decision에서 note density, collapse, postprocess removal 원인 분리
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe tests.test_stage_b_midi_to_solo_controlled_training_scale_smoke tests.test_stage_b_generic_base_scale_checkpoint_generation_probe`
+- `.venv/bin/python -m py_compile scripts/summarize_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe.py scripts/run_stage_b_generic_base_scale_checkpoint_generation_probe.py`
+- `bash -n scripts/agent_harness.sh`
+- `FORCE_GENERATION_PROBE=1 bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-generation-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint repair decision`
 
 ## Previous Model Decision
 
