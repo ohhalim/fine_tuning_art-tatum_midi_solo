@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #546, Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repeatability objective-only next decision
-- 다음 권장 이슈: `Stage B model-core evidence README refresh`
+- latest functional result: Issue #548, Stage B model-core evidence README refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo training scale expansion decision`
 
 현재 범위가 아닌 것:
 
@@ -1623,6 +1623,48 @@ Issue #546은 #544 pending listening review와 #540 repeatability consolidation 
 다음:
 
 - `Stage B model-core evidence README refresh`
+
+## Stage B Model-Core Evidence README Refresh Result
+
+Issue #548은 README의 현재 상태를 #546 MIDI-to-solo objective path 기준으로 갱신한 작업이다.
+
+변경:
+
+- README evidence boundary를 #546 final boundary로 갱신
+- MIDI-to-solo execution path, sequence budget repair, contour phrase repeatability 결과 반영
+- listening review pending fields와 quality claim 제외 범위 기록
+- 주요 실행 command에 repeatability objective decision harness 추가
+
+결과:
+
+- document: `README.md`
+- evidence boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_path_complete`
+- next engineering boundary: `stage_b_midi_to_solo_training_scale_expansion_decision`
+- input MIDI to ranked candidate technical path: `true`
+- objective MIDI repeatability path support: `true`
+- generated / qualified: `6 / 6`
+- flags / overlap: `0 / 0`
+- rendered WAV: `6`
+- pending review fields: `4 / 6 / 18`
+- musical quality claim: `false`
+- human/audio preference claim: `false`
+- broad trained-model quality claim: `false`
+- Brad style adaptation claim: `false`
+
+판단:
+
+- README의 첫 화면 기준을 generic checkpoint repeatability에서 MIDI-to-solo 실행 경로로 이동
+- 홍보 문구 대신 관측값과 claim boundary 중심으로 기록
+- 다음 작업은 README/지원 문구가 아니라 MIDI-to-solo training scale expansion decision
+
+검증:
+
+- `git diff --check`
+- `bash scripts/agent_harness.sh quick`
+
+다음:
+
+- `Stage B MIDI-to-solo training scale expansion decision`
 
 ## Previous Model Decision
 
