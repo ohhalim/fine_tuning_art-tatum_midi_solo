@@ -210,6 +210,8 @@ Modes:
                 Decide the next bounded MIDI-to-solo training scale smoke after objective path support.
   stage-b-midi-to-solo-controlled-training-scale-smoke
                 Run the bounded 512/128 max_sequence 160 MIDI-to-solo training scale smoke.
+  stage-b-midi-to-solo-controlled-scale-checkpoint-generation-probe
+                Probe generation/decode from the controlled MIDI-to-solo scale checkpoint.
   stage-b-midi-to-solo-model-direct-8bar-generation-probe
                 Run fallback-free model-direct 8-bar MIDI generation and record review gate evidence.
   stage-b-midi-to-solo-model-direct-monophonic-overlap-repair
@@ -4594,6 +4596,48 @@ run_stage_b_midi_to_solo_controlled_training_scale_smoke() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe() {
+  local controlled_training_run_id="${CONTROLLED_TRAINING_RUN_ID:-harness_stage_b_midi_to_solo_controlled_training_scale_smoke}"
+  local training_run_id="${TRAINING_RUN_ID:-controlled_512_128_maxseq160}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe}"
+  local generation_probe_run_id="${GENERATION_PROBE_RUN_ID:-controlled_scale_checkpoint}"
+  local output_root="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe"
+  local controlled_training="outputs/stage_b_midi_to_solo_controlled_training_scale_smoke/${controlled_training_run_id}/stage_b_midi_to_solo_controlled_training_scale_smoke.json"
+  local training_scale_smoke="outputs/stage_b_midi_to_solo_controlled_training_scale_smoke/${controlled_training_run_id}/training_smoke/${training_run_id}/stage_b_generic_base_training_scale_smoke.json"
+  local generic_output_root="${output_root}/${run_id}/generic_generation_probe"
+  local generation_probe="${generic_output_root}/${generation_probe_run_id}/stage_b_generic_base_scale_checkpoint_generation_probe.json"
+  if [[ ! -f "$controlled_training" || ! -f "$training_scale_smoke" ]]; then
+    print_header "Stage B MIDI-to-solo controlled training scale smoke"
+    RUN_ID="$controlled_training_run_id" TRAINING_RUN_ID="$training_run_id" run_stage_b_midi_to_solo_controlled_training_scale_smoke
+  fi
+  if [[ "${FORCE_GENERATION_PROBE:-0}" == "1" || ! -f "$generation_probe" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint raw generation probe"
+    "$PYTHON_BIN" scripts/run_stage_b_generic_base_scale_checkpoint_generation_probe.py \
+      --run_id "$generation_probe_run_id" \
+      --output_root "$generic_output_root" \
+      --training_scale_smoke "$training_scale_smoke" \
+      --issue_number 554 \
+      --max_sequence 160 \
+      --num_samples 3 \
+      --seed 43 \
+      --max_simultaneous_notes 1 \
+      --expected_boundary stage_b_generic_base_scale_checkpoint_generation_probe \
+      --require_probe_completed \
+      --require_no_broad_quality_claim \
+      --require_no_brad_style_claim
+  fi
+  print_header "Stage B MIDI-to-solo controlled scale checkpoint generation probe"
+  "$PYTHON_BIN" scripts/summarize_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe.py \
+    --run_id "$run_id" \
+    --controlled_training "$controlled_training" \
+    --generation_probe "$generation_probe" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_GENERATION_PROBE_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe \
+    --min_sample_count 1 \
+    --require_generation_executable \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -6079,6 +6123,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-controlled-training-scale-smoke)
     run_stage_b_midi_to_solo_controlled_training_scale_smoke
+    ;;
+  stage-b-midi-to-solo-controlled-scale-checkpoint-generation-probe)
+    run_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

@@ -138,6 +138,15 @@ def build_probe_report(
             "diagnostic_failure_reasons": _dict(summary.get("diagnostic_failure_reasons")),
             "collapse_warning_sample_count": _int(summary.get("collapse_warning_sample_count")),
             "collapse_warning_sample_rate": _float(summary.get("collapse_warning_sample_rate")),
+            "passed_collapse_rate_gate": bool(summary.get("passed_collapse_rate_gate", False)),
+            "avg_repeated_position_pitch_pair_ratio": _float(
+                summary.get("avg_repeated_position_pitch_pair_ratio")
+            ),
+            "max_repeated_position_pitch_pair_ratio": _float(
+                summary.get("max_repeated_position_pitch_pair_ratio")
+            ),
+            "avg_postprocess_removal_ratio": _float(summary.get("avg_postprocess_removal_ratio")),
+            "max_postprocess_removal_ratio": _float(summary.get("max_postprocess_removal_ratio")),
             "avg_onset_coverage_ratio": _float(summary.get("avg_onset_coverage_ratio")),
             "avg_sustained_coverage_ratio": _float(summary.get("avg_sustained_coverage_ratio")),
             "max_longest_sustained_empty_run_steps": _int(
@@ -278,6 +287,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- strict valid sample count: `{generation['strict_valid_sample_count']}`",
         f"- grammar gate sample count: `{generation['grammar_gate_sample_count']}`",
         f"- collapse warning sample rate: `{generation['collapse_warning_sample_rate']}`",
+        f"- passed collapse rate gate: `{_bool_token(generation['passed_collapse_rate_gate'])}`",
+        f"- avg / max postprocess removal ratio: `{generation['avg_postprocess_removal_ratio']}` / `{generation['max_postprocess_removal_ratio']}`",
         f"- avg onset coverage ratio: `{generation['avg_onset_coverage_ratio']}`",
         f"- avg sustained coverage ratio: `{generation['avg_sustained_coverage_ratio']}`",
         f"- max longest sustained empty run steps: `{generation['max_longest_sustained_empty_run_steps']}`",
