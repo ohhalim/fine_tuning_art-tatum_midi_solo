@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #558, Stage B MIDI-to-solo controlled scale checkpoint density collapse repair probe
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint dead-air remaining blocker decision`
+- latest functional result: Issue #560, Stage B MIDI-to-solo controlled scale checkpoint dead-air remaining blocker decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint dead-air repair probe`
 
 현재 범위가 아닌 것:
 
@@ -1894,6 +1894,56 @@ Issue #558은 #556에서 선택한 `target_density_collapse_postprocess_repair`�
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint dead-air remaining blocker decision`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Dead-Air Remaining Blocker Decision Result
+
+Issue #560은 #558 density/collapse repair 이후 남은 strict gate 실패를 dead-air repair target으로 분리한 작업이다.
+
+변경:
+
+- controlled scale checkpoint dead-air remaining blocker decision script 추가
+- #558 repair report 입력 검증
+- note-count failure 제거, collapse warning 제거, dead-air failure 잔여 조건 확인
+- audio review와 training scale change 제외
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_DEAD_AIR_REMAINING_BLOCKER_DECISION_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision`
+- input boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_density_collapse_repair_probe`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repair_probe`
+- decision: `select_dead_air_repair_probe`
+- selected target: `dead_air_sustained_coverage_repair`
+- remaining blocker: `dead_air_sustained_coverage`
+- sample count: `3`
+- valid / strict / grammar: `0` / `0` / `3`
+- note count failure count: `0`
+- collapse warning sample count: `0`
+- dead-air failure count: `3`
+- avg onset / sustained coverage ratio: `0.4583333333333333` / `0.71875`
+- audio review selected: `false`
+- training scale change selected: `false`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- #558에서 note-count failure와 collapse warning은 제거
+- strict gate 미회복 원인은 dead-air failure `3/3`
+- audio review나 training scale 변경보다 dead-air sustained coverage repair probe 우선
+- 다음 작업은 품질 claim이 아니라 dead-air repair probe
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker_decision tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_density_collapse_repair_probe`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_remaining_blocker.py scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_density_collapse_repair_probe.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-remaining-blocker-decision`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint dead-air repair probe`
 
 ## Previous Model Decision
 
