@@ -5097,6 +5097,40 @@ run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decis
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repair_probe() {
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision}"
+  local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe}"
+  local selected_training_run_id="${SELECTED_TRAINING_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke}"
+  local training_run_id="${TRAINING_RUN_ID:-controlled_2048_512_maxseq160}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repair_probe}"
+  local decision_report="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision/${decision_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision.json"
+  local baseline_generation_probe="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe/${generation_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe.json"
+  local checkpoint_dir="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke/${selected_training_run_id}/training_smoke/${training_run_id}/checkpoints"
+  if [[ ! -f "$decision_report" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale repair decision"
+    RUN_ID="$decision_run_id" GENERATION_RUN_ID="$generation_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision
+  fi
+  if [[ ! -f "$baseline_generation_probe" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale generation probe"
+    RUN_ID="$generation_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_generation_probe
+  fi
+  if [[ ! -f "${checkpoint_dir}/checkpoint_epoch1.pt" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale smoke"
+    RUN_ID="$selected_training_run_id" TRAINING_RUN_ID="$training_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_smoke
+  fi
+  print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale density/grammar/collapse repair probe"
+  "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repair_probe.py \
+    --run_id "$run_id" \
+    --decision_report "$decision_report" \
+    --baseline_generation_probe "$baseline_generation_probe" \
+    --checkpoint_dir "$checkpoint_dir" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_DENSITY_GRAMMAR_COLLAPSE_REPAIR_PROBE_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repair_probe \
+    --expected_next_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repeatability_probe \
+    --require_target_supported \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -6630,6 +6664,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-repair-decision)
     run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision
+    ;;
+  stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-density-grammar-collapse-repair-probe)
+    run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repair_probe
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

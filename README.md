@@ -38,6 +38,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | controlled scale checkpoint training scale smoke | train / val `2048 / 512`, best validation loss `3.0396`, checkpoint `1` |
 | controlled scale checkpoint training scale generation probe | sample `3`, valid / strict / grammar `0 / 0 / 2`, collapse warning `3` |
 | controlled scale checkpoint training scale repair decision | selected target `target_density_grammar_collapse_postprocess_repair`, next density/grammar/collapse repair probe |
+| controlled scale checkpoint training scale density/grammar/collapse repair probe | valid / strict / grammar `1 / 1 / 3`, note-count/grammar/collapse failure `0 / 0 / 0`, repeatability 필요 |
 | human/audio preference | 미검증 |
 | MIDI-to-solo musical quality | 미검증 |
 | broad trained-model quality | 미주장 |
@@ -47,8 +48,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 최신 판단:
 
 - evidence boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_objective_path_complete`
-- documentation status: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_repair_decision`
-- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repair_probe`
+- documentation status: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repair_probe`
+- next engineering boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_density_grammar_collapse_repeatability_probe`
 - objective MIDI repeatability path support: `true`
 - objective temperature guard path support: `true`
 - controlled training scale smoke ready: `true`
@@ -56,6 +57,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 - selected scale training smoke result: validation loss `3.0396`, checkpoint `1`
 - selected scale generation probe result: valid / strict / grammar `0 / 0 / 2`
 - selected scale repair target: `target_density_grammar_collapse_postprocess_repair`
+- selected scale repair probe result: valid / strict / grammar `1 / 1 / 3`, note-count/grammar/collapse failure `0 / 0 / 0`
 - input MIDI to ranked candidate technical path: `true`
 - musical quality claim: `false`
 - human/audio preference claim: `false`
@@ -119,6 +121,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | selected training scale 실행 필요 | selected `2048/512`, max_sequence `160`, 1 epoch | local bounded training smoke 실행 | returncode `0`, best validation loss `3.0396`, checkpoint `1`, next generation probe |
 | selected scale generation 실패 | sample `3`, valid/strict `0/0`, collapse warning `3/3` | checkpoint generation probe 결과를 repair decision으로 라우팅 | postprocess removal avg/max `0.7909/0.8`, next repair decision |
 | selected scale repair target 분리 | valid/strict/grammar `0/0/2`, note-count/collapse `3/3`, grammar failure `1` | postprocess-only/audio/additional scale 제외, density/grammar/collapse/postprocess repair target 선택 | selected target `target_density_grammar_collapse_postprocess_repair`, next repair probe |
+| selected scale density/grammar/collapse repair | note-count/collapse/grammar failure `3/3/1`, avg postprocess removal `0.7909` | constrained note-group density, coverage-aware position, chord-aware pitch, jazz rhythm/duration token 적용 | valid/strict/grammar `1/1/3`, postprocess removal `0.1875`, next repeatability |
 | 음악 품질 claim 과장 위험 | objective MIDI gate와 청감 품질의 분리 필요 | listening review guard와 claim boundary 문서화 | pending fields `4/6/18`, musical quality/human preference/broad quality claim `false` |
 
 ## 주요 검증 결과
