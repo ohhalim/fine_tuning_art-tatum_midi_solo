@@ -4316,6 +4316,38 @@ run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shap
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_next() {
+  local contour_listening_run_id="${CONTOUR_LISTENING_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_listening_review}"
+  local contour_audio_run_id="${CONTOUR_AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_audio_package}"
+  local contour_repair_run_id="${CONTOUR_REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair}"
+  local objective_next_run_id="${OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_objective_next}"
+  local listening_review_run_id="${LISTENING_REVIEW_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_listening_review}"
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_audio_package}"
+  local repair_probe_run_id="${REPAIR_PROBE_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_repair_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_next}"
+  local contour_listening="outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_listening_review/${contour_listening_run_id}/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_listening_review.json"
+  local contour_repair="outputs/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair/${contour_repair_run_id}/stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair.json"
+  if [[ ! -f "$contour_listening" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape listening review"
+    RUN_ID="$contour_listening_run_id" CONTOUR_AUDIO_RUN_ID="$contour_audio_run_id" CONTOUR_REPAIR_RUN_ID="$contour_repair_run_id" OBJECTIVE_NEXT_RUN_ID="$objective_next_run_id" LISTENING_REVIEW_RUN_ID="$listening_review_run_id" AUDIO_PACKAGE_RUN_ID="$audio_package_run_id" REPAIR_PROBE_RUN_ID="$repair_probe_run_id" run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_listening_review
+  fi
+  if [[ ! -f "$contour_repair" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape repair"
+    RUN_ID="$contour_repair_run_id" OBJECTIVE_NEXT_RUN_ID="$objective_next_run_id" LISTENING_REVIEW_RUN_ID="$listening_review_run_id" AUDIO_PACKAGE_RUN_ID="$audio_package_run_id" REPAIR_PROBE_RUN_ID="$repair_probe_run_id" run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair
+  fi
+  print_header "Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-only next decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_next.py \
+    --run_id "$run_id" \
+    --listening_review "$contour_listening" \
+    --contour_repair "$contour_repair" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_JAZZ_PHRASE_VOCABULARY_CONTOUR_PHRASE_SHAPE_OBJECTIVE_NEXT_DECISION_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_only_next_decision \
+    --expected_next_boundary stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_clean_repeatability_sweep \
+    --require_objective_clean \
+    --require_pending_review \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -5777,6 +5809,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-contour-phrase-shape-listening-review)
     run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_listening_review
+    ;;
+  stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-contour-phrase-shape-objective-next)
+    run_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_next
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
