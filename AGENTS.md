@@ -916,6 +916,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-t
 
 This harness tests the selected repair target against the selected-scale checkpoint and records repeatability as the next boundary without claiming musical quality.
 
+For Stage B MIDI-to-solo controlled scale checkpoint training scale density/grammar/collapse repeatability probe changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-density-grammar-collapse-repeatability-probe
+```
+
+This harness repeats the selected repair condition across seeds and routes remaining dead-air separately without claiming musical quality.
+
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 
 ```bash
