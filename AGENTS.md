@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #548, Stage B model-core evidence README refresh.
+- Latest functional issue completed: Issue #550, Stage B MIDI-to-solo training scale expansion decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo training scale expansion decision.
+- Recommended next issue: Stage B MIDI-to-solo controlled training scale smoke.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -995,6 +995,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-jazz-phrase-voca
 ```
 
 This harness closes the repeatability objective path and routes to evidence refresh without claiming listening quality.
+
+For Stage B MIDI-to-solo training scale expansion decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-training-scale-expansion-decision
+```
+
+This harness selects the next bounded training scale smoke without running broad training or claiming model quality.
 
 For Stage B generic jazz base readiness audit changes, run:
 

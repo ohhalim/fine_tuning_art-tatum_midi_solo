@@ -21,6 +21,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | contour phrase repeatability | generated / qualified `6 / 6`, flags / overlap `0 / 0` |
 | rendered review WAV | `6` files, duration `18.865s-19.000s` |
 | listening review input | pending fields `4 / 6 / 18` |
+| next controlled training smoke | train / val `512 / 128`, max sequence `160` |
 | human/audio preference | 미검증 |
 | MIDI-to-solo musical quality | 미검증 |
 | broad trained-model quality | 미주장 |
@@ -31,8 +32,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 
 - evidence boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repeatability_objective_path_complete`
 - documentation status: `stage_b_model_core_evidence_readme_refresh`
-- next engineering boundary: `stage_b_midi_to_solo_training_scale_expansion_decision`
+- next engineering boundary: `stage_b_midi_to_solo_controlled_training_scale_smoke`
 - objective MIDI repeatability path support: `true`
+- controlled training scale smoke ready: `true`
 - input MIDI to ranked candidate technical path: `true`
 - musical quality claim: `false`
 - human/audio preference claim: `false`
@@ -112,6 +114,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | contour phrase repeatability pass rate | `1.0000` |
 | contour phrase repeatability rendered WAV | `6` |
 | listening review pending fields | `4 / 6 / 18` |
+| controlled scale smoke selected train / val records | `512 / 128` |
+| controlled scale smoke max sequence | `160` |
 | raw generation probe | sample `3`, valid/strict/grammar `0/0/0` |
 | density/coverage repair | valid/strict/grammar `1/1/3`, note-count failure delta `3` |
 | duration/long-note repair | valid/strict/grammar `2/2/3`, long-note failure delta `2` |
@@ -132,6 +136,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 모델의 학습, 생성, 디�
 | constrained objective repair path | 검증 |
 | model-direct 8-bar candidate generation | objective gate 범위 검증 |
 | model-direct contour phrase repeatability | generated/qualified `6/6` 범위 검증 |
+| controlled training scale expansion decision | `512/128` bounded smoke 조건 정의 |
 | `.mid` 파일 존재 기반 성공 판정 제거 | 검증 |
 | one-note / long sustain / chord block 실패 감지 | 검증 |
 | human/audio preference | 미검증 |
