@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #534, Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape listening review boundary
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-only next decision`
+- latest functional result: Issue #536, Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-only next decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-clean repeatability sweep`
 
 현재 범위가 아닌 것:
 
@@ -1314,6 +1314,58 @@ Review input:
 다음:
 
 - `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-only next decision`
+
+## Stage B MIDI-to-Solo Model-Direct Jazz Phrase Vocabulary Contour Phrase-Shape Objective-Only Next Decision Result
+
+Issue #536은 #534 pending listening review 상태와 #530 contour phrase-shape repair evidence를 연결해 다음 자동 경계를 정의한 작업이다.
+
+변경:
+
+- contour phrase-shape objective-only next decision script 추가
+- listening review pending guard 검증
+- contour repair objective evidence 연결
+- objective-clean 후보 boundary와 추가 repair 필요 여부 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_DIRECT_JAZZ_PHRASE_VOCABULARY_CONTOUR_PHRASE_SHAPE_OBJECTIVE_NEXT_DECISION_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_only_next_decision`
+- source boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_listening_review`
+- repair evidence boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_repair`
+- next boundary: `stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_clean_repeatability_sweep`
+- candidate count: `3`
+- current analysis flag count: `0`
+- source stepwise contour bias count: `3`
+- repaired stepwise contour bias count: `0`
+- objective-clean candidate boundary supported: `true`
+- additional repair required: `false`
+- distinct density pattern count: `3`
+- max abs interval max: `11`
+- max small interval ratio <=4: `0.1714`
+- no overlap: `true`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- #530 repair 이후 current analysis flag `0`
+- stepwise contour bias `3 -> 0`
+- 추가 repair보다 distinct seed repeatability 검증 우선
+- 실제 청음 입력이 없으므로 human/audio preference와 musical quality claim 차단
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_next tests.test_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_listening_review`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_objective_next.py scripts/build_stage_b_midi_to_solo_model_direct_jazz_phrase_vocabulary_contour_phrase_shape_listening_review.py`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-direct-jazz-phrase-vocabulary-contour-phrase-shape-objective-next`
+
+다음:
+
+- `Stage B MIDI-to-solo model-direct jazz phrase vocabulary contour phrase-shape objective-clean repeatability sweep`
 
 ## Previous Model Decision
 
