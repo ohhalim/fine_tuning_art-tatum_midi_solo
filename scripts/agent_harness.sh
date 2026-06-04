@@ -212,6 +212,8 @@ Modes:
                 Run the bounded 512/128 max_sequence 160 MIDI-to-solo training scale smoke.
   stage-b-midi-to-solo-controlled-scale-checkpoint-generation-probe
                 Probe generation/decode from the controlled MIDI-to-solo scale checkpoint.
+  stage-b-midi-to-solo-controlled-scale-checkpoint-repair-decision
+                Decide the next repair target after controlled checkpoint generation gate failure.
   stage-b-midi-to-solo-model-direct-8bar-generation-probe
                 Run fallback-free model-direct 8-bar MIDI generation and record review gate evidence.
   stage-b-midi-to-solo-model-direct-monophonic-overlap-repair
@@ -4638,6 +4640,25 @@ run_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_controlled_scale_checkpoint_repair_decision() {
+  local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_repair_decision}"
+  local generation_probe="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe/${generation_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe.json"
+  if [[ ! -f "$generation_probe" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint generation probe"
+    RUN_ID="$generation_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe
+  fi
+  print_header "Stage B MIDI-to-solo controlled scale checkpoint repair decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_repair.py \
+    --run_id "$run_id" \
+    --generation_probe "$generation_probe" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_REPAIR_DECISION_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_repair_decision \
+    --expected_next_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_density_collapse_repair_probe \
+    --require_repair_target \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -6126,6 +6147,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-controlled-scale-checkpoint-generation-probe)
     run_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe
+    ;;
+  stage-b-midi-to-solo-controlled-scale-checkpoint-repair-decision)
+    run_stage_b_midi_to_solo_controlled_scale_checkpoint_repair_decision
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

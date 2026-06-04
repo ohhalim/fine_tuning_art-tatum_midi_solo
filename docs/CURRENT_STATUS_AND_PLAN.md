@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #554, Stage B MIDI-to-solo controlled scale checkpoint generation probe
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint repair decision`
+- latest functional result: Issue #556, Stage B MIDI-to-solo controlled scale checkpoint repair decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint density collapse repair probe`
 
 현재 범위가 아닌 것:
 
@@ -1799,6 +1799,51 @@ Issue #554는 #552 controlled `512/128`, `max_sequence=160` checkpoint로 genera
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint repair decision`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Repair Decision Result
+
+Issue #556은 #554 generation probe 실패를 다음 repair target으로 변환한 작업이다.
+
+변경:
+
+- controlled scale checkpoint repair decision script 추가
+- note count, collapse warning, postprocess removal, onset/sustained coverage 지표 기반 target 선택
+- postprocess-only repair, audio review, training scale change 제외
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_REPAIR_DECISION_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_repair_decision`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_density_collapse_repair_probe`
+- selected target: `target_density_collapse_postprocess_repair`
+- sample count: `3`
+- valid / strict / grammar: `0` / `0` / `3`
+- note count failure count: `3`
+- collapse warning sample count / rate: `3` / `1.0`
+- avg / max postprocess removal ratio: `0.809042809042809` / `0.8636363636363636`
+- postprocess-only repair selected: `false`
+- training scale change selected: `false`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- grammar-valid token group은 생성되므로 representation 전체 실패로 단정하지 않음
+- 모든 sample에서 note count failure와 collapse warning 관측
+- postprocess removal ratio가 높아 단순 audio review 단계로 이동하지 않음
+- 다음 작업은 density/collapse/postprocess repair probe
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_repair_decision tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_repair.py scripts/summarize_stage_b_midi_to_solo_controlled_scale_checkpoint_generation_probe.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-repair-decision`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint density collapse repair probe`
 
 ## Previous Model Decision
 
