@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #572, Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard audio review package.
+- Latest functional issue completed: Issue #574, Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard listening review.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard listening review.
+- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard objective-only next decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1091,6 +1091,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-d
 ```
 
 This harness renders selected objective-supported MIDI candidates to WAV and records technical audio validation without claiming listening preference.
+
+For Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard listening review changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-dead-air-repeatability-temperature-guard-listening-review
+```
+
+This harness writes the pending listening review template and blocks preference fill without validated review input.
 
 For Stage B generic jazz base readiness audit changes, run:
 
