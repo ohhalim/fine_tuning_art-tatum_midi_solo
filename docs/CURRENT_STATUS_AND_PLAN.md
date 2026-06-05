@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #606, Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair audio review package
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair listening review`
+- latest functional result: Issue #608, Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair listening review
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision`
 
 현재 범위가 아닌 것:
 
@@ -3062,6 +3062,58 @@ WAV:
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair listening review`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Training Scale Postprocess Removal Dead-Air Repair Listening Review Result
+
+Issue #608은 #606 WAV package를 pending listening review boundary로 정리한 작업이다.
+
+변경:
+
+- selected-scale postprocess removal dead-air repair listening review script 추가
+- #606 audio package report 입력 검증
+- WAV 후보 `3`개 review input template 생성
+- pending review field 집계
+- preference fill과 musical quality claim 차단
+- 전용 harness mode와 unit test 추가
+- handoff docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_POSTPROCESS_REMOVAL_DEAD_AIR_REPAIR_LISTENING_REVIEW_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_listening_review`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_only_next_decision`
+- candidate count: `3`
+- rendered audio file count: `3`
+- review input template written: `true`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- pending status field count: `4`
+- pending candidate decision count: `3`
+- pending candidate field count: `9`
+- listening review completed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+review input:
+
+- `outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_listening_review/harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_listening_review/review/postprocess_removal_dead_air_repair_listening_review_input.md`
+
+판단:
+
+- WAV 후보는 review 가능한 상태로 정리
+- validated listening input 부재로 preference fill 차단
+- 다음 작업은 objective-only next decision
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_listening_review`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_listening_review.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-postprocess-removal-dead-air-repair-listening-review`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision`
 
 ## Previous Model Decision
 
