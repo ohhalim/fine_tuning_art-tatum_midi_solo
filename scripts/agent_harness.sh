@@ -208,6 +208,8 @@ Modes:
                 Guard phrase-bank preference fill while listening review input is pending.
   stage-b-midi-to-solo-phrase-bank-objective-only-next-decision
                 Select the next phrase-bank boundary from objective MIDI/WAV evidence only.
+  stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-probe
+                Repair phrase-bank candidates for dead-air and density variation.
   stage-b-midi-to-solo-candidate-audio-render-package
                 Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-mvp-execution-consolidation
@@ -3747,6 +3749,26 @@ run_stage_b_midi_to_solo_phrase_bank_objective_only_next_decision() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe() {
+  local objective_next_run_id="${OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_objective_only_next_decision}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe}"
+  local objective_next_report="outputs/stage_b_midi_to_solo_phrase_bank_objective_only_next_decision/${objective_next_run_id}/stage_b_midi_to_solo_phrase_bank_objective_only_next_decision.json"
+  if [[ ! -f "$objective_next_report" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank objective-only next decision"
+    RUN_ID="$objective_next_run_id" run_stage_b_midi_to_solo_phrase_bank_objective_only_next_decision
+  fi
+  print_header "Stage B MIDI-to-solo phrase-bank dead-air density repair probe"
+  "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe.py \
+    --run_id "$run_id" \
+    --objective_next_report "$objective_next_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_DEAD_AIR_DENSITY_REPAIR_PROBE_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe \
+    --expected_next_boundary stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_audio_package \
+    --require_repair_probe_completed \
+    --require_target_passed \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_candidate_audio_render_package() {
   local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_conditioned_generation_probe}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_candidate_audio_render_package}"
@@ -7221,6 +7243,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-phrase-bank-objective-only-next-decision)
     run_stage_b_midi_to_solo_phrase_bank_objective_only_next_decision
+    ;;
+  stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-probe)
+    run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe
     ;;
   stage-b-midi-to-solo-candidate-audio-render-package)
     run_stage_b_midi_to_solo_candidate_audio_render_package
