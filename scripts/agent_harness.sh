@@ -5639,6 +5639,33 @@ run_stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation() {
+  local candidate_export_run_id="${CANDIDATE_EXPORT_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export}"
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation}"
+  local candidate_export="outputs/stage_b_midi_to_solo_model_conditioned_input_path_candidate_export/${candidate_export_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_candidate_export.json"
+  local audio_render="outputs/stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package/${audio_render_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package.json"
+  if [[ ! -f "$candidate_export" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path candidate export"
+    RUN_ID="$candidate_export_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export
+  fi
+  if [[ ! -f "$audio_render" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path audio render package"
+    RUN_ID="$audio_render_run_id" CANDIDATE_EXPORT_RUN_ID="$candidate_export_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path replacement consolidation"
+  "$PYTHON_BIN" scripts/consolidate_stage_b_midi_to_solo_model_conditioned_input_path_replacement.py \
+    --run_id "$run_id" \
+    --candidate_export_report "$candidate_export" \
+    --audio_render_report "$audio_render" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_REPLACEMENT_CONSOLIDATION_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package \
+    --require_technical_replacement \
+    --require_listening_review_package \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -7232,6 +7259,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-audio-render-package)
     run_stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-replacement-consolidation)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

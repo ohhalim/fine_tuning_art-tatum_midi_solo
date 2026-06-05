@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #626, Stage B MIDI-to-solo model-conditioned input path audio render package
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path replacement consolidation`
+- latest functional result: Issue #628, Stage B MIDI-to-solo model-conditioned input path replacement consolidation
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path listening review package`
 
 현재 범위가 아닌 것:
 
@@ -3545,6 +3545,52 @@ Issue #626은 model-conditioned ranked MIDI export 결과를 WAV로 렌더링하
 다음:
 
 - `Stage B MIDI-to-solo model-conditioned input path replacement consolidation`
+
+## Stage B MIDI-to-Solo Model-Conditioned Input Path Replacement Consolidation Result
+
+Issue #628은 model-conditioned ranked MIDI export와 ranked WAV render evidence를 묶어 technical replacement 경계를 정리한 작업이다.
+
+변경:
+
+- replacement consolidation script 추가
+- candidate export report와 audio render report cross-check
+- ranked MIDI path와 WAV render source path 매칭 검증
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_REPLACEMENT_CONSOLIDATION_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
+- model-conditioned input path replacement consolidated: `true`
+- model-conditioned input to ranked MIDI completed: `true`
+- model-conditioned input to ranked WAV completed: `true`
+- fallback replacement technical path ready: `true`
+- fallback replacement ready: `true`
+- listening review package required: `true`
+- exported/rendered: `3/3`
+- WAV duration range: `19.585s - 22.390s`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- model-conditioned input-to-WAV 기술 경로는 fallback 대체 기준 충족
+- ranked MIDI export와 WAV render source path 일치
+- musical quality와 human/audio preference는 아직 미검증
+- 다음 작업은 청음 리뷰용 package 생성
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation`
+- `.venv/bin/python -m py_compile scripts/consolidate_stage_b_midi_to_solo_model_conditioned_input_path_replacement.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-replacement-consolidation`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned input path listening review package`
 
 ## Previous Model Decision
 
