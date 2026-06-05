@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_retrieval_baseline`
-- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_retrieval_baseline`
+- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_audio_render_package`
+- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_audio_render_package`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -25,6 +25,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank source records / motifs: `56 / 803`
 - phrase-bank exported / qualified MIDI candidates: `3 / 3`
 - phrase-bank best notes / unique pitches / max simultaneous: `64 / 22 / 1`
+- phrase-bank rendered WAV files: `3`
+- phrase-bank audio technical validation: `true`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -46,6 +48,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned ranked MIDI candidate export 가능
 - model-conditioned ranked WAV technical render 가능
 - 입력 MIDI context 기반 phrase-bank retrieval 후보 export 가능
+- phrase-bank 후보의 WAV technical render 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -143,6 +146,16 @@ Phrase-bank retrieval baseline.
 - best note / unique pitch / max simultaneous: `64 / 22 / 1`
 - best dead-air / phrase coverage: `0.5873015873015873 / 1.0`
 - MIDI-to-solo MVP claimed: `false`
+- human/audio preference claimed: `false`
+
+Phrase-bank audio render package.
+
+- rendered WAV files: `3`
+- technical WAV validation: `true`
+- rank 1 duration / sample rate / sha256 prefix: `18.985s / 44100 / 07a95cfe5c4b`
+- rank 2 duration / sample rate / sha256 prefix: `18.984s / 44100 / a3a3efc8a9e1`
+- rank 3 duration / sample rate / sha256 prefix: `18.997s / 44100 / d3550541fe41`
+- audio rendered quality claimed: `false`
 - human/audio preference claimed: `false`
 
 MIDI-to-solo input contract.

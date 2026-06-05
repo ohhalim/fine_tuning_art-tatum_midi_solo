@@ -200,6 +200,8 @@ Modes:
                 Export ranked context-conditioned MIDI-to-solo candidates.
   stage-b-midi-to-solo-phrase-bank-retrieval-baseline
                 Export ranked MIDI-to-solo candidates from input context and data-derived phrase-bank templates.
+  stage-b-midi-to-solo-phrase-bank-audio-render-package
+                Render phrase-bank MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-candidate-audio-render-package
                 Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-mvp-execution-consolidation
@@ -3645,6 +3647,25 @@ run_stage_b_midi_to_solo_phrase_bank_retrieval_baseline() {
     --expected_next_boundary stage_b_midi_to_solo_phrase_bank_audio_render_package \
     --require_exported_candidates \
     --require_no_final_claim
+}
+
+run_stage_b_midi_to_solo_phrase_bank_audio_render_package() {
+  local phrase_bank_run_id="${PHRASE_BANK_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_retrieval_baseline}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_audio_render_package}"
+  local phrase_bank_report="outputs/stage_b_midi_to_solo_phrase_bank_retrieval_baseline/${phrase_bank_run_id}/stage_b_midi_to_solo_phrase_bank_retrieval_baseline.json"
+  if [[ ! -f "$phrase_bank_report" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank retrieval baseline"
+    RUN_ID="$phrase_bank_run_id" run_stage_b_midi_to_solo_phrase_bank_retrieval_baseline
+  fi
+  print_header "Stage B MIDI-to-solo phrase-bank audio render package"
+  "$PYTHON_BIN" scripts/render_stage_b_midi_to_solo_phrase_bank_audio.py \
+    --run_id "$run_id" \
+    --phrase_bank_report "$phrase_bank_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_AUDIO_RENDER_PACKAGE_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_phrase_bank_audio_render_package \
+    --expected_next_boundary stage_b_midi_to_solo_phrase_bank_listening_review_package \
+    --require_phrase_bank_audio_path \
+    --require_no_quality_claim
 }
 
 run_stage_b_midi_to_solo_candidate_audio_render_package() {
@@ -7109,6 +7130,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-phrase-bank-retrieval-baseline)
     run_stage_b_midi_to_solo_phrase_bank_retrieval_baseline
+    ;;
+  stage-b-midi-to-solo-phrase-bank-audio-render-package)
+    run_stage_b_midi_to_solo_phrase_bank_audio_render_package
     ;;
   stage-b-midi-to-solo-candidate-audio-render-package)
     run_stage_b_midi_to_solo_candidate_audio_render_package
