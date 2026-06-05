@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -20,6 +20,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - fallback replacement technical path ready: `true`
 - fallback replacement ready: `true`
 - listening review package required: `true`
+- listening review package ready: `true`
+- validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
 - musical quality MVP completed: `false`
@@ -115,6 +117,14 @@ Model-conditioned input path replacement consolidation.
 - exported/rendered count: `3 / 3`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
+
+Model-conditioned input path listening review package.
+
+- package ready: `true`
+- review item count: `3`
+- validated review input: `false`
+- review WAV files: `rank_01_sample_01.wav`, `rank_02_sample_02.wav`, `rank_03_sample_03.wav`
+- human/audio preference claimed: `false`
 
 MIDI-to-solo input contract.
 
