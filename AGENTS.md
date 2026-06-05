@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #582, Stage B MIDI-to-solo controlled scale checkpoint training scale generation probe.
+- Latest functional issue completed: Issue #592, Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair probe.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint training scale repair decision.
+- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair repeatability probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -931,6 +931,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-t
 ```
 
 This harness selects the selected-scale dead-air repair target after density/grammar/collapse repeatability support without claiming musical quality.
+
+For Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair probe changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-dead-air-repair-probe
+```
+
+This harness tests whether the selected-scale checkpoint can remove the dead-air blocker under the selected repair condition without claiming musical quality.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 

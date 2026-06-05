@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #590, Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air remaining blocker decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair probe`
+- latest functional result: Issue #592, Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair repeatability probe`
 
 현재 범위가 아닌 것:
 
@@ -2676,6 +2676,53 @@ Issue #590은 #588 repeatability 결과에서 남은 병목을 dead-air sustaine
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair probe`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Training Scale Dead-Air Repair Probe Result
+
+Issue #592는 #590 decision 결과에서 선택된 selected-scale dead-air repair target을 실제 checkpoint generation으로 검증한 작업이다.
+
+변경:
+
+- selected-scale dead-air repair probe script 추가
+- 12 note-groups/bar constrained decode 조건 적용
+- dead-air decision report와 selected training-scale checkpoint 검증
+- 전용 harness mode와 unit test 추가
+- handoff docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_DEAD_AIR_REPAIR_PROBE_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_probe`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_repeatability_probe`
+- source sample count: `9`
+- source valid / strict / grammar: `2` / `2` / `9`
+- source note-count / grammar / dead-air / collapse failure count: `0` / `0` / `7` / `0`
+- repair sample count: `3`
+- repair valid / strict / grammar: `3` / `3` / `3`
+- repair note-count / grammar / dead-air / collapse failure count: `0` / `0` / `0` / `0`
+- dead-air failure delta: `7`
+- avg onset / sustained coverage ratio: `0.5729166666666666` / `0.7083333333333334`
+- selected-scale dead-air target qualified: `true`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- selected-scale checkpoint에서 dead-air blocker 제거 가능성 확인
+- density/grammar/collapse failure 재발 없음
+- repeatability는 아직 미검증
+- 다음 작업은 selected-scale dead-air repair repeatability probe
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_probe tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_remaining_blocker_decision`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_probe.py scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_remaining_blocker.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-dead-air-repair-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair repeatability probe`
 
 ## Previous Model Decision
 
