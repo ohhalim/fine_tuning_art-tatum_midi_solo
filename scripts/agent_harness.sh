@@ -208,6 +208,8 @@ Modes:
                 Audit technical model-core MVP completion and separate remaining quality claims.
   stage-b-midi-to-solo-quality-gap-decision
                 Decide the next quality-gap repair target after technical MVP completion.
+  stage-b-midi-to-solo-model-conditioned-input-path-quality-alignment
+                Decide model-conditioned input-path alignment requirements and next probe target.
   stage-b-midi-to-solo-model-direct-generation-repair
                 Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
@@ -5518,6 +5520,26 @@ run_stage_b_midi_to_solo_quality_gap_decision() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment() {
+  local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment}"
+  local quality_gap="outputs/stage_b_midi_to_solo_quality_gap_decision/${quality_gap_run_id}/stage_b_midi_to_solo_quality_gap_decision.json"
+  if [[ ! -f "$quality_gap" ]]; then
+    print_header "Stage B MIDI-to-solo quality gap decision"
+    RUN_ID="$quality_gap_run_id" run_stage_b_midi_to_solo_quality_gap_decision
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path quality alignment"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment.py \
+    --run_id "$run_id" \
+    --quality_gap_decision "$quality_gap" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_QUALITY_ALIGNMENT_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_probe \
+    --expected_probe_target replace_fallback_with_model_conditioned_input_path_probe \
+    --require_probe_required \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -7099,6 +7121,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-quality-gap-decision)
     run_stage_b_midi_to_solo_quality_gap_decision
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-quality-alignment)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
