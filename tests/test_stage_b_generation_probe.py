@@ -233,6 +233,31 @@ class StageBGenerationProbeTest(unittest.TestCase):
         self.assertEqual(coverage["earliest_absolute_position"], 0)
         self.assertEqual(coverage["latest_absolute_position"], 9)
 
+    def test_constrained_generation_can_avoid_reused_bar_positions(self) -> None:
+        primer = build_stage_b_primer(["Cm7"], bpm=120)
+
+        tokens = generate_stage_b_constrained_tokens(
+            model=FakeConstrainedModel(),
+            primer_tokens=primer,
+            chords=["Cm7"],
+            bpm=120,
+            bars=1,
+            note_groups_per_bar=12,
+            max_sequence=128,
+            temperature=1.0,
+            top_k=1,
+            coverage_position_window=1,
+            jazz_rhythm_positions=True,
+            jazz_rhythm_profile="swing_motif",
+            avoid_reused_positions=True,
+        )
+
+        groups = extract_stage_b_note_groups(tokens, primer_size=len(primer))
+        positions = [int(group["position"]) for group in groups]
+
+        self.assertEqual(len(groups), 12)
+        self.assertEqual(len(set(positions)), len(positions))
+
     def test_coverage_aware_position_tokens_spread_onset_pairs(self) -> None:
         positions = [
             position_from_token(coverage_aware_position_tokens(index, note_groups_per_bar=4)[0])

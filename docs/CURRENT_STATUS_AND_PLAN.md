@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #600, Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard follow-up decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair probe`
+- latest functional result: Issue #602, Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair consolidation`
 
 현재 범위가 아닌 것:
 
@@ -2913,6 +2913,57 @@ Issue #600은 #598 temperature guard partial repair 이후 남은 strict shortfa
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair probe`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Training Scale Postprocess Removal Dead-Air Repair Probe Result
+
+Issue #602는 #600에서 선택한 `postprocess_removal_dead_air_repair` target을 reused-position guard로 검증한 작업이다.
+
+변경:
+
+- constrained generation `avoid_reused_positions` 옵션 추가
+- selected-scale postprocess removal dead-air repair probe script 추가
+- seeds `47/52/60` 기반 seed sweep 실행
+- postprocess removal, dead-air, strict gate delta 기록
+- 전용 harness mode와 unit test 추가
+- handoff docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_POSTPROCESS_REMOVAL_DEAD_AIR_REPAIR_PROBE_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_probe`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_consolidation`
+- target qualified: `true`
+- avoid reused positions: `true`
+- seed count: `3`
+- sample count: `9`
+- valid / strict / grammar: `9` / `9` / `9`
+- note-count / grammar / dead-air / collapse failure count: `0` / `0` / `0` / `0`
+- avg / max postprocess removal ratio: `0.21759259259259262` / `0.2916666666666667`
+- avg onset / sustained coverage ratio: `0.7326388888888888` / `0.7708333333333334`
+- strict valid sample delta: `+1`
+- dead-air failure delta: `-1`
+- postprocess removal delta: `-0.1435185185185185`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- reused-position guard로 all-sample strict gate 회복
+- dead-air/collapse failure `0/0`
+- postprocess removal target `<= 0.3` 충족
+- onset/sustained coverage 개선
+- 다음 작업은 repair evidence consolidation
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_generation_probe tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_probe tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_followup_decision`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_generation_probe.py scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_probe.py scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_followup.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-postprocess-removal-dead-air-repair-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair consolidation`
 
 ## Previous Model Decision
 
