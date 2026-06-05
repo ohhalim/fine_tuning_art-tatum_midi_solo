@@ -198,6 +198,8 @@ Modes:
                 Check MIDI-to-solo context, Stage B windows, and scale-smoke checkpoint resources.
   stage-b-midi-to-solo-conditioned-generation-probe
                 Export ranked context-conditioned MIDI-to-solo candidates.
+  stage-b-midi-to-solo-phrase-bank-retrieval-baseline
+                Export ranked MIDI-to-solo candidates from input context and data-derived phrase-bank templates.
   stage-b-midi-to-solo-candidate-audio-render-package
                 Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-mvp-execution-consolidation
@@ -3622,6 +3624,25 @@ run_stage_b_midi_to_solo_conditioned_generation_probe() {
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_CONDITIONED_GENERATION_PROBE_2026-06-03.md \
     --expected_boundary stage_b_midi_to_solo_conditioned_generation_probe \
     --expected_next_boundary stage_b_midi_to_solo_candidate_audio_render_package \
+    --require_exported_candidates \
+    --require_no_final_claim
+}
+
+run_stage_b_midi_to_solo_phrase_bank_retrieval_baseline() {
+  local context_run_id="${CONTEXT_RUN_ID:-harness_stage_b_midi_to_solo_context_extraction}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_retrieval_baseline}"
+  local context_report="outputs/stage_b_midi_to_solo_context_extraction/${context_run_id}/stage_b_midi_to_solo_context_extraction.json"
+  if [[ ! -f "$context_report" ]]; then
+    print_header "Stage B MIDI-to-solo context extraction MVP"
+    RUN_ID="$context_run_id" run_stage_b_midi_to_solo_context_extraction
+  fi
+  print_header "Stage B MIDI-to-solo phrase-bank retrieval baseline"
+  "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_phrase_bank_retrieval_baseline.py \
+    --run_id "$run_id" \
+    --context_report "$context_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_RETRIEVAL_BASELINE_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_phrase_bank_retrieval_baseline \
+    --expected_next_boundary stage_b_midi_to_solo_phrase_bank_audio_render_package \
     --require_exported_candidates \
     --require_no_final_claim
 }
@@ -7085,6 +7106,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-conditioned-generation-probe)
     run_stage_b_midi_to_solo_conditioned_generation_probe
+    ;;
+  stage-b-midi-to-solo-phrase-bank-retrieval-baseline)
+    run_stage_b_midi_to_solo_phrase_bank_retrieval_baseline
     ;;
   stage-b-midi-to-solo-candidate-audio-render-package)
     run_stage_b_midi_to_solo_candidate_audio_render_package

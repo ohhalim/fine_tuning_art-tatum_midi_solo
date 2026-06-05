@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
-- current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_retrieval_baseline`
+- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_retrieval_baseline`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -21,6 +21,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - fallback replacement ready: `true`
 - listening review package required: `true`
 - listening review package ready: `true`
+- phrase-bank retrieval baseline completed: `true`
+- phrase-bank source records / motifs: `56 / 803`
+- phrase-bank exported / qualified MIDI candidates: `3 / 3`
+- phrase-bank best notes / unique pitches / max simultaneous: `64 / 22 / 1`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -41,11 +45,13 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned strict MIDI/WAV technical evidence 존재
 - model-conditioned ranked MIDI candidate export 가능
 - model-conditioned ranked WAV technical render 가능
+- 입력 MIDI context 기반 phrase-bank retrieval 후보 export 가능
 
 현재 README가 주장하지 않는 것.
 
 - 최종 jazz solo 품질
 - 사용자 청음 선호
+- phrase-bank 후보의 청음 품질
 - broad training 완료 모델 품질
 - Brad Mehldau style adaptation
 - realtime DAW/plugin 또는 product-ready improviser
@@ -124,6 +130,19 @@ Model-conditioned input path listening review package.
 - review item count: `3`
 - validated review input: `false`
 - review WAV files: `rank_01_sample_01.wav`, `rank_02_sample_02.wav`, `rank_03_sample_03.wav`
+- human/audio preference claimed: `false`
+
+Phrase-bank retrieval baseline.
+
+- generation source: `phrase_bank_data_motif_retrieval`
+- source records / motif count: `56 / 803`
+- unique rhythm / contour templates: `520 / 328`
+- candidate count: `9`
+- qualified candidate count: `3`
+- exported / exported qualified MIDI candidates: `3 / 3`
+- best note / unique pitch / max simultaneous: `64 / 22 / 1`
+- best dead-air / phrase coverage: `0.5873015873015873 / 1.0`
+- MIDI-to-solo MVP claimed: `false`
 - human/audio preference claimed: `false`
 
 MIDI-to-solo input contract.
