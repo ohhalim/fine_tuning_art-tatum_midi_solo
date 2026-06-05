@@ -202,6 +202,8 @@ Modes:
                 Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-mvp-execution-consolidation
                 Consolidate input-to-MIDI-to-WAV technical execution evidence.
+  stage-b-midi-to-solo-mvp-current-evidence-consolidation
+                Consolidate current MVP evidence from contract, generated MIDI, WAV, and objective repair.
   stage-b-midi-to-solo-model-direct-generation-repair
                 Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
@@ -5416,6 +5418,63 @@ run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_mvp_current_evidence_consolidation() {
+  local contract_run_id="${CONTRACT_RUN_ID:-harness_stage_b_midi_to_solo_mvp_contract}"
+  local context_run_id="${CONTEXT_RUN_ID:-harness_stage_b_midi_to_solo_context_extraction}"
+  local resource_run_id="${RESOURCE_RUN_ID:-harness_stage_b_midi_to_solo_training_resource_probe}"
+  local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_conditioned_generation_probe}"
+  local candidate_audio_run_id="${CANDIDATE_AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_candidate_audio_render_package}"
+  local objective_next_run_id="${OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_next}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_current_evidence_consolidation}"
+  local contract_report="outputs/stage_b_midi_to_solo_mvp_contract/${contract_run_id}/stage_b_midi_to_solo_mvp_contract.json"
+  local context_report="outputs/stage_b_midi_to_solo_context_extraction/${context_run_id}/stage_b_midi_to_solo_context_extraction.json"
+  local resource_probe="outputs/stage_b_midi_to_solo_training_resource_probe/${resource_run_id}/stage_b_midi_to_solo_training_resource_probe.json"
+  local generation_probe="outputs/stage_b_midi_to_solo_conditioned_generation_probe/${generation_run_id}/stage_b_midi_to_solo_conditioned_generation_probe.json"
+  local candidate_audio="outputs/stage_b_midi_to_solo_candidate_audio_render_package/${candidate_audio_run_id}/stage_b_midi_to_solo_candidate_audio_render_package.json"
+  local objective_next="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_next/${objective_next_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_next.json"
+  if [[ ! -f "$contract_report" ]]; then
+    print_header "Stage B MIDI-to-solo MVP input contract"
+    RUN_ID="$contract_run_id" run_stage_b_midi_to_solo_mvp_contract
+  fi
+  if [[ ! -f "$context_report" ]]; then
+    print_header "Stage B MIDI-to-solo context extraction MVP"
+    RUN_ID="$context_run_id" run_stage_b_midi_to_solo_context_extraction
+  fi
+  if [[ ! -f "$resource_probe" ]]; then
+    print_header "Stage B MIDI-to-solo training resource probe"
+    RUN_ID="$resource_run_id" CONTEXT_RUN_ID="$context_run_id" run_stage_b_midi_to_solo_training_resource_probe
+  fi
+  if [[ ! -f "$generation_probe" ]]; then
+    print_header "Stage B MIDI-to-solo conditioned generation probe"
+    RUN_ID="$generation_run_id" CONTEXT_RUN_ID="$context_run_id" RESOURCE_RUN_ID="$resource_run_id" run_stage_b_midi_to_solo_conditioned_generation_probe
+  fi
+  if [[ ! -f "$candidate_audio" ]]; then
+    print_header "Stage B MIDI-to-solo candidate audio render package"
+    RUN_ID="$candidate_audio_run_id" GENERATION_RUN_ID="$generation_run_id" run_stage_b_midi_to_solo_candidate_audio_render_package
+  fi
+  if [[ ! -f "$objective_next" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision"
+    RUN_ID="$objective_next_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_next
+  fi
+  print_header "Stage B MIDI-to-solo MVP current evidence consolidation"
+  "$PYTHON_BIN" scripts/consolidate_stage_b_midi_to_solo_mvp_current_evidence.py \
+    --run_id "$run_id" \
+    --contract_report "$contract_report" \
+    --context_report "$context_report" \
+    --resource_probe "$resource_probe" \
+    --generation_probe "$generation_probe" \
+    --audio_render "$candidate_audio" \
+    --objective_next "$objective_next" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_CURRENT_EVIDENCE_CONSOLIDATION_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_mvp_current_evidence_consolidation \
+    --expected_next_boundary stage_b_midi_to_solo_readme_evidence_refresh \
+    --min_exported_candidates 3 \
+    --min_rendered_wav_files 3 \
+    --min_objective_sample_count 9 \
+    --require_current_evidence_support \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -6988,6 +7047,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-postprocess-removal-dead-air-repair-objective-next)
     run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_next
+    ;;
+  stage-b-midi-to-solo-mvp-current-evidence-consolidation)
+    run_stage_b_midi_to_solo_mvp_current_evidence_consolidation
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

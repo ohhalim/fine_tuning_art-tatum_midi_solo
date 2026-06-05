@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #610, Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision.
+- Latest functional issue completed: Issue #612, Stage B MIDI-to-solo MVP current evidence consolidation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo MVP current evidence consolidation.
+- Recommended next issue: Stage B MIDI-to-solo README evidence refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1011,6 +1011,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-t
 ```
 
 This harness closes the objective MIDI path and routes to MVP evidence consolidation without claiming listening quality.
+
+For Stage B MIDI-to-solo MVP current evidence consolidation changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-current-evidence-consolidation
+```
+
+This harness consolidates the input contract, context extraction, ranked MIDI candidates, technical WAV render path, and selected-scale objective repair boundary without claiming musical quality.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 
