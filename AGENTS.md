@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #634, Stage B MIDI-to-solo phrase-bank audio render package.
+- Latest functional issue completed: Issue #636, Stage B MIDI-to-solo phrase-bank listening review package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo phrase-bank listening review package.
+- Recommended next issue: Stage B MIDI-to-solo phrase-bank listening review input guard.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1108,6 +1108,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-audio-render-pack
 ```
 
 This harness renders phrase-bank ranked MIDI exports to WAV and records technical audio metadata without claiming musical quality.
+
+For Stage B MIDI-to-solo phrase-bank listening review package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-listening-review-package
+```
+
+This harness packages phrase-bank MIDI/WAV review items and keeps preference pending without claiming musical quality.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 

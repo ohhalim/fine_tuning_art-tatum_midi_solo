@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_audio_render_package`
-- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_audio_render_package`
+- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_package`
+- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_package`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -27,6 +27,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank best notes / unique pitches / max simultaneous: `64 / 22 / 1`
 - phrase-bank rendered WAV files: `3`
 - phrase-bank audio technical validation: `true`
+- phrase-bank listening review package ready: `true`
+- phrase-bank listening review items: `3`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -49,6 +51,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned ranked WAV technical render 가능
 - 입력 MIDI context 기반 phrase-bank retrieval 후보 export 가능
 - phrase-bank 후보의 WAV technical render 가능
+- phrase-bank 후보의 listening review package 생성 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -157,6 +160,15 @@ Phrase-bank audio render package.
 - rank 3 duration / sample rate / sha256 prefix: `18.997s / 44100 / d3550541fe41`
 - audio rendered quality claimed: `false`
 - human/audio preference claimed: `false`
+
+Phrase-bank listening review package.
+
+- package ready: `true`
+- review item count: `3`
+- validated review input: `false`
+- review WAV files: `rank_01_seed_635.wav`, `rank_02_seed_632.wav`, `rank_03_seed_638.wav`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
 
 MIDI-to-solo input contract.
 
