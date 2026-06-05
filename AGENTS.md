@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #616, Stage B MIDI-to-solo MVP completion audit.
+- Latest functional issue completed: Issue #618, Stage B MIDI-to-solo quality gap decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo quality gap decision.
+- Recommended next issue: Stage B MIDI-to-solo model-conditioned input path quality alignment.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1036,6 +1036,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit
 ```
 
 This harness audits technical model-core MVP completion and keeps musical quality, human preference, broad model quality, and product readiness claims excluded.
+
+For Stage B MIDI-to-solo quality gap decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-quality-gap-decision
+```
+
+This harness selects the next quality-gap target after technical MVP completion without claiming musical quality or requiring immediate human review.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 
