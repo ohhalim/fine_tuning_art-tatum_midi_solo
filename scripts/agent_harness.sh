@@ -206,6 +206,8 @@ Modes:
                 Package phrase-bank MIDI/WAV candidates for pending listening review.
   stage-b-midi-to-solo-phrase-bank-listening-review-input-guard
                 Guard phrase-bank preference fill while listening review input is pending.
+  stage-b-midi-to-solo-phrase-bank-objective-only-next-decision
+                Select the next phrase-bank boundary from objective MIDI/WAV evidence only.
   stage-b-midi-to-solo-candidate-audio-render-package
                 Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-mvp-execution-consolidation
@@ -3711,6 +3713,40 @@ run_stage_b_midi_to_solo_phrase_bank_listening_review_input_guard() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_phrase_bank_objective_only_next_decision() {
+  local phrase_bank_run_id="${PHRASE_BANK_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_retrieval_baseline}"
+  local audio_run_id="${AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_audio_render_package}"
+  local input_guard_run_id="${INPUT_GUARD_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_listening_review_input_guard}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_objective_only_next_decision}"
+  local phrase_bank_report="outputs/stage_b_midi_to_solo_phrase_bank_retrieval_baseline/${phrase_bank_run_id}/stage_b_midi_to_solo_phrase_bank_retrieval_baseline.json"
+  local audio_render_report="outputs/stage_b_midi_to_solo_phrase_bank_audio_render_package/${audio_run_id}/stage_b_midi_to_solo_phrase_bank_audio_render_package.json"
+  local input_guard_report="outputs/stage_b_midi_to_solo_phrase_bank_listening_review_input_guard/${input_guard_run_id}/stage_b_midi_to_solo_phrase_bank_listening_review_input_guard.json"
+  if [[ ! -f "$phrase_bank_report" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank retrieval baseline"
+    RUN_ID="$phrase_bank_run_id" run_stage_b_midi_to_solo_phrase_bank_retrieval_baseline
+  fi
+  if [[ ! -f "$audio_render_report" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank audio render package"
+    RUN_ID="$audio_run_id" PHRASE_BANK_RUN_ID="$phrase_bank_run_id" run_stage_b_midi_to_solo_phrase_bank_audio_render_package
+  fi
+  if [[ ! -f "$input_guard_report" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank listening review input guard"
+    RUN_ID="$input_guard_run_id" AUDIO_RUN_ID="$audio_run_id" PHRASE_BANK_RUN_ID="$phrase_bank_run_id" run_stage_b_midi_to_solo_phrase_bank_listening_review_input_guard
+  fi
+  print_header "Stage B MIDI-to-solo phrase-bank objective-only next decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_phrase_bank_objective_next.py \
+    --run_id "$run_id" \
+    --input_guard_report "$input_guard_report" \
+    --phrase_bank_report "$phrase_bank_report" \
+    --audio_render_report "$audio_render_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_phrase_bank_objective_only_next_decision \
+    --expected_next_boundary stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe \
+    --require_objective_decision \
+    --require_repair_required \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_candidate_audio_render_package() {
   local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_conditioned_generation_probe}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_candidate_audio_render_package}"
@@ -7182,6 +7218,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-phrase-bank-listening-review-input-guard)
     run_stage_b_midi_to_solo_phrase_bank_listening_review_input_guard
+    ;;
+  stage-b-midi-to-solo-phrase-bank-objective-only-next-decision)
+    run_stage_b_midi_to_solo_phrase_bank_objective_only_next_decision
     ;;
   stage-b-midi-to-solo-candidate-audio-render-package)
     run_stage_b_midi_to_solo_candidate_audio_render_package

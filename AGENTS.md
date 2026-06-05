@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #638, Stage B MIDI-to-solo phrase-bank listening review input guard.
+- Latest functional issue completed: Issue #640, Stage B MIDI-to-solo phrase-bank objective-only next decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo phrase-bank objective-only next decision.
+- Recommended next issue: Stage B MIDI-to-solo phrase-bank dead-air density repair probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1124,6 +1124,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-listening-review-
 ```
 
 This harness blocks preference fill while phrase-bank listening review input is pending and routes to the objective-only next decision.
+
+For Stage B MIDI-to-solo phrase-bank objective-only next decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-objective-only-next-decision
+```
+
+This harness selects the next phrase-bank boundary from objective MIDI/WAV evidence only, without claiming human/audio preference or musical quality.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 

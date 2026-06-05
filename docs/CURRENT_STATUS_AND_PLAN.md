@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #638, Stage B MIDI-to-solo phrase-bank listening review input guard
-- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank objective-only next decision`
+- latest functional result: Issue #640, Stage B MIDI-to-solo phrase-bank objective-only next decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank dead-air density repair probe`
 
 현재 범위가 아닌 것:
 
@@ -36,6 +36,50 @@
 - phrase-bank audio render technical validation 완료
 - phrase-bank listening review package 준비 완료
 - review input pending 상태에서 preference fill 차단 완료
+- objective-only 지표 기준 phrase-bank 후보 3개 모두 repair 필요
+
+## Stage B MIDI-to-Solo Phrase-Bank Objective-Only Next Decision Result
+
+Issue #640은 Issue #638 input guard 이후 사용자 청음 없이 진행 가능한 objective-only decision을 추가한 작업이다.
+
+변경:
+
+- input guard, phrase-bank retrieval, audio render report source validation 추가
+- review input 없는 preference fill 차단 유지
+- MIDI/WAV metadata 기반 후보별 risk flag 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_phrase_bank_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe`
+- review basis: `objective_midi_and_wav_metadata_only`
+- candidate count: `3`
+- objective keep candidate count: `0`
+- repair required candidate count: `3`
+- all candidates require repair: `true`
+- dead-air range: `0.5873 - 0.6032`
+- preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 3개 후보 모두 기존 export gate는 통과
+- solo keep 기준 objective risk 존재
+- 공통 risk: dead-air 초과, uniform bar note density, duration/IOI diversity 부족, approach resolution 부족, pitch reuse 과다, leap motion 부재
+- CLI MVP package 전 dead-air/density repair 필요
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_objective_only_next_decision`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-objective-only-next-decision`
+
+다음:
+
+- `Stage B MIDI-to-solo phrase-bank dead-air density repair probe`
 
 ## Stage B MIDI-to-Solo Phrase-Bank Listening Review Input Guard Result
 
