@@ -5590,6 +5590,35 @@ run_stage_b_midi_to_solo_model_conditioned_input_path_probe() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export() {
+  local probe_run_id="${PROBE_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_probe}"
+  local model_direct_repair_run_id="${MODEL_DIRECT_REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export}"
+  local probe_report="outputs/stage_b_midi_to_solo_model_conditioned_input_path_probe/${probe_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_probe.json"
+  local model_direct_repair="outputs/stage_b_midi_to_solo_model_direct_monophonic_overlap_repair/${model_direct_repair_run_id}/stage_b_midi_to_solo_model_direct_monophonic_overlap_repair.json"
+  local model_direct_generation="outputs/stage_b_midi_to_solo_model_direct_monophonic_overlap_repair/${model_direct_repair_run_id}/generation_probe/monophonic_overlap_repair/report.json"
+  if [[ ! -f "$probe_report" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path probe"
+    RUN_ID="$probe_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_probe
+  fi
+  if [[ ! -f "$model_direct_repair" || ! -f "$model_direct_generation" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct monophonic overlap repair"
+    RUN_ID="$model_direct_repair_run_id" run_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path candidate export"
+  "$PYTHON_BIN" scripts/export_stage_b_midi_to_solo_model_conditioned_input_path_candidates.py \
+    --run_id "$run_id" \
+    --probe_report "$probe_report" \
+    --model_direct_repair_report "$model_direct_repair" \
+    --model_direct_generation_report "$model_direct_generation" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_CANDIDATE_EXPORT_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_candidate_export \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package \
+    --require_ranked_export_contract \
+    --require_audio_render_required \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -7177,6 +7206,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-probe)
     run_stage_b_midi_to_solo_model_conditioned_input_path_probe
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-candidate-export)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
