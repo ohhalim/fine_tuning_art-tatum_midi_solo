@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #640, Stage B MIDI-to-solo phrase-bank objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank dead-air density repair probe`
+- latest functional result: Issue #642, Stage B MIDI-to-solo phrase-bank dead-air density repair probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank dead-air density repair audio package`
 
 현재 범위가 아닌 것:
 
@@ -37,6 +37,51 @@
 - phrase-bank listening review package 준비 완료
 - review input pending 상태에서 preference fill 차단 완료
 - objective-only 지표 기준 phrase-bank 후보 3개 모두 repair 필요
+- dead-air/density repair probe 기준 repaired 후보 3개 모두 objective target 통과
+
+## Stage B MIDI-to-Solo Phrase-Bank Dead-Air Density Repair Probe Result
+
+Issue #642는 Issue #640 objective-only decision의 repair target을 받아 phrase-bank 후보 3개를 dead-air/density 기준으로 수리한 작업이다.
+
+변경:
+
+- objective-only decision source validation 추가
+- 큰 onset gap에 guide-tone/approach fill note 추가
+- per-bar addition target으로 uniform density 완화
+- before/after dead-air, density, note count, monophonic gate 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_DEAD_AIR_DENSITY_REPAIR_PROBE_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_audio_package`
+- repaired candidate count: `3`
+- qualified repaired candidate count: `3`
+- repair probe target passed: `true`
+- repaired dead-air range: `0.1895 - 0.2211`
+- dead-air gain range: `0.3768 - 0.3978`
+- note count gain: `32`
+- per-bar note count pattern: `11 / 13 / 10 / 14 / 11 / 13 / 10 / 14`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 기존 phrase-bank 후보의 dead-air objective risk 분리
+- repaired 후보 3개 모두 dead-air target `<= 0.45` 통과
+- uniform bar density 제거
+- 청음 품질 claim 없이 다음 audio package 경계로 이동
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo phrase-bank dead-air density repair audio package`
 
 ## Stage B MIDI-to-Solo Phrase-Bank Objective-Only Next Decision Result
 
