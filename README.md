@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_package`
-- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_package`
+- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_input_guard`
+- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_input_guard`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -29,6 +29,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank audio technical validation: `true`
 - phrase-bank listening review package ready: `true`
 - phrase-bank listening review items: `3`
+- phrase-bank preference fill allowed: `false`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -169,6 +170,15 @@ Phrase-bank listening review package.
 - review WAV files: `rank_01_seed_635.wav`, `rank_02_seed_632.wav`, `rank_03_seed_638.wav`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
+
+Phrase-bank listening review input guard.
+
+- validated review input present: `false`
+- preference fill allowed: `false`
+- review item count: `3`
+- required input fields: `candidate_rank`, `listening_status`, `preference`, `issue_notes`
+- human/audio preference claimed: `false`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_objective_only_next_decision`
 
 MIDI-to-solo input contract.
 
