@@ -2264,6 +2264,41 @@ Issue #328은 duration/coverage fill 후보의 외부 review input 전 package�
 
 - `Stage B margin-recovered phrase/vocabulary duration coverage fill external review input fill`
 
+## 9.7 Stage B MIDI-to-solo phrase-bank retrieval baseline
+
+Issue #632는 model-conditioned direct path의 청음 품질 claim 없이, 입력 MIDI context와 실제 Stage B phrase/motif template을 연결한 baseline 후보 export 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_phrase_bank_retrieval_baseline`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_audio_render_package`
+- generation source: `phrase_bank_data_motif_retrieval`
+- source records / motif count: `56 / 803`
+- unique rhythm / contour templates: `520 / 328`
+- candidate count: `9`
+- qualified candidate count: `3`
+- exported / exported qualified MIDI candidates: `3 / 3`
+- best note / unique pitch / max simultaneous: `64 / 22 / 1`
+- best dead-air / phrase coverage: `0.5873015873015873 / 1.0`
+- MIDI-to-solo MVP claimed: `false`
+- human/audio preference claimed: `false`
+
+판단:
+
+- checkpoint 직접 생성 품질 claim 없이 실제 phrase/motif template 기반 후보 경로 확보.
+- objective gate 기준 MIDI export 가능.
+- 청음 품질, human/audio preference, Brad style adaptation claim 제외.
+- 다음 작업은 phrase-bank 후보의 WAV render package다.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_retrieval_baseline`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-retrieval-baseline`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo phrase-bank audio render package`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

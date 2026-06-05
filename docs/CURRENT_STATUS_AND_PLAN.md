@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #630, Stage B MIDI-to-solo model-conditioned input path listening review package
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path listening review input guard`
+- latest functional result: Issue #632, Stage B MIDI-to-solo phrase-bank retrieval baseline
+- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank audio render package`
 
 현재 범위가 아닌 것:
 
@@ -28,6 +28,59 @@
 ## Current Decision
 
 현재 목표는 완성형 jazz model claim이 아니라, `input.mid -> ranked solo MIDI candidates` 실행 경로를 만드는 것이다.
+
+현재 품질 경계:
+
+- checkpoint 직접 생성 품질 claim 제외
+- phrase-bank retrieval baseline을 품질 하한 후보 경로로 사용
+- audio render와 청음 review는 다음 작업으로 분리
+
+## Stage B MIDI-to-Solo Phrase-Bank Retrieval Baseline Result
+
+Issue #632는 입력 MIDI context와 실제 Stage B phrase/motif template을 연결해 phrase-bank retrieval baseline 후보를 export한 작업이다.
+
+변경:
+
+- MIDI-to-solo phrase-bank retrieval baseline script 추가
+- context extraction 결과의 chord progression 재사용
+- real phrase/motif template extraction 재사용
+- `data_motif_*` generation mode 기반 후보 생성
+- overlap-free solo-line MIDI export 추가
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_RETRIEVAL_BASELINE_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_phrase_bank_retrieval_baseline`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_audio_render_package`
+- generation source: `phrase_bank_data_motif_retrieval`
+- source records: `56`
+- motif count: `803`
+- unique rhythm / contour templates: `520 / 328`
+- candidate count: `9`
+- qualified candidate count: `3`
+- exported / exported qualified MIDI candidates: `3 / 3`
+- best note / unique pitch / max simultaneous: `64 / 22 / 1`
+- best dead-air / phrase coverage: `0.5873015873015873 / 1.0`
+- MIDI-to-solo MVP claimed: `false`
+- human/audio preference claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- model-conditioned direct path의 청음 품질 claim 없이도, 실제 phrase/motif template 기반 후보 export 경로 확보
+- 현재 결과는 MIDI objective gate와 template evidence 기준
+- musical quality, human/audio preference, Brad style adaptation claim 제외
+- 다음 작업은 exported phrase-bank MIDI의 WAV render package
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_retrieval_baseline`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-retrieval-baseline`
+
+다음:
+
+- `Stage B MIDI-to-solo phrase-bank audio render package`
 
 ## Stage B MIDI-to-Solo MVP Input Contract Result
 
