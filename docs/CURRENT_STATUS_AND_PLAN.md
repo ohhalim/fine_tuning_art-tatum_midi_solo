@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #592, Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair probe
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair repeatability probe`
+- latest functional result: Issue #594, Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair repeatability probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard decision`
 
 현재 범위가 아닌 것:
 
@@ -2723,6 +2723,51 @@ Issue #592는 #590 decision 결과에서 선택된 selected-scale dead-air repai
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair repeatability probe`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Training Scale Dead-Air Repair Repeatability Probe Result
+
+Issue #594는 #592 repair 조건이 seed sweep에서도 유지되는지 검증한 작업이다.
+
+변경:
+
+- selected-scale dead-air repair repeatability probe script 추가
+- seeds `47/52/60` aggregate 기록
+- dead-air / collapse 재발 여부 검증
+- 전용 harness mode와 unit test 추가
+- handoff docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_DEAD_AIR_REPAIR_REPEATABILITY_PROBE_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_repeatability_probe`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_decision`
+- seed count: `3`
+- sample count: `9`
+- valid / strict / grammar: `7` / `7` / `9`
+- note-count / grammar / dead-air / collapse failure count: `0` / `0` / `2` / `1`
+- all seed gate passed: `true`
+- all samples strict valid: `false`
+- selected-scale dead-air repair repeatability target qualified: `false`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- seed `52`에서 dead-air와 postprocess collapse warning 재발
+- 단일 seed repair는 성공했지만 repeatability target은 미충족
+- note-count / grammar failure는 재발하지 않음
+- 다음 작업은 temperature guard decision
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_repeatability_probe tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_probe`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_repeatability_probe.py scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_probe.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-dead-air-repair-repeatability-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard decision`
 
 ## Previous Model Decision
 
