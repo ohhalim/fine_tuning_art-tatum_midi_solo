@@ -2399,6 +2399,41 @@ Issue #638은 Issue #636 listening review package의 pending input 상태를 검
 
 - `Stage B MIDI-to-solo phrase-bank objective-only next decision`
 
+## 9.11 Stage B MIDI-to-solo phrase-bank objective-only next decision
+
+Issue #640은 Issue #638 input guard 이후 사용자 청음 없이 진행 가능한 objective-only decision을 추가한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_phrase_bank_objective_only_next_decision`
+- source boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_input_guard`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe`
+- review basis: `objective_midi_and_wav_metadata_only`
+- candidate count: `3`
+- objective keep candidate count: `0`
+- repair required candidate count: `3`
+- all candidates require repair: `true`
+- dead-air range: `0.5873 - 0.6032`
+- preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- phrase-bank 후보 3개 모두 기존 export gate 통과.
+- 3개 모두 solo keep 기준 objective risk 존재.
+- 공통 risk: dead-air 초과, uniform bar note density, duration/IOI diversity 부족, approach resolution 부족, pitch reuse 과다, leap motion 부재.
+- 현재 후보를 CLI MVP keep 후보로 포장하지 않고 dead-air/density repair 대상으로 분리.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_objective_only_next_decision`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-objective-only-next-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo phrase-bank dead-air density repair probe`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

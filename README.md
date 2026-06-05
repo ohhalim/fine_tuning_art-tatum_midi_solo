@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_input_guard`
-- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_input_guard`
+- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_objective_only_next_decision`
+- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_objective_only_next_decision`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -30,6 +30,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank listening review package ready: `true`
 - phrase-bank listening review items: `3`
 - phrase-bank preference fill allowed: `false`
+- phrase-bank objective keep candidates: `0 / 3`
+- phrase-bank repair required candidates: `3 / 3`
+- phrase-bank dead-air range: `0.5873 - 0.6032`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -53,6 +56,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - 입력 MIDI context 기반 phrase-bank retrieval 후보 export 가능
 - phrase-bank 후보의 WAV technical render 가능
 - phrase-bank 후보의 listening review package 생성 가능
+- phrase-bank 후보의 objective-only 실패 신호 분리 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -179,6 +183,19 @@ Phrase-bank listening review input guard.
 - required input fields: `candidate_rank`, `listening_status`, `preference`, `issue_notes`
 - human/audio preference claimed: `false`
 - next boundary: `stage_b_midi_to_solo_phrase_bank_objective_only_next_decision`
+
+Phrase-bank objective-only next decision.
+
+- review basis: `objective_midi_and_wav_metadata_only`
+- candidate count: `3`
+- objective keep candidate count: `0`
+- repair required candidate count: `3`
+- all candidates require repair: `true`
+- dead-air range: `0.5873 - 0.6032`
+- primary risk flags: `dead_air_ratio_above_review_threshold`, `uniform_bar_note_density`, `low_duration_diversity`, `low_ioi_diversity`, `low_approach_resolution`, `high_pitch_reuse_ratio`, `no_leap_motion`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe`
 
 MIDI-to-solo input contract.
 
