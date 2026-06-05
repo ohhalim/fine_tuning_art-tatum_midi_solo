@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -16,8 +16,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned audio technical path available: `true`
 - model-conditioned ranked input-path export contract matched: `true`
 - fallback replacement candidate export ready: `true`
-- fallback replacement ready: `false`
-- candidate audio render required: `true`
+- model-conditioned ranked audio render completed: `true`
+- fallback replacement technical path ready: `true`
+- fallback replacement ready: `true`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
 - musical quality MVP completed: `false`
@@ -36,6 +37,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - selected-scale checkpoint repair path의 objective evidence 정리 가능
 - model-conditioned strict MIDI/WAV technical evidence 존재
 - model-conditioned ranked MIDI candidate export 가능
+- model-conditioned ranked WAV technical render 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -91,6 +93,17 @@ Model-conditioned input path candidate export.
 - fallback replacement candidate export ready: `true`
 - fallback replacement ready: `false`
 - candidate audio render required: `true`
+
+Model-conditioned input path audio render package.
+
+- rendered audio file count: `3`
+- technical WAV validation: `true`
+- model-conditioned ranked audio render completed: `true`
+- fallback replacement technical path ready: `true`
+- fallback replacement ready: `true`
+- WAV duration range: `19.585s - 22.390s`
+- audio rendered quality claimed: `false`
+- human/audio preference claimed: `false`
 
 MIDI-to-solo input contract.
 

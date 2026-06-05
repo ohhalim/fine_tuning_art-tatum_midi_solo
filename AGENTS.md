@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #624, Stage B MIDI-to-solo model-conditioned input path candidate export.
+- Latest functional issue completed: Issue #626, Stage B MIDI-to-solo model-conditioned input path audio render package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-conditioned input path audio render package.
+- Recommended next issue: Stage B MIDI-to-solo model-conditioned input path replacement consolidation.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1068,6 +1068,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-
 ```
 
 This harness exports model-conditioned strict MIDI candidates through the ranked input-path contract and routes to ranked audio render without claiming musical quality.
+
+For Stage B MIDI-to-solo model-conditioned input path audio render package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-audio-render-package
+```
+
+This harness renders model-conditioned ranked MIDI exports to WAV and records technical replacement evidence without claiming musical quality.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 
