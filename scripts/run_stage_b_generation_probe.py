@@ -1028,9 +1028,11 @@ def generate_stage_b_constrained_tokens(
     jazz_rhythm_profile: str = "swing_motif",
     cap_duration_to_next_position: bool = False,
     fill_duration_to_next_position: bool = False,
+    avoid_reused_positions: bool = False,
 ) -> list[int]:
     tokens = [int(token) for token in primer_tokens]
     recent_pitches: list[int] = []
+    used_positions_by_bar: dict[int, set[int]] = {}
     families = [
         range(TOKEN_POSITION_START, TOKEN_POSITION_END + 1),
         range(TOKEN_VELOCITY_START, TOKEN_VELOCITY_END + 1),
@@ -1061,6 +1063,16 @@ def generate_stage_b_constrained_tokens(
                 )
                 if planned_positions is not None and family_index == 0:
                     allowed = planned_positions
+                if avoid_reused_positions and family_index == 0:
+                    used_positions = used_positions_by_bar.setdefault(bar_index, set())
+                    filtered_positions = [
+                        token
+                        for token in allowed
+                        if is_position_token(token)
+                        and position_from_token(token) not in used_positions
+                    ]
+                    if filtered_positions:
+                        allowed = filtered_positions
                 if chord_aware_pitches and family_index == 2:
                     allowed = chord_aware_pitch_tokens(
                         chord,
@@ -1112,6 +1124,8 @@ def generate_stage_b_constrained_tokens(
                 tokens.append(token)
                 if family_index == 0 and is_position_token(token):
                     current_position = position_from_token(token)
+                    if avoid_reused_positions:
+                        used_positions_by_bar.setdefault(bar_index, set()).add(current_position)
                 if family_index == 2 and is_note_pitch_token(token):
                     recent_pitches.append(pitch_from_token(token))
 
@@ -1522,6 +1536,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--cap_duration_to_next_position", action="store_true")
     parser.add_argument("--fill_duration_to_next_position", action="store_true")
+    parser.add_argument("--avoid_reused_positions", action="store_true")
     parser.add_argument("--postprocess_overlap", action="store_true")
     parser.add_argument("--max_simultaneous_notes", type=int, default=2)
     parser.add_argument("--min_valid_samples", type=int, default=1)
@@ -1609,6 +1624,7 @@ def main() -> int:
         "jazz_rhythm_profile": args.jazz_rhythm_profile,
         "cap_duration_to_next_position": bool(args.cap_duration_to_next_position),
         "fill_duration_to_next_position": bool(args.fill_duration_to_next_position),
+        "avoid_reused_positions": bool(args.avoid_reused_positions),
         "postprocess_overlap": bool(args.postprocess_overlap),
     }
 
@@ -1679,6 +1695,7 @@ def main() -> int:
                 jazz_rhythm_profile=args.jazz_rhythm_profile,
                 cap_duration_to_next_position=args.cap_duration_to_next_position,
                 fill_duration_to_next_position=args.fill_duration_to_next_position,
+                avoid_reused_positions=args.avoid_reused_positions,
             )
         else:
             generated_tokens = generate_stage_b_tokens(
