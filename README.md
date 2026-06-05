@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_probe`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -14,9 +14,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned input path aligned: `false`
 - model-conditioned candidate source available: `true`
 - model-conditioned audio technical path available: `true`
-- model-conditioned ranked input-path export contract matched: `false`
+- model-conditioned ranked input-path export contract matched: `true`
+- fallback replacement candidate export ready: `true`
 - fallback replacement ready: `false`
-- candidate export required: `true`
+- candidate audio render required: `true`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
 - musical quality MVP completed: `false`
@@ -34,6 +35,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - objective MIDI gate 기반 실패/개선 분리 가능
 - selected-scale checkpoint repair path의 objective evidence 정리 가능
 - model-conditioned strict MIDI/WAV technical evidence 존재
+- model-conditioned ranked MIDI candidate export 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -78,6 +80,17 @@ Model-conditioned input path probe.
 - ranked input-path export contract matched: `false`
 - fallback replacement ready: `false`
 - candidate export required: `true`
+
+Model-conditioned input path candidate export.
+
+- generation source: `model_checkpoint_direct_constrained`
+- ranked MIDI candidates exported: `true`
+- ranked input-path export contract matched: `true`
+- exported candidate count: `3`
+- best note / unique pitch / max simultaneous: `24 / 20 / 1`
+- fallback replacement candidate export ready: `true`
+- fallback replacement ready: `false`
+- candidate audio render required: `true`
 
 MIDI-to-solo input contract.
 
