@@ -6,10 +6,11 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- latest evidence boundary: `stage_b_midi_to_solo_quality_gap_decision`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
+- selected quality gap target: `model_conditioned_input_path_quality_alignment`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
 - musical quality MVP completed: `false`
@@ -46,6 +47,13 @@ MVP completion audit.
 - musical quality MVP completed: `false`
 - human/audio preference completed: `false`
 - product MVP completed: `false`
+
+Quality gap decision.
+
+- selected target: `model_conditioned_input_path_quality_alignment`
+- fallback path active: `true`
+- model-conditioned input path alignment required: `true`
+- human review required now: `false`
 
 MIDI-to-solo input contract.
 
@@ -264,6 +272,6 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-t
 
 ## 다음 작업
 
-- Stage B MIDI-to-solo quality gap decision
+- Stage B MIDI-to-solo model-conditioned input path quality alignment
 - `context_conditioned_fallback` path와 selected-scale objective repair path의 quality gap 분리
 - human listening review 입력 전까지 preference/musical quality claim 차단 유지
