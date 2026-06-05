@@ -5323,6 +5323,27 @@ run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_consolidation() {
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_consolidation}"
+  local repair_report="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_probe/${repair_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_probe.json"
+  if [[ ! -f "$repair_report" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair probe"
+    RUN_ID="$repair_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_probe
+  fi
+  print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair consolidation"
+  "$PYTHON_BIN" scripts/consolidate_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair.py \
+    --run_id "$run_id" \
+    --repair_probe_report "$repair_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_POSTPROCESS_REMOVAL_DEAD_AIR_REPAIR_CONSOLIDATION_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_consolidation \
+    --expected_next_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_audio_review_package \
+    --min_sample_count 9 \
+    --require_objective_support \
+    --require_audio_review_required \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -6883,6 +6904,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-postprocess-removal-dead-air-repair-probe)
     run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_probe
+    ;;
+  stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-postprocess-removal-dead-air-repair-consolidation)
+    run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_consolidation
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
