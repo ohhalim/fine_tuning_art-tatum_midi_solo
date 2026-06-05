@@ -5619,6 +5619,26 @@ run_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package() {
+  local candidate_export_run_id="${CANDIDATE_EXPORT_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package}"
+  local candidate_export="outputs/stage_b_midi_to_solo_model_conditioned_input_path_candidate_export/${candidate_export_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_candidate_export.json"
+  if [[ ! -f "$candidate_export" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path candidate export"
+    RUN_ID="$candidate_export_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path audio render package"
+  "$PYTHON_BIN" scripts/render_stage_b_midi_to_solo_model_conditioned_input_path_audio.py \
+    --run_id "$run_id" \
+    --candidate_export_report "$candidate_export" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_AUDIO_RENDER_PACKAGE_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation \
+    --expected_file_count 3 \
+    --require_replacement_technical_path \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -7209,6 +7229,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-candidate-export)
     run_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-audio-render-package)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
