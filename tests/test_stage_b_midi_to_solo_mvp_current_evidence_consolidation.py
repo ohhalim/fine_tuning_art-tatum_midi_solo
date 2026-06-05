@@ -1,0 +1,298 @@
+from __future__ import annotations
+
+import tempfile
+import unittest
+from pathlib import Path
+
+from scripts.consolidate_stage_b_midi_to_solo_mvp_current_evidence import (
+    BOUNDARY,
+    NEXT_BOUNDARY,
+    OBJECTIVE_FINAL_BOUNDARY,
+    OBJECTIVE_NEXT_BOUNDARY,
+    StageBMidiToSoloMvpCurrentEvidenceConsolidationError,
+    build_current_evidence_consolidation_report,
+    validate_current_evidence_consolidation_report,
+)
+
+
+def touch(path: Path) -> str:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"x")
+    return str(path)
+
+
+def reports(
+    root: Path,
+    *,
+    strict_count: int = 9,
+    dead_air_failure_count: int = 0,
+    collapse_count: int = 0,
+    quality_claim: bool = False,
+) -> dict[str, dict]:
+    midi_paths = [touch(root / f"rank_{index:02d}.mid") for index in range(1, 4)]
+    wav_paths = [touch(root / f"rank_{index:02d}.wav") for index in range(1, 4)]
+    objective_support = strict_count == 9 and dead_air_failure_count == 0 and collapse_count == 0
+    return {
+        "contract": {
+            "boundary": "stage_b_midi_to_solo_mvp_input_contract",
+            "output_contract": {
+                "candidate_count": 32,
+                "export_top_midi_count": 3,
+                "target_solo_bars": 8,
+            },
+            "objective_gate": {
+                "min_note_count": 24,
+                "min_unique_pitch_count": 8,
+                "max_dead_air_ratio": 0.5,
+                "max_long_note_ratio": 0.5,
+                "max_simultaneous_notes": 1,
+                "min_phrase_coverage_ratio": 0.75,
+            },
+            "generation_stack": {
+                "primary_path": "generic_base_checkpoint_conditioned_generation",
+                "fallback_path": "phrase_retrieval_data_motif_hybrid",
+            },
+            "decision": {"critical_user_input_required": False},
+        },
+        "context": {
+            "boundary": "stage_b_midi_to_solo_context_extraction_mvp",
+            "summary": {
+                "context_bars": 8,
+                "positions_per_bar": 16,
+                "context_event_count": 128,
+                "inferred_chord_bar_count": 4,
+                "carry_forward_chord_bar_count": 4,
+                "unknown_chord_bar_count": 0,
+                "low_confidence_bar_count": 4,
+                "bass_note_bar_count": 4,
+            },
+            "readiness": {
+                "context_extraction_completed": True,
+                "required_context_fields_present": True,
+                "midi_to_solo_mvp_claimed": False,
+                "harmony_analysis_quality_claimed": False,
+                "brad_style_fine_tuning_completed": False,
+            },
+        },
+        "resource": {
+            "boundary": "stage_b_midi_to_solo_training_resource_probe",
+            "readiness": {
+                "training_resource_probe_completed": True,
+                "midi_to_solo_training_resource_ready": True,
+                "conditioned_generation_probe_ready": True,
+                "midi_to_solo_mvp_claimed": False,
+                "broad_training_executed": False,
+                "broad_trained_model_quality_claimed": False,
+                "brad_style_adaptation_claimed": False,
+                "musical_quality_claimed": False,
+            },
+        },
+        "generation": {
+            "boundary": "stage_b_midi_to_solo_conditioned_generation_probe",
+            "generation_config": {
+                "generation_source": "context_conditioned_fallback",
+                "model_checkpoint_generation_used": False,
+                "checkpoint_direct_generation_skip_reason": "sequence budget shortfall",
+            },
+            "summary": {
+                "candidate_count": 8,
+                "qualified_candidate_count": 8,
+                "exported_candidate_count": 3,
+                "exported_qualified_candidate_count": 3,
+                "best_score": 1.89,
+                "best_note_count": 60,
+                "best_unique_pitch_count": 14,
+                "best_max_simultaneous_notes": 1,
+                "best_chord_tone_ratio": 1.0,
+            },
+            "readiness": {
+                "conditioned_generation_probe_completed": True,
+                "ranked_midi_candidates_exported": True,
+                "midi_to_solo_mvp_claimed": False,
+                "model_checkpoint_generation_quality_claimed": False,
+                "broad_trained_model_quality_claimed": False,
+                "brad_style_adaptation_claimed": False,
+                "human_audio_preference_claimed": False,
+            },
+            "top_candidates": [{"export_midi_path": path} for path in midi_paths],
+        },
+        "audio": {
+            "audio_render_boundary": {
+                "boundary": "stage_b_midi_to_solo_candidate_audio_render_package",
+                "render_attempted": True,
+                "rendered_audio_file_count": 3,
+                "technical_wav_validation": True,
+                "audio_rendered_quality_claimed": False,
+                "human_audio_preference_claimed": False,
+                "musical_quality_claimed": quality_claim,
+                "midi_to_solo_mvp_claimed": False,
+                "broad_trained_model_quality_claimed": False,
+                "brad_style_adaptation_claimed": False,
+            },
+            "rendered_audio_files": [
+                {
+                    "wav_file": {
+                        "path": path,
+                        "sample_rate": 44100,
+                        "duration_seconds": 18.0 + index,
+                    }
+                }
+                for index, path in enumerate(wav_paths)
+            ],
+        },
+        "objective": {
+            "boundary": OBJECTIVE_NEXT_BOUNDARY,
+            "final_boundary": OBJECTIVE_FINAL_BOUNDARY,
+            "postprocess_removal_dead_air_repair_summary": {
+                "sample_count": 9,
+                "seed_count": 3,
+                "valid_sample_count": strict_count,
+                "strict_valid_sample_count": strict_count,
+                "grammar_gate_sample_count": 9,
+                "dead_air_failure_count": dead_air_failure_count,
+                "collapse_warning_sample_count": collapse_count,
+                "strict_valid_sample_delta": 1,
+                "dead_air_failure_delta": -1,
+                "temperature": 0.75,
+                "top_k": 4,
+                "avoid_reused_positions": True,
+                "avg_postprocess_removal_ratio": 0.2176,
+                "max_postprocess_removal_ratio": 0.2917,
+                "target_avg_postprocess_removal_ratio": 0.3,
+                "postprocess_removal_delta": -0.1435,
+                "avg_onset_coverage_ratio": 0.7326,
+                "avg_sustained_coverage_ratio": 0.7708,
+            },
+            "review_boundary_summary": {
+                "candidate_count": 3,
+                "rendered_audio_file_count": 3,
+                "review_input_template_written": True,
+                "validated_review_input_present": False,
+                "preference_fill_allowed": False,
+                "pending_status_field_count": 4,
+                "pending_candidate_decision_count": 3,
+                "pending_candidate_field_count": 9,
+            },
+            "readiness": {
+                "objective_only_decision_completed": True,
+                "objective_postprocess_removal_dead_air_repair_path_supported": objective_support,
+                "human_audio_preference_claimed": False,
+                "midi_to_solo_musical_quality_claimed": quality_claim,
+                "broad_trained_model_quality_claimed": False,
+                "brad_style_adaptation_claimed": False,
+            },
+            "decision": {
+                "next_boundary": "stage_b_midi_to_solo_mvp_current_evidence_consolidation",
+                "critical_user_input_required": False,
+            },
+        },
+    }
+
+
+class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
+    def test_consolidates_current_evidence_without_quality_claim(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp))
+            report = build_current_evidence_consolidation_report(
+                contract_report=data["contract"],
+                context_report=data["context"],
+                resource_probe=data["resource"],
+                generation_probe=data["generation"],
+                audio_render=data["audio"],
+                objective_next=data["objective"],
+                output_dir=Path(tmp) / "out",
+                issue_number=612,
+            )
+            summary = validate_current_evidence_consolidation_report(
+                report,
+                expected_boundary=BOUNDARY,
+                expected_next_boundary=NEXT_BOUNDARY,
+                require_current_evidence_support=True,
+                require_no_quality_claim=True,
+                min_exported_candidates=3,
+                min_rendered_wav_files=3,
+                min_objective_sample_count=9,
+            )
+
+            self.assertTrue(summary["midi_to_solo_mvp_current_evidence_supported"])
+            self.assertTrue(summary["technical_execution_evidence_supported"])
+            self.assertTrue(summary["selected_scale_objective_path_complete"])
+            self.assertEqual(summary["generation_source"], "context_conditioned_fallback")
+            self.assertEqual(summary["exported_candidate_count"], 3)
+            self.assertEqual(summary["rendered_audio_file_count"], 3)
+            self.assertEqual(summary["objective_sample_count"], 9)
+            self.assertEqual(summary["objective_strict_valid_sample_count"], 9)
+            self.assertEqual(summary["objective_grammar_gate_sample_count"], 9)
+            self.assertEqual(summary["objective_dead_air_failure_count"], 0)
+            self.assertEqual(summary["objective_collapse_warning_sample_count"], 0)
+            self.assertFalse(summary["human_audio_preference_claimed"])
+            self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
+            self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
+
+    def test_rejects_missing_ranked_midi_artifact(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp))
+            Path(data["generation"]["top_candidates"][0]["export_midi_path"]).unlink()
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=612,
+                )
+
+    def test_rejects_objective_strict_shortfall(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp), strict_count=8)
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=612,
+                )
+
+    def test_rejects_dead_air_or_quality_claim(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp), dead_air_failure_count=1)
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=612,
+                )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp), quality_claim=True)
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=612,
+                )
+
+    def test_boundary_constants_are_stable(self) -> None:
+        self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_mvp_current_evidence_consolidation")
+        self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_readme_evidence_refresh")
+
+
+if __name__ == "__main__":
+    unittest.main()

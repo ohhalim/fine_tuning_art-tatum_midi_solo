@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #610, Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation`
+- latest functional result: Issue #612, Stage B MIDI-to-solo MVP current evidence consolidation
+- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence refresh`
 
 현재 범위가 아닌 것:
 
@@ -3164,6 +3164,62 @@ Issue #610은 #608 pending listening review와 #604 objective MIDI support를 �
 다음:
 
 - `Stage B MIDI-to-solo MVP current evidence consolidation`
+
+## Stage B MIDI-to-Solo MVP Current Evidence Consolidation Result
+
+Issue #612는 입력 계약, context extraction, ranked MIDI export, technical WAV render, selected-scale objective repair 완료 경계를 하나의 현재 MVP evidence로 집계한 작업이다.
+
+변경:
+
+- MIDI-to-solo MVP current evidence consolidation script 추가
+- contract / context / resource / generation / audio / objective-next report 검증 연결
+- current evidence readiness와 claim boundary 분리
+- README evidence refresh next boundary 결정
+- 전용 harness mode와 unit test 추가
+- handoff docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_CURRENT_EVIDENCE_CONSOLIDATION_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- current MVP evidence supported: `true`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- generation source: `context_conditioned_fallback`
+- exported / qualified candidates: `3` / `3`
+- rendered WAV files: `3`
+- WAV sample rate: `44100`
+- WAV duration range: `18.617s-18.991s`
+- technical WAV validation: `true`
+- objective sample / seed count: `9` / `3`
+- objective valid / strict / grammar: `9` / `9` / `9`
+- objective dead-air / collapse failure count: `0` / `0`
+- objective avg / target postprocess removal ratio: `0.21759259259259262` / `0.3`
+- validated review input present: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- broad trained model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 입력 MIDI 기반 context, ranked MIDI export, WAV render 기술 경로는 현재 evidence로 집계 가능
+- selected-scale checkpoint postprocess removal dead-air repair objective path는 완료 경계로 정리
+- 청음 선호와 musical quality claim은 미검증 상태 유지
+- 다음 작업은 README에 현재 evidence와 claim boundary를 반영하는 문서 갱신
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- `.venv/bin/python -m py_compile scripts/consolidate_stage_b_midi_to_solo_mvp_current_evidence.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-current-evidence-consolidation`
+
+다음:
+
+- `Stage B MIDI-to-solo README evidence refresh`
 
 ## Previous Model Decision
 
