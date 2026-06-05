@@ -5231,6 +5231,25 @@ run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_rep
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_decision() {
+  local repeatability_run_id="${REPEATABILITY_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_repeatability_probe}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_decision}"
+  local repeatability_report="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_repeatability_probe/${repeatability_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_repeatability_probe.json"
+  if [[ ! -f "$repeatability_report" ]]; then
+    print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repair repeatability probe"
+    RUN_ID="$repeatability_run_id" run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_repeatability_probe
+  fi
+  print_header "Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard.py \
+    --run_id "$run_id" \
+    --repeatability_report "$repeatability_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_DEAD_AIR_REPEATABILITY_TEMPERATURE_GUARD_DECISION_2026-06-04.md \
+    --expected_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_decision \
+    --expected_next_boundary stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_repair_probe \
+    --require_guard_target \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -6779,6 +6798,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-dead-air-repair-repeatability-probe)
     run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repair_repeatability_probe
+    ;;
+  stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-dead-air-repeatability-temperature-guard-decision)
+    run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_decision
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
