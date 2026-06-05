@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #634, Stage B MIDI-to-solo phrase-bank audio render package
-- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank listening review package`
+- latest functional result: Issue #636, Stage B MIDI-to-solo phrase-bank listening review package
+- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank listening review input guard`
 
 현재 범위가 아닌 것:
 
@@ -34,7 +34,53 @@
 - checkpoint 직접 생성 품질 claim 제외
 - phrase-bank retrieval baseline을 품질 하한 후보 경로로 사용
 - phrase-bank audio render technical validation 완료
-- 청음 review는 다음 작업으로 분리
+- phrase-bank listening review package 준비 완료
+- review input validation guard는 다음 작업으로 분리
+
+## Stage B MIDI-to-Solo Phrase-Bank Listening Review Package Result
+
+Issue #636은 Issue #634 phrase-bank WAV/MIDI 후보를 listening review package로 묶고, preference 입력 전 claim boundary를 고정한 작업이다.
+
+변경:
+
+- phrase-bank audio render report source validation 추가
+- WAV/MIDI review item manifest 생성
+- required review input fields 정의
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_LISTENING_REVIEW_PACKAGE_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_input_guard`
+- listening review package ready: `true`
+- review item count: `3`
+- validated review input: `false`
+- human review required now: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+Review WAV:
+
+- rank 1: `outputs/stage_b_midi_to_solo_phrase_bank_audio_render_package/harness_stage_b_midi_to_solo_phrase_bank_audio_render_package/audio/rank_01_seed_635.wav`
+- rank 2: `outputs/stage_b_midi_to_solo_phrase_bank_audio_render_package/harness_stage_b_midi_to_solo_phrase_bank_audio_render_package/audio/rank_02_seed_632.wav`
+- rank 3: `outputs/stage_b_midi_to_solo_phrase_bank_audio_render_package/harness_stage_b_midi_to_solo_phrase_bank_audio_render_package/audio/rank_03_seed_638.wav`
+
+판단:
+
+- WAV/MIDI review artifact 접근 경로 확보
+- preference와 musical quality claim은 review input 전 pending 유지
+- 다음 작업은 review input 없이 preference fill이 불가능하도록 guard 추가
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_listening_review_package`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-listening-review-package`
+
+다음:
+
+- `Stage B MIDI-to-solo phrase-bank listening review input guard`
 
 ## Stage B MIDI-to-Solo Phrase-Bank Audio Render Package Result
 

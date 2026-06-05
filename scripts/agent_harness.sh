@@ -202,6 +202,8 @@ Modes:
                 Export ranked MIDI-to-solo candidates from input context and data-derived phrase-bank templates.
   stage-b-midi-to-solo-phrase-bank-audio-render-package
                 Render phrase-bank MIDI-to-solo candidates to local WAV files.
+  stage-b-midi-to-solo-phrase-bank-listening-review-package
+                Package phrase-bank MIDI/WAV candidates for pending listening review.
   stage-b-midi-to-solo-candidate-audio-render-package
                 Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-mvp-execution-consolidation
@@ -3665,6 +3667,25 @@ run_stage_b_midi_to_solo_phrase_bank_audio_render_package() {
     --expected_boundary stage_b_midi_to_solo_phrase_bank_audio_render_package \
     --expected_next_boundary stage_b_midi_to_solo_phrase_bank_listening_review_package \
     --require_phrase_bank_audio_path \
+    --require_no_quality_claim
+}
+
+run_stage_b_midi_to_solo_phrase_bank_listening_review_package() {
+  local audio_run_id="${AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_audio_render_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_listening_review_package}"
+  local audio_render_report="outputs/stage_b_midi_to_solo_phrase_bank_audio_render_package/${audio_run_id}/stage_b_midi_to_solo_phrase_bank_audio_render_package.json"
+  if [[ ! -f "$audio_render_report" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank audio render package"
+    RUN_ID="$audio_run_id" run_stage_b_midi_to_solo_phrase_bank_audio_render_package
+  fi
+  print_header "Stage B MIDI-to-solo phrase-bank listening review package"
+  "$PYTHON_BIN" scripts/build_stage_b_midi_to_solo_phrase_bank_listening_review_package.py \
+    --run_id "$run_id" \
+    --audio_render_report "$audio_render_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_LISTENING_REVIEW_PACKAGE_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_phrase_bank_listening_review_package \
+    --expected_next_boundary stage_b_midi_to_solo_phrase_bank_listening_review_input_guard \
+    --require_package_ready \
     --require_no_quality_claim
 }
 
@@ -7133,6 +7154,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-phrase-bank-audio-render-package)
     run_stage_b_midi_to_solo_phrase_bank_audio_render_package
+    ;;
+  stage-b-midi-to-solo-phrase-bank-listening-review-package)
+    run_stage_b_midi_to_solo_phrase_bank_listening_review_package
     ;;
   stage-b-midi-to-solo-candidate-audio-render-package)
     run_stage_b_midi_to_solo_candidate_audio_render_package
