@@ -2299,6 +2299,39 @@ Issue #632는 model-conditioned direct path의 청음 품질 claim 없이, 입�
 
 - `Stage B MIDI-to-solo phrase-bank audio render package`
 
+## 9.8 Stage B MIDI-to-solo phrase-bank audio render package
+
+Issue #634는 Issue #632 phrase-bank retrieval baseline MIDI 후보를 WAV로 render하고 technical metadata를 검증한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_phrase_bank_audio_render_package`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_listening_review_package`
+- rendered audio file count: `3`
+- technical WAV validation: `true`
+- phrase-bank ranked audio render completed: `true`
+- rank 1 duration / sample rate / sha256 prefix: `18.985s / 44100 / 07a95cfe5c4b`
+- rank 2 duration / sample rate / sha256 prefix: `18.984s / 44100 / a3a3efc8a9e1`
+- rank 3 duration / sample rate / sha256 prefix: `18.997s / 44100 / d3550541fe41`
+- audio rendered quality claimed: `false`
+- human/audio preference claimed: `false`
+
+판단:
+
+- phrase-bank 후보의 review-ready WAV artifact 생성 완료.
+- 현재 검증 범위는 renderer execution과 WAV metadata다.
+- 청음 품질, phrase-bank musical quality, human/audio preference claim 제외.
+- 다음 작업은 phrase-bank listening review package다.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_audio_render`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-audio-render-package`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo phrase-bank listening review package`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
