@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #608, Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair listening review
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision`
+- latest functional result: Issue #610, Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation`
 
 현재 범위가 아닌 것:
 
@@ -3114,6 +3114,56 @@ review input:
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Training Scale Postprocess Removal Dead-Air Repair Objective-Only Next Decision Result
+
+Issue #610은 #608 pending listening review와 #604 objective MIDI support를 연결해 selected-scale postprocess removal dead-air repair objective path 완료 경계를 정리한 작업이다.
+
+변경:
+
+- selected-scale postprocess removal dead-air repair objective-only next decision script 추가
+- #608 listening review pending guard 검증
+- #604 consolidation의 objective support `9/9` 검증
+- preference/quality claim 차단 유지
+- 전용 harness mode와 unit test 추가
+- handoff docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_POSTPROCESS_REMOVAL_DEAD_AIR_REPAIR_OBJECTIVE_NEXT_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_only_next_decision`
+- final boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_path_complete`
+- next boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- candidate count / rendered audio file count: `3` / `3`
+- sample count / seed count: `9` / `3`
+- valid / strict / grammar: `9` / `9` / `9`
+- dead-air / collapse failure count: `0` / `0`
+- avg / max postprocess removal ratio: `0.21759259259259262` / `0.2916666666666667`
+- target avg postprocess removal ratio: `0.3`
+- postprocess removal delta: `-0.1435185185185185`
+- pending status / candidate decision / candidate field: `4` / `3` / `9`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- objective MIDI evidence 기준 selected-scale postprocess removal dead-air repair path는 완료 경계로 정리 가능
+- 실제 청음 입력이 없으므로 preference와 musical quality claim 차단 유지
+- 다음 작업은 9일 실행 범위의 현재 MVP evidence consolidation
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_next tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_listening_review`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_next.py scripts/build_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_listening_review.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-postprocess-removal-dead-air-repair-objective-next`
+
+다음:
+
+- `Stage B MIDI-to-solo MVP current evidence consolidation`
 
 ## Previous Model Decision
 
