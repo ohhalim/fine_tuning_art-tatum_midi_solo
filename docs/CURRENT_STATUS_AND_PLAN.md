@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #596, Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard repair probe`
+- latest functional result: Issue #598, Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard repair probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air temperature guard follow-up decision`
 
 현재 범위가 아닌 것:
 
@@ -2814,6 +2814,53 @@ Issue #596은 #594 repeatability 실패를 lower-temperature guard repair로 라
 다음:
 
 - `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard repair probe`
+
+## Stage B MIDI-to-Solo Controlled Scale Checkpoint Training Scale Dead-Air Repeatability Temperature Guard Repair Probe Result
+
+Issue #598은 #596에서 선택한 lower-temperature guard config를 실제 seed sweep에 적용한 작업이다.
+
+변경:
+
+- selected-scale temperature guard repair probe script 추가
+- selected temperature `0.75`, top_k `4` 조건으로 seeds `47/52/60` 실행
+- strict shortfall, dead-air, collapse 재발 여부 기록
+- 전용 harness mode와 unit test 추가
+- handoff docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CONTROLLED_SCALE_CHECKPOINT_TRAINING_SCALE_DEAD_AIR_REPEATABILITY_TEMPERATURE_GUARD_REPAIR_PROBE_2026-06-04.md`
+- boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_repair_probe`
+- next boundary: `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_followup_decision`
+- source / repair temperature: `0.9` / `0.75`
+- top_k: `4`
+- sample count: `9`
+- valid / strict / grammar: `8` / `8` / `9`
+- note-count / grammar / dead-air / collapse failure count: `0` / `0` / `1` / `0`
+- strict sample shortfall: `2 -> 1`
+- dead-air failure count: `2 -> 1`
+- collapse warning sample count: `1 -> 0`
+- selected-scale temperature guard repair target qualified: `false`
+- critical user input required: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- lower-temperature guard로 collapse warning 제거
+- strict shortfall과 dead-air failure 일부 감소
+- all-sample strict validity는 아직 미충족
+- 다음 작업은 follow-up decision
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_repair_probe tests.test_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_decision`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard_repair_probe.py scripts/decide_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_dead_air_repeatability_temperature_guard.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-dead-air-repeatability-temperature-guard-repair-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air temperature guard follow-up decision`
 
 ## Previous Model Decision
 
