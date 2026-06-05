@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #612, Stage B MIDI-to-solo MVP current evidence consolidation
-- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence refresh`
+- latest functional result: Issue #614, Stage B MIDI-to-solo README evidence refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit`
 
 현재 범위가 아닌 것:
 
@@ -3220,6 +3220,55 @@ Issue #612는 입력 계약, context extraction, ranked MIDI export, technical W
 다음:
 
 - `Stage B MIDI-to-solo README evidence refresh`
+
+## Stage B MIDI-to-Solo README Evidence Refresh Result
+
+Issue #614는 #612 current evidence를 README 첫 화면과 검증 요약에 반영한 문서 갱신 작업이다.
+
+변경:
+
+- stale evidence boundary 제거
+- README current status를 #612 기준으로 갱신
+- current evidence / 구현 범위 / 문제-조치-관측 결과 / 산출물 / 검증 명령 재정리
+- input MIDI -> context -> ranked MIDI -> WAV technical path 수치 반영
+- selected-scale objective repair path 완료 수치 반영
+- musical quality / human preference / broad quality / Brad adaptation claim guard 유지
+- AGENTS / CURRENT_STATUS / CORE_PLAN 갱신
+
+결과:
+
+- README latest evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- current MVP evidence support: `true`
+- input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
+- selected-scale objective repair path complete: `true`
+- generation source: `context_conditioned_fallback`
+- exported / qualified candidates: `3` / `3`
+- rendered WAV files: `3`
+- WAV sample rate: `44100`
+- WAV duration range: `18.617s-18.991s`
+- objective valid / strict / grammar: `9` / `9` / `9`
+- objective dead-air / collapse failure count: `0` / `0`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- broad trained-model quality claim: `false`
+- Brad style adaptation claim: `false`
+
+판단:
+
+- README 기준 현재 완료 범위와 미검증 claim boundary 분리
+- selected-scale objective evidence와 input-to-WAV technical path를 같은 current evidence 섹션에 배치
+- `context_conditioned_fallback` path와 selected-scale objective repair path의 차이를 README에 유지
+- 다음 작업은 README 반영 이후의 MVP completion audit
+
+검증:
+
+- `git diff --check`
+- public artifact naming guard
+- `bash scripts/agent_harness.sh quick`
+
+다음:
+
+- `Stage B MIDI-to-solo MVP completion audit`
 
 ## Previous Model Decision
 
