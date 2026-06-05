@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #606, Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair audio review package.
+- Latest functional issue completed: Issue #608, Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair listening review.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair listening review.
+- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -995,6 +995,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-t
 ```
 
 This harness renders selected objective-supported MIDI candidates to WAV and records technical audio validation without claiming listening preference.
+
+For Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair listening review changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-postprocess-removal-dead-air-repair-listening-review
+```
+
+This harness writes the pending listening review template and blocks preference fill without validated review input.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 
