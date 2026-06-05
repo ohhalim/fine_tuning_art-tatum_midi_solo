@@ -5540,6 +5540,56 @@ run_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_probe() {
+  local alignment_run_id="${ALIGNMENT_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment}"
+  local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
+  local fallback_generation_run_id="${FALLBACK_GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_conditioned_generation_probe}"
+  local fallback_audio_run_id="${FALLBACK_AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_candidate_audio_render_package}"
+  local model_direct_repair_run_id="${MODEL_DIRECT_REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair}"
+  local model_direct_audio_run_id="${MODEL_DIRECT_AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_model_direct_audio_render_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_probe}"
+  local alignment="outputs/stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment/${alignment_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment.json"
+  local fallback_generation="outputs/stage_b_midi_to_solo_conditioned_generation_probe/${fallback_generation_run_id}/stage_b_midi_to_solo_conditioned_generation_probe.json"
+  local fallback_audio="outputs/stage_b_midi_to_solo_candidate_audio_render_package/${fallback_audio_run_id}/stage_b_midi_to_solo_candidate_audio_render_package.json"
+  local model_direct_repair="outputs/stage_b_midi_to_solo_model_direct_monophonic_overlap_repair/${model_direct_repair_run_id}/stage_b_midi_to_solo_model_direct_monophonic_overlap_repair.json"
+  local model_direct_audio="outputs/stage_b_midi_to_solo_model_direct_audio_render_package/${model_direct_audio_run_id}/stage_b_midi_to_solo_model_direct_audio_render_package.json"
+  if [[ ! -f "$alignment" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path quality alignment"
+    RUN_ID="$alignment_run_id" QUALITY_GAP_RUN_ID="$quality_gap_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment
+  fi
+  if [[ ! -f "$fallback_generation" ]]; then
+    print_header "Stage B MIDI-to-solo conditioned generation probe"
+    RUN_ID="$fallback_generation_run_id" run_stage_b_midi_to_solo_conditioned_generation_probe
+  fi
+  if [[ ! -f "$fallback_audio" ]]; then
+    print_header "Stage B MIDI-to-solo candidate audio render package"
+    RUN_ID="$fallback_audio_run_id" GENERATION_RUN_ID="$fallback_generation_run_id" run_stage_b_midi_to_solo_candidate_audio_render_package
+  fi
+  if [[ ! -f "$model_direct_repair" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct monophonic overlap repair"
+    RUN_ID="$model_direct_repair_run_id" run_stage_b_midi_to_solo_model_direct_monophonic_overlap_repair
+  fi
+  if [[ ! -f "$model_direct_audio" ]]; then
+    print_header "Stage B MIDI-to-solo model-direct audio render package"
+    RUN_ID="$model_direct_audio_run_id" OVERLAP_REPAIR_RUN_ID="$model_direct_repair_run_id" run_stage_b_midi_to_solo_model_direct_audio_render_package
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path probe"
+  "$PYTHON_BIN" scripts/probe_stage_b_midi_to_solo_model_conditioned_input_path.py \
+    --run_id "$run_id" \
+    --alignment_report "$alignment" \
+    --fallback_generation_report "$fallback_generation" \
+    --fallback_audio_report "$fallback_audio" \
+    --model_direct_repair_report "$model_direct_repair" \
+    --model_direct_audio_report "$model_direct_audio" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_PROBE_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_probe \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_candidate_export \
+    --require_model_conditioned_evidence \
+    --require_candidate_export \
+    --require_replacement_not_ready \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -7124,6 +7174,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-quality-alignment)
     run_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-probe)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_probe
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #620, Stage B MIDI-to-solo model-conditioned input path quality alignment
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path probe`
+- latest functional result: Issue #622, Stage B MIDI-to-solo model-conditioned input path probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path candidate export`
 
 현재 범위가 아닌 것:
 
@@ -3407,6 +3407,51 @@ Issue #620은 #618 quality gap decision을 받아 model-conditioned input path a
 다음:
 
 - `Stage B MIDI-to-solo model-conditioned input path probe`
+
+## Stage B MIDI-to-Solo Model-Conditioned Input Path Probe Result
+
+Issue #622는 fallback input-to-WAV path를 model-conditioned 후보로 대체할 수 있는지 판정한 작업이다.
+
+변경:
+
+- model-conditioned input path probe script 추가
+- fallback ranked MIDI/WAV path와 model-direct MIDI/WAV evidence 비교
+- ranked input-path export contract gap 판정
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_PROBE_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_probe`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
+- model-conditioned candidate source available: `true`
+- model-conditioned audio technical path available: `true`
+- same input context as fallback: `true`
+- ranked input-path export contract matched: `false`
+- fallback replacement ready: `false`
+- candidate export required: `true`
+- human review required now: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- `model_checkpoint_direct_constrained` 후보는 strict-valid MIDI `3`개와 technical WAV `3`개 확보
+- fallback path는 `context_conditioned_fallback` 기반 ranked export/WAV `3`개 유지
+- model-direct 후보는 현재 `top_candidates`/ranked export contract로 통합되지 않음
+- 다음 작업은 model-conditioned 후보를 fallback과 동일한 ranked input-path export 형식으로 연결
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_probe`
+- `.venv/bin/python -m py_compile scripts/probe_stage_b_midi_to_solo_model_conditioned_input_path.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned input path candidate export`
 
 ## Previous Model Decision
 

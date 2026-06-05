@@ -6,13 +6,17 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_probe`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
 - model-conditioned input path aligned: `false`
-- fallback replacement probe required: `true`
+- model-conditioned candidate source available: `true`
+- model-conditioned audio technical path available: `true`
+- model-conditioned ranked input-path export contract matched: `false`
+- fallback replacement ready: `false`
+- candidate export required: `true`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
 - musical quality MVP completed: `false`
@@ -29,6 +33,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - technical WAV render 가능
 - objective MIDI gate 기반 실패/개선 분리 가능
 - selected-scale checkpoint repair path의 objective evidence 정리 가능
+- model-conditioned strict MIDI/WAV technical evidence 존재
 
 현재 README가 주장하지 않는 것.
 
@@ -63,6 +68,16 @@ Model-conditioned input path alignment.
 - model-conditioned input path aligned: `false`
 - fallback replacement probe required: `true`
 - human review required now: `false`
+
+Model-conditioned input path probe.
+
+- model-conditioned source: `model_checkpoint_direct_constrained`
+- model-conditioned candidate source available: `true`
+- model-conditioned audio technical path available: `true`
+- same input context as fallback: `true`
+- ranked input-path export contract matched: `false`
+- fallback replacement ready: `false`
+- candidate export required: `true`
 
 MIDI-to-solo input contract.
 
