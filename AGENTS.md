@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #596, Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard decision.
+- Latest functional issue completed: Issue #598, Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard repair probe.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard repair probe.
+- Recommended next issue: Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air temperature guard follow-up decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -955,6 +955,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-t
 ```
 
 This harness selects the lower-temperature repeatability guard target after selected-scale dead-air repair repeatability failure without claiming musical quality.
+
+For Stage B MIDI-to-solo controlled scale checkpoint training scale dead-air repeatability temperature guard repair probe changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-controlled-scale-checkpoint-training-scale-dead-air-repeatability-temperature-guard-repair-probe
+```
+
+This harness tests the selected lower-temperature guard config and routes remaining instability to a follow-up decision without claiming musical quality.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 
