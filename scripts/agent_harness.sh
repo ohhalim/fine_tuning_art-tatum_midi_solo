@@ -204,6 +204,8 @@ Modes:
                 Consolidate input-to-MIDI-to-WAV technical execution evidence.
   stage-b-midi-to-solo-mvp-current-evidence-consolidation
                 Consolidate current MVP evidence from contract, generated MIDI, WAV, and objective repair.
+  stage-b-midi-to-solo-mvp-completion-audit
+                Audit technical model-core MVP completion and separate remaining quality claims.
   stage-b-midi-to-solo-model-direct-generation-repair
                 Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
@@ -5475,6 +5477,26 @@ run_stage_b_midi_to_solo_mvp_current_evidence_consolidation() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_mvp_completion_audit() {
+  local current_evidence_run_id="${CURRENT_EVIDENCE_RUN_ID:-harness_stage_b_midi_to_solo_mvp_current_evidence_consolidation}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_completion_audit}"
+  local current_evidence="outputs/stage_b_midi_to_solo_mvp_current_evidence_consolidation/${current_evidence_run_id}/stage_b_midi_to_solo_mvp_current_evidence_consolidation.json"
+  if [[ ! -f "$current_evidence" ]]; then
+    print_header "Stage B MIDI-to-solo MVP current evidence consolidation"
+    RUN_ID="$current_evidence_run_id" run_stage_b_midi_to_solo_mvp_current_evidence_consolidation
+  fi
+  print_header "Stage B MIDI-to-solo MVP completion audit"
+  "$PYTHON_BIN" scripts/audit_stage_b_midi_to_solo_mvp_completion.py \
+    --run_id "$run_id" \
+    --current_evidence "$current_evidence" \
+    --readme_path README.md \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_2026-06-05.md \
+    --expected_boundary stage_b_midi_to_solo_mvp_completion_audit \
+    --expected_next_boundary stage_b_midi_to_solo_quality_gap_decision \
+    --require_technical_mvp_completion \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -7050,6 +7072,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-mvp-current-evidence-consolidation)
     run_stage_b_midi_to_solo_mvp_current_evidence_consolidation
+    ;;
+  stage-b-midi-to-solo-mvp-completion-audit)
+    run_stage_b_midi_to_solo_mvp_completion_audit
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #614, Stage B MIDI-to-solo README evidence refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit`
+- latest functional result: Issue #616, Stage B MIDI-to-solo MVP completion audit
+- 다음 권장 이슈: `Stage B MIDI-to-solo quality gap decision`
 
 현재 범위가 아닌 것:
 
@@ -3269,6 +3269,56 @@ Issue #614는 #612 current evidence를 README 첫 화면과 검증 요약에 반
 다음:
 
 - `Stage B MIDI-to-solo MVP completion audit`
+
+## Stage B MIDI-to-Solo MVP Completion Audit Result
+
+Issue #616은 #612 current evidence와 #614 README refresh를 기준으로 MVP 완료 범위를 audit한 작업이다.
+
+변경:
+
+- MVP completion audit script 추가
+- current evidence report와 README evidence snippet 검증 연결
+- technical model-core MVP completion과 musical quality/product completion 분리
+- 전용 harness mode와 unit test 추가
+- README / AGENTS / CURRENT_STATUS / CORE_PLAN 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- technical model-core MVP completed: `true`
+- input to ranked MIDI completed: `true`
+- input to rendered WAV completed: `true`
+- selected-scale objective repair completed: `true`
+- musical quality MVP completed: `false`
+- human/audio preference completed: `false`
+- product MVP completed: `false`
+- generation source: `context_conditioned_fallback`
+- exported candidate count: `3`
+- rendered WAV files: `3`
+- objective sample / strict count: `9` / `9`
+- objective dead-air failure count: `0`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 기술 model-core MVP는 현재 evidence와 README refresh 기준 완료 범위로 정리
+- 음악 품질, 청음 선호, product readiness는 완료 범위에서 제외
+- 다음 작업은 기술 경로가 아니라 quality gap decision
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_completion_audit`
+- `.venv/bin/python -m py_compile scripts/audit_stage_b_midi_to_solo_mvp_completion.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit`
+
+다음:
+
+- `Stage B MIDI-to-solo quality gap decision`
 
 ## Previous Model Decision
 
