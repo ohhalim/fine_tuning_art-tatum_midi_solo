@@ -66,6 +66,13 @@ def candidate_export_report(root: Path, *, quality_claim: bool = False) -> dict:
             "candidate_count": 3,
             "exported_candidate_count": 3,
         },
+        "probe_source": {
+            "phrase_bank_cli_technical_path_completed": True,
+            "cli_candidate_count": 3,
+            "cli_rendered_audio_file_count": 3,
+            "cli_input_context_bars": 228,
+            "cli_preference_fill_allowed": False,
+        },
         "top_candidates": top_candidates,
         "readiness": {
             "model_conditioned_input_path_candidate_export_completed": True,
@@ -119,6 +126,11 @@ class StageBMidiToSoloModelConditionedInputPathAudioRenderTest(unittest.TestCase
         self.assertTrue(summary["model_conditioned_ranked_audio_render_completed"])
         self.assertTrue(summary["fallback_replacement_technical_path_ready"])
         self.assertTrue(summary["fallback_replacement_ready"])
+        self.assertTrue(summary["phrase_bank_cli_technical_path_completed"])
+        self.assertEqual(summary["cli_candidate_count"], 3)
+        self.assertEqual(summary["cli_rendered_audio_file_count"], 3)
+        self.assertEqual(summary["cli_input_context_bars"], 228)
+        self.assertFalse(summary["cli_preference_fill_allowed"])
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
 

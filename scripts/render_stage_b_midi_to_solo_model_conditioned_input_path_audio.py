@@ -149,6 +149,31 @@ def validate_source_report(report: dict[str, Any], *, expected_count: int) -> li
     return compacted
 
 
+def validate_source_cli_evidence(report: dict[str, Any]) -> dict[str, Any]:
+    source = _dict(report.get("probe_source"))
+    if not bool(source.get("phrase_bank_cli_technical_path_completed", False)):
+        raise StageBMidiToSoloModelConditionedInputPathAudioRenderError(
+            "phrase-bank CLI technical path completion required"
+        )
+    if _int(source.get("cli_candidate_count")) < 3:
+        raise StageBMidiToSoloModelConditionedInputPathAudioRenderError("CLI candidate count below 3")
+    if _int(source.get("cli_rendered_audio_file_count")) < 3:
+        raise StageBMidiToSoloModelConditionedInputPathAudioRenderError("CLI rendered WAV count below 3")
+    if _int(source.get("cli_input_context_bars")) <= 0:
+        raise StageBMidiToSoloModelConditionedInputPathAudioRenderError("CLI input context bars required")
+    if bool(source.get("cli_preference_fill_allowed", True)):
+        raise StageBMidiToSoloModelConditionedInputPathAudioRenderError(
+            "CLI preference fill should remain blocked"
+        )
+    return {
+        "phrase_bank_cli_technical_path_completed": True,
+        "cli_candidate_count": _int(source.get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(source.get("cli_rendered_audio_file_count")),
+        "cli_input_context_bars": _int(source.get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(source.get("cli_preference_fill_allowed", True)),
+    }
+
+
 def build_render_plan(
     candidates: list[dict[str, Any]],
     *,
@@ -234,6 +259,7 @@ def build_audio_render_report(
     runner: CommandRunner = default_runner,
 ) -> dict[str, Any]:
     candidates = validate_source_report(source_report, expected_count=expected_file_count)
+    source_cli_evidence = validate_source_cli_evidence(source_report)
     resolved_renderer = renderer_path or shutil.which("fluidsynth") or ""
     resolved_soundfont = resolve_soundfont(soundfont_path)
     plan = build_render_plan(
@@ -250,6 +276,7 @@ def build_audio_render_report(
         "output_dir": str(output_dir),
         "source_boundary": SOURCE_BOUNDARY,
         "source_generation_summary": _dict(source_report.get("summary")),
+        "candidate_export_source": source_cli_evidence,
         "renderer": {
             "name": "fluidsynth",
             "path": resolved_renderer,
@@ -357,6 +384,17 @@ def validate_audio_render_report(
             boundary.get("fallback_replacement_technical_path_ready", False)
         ),
         "fallback_replacement_ready": bool(boundary.get("fallback_replacement_ready", False)),
+        "phrase_bank_cli_technical_path_completed": bool(
+            _dict(report.get("candidate_export_source")).get("phrase_bank_cli_technical_path_completed", False)
+        ),
+        "cli_candidate_count": _int(_dict(report.get("candidate_export_source")).get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(
+            _dict(report.get("candidate_export_source")).get("cli_rendered_audio_file_count")
+        ),
+        "cli_input_context_bars": _int(_dict(report.get("candidate_export_source")).get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(
+            _dict(report.get("candidate_export_source")).get("cli_preference_fill_allowed", True)
+        ),
         "audio_rendered_quality_claimed": bool(boundary.get("audio_rendered_quality_claimed", True)),
         "human_audio_preference_claimed": bool(boundary.get("human_audio_preference_claimed", True)),
         "midi_to_solo_musical_quality_claimed": bool(
@@ -371,6 +409,7 @@ def validate_audio_render_report(
 def markdown_report(report: dict[str, Any]) -> str:
     boundary = report["audio_render_boundary"]
     decision = report["decision"]
+    source = report["candidate_export_source"]
     lines = [
         "# Stage B MIDI-to-Solo Model-Conditioned Input Path Audio Render Package",
         "",
@@ -385,6 +424,13 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- fallback replacement ready: `{_bool_token(boundary['fallback_replacement_ready'])}`",
         f"- audio rendered quality claimed: `{_bool_token(boundary['audio_rendered_quality_claimed'])}`",
         f"- human/audio preference claimed: `{_bool_token(boundary['human_audio_preference_claimed'])}`",
+        "",
+        "## Candidate Export Source",
+        "",
+        f"- phrase-bank CLI technical path completed: `{_bool_token(source['phrase_bank_cli_technical_path_completed'])}`",
+        f"- CLI candidate / rendered WAV: `{source['cli_candidate_count']}` / `{source['cli_rendered_audio_file_count']}`",
+        f"- CLI input context bars: `{source['cli_input_context_bars']}`",
+        f"- CLI preference fill allowed: `{_bool_token(source['cli_preference_fill_allowed'])}`",
         "",
         "## Rendered Files",
         "",
