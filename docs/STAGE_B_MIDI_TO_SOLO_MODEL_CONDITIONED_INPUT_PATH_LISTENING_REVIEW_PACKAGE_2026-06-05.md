@@ -8,6 +8,10 @@
 - review item count: `3`
 - validated review input: `false`
 - human/audio preference claimed: `false`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3` / `3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
 
 ## Review Items
 

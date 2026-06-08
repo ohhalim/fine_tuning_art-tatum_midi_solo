@@ -42,6 +42,13 @@ def replacement_report() -> dict:
             "broad_trained_model_quality_claimed": False,
             "brad_style_adaptation_claimed": False,
         },
+        "source_evidence": {
+            "phrase_bank_cli_technical_path_completed": True,
+            "cli_candidate_count": 3,
+            "cli_rendered_audio_file_count": 3,
+            "cli_input_context_bars": 228,
+            "cli_preference_fill_allowed": False,
+        },
         "decision": {
             "next_boundary": REPLACEMENT_NEXT_BOUNDARY,
             "critical_user_input_required": False,
@@ -109,6 +116,11 @@ class StageBMidiToSoloModelConditionedInputPathListeningReviewPackageTest(unitte
         self.assertTrue(summary["listening_review_package_ready"])
         self.assertEqual(summary["review_item_count"], 3)
         self.assertFalse(summary["validated_review_input"])
+        self.assertTrue(summary["phrase_bank_cli_technical_path_completed"])
+        self.assertEqual(summary["cli_candidate_count"], 3)
+        self.assertEqual(summary["cli_rendered_audio_file_count"], 3)
+        self.assertEqual(summary["cli_input_context_bars"], 228)
+        self.assertFalse(summary["cli_preference_fill_allowed"])
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
         self.assertEqual(len(summary["wav_paths"]), 3)

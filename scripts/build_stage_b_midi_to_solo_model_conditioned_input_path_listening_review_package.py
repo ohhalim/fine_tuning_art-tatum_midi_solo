@@ -80,9 +80,40 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
         )
 
 
+def validate_cli_source(source: dict[str, Any], *, label: str) -> dict[str, Any]:
+    if not bool(source.get("phrase_bank_cli_technical_path_completed", False)):
+        raise StageBMidiToSoloModelConditionedInputPathListeningReviewPackageError(
+            f"{label} phrase-bank CLI technical path completion required"
+        )
+    if _int(source.get("cli_candidate_count")) < 3:
+        raise StageBMidiToSoloModelConditionedInputPathListeningReviewPackageError(
+            f"{label} CLI candidate count below 3"
+        )
+    if _int(source.get("cli_rendered_audio_file_count")) < 3:
+        raise StageBMidiToSoloModelConditionedInputPathListeningReviewPackageError(
+            f"{label} CLI rendered WAV count below 3"
+        )
+    if _int(source.get("cli_input_context_bars")) <= 0:
+        raise StageBMidiToSoloModelConditionedInputPathListeningReviewPackageError(
+            f"{label} CLI input context bars required"
+        )
+    if bool(source.get("cli_preference_fill_allowed", True)):
+        raise StageBMidiToSoloModelConditionedInputPathListeningReviewPackageError(
+            f"{label} CLI preference fill should remain blocked"
+        )
+    return {
+        "phrase_bank_cli_technical_path_completed": True,
+        "cli_candidate_count": _int(source.get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(source.get("cli_rendered_audio_file_count")),
+        "cli_input_context_bars": _int(source.get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(source.get("cli_preference_fill_allowed", True)),
+    }
+
+
 def validate_replacement_report(report: dict[str, Any]) -> dict[str, Any]:
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
+    source = validate_cli_source(_dict(report.get("source_evidence")), label="replacement source")
     if str(report.get("boundary") or readiness.get("boundary") or "") != REPLACEMENT_BOUNDARY:
         raise StageBMidiToSoloModelConditionedInputPathListeningReviewPackageError(
             "replacement consolidation boundary required"
@@ -108,6 +139,7 @@ def validate_replacement_report(report: dict[str, Any]) -> dict[str, Any]:
         "boundary": REPLACEMENT_BOUNDARY,
         "technical_replacement_ready": True,
         "listening_review_package_required": True,
+        "source_evidence": source,
     }
 
 
@@ -182,9 +214,10 @@ def build_listening_review_package_report(
         "review_package": {
             "package_ready": True,
             "review_item_count": int(len(review_items)),
-            "review_basis": "human_audio_listening_pending",
-            "validated_review_input": False,
-            "required_input_fields": [
+        "review_basis": "human_audio_listening_pending",
+        "validated_review_input": False,
+        "source_evidence": replacement["source_evidence"],
+        "required_input_fields": [
                 "candidate_rank",
                 "listening_status",
                 "preference",
@@ -268,6 +301,29 @@ def validate_listening_review_package_report(
         "listening_review_package_ready": bool(readiness.get("listening_review_package_ready", False)),
         "review_item_count": _int(readiness.get("review_item_count")),
         "validated_review_input": bool(readiness.get("validated_review_input", True)),
+        "phrase_bank_cli_technical_path_completed": bool(
+            _dict(_dict(report.get("replacement_source")).get("source_evidence")).get(
+                "phrase_bank_cli_technical_path_completed",
+                False,
+            )
+        ),
+        "cli_candidate_count": _int(
+            _dict(_dict(report.get("replacement_source")).get("source_evidence")).get("cli_candidate_count")
+        ),
+        "cli_rendered_audio_file_count": _int(
+            _dict(_dict(report.get("replacement_source")).get("source_evidence")).get(
+                "cli_rendered_audio_file_count"
+            )
+        ),
+        "cli_input_context_bars": _int(
+            _dict(_dict(report.get("replacement_source")).get("source_evidence")).get("cli_input_context_bars")
+        ),
+        "cli_preference_fill_allowed": bool(
+            _dict(_dict(report.get("replacement_source")).get("source_evidence")).get(
+                "cli_preference_fill_allowed",
+                True,
+            )
+        ),
         "human_review_required_now": bool(readiness.get("human_review_required_now", True)),
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
         "midi_to_solo_musical_quality_claimed": bool(
@@ -283,6 +339,7 @@ def markdown_report(report: dict[str, Any]) -> str:
     readiness = report["readiness"]
     decision = report["decision"]
     package = report["review_package"]
+    source = package["source_evidence"]
     lines = [
         "# Stage B MIDI-to-Solo Model-Conditioned Input Path Listening Review Package",
         "",
@@ -294,6 +351,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- review item count: `{package['review_item_count']}`",
         f"- validated review input: `{_bool_token(package['validated_review_input'])}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
+        f"- phrase-bank CLI technical path completed: `{_bool_token(source['phrase_bank_cli_technical_path_completed'])}`",
+        f"- CLI candidate / rendered WAV: `{source['cli_candidate_count']}` / `{source['cli_rendered_audio_file_count']}`",
+        f"- CLI input context bars: `{source['cli_input_context_bars']}`",
+        f"- CLI preference fill allowed: `{_bool_token(source['cli_preference_fill_allowed'])}`",
         "",
         "## Review Items",
         "",
