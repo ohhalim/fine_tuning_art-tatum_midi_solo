@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #658, Stage B MIDI-to-solo phrase-bank CLI listening review package
-- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank CLI listening review input guard`
+- latest functional result: Issue #660, Stage B MIDI-to-solo phrase-bank CLI listening review input guard
+- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank CLI objective-only next decision`
 
 현재 범위가 아닌 것:
 
@@ -46,6 +46,47 @@
 - 실제 MIDI 입력 경로 기준 CLI smoke 완료
 - 실제 MIDI 입력 CLI 후보 3개 WAV technical render 완료
 - 실제 MIDI 입력 CLI WAV/MIDI 후보 3개 listening review package 준비 완료
+- 실제 MIDI 입력 CLI review input pending 상태에서 preference fill 차단 완료
+
+## Stage B MIDI-to-Solo Phrase-Bank CLI Listening Review Input Guard Result
+
+Issue #660은 Issue #658 listening review package의 pending input 상태를 검증하고, review input 없이 preference fill이 진행되지 않도록 막은 작업이다.
+
+변경:
+
+- CLI listening review package source validation 추가
+- pending review input 기준 preference fill guard 추가
+- validated input 여부에 따른 fill/objective-only next boundary 분기 추가
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_CLI_LISTENING_REVIEW_INPUT_GUARD_2026-06-08.md`
+- boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_input_guard`
+- source boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- review item count: `3`
+- required input field count: `4`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- review input 없는 상태에서 preference fill 차단
+- 청음 preference와 musical quality claim 제외 유지
+- 다음 작업은 CLI objective-only next decision
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_cli_listening_review_input_guard`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-cli-listening-review-input-guard`
+
+다음:
+
+- `Stage B MIDI-to-solo phrase-bank CLI objective-only next decision`
 
 ## Stage B MIDI-to-Solo Phrase-Bank CLI Listening Review Package Result
 
