@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #672, Stage B MIDI-to-solo model-conditioned input path quality alignment
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path probe`
+- latest functional result: Issue #674, Stage B MIDI-to-solo model-conditioned input path probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path candidate export`
 
 현재 범위가 아닌 것:
 
@@ -53,6 +53,53 @@
 - technical model-core MVP completion audit 완료
 - quality gap target 결정 완료
 - model-conditioned input path alignment decision 완료
+- model-conditioned input path probe 완료
+
+## Stage B MIDI-to-Solo Model-Conditioned Input Path Probe Result
+
+Issue #674는 Issue #672 alignment decision을 받아 fallback path와 model-conditioned path를 같은 input context 기준으로 비교한 작업이다.
+
+변경:
+
+- probe alignment source 검증에 phrase-bank CLI technical path evidence 추가
+- CLI candidate/rendered WAV/input context/preference guard 검증 추가
+- generated probe doc와 status docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_PROBE_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_probe`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
+- model-conditioned candidate source available: `true`
+- model-conditioned audio technical path available: `true`
+- same input context as fallback: `true`
+- ranked input-path export contract matched: `false`
+- fallback replacement ready: `false`
+- candidate export required: `true`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+- human review required now: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- model-conditioned strict MIDI/WAV technical evidence 확인
+- fallback path와 같은 input context 사용 확인
+- ranked input-path export contract 미충족
+- 다음 작업은 model-conditioned candidate export
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_probe`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned input path candidate export`
 
 ## Stage B MIDI-to-Solo Model-Conditioned Input Path Quality Alignment Result
 

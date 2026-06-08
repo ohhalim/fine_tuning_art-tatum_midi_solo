@@ -99,6 +99,7 @@ def validate_alignment_report(report: dict[str, Any]) -> dict[str, Any]:
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
     alignment = _dict(report.get("alignment_decision"))
+    source = _dict(report.get("alignment_source"))
     if str(report.get("boundary") or readiness.get("boundary") or "") != ALIGNMENT_BOUNDARY:
         raise StageBMidiToSoloModelConditionedInputPathProbeError(
             "model-conditioned input path alignment boundary required"
@@ -121,6 +122,20 @@ def validate_alignment_report(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloModelConditionedInputPathProbeError(
             "critical user input should not be required"
         )
+    if not bool(source.get("phrase_bank_cli_technical_path_completed", False)):
+        raise StageBMidiToSoloModelConditionedInputPathProbeError(
+            "phrase-bank CLI technical path completion required"
+        )
+    if _int(source.get("cli_candidate_count")) < 3:
+        raise StageBMidiToSoloModelConditionedInputPathProbeError("CLI candidate count below 3")
+    if _int(source.get("cli_rendered_audio_file_count")) < 3:
+        raise StageBMidiToSoloModelConditionedInputPathProbeError("CLI rendered WAV count below 3")
+    if _int(source.get("cli_input_context_bars")) <= 0:
+        raise StageBMidiToSoloModelConditionedInputPathProbeError("CLI input context bars required")
+    if bool(source.get("cli_preference_fill_allowed", True)):
+        raise StageBMidiToSoloModelConditionedInputPathProbeError(
+            "CLI preference fill should remain blocked"
+        )
     _require_no_quality_claim(readiness, label="alignment readiness")
     return {
         "boundary": ALIGNMENT_BOUNDARY,
@@ -129,6 +144,11 @@ def validate_alignment_report(report: dict[str, Any]) -> dict[str, Any]:
         "alignment_decision_probe_required": bool(
             alignment.get("fallback_replacement_probe_required", False)
         ),
+        "phrase_bank_cli_technical_path_completed": True,
+        "cli_candidate_count": _int(source.get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(source.get("cli_rendered_audio_file_count")),
+        "cli_input_context_bars": _int(source.get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(source.get("cli_preference_fill_allowed", True)),
         "human_review_required_now": bool(readiness.get("human_review_required_now", False)),
     }
 
@@ -517,6 +537,17 @@ def validate_probe_report(
         ),
         "fallback_replacement_ready": bool(readiness.get("fallback_replacement_ready", True)),
         "candidate_export_required": bool(readiness.get("candidate_export_required", False)),
+        "phrase_bank_cli_technical_path_completed": bool(
+            _dict(report.get("alignment_source")).get("phrase_bank_cli_technical_path_completed", False)
+        ),
+        "cli_candidate_count": _int(_dict(report.get("alignment_source")).get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(
+            _dict(report.get("alignment_source")).get("cli_rendered_audio_file_count")
+        ),
+        "cli_input_context_bars": _int(_dict(report.get("alignment_source")).get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(
+            _dict(report.get("alignment_source")).get("cli_preference_fill_allowed", True)
+        ),
         "human_review_required_now": bool(readiness.get("human_review_required_now", True)),
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
         "midi_to_solo_musical_quality_claimed": bool(
@@ -532,6 +563,7 @@ def validate_probe_report(
 
 
 def markdown_report(report: dict[str, Any]) -> str:
+    alignment = report["alignment_source"]
     fallback = report["fallback_input_path"]
     model_probe = report["model_conditioned_probe"]
     readiness = report["readiness"]
@@ -548,6 +580,13 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- ranked input-path export contract matched: `{_bool_token(readiness['model_conditioned_ranked_input_path_contract_matched'])}`",
         f"- fallback replacement ready: `{_bool_token(readiness['fallback_replacement_ready'])}`",
         f"- candidate export required: `{_bool_token(readiness['candidate_export_required'])}`",
+        "",
+        "## Alignment Source",
+        "",
+        f"- phrase-bank CLI technical path completed: `{_bool_token(alignment['phrase_bank_cli_technical_path_completed'])}`",
+        f"- CLI candidate / rendered WAV: `{alignment['cli_candidate_count']}` / `{alignment['cli_rendered_audio_file_count']}`",
+        f"- CLI input context bars: `{alignment['cli_input_context_bars']}`",
+        f"- CLI preference fill allowed: `{_bool_token(alignment['cli_preference_fill_allowed'])}`",
         "",
         "## Fallback Input Path",
         "",

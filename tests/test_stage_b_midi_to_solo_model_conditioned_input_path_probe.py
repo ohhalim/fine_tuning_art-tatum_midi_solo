@@ -33,6 +33,13 @@ def alignment_report() -> dict:
         "alignment_decision": {
             "fallback_replacement_probe_required": True,
         },
+        "alignment_source": {
+            "phrase_bank_cli_technical_path_completed": True,
+            "cli_candidate_count": 3,
+            "cli_rendered_audio_file_count": 3,
+            "cli_input_context_bars": 228,
+            "cli_preference_fill_allowed": False,
+        },
         "readiness": {
             "boundary": ALIGNMENT_BOUNDARY,
             "model_conditioned_input_path_quality_alignment_decision_completed": True,
@@ -213,6 +220,11 @@ class StageBMidiToSoloModelConditionedInputPathProbeTest(unittest.TestCase):
         self.assertTrue(summary["candidate_export_required"])
         self.assertTrue(summary["missing_ranked_export_contract"])
         self.assertEqual(summary["selected_next_boundary"], NEXT_BOUNDARY)
+        self.assertTrue(summary["phrase_bank_cli_technical_path_completed"])
+        self.assertEqual(summary["cli_candidate_count"], 3)
+        self.assertEqual(summary["cli_rendered_audio_file_count"], 3)
+        self.assertEqual(summary["cli_input_context_bars"], 228)
+        self.assertFalse(summary["cli_preference_fill_allowed"])
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
 

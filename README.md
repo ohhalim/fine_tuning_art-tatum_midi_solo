@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_probe`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -14,11 +14,13 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned input path aligned: `false`
 - model-conditioned candidate source available: `true`
 - model-conditioned audio technical path available: `true`
-- model-conditioned ranked input-path export contract matched: `true`
-- fallback replacement candidate export ready: `true`
+- model-conditioned input path probe completed: `true`
+- model-conditioned ranked input-path export contract matched: `false`
+- fallback replacement candidate export ready: `false`
 - model-conditioned ranked audio render completed: `true`
 - fallback replacement technical path ready: `true`
-- fallback replacement ready: `true`
+- fallback replacement ready: `false`
+- candidate export required: `true`
 - listening review package required: `true`
 - listening review package ready: `true`
 - phrase-bank retrieval baseline completed: `true`
@@ -60,7 +62,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_probe`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -98,6 +100,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - README 첫 상태 영역에 current evidence와 claim boundary 반영 완료
 - technical model-core MVP 완료 범위 audit 가능
 - model-conditioned input path alignment decision 가능
+- model-conditioned input path probe 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -151,6 +154,8 @@ Model-conditioned input path alignment.
 
 Model-conditioned input path probe.
 
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_probe`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
 - model-conditioned source: `model_checkpoint_direct_constrained`
 - model-conditioned candidate source available: `true`
 - model-conditioned audio technical path available: `true`
@@ -158,6 +163,10 @@ Model-conditioned input path probe.
 - ranked input-path export contract matched: `false`
 - fallback replacement ready: `false`
 - candidate export required: `true`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
 
 Model-conditioned input path candidate export.
 
