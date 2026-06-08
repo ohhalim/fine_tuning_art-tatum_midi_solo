@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #686, Stage B MIDI-to-solo model-conditioned input path objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair decision`
+- latest functional result: Issue #688, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair probe`
 
 현재 범위가 아닌 것:
 
@@ -60,6 +60,53 @@
 - model-conditioned input path listening review package 완료
 - model-conditioned input path review input pending 상태에서 preference fill 차단 완료
 - model-conditioned input path objective-only 기준 dead-air/timing repair 필요 판정
+- model-conditioned input path dead-air/timing repair target 정의 완료
+
+## Stage B MIDI-to-Solo Model-Conditioned Input Path Dead-Air Timing Repair Decision Result
+
+Issue #688은 Issue #686 objective-only next decision 결과를 source로 사용해 dead-air/timing repair target과 guardrail을 정의한 작업이다.
+
+변경:
+
+- model-conditioned input path dead-air timing repair decision script 추가
+- objective-only next decision report 검증
+- target dead-air max와 guardrail 정의
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_DEAD_AIR_TIMING_REPAIR_DECISION_2026-06-08.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
+- source boundary: `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe`
+- selected target: `dead_air_timing_continuity`
+- repair probe required: `true`
+- source dead-air failure count: `3`
+- source dead-air min / max: `0.6522 / 0.6522`
+- target dead-air max: `0.3500`
+- required dead-air gain min: `0.3022`
+- strategy: `timing_gap_fill_and_duration_compaction`
+- max postprocess removal ratio: `0.2500`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- selected candidate 3개 모두 dead-air threshold 초과.
+- 다음 경계에서 timing gap fill과 duration compaction repair probe 필요.
+- repair success와 musical quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-decision`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair probe`
 
 ## Stage B MIDI-to-Solo Model-Conditioned Input Path Objective-Only Next Decision Result
 
