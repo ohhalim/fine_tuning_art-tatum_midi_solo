@@ -31,6 +31,13 @@ def probe_report() -> dict:
         "replacement_decision": {
             "selected_next_boundary": PROBE_NEXT_BOUNDARY,
         },
+        "alignment_source": {
+            "phrase_bank_cli_technical_path_completed": True,
+            "cli_candidate_count": 3,
+            "cli_rendered_audio_file_count": 3,
+            "cli_input_context_bars": 228,
+            "cli_preference_fill_allowed": False,
+        },
         "readiness": {
             "model_conditioned_input_path_probe_completed": True,
             "model_conditioned_candidate_source_available": True,
@@ -161,6 +168,11 @@ class StageBMidiToSoloModelConditionedInputPathCandidateExportTest(unittest.Test
         self.assertTrue(summary["fallback_replacement_candidate_export_ready"])
         self.assertFalse(summary["fallback_replacement_ready"])
         self.assertTrue(summary["candidate_audio_render_required"])
+        self.assertTrue(summary["phrase_bank_cli_technical_path_completed"])
+        self.assertEqual(summary["cli_candidate_count"], 3)
+        self.assertEqual(summary["cli_rendered_audio_file_count"], 3)
+        self.assertEqual(summary["cli_input_context_bars"], 228)
+        self.assertFalse(summary["cli_preference_fill_allowed"])
         self.assertEqual(summary["exported_candidate_count"], 3)
         self.assertEqual(summary["best_max_simultaneous_notes"], 1)
         self.assertFalse(summary["human_audio_preference_claimed"])

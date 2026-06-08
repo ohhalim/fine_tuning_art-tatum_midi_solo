@@ -11,6 +11,13 @@
 - fallback replacement ready: `false`
 - candidate audio render required: `true`
 
+## Probe Source
+
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3` / `3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+
 ## Input Context
 
 - chord progression: `Cmaj7, F7, G7, Cmaj7, Cmaj7, Cmaj7, Cmaj7, Cmaj7`

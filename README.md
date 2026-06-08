@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_probe`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -15,14 +15,15 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned candidate source available: `true`
 - model-conditioned audio technical path available: `true`
 - model-conditioned input path probe completed: `true`
-- model-conditioned ranked input-path export contract matched: `false`
-- fallback replacement candidate export ready: `false`
-- model-conditioned ranked audio render completed: `true`
-- fallback replacement technical path ready: `true`
+- model-conditioned ranked input-path export contract matched: `true`
+- fallback replacement candidate export ready: `true`
+- model-conditioned ranked audio render completed: `false`
+- fallback replacement technical path ready: `false`
 - fallback replacement ready: `false`
-- candidate export required: `true`
-- listening review package required: `true`
-- listening review package ready: `true`
+- model-conditioned input path candidate export completed: `true`
+- candidate audio render required: `true`
+- listening review package required: `false`
+- listening review package ready: `false`
 - phrase-bank retrieval baseline completed: `true`
 - phrase-bank source records / motifs: `56 / 803`
 - phrase-bank exported / qualified MIDI candidates: `3 / 3`
@@ -62,7 +63,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -101,6 +102,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - technical model-core MVP 완료 범위 audit 가능
 - model-conditioned input path alignment decision 가능
 - model-conditioned input path probe 가능
+- model-conditioned ranked input-path candidate export 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -170,6 +172,8 @@ Model-conditioned input path probe.
 
 Model-conditioned input path candidate export.
 
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package`
 - generation source: `model_checkpoint_direct_constrained`
 - ranked MIDI candidates exported: `true`
 - ranked input-path export contract matched: `true`
@@ -178,6 +182,10 @@ Model-conditioned input path candidate export.
 - fallback replacement candidate export ready: `true`
 - fallback replacement ready: `false`
 - candidate audio render required: `true`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
 
 Model-conditioned input path audio render package.
 
