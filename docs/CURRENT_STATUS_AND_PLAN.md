@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-06-05
+작성일: 2026-06-08
 
 ## Current Focus
 
@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #682, Stage B MIDI-to-solo model-conditioned input path listening review package
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path listening review input guard`
+- latest functional result: Issue #684, Stage B MIDI-to-solo model-conditioned input path listening review input guard
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path objective-only next decision`
 
 현재 범위가 아닌 것:
 
@@ -58,6 +58,54 @@
 - model-conditioned input path audio render package 완료
 - model-conditioned input path replacement consolidation 완료
 - model-conditioned input path listening review package 완료
+- model-conditioned input path review input pending 상태에서 preference fill 차단 완료
+
+## Stage B MIDI-to-Solo Model-Conditioned Input Path Listening Review Input Guard Result
+
+Issue #684는 Issue #682 listening review package 결과를 source로 사용해, 검증된 청음 입력이 없는 상태의 preference fill을 차단한 작업이다.
+
+변경:
+
+- model-conditioned input path listening review input guard script 추가
+- source package boundary와 replacement source CLI evidence 일치 검증
+- pending review input 기준 preference fill 차단
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_LISTENING_REVIEW_INPUT_GUARD_2026-06-08.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard`
+- source boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
+- review item count: `3`
+- required input field count: `4`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- validated listening input 없음.
+- preference fill 차단.
+- musical quality claim 제외 유지.
+- 객관 evidence 기반 다음 경계 진행 가능.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard`
+- `.venv/bin/python -m py_compile scripts/guard_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-listening-review-input-guard`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned input path objective-only next decision`
 
 ## Stage B MIDI-to-Solo Model-Conditioned Input Path Listening Review Package Result
 

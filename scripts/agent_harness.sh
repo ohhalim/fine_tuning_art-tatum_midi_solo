@@ -242,6 +242,8 @@ Modes:
                 Decide the next quality-gap repair target after technical MVP completion.
   stage-b-midi-to-solo-model-conditioned-input-path-quality-alignment
                 Decide model-conditioned input-path alignment requirements and next probe target.
+  stage-b-midi-to-solo-model-conditioned-input-path-listening-review-input-guard
+                Block model-conditioned input-path preference fill while listening review input is pending.
   stage-b-midi-to-solo-model-direct-generation-repair
                 Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
@@ -6090,6 +6092,27 @@ run_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package()
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard() {
+  local package_run_id="${PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard}"
+  local source_package="outputs/stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package/${package_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package.json"
+  if [[ ! -f "$source_package" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path listening review package"
+    RUN_ID="$package_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path listening review input guard"
+  "$PYTHON_BIN" scripts/guard_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input.py \
+    --run_id "$run_id" \
+    --source_package "$source_package" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_LISTENING_REVIEW_INPUT_GUARD_2026-06-08.md \
+    --issue_number 684 \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision \
+    --require_guard_completed \
+    --require_pending_input \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -7737,6 +7760,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-listening-review-package)
     run_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-listening-review-input-guard)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

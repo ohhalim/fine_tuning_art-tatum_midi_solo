@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -25,6 +25,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned input path replacement consolidated: `true`
 - listening review package required: `true`
 - listening review package ready: `true`
+- model-conditioned listening review input guard completed: `true`
+- model-conditioned preference fill allowed: `false`
 - phrase-bank retrieval baseline completed: `true`
 - phrase-bank source records / motifs: `56 / 803`
 - phrase-bank exported / qualified MIDI candidates: `3 / 3`
@@ -64,7 +66,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -239,6 +241,22 @@ Model-conditioned input path listening review package.
 - CLI input context bars: `228`
 - CLI preference fill allowed: `false`
 - human/audio preference claimed: `false`
+
+Model-conditioned input path listening review input guard.
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard`
+- source boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
+- review item count: `3`
+- required input field count: `4`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
 
 Phrase-bank retrieval baseline.
 
