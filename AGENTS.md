@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #646, Stage B MIDI-to-solo phrase-bank dead-air density repair listening review package.
+- Latest functional issue completed: Issue #648, Stage B MIDI-to-solo phrase-bank dead-air density repair listening review input guard.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo phrase-bank dead-air density repair listening review input guard.
+- Recommended next issue: Stage B MIDI-to-solo phrase-bank dead-air density repair objective-only next decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1156,6 +1156,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-dead-air-density-
 ```
 
 This harness packages dead-air/density repaired MIDI/WAV candidates for pending listening review without claiming human/audio preference.
+
+For Stage B MIDI-to-solo phrase-bank dead-air density repair listening review input guard changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-listening-review-input-guard
+```
+
+This harness blocks preference fill while repaired phrase-bank listening review input is pending and routes to the objective-only next decision.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 

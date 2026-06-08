@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_package`
-- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_package`
+- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard`
+- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -40,6 +40,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank repaired audio technical validation: `true`
 - phrase-bank repaired listening review package ready: `true`
 - phrase-bank repaired listening review items: `3`
+- phrase-bank repaired preference fill allowed: `false`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -241,6 +242,16 @@ Phrase-bank dead-air density repair listening review package.
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 - next boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard`
+
+Phrase-bank dead-air density repair listening review input guard.
+
+- validated review input present: `false`
+- preference fill allowed: `false`
+- review item count: `3`
+- required input fields: `candidate_rank`, `listening_status`, `preference`, `issue_notes`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision`
 
 MIDI-to-solo input contract.
 

@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #646, Stage B MIDI-to-solo phrase-bank dead-air density repair listening review package
-- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank dead-air density repair listening review input guard`
+- latest functional result: Issue #648, Stage B MIDI-to-solo phrase-bank dead-air density repair listening review input guard
+- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank dead-air density repair objective-only next decision`
 
 현재 범위가 아닌 것:
 
@@ -40,6 +40,47 @@
 - dead-air/density repair probe 기준 repaired 후보 3개 모두 objective target 통과
 - dead-air/density repaired MIDI 후보 3개 WAV technical render 완료
 - dead-air/density repaired 후보 listening review package 준비 완료
+- repaired review input pending 상태에서 preference fill 차단 완료
+
+## Stage B MIDI-to-Solo Phrase-Bank Dead-Air Density Repair Listening Review Input Guard Result
+
+Issue #648은 Issue #646 listening review package의 pending input 상태를 검증하고, review input 없이 preference fill이 진행되지 않도록 막은 작업이다.
+
+변경:
+
+- repaired listening review package source validation 추가
+- `validated_review_input=false` 상태 검증
+- preference fill allowed false 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_DEAD_AIR_DENSITY_REPAIR_LISTENING_REVIEW_INPUT_GUARD_2026-06-08.md`
+- boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard`
+- source boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- review item count: `3`
+- required input field count: `4`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- review input 없는 상태에서 preference fill 차단
+- human/audio preference와 musical quality claim 제외 유지
+- 다음 작업은 repaired 후보 objective-only next decision
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-listening-review-input-guard`
+
+다음:
+
+- `Stage B MIDI-to-solo phrase-bank dead-air density repair objective-only next decision`
 
 ## Stage B MIDI-to-Solo Phrase-Bank Dead-Air Density Repair Listening Review Package Result
 
