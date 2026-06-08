@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard`
-- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard`
+- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision`
+- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -41,6 +41,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank repaired listening review package ready: `true`
 - phrase-bank repaired listening review items: `3`
 - phrase-bank repaired preference fill allowed: `false`
+- phrase-bank repaired objective supported candidates: `3 / 3`
+- phrase-bank CLI MVP package ready: `true`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -252,6 +254,18 @@ Phrase-bank dead-air density repair listening review input guard.
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 - next boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision`
+
+Phrase-bank dead-air density repair objective-only next decision.
+
+- objective supported candidate count: `3`
+- all repaired candidates objective supported: `true`
+- dead-air range: `0.1895 - 0.2211`
+- technical WAV validation: `true`
+- CLI MVP package ready: `true`
+- preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_cli_mvp_package`
 
 MIDI-to-solo input contract.
 

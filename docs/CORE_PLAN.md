@@ -2564,6 +2564,40 @@ Issue #648은 Issue #646 listening review package의 pending input 상태를 검
 
 - `Stage B MIDI-to-solo phrase-bank dead-air density repair objective-only next decision`
 
+## 9.16 Stage B MIDI-to-solo phrase-bank dead-air density repair objective-only next decision
+
+Issue #650은 Issue #648 input guard, Issue #642 repair probe, Issue #644 audio package 결과를 묶어 review input 없이 진행 가능한 objective-only next boundary를 정한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_cli_mvp_package`
+- candidate count: `3`
+- objective supported candidate count: `3`
+- all repaired candidates objective supported: `true`
+- dead-air range: `0.1895 - 0.2211`
+- technical WAV validation: `true`
+- CLI MVP package ready: `true`
+- preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- repaired MIDI 3개 objective support 확인.
+- repaired WAV technical validation 확인.
+- review input 없는 preference fill 차단 유지.
+- 다음 작업은 CLI에서 재현 가능한 MVP package 구성.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_next`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-objective-only-next-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo phrase-bank CLI MVP package`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
