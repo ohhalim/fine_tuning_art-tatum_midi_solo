@@ -2632,6 +2632,41 @@ Issue #652는 입력 MIDI에서 context extraction, phrase-bank retrieval, dead-
 
 - `Stage B MIDI-to-solo phrase-bank CLI user-input smoke`
 
+## 9.18 Stage B MIDI-to-solo phrase-bank CLI user-input smoke
+
+Issue #654는 Issue #652 CLI package를 fixture 자동 생성이 아닌 명시적 `--input_midi` 경로로 실행하고 결과를 검증한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_cli_audio_render_smoke`
+- input MIDI: `midi_dataset/midi/studio/Geri Allen/Home Grown/Alone Together.midi`
+- explicit input used: `true`
+- candidate count: `3`
+- objective supported candidate count: `3`
+- all candidates objective supported: `true`
+- repaired MIDI file count: `3`
+- input context bars: `228`
+- dead-air range: `0.1895 - 0.2211`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- 명시적 입력 MIDI path 검증 완료.
+- ranked repaired MIDI 후보 3개 export 확인.
+- audio render와 청음 preference는 별도 boundary로 유지.
+- 다음 작업은 CLI output audio render smoke.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-cli-user-input-smoke`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo phrase-bank CLI audio render smoke`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
