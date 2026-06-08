@@ -11,12 +11,16 @@
 ## Evidence
 
 - technical model-core MVP completed: `true`
+- phrase-bank CLI technical path completed: `true`
 - musical quality MVP completed: `false`
 - generation source: `context_conditioned_fallback`
 - exported candidates: `3`
 - rendered WAV files: `3`
 - objective strict/sample: `9` / `9`
 - objective dead-air failure: `0`
+- CLI candidate / rendered WAV: `3` / `3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
 
 ## Claim Boundary
 

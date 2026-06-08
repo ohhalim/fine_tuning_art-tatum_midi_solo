@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- latest evidence boundary: `stage_b_midi_to_solo_quality_gap_decision`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -58,8 +58,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank CLI technical path included in current evidence: `true`
 - README evidence refreshed: `true`
 - MVP completion audit completed: `true`
-- quality gap decision required: `true`
-- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- quality gap decision completed: `true`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -123,9 +123,15 @@ MVP completion audit.
 
 Quality gap decision.
 
+- boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment`
 - selected target: `model_conditioned_input_path_quality_alignment`
 - fallback path active: `true`
 - model-conditioned input path alignment required: `true`
+- phrase-bank CLI technical path completed: `true`
+- musical quality MVP completed: `false`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI preference fill allowed: `false`
 - human review required now: `false`
 
 Model-conditioned input path alignment.
