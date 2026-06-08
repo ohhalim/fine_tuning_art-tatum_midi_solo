@@ -2837,6 +2837,34 @@ Issue #664는 기존 current evidence consolidation에 CLI phrase-bank objective
 
 - `Stage B MIDI-to-solo README evidence refresh`
 
+## 9.24 Stage B MIDI-to-solo README evidence refresh
+
+Issue #666은 Issue #664 current evidence를 README 첫 상태 영역과 claim boundary에 반영하고, 다음 boundary를 MVP completion audit으로 넘긴 문서 작업이다.
+
+결과:
+
+- latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- quality/preference claim excluded: `true`
+- next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+
+판단:
+
+- README 첫 상태 영역에서 technical current evidence 확인 가능.
+- 청음 preference와 musical quality claim 제외 유지.
+- 다음 작업은 MVP completion audit.
+
+검증:
+
+- `git diff --check`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo MVP completion audit`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
