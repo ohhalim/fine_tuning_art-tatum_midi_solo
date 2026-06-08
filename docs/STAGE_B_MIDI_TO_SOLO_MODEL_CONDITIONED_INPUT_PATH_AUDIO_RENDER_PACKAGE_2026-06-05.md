@@ -12,6 +12,13 @@
 - audio rendered quality claimed: `false`
 - human/audio preference claimed: `false`
 
+## Candidate Export Source
+
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3` / `3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+
 ## Rendered Files
 
 - rank `1` sample `1` seed `497`: `outputs/stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package/harness_stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package/audio/rank_01_sample_01.wav`, duration `22.390`, sample rate `44100`, size `3949612`, sha256 `fd78ec4d6fdb`

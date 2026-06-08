@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -17,11 +17,11 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned input path probe completed: `true`
 - model-conditioned ranked input-path export contract matched: `true`
 - fallback replacement candidate export ready: `true`
-- model-conditioned ranked audio render completed: `false`
-- fallback replacement technical path ready: `false`
-- fallback replacement ready: `false`
+- model-conditioned ranked audio render completed: `true`
+- fallback replacement technical path ready: `true`
+- fallback replacement ready: `true`
 - model-conditioned input path candidate export completed: `true`
-- candidate audio render required: `true`
+- model-conditioned input path audio render completed: `true`
 - listening review package required: `false`
 - listening review package ready: `false`
 - phrase-bank retrieval baseline completed: `true`
@@ -63,7 +63,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -103,6 +103,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned input path alignment decision 가능
 - model-conditioned input path probe 가능
 - model-conditioned ranked input-path candidate export 가능
+- model-conditioned ranked MIDI WAV render 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -189,12 +190,18 @@ Model-conditioned input path candidate export.
 
 Model-conditioned input path audio render package.
 
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation`
 - rendered audio file count: `3`
 - technical WAV validation: `true`
 - model-conditioned ranked audio render completed: `true`
 - fallback replacement technical path ready: `true`
 - fallback replacement ready: `true`
 - WAV duration range: `19.585s - 22.390s`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
 - audio rendered quality claimed: `false`
 - human/audio preference claimed: `false`
 
