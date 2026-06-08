@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #656, Stage B MIDI-to-solo phrase-bank CLI audio render smoke
-- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank CLI listening review package`
+- latest functional result: Issue #658, Stage B MIDI-to-solo phrase-bank CLI listening review package
+- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank CLI listening review input guard`
 
 현재 범위가 아닌 것:
 
@@ -45,6 +45,47 @@
 - 입력 MIDI fixture 기준 CLI package와 repaired MIDI 후보 3개 생성 완료
 - 실제 MIDI 입력 경로 기준 CLI smoke 완료
 - 실제 MIDI 입력 CLI 후보 3개 WAV technical render 완료
+- 실제 MIDI 입력 CLI WAV/MIDI 후보 3개 listening review package 준비 완료
+
+## Stage B MIDI-to-Solo Phrase-Bank CLI Listening Review Package Result
+
+Issue #658은 Issue #656 audio render smoke 결과의 CLI WAV/MIDI 후보 3개를 listening review package로 묶고, preference와 musical quality claim을 차단한 작업이다.
+
+변경:
+
+- CLI audio render smoke report source validation 추가
+- WAV/MIDI review item manifest 생성
+- pending review input field 정의
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_CLI_LISTENING_REVIEW_PACKAGE_2026-06-08.md`
+- boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_package`
+- source boundary: `stage_b_midi_to_solo_phrase_bank_cli_audio_render_smoke`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_input_guard`
+- package ready: `true`
+- review item count: `3`
+- validated review input: `false`
+- required input fields: `candidate_rank`, `listening_status`, `preference`, `issue_notes`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 명시적 input MIDI 기반 CLI output review package 생성 확인
+- 청음 preference 입력 전 품질 claim 제외 유지
+- 다음 작업은 CLI listening review input guard
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_cli_listening_review_package`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-cli-listening-review-package`
+
+다음:
+
+- `Stage B MIDI-to-solo phrase-bank CLI listening review input guard`
 
 ## Stage B MIDI-to-Solo Phrase-Bank CLI Audio Render Smoke Result
 
