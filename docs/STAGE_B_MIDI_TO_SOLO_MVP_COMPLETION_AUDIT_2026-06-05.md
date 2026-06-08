@@ -5,6 +5,7 @@
 - boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 - next boundary: `stage_b_midi_to_solo_quality_gap_decision`
 - technical model-core MVP completed: `true`
+- phrase-bank CLI technical path completed: `true`
 - musical quality MVP completed: `false`
 - human/audio preference completed: `false`
 - product MVP completed: `false`
@@ -20,6 +21,10 @@
 - objective sample / strict / grammar: `9` / `9` / `9`
 - objective dead-air / collapse failure: `0` / `0`
 - objective avg / target postprocess removal: `0.21759259259259262` / `0.3`
+- phrase-bank CLI technical path ready: `true`
+- CLI candidate / rendered WAV: `3` / `3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
 
 ## Claim Boundary
 

@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #666, Stage B MIDI-to-solo README evidence refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit`
+- latest functional result: Issue #668, Stage B MIDI-to-solo MVP completion audit
+- 다음 권장 이슈: `Stage B MIDI-to-solo quality gap decision`
 
 현재 범위가 아닌 것:
 
@@ -50,6 +50,50 @@
 - 실제 MIDI 입력 CLI technical path objective decision 완료
 - selected-scale objective path와 실제 MIDI 입력 CLI technical path current evidence 통합 완료
 - README current evidence와 claim boundary refresh 완료
+- technical model-core MVP completion audit 완료
+
+## Stage B MIDI-to-Solo MVP Completion Audit Result
+
+Issue #668은 Issue #664 current evidence와 Issue #666 README refresh를 기준으로 technical model-core MVP 완료 범위를 audit한 작업이다.
+
+변경:
+
+- completion audit script에 CLI technical path readiness 검증 추가
+- README required snippet에 CLI technical path와 README refresh 상태 추가
+- technical model-core MVP 완료 범위와 quality gap boundary 분리
+- unit test와 generated audit doc 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- technical model-core MVP completed: `true`
+- input to ranked MIDI completed: `true`
+- input to rendered WAV completed: `true`
+- selected-scale objective repair completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- musical quality MVP completed: `false`
+- human/audio preference completed: `false`
+- product MVP completed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- technical model-core MVP 완료 범위 확인
+- 음악 품질, 사용자 선호, 제품 MVP 완료 claim 제외 유지
+- 다음 작업은 quality gap decision
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_completion_audit`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit`
+
+다음:
+
+- `Stage B MIDI-to-solo quality gap decision`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

@@ -60,6 +60,7 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
     generation = _dict(report.get("ranked_midi_generation"))
     audio = _dict(report.get("technical_audio_render"))
     objective = _dict(report.get("selected_scale_objective_path"))
+    cli_objective = _dict(report.get("phrase_bank_cli_technical_path"))
     decision = _dict(report.get("decision"))
     required_true = [
         "mvp_current_evidence_consolidated",
@@ -69,6 +70,7 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         "ranked_midi_candidates_exported",
         "technical_wav_path_ready",
         "selected_scale_objective_path_complete",
+        "phrase_bank_cli_technical_path_ready",
         "current_mvp_technical_execution_evidence_supported",
         "current_mvp_objective_repair_evidence_supported",
         "midi_to_solo_mvp_current_evidence_supported",
@@ -98,6 +100,14 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloMvpCompletionAuditError("objective strict valid count must match sample count")
     if _int(objective.get("dead_air_failure_count")) != 0:
         raise StageBMidiToSoloMvpCompletionAuditError("objective dead-air failure count must be zero")
+    if not bool(cli_objective.get("technical_midi_to_solo_cli_path_ready", False)):
+        raise StageBMidiToSoloMvpCompletionAuditError("CLI technical path support required")
+    if _int(cli_objective.get("candidate_count")) < 3:
+        raise StageBMidiToSoloMvpCompletionAuditError("CLI candidate count below 3")
+    if _int(cli_objective.get("rendered_audio_file_count")) < 3:
+        raise StageBMidiToSoloMvpCompletionAuditError("CLI rendered WAV count below 3")
+    if bool(cli_objective.get("preference_fill_allowed", True)):
+        raise StageBMidiToSoloMvpCompletionAuditError("CLI preference fill should remain blocked")
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloMvpCompletionAuditError("critical user input should not be required")
     return {
@@ -123,6 +133,13 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         "objective_target_avg_postprocess_removal_ratio": _float(
             objective.get("target_avg_postprocess_removal_ratio")
         ),
+        "phrase_bank_cli_technical_path_ready": bool(
+            cli_objective.get("technical_midi_to_solo_cli_path_ready", False)
+        ),
+        "cli_candidate_count": _int(cli_objective.get("candidate_count")),
+        "cli_rendered_audio_file_count": _int(cli_objective.get("rendered_audio_file_count")),
+        "cli_input_context_bars": _int(cli_objective.get("input_context_bars")),
+        "cli_preference_fill_allowed": bool(cli_objective.get("preference_fill_allowed", True)),
     }
 
 
@@ -132,6 +149,8 @@ def validate_readme_refresh(readme_text: str) -> dict[str, Any]:
         "current_evidence_support": "current MVP evidence support: `true`",
         "technical_path": "input MIDI -> context -> ranked MIDI -> WAV technical path: `true`",
         "objective_path": "selected-scale objective repair path complete: `true`",
+        "cli_path": "phrase-bank CLI technical path included in current evidence: `true`",
+        "readme_refresh": "README evidence refreshed: `true`",
         "human_preference_false": "human/audio preference claim: `false`",
         "musical_quality_false": "MIDI-to-solo musical quality claim: `false`",
         "broad_quality_false": "broad trained-model quality claim: `false`",
@@ -160,6 +179,7 @@ def build_mvp_completion_audit_report(
         evidence["current_evidence_supported"]
         and evidence["technical_execution_evidence_supported"]
         and evidence["selected_scale_objective_path_complete"]
+        and evidence["phrase_bank_cli_technical_path_ready"]
         and readme["readme_current_evidence_refreshed"]
     )
     return {
@@ -176,6 +196,7 @@ def build_mvp_completion_audit_report(
             "input_to_ranked_midi_completed": True,
             "input_to_rendered_wav_completed": True,
             "selected_scale_objective_repair_completed": True,
+            "phrase_bank_cli_technical_path_completed": True,
             "readme_evidence_boundary_refreshed": True,
             "musical_quality_mvp_completed": False,
             "human_audio_preference_completed": False,
@@ -209,6 +230,7 @@ def build_mvp_completion_audit_report(
             "ranked_midi_candidate_export",
             "technical_wav_render_path",
             "selected_scale_objective_repair_path",
+            "phrase_bank_cli_technical_path",
             "readme_current_evidence_refresh",
         ],
         "not_proven": [
@@ -269,6 +291,9 @@ def validate_mvp_completion_audit_report(
         "selected_scale_objective_repair_completed": bool(
             audit.get("selected_scale_objective_repair_completed", False)
         ),
+        "phrase_bank_cli_technical_path_completed": bool(
+            audit.get("phrase_bank_cli_technical_path_completed", False)
+        ),
         "musical_quality_mvp_completed": bool(audit.get("musical_quality_mvp_completed", True)),
         "human_audio_preference_completed": bool(audit.get("human_audio_preference_completed", True)),
         "product_mvp_completed": bool(audit.get("product_mvp_completed", True)),
@@ -280,6 +305,13 @@ def validate_mvp_completion_audit_report(
             evidence.get("objective_strict_valid_sample_count")
         ),
         "objective_dead_air_failure_count": _int(evidence.get("objective_dead_air_failure_count")),
+        "phrase_bank_cli_technical_path_ready": bool(
+            evidence.get("phrase_bank_cli_technical_path_ready", False)
+        ),
+        "cli_candidate_count": _int(evidence.get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(evidence.get("cli_rendered_audio_file_count")),
+        "cli_input_context_bars": _int(evidence.get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(evidence.get("cli_preference_fill_allowed", True)),
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
         "midi_to_solo_musical_quality_claimed": bool(
             readiness.get("midi_to_solo_musical_quality_claimed", True)
@@ -302,6 +334,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- boundary: `{report['boundary']}`",
         f"- next boundary: `{decision['next_boundary']}`",
         f"- technical model-core MVP completed: `{_bool_token(audit['technical_model_core_mvp_completed'])}`",
+        f"- phrase-bank CLI technical path completed: `{_bool_token(audit['phrase_bank_cli_technical_path_completed'])}`",
         f"- musical quality MVP completed: `{_bool_token(audit['musical_quality_mvp_completed'])}`",
         f"- human/audio preference completed: `{_bool_token(audit['human_audio_preference_completed'])}`",
         f"- product MVP completed: `{_bool_token(audit['product_mvp_completed'])}`",
@@ -317,6 +350,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- objective sample / strict / grammar: `{evidence['objective_sample_count']}` / `{evidence['objective_strict_valid_sample_count']}` / `{evidence['objective_grammar_gate_sample_count']}`",
         f"- objective dead-air / collapse failure: `{evidence['objective_dead_air_failure_count']}` / `{evidence['objective_collapse_warning_sample_count']}`",
         f"- objective avg / target postprocess removal: `{evidence['objective_avg_postprocess_removal_ratio']}` / `{evidence['objective_target_avg_postprocess_removal_ratio']}`",
+        f"- phrase-bank CLI technical path ready: `{_bool_token(evidence['phrase_bank_cli_technical_path_ready'])}`",
+        f"- CLI candidate / rendered WAV: `{evidence['cli_candidate_count']}` / `{evidence['cli_rendered_audio_file_count']}`",
+        f"- CLI input context bars: `{evidence['cli_input_context_bars']}`",
+        f"- CLI preference fill allowed: `{_bool_token(evidence['cli_preference_fill_allowed'])}`",
         "",
         "## Claim Boundary",
         "",

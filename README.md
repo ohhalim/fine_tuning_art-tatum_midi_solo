@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- latest evidence boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -57,7 +57,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank CLI MVP current evidence consolidation ready: `true`
 - phrase-bank CLI technical path included in current evidence: `true`
 - README evidence refreshed: `true`
-- next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- MVP completion audit completed: `true`
+- quality gap decision required: `true`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -93,6 +95,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - 명시적 `--input_midi` 경로 기준 phrase-bank CLI technical path objective decision 가능
 - selected-scale objective path와 phrase-bank CLI technical path를 current evidence로 통합 가능
 - README 첫 상태 영역에 current evidence와 claim boundary 반영 완료
+- technical model-core MVP 완료 범위 audit 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -112,9 +115,11 @@ MVP completion audit.
 - input to rendered WAV completed: `true`
 - selected-scale objective repair completed: `true`
 - phrase-bank CLI technical path included: `true`
+- phrase-bank CLI technical path completed: `true`
 - musical quality MVP completed: `false`
 - human/audio preference completed: `false`
 - product MVP completed: `false`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
 
 Quality gap decision.
 

@@ -26,6 +26,7 @@ def current_evidence(*, quality_claim: bool = False, strict_count: int = 9) -> d
             "ranked_midi_candidates_exported": True,
             "technical_wav_path_ready": True,
             "selected_scale_objective_path_complete": True,
+            "phrase_bank_cli_technical_path_ready": True,
             "current_mvp_technical_execution_evidence_supported": True,
             "current_mvp_objective_repair_evidence_supported": True,
             "midi_to_solo_mvp_current_evidence_supported": True,
@@ -56,6 +57,13 @@ def current_evidence(*, quality_claim: bool = False, strict_count: int = 9) -> d
             "avg_postprocess_removal_ratio": 0.2176,
             "target_avg_postprocess_removal_ratio": 0.3,
         },
+        "phrase_bank_cli_technical_path": {
+            "technical_midi_to_solo_cli_path_ready": True,
+            "candidate_count": 3,
+            "rendered_audio_file_count": 3,
+            "input_context_bars": 228,
+            "preference_fill_allowed": False,
+        },
         "decision": {
             "critical_user_input_required": False,
         },
@@ -71,6 +79,8 @@ def readme_text(*, missing_boundary: bool = False) -> str:
             "- current MVP evidence support: `true`",
             "- input MIDI -> context -> ranked MIDI -> WAV technical path: `true`",
             "- selected-scale objective repair path complete: `true`",
+            "- phrase-bank CLI technical path included in current evidence: `true`",
+            "- README evidence refreshed: `true`",
             "- human/audio preference claim: `false`",
             "- MIDI-to-solo musical quality claim: `false`",
             "- broad trained-model quality claim: `false`",
@@ -99,6 +109,7 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
         self.assertTrue(summary["input_to_ranked_midi_completed"])
         self.assertTrue(summary["input_to_rendered_wav_completed"])
         self.assertTrue(summary["selected_scale_objective_repair_completed"])
+        self.assertTrue(summary["phrase_bank_cli_technical_path_completed"])
         self.assertFalse(summary["musical_quality_mvp_completed"])
         self.assertFalse(summary["human_audio_preference_completed"])
         self.assertFalse(summary["product_mvp_completed"])
@@ -108,6 +119,11 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
         self.assertEqual(summary["objective_sample_count"], 9)
         self.assertEqual(summary["objective_strict_valid_sample_count"], 9)
         self.assertEqual(summary["objective_dead_air_failure_count"], 0)
+        self.assertTrue(summary["phrase_bank_cli_technical_path_ready"])
+        self.assertEqual(summary["cli_candidate_count"], 3)
+        self.assertEqual(summary["cli_rendered_audio_file_count"], 3)
+        self.assertEqual(summary["cli_input_context_bars"], 228)
+        self.assertFalse(summary["cli_preference_fill_allowed"])
         self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
 
     def test_rejects_missing_readme_evidence_boundary(self) -> None:
