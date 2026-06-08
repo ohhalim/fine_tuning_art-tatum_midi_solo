@@ -13,6 +13,10 @@
 
 - source boundary: `stage_b_midi_to_solo_quality_gap_decision`
 - technical model-core MVP completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3` / `3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
 - fallback path active: `true`
 - model-conditioned input path alignment required: `true`
 
@@ -22,6 +26,7 @@
 - reuse_selected_scale_objective_repair_guardrails: `True`
 - preserve_ranked_midi_export_min_count: `3`
 - preserve_rendered_wav_min_count: `3`
+- preserve_phrase_bank_cli_technical_path: `True`
 - preserve_objective_strict_sample_support: `True`
 - preserve_no_quality_claim: `True`
 

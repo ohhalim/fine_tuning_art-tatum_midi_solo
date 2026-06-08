@@ -38,6 +38,13 @@ def _bool_token(value: Any) -> str:
     return "true" if bool(value) else "false"
 
 
+def _int(value: Any, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
     if str(report.get("boundary") or "") != QUALITY_GAP_BOUNDARY:
         raise StageBMidiToSoloModelConditionedInputPathAlignmentError(
@@ -45,6 +52,7 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
         )
     readiness = _dict(report.get("readiness"))
     quality_gap = _dict(report.get("quality_gap"))
+    summary = _dict(report.get("mvp_completion_summary"))
     selected = _dict(report.get("selected_target"))
     decision = _dict(report.get("decision"))
     if str(decision.get("next_boundary") or "") != SOURCE_NEXT_BOUNDARY:
@@ -63,6 +71,10 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloModelConditionedInputPathAlignmentError(
             "technical model-core MVP completion required"
         )
+    if not bool(quality_gap.get("phrase_bank_cli_technical_path_completed", False)):
+        raise StageBMidiToSoloModelConditionedInputPathAlignmentError(
+            "phrase-bank CLI technical path completion required"
+        )
     if not bool(quality_gap.get("fallback_path_active", False)):
         raise StageBMidiToSoloModelConditionedInputPathAlignmentError(
             "fallback path should be active for this alignment boundary"
@@ -74,6 +86,20 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
     if bool(quality_gap.get("musical_quality_mvp_completed", True)):
         raise StageBMidiToSoloModelConditionedInputPathAlignmentError(
             "musical quality MVP should remain incomplete"
+        )
+    if not bool(summary.get("phrase_bank_cli_technical_path_ready", False)):
+        raise StageBMidiToSoloModelConditionedInputPathAlignmentError(
+            "phrase-bank CLI technical path readiness required"
+        )
+    if _int(summary.get("cli_candidate_count")) < 3:
+        raise StageBMidiToSoloModelConditionedInputPathAlignmentError("CLI candidate count below 3")
+    if _int(summary.get("cli_rendered_audio_file_count")) < 3:
+        raise StageBMidiToSoloModelConditionedInputPathAlignmentError("CLI rendered WAV count below 3")
+    if _int(summary.get("cli_input_context_bars")) <= 0:
+        raise StageBMidiToSoloModelConditionedInputPathAlignmentError("CLI input context bars required")
+    if bool(summary.get("cli_preference_fill_allowed", True)):
+        raise StageBMidiToSoloModelConditionedInputPathAlignmentError(
+            "CLI preference fill should remain blocked"
         )
     blocked_claims = [
         "human_audio_preference_claimed",
@@ -90,6 +116,12 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
     return {
         "source_boundary": QUALITY_GAP_BOUNDARY,
         "technical_model_core_mvp_completed": True,
+        "phrase_bank_cli_technical_path_completed": True,
+        "phrase_bank_cli_technical_path_ready": True,
+        "cli_candidate_count": _int(summary.get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(summary.get("cli_rendered_audio_file_count")),
+        "cli_input_context_bars": _int(summary.get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(summary.get("cli_preference_fill_allowed", True)),
         "fallback_path_active": True,
         "model_conditioned_input_path_alignment_required": True,
         "selected_quality_gap_target": str(readiness.get("selected_target") or ""),
@@ -117,6 +149,7 @@ def build_alignment_report(
             "reuse_selected_scale_objective_repair_guardrails": True,
             "preserve_ranked_midi_export_min_count": 3,
             "preserve_rendered_wav_min_count": 3,
+            "preserve_phrase_bank_cli_technical_path": True,
             "preserve_objective_strict_sample_support": True,
             "preserve_no_quality_claim": True,
         },
@@ -213,6 +246,17 @@ def validate_alignment_report(
         "fallback_replacement_probe_required": bool(
             readiness.get("fallback_replacement_probe_required", False)
         ),
+        "phrase_bank_cli_technical_path_completed": bool(
+            _dict(report.get("alignment_source")).get("phrase_bank_cli_technical_path_completed", False)
+        ),
+        "cli_candidate_count": _int(_dict(report.get("alignment_source")).get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(
+            _dict(report.get("alignment_source")).get("cli_rendered_audio_file_count")
+        ),
+        "cli_input_context_bars": _int(_dict(report.get("alignment_source")).get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(
+            _dict(report.get("alignment_source")).get("cli_preference_fill_allowed", True)
+        ),
         "human_review_required_now": bool(readiness.get("human_review_required_now", True)),
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
         "midi_to_solo_musical_quality_claimed": bool(
@@ -247,6 +291,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- source boundary: `{source['source_boundary']}`",
         f"- technical model-core MVP completed: `{_bool_token(source['technical_model_core_mvp_completed'])}`",
+        f"- phrase-bank CLI technical path completed: `{_bool_token(source['phrase_bank_cli_technical_path_completed'])}`",
+        f"- CLI candidate / rendered WAV: `{source['cli_candidate_count']}` / `{source['cli_rendered_audio_file_count']}`",
+        f"- CLI input context bars: `{source['cli_input_context_bars']}`",
+        f"- CLI preference fill allowed: `{_bool_token(source['cli_preference_fill_allowed'])}`",
         f"- fallback path active: `{_bool_token(source['fallback_path_active'])}`",
         f"- model-conditioned input path alignment required: `{_bool_token(source['model_conditioned_input_path_alignment_required'])}`",
         "",

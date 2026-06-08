@@ -28,12 +28,21 @@ def quality_gap_decision(
         "boundary": QUALITY_GAP_BOUNDARY,
         "quality_gap": {
             "technical_model_core_mvp_completed": True,
+            "phrase_bank_cli_technical_path_completed": True,
             "musical_quality_mvp_completed": False,
             "human_audio_preference_completed": False,
             "product_mvp_completed": False,
             "fallback_path_active": fallback_active,
             "model_conditioned_input_path_alignment_required": fallback_active,
             "human_review_required_now": False,
+        },
+        "mvp_completion_summary": {
+            "phrase_bank_cli_technical_path_completed": True,
+            "phrase_bank_cli_technical_path_ready": True,
+            "cli_candidate_count": 3,
+            "cli_rendered_audio_file_count": 3,
+            "cli_input_context_bars": 228,
+            "cli_preference_fill_allowed": False,
         },
         "selected_target": {
             "selected_target": selected_target,
@@ -80,6 +89,11 @@ class StageBMidiToSoloModelConditionedInputPathAlignmentTest(unittest.TestCase):
         self.assertFalse(summary["model_conditioned_input_path_aligned"])
         self.assertTrue(summary["fallback_replacement_probe_required"])
         self.assertTrue(summary["fallback_replacement_probe_required_from_decision"])
+        self.assertTrue(summary["phrase_bank_cli_technical_path_completed"])
+        self.assertEqual(summary["cli_candidate_count"], 3)
+        self.assertEqual(summary["cli_rendered_audio_file_count"], 3)
+        self.assertEqual(summary["cli_input_context_bars"], 228)
+        self.assertFalse(summary["cli_preference_fill_allowed"])
         self.assertFalse(summary["human_review_required_now"])
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
