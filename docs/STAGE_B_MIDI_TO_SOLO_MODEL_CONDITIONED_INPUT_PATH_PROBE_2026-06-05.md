@@ -10,6 +10,13 @@
 - fallback replacement ready: `false`
 - candidate export required: `true`
 
+## Alignment Source
+
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3` / `3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+
 ## Fallback Input Path
 
 - generation source: `context_conditioned_fallback`
