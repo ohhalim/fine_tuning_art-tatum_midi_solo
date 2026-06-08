@@ -222,6 +222,8 @@ Modes:
                 Build a runnable input-MIDI to repaired ranked MIDI package manifest.
   stage-b-midi-to-solo-phrase-bank-cli-user-input-smoke
                 Validate the phrase-bank CLI package with an explicit input MIDI path.
+  stage-b-midi-to-solo-phrase-bank-cli-audio-render-smoke
+                Render explicit-input phrase-bank CLI MIDI candidates to WAV.
   stage-b-midi-to-solo-candidate-audio-render-package
                 Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-mvp-execution-consolidation
@@ -3914,6 +3916,26 @@ run_stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_phrase_bank_cli_audio_render_smoke() {
+  local smoke_run_id="${SMOKE_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_cli_audio_render_smoke}"
+  local smoke_report="outputs/stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke/${smoke_run_id}/stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke.json"
+  if [[ ! -f "$smoke_report" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank CLI user-input smoke"
+    RUN_ID="$smoke_run_id" run_stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke
+  fi
+  print_header "Stage B MIDI-to-solo phrase-bank CLI audio render smoke"
+  "$PYTHON_BIN" scripts/render_stage_b_midi_to_solo_phrase_bank_cli_audio_smoke.py \
+    --run_id "$run_id" \
+    --user_input_smoke_report "$smoke_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_CLI_AUDIO_RENDER_SMOKE_2026-06-08.md \
+    --expected_boundary stage_b_midi_to_solo_phrase_bank_cli_audio_render_smoke \
+    --expected_next_boundary stage_b_midi_to_solo_phrase_bank_cli_listening_review_package \
+    --expected_file_count 3 \
+    --sample_rate 44100 \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_candidate_audio_render_package() {
   local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_conditioned_generation_probe}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_candidate_audio_render_package}"
@@ -7409,6 +7431,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-phrase-bank-cli-user-input-smoke)
     run_stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke
+    ;;
+  stage-b-midi-to-solo-phrase-bank-cli-audio-render-smoke)
+    run_stage_b_midi_to_solo_phrase_bank_cli_audio_render_smoke
     ;;
   stage-b-midi-to-solo-candidate-audio-render-package)
     run_stage_b_midi_to_solo_candidate_audio_render_package
