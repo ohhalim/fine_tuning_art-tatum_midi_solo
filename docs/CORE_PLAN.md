@@ -2700,6 +2700,37 @@ Issue #656은 Issue #654 user-input smoke 결과의 repaired MIDI 후보 3개를
 
 - `Stage B MIDI-to-solo phrase-bank CLI listening review package`
 
+## 9.20 Stage B MIDI-to-solo phrase-bank CLI listening review package
+
+Issue #658은 Issue #656 CLI audio render smoke 결과의 WAV/MIDI 후보 3개를 listening review package로 묶고, preference와 musical quality claim을 차단한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_package`
+- source boundary: `stage_b_midi_to_solo_phrase_bank_cli_audio_render_smoke`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_input_guard`
+- package ready: `true`
+- review item count: `3`
+- validated review input: `false`
+- required input fields: `candidate_rank`, `listening_status`, `preference`, `issue_notes`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- 명시적 input MIDI 기반 CLI output review package 생성 확인.
+- 청음 preference 입력 전 품질 claim 제외 유지.
+- 다음 작업은 CLI listening review input guard.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_cli_listening_review_package`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-cli-listening-review-package`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo phrase-bank CLI listening review input guard`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

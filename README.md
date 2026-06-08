@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_audio_render_smoke`
-- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_audio_render_smoke`
+- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_package`
+- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_package`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -48,6 +48,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank CLI explicit input context bars: `228`
 - phrase-bank CLI explicit input WAV files: `3`
 - phrase-bank CLI audio technical validation: `true`
+- phrase-bank CLI listening review package ready: `true`
+- phrase-bank CLI listening review items: `3`
+- phrase-bank CLI validated review input: `false`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -78,6 +81,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - 입력 MIDI 기반 phrase-bank CLI package와 repaired MIDI 후보 export 가능
 - 명시적 `--input_midi` 경로 기준 phrase-bank CLI smoke 가능
 - 명시적 `--input_midi` 경로 기준 phrase-bank CLI WAV technical render 가능
+- 명시적 `--input_midi` 경로 기준 phrase-bank CLI listening review package 생성 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -313,6 +317,17 @@ Phrase-bank CLI audio render smoke.
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 - next boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_package`
+
+Phrase-bank CLI listening review package.
+
+- package ready: `true`
+- review item count: `3`
+- validated review input: `false`
+- review WAV files: `rank_01_seed_635.wav`, `rank_02_seed_632.wav`, `rank_03_seed_638.wav`
+- required input fields: `candidate_rank`, `listening_status`, `preference`, `issue_notes`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_input_guard`
 
 MIDI-to-solo input contract.
 
