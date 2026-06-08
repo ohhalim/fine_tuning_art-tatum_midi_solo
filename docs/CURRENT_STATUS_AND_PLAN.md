@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #690, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair probe
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair audio package`
+- latest functional result: Issue #692, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair audio package
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair objective next decision`
 
 현재 범위가 아닌 것:
 
@@ -62,6 +62,52 @@
 - model-conditioned input path objective-only 기준 dead-air/timing repair 필요 판정
 - model-conditioned input path dead-air/timing repair target 정의 완료
 - model-conditioned input path dead-air/timing repair probe 기준 repaired 후보 3개 objective target 통과
+- model-conditioned input path dead-air/timing repaired 후보 3개 WAV technical render 완료
+
+## Stage B MIDI-to-Solo Model-Conditioned Input Path Dead-Air Timing Repair Audio Package Result
+
+Issue #692는 Issue #690 repair probe 결과의 repaired MIDI 3개를 WAV로 렌더링하고 technical metadata를 검증한 작업이다.
+
+변경:
+
+- model-conditioned input path dead-air timing repair audio package script 추가
+- repaired MIDI 3개 대상 WAV render 및 metadata 기록
+- renderer, soundfont, WAV sample rate, frame count, sha256 검증
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_DEAD_AIR_TIMING_REPAIR_AUDIO_PACKAGE_2026-06-08.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_audio_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next_decision`
+- rendered audio file count: `3`
+- technical WAV validation: `true`
+- repaired dead-air max: `0.0000`
+- max added-note ratio: `0.9167`
+- max postprocess removal ratio: `0.0000`
+- max repaired interval: `62`
+- remaining wide-interval risk: `true`
+- audio rendered quality claimed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- repaired MIDI 3개 WAV technical render 완료.
+- max repaired interval `62` 잔존으로 objective next decision 필요.
+- audio render quality와 human/audio preference claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_audio`
+- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_audio.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-audio-package`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair objective next decision`
 
 ## Stage B MIDI-to-Solo Model-Conditioned Input Path Dead-Air Timing Repair Probe Result
 
