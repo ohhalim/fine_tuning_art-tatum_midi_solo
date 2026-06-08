@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #684, Stage B MIDI-to-solo model-conditioned input path listening review input guard
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path objective-only next decision`
+- latest functional result: Issue #686, Stage B MIDI-to-solo model-conditioned input path objective-only next decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair decision`
 
 현재 범위가 아닌 것:
 
@@ -59,6 +59,55 @@
 - model-conditioned input path replacement consolidation 완료
 - model-conditioned input path listening review package 완료
 - model-conditioned input path review input pending 상태에서 preference fill 차단 완료
+- model-conditioned input path objective-only 기준 dead-air/timing repair 필요 판정
+
+## Stage B MIDI-to-Solo Model-Conditioned Input Path Objective-Only Next Decision Result
+
+Issue #686은 Issue #684 input guard와 model-conditioned candidate/audio evidence를 source로 사용해, 청음 입력 없이 다음 자동 경계를 결정한 작업이다.
+
+변경:
+
+- model-conditioned input path objective-only next decision script 추가
+- input guard, candidate export, audio render source evidence 검증
+- dead-air threshold 기반 repair 필요 여부 판정
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_OBJECTIVE_NEXT_DECISION_2026-06-08.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
+- model-conditioned technical path ready: `true`
+- candidate / exported / rendered: `3 / 3 / 3`
+- technical WAV validation: `true`
+- dead-air threshold: `0.5000`
+- dead-air failure count: `3`
+- dead-air min / max: `0.6522 / 0.6522`
+- dead-air timing repair required: `true`
+- current evidence consolidation ready: `false`
+- preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- ranked MIDI/WAV technical path ready.
+- candidate 3개 모두 dead-air threshold 초과.
+- current evidence consolidation 보류.
+- dead-air/timing repair decision 필요.
+- musical quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_objective_next`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_model_conditioned_input_path_objective_next.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-objective-next`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair decision`
 
 ## Stage B MIDI-to-Solo Model-Conditioned Input Path Listening Review Input Guard Result
 

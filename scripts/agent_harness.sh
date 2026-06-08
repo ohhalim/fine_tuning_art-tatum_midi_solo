@@ -244,6 +244,8 @@ Modes:
                 Decide model-conditioned input-path alignment requirements and next probe target.
   stage-b-midi-to-solo-model-conditioned-input-path-listening-review-input-guard
                 Block model-conditioned input-path preference fill while listening review input is pending.
+  stage-b-midi-to-solo-model-conditioned-input-path-objective-next
+                Select the next model-conditioned input-path boundary from objective MIDI/WAV evidence only.
   stage-b-midi-to-solo-model-direct-generation-repair
                 Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
@@ -6113,6 +6115,41 @@ run_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_gua
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_objective_next() {
+  local input_guard_run_id="${INPUT_GUARD_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard}"
+  local candidate_export_run_id="${CANDIDATE_EXPORT_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export}"
+  local audio_render_run_id="${AUDIO_RENDER_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision}"
+  local input_guard="outputs/stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard/${input_guard_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard.json"
+  local candidate_export="outputs/stage_b_midi_to_solo_model_conditioned_input_path_candidate_export/${candidate_export_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_candidate_export.json"
+  local audio_render="outputs/stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package/${audio_render_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package.json"
+  if [[ ! -f "$input_guard" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path listening review input guard"
+    RUN_ID="$input_guard_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard
+  fi
+  if [[ ! -f "$candidate_export" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path candidate export"
+    RUN_ID="$candidate_export_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export
+  fi
+  if [[ ! -f "$audio_render" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path audio render package"
+    RUN_ID="$audio_render_run_id" CANDIDATE_EXPORT_RUN_ID="$candidate_export_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path objective-only next decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_model_conditioned_input_path_objective_next.py \
+    --run_id "$run_id" \
+    --input_guard_report "$input_guard" \
+    --candidate_export_report "$candidate_export" \
+    --audio_render_report "$audio_render" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_OBJECTIVE_NEXT_DECISION_2026-06-08.md \
+    --issue_number 686 \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision \
+    --require_objective_decision \
+    --require_repair_required \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -7763,6 +7800,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-listening-review-input-guard)
     run_stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-objective-next)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_objective_next
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #684, Stage B MIDI-to-solo model-conditioned input path listening review input guard.
+- Latest functional issue completed: Issue #686, Stage B MIDI-to-solo model-conditioned input path objective-only next decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-conditioned input path objective-only next decision.
+- Recommended next issue: Stage B MIDI-to-solo model-conditioned input path dead-air timing repair decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1100,6 +1100,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-
 ```
 
 This harness blocks model-conditioned input-path preference fill while listening review input is pending.
+
+For Stage B MIDI-to-solo model-conditioned input path objective-only next decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-objective-next
+```
+
+This harness selects the next model-conditioned input-path boundary from objective MIDI/WAV evidence only.
 
 For Stage B MIDI-to-solo phrase-bank retrieval baseline changes, run:
 

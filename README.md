@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -27,6 +27,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - listening review package ready: `true`
 - model-conditioned listening review input guard completed: `true`
 - model-conditioned preference fill allowed: `false`
+- model-conditioned objective-only next decision completed: `true`
+- model-conditioned dead-air failure count: `3 / 3`
+- model-conditioned dead-air timing repair required: `true`
 - phrase-bank retrieval baseline completed: `true`
 - phrase-bank source records / motifs: `56 / 803`
 - phrase-bank exported / qualified MIDI candidates: `3 / 3`
@@ -66,7 +69,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -255,6 +258,22 @@ Model-conditioned input path listening review input guard.
 - CLI candidate / rendered WAV: `3 / 3`
 - CLI input context bars: `228`
 - CLI preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+Model-conditioned input path objective-only next decision.
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
+- model-conditioned technical path ready: `true`
+- candidate / exported / rendered: `3 / 3 / 3`
+- technical WAV validation: `true`
+- dead-air threshold: `0.5000`
+- dead-air failure count: `3`
+- dead-air min / max: `0.6522 / 0.6522`
+- dead-air timing repair required: `true`
+- current evidence consolidation ready: `false`
+- preference fill allowed: `false`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 
