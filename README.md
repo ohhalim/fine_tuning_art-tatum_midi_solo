@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision`
-- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision`
+- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_mvp_package`
+- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_mvp_package`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -43,6 +43,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank repaired preference fill allowed: `false`
 - phrase-bank repaired objective supported candidates: `3 / 3`
 - phrase-bank CLI MVP package ready: `true`
+- phrase-bank CLI MVP repaired MIDI candidates: `3`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -70,6 +71,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank 후보의 dead-air/density objective repair 가능
 - phrase-bank repaired MIDI 후보의 WAV technical render 가능
 - phrase-bank repaired 후보의 listening review package 생성 가능
+- 입력 MIDI 기반 phrase-bank CLI package와 repaired MIDI 후보 export 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -266,6 +268,19 @@ Phrase-bank dead-air density repair objective-only next decision.
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 - next boundary: `stage_b_midi_to_solo_phrase_bank_cli_mvp_package`
+
+Phrase-bank CLI MVP package.
+
+- CLI MVP package completed: `true`
+- ranked repaired MIDI exported: `true`
+- candidate count: `3`
+- objective supported candidate count: `3`
+- dead-air range: `0.1895 - 0.2211`
+- input context bars: `8`
+- phrase-bank exported candidate count: `3`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke`
 
 MIDI-to-solo input contract.
 
