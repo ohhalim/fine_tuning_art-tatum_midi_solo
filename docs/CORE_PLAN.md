@@ -2865,6 +2865,40 @@ Issue #666은 Issue #664 current evidence를 README 첫 상태 영역과 claim b
 
 - `Stage B MIDI-to-solo MVP completion audit`
 
+## 9.25 Stage B MIDI-to-solo MVP completion audit
+
+Issue #668은 Issue #664 current evidence와 Issue #666 README refresh를 기준으로 technical model-core MVP 완료 범위를 audit한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- technical model-core MVP completed: `true`
+- input to ranked MIDI completed: `true`
+- input to rendered WAV completed: `true`
+- selected-scale objective repair completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- musical quality MVP completed: `false`
+- human/audio preference completed: `false`
+- product MVP completed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- technical model-core MVP 완료 범위 확인.
+- 음악 품질, 사용자 선호, 제품 MVP 완료 claim 제외 유지.
+- 다음 작업은 quality gap decision.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_completion_audit`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo quality gap decision`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
