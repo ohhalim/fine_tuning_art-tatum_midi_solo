@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #650, Stage B MIDI-to-solo phrase-bank dead-air density repair objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank CLI MVP package`
+- latest functional result: Issue #652, Stage B MIDI-to-solo phrase-bank CLI MVP package
+- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank CLI user-input smoke`
 
 현재 범위가 아닌 것:
 
@@ -42,6 +42,51 @@
 - dead-air/density repaired 후보 listening review package 준비 완료
 - repaired review input pending 상태에서 preference fill 차단 완료
 - objective-only 기준 repaired 후보 3개 CLI MVP package ready
+- 입력 MIDI fixture 기준 CLI package와 repaired MIDI 후보 3개 생성 완료
+
+## Stage B MIDI-to-Solo Phrase-Bank CLI MVP Package Result
+
+Issue #652는 Issue #650 objective-only decision 이후 입력 MIDI에서 ranked repaired MIDI 후보까지 이어지는 실행 package를 추가한 작업이다.
+
+변경:
+
+- 입력 MIDI context extraction, phrase-bank retrieval, dead-air/density repair 연결
+- CLI package manifest, candidate manifest, command 기록
+- 전용 harness mode와 unit test 추가
+- README, current status, core plan, handoff scope 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_CLI_MVP_PACKAGE_2026-06-08.md`
+- boundary: `stage_b_midi_to_solo_phrase_bank_cli_mvp_package`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke`
+- candidate count: `3`
+- objective supported candidate count: `3`
+- all candidates objective supported: `true`
+- dead-air range: `0.1895 - 0.2211`
+- input context bars: `8`
+- phrase-bank exported candidate count: `3`
+- CLI MVP package ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 입력 MIDI fixture 기준 CLI 실행 경로 확인
+- ranked repaired MIDI 후보 3개 export 확인
+- 청음 preference와 musical quality claim 제외 유지
+- 다음 작업은 실제 사용자 입력 MIDI smoke
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_cli_mvp_package`
+- `.venv/bin/python scripts/run_stage_b_midi_to_solo_phrase_bank_cli_mvp_package.py --run_id harness_stage_b_midi_to_solo_phrase_bank_cli_mvp_package --doc_path docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_CLI_MVP_PACKAGE_2026-06-08.md --expected_boundary stage_b_midi_to_solo_phrase_bank_cli_mvp_package --expected_next_boundary stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke --require_cli_ready --require_no_quality_claim`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-cli-mvp-package`
+
+다음:
+
+- `Stage B MIDI-to-solo phrase-bank CLI user-input smoke`
 
 ## Stage B MIDI-to-Solo Phrase-Bank Dead-Air Density Repair Objective-Only Next Decision Result
 

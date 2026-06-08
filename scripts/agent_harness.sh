@@ -218,6 +218,8 @@ Modes:
                 Guard repaired phrase-bank preference fill while listening review input is pending.
   stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-objective-only-next-decision
                 Select the next repaired phrase-bank boundary from objective MIDI/WAV evidence only.
+  stage-b-midi-to-solo-phrase-bank-cli-mvp-package
+                Build a runnable input-MIDI to repaired ranked MIDI package manifest.
   stage-b-midi-to-solo-candidate-audio-render-package
                 Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-mvp-execution-consolidation
@@ -3871,6 +3873,18 @@ run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_phrase_bank_cli_mvp_package() {
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_cli_mvp_package}"
+  print_header "Stage B MIDI-to-solo phrase-bank CLI MVP package"
+  "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_phrase_bank_cli_mvp_package.py \
+    --run_id "$run_id" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_CLI_MVP_PACKAGE_2026-06-08.md \
+    --expected_boundary stage_b_midi_to_solo_phrase_bank_cli_mvp_package \
+    --expected_next_boundary stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke \
+    --require_cli_ready \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_candidate_audio_render_package() {
   local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_conditioned_generation_probe}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_candidate_audio_render_package}"
@@ -7360,6 +7374,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-objective-only-next-decision)
     run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision
+    ;;
+  stage-b-midi-to-solo-phrase-bank-cli-mvp-package)
+    run_stage_b_midi_to_solo_phrase_bank_cli_mvp_package
     ;;
   stage-b-midi-to-solo-candidate-audio-render-package)
     run_stage_b_midi_to_solo_candidate_audio_render_package

@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #650, Stage B MIDI-to-solo phrase-bank dead-air density repair objective-only next decision.
+- Latest functional issue completed: Issue #652, Stage B MIDI-to-solo phrase-bank CLI MVP package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo phrase-bank CLI MVP package.
+- Recommended next issue: Stage B MIDI-to-solo phrase-bank CLI user-input smoke.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1172,6 +1172,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-dead-air-density-
 ```
 
 This harness selects the next repaired phrase-bank boundary from objective MIDI/WAV evidence only and routes CLI MVP packaging without claiming listening preference.
+
+For Stage B MIDI-to-solo phrase-bank CLI MVP package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-cli-mvp-package
+```
+
+This harness builds a runnable input-MIDI to repaired ranked MIDI package manifest without claiming listening preference or musical quality.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 
