@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -24,7 +24,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned input path audio render completed: `true`
 - model-conditioned input path replacement consolidated: `true`
 - listening review package required: `true`
-- listening review package ready: `false`
+- listening review package ready: `true`
 - phrase-bank retrieval baseline completed: `true`
 - phrase-bank source records / motifs: `56 / 803`
 - phrase-bank exported / qualified MIDI candidates: `3 / 3`
@@ -64,7 +64,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -106,6 +106,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned ranked input-path candidate export 가능
 - model-conditioned ranked MIDI WAV render 가능
 - model-conditioned ranked MIDI/WAV technical replacement consolidation 가능
+- model-conditioned ranked MIDI/WAV listening review package 생성 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -227,10 +228,16 @@ Model-conditioned input path replacement consolidation.
 
 Model-conditioned input path listening review package.
 
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard`
 - package ready: `true`
 - review item count: `3`
 - validated review input: `false`
 - review WAV files: `rank_01_sample_01.wav`, `rank_02_sample_02.wav`, `rank_03_sample_03.wav`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
 - human/audio preference claimed: `false`
 
 Phrase-bank retrieval baseline.

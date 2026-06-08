@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #680, Stage B MIDI-to-solo model-conditioned input path replacement consolidation.
+- Latest functional issue completed: Issue #682, Stage B MIDI-to-solo model-conditioned input path listening review package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-conditioned input path listening review package.
+- Recommended next issue: Stage B MIDI-to-solo model-conditioned input path listening review input guard.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
