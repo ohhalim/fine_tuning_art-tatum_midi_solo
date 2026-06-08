@@ -44,6 +44,13 @@ def candidate_export_report(root: Path) -> dict:
             "best_max_simultaneous_notes": 1,
             "best_dead_air_ratio": 0.65,
         },
+        "probe_source": {
+            "phrase_bank_cli_technical_path_completed": True,
+            "cli_candidate_count": 3,
+            "cli_rendered_audio_file_count": 3,
+            "cli_input_context_bars": 228,
+            "cli_preference_fill_allowed": False,
+        },
         "top_candidates": top,
         "readiness": {
             "model_conditioned_input_path_candidate_export_completed": True,
@@ -96,6 +103,13 @@ def audio_render_report(root: Path, midi_paths: list[str], *, quality_claim: boo
             "next_boundary": AUDIO_RENDER_NEXT_BOUNDARY,
             "critical_user_input_required": False,
         },
+        "candidate_export_source": {
+            "phrase_bank_cli_technical_path_completed": True,
+            "cli_candidate_count": 3,
+            "cli_rendered_audio_file_count": 3,
+            "cli_input_context_bars": 228,
+            "cli_preference_fill_allowed": False,
+        },
         "rendered_audio_files": files,
     }
 
@@ -130,6 +144,11 @@ class StageBMidiToSoloModelConditionedInputPathReplacementConsolidationTest(unit
         self.assertTrue(summary["listening_review_package_required"])
         self.assertEqual(summary["exported_candidate_count"], 3)
         self.assertEqual(summary["rendered_audio_file_count"], 3)
+        self.assertTrue(summary["phrase_bank_cli_technical_path_completed"])
+        self.assertEqual(summary["cli_candidate_count"], 3)
+        self.assertEqual(summary["cli_rendered_audio_file_count"], 3)
+        self.assertEqual(summary["cli_input_context_bars"], 228)
+        self.assertFalse(summary["cli_preference_fill_allowed"])
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
 

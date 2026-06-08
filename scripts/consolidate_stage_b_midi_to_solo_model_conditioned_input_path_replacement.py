@@ -81,9 +81,40 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
         )
 
 
+def validate_cli_source(source: dict[str, Any], *, label: str) -> dict[str, Any]:
+    if not bool(source.get("phrase_bank_cli_technical_path_completed", False)):
+        raise StageBMidiToSoloModelConditionedInputPathReplacementConsolidationError(
+            f"{label} phrase-bank CLI technical path completion required"
+        )
+    if _int(source.get("cli_candidate_count")) < 3:
+        raise StageBMidiToSoloModelConditionedInputPathReplacementConsolidationError(
+            f"{label} CLI candidate count below 3"
+        )
+    if _int(source.get("cli_rendered_audio_file_count")) < 3:
+        raise StageBMidiToSoloModelConditionedInputPathReplacementConsolidationError(
+            f"{label} CLI rendered WAV count below 3"
+        )
+    if _int(source.get("cli_input_context_bars")) <= 0:
+        raise StageBMidiToSoloModelConditionedInputPathReplacementConsolidationError(
+            f"{label} CLI input context bars required"
+        )
+    if bool(source.get("cli_preference_fill_allowed", True)):
+        raise StageBMidiToSoloModelConditionedInputPathReplacementConsolidationError(
+            f"{label} CLI preference fill should remain blocked"
+        )
+    return {
+        "phrase_bank_cli_technical_path_completed": True,
+        "cli_candidate_count": _int(source.get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(source.get("cli_rendered_audio_file_count")),
+        "cli_input_context_bars": _int(source.get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(source.get("cli_preference_fill_allowed", True)),
+    }
+
+
 def validate_candidate_export(report: dict[str, Any], *, expected_count: int) -> dict[str, Any]:
     readiness = _dict(report.get("readiness"))
     summary = _dict(report.get("summary"))
+    source = validate_cli_source(_dict(report.get("probe_source")), label="candidate export source")
     if str(report.get("boundary") or readiness.get("boundary") or "") != CANDIDATE_EXPORT_BOUNDARY:
         raise StageBMidiToSoloModelConditionedInputPathReplacementConsolidationError(
             "candidate export boundary required"
@@ -119,12 +150,14 @@ def validate_candidate_export(report: dict[str, Any], *, expected_count: int) ->
         "best_max_simultaneous_notes": _int(summary.get("best_max_simultaneous_notes")),
         "best_dead_air_ratio": _float(summary.get("best_dead_air_ratio")),
         "midi_paths": midi_paths,
+        "source_evidence": source,
     }
 
 
 def validate_audio_render(report: dict[str, Any], *, expected_count: int) -> dict[str, Any]:
     boundary = _dict(report.get("audio_render_boundary"))
     decision = _dict(report.get("decision"))
+    source = validate_cli_source(_dict(report.get("candidate_export_source")), label="audio render source")
     if str(boundary.get("boundary") or "") != AUDIO_RENDER_BOUNDARY:
         raise StageBMidiToSoloModelConditionedInputPathReplacementConsolidationError(
             "audio render boundary required"
@@ -182,6 +215,7 @@ def validate_audio_render(report: dict[str, Any], *, expected_count: int) -> dic
         "wav_duration_max_seconds": max(durations) if durations else 0.0,
         "wav_paths": wav_paths,
         "source_midi_paths": source_midi_paths,
+        "source_evidence": source,
     }
 
 
@@ -200,6 +234,10 @@ def build_replacement_consolidation_report(
         raise StageBMidiToSoloModelConditionedInputPathReplacementConsolidationError(
             "ranked MIDI export paths must match audio render source paths"
         )
+    if candidate["source_evidence"] != audio["source_evidence"]:
+        raise StageBMidiToSoloModelConditionedInputPathReplacementConsolidationError(
+            "candidate export and audio render source evidence must match"
+        )
     return {
         "schema_version": SCHEMA_VERSION,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
@@ -212,6 +250,7 @@ def build_replacement_consolidation_report(
         },
         "candidate_export": candidate,
         "audio_render": audio,
+        "source_evidence": candidate["source_evidence"],
         "replacement_consolidation": {
             "model_conditioned_input_to_ranked_midi_completed": True,
             "model_conditioned_input_to_ranked_wav_completed": True,
@@ -327,6 +366,17 @@ def validate_replacement_consolidation_report(
         "rendered_audio_file_count": _int(audio.get("rendered_audio_file_count")),
         "wav_duration_min_seconds": _float(audio.get("wav_duration_min_seconds")),
         "wav_duration_max_seconds": _float(audio.get("wav_duration_max_seconds")),
+        "phrase_bank_cli_technical_path_completed": bool(
+            _dict(report.get("source_evidence")).get("phrase_bank_cli_technical_path_completed", False)
+        ),
+        "cli_candidate_count": _int(_dict(report.get("source_evidence")).get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(
+            _dict(report.get("source_evidence")).get("cli_rendered_audio_file_count")
+        ),
+        "cli_input_context_bars": _int(_dict(report.get("source_evidence")).get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(
+            _dict(report.get("source_evidence")).get("cli_preference_fill_allowed", True)
+        ),
         "human_review_required_now": bool(readiness.get("human_review_required_now", True)),
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
         "midi_to_solo_musical_quality_claimed": bool(
@@ -342,6 +392,7 @@ def markdown_report(report: dict[str, Any]) -> str:
     decision = report["decision"]
     candidate = report["candidate_export"]
     audio = report["audio_render"]
+    source = report["source_evidence"]
     lines = [
         "# Stage B MIDI-to-Solo Model-Conditioned Input Path Replacement Consolidation",
         "",
@@ -361,6 +412,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- rendered audio file count: `{audio['rendered_audio_file_count']}`",
         f"- WAV duration range: `{audio['wav_duration_min_seconds']:.3f}s - {audio['wav_duration_max_seconds']:.3f}s`",
         f"- best note / unique pitch / max simultaneous: `{candidate['best_note_count']} / {candidate['best_unique_pitch_count']} / {candidate['best_max_simultaneous_notes']}`",
+        f"- phrase-bank CLI technical path completed: `{_bool_token(source['phrase_bank_cli_technical_path_completed'])}`",
+        f"- CLI candidate / rendered WAV: `{source['cli_candidate_count']}` / `{source['cli_rendered_audio_file_count']}`",
+        f"- CLI input context bars: `{source['cli_input_context_bars']}`",
+        f"- CLI preference fill allowed: `{_bool_token(source['cli_preference_fill_allowed'])}`",
         "",
         "## Claim Boundary",
         "",

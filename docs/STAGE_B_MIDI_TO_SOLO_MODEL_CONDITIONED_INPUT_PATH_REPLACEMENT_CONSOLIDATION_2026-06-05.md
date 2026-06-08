@@ -16,6 +16,10 @@
 - rendered audio file count: `3`
 - WAV duration range: `19.585s - 22.390s`
 - best note / unique pitch / max simultaneous: `24 / 20 / 1`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3` / `3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
 
 ## Claim Boundary
 

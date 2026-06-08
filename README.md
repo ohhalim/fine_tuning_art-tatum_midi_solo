@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -22,7 +22,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - fallback replacement ready: `true`
 - model-conditioned input path candidate export completed: `true`
 - model-conditioned input path audio render completed: `true`
-- listening review package required: `false`
+- model-conditioned input path replacement consolidated: `true`
+- listening review package required: `true`
 - listening review package ready: `false`
 - phrase-bank retrieval baseline completed: `true`
 - phrase-bank source records / motifs: `56 / 803`
@@ -63,7 +64,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -104,6 +105,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned input path probe 가능
 - model-conditioned ranked input-path candidate export 가능
 - model-conditioned ranked MIDI WAV render 가능
+- model-conditioned ranked MIDI/WAV technical replacement consolidation 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -207,11 +209,19 @@ Model-conditioned input path audio render package.
 
 Model-conditioned input path replacement consolidation.
 
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
 - model-conditioned input to ranked MIDI completed: `true`
 - model-conditioned input to ranked WAV completed: `true`
 - fallback replacement technical path ready: `true`
+- fallback replacement ready: `true`
 - listening review package required: `true`
 - exported/rendered count: `3 / 3`
+- WAV duration range: `19.585s - 22.390s`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 

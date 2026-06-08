@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #678, Stage B MIDI-to-solo model-conditioned input path audio render package
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path replacement consolidation`
+- latest functional result: Issue #680, Stage B MIDI-to-solo model-conditioned input path replacement consolidation
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path listening review package`
 
 현재 범위가 아닌 것:
 
@@ -56,6 +56,54 @@
 - model-conditioned input path probe 완료
 - model-conditioned input path candidate export 완료
 - model-conditioned input path audio render package 완료
+- model-conditioned input path replacement consolidation 완료
+
+## Stage B MIDI-to-Solo Model-Conditioned Input Path Replacement Consolidation Result
+
+Issue #680은 Issue #676 candidate export와 Issue #678 audio render 결과를 단일 technical replacement evidence로 통합한 작업이다.
+
+변경:
+
+- candidate export source와 audio render source CLI evidence 일치 검증 추가
+- ranked MIDI export path와 audio render source path 일치 검증 유지
+- generated consolidation doc와 status docs 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_REPLACEMENT_CONSOLIDATION_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_package`
+- replacement consolidated: `true`
+- input to ranked MIDI completed: `true`
+- input to ranked WAV completed: `true`
+- fallback replacement technical path ready: `true`
+- fallback replacement ready: `true`
+- listening review package required: `true`
+- exported/rendered count: `3 / 3`
+- WAV duration range: `19.585s - 22.390s`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+- human review required now: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- ranked MIDI/WAV technical replacement evidence 통합 완료
+- listening review package 필요
+- 청음 품질과 사용자 선호 claim 제외 유지
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_replacement_consolidation`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-replacement-consolidation`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned input path listening review package`
 
 ## Stage B MIDI-to-Solo Model-Conditioned Input Path Audio Render Package Result
 
