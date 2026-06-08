@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #662, Stage B MIDI-to-solo phrase-bank CLI objective-only next decision.
+- Latest functional issue completed: Issue #664, Stage B MIDI-to-solo MVP current evidence consolidation.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo MVP current evidence consolidation.
+- Recommended next issue: Stage B MIDI-to-solo README evidence refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1018,7 +1018,7 @@ For Stage B MIDI-to-solo MVP current evidence consolidation changes, run:
 bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-current-evidence-consolidation
 ```
 
-This harness consolidates the input contract, context extraction, ranked MIDI candidates, technical WAV render path, and selected-scale objective repair boundary without claiming musical quality.
+This harness consolidates the input contract, context extraction, ranked MIDI candidates, technical WAV render path, selected-scale objective repair boundary, and CLI technical path without claiming musical quality.
 
 For Stage B MIDI-to-solo README evidence refresh changes, run:
 

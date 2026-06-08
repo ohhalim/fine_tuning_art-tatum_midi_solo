@@ -7,6 +7,7 @@
 - current MVP evidence supported: `true`
 - technical execution evidence supported: `true`
 - selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 
@@ -44,6 +45,16 @@
 - avg / max postprocess removal ratio: `0.21759259259259262` / `0.2916666666666667`
 - target avg postprocess removal ratio: `0.3`
 - validated review input present: `false`
+- preference fill allowed: `false`
+
+## Phrase-Bank CLI Technical Path
+
+- technical MIDI-to-solo CLI path ready: `true`
+- explicit input used: `true`
+- candidate / objective supported: `3` / `3`
+- repaired MIDI / rendered WAV: `3` / `3`
+- input context bars: `228`
+- dead-air range: `0.1895-0.2211`
 - preference fill allowed: `false`
 
 ## MIDI Paths

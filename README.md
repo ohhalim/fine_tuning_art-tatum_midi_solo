@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision`
-- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision`
+- latest evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -55,6 +55,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank CLI preference fill allowed: `false`
 - phrase-bank CLI technical MIDI-to-solo path ready: `true`
 - phrase-bank CLI MVP current evidence consolidation ready: `true`
+- phrase-bank CLI technical path included in current evidence: `true`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -88,6 +89,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - 명시적 `--input_midi` 경로 기준 phrase-bank CLI listening review package 생성 가능
 - 명시적 `--input_midi` 경로 기준 phrase-bank CLI review input pending 상태에서 preference fill 차단 가능
 - 명시적 `--input_midi` 경로 기준 phrase-bank CLI technical path objective decision 가능
+- selected-scale objective path와 phrase-bank CLI technical path를 current evidence로 통합 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -106,6 +108,7 @@ MVP completion audit.
 - input to ranked MIDI completed: `true`
 - input to rendered WAV completed: `true`
 - selected-scale objective repair completed: `true`
+- phrase-bank CLI technical path included: `true`
 - musical quality MVP completed: `false`
 - human/audio preference completed: `false`
 - product MVP completed: `false`
@@ -361,6 +364,22 @@ Phrase-bank CLI objective-only next decision.
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 - next boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+
+MVP current evidence consolidation.
+
+- current MVP evidence supported: `true`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- generation exported / qualified candidates: `3 / 3`
+- technical audio rendered WAV files: `3`
+- selected-scale objective valid / strict / grammar: `9 / 9 / 9`
+- CLI candidate / rendered WAV files: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
 
 MIDI-to-solo input contract.
 
