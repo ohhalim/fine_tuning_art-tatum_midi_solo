@@ -2935,6 +2935,41 @@ Issue #670은 Issue #668 MVP completion audit 이후 남은 quality gap을 다�
 
 - `Stage B MIDI-to-solo model-conditioned input path quality alignment`
 
+## 9.27 Stage B MIDI-to-solo model-conditioned input path quality alignment
+
+Issue #672는 Issue #670 quality gap decision 이후 fallback replacement probe 조건을 다시 고정한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_probe`
+- selected probe target: `replace_fallback_with_model_conditioned_input_path_probe`
+- model-conditioned input path aligned: `false`
+- fallback replacement probe required: `true`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+- human review required now: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- quality gap source의 CLI technical path 완료 evidence를 alignment decision source로 유지.
+- 현재 input-to-WAV path는 아직 `context_conditioned_fallback` 경로.
+- 다음 작업은 model-conditioned input path probe.
+- 청음 리뷰와 musical quality claim은 아직 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-quality-alignment`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo model-conditioned input path probe`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
