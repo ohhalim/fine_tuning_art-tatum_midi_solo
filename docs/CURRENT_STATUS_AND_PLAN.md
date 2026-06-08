@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #660, Stage B MIDI-to-solo phrase-bank CLI listening review input guard
-- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank CLI objective-only next decision`
+- latest functional result: Issue #662, Stage B MIDI-to-solo phrase-bank CLI objective-only next decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation`
 
 현재 범위가 아닌 것:
 
@@ -47,6 +47,55 @@
 - 실제 MIDI 입력 CLI 후보 3개 WAV technical render 완료
 - 실제 MIDI 입력 CLI WAV/MIDI 후보 3개 listening review package 준비 완료
 - 실제 MIDI 입력 CLI review input pending 상태에서 preference fill 차단 완료
+- 실제 MIDI 입력 CLI technical path objective decision 완료
+
+## Stage B MIDI-to-Solo Phrase-Bank CLI Objective-Only Next Decision Result
+
+Issue #662는 CLI phrase-bank 경로의 objective-only evidence를 통합하고, 품질 claim 없이 current evidence consolidation으로 넘긴 작업이다.
+
+변경:
+
+- CLI user-input smoke report validation 추가
+- CLI audio render smoke report validation 추가
+- CLI listening review input guard validation 추가
+- technical path readiness와 claim boundary 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_CLI_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-08.md`
+- boundary: `stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- technical MIDI-to-solo CLI path ready: `true`
+- MVP current evidence consolidation ready: `true`
+- explicit input used: `true`
+- candidate count: `3`
+- objective supported candidate count: `3`
+- repaired MIDI file count: `3`
+- rendered audio file count: `3`
+- technical WAV validation: `true`
+- input context bars: `228`
+- dead-air range: `0.1895 - 0.2211`
+- preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 명시적 input MIDI 기준 ranked MIDI/WAV technical path 준비 완료
+- review input 없는 preference fill 차단 유지
+- 청음 preference와 musical quality claim 제외 유지
+- 다음 작업은 MVP current evidence consolidation
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_cli_objective_next`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-cli-objective-only-next-decision`
+
+다음:
+
+- `Stage B MIDI-to-solo MVP current evidence consolidation`
 
 ## Stage B MIDI-to-Solo Phrase-Bank CLI Listening Review Input Guard Result
 

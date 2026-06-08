@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_input_guard`
-- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_listening_review_input_guard`
+- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision`
+- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -53,6 +53,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank CLI validated review input: `false`
 - phrase-bank CLI listening review input guard completed: `true`
 - phrase-bank CLI preference fill allowed: `false`
+- phrase-bank CLI technical MIDI-to-solo path ready: `true`
+- phrase-bank CLI MVP current evidence consolidation ready: `true`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -85,6 +87,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - 명시적 `--input_midi` 경로 기준 phrase-bank CLI WAV technical render 가능
 - 명시적 `--input_midi` 경로 기준 phrase-bank CLI listening review package 생성 가능
 - 명시적 `--input_midi` 경로 기준 phrase-bank CLI review input pending 상태에서 preference fill 차단 가능
+- 명시적 `--input_midi` 경로 기준 phrase-bank CLI technical path objective decision 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -341,6 +344,23 @@ Phrase-bank CLI listening review input guard.
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 - next boundary: `stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision`
+
+Phrase-bank CLI objective-only next decision.
+
+- technical MIDI-to-solo CLI path ready: `true`
+- MVP current evidence consolidation ready: `true`
+- explicit input used: `true`
+- candidate count: `3`
+- objective supported candidate count: `3`
+- repaired MIDI file count: `3`
+- rendered audio file count: `3`
+- technical WAV validation: `true`
+- input context bars: `228`
+- dead-air range: `0.1895 - 0.2211`
+- preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- next boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 
 MIDI-to-solo input contract.
 
