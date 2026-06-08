@@ -248,6 +248,8 @@ Modes:
                 Select the next model-conditioned input-path boundary from objective MIDI/WAV evidence only.
   stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-decision
                 Decide the dead-air/timing repair target after model-conditioned objective evidence.
+  stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-probe
+                Repair dead-air/timing gaps in ranked model-conditioned MIDI candidates.
   stage-b-midi-to-solo-model-direct-generation-repair
                 Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
@@ -6175,6 +6177,40 @@ run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_dec
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe() {
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision}"
+  local candidate_export_run_id="${CANDIDATE_EXPORT_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe}"
+  local decision_report="outputs/stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision/${decision_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision.json"
+  local candidate_export="outputs/stage_b_midi_to_solo_model_conditioned_input_path_candidate_export/${candidate_export_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_candidate_export.json"
+  if [[ ! -f "$decision_report" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path dead-air timing repair decision"
+    RUN_ID="$decision_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision
+  fi
+  if [[ ! -f "$candidate_export" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path candidate export"
+    RUN_ID="$candidate_export_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path dead-air timing repair probe"
+  "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe.py \
+    --run_id "$run_id" \
+    --repair_decision_report "$decision_report" \
+    --candidate_export_report "$candidate_export" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_DEAD_AIR_TIMING_REPAIR_PROBE_2026-06-08.md \
+    --issue_number 690 \
+    --min_repaired_candidates 3 \
+    --dead_air_threshold_seconds 0.5 \
+    --max_start_gap_seconds 0.49 \
+    --fill_note_duration_seconds 0.18 \
+    --min_note_duration_seconds 0.04 \
+    --preferred_pitch_min 48 \
+    --preferred_pitch_max 88 \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_audio_package \
+    --require_repair_passed \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -7831,6 +7867,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-decision)
     run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-probe)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
