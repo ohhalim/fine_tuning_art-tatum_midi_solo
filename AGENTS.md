@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #652, Stage B MIDI-to-solo phrase-bank CLI MVP package.
+- Latest functional issue completed: Issue #654, Stage B MIDI-to-solo phrase-bank CLI user-input smoke.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo phrase-bank CLI user-input smoke.
+- Recommended next issue: Stage B MIDI-to-solo phrase-bank CLI audio render smoke.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1180,6 +1180,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-cli-mvp-package
 ```
 
 This harness builds a runnable input-MIDI to repaired ranked MIDI package manifest without claiming listening preference or musical quality.
+
+For Stage B MIDI-to-solo phrase-bank CLI user-input smoke changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-cli-user-input-smoke
+```
+
+This harness validates the phrase-bank CLI package with an explicit input MIDI path and keeps listening preference unclaimed.
 
 For Stage B MIDI-to-solo model-direct user listening review fill changes, run:
 

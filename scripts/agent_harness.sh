@@ -220,6 +220,8 @@ Modes:
                 Select the next repaired phrase-bank boundary from objective MIDI/WAV evidence only.
   stage-b-midi-to-solo-phrase-bank-cli-mvp-package
                 Build a runnable input-MIDI to repaired ranked MIDI package manifest.
+  stage-b-midi-to-solo-phrase-bank-cli-user-input-smoke
+                Validate the phrase-bank CLI package with an explicit input MIDI path.
   stage-b-midi-to-solo-candidate-audio-render-package
                 Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-mvp-execution-consolidation
@@ -3885,6 +3887,33 @@ run_stage_b_midi_to_solo_phrase_bank_cli_mvp_package() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke() {
+  local input_midi="${INPUT_MIDI:-midi_dataset/midi/studio/Geri Allen/Home Grown/Alone Together.midi}"
+  local package_run_id="${PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke}"
+  local package_report="outputs/stage_b_midi_to_solo_phrase_bank_cli_mvp_package/${package_run_id}/stage_b_midi_to_solo_phrase_bank_cli_mvp_package.json"
+  if [[ ! -f "$package_report" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank CLI MVP package explicit input"
+    "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_phrase_bank_cli_mvp_package.py \
+      --input_midi "$input_midi" \
+      --run_id "$package_run_id" \
+      --expected_boundary stage_b_midi_to_solo_phrase_bank_cli_mvp_package \
+      --expected_next_boundary stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke \
+      --require_cli_ready \
+      --require_no_quality_claim
+  fi
+  print_header "Stage B MIDI-to-solo phrase-bank CLI user-input smoke"
+  "$PYTHON_BIN" scripts/check_stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke.py \
+    --run_id "$run_id" \
+    --cli_package_report "$package_report" \
+    --expected_input_midi "$input_midi" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_CLI_USER_INPUT_SMOKE_2026-06-08.md \
+    --expected_boundary stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke \
+    --expected_next_boundary stage_b_midi_to_solo_phrase_bank_cli_audio_render_smoke \
+    --require_explicit_input \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_candidate_audio_render_package() {
   local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_conditioned_generation_probe}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_candidate_audio_render_package}"
@@ -7377,6 +7406,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-phrase-bank-cli-mvp-package)
     run_stage_b_midi_to_solo_phrase_bank_cli_mvp_package
+    ;;
+  stage-b-midi-to-solo-phrase-bank-cli-user-input-smoke)
+    run_stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke
     ;;
   stage-b-midi-to-solo-candidate-audio-render-package)
     run_stage_b_midi_to_solo_candidate_audio_render_package

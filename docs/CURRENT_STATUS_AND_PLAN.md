@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #652, Stage B MIDI-to-solo phrase-bank CLI MVP package
-- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank CLI user-input smoke`
+- latest functional result: Issue #654, Stage B MIDI-to-solo phrase-bank CLI user-input smoke
+- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank CLI audio render smoke`
 
 현재 범위가 아닌 것:
 
@@ -43,6 +43,51 @@
 - repaired review input pending 상태에서 preference fill 차단 완료
 - objective-only 기준 repaired 후보 3개 CLI MVP package ready
 - 입력 MIDI fixture 기준 CLI package와 repaired MIDI 후보 3개 생성 완료
+- 실제 MIDI 입력 경로 기준 CLI smoke 완료
+
+## Stage B MIDI-to-Solo Phrase-Bank CLI User-Input Smoke Result
+
+Issue #654는 Issue #652 CLI package를 fixture 자동 생성이 아닌 명시적 `--input_midi` 경로로 검증한 작업이다.
+
+변경:
+
+- CLI package report source validation 추가
+- 명시적 input MIDI path 검증
+- repaired MIDI candidate manifest 검증
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_CLI_USER_INPUT_SMOKE_2026-06-08.md`
+- boundary: `stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_cli_audio_render_smoke`
+- input MIDI: `midi_dataset/midi/studio/Geri Allen/Home Grown/Alone Together.midi`
+- explicit input used: `true`
+- candidate count: `3`
+- objective supported candidate count: `3`
+- all candidates objective supported: `true`
+- repaired MIDI file count: `3`
+- input context bars: `228`
+- dead-air range: `0.1895 - 0.2211`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- fixture 자동 생성 경로와 명시적 입력 경로 분리 확인
+- 실제 MIDI 입력 기준 ranked repaired MIDI 후보 3개 export 확인
+- 청음 preference와 musical quality claim 제외 유지
+- 다음 작업은 CLI output audio render smoke
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_cli_user_input_smoke`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-cli-user-input-smoke`
+
+다음:
+
+- `Stage B MIDI-to-solo phrase-bank CLI audio render smoke`
 
 ## Stage B MIDI-to-Solo Phrase-Bank CLI MVP Package Result
 
