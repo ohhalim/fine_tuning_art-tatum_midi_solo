@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #644, Stage B MIDI-to-solo phrase-bank dead-air density repair audio package
-- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank dead-air density repair listening review package`
+- latest functional result: Issue #646, Stage B MIDI-to-solo phrase-bank dead-air density repair listening review package
+- 다음 권장 이슈: `Stage B MIDI-to-solo phrase-bank dead-air density repair listening review input guard`
 
 현재 범위가 아닌 것:
 
@@ -39,6 +39,46 @@
 - objective-only 지표 기준 phrase-bank 후보 3개 모두 repair 필요
 - dead-air/density repair probe 기준 repaired 후보 3개 모두 objective target 통과
 - dead-air/density repaired MIDI 후보 3개 WAV technical render 완료
+- dead-air/density repaired 후보 listening review package 준비 완료
+
+## Stage B MIDI-to-Solo Phrase-Bank Dead-Air Density Repair Listening Review Package Result
+
+Issue #646은 Issue #644 repaired WAV/MIDI 후보를 listening review package로 묶고, preference 입력 전 claim boundary를 고정한 작업이다.
+
+변경:
+
+- repaired audio render report source validation 추가
+- repaired WAV/MIDI review item manifest 생성
+- required review input fields 정의
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_DEAD_AIR_DENSITY_REPAIR_LISTENING_REVIEW_PACKAGE_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard`
+- package ready: `true`
+- review item count: `3`
+- validated review input: `false`
+- review WAV files: `rank_01_seed_635.wav`, `rank_02_seed_632.wav`, `rank_03_seed_638.wav`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- repaired WAV/MIDI review artifact 접근 경로 확보
+- preference와 musical quality claim은 review input 전 pending 유지
+- 다음 작업은 review input 없이 preference fill이 불가능하도록 guard 추가
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_package`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-listening-review-package`
+
+다음:
+
+- `Stage B MIDI-to-solo phrase-bank dead-air density repair listening review input guard`
 
 ## Stage B MIDI-to-Solo Phrase-Bank Dead-Air Density Repair Audio Package Result
 
