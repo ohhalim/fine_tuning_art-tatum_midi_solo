@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #664, Stage B MIDI-to-solo MVP current evidence consolidation
-- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence refresh`
+- latest functional result: Issue #666, Stage B MIDI-to-solo README evidence refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit`
 
 현재 범위가 아닌 것:
 
@@ -49,6 +49,42 @@
 - 실제 MIDI 입력 CLI review input pending 상태에서 preference fill 차단 완료
 - 실제 MIDI 입력 CLI technical path objective decision 완료
 - selected-scale objective path와 실제 MIDI 입력 CLI technical path current evidence 통합 완료
+- README current evidence와 claim boundary refresh 완료
+
+## Stage B MIDI-to-Solo README Evidence Refresh Result
+
+Issue #666은 Issue #664 current evidence를 README 첫 상태 영역과 claim boundary에 반영하고, 다음 boundary를 MVP completion audit으로 넘긴 문서 작업이다.
+
+변경:
+
+- README latest/current evidence boundary 확인
+- selected-scale objective path와 phrase-bank CLI technical path status 반영
+- README evidence refresh 완료 상태 추가
+- current status, core plan, handoff scope 갱신
+
+결과:
+
+- latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- quality/preference claim excluded: `true`
+- next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+
+판단:
+
+- README 첫 상태 영역에서 technical current evidence 확인 가능
+- 청음 preference와 musical quality claim 제외 유지
+- 다음 작업은 MVP completion audit
+
+검증:
+
+- `git diff --check`
+- `bash scripts/agent_harness.sh quick`
+
+다음:
+
+- `Stage B MIDI-to-solo MVP completion audit`
 
 ## Stage B MIDI-to-Solo MVP Current Evidence Consolidation Result
 
