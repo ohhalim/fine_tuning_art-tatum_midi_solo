@@ -403,6 +403,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo model-conditioned input path listening review package: package ready `true`, review items `3`, validated input `false`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard`
 - MIDI-to-solo model-conditioned input path listening review input guard: validated input `false`, preference fill `false`, review items `3`, required input fields `4`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
 - MIDI-to-solo model-conditioned input path objective-only next decision: technical path `true`, dead-air failure `3/3`, repair required `true`, current evidence consolidation `false`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
+- MIDI-to-solo model-conditioned input path dead-air timing repair decision: target `dead_air_timing_continuity`, target dead-air max `0.3500`, required gain `0.3022`, repair probe required `true`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe`
 - model-core portfolio bullet refresh: resume bullet `6`, short bullet `3`, generic base checkpoint repeatability `9/9/9`, unsupported claim guard 유지
 - Muzig application wording refresh: resume project bullet `5`, short bullet `3`, 자기소개 section `3`, AI 음악 실험/검증 claim만 사용
 - Muzig application final review package: long bullet `5`, short bullet `3`, 자기소개 paragraph `3`, 지원 동기 paragraph `2`, 최종 claim check 포함
@@ -478,6 +479,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - Stage B MIDI-to-solo model-conditioned input path listening review package: review item count `3`, validated review input `false`, human/audio preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_listening_review_input_guard`
 - Stage B MIDI-to-solo model-conditioned input path listening review input guard: review item count `3`, validated review input `false`, preference fill allowed `false`, CLI technical evidence `3/3/228`, human/audio preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
 - Stage B MIDI-to-solo model-conditioned input path objective-only next decision: candidate/export/render `3/3/3`, dead-air failure `3`, dead-air range `0.6522/0.6522`, repair required `true`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
+- Stage B MIDI-to-solo model-conditioned input path dead-air timing repair decision: source dead-air failure `3`, target dead-air max `0.3500`, required gain `0.3022`, guardrail max postprocess removal `0.2500`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe`
 - Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard audio review package: candidate/rendered `3/3`, sample rate `44100`, duration `6.747s-6.861s`, technical validation `true`, quality claim `false`, next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_listening_review`
 - Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard listening review: candidate/rendered `3/3`, validated review input `false`, pending fields `4/3/9`, preference fill `false`, quality claim `false`, next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_objective_only_next_decision`
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
@@ -3233,6 +3235,41 @@ Issue #686은 Issue #684 input guard와 model-conditioned candidate/audio eviden
 다음 작업:
 
 - `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair decision`
+
+## 9.35 Stage B MIDI-to-solo model-conditioned input path dead-air timing repair decision
+
+Issue #688은 Issue #686 objective-only next decision 결과를 source로 사용해 dead-air/timing repair target과 guardrail을 정의한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
+- source boundary: `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe`
+- selected target: `dead_air_timing_continuity`
+- repair probe required: `true`
+- source dead-air failure count: `3`
+- source dead-air min / max: `0.6522 / 0.6522`
+- target dead-air max: `0.3500`
+- required dead-air gain min: `0.3022`
+- strategy: `timing_gap_fill_and_duration_compaction`
+- max postprocess removal ratio: `0.2500`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- selected candidate 3개 모두 dead-air threshold 초과.
+- 다음 경계에서 timing gap fill과 duration compaction repair probe 필요.
+- repair success와 musical quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair probe`
 
 ## 10. 한 문장 요약
 

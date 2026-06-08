@@ -246,6 +246,8 @@ Modes:
                 Block model-conditioned input-path preference fill while listening review input is pending.
   stage-b-midi-to-solo-model-conditioned-input-path-objective-next
                 Select the next model-conditioned input-path boundary from objective MIDI/WAV evidence only.
+  stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-decision
+                Decide the dead-air/timing repair target after model-conditioned objective evidence.
   stage-b-midi-to-solo-model-direct-generation-repair
                 Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
@@ -6150,6 +6152,29 @@ run_stage_b_midi_to_solo_model_conditioned_input_path_objective_next() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision() {
+  local objective_next_run_id="${OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision}"
+  local objective_next="outputs/stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision/${objective_next_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision.json"
+  if [[ ! -f "$objective_next" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path objective-only next decision"
+    RUN_ID="$objective_next_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_objective_next
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path dead-air timing repair decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision.py \
+    --run_id "$run_id" \
+    --objective_next_report "$objective_next" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_DEAD_AIR_TIMING_REPAIR_DECISION_2026-06-08.md \
+    --issue_number 688 \
+    --target_dead_air_max 0.35 \
+    --max_postprocess_removal_ratio 0.25 \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe \
+    --require_decision_completed \
+    --require_repair_probe \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -7803,6 +7828,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-objective-next)
     run_stage_b_midi_to_solo_model_conditioned_input_path_objective_next
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-decision)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe

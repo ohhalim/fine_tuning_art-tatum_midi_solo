@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -30,6 +30,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned objective-only next decision completed: `true`
 - model-conditioned dead-air failure count: `3 / 3`
 - model-conditioned dead-air timing repair required: `true`
+- model-conditioned dead-air timing repair decision completed: `true`
+- model-conditioned target dead-air max: `0.3500`
+- model-conditioned required dead-air gain min: `0.3022`
 - phrase-bank retrieval baseline completed: `true`
 - phrase-bank source records / motifs: `56 / 803`
 - phrase-bank exported / qualified MIDI candidates: `3 / 3`
@@ -69,7 +72,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -274,6 +277,22 @@ Model-conditioned input path objective-only next decision.
 - dead-air timing repair required: `true`
 - current evidence consolidation ready: `false`
 - preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+Model-conditioned input path dead-air timing repair decision.
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_decision`
+- source boundary: `stage_b_midi_to_solo_model_conditioned_input_path_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_probe`
+- selected target: `dead_air_timing_continuity`
+- repair probe required: `true`
+- source dead-air failure count: `3`
+- source dead-air min / max: `0.6522 / 0.6522`
+- target dead-air max: `0.3500`
+- required dead-air gain min: `0.3022`
+- strategy: `timing_gap_fill_and_duration_compaction`
+- max postprocess removal ratio: `0.2500`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 
