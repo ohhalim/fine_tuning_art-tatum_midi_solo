@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_audio_package`
-- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_audio_package`
+- latest evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_package`
+- current evidence boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_package`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `model_conditioned_input_path_quality_alignment`
@@ -38,6 +38,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank min dead-air gain: `0.3768`
 - phrase-bank repaired WAV files: `3`
 - phrase-bank repaired audio technical validation: `true`
+- phrase-bank repaired listening review package ready: `true`
+- phrase-bank repaired listening review items: `3`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -64,6 +66,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank 후보의 objective-only 실패 신호 분리 가능
 - phrase-bank 후보의 dead-air/density objective repair 가능
 - phrase-bank repaired MIDI 후보의 WAV technical render 가능
+- phrase-bank repaired 후보의 listening review package 생성 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -228,6 +231,16 @@ Phrase-bank dead-air density repair audio package.
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 - next boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_package`
+
+Phrase-bank dead-air density repair listening review package.
+
+- package ready: `true`
+- review item count: `3`
+- validated review input: `false`
+- review WAV files: `rank_01_seed_635.wav`, `rank_02_seed_632.wav`, `rank_03_seed_638.wav`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- next boundary: `stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard`
 
 MIDI-to-solo input contract.
 
