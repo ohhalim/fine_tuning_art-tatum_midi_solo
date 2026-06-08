@@ -216,6 +216,8 @@ Modes:
                 Package dead-air/density repaired MIDI/WAV candidates for pending listening review.
   stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-listening-review-input-guard
                 Guard repaired phrase-bank preference fill while listening review input is pending.
+  stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-objective-only-next-decision
+                Select the next repaired phrase-bank boundary from objective MIDI/WAV evidence only.
   stage-b-midi-to-solo-candidate-audio-render-package
                 Render exported MIDI-to-solo candidates to local WAV files.
   stage-b-midi-to-solo-mvp-execution-consolidation
@@ -3835,6 +3837,40 @@ run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_in
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision() {
+  local input_guard_run_id="${INPUT_GUARD_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard}"
+  local repair_run_id="${REPAIR_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe}"
+  local audio_run_id="${AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_audio_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision}"
+  local input_guard_report="outputs/stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard/${input_guard_run_id}/stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard.json"
+  local repair_probe_report="outputs/stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe/${repair_run_id}/stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe.json"
+  local audio_package_report="outputs/stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_audio_package/${audio_run_id}/stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_audio_package.json"
+  if [[ ! -f "$repair_probe_report" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank dead-air density repair probe"
+    RUN_ID="$repair_run_id" run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_probe
+  fi
+  if [[ ! -f "$audio_package_report" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank dead-air density repair audio package"
+    RUN_ID="$audio_run_id" REPAIR_RUN_ID="$repair_run_id" run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_audio_package
+  fi
+  if [[ ! -f "$input_guard_report" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank dead-air density repair listening review input guard"
+    RUN_ID="$input_guard_run_id" AUDIO_RUN_ID="$audio_run_id" REPAIR_RUN_ID="$repair_run_id" run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard
+  fi
+  print_header "Stage B MIDI-to-solo phrase-bank dead-air density repair objective-only next decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_next.py \
+    --run_id "$run_id" \
+    --input_guard_report "$input_guard_report" \
+    --repair_probe_report "$repair_probe_report" \
+    --audio_package_report "$audio_package_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_PHRASE_BANK_DEAD_AIR_DENSITY_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-08.md \
+    --expected_boundary stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision \
+    --expected_next_boundary stage_b_midi_to_solo_phrase_bank_cli_mvp_package \
+    --require_objective_decision \
+    --require_cli_ready \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_candidate_audio_render_package() {
   local generation_run_id="${GENERATION_RUN_ID:-harness_stage_b_midi_to_solo_conditioned_generation_probe}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_candidate_audio_render_package}"
@@ -7321,6 +7357,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-listening-review-input-guard)
     run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_listening_review_input_guard
+    ;;
+  stage-b-midi-to-solo-phrase-bank-dead-air-density-repair-objective-only-next-decision)
+    run_stage_b_midi_to_solo_phrase_bank_dead_air_density_repair_objective_only_next_decision
     ;;
   stage-b-midi-to-solo-candidate-audio-render-package)
     run_stage_b_midi_to_solo_candidate_audio_render_package
