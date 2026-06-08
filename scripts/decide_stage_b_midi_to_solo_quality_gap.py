@@ -69,10 +69,20 @@ def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloQualityGapDecisionError("human/audio preference should remain incomplete")
     if bool(audit.get("product_mvp_completed", True)):
         raise StageBMidiToSoloQualityGapDecisionError("product MVP should remain incomplete")
+    if not bool(audit.get("phrase_bank_cli_technical_path_completed", False)):
+        raise StageBMidiToSoloQualityGapDecisionError("phrase-bank CLI technical path completion required")
     if _int(evidence.get("exported_candidate_count")) < 3:
         raise StageBMidiToSoloQualityGapDecisionError("exported candidate count below 3")
     if _int(evidence.get("rendered_audio_file_count")) < 3:
         raise StageBMidiToSoloQualityGapDecisionError("rendered WAV count below 3")
+    if not bool(evidence.get("phrase_bank_cli_technical_path_ready", False)):
+        raise StageBMidiToSoloQualityGapDecisionError("phrase-bank CLI technical path readiness required")
+    if _int(evidence.get("cli_candidate_count")) < 3:
+        raise StageBMidiToSoloQualityGapDecisionError("CLI candidate count below 3")
+    if _int(evidence.get("cli_rendered_audio_file_count")) < 3:
+        raise StageBMidiToSoloQualityGapDecisionError("CLI rendered WAV count below 3")
+    if bool(evidence.get("cli_preference_fill_allowed", True)):
+        raise StageBMidiToSoloQualityGapDecisionError("CLI preference fill should remain blocked")
     if _int(evidence.get("objective_strict_valid_sample_count")) != _int(evidence.get("objective_sample_count")):
         raise StageBMidiToSoloQualityGapDecisionError("objective strict valid count must match sample count")
     blocked_claims = [
@@ -87,6 +97,7 @@ def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloQualityGapDecisionError(f"unexpected quality claim: {claimed}")
     return {
         "technical_model_core_mvp_completed": True,
+        "phrase_bank_cli_technical_path_completed": True,
         "musical_quality_mvp_completed": False,
         "human_audio_preference_completed": False,
         "product_mvp_completed": False,
@@ -102,6 +113,13 @@ def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
         "objective_target_avg_postprocess_removal_ratio": _float(
             evidence.get("objective_target_avg_postprocess_removal_ratio")
         ),
+        "phrase_bank_cli_technical_path_ready": bool(
+            evidence.get("phrase_bank_cli_technical_path_ready", False)
+        ),
+        "cli_candidate_count": _int(evidence.get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(evidence.get("cli_rendered_audio_file_count")),
+        "cli_input_context_bars": _int(evidence.get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(evidence.get("cli_preference_fill_allowed", True)),
     }
 
 
@@ -111,7 +129,7 @@ def select_quality_gap_target(audit_summary: dict[str, Any]) -> dict[str, Any]:
     target = SELECTED_TARGET if fallback_path_active else "listening_review_quality_gap"
     next_boundary = NEXT_BOUNDARY if fallback_path_active else "stage_b_midi_to_solo_listening_review_quality_gap"
     reason = (
-        "input-to-WAV path still uses context_conditioned_fallback while selected-scale objective repair is separate"
+        "input-to-WAV path still uses context_conditioned_fallback while selected-scale and CLI paths are technical evidence, not model-conditioned quality"
         if fallback_path_active
         else "model-conditioned path is available; listening review gap remains"
     )
@@ -142,6 +160,7 @@ def build_quality_gap_decision_report(
         "mvp_completion_summary": audit_summary,
         "quality_gap": {
             "technical_model_core_mvp_completed": True,
+            "phrase_bank_cli_technical_path_completed": True,
             "musical_quality_mvp_completed": False,
             "human_audio_preference_completed": False,
             "product_mvp_completed": False,
@@ -229,7 +248,18 @@ def validate_quality_gap_decision_report(
         "technical_model_core_mvp_completed": bool(
             quality_gap.get("technical_model_core_mvp_completed", False)
         ),
+        "phrase_bank_cli_technical_path_completed": bool(
+            quality_gap.get("phrase_bank_cli_technical_path_completed", False)
+        ),
         "musical_quality_mvp_completed": bool(quality_gap.get("musical_quality_mvp_completed", True)),
+        "cli_candidate_count": _int(_dict(report.get("mvp_completion_summary")).get("cli_candidate_count")),
+        "cli_rendered_audio_file_count": _int(
+            _dict(report.get("mvp_completion_summary")).get("cli_rendered_audio_file_count")
+        ),
+        "cli_input_context_bars": _int(_dict(report.get("mvp_completion_summary")).get("cli_input_context_bars")),
+        "cli_preference_fill_allowed": bool(
+            _dict(report.get("mvp_completion_summary")).get("cli_preference_fill_allowed", True)
+        ),
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
         "midi_to_solo_musical_quality_claimed": bool(
             readiness.get("midi_to_solo_musical_quality_claimed", True)
@@ -259,12 +289,16 @@ def markdown_report(report: dict[str, Any]) -> str:
         "## Evidence",
         "",
         f"- technical model-core MVP completed: `{_bool_token(summary['technical_model_core_mvp_completed'])}`",
+        f"- phrase-bank CLI technical path completed: `{_bool_token(summary['phrase_bank_cli_technical_path_completed'])}`",
         f"- musical quality MVP completed: `{_bool_token(summary['musical_quality_mvp_completed'])}`",
         f"- generation source: `{summary['generation_source']}`",
         f"- exported candidates: `{summary['exported_candidate_count']}`",
         f"- rendered WAV files: `{summary['rendered_audio_file_count']}`",
         f"- objective strict/sample: `{summary['objective_strict_valid_sample_count']}` / `{summary['objective_sample_count']}`",
         f"- objective dead-air failure: `{summary['objective_dead_air_failure_count']}`",
+        f"- CLI candidate / rendered WAV: `{summary['cli_candidate_count']}` / `{summary['cli_rendered_audio_file_count']}`",
+        f"- CLI input context bars: `{summary['cli_input_context_bars']}`",
+        f"- CLI preference fill allowed: `{_bool_token(summary['cli_preference_fill_allowed'])}`",
         "",
         "## Claim Boundary",
         "",

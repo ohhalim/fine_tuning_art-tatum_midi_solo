@@ -40,6 +40,7 @@ def mvp_completion_audit(
             "input_to_ranked_midi_completed": True,
             "input_to_rendered_wav_completed": True,
             "selected_scale_objective_repair_completed": True,
+            "phrase_bank_cli_technical_path_completed": True,
             "readme_evidence_boundary_refreshed": True,
             "musical_quality_mvp_completed": musical_complete,
             "human_audio_preference_completed": False,
@@ -56,6 +57,11 @@ def mvp_completion_audit(
             "objective_dead_air_failure_count": 0,
             "objective_avg_postprocess_removal_ratio": 0.2176,
             "objective_target_avg_postprocess_removal_ratio": 0.3,
+            "phrase_bank_cli_technical_path_ready": True,
+            "cli_candidate_count": 3,
+            "cli_rendered_audio_file_count": 3,
+            "cli_input_context_bars": 228,
+            "cli_preference_fill_allowed": False,
         },
         "decision": {
             "next_boundary": "stage_b_midi_to_solo_quality_gap_decision",
@@ -85,6 +91,11 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
         self.assertTrue(summary["model_conditioned_input_path_alignment_required"])
         self.assertFalse(summary["human_review_required_now"])
         self.assertTrue(summary["technical_model_core_mvp_completed"])
+        self.assertTrue(summary["phrase_bank_cli_technical_path_completed"])
+        self.assertEqual(summary["cli_candidate_count"], 3)
+        self.assertEqual(summary["cli_rendered_audio_file_count"], 3)
+        self.assertEqual(summary["cli_input_context_bars"], 228)
+        self.assertFalse(summary["cli_preference_fill_allowed"])
         self.assertFalse(summary["musical_quality_mvp_completed"])
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
