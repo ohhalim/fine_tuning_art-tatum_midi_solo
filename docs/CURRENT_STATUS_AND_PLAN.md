@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #662, Stage B MIDI-to-solo phrase-bank CLI objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation`
+- latest functional result: Issue #664, Stage B MIDI-to-solo MVP current evidence consolidation
+- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence refresh`
 
 현재 범위가 아닌 것:
 
@@ -48,6 +48,54 @@
 - 실제 MIDI 입력 CLI WAV/MIDI 후보 3개 listening review package 준비 완료
 - 실제 MIDI 입력 CLI review input pending 상태에서 preference fill 차단 완료
 - 실제 MIDI 입력 CLI technical path objective decision 완료
+- selected-scale objective path와 실제 MIDI 입력 CLI technical path current evidence 통합 완료
+
+## Stage B MIDI-to-Solo MVP Current Evidence Consolidation Result
+
+Issue #664는 기존 current evidence consolidation에 CLI phrase-bank objective evidence를 추가하고, selected-scale objective path와 명시적 input MIDI CLI technical path를 함께 current evidence로 정리한 작업이다.
+
+변경:
+
+- current evidence consolidation script에 CLI objective report source 추가
+- selected-scale objective path와 phrase-bank CLI technical path 병행 기록
+- readiness와 proven evidence 항목에 CLI technical path 반영
+- harness mode 입력 report 확장
+- unit test와 문서 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_CURRENT_EVIDENCE_CONSOLIDATION_2026-06-05.md`
+- boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- current MVP evidence supported: `true`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- exported / qualified candidates: `3 / 3`
+- rendered WAV files: `3`
+- selected-scale objective valid / strict / grammar: `9 / 9 / 9`
+- CLI candidate / rendered WAV files: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- 입력 MIDI 기반 context, ranked MIDI export, WAV render 기술 경로 current evidence 유지
+- selected-scale objective repair path와 명시적 input MIDI CLI technical path 병행 정리
+- 청음 preference와 musical quality claim 제외 유지
+- 다음 작업은 README evidence refresh
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-current-evidence-consolidation`
+
+다음:
+
+- `Stage B MIDI-to-solo README evidence refresh`
 
 ## Stage B MIDI-to-Solo Phrase-Bank CLI Objective-Only Next Decision Result
 

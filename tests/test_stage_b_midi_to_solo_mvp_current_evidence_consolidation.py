@@ -186,6 +186,39 @@ def reports(
                 "critical_user_input_required": False,
             },
         },
+        "cli_objective": {
+            "boundary": "stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision",
+            "objective_summary": {
+                "technical_midi_to_solo_cli_path_ready": True,
+                "mvp_current_evidence_consolidation_ready": True,
+                "explicit_input_used": True,
+                "candidate_count": 3,
+                "objective_supported_candidate_count": 3,
+                "repaired_midi_file_count": 3,
+                "rendered_audio_file_count": 3,
+                "technical_wav_validation": True,
+                "input_context_bars": 228,
+                "dead_air_range": [0.1895, 0.2211],
+                "validated_review_input_present": False,
+                "preference_fill_allowed": False,
+            },
+            "readiness": {
+                "cli_objective_only_next_decision_completed": True,
+                "technical_midi_to_solo_cli_path_ready": True,
+                "mvp_current_evidence_consolidation_ready": True,
+                "human_audio_preference_claimed": False,
+                "midi_to_solo_musical_quality_claimed": quality_claim,
+                "audio_rendered_quality_claimed": False,
+                "phrase_bank_musical_quality_claimed": False,
+                "broad_trained_model_quality_claimed": False,
+                "brad_style_adaptation_claimed": False,
+                "production_ready_claimed": False,
+            },
+            "decision": {
+                "next_boundary": "stage_b_midi_to_solo_mvp_current_evidence_consolidation",
+                "critical_user_input_required": False,
+            },
+        },
     }
 
 
@@ -200,6 +233,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                 generation_probe=data["generation"],
                 audio_render=data["audio"],
                 objective_next=data["objective"],
+                cli_objective_next=data["cli_objective"],
                 output_dir=Path(tmp) / "out",
                 issue_number=612,
             )
@@ -217,9 +251,14 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
             self.assertTrue(summary["midi_to_solo_mvp_current_evidence_supported"])
             self.assertTrue(summary["technical_execution_evidence_supported"])
             self.assertTrue(summary["selected_scale_objective_path_complete"])
+            self.assertTrue(summary["phrase_bank_cli_technical_path_ready"])
             self.assertEqual(summary["generation_source"], "context_conditioned_fallback")
             self.assertEqual(summary["exported_candidate_count"], 3)
             self.assertEqual(summary["rendered_audio_file_count"], 3)
+            self.assertEqual(summary["cli_candidate_count"], 3)
+            self.assertEqual(summary["cli_rendered_audio_file_count"], 3)
+            self.assertEqual(summary["cli_input_context_bars"], 228)
+            self.assertFalse(summary["cli_preference_fill_allowed"])
             self.assertEqual(summary["objective_sample_count"], 9)
             self.assertEqual(summary["objective_strict_valid_sample_count"], 9)
             self.assertEqual(summary["objective_grammar_gate_sample_count"], 9)
@@ -241,6 +280,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     generation_probe=data["generation"],
                     audio_render=data["audio"],
                     objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
                     output_dir=Path(tmp) / "out",
                     issue_number=612,
                 )
@@ -256,6 +296,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     generation_probe=data["generation"],
                     audio_render=data["audio"],
                     objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
                     output_dir=Path(tmp) / "out",
                     issue_number=612,
                 )
@@ -271,6 +312,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     generation_probe=data["generation"],
                     audio_render=data["audio"],
                     objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
                     output_dir=Path(tmp) / "out",
                     issue_number=612,
                 )
@@ -285,6 +327,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     generation_probe=data["generation"],
                     audio_render=data["audio"],
                     objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
                     output_dir=Path(tmp) / "out",
                     issue_number=612,
                 )

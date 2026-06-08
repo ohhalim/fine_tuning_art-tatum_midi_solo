@@ -2800,6 +2800,43 @@ Issue #662는 CLI phrase-bank 경로의 objective-only evidence를 통합하고,
 
 - `Stage B MIDI-to-solo MVP current evidence consolidation`
 
+## 9.23 Stage B MIDI-to-solo MVP current evidence consolidation
+
+Issue #664는 기존 current evidence consolidation에 CLI phrase-bank objective evidence를 추가하고, selected-scale objective path와 명시적 input MIDI CLI technical path를 함께 current evidence로 정리한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- current MVP evidence supported: `true`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- exported / qualified candidates: `3 / 3`
+- rendered WAV files: `3`
+- selected-scale objective valid / strict / grammar: `9 / 9 / 9`
+- CLI candidate / rendered WAV files: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- 입력 MIDI 기반 context, ranked MIDI export, WAV render 기술 경로 current evidence 유지.
+- selected-scale objective repair path와 명시적 input MIDI CLI technical path 병행 정리.
+- 청음 preference와 musical quality claim 제외 유지.
+- 다음 작업은 README evidence refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-current-evidence-consolidation`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo README evidence refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

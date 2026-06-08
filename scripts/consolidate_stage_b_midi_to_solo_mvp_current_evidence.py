@@ -36,6 +36,7 @@ OBJECTIVE_FINAL_BOUNDARY = (
     "stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_"
     "postprocess_removal_dead_air_repair_objective_path_complete"
 )
+CLI_OBJECTIVE_BOUNDARY = "stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision"
 
 
 def _dict(value: Any) -> dict[str, Any]:
@@ -352,6 +353,81 @@ def validate_objective_next(report: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def validate_cli_objective_next(report: dict[str, Any]) -> dict[str, Any]:
+    if str(report.get("boundary") or "") != CLI_OBJECTIVE_BOUNDARY:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI objective boundary required")
+    summary = _dict(report.get("objective_summary"))
+    readiness = _dict(report.get("readiness"))
+    decision = _dict(report.get("decision"))
+    if str(decision.get("next_boundary") or "") != BOUNDARY:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "CLI objective next boundary should route to current evidence"
+        )
+    if not bool(readiness.get("cli_objective_only_next_decision_completed", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI objective decision completion required")
+    if not bool(summary.get("technical_midi_to_solo_cli_path_ready", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI technical path readiness required")
+    if not bool(summary.get("mvp_current_evidence_consolidation_ready", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "CLI current evidence readiness required"
+        )
+    if not bool(summary.get("explicit_input_used", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI explicit input evidence required")
+    if _int(summary.get("candidate_count")) < 3:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI candidate count below 3")
+    if _int(summary.get("objective_supported_candidate_count")) < 3:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI objective support below 3")
+    if _int(summary.get("repaired_midi_file_count")) < 3:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI repaired MIDI count below 3")
+    if _int(summary.get("rendered_audio_file_count")) < 3:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI rendered audio count below 3")
+    if not bool(summary.get("technical_wav_validation", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI technical WAV validation required")
+    if bool(summary.get("validated_review_input_present", True)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "CLI validated review input should remain absent"
+        )
+    if bool(summary.get("preference_fill_allowed", True)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI preference fill should remain blocked")
+    if bool(decision.get("critical_user_input_required", True)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI critical user input should not be required")
+    blocked_claims = [
+        "human_audio_preference_claimed",
+        "midi_to_solo_musical_quality_claimed",
+        "audio_rendered_quality_claimed",
+        "phrase_bank_musical_quality_claimed",
+        "broad_trained_model_quality_claimed",
+        "brad_style_adaptation_claimed",
+        "production_ready_claimed",
+    ]
+    claimed = [name for name in blocked_claims if bool(readiness.get(name, False))]
+    if claimed:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            f"unexpected CLI objective claim: {claimed}"
+        )
+    dead_air = _list(summary.get("dead_air_range"))
+    return {
+        "boundary": CLI_OBJECTIVE_BOUNDARY,
+        "technical_midi_to_solo_cli_path_ready": bool(
+            summary.get("technical_midi_to_solo_cli_path_ready", False)
+        ),
+        "mvp_current_evidence_consolidation_ready": bool(
+            summary.get("mvp_current_evidence_consolidation_ready", False)
+        ),
+        "explicit_input_used": bool(summary.get("explicit_input_used", False)),
+        "candidate_count": _int(summary.get("candidate_count")),
+        "objective_supported_candidate_count": _int(summary.get("objective_supported_candidate_count")),
+        "repaired_midi_file_count": _int(summary.get("repaired_midi_file_count")),
+        "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
+        "technical_wav_validation": bool(summary.get("technical_wav_validation", False)),
+        "input_context_bars": _int(summary.get("input_context_bars")),
+        "min_dead_air_ratio": _float(dead_air[0]) if len(dead_air) >= 1 else 0.0,
+        "max_dead_air_ratio": _float(dead_air[1]) if len(dead_air) >= 2 else 0.0,
+        "validated_review_input_present": bool(summary.get("validated_review_input_present", True)),
+        "preference_fill_allowed": bool(summary.get("preference_fill_allowed", True)),
+    }
+
+
 def build_current_evidence_consolidation_report(
     *,
     contract_report: dict[str, Any],
@@ -360,6 +436,7 @@ def build_current_evidence_consolidation_report(
     generation_probe: dict[str, Any],
     audio_render: dict[str, Any],
     objective_next: dict[str, Any],
+    cli_objective_next: dict[str, Any],
     output_dir: Path,
     issue_number: int,
 ) -> dict[str, Any]:
@@ -369,6 +446,7 @@ def build_current_evidence_consolidation_report(
     generation = validate_generation(generation_probe)
     audio = validate_audio(audio_render)
     objective = validate_objective_next(objective_next)
+    cli_objective = validate_cli_objective_next(cli_objective_next)
     technical_path_supported = (
         bool(resource["midi_to_solo_training_resource_ready"])
         and generation["exported_candidate_count"] >= 3
@@ -377,7 +455,12 @@ def build_current_evidence_consolidation_report(
         and bool(audio["technical_wav_validation"])
     )
     selected_scale_objective_path_complete = bool(objective["objective_path_supported"])
-    current_evidence_supported = bool(technical_path_supported and selected_scale_objective_path_complete)
+    phrase_bank_cli_technical_path_ready = bool(cli_objective["technical_midi_to_solo_cli_path_ready"])
+    current_evidence_supported = bool(
+        technical_path_supported
+        and selected_scale_objective_path_complete
+        and phrase_bank_cli_technical_path_ready
+    )
     return {
         "schema_version": SCHEMA_VERSION,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
@@ -392,6 +475,7 @@ def build_current_evidence_consolidation_report(
             "audio": audio["boundary"],
             "objective_next": objective["boundary"],
             "objective_final": objective["final_boundary"],
+            "phrase_bank_cli_objective_next": cli_objective["boundary"],
         },
         "mvp_contract": contract,
         "context_extraction": context,
@@ -399,6 +483,7 @@ def build_current_evidence_consolidation_report(
         "ranked_midi_generation": generation,
         "technical_audio_render": audio,
         "selected_scale_objective_path": objective,
+        "phrase_bank_cli_technical_path": cli_objective,
         "readiness": {
             "boundary": BOUNDARY,
             "mvp_current_evidence_consolidated": True,
@@ -408,6 +493,7 @@ def build_current_evidence_consolidation_report(
             "ranked_midi_candidates_exported": True,
             "technical_wav_path_ready": True,
             "selected_scale_objective_path_complete": selected_scale_objective_path_complete,
+            "phrase_bank_cli_technical_path_ready": phrase_bank_cli_technical_path_ready,
             "current_mvp_technical_execution_evidence_supported": technical_path_supported,
             "current_mvp_objective_repair_evidence_supported": selected_scale_objective_path_complete,
             "midi_to_solo_mvp_current_evidence_supported": current_evidence_supported,
@@ -435,6 +521,7 @@ def build_current_evidence_consolidation_report(
             "ranked_midi_candidates_exported",
             "technical_wav_render_path_validated",
             "selected_scale_objective_dead_air_repair_path_complete",
+            "explicit_input_cli_ranked_midi_wav_path_validated",
             "quality_claim_guard_preserved",
         ],
         "not_proven": [
@@ -465,6 +552,7 @@ def validate_current_evidence_consolidation_report(
     generation = _dict(report.get("ranked_midi_generation"))
     audio = _dict(report.get("technical_audio_render"))
     objective = _dict(report.get("selected_scale_objective_path"))
+    cli_objective = _dict(report.get("phrase_bank_cli_technical_path"))
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -483,6 +571,10 @@ def validate_current_evidence_consolidation_report(
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("objective sample count below threshold")
     if not bool(objective.get("objective_path_supported", False)):
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("objective path support required")
+    if not bool(cli_objective.get("technical_midi_to_solo_cli_path_ready", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI technical path support required")
+    if bool(cli_objective.get("preference_fill_allowed", True)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI preference fill should remain blocked")
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("critical user input should not be required")
     for item in _list(generation.get("midi_paths")) + _list(audio.get("wav_paths")):
@@ -513,6 +605,13 @@ def validate_current_evidence_consolidation_report(
         "selected_scale_objective_path_complete": bool(
             readiness.get("selected_scale_objective_path_complete", False)
         ),
+        "phrase_bank_cli_technical_path_ready": bool(
+            readiness.get("phrase_bank_cli_technical_path_ready", False)
+        ),
+        "cli_candidate_count": _int(cli_objective.get("candidate_count")),
+        "cli_rendered_audio_file_count": _int(cli_objective.get("rendered_audio_file_count")),
+        "cli_input_context_bars": _int(cli_objective.get("input_context_bars")),
+        "cli_preference_fill_allowed": bool(cli_objective.get("preference_fill_allowed", True)),
         "generation_source": str(generation.get("generation_source") or ""),
         "exported_candidate_count": _int(generation.get("exported_candidate_count")),
         "exported_qualified_candidate_count": _int(generation.get("exported_qualified_candidate_count")),
@@ -550,6 +649,7 @@ def markdown_report(report: dict[str, Any]) -> str:
     generation = report["ranked_midi_generation"]
     audio = report["technical_audio_render"]
     objective = report["selected_scale_objective_path"]
+    cli_objective = report["phrase_bank_cli_technical_path"]
     lines = [
         "# Stage B MIDI-to-Solo MVP Current Evidence Consolidation",
         "",
@@ -560,6 +660,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- current MVP evidence supported: `{_bool_token(readiness['midi_to_solo_mvp_current_evidence_supported'])}`",
         f"- technical execution evidence supported: `{_bool_token(readiness['current_mvp_technical_execution_evidence_supported'])}`",
         f"- selected-scale objective path complete: `{_bool_token(readiness['selected_scale_objective_path_complete'])}`",
+        f"- phrase-bank CLI technical path ready: `{_bool_token(readiness['phrase_bank_cli_technical_path_ready'])}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         f"- MIDI-to-solo musical quality claimed: `{_bool_token(readiness['midi_to_solo_musical_quality_claimed'])}`",
         "",
@@ -599,6 +700,16 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- validated review input present: `{_bool_token(objective['validated_review_input_present'])}`",
         f"- preference fill allowed: `{_bool_token(objective['preference_fill_allowed'])}`",
         "",
+        "## Phrase-Bank CLI Technical Path",
+        "",
+        f"- technical MIDI-to-solo CLI path ready: `{_bool_token(cli_objective['technical_midi_to_solo_cli_path_ready'])}`",
+        f"- explicit input used: `{_bool_token(cli_objective['explicit_input_used'])}`",
+        f"- candidate / objective supported: `{cli_objective['candidate_count']}` / `{cli_objective['objective_supported_candidate_count']}`",
+        f"- repaired MIDI / rendered WAV: `{cli_objective['repaired_midi_file_count']}` / `{cli_objective['rendered_audio_file_count']}`",
+        f"- input context bars: `{cli_objective['input_context_bars']}`",
+        f"- dead-air range: `{cli_objective['min_dead_air_ratio']:.4f}-{cli_objective['max_dead_air_ratio']:.4f}`",
+        f"- preference fill allowed: `{_bool_token(cli_objective['preference_fill_allowed'])}`",
+        "",
         "## MIDI Paths",
         "",
     ]
@@ -622,6 +733,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--generation_probe", type=str, required=True)
     parser.add_argument("--audio_render", type=str, required=True)
     parser.add_argument("--objective_next", type=str, required=True)
+    parser.add_argument("--cli_objective_next", type=str, required=True)
     parser.add_argument(
         "--output_root",
         type=str,
@@ -651,6 +763,7 @@ def main() -> int:
         generation_probe=read_json(Path(args.generation_probe)),
         audio_render=read_json(Path(args.audio_render)),
         objective_next=read_json(Path(args.objective_next)),
+        cli_objective_next=read_json(Path(args.cli_objective_next)),
         output_dir=output_dir,
         issue_number=int(args.issue_number),
     )
