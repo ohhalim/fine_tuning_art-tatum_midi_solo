@@ -3008,6 +3008,44 @@ Issue #674는 Issue #672 alignment decision 이후 fallback path와 model-condit
 
 - `Stage B MIDI-to-solo model-conditioned input path candidate export`
 
+## 9.29 Stage B MIDI-to-solo model-conditioned input path candidate export
+
+Issue #676은 Issue #674 probe 결과의 ranked export contract gap을 model-conditioned 후보 export로 닫은 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_audio_render_package`
+- ranked MIDI candidates exported: `true`
+- ranked input-path export contract matched: `true`
+- fallback replacement candidate export ready: `true`
+- fallback replacement ready: `false`
+- candidate audio render required: `true`
+- phrase-bank CLI technical path completed: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- CLI preference fill allowed: `false`
+- exported candidate count: `3`
+- best note / unique pitch / max simultaneous: `24 / 20 / 1`
+- human review required now: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- model-conditioned strict MIDI 후보가 ranked input-path export contract 충족.
+- audio render package는 아직 미완료.
+- fallback replacement ready는 ranked WAV render 후 판단.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_candidate_export`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-candidate-export`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo model-conditioned input path audio render package`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
