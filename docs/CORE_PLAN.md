@@ -2762,6 +2762,44 @@ Issue #660은 Issue #658 listening review package의 pending input 상태를 검
 
 - `Stage B MIDI-to-solo phrase-bank CLI objective-only next decision`
 
+## 9.22 Stage B MIDI-to-solo phrase-bank CLI objective-only next decision
+
+Issue #662는 CLI phrase-bank 경로의 objective-only evidence를 통합하고, 품질 claim 없이 current evidence consolidation으로 넘긴 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision`
+- next boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- technical MIDI-to-solo CLI path ready: `true`
+- MVP current evidence consolidation ready: `true`
+- explicit input used: `true`
+- candidate count: `3`
+- objective supported candidate count: `3`
+- repaired MIDI file count: `3`
+- rendered audio file count: `3`
+- technical WAV validation: `true`
+- input context bars: `228`
+- dead-air range: `0.1895 - 0.2211`
+- preference fill allowed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- 명시적 input MIDI 기준 ranked MIDI/WAV technical path 준비 완료.
+- review input 없는 preference fill 차단 유지.
+- 청음 preference와 musical quality claim 제외 유지.
+- 다음 작업은 MVP current evidence consolidation.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_phrase_bank_cli_objective_next`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-phrase-bank-cli-objective-only-next-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo MVP current evidence consolidation`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
