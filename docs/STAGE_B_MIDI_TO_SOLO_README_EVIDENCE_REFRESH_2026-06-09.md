@@ -12,6 +12,9 @@
 - phrase-bank CLI technical path ready: `true`
 - model-conditioned pitch-contour objective path ready: `true`
 - model-conditioned pitch-contour changed-ratio review required: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair max ratio / target: `0.4348 / 0.5000`
+- model-conditioned pitch-contour changed-ratio repair max interval / target: `12 / 12`
 - quality/preference claim excluded: `true`
 
 ## Claim Boundary
@@ -23,6 +26,6 @@
 
 ## Decision
 
-- current README status reflects Issue #708 current evidence.
+- current README status reflects Issue #728 current evidence.
 - no new musical quality claim added.
 - next recommended issue: `Stage B MIDI-to-solo MVP completion audit`
