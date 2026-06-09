@@ -831,6 +831,8 @@ README evidence refresh.
 - phrase-bank CLI technical path ready: `true`
 - model-conditioned pitch-contour objective path ready: `true`
 - model-conditioned pitch-contour changed-ratio review required: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair max ratio / target: `0.4348 / 0.5000`
 - quality/preference claim excluded: `true`
 - next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 

@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #728, Stage B MIDI-to-solo MVP current evidence consolidation
-- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence refresh`
+- latest functional result: Issue #730, Stage B MIDI-to-solo README evidence refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit`
 
 현재 범위가 아닌 것:
 
@@ -81,6 +81,7 @@
 - pitch-contour changed-ratio repaired review input pending 상태에서 preference fill 차단 완료
 - pitch-contour changed-ratio repaired objective-only 기준 current evidence consolidation 준비 완료
 - pitch-contour changed-ratio repaired objective path를 current evidence에 통합 완료
+- README current evidence block에 changed-ratio repair objective path 반영 완료
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
@@ -1521,6 +1522,51 @@ Issue #728은 Issue #726 changed-ratio repair objective-only next decision을 cu
 다음:
 
 - `Stage B MIDI-to-solo README evidence refresh`
+
+## Stage B MIDI-to-Solo README Evidence Refresh Result
+
+Issue #730은 Issue #728 current evidence를 README 첫 상태 영역과 evidence section에 반영한 문서 작업이다.
+
+변경:
+
+- README latest/current evidence boundary 확인
+- changed-ratio repair objective path ready 상태 반영
+- changed-ratio repair ratio/interval guardrail 수치 반영
+- generated README evidence document, handoff/status/core plan 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_README_EVIDENCE_REFRESH_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- source boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- current MVP evidence supported: `true`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- changed-ratio repair max pitch changed ratio / target: `0.4348 / 0.5000`
+- changed-ratio repair max interval / target: `12 / 12`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- README 첫 상태 영역에서 Issue #728 current evidence 확인 가능.
+- changed-ratio repair objective path 포함 상태 반영 완료.
+- 청음 preference와 musical quality claim 제외 유지.
+- 다음 boundary는 MVP completion audit.
+
+검증:
+
+- `git diff --check`
+- `bash scripts/agent_harness.sh quick`
+
+다음:
+
+- `Stage B MIDI-to-solo MVP completion audit`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
