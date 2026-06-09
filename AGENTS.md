@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #700, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour audio package.
+- Latest functional issue completed: Issue #702, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour listening review package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour listening review package.
+- Recommended next issue: Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour listening review input guard.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1164,6 +1164,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-
 ```
 
 This harness renders pitch-contour repaired model-conditioned MIDI candidates to WAV and verifies technical audio metadata without claiming musical quality.
+
+For Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour listening review package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-listening-review-package
+```
+
+This harness packages pitch-contour repaired WAV/MIDI candidates for pending listening review without claiming musical quality.
 
 For Stage B MIDI-to-solo phrase-bank retrieval baseline changes, run:
 

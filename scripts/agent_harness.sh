@@ -260,6 +260,8 @@ Modes:
                 Repair wide pitch intervals in dead-air/timing repaired model-conditioned MIDI candidates.
   stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-audio-package
                 Render pitch-contour repaired model-conditioned MIDI candidates to WAV.
+  stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-listening-review-package
+                Package pitch-contour repaired WAV/MIDI candidates for pending listening review.
   stage-b-midi-to-solo-model-direct-generation-repair
                 Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
@@ -6346,6 +6348,27 @@ run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pit
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_package() {
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_package}"
+  local audio_package_report="outputs/stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package/${audio_package_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package.json"
+  if [[ ! -f "$audio_package_report" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour audio package"
+    RUN_ID="$audio_package_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour listening review package"
+  "$PYTHON_BIN" scripts/build_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_package.py \
+    --run_id "$run_id" \
+    --audio_package_report "$audio_package_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_DEAD_AIR_TIMING_REPAIR_PITCH_CONTOUR_LISTENING_REVIEW_PACKAGE_2026-06-09.md \
+    --issue_number 702 \
+    --expected_review_item_count 3 \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_package \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_input_guard \
+    --require_package_ready \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -8020,6 +8043,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-audio-package)
     run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-listening-review-package)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_package
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
