@@ -246,6 +246,8 @@ Modes:
                 Build the current technical MVP delivery manifest and claim boundary.
   stage-b-midi-to-solo-final-status-audit
                 Audit final technical MVP status against README and delivery package evidence.
+  stage-b-midi-to-solo-post-mvp-quality-iteration-plan
+                Plan the first post-MVP musical quality iteration boundary.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision
                 Decide the next pitch-contour changed-ratio repair boundary.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-probe
@@ -6057,6 +6059,27 @@ run_stage_b_midi_to_solo_final_status_audit() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_post_mvp_quality_iteration_plan() {
+  local final_status_run_id="${FINAL_STATUS_RUN_ID:-harness_stage_b_midi_to_solo_final_status_audit}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_post_mvp_quality_iteration_plan}"
+  local final_status="outputs/stage_b_midi_to_solo_final_status_audit/${final_status_run_id}/stage_b_midi_to_solo_final_status_audit.json"
+  if [[ ! -f "$final_status" ]]; then
+    print_header "Stage B MIDI-to-solo final status audit"
+    RUN_ID="$final_status_run_id" run_stage_b_midi_to_solo_final_status_audit
+  fi
+  print_header "Stage B MIDI-to-solo post-MVP quality iteration plan"
+  "$PYTHON_BIN" scripts/plan_stage_b_midi_to_solo_post_mvp_quality_iteration.py \
+    --run_id "$run_id" \
+    --final_status_audit "$final_status" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_POST_MVP_QUALITY_ITERATION_PLAN_2026-06-09.md \
+    --issue_number 744 \
+    --expected_boundary stage_b_midi_to_solo_post_mvp_quality_iteration_plan \
+    --expected_next_boundary stage_b_midi_to_solo_quality_rubric_baseline \
+    --expected_target quality_rubric_baseline \
+    --require_quality_rubric \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision}"
@@ -8313,6 +8336,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-final-status-audit)
     run_stage_b_midi_to_solo_final_status_audit
+    ;;
+  stage-b-midi-to-solo-post-mvp-quality-iteration-plan)
+    run_stage_b_midi_to_solo_post_mvp_quality_iteration_plan
     ;;
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision)
     run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision

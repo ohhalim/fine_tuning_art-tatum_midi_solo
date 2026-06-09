@@ -399,6 +399,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo MVP delivery package: runnable CLI `true`, input ranked MIDI `true`, rendered WAV evidence `true`, CLI/changed-ratio audio candidate count `3/3`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_readme_final_evidence_refresh`
 - MIDI-to-solo README final evidence refresh: latest evidence boundary `stage_b_midi_to_solo_mvp_delivery_package`, runnable CLI `true`, input ranked MIDI/WAV evidence `true/true`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_final_status_audit`
 - MIDI-to-solo final status audit: technical MVP complete `true`, local review ready `true`, README final evidence reflected `true`, CLI/WAV count `3/3`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- MIDI-to-solo post-MVP quality iteration plan: selected target `quality_rubric_baseline`, ordered work `4`, taxonomy seed `7`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_rubric_baseline`
 - MIDI-to-solo pitch-contour changed-ratio review decision: selected target `lower_pitch_change_ratio_repair_probe`, repair probe required `true`, max interval/threshold `11/12`, changed-ratio review threshold `0.5`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
 - MIDI-to-solo pitch-contour changed-ratio repair probe: repaired/pass `3/3`, max pitch changed ratio `0.7174 -> 0.4348`, max interval `12`, dead-air max `0.0000`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package`
 - MIDI-to-solo pitch-contour changed-ratio repair audio package: rendered WAV `3`, duration `18.422s-18.978s`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package`
@@ -4312,6 +4313,45 @@ Issue #742는 Issue #740 README final evidence refresh와 Issue #738 MVP deliver
 다음 작업:
 
 - `Stage B MIDI-to-solo post-MVP musical quality iteration plan`
+
+## 9.63 Stage B MIDI-to-solo post-MVP quality iteration plan
+
+Issue #744는 Issue #742 final status audit 이후 technical MVP 완료 상태에서 첫 post-MVP musical quality iteration boundary를 정의한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- source boundary: `stage_b_midi_to_solo_final_status_audit`
+- next boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- selected target: `quality_rubric_baseline`
+- technical MVP complete: `true`
+- local review ready: `true`
+- quality rubric required: `true`
+- candidate failure labeling required: `true`
+- targeted quality repair sweep required: `true`
+- audio review package required: `true`
+- ordered work count: `4`
+- quality failure taxonomy seed count: `7`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- technical MVP 완료 이후 무작위 repair 재진입 대신 quality rubric baseline 선행.
+- 현재 MIDI/WAV evidence와 objective metric 기준 candidate failure label 정의 필요.
+- musical quality, human/audio preference claim 제외 유지.
+- 다음 boundary는 quality rubric baseline.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- `.venv/bin/python -m py_compile scripts/plan_stage_b_midi_to_solo_post_mvp_quality_iteration.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-post-mvp-quality-iteration-plan`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo quality rubric baseline`
 
 ## 10. 한 문장 요약
 
