@@ -268,6 +268,8 @@ Modes:
                 Run a contour/rhythm repair sweep for remaining songlike melody labels.
   stage-b-midi-to-solo-songlike-melody-contour-repair-audio-package
                 Render songlike melody contour repair MIDI candidates to WAV files.
+  stage-b-midi-to-solo-songlike-melody-contour-repair-listening-review-package
+                Package songlike melody contour repair WAV/MIDI candidates for listening review.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision
                 Decide the next pitch-contour changed-ratio repair boundary.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-probe
@@ -6350,6 +6352,27 @@ run_stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package() {
+  local audio_package_run_id="${AUDIO_PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package}"
+  local review_run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package}"
+  local audio_package_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package/${audio_package_run_id}/stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package.json"
+  if [[ ! -f "$audio_package_report" ]]; then
+    print_header "Stage B MIDI-to-solo songlike melody contour repair audio package"
+    RUN_ID="$audio_package_run_id" run_stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package
+  fi
+  print_header "Stage B MIDI-to-solo songlike melody contour repair listening review package"
+  "$PYTHON_BIN" scripts/build_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package.py \
+    --run_id "$review_run_id" \
+    --audio_package_report "$audio_package_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_LISTENING_REVIEW_PACKAGE_2026-06-09.md \
+    --issue_number 766 \
+    --expected_review_item_count 6 \
+    --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package \
+    --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard \
+    --require_package_ready \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision}"
@@ -8639,6 +8662,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-songlike-melody-contour-repair-audio-package)
     run_stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package
+    ;;
+  stage-b-midi-to-solo-songlike-melody-contour-repair-listening-review-package)
+    run_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package
     ;;
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision)
     run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision
