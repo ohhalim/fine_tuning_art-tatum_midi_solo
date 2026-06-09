@@ -408,6 +408,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo model-conditioned input path dead-air timing repair audio package: rendered WAV `3`, technical validation `true`, repaired dead-air max `0.0000`, max interval `62`, remaining wide-interval risk `true`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next_decision`
 - MIDI-to-solo model-conditioned input path dead-air timing repair objective next decision: dead-air target supported `true`, max interval `62`, wide-interval follow-up `true`, current evidence consolidation `false`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_decision`
 - MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour decision: target `wide_interval_pitch_contour_repair`, interval target `62 -> 12`, required reduction `50`, repair probe `true`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_probe`
+- MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour probe: repaired/pass `3/3`, max interval `62 -> 11`, interval reduction `51`, dead-air max `0.0000`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package`
 - model-core portfolio bullet refresh: resume bullet `6`, short bullet `3`, generic base checkpoint repeatability `9/9/9`, unsupported claim guard 유지
 - Muzig application wording refresh: resume project bullet `5`, short bullet `3`, 자기소개 section `3`, AI 음악 실험/검증 claim만 사용
 - Muzig application final review package: long bullet `5`, short bullet `3`, 자기소개 paragraph `3`, 지원 동기 paragraph `2`, 최종 claim check 포함
@@ -488,6 +489,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - Stage B MIDI-to-solo model-conditioned input path dead-air timing repair audio package: rendered WAV `3`, technical validation `true`, duration `19.585s-22.390s`, remaining wide-interval risk `true`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next_decision`
 - Stage B MIDI-to-solo model-conditioned input path dead-air timing repair objective next decision: technical WAV `true`, dead-air target supported `true`, added-note ratio review `true`, max interval `62`, pitch-contour follow-up `true`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_decision`
 - Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour decision: technical WAV `true`, dead-air target supported `true`, selected target `wide_interval_pitch_contour_repair`, required interval reduction `50`, repair probe `true`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_probe`
+- Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour probe: repaired/pass `3/3`, max interval `62 -> 11`, target max interval `12`, dead-air max `0.0000`, max pitch changed ratio `0.7174`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package`
 - Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard audio review package: candidate/rendered `3/3`, sample rate `44100`, duration `6.747s-6.861s`, technical validation `true`, quality claim `false`, next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_listening_review`
 - Stage B MIDI-to-solo controlled scale checkpoint dead-air repeatability temperature guard listening review: candidate/rendered `3/3`, validated review input `false`, pending fields `4/3/9`, preference fill `false`, quality claim `false`, next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_dead_air_repeatability_temperature_guard_objective_only_next_decision`
 - Muzig application resume wording: long bullet `7`, short bullet `3`, self-introduction sections `3`, unsupported claim guard 유지
@@ -3425,6 +3427,45 @@ Issue #696은 Issue #694 objective next decision 결과를 source로 사용해 p
 다음 작업:
 
 - `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour probe`
+
+## 9.40 Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour probe
+
+Issue #698은 Issue #696 pitch-contour decision 결과와 Issue #690 dead-air timing repair MIDI를 source로 사용해 wide interval objective repair를 실행한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_probe`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package`
+- repaired / passed candidates: `3 / 3`
+- source max interval: `62`
+- repaired max interval: `11`
+- target max interval: `12`
+- interval reduction: `51`
+- required interval reduction min: `50`
+- source dead-air max: `0.0000`
+- repaired dead-air max: `0.0000`
+- max simultaneous notes: `1`
+- min repaired unique pitch count: `22`
+- max pitch changed ratio: `0.7174`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- max interval target 통과.
+- dead-air target 유지.
+- monophonic gate 유지.
+- pitch changed ratio `0.7174`로 audio review 필요.
+- 음악적 품질 claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_probe`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-probe`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour audio package`
 
 ## 10. 한 문장 요약
 
