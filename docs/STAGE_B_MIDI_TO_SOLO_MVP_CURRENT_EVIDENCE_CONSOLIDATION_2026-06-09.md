@@ -9,6 +9,7 @@
 - selected-scale objective path complete: `true`
 - phrase-bank CLI technical path ready: `true`
 - model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 
@@ -67,6 +68,18 @@
 - pitch-contour target supported: `true`
 - max pitch changed ratio: `0.7174`
 - pitch changed ratio review required: `true`
+- audio review required: `true`
+- preference fill allowed: `false`
+
+## Model-Conditioned Pitch-Contour Changed-Ratio Repair Objective Path
+
+- current evidence consolidation ready: `true`
+- objective path supported: `true`
+- rendered WAV files: `3`
+- technical WAV validation: `true`
+- max interval / threshold: `12` / `12`
+- max pitch changed ratio / target: `0.4348` / `0.5000`
+- changed-ratio target supported: `true`
 - audio review required: `true`
 - preference fill allowed: `false`
 

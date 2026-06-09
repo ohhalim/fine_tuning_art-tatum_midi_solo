@@ -41,6 +41,10 @@ MODEL_CONDITIONED_PITCH_CONTOUR_OBJECTIVE_BOUNDARY = (
     "stage_b_midi_to_solo_model_conditioned_input_path_"
     "dead_air_timing_repair_pitch_contour_objective_only_next_decision"
 )
+MODEL_CONDITIONED_PITCH_CONTOUR_CHANGED_RATIO_REPAIR_OBJECTIVE_BOUNDARY = (
+    "stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_"
+    "objective_only_next_decision"
+)
 
 
 def _dict(value: Any) -> dict[str, Any]:
@@ -519,6 +523,108 @@ def validate_model_conditioned_pitch_contour_objective_next(
     }
 
 
+def validate_model_conditioned_pitch_contour_changed_ratio_repair_objective_next(
+    report: dict[str, Any],
+) -> dict[str, Any]:
+    boundary = str(report.get("boundary") or "")
+    if boundary != MODEL_CONDITIONED_PITCH_CONTOUR_CHANGED_RATIO_REPAIR_OBJECTIVE_BOUNDARY:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair objective boundary required"
+        )
+    summary = _dict(report.get("objective_summary"))
+    readiness = _dict(report.get("readiness"))
+    decision = _dict(report.get("decision"))
+    if str(decision.get("next_boundary") or "") != BOUNDARY:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair objective should route to current evidence"
+        )
+    if not bool(readiness.get("objective_next_completed", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair objective completion required"
+        )
+    if not bool(summary.get("changed_ratio_repair_objective_path_supported", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair objective support required"
+        )
+    if not bool(summary.get("current_evidence_consolidation_ready", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair current evidence readiness required"
+        )
+    if not bool(summary.get("technical_wav_validation", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair technical WAV validation required"
+        )
+    if _int(summary.get("rendered_audio_file_count")) < 3:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair rendered WAV count below 3"
+        )
+    if _int(summary.get("max_repaired_interval")) > _int(summary.get("max_interval_threshold")):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair interval target exceeded"
+        )
+    target_ratio = _float(summary.get("target_max_pitch_changed_ratio"))
+    if target_ratio and _float(summary.get("max_repaired_pitch_changed_ratio")) > target_ratio:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair ratio target exceeded"
+        )
+    if bool(summary.get("validated_review_input_present", True)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair review input should remain absent"
+        )
+    if bool(summary.get("preference_fill_allowed", True)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair preference fill should remain blocked"
+        )
+    if bool(decision.get("critical_user_input_required", True)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair critical user input should not be required"
+        )
+    blocked_claims = [
+        "human_audio_preference_claimed",
+        "midi_to_solo_musical_quality_claimed",
+        "audio_rendered_quality_claimed",
+        "model_checkpoint_generation_quality_claimed",
+        "model_direct_generation_quality_claimed",
+        "broad_trained_model_quality_claimed",
+        "brad_style_adaptation_claimed",
+        "production_ready_claimed",
+    ]
+    claimed = [name for name in blocked_claims if bool(readiness.get(name, False))]
+    if claimed:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            f"unexpected model-conditioned pitch-contour changed-ratio repair claim: {claimed}"
+        )
+    return {
+        "boundary": MODEL_CONDITIONED_PITCH_CONTOUR_CHANGED_RATIO_REPAIR_OBJECTIVE_BOUNDARY,
+        "objective_next_completed": bool(readiness.get("objective_next_completed", False)),
+        "current_evidence_consolidation_ready": bool(
+            summary.get("current_evidence_consolidation_ready", False)
+        ),
+        "changed_ratio_repair_objective_path_supported": bool(
+            summary.get("changed_ratio_repair_objective_path_supported", False)
+        ),
+        "review_item_count": _int(summary.get("review_item_count")),
+        "required_input_field_count": _int(summary.get("required_input_field_count")),
+        "validated_review_input_present": bool(
+            summary.get("validated_review_input_present", True)
+        ),
+        "preference_fill_allowed": bool(summary.get("preference_fill_allowed", True)),
+        "technical_wav_validation": bool(summary.get("technical_wav_validation", False)),
+        "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
+        "max_repaired_interval": _int(summary.get("max_repaired_interval")),
+        "max_interval_threshold": _int(summary.get("max_interval_threshold")),
+        "interval_target_supported": bool(summary.get("interval_target_supported", False)),
+        "max_repaired_pitch_changed_ratio": _float(
+            summary.get("max_repaired_pitch_changed_ratio")
+        ),
+        "target_max_pitch_changed_ratio": target_ratio,
+        "changed_ratio_target_supported": bool(
+            summary.get("changed_ratio_target_supported", False)
+        ),
+        "audio_review_required": bool(summary.get("audio_review_required", False)),
+    }
+
+
 def build_current_evidence_consolidation_report(
     *,
     contract_report: dict[str, Any],
@@ -529,6 +635,10 @@ def build_current_evidence_consolidation_report(
     objective_next: dict[str, Any],
     cli_objective_next: dict[str, Any],
     model_conditioned_pitch_contour_objective_next: dict[str, Any] | None = None,
+    model_conditioned_pitch_contour_changed_ratio_repair_objective_next: dict[
+        str, Any
+    ]
+    | None = None,
     output_dir: Path,
     issue_number: int,
 ) -> dict[str, Any]:
@@ -546,6 +656,13 @@ def build_current_evidence_consolidation_report(
         if model_conditioned_pitch_contour_objective_next
         else {}
     )
+    model_conditioned_pitch_contour_changed_ratio_repair_objective = (
+        validate_model_conditioned_pitch_contour_changed_ratio_repair_objective_next(
+            model_conditioned_pitch_contour_changed_ratio_repair_objective_next
+        )
+        if model_conditioned_pitch_contour_changed_ratio_repair_objective_next
+        else {}
+    )
     technical_path_supported = (
         bool(resource["midi_to_solo_training_resource_ready"])
         and generation["exported_candidate_count"] >= 3
@@ -561,11 +678,18 @@ def build_current_evidence_consolidation_report(
             not bool(model_conditioned_pitch_contour_objective_next),
         )
     )
+    model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready = bool(
+        model_conditioned_pitch_contour_changed_ratio_repair_objective.get(
+            "current_evidence_consolidation_ready",
+            not bool(model_conditioned_pitch_contour_changed_ratio_repair_objective_next),
+        )
+    )
     current_evidence_supported = bool(
         technical_path_supported
         and selected_scale_objective_path_complete
         and phrase_bank_cli_technical_path_ready
         and model_conditioned_pitch_contour_objective_path_ready
+        and model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready
     )
     source_boundaries = {
         "contract": contract["boundary"],
@@ -581,6 +705,10 @@ def build_current_evidence_consolidation_report(
         source_boundaries["model_conditioned_pitch_contour_objective_next"] = (
             model_conditioned_pitch_contour_objective["boundary"]
         )
+    if model_conditioned_pitch_contour_changed_ratio_repair_objective:
+        source_boundaries[
+            "model_conditioned_pitch_contour_changed_ratio_repair_objective_next"
+        ] = model_conditioned_pitch_contour_changed_ratio_repair_objective["boundary"]
     return {
         "schema_version": SCHEMA_VERSION,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
@@ -596,6 +724,9 @@ def build_current_evidence_consolidation_report(
         "selected_scale_objective_path": objective,
         "phrase_bank_cli_technical_path": cli_objective,
         "model_conditioned_pitch_contour_objective_path": model_conditioned_pitch_contour_objective,
+        "model_conditioned_pitch_contour_changed_ratio_repair_objective_path": (
+            model_conditioned_pitch_contour_changed_ratio_repair_objective
+        ),
         "readiness": {
             "boundary": BOUNDARY,
             "mvp_current_evidence_consolidated": True,
@@ -608,6 +739,9 @@ def build_current_evidence_consolidation_report(
             "phrase_bank_cli_technical_path_ready": phrase_bank_cli_technical_path_ready,
             "model_conditioned_pitch_contour_objective_path_ready": bool(
                 model_conditioned_pitch_contour_objective_path_ready
+            ),
+            "model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready": bool(
+                model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready
             ),
             "current_mvp_technical_execution_evidence_supported": technical_path_supported,
             "current_mvp_objective_repair_evidence_supported": selected_scale_objective_path_complete,
@@ -642,6 +776,13 @@ def build_current_evidence_consolidation_report(
                 if model_conditioned_pitch_contour_objective
                 else []
             ),
+            *(
+                [
+                    "model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready"
+                ]
+                if model_conditioned_pitch_contour_changed_ratio_repair_objective
+                else []
+            ),
             "quality_claim_guard_preserved",
         ],
         "not_proven": [
@@ -666,6 +807,7 @@ def validate_current_evidence_consolidation_report(
     min_rendered_wav_files: int,
     min_objective_sample_count: int,
     require_model_conditioned_pitch_contour_objective: bool = False,
+    require_model_conditioned_pitch_contour_changed_ratio_repair_objective: bool = False,
 ) -> dict[str, Any]:
     boundary = str(report.get("boundary") or "")
     readiness = _dict(report.get("readiness"))
@@ -676,6 +818,12 @@ def validate_current_evidence_consolidation_report(
     cli_objective = _dict(report.get("phrase_bank_cli_technical_path"))
     model_conditioned_pitch_contour = _dict(
         report.get("model_conditioned_pitch_contour_objective_path")
+    )
+    model_conditioned_pitch_contour_changed_ratio_repair = _dict(
+        report.get("model_conditioned_pitch_contour_changed_ratio_repair_objective_path")
+    )
+    model_conditioned_pitch_contour_changed_ratio_repair = _dict(
+        report.get("model_conditioned_pitch_contour_changed_ratio_repair_objective_path")
     )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
@@ -710,6 +858,24 @@ def validate_current_evidence_consolidation_report(
     ):
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
             "model-conditioned pitch-contour preference fill should remain blocked"
+        )
+    if require_model_conditioned_pitch_contour_changed_ratio_repair_objective and not bool(
+        readiness.get(
+            "model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready",
+            False,
+        )
+    ):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair objective path support required"
+        )
+    if model_conditioned_pitch_contour_changed_ratio_repair and bool(
+        model_conditioned_pitch_contour_changed_ratio_repair.get(
+            "preference_fill_allowed",
+            True,
+        )
+    ):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour changed-ratio repair preference fill should remain blocked"
         )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("critical user input should not be required")
@@ -747,6 +913,12 @@ def validate_current_evidence_consolidation_report(
         "model_conditioned_pitch_contour_objective_path_ready": bool(
             readiness.get("model_conditioned_pitch_contour_objective_path_ready", False)
         ),
+        "model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready": bool(
+            readiness.get(
+                "model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready",
+                False,
+            )
+        ),
         "model_conditioned_pitch_contour_max_interval": _int(
             model_conditioned_pitch_contour.get("max_repaired_interval")
         ),
@@ -758,6 +930,38 @@ def validate_current_evidence_consolidation_report(
         ),
         "model_conditioned_pitch_contour_audio_review_required": bool(
             model_conditioned_pitch_contour.get("audio_review_required", False)
+        ),
+        "model_conditioned_pitch_contour_changed_ratio_repair_rendered_audio_file_count": _int(
+            model_conditioned_pitch_contour_changed_ratio_repair.get(
+                "rendered_audio_file_count"
+            )
+        ),
+        "model_conditioned_pitch_contour_changed_ratio_repair_max_interval": _int(
+            model_conditioned_pitch_contour_changed_ratio_repair.get(
+                "max_repaired_interval"
+            )
+        ),
+        "model_conditioned_pitch_contour_changed_ratio_repair_max_pitch_changed_ratio": _float(
+            model_conditioned_pitch_contour_changed_ratio_repair.get(
+                "max_repaired_pitch_changed_ratio"
+            )
+        ),
+        "model_conditioned_pitch_contour_changed_ratio_repair_target_max_pitch_changed_ratio": _float(
+            model_conditioned_pitch_contour_changed_ratio_repair.get(
+                "target_max_pitch_changed_ratio"
+            )
+        ),
+        "model_conditioned_pitch_contour_changed_ratio_repair_changed_ratio_target_supported": bool(
+            model_conditioned_pitch_contour_changed_ratio_repair.get(
+                "changed_ratio_target_supported",
+                False,
+            )
+        ),
+        "model_conditioned_pitch_contour_changed_ratio_repair_audio_review_required": bool(
+            model_conditioned_pitch_contour_changed_ratio_repair.get(
+                "audio_review_required",
+                False,
+            )
         ),
         "cli_candidate_count": _int(cli_objective.get("candidate_count")),
         "cli_rendered_audio_file_count": _int(cli_objective.get("rendered_audio_file_count")),
@@ -804,6 +1008,9 @@ def markdown_report(report: dict[str, Any]) -> str:
     model_conditioned_pitch_contour = _dict(
         report.get("model_conditioned_pitch_contour_objective_path")
     )
+    model_conditioned_pitch_contour_changed_ratio_repair = _dict(
+        report.get("model_conditioned_pitch_contour_changed_ratio_repair_objective_path")
+    )
     lines = [
         "# Stage B MIDI-to-Solo MVP Current Evidence Consolidation",
         "",
@@ -816,6 +1023,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- selected-scale objective path complete: `{_bool_token(readiness['selected_scale_objective_path_complete'])}`",
         f"- phrase-bank CLI technical path ready: `{_bool_token(readiness['phrase_bank_cli_technical_path_ready'])}`",
         f"- model-conditioned pitch-contour objective path ready: `{_bool_token(readiness['model_conditioned_pitch_contour_objective_path_ready'])}`",
+        f"- model-conditioned pitch-contour changed-ratio repair objective path ready: `{_bool_token(readiness['model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready'])}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         f"- MIDI-to-solo musical quality claimed: `{_bool_token(readiness['midi_to_solo_musical_quality_claimed'])}`",
         "",
@@ -883,6 +1091,23 @@ def markdown_report(report: dict[str, Any]) -> str:
                 "",
             ]
         )
+    if model_conditioned_pitch_contour_changed_ratio_repair:
+        lines.extend(
+            [
+                "## Model-Conditioned Pitch-Contour Changed-Ratio Repair Objective Path",
+                "",
+                f"- current evidence consolidation ready: `{_bool_token(model_conditioned_pitch_contour_changed_ratio_repair['current_evidence_consolidation_ready'])}`",
+                f"- objective path supported: `{_bool_token(model_conditioned_pitch_contour_changed_ratio_repair['changed_ratio_repair_objective_path_supported'])}`",
+                f"- rendered WAV files: `{model_conditioned_pitch_contour_changed_ratio_repair['rendered_audio_file_count']}`",
+                f"- technical WAV validation: `{_bool_token(model_conditioned_pitch_contour_changed_ratio_repair['technical_wav_validation'])}`",
+                f"- max interval / threshold: `{model_conditioned_pitch_contour_changed_ratio_repair['max_repaired_interval']}` / `{model_conditioned_pitch_contour_changed_ratio_repair['max_interval_threshold']}`",
+                f"- max pitch changed ratio / target: `{model_conditioned_pitch_contour_changed_ratio_repair['max_repaired_pitch_changed_ratio']:.4f}` / `{model_conditioned_pitch_contour_changed_ratio_repair['target_max_pitch_changed_ratio']:.4f}`",
+                f"- changed-ratio target supported: `{_bool_token(model_conditioned_pitch_contour_changed_ratio_repair['changed_ratio_target_supported'])}`",
+                f"- audio review required: `{_bool_token(model_conditioned_pitch_contour_changed_ratio_repair['audio_review_required'])}`",
+                f"- preference fill allowed: `{_bool_token(model_conditioned_pitch_contour_changed_ratio_repair['preference_fill_allowed'])}`",
+                "",
+            ]
+        )
     lines.extend(["## MIDI Paths", ""])
     for item in generation["midi_paths"]:
         lines.append(f"- `{item}`")
@@ -907,6 +1132,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--cli_objective_next", type=str, required=True)
     parser.add_argument("--model_conditioned_pitch_contour_objective_next", type=str, default="")
     parser.add_argument(
+        "--model_conditioned_pitch_contour_changed_ratio_repair_objective_next",
+        type=str,
+        default="",
+    )
+    parser.add_argument(
         "--output_root",
         type=str,
         default="outputs/stage_b_midi_to_solo_mvp_current_evidence_consolidation",
@@ -918,6 +1148,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_current_evidence_support", action="store_true")
     parser.add_argument("--require_model_conditioned_pitch_contour_objective", action="store_true")
+    parser.add_argument(
+        "--require_model_conditioned_pitch_contour_changed_ratio_repair_objective",
+        action="store_true",
+    )
     parser.add_argument("--require_no_quality_claim", action="store_true")
     parser.add_argument("--min_exported_candidates", type=int, default=3)
     parser.add_argument("--min_rendered_wav_files", type=int, default=3)
@@ -942,6 +1176,15 @@ def main() -> int:
             if args.model_conditioned_pitch_contour_objective_next
             else None
         ),
+        model_conditioned_pitch_contour_changed_ratio_repair_objective_next=(
+            read_json(
+                Path(
+                    args.model_conditioned_pitch_contour_changed_ratio_repair_objective_next
+                )
+            )
+            if args.model_conditioned_pitch_contour_changed_ratio_repair_objective_next
+            else None
+        ),
         output_dir=output_dir,
         issue_number=int(args.issue_number),
     )
@@ -956,6 +1199,9 @@ def main() -> int:
         min_objective_sample_count=int(args.min_objective_sample_count),
         require_model_conditioned_pitch_contour_objective=bool(
             args.require_model_conditioned_pitch_contour_objective
+        ),
+        require_model_conditioned_pitch_contour_changed_ratio_repair_objective=bool(
+            args.require_model_conditioned_pitch_contour_changed_ratio_repair_objective
         ),
     )
     output_dir.mkdir(parents=True, exist_ok=True)

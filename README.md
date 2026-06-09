@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_objective_only_next_decision`
+- latest evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -127,8 +127,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - pitch-contour changed-ratio repair current evidence consolidation ready: `true`
 - pitch-contour changed-ratio repair max interval / target: `12 / 12`
 - pitch-contour changed-ratio repair max pitch changed ratio / target: `0.4348 / 0.5000`
+- current evidence changed-ratio repair objective path included: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -186,6 +187,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned pitch-contour changed-ratio repaired WAV/MIDI 후보의 listening review package 생성 가능
 - model-conditioned pitch-contour changed-ratio review input pending 상태에서 preference fill 차단 가능
 - model-conditioned pitch-contour changed-ratio objective evidence 기준 current evidence consolidation 경계 결정 가능
+- model-conditioned pitch-contour changed-ratio objective path를 current evidence로 통합 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -806,6 +808,7 @@ MVP current evidence consolidation.
 - selected-scale objective path complete: `true`
 - phrase-bank CLI technical path ready: `true`
 - model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - generation exported / qualified candidates: `3 / 3`
 - technical audio rendered WAV files: `3`
 - selected-scale objective valid / strict / grammar: `9 / 9 / 9`
@@ -814,6 +817,8 @@ MVP current evidence consolidation.
 - CLI preference fill allowed: `false`
 - model-conditioned pitch-contour max interval / threshold: `11 / 12`
 - model-conditioned pitch-contour changed-ratio review required: `true`
+- model-conditioned pitch-contour changed-ratio repair max ratio / target: `0.4348 / 0.5000`
+- model-conditioned pitch-contour changed-ratio repair max interval / target: `12 / 12`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 - next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
