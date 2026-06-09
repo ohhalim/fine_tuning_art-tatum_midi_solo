@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #722, Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair listening review package
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair listening review input guard`
+- latest functional result: Issue #724, Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair listening review input guard
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair objective-only next decision`
 
 현재 범위가 아닌 것:
 
@@ -78,6 +78,7 @@
 - pitch-contour changed-ratio repair probe 기준 repaired 후보 3개 objective target 통과
 - pitch-contour changed-ratio repaired 후보 3개 WAV technical render 완료
 - pitch-contour changed-ratio repaired WAV/MIDI 후보 3개 listening review package 준비 완료
+- pitch-contour changed-ratio repaired review input pending 상태에서 preference fill 차단 완료
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
@@ -1377,6 +1378,50 @@ Issue #722는 Issue #720 audio package 이후 repaired WAV/MIDI 후보 3개를 l
 다음:
 
 - `Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair listening review input guard`
+
+## Stage B MIDI-to-Solo Model-Conditioned Pitch-Contour Changed-Ratio Repair Listening Review Input Guard Result
+
+Issue #724는 Issue #722 listening review package 이후 validated listening input이 없는 상태에서 preference fill을 차단한 작업이다.
+
+변경:
+
+- changed-ratio repair listening review input guard script 추가
+- required input fields, review item count, technical WAV validation 검증
+- validated review input pending 상태와 preference fill 차단 상태 기록
+- generated input guard document, README, handoff/status/core plan 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_PITCH_CONTOUR_CHANGED_RATIO_REPAIR_LISTENING_REVIEW_INPUT_GUARD_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_input_guard`
+- source boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_objective_only_next_decision`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- review item count: `3`
+- required input field count: `4`
+- technical WAV validation: `true`
+- max repaired pitch changed ratio / target: `0.4348 / 0.5000`
+- max repaired interval: `12`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- review input pending 상태에서 preference fill 차단 완료.
+- human/audio preference와 final musical quality claim 제외 유지.
+- 다음 boundary는 objective-only next decision.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_input_guard`
+- `.venv/bin/python -m py_compile scripts/guard_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_input.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-listening-review-input-guard`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair objective-only next decision`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

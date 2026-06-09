@@ -248,6 +248,8 @@ Modes:
                 Render changed-ratio repaired model-conditioned MIDI candidates to WAV.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-listening-review-package
                 Package changed-ratio repaired WAV/MIDI candidates for listening review.
+  stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-listening-review-input-guard
+                Block changed-ratio repair preference fill while listening review input is pending.
   stage-b-midi-to-solo-model-conditioned-input-path-quality-alignment
                 Decide model-conditioned input-path alignment requirements and next probe target.
   stage-b-midi-to-solo-model-conditioned-input-path-listening-review-input-guard
@@ -6059,6 +6061,27 @@ run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_li
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_input_guard() {
+  local package_run_id="${PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_input_guard}"
+  local source_package="outputs/stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package/${package_run_id}/stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package.json"
+  if [[ ! -f "$source_package" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair listening review package"
+    RUN_ID="$package_run_id" run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair listening review input guard"
+  "$PYTHON_BIN" scripts/guard_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_input.py \
+    --run_id "$run_id" \
+    --source_package "$source_package" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_PITCH_CONTOUR_CHANGED_RATIO_REPAIR_LISTENING_REVIEW_INPUT_GUARD_2026-06-09.md \
+    --issue_number 724 \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_input_guard \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_objective_only_next_decision \
+    --require_guard_completed \
+    --require_preference_blocked \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment}"
@@ -8176,6 +8199,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-listening-review-package)
     run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package
+    ;;
+  stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-listening-review-input-guard)
+    run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_input_guard
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-quality-alignment)
     run_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment
