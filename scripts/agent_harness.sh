@@ -254,6 +254,8 @@ Modes:
                 Render repaired model-conditioned dead-air/timing MIDI candidates to WAV.
   stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-objective-next
                 Select the next objective boundary after repaired dead-air/timing audio evidence.
+  stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-decision
+                Define the pitch-contour repair target after repaired dead-air/timing objective evidence.
   stage-b-midi-to-solo-model-direct-generation-repair
                 Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
@@ -6260,6 +6262,32 @@ run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_obj
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_decision() {
+  local objective_next_run_id="${OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next_decision}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_decision}"
+  local objective_next_report="outputs/stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next_decision/${objective_next_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next_decision.json"
+  if [[ ! -f "$objective_next_report" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path dead-air timing repair objective next decision"
+    RUN_ID="$objective_next_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour.py \
+    --run_id "$run_id" \
+    --objective_next_report "$objective_next_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_DEAD_AIR_TIMING_REPAIR_PITCH_CONTOUR_DECISION_2026-06-09.md \
+    --issue_number 696 \
+    --target_max_interval 12 \
+    --target_dead_air_max 0.35 \
+    --min_repaired_candidate_count 3 \
+    --max_simultaneous_notes 1 \
+    --max_added_note_ratio_review_threshold 0.75 \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_decision \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_probe \
+    --require_pitch_contour_decision \
+    --require_repair_probe \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -7925,6 +7953,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-objective-next)
     run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-decision)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_decision
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
