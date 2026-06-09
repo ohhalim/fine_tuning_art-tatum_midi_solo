@@ -4668,6 +4668,46 @@ Issue #760은 Issue #758 objective-only next decision과 Issue #750 repair sweep
 
 - `Stage B MIDI-to-solo songlike melody contour repair sweep`
 
+## 9.72 Stage B MIDI-to-solo songlike melody contour repair sweep
+
+Issue #762는 Issue #760 follow-up decision에서 선택한 `songlike_melody_not_soloing` dominant label을 대상으로 contour/rhythm repair sweep을 실행한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- source boundary: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package`
+- selected target: `songlike_melody_contour_repair_audio_package`
+- candidate count: `6`
+- total failure labels: `8 -> 4`
+- failure label delta: `4`
+- songlike failure count: `5 -> 0`
+- songlike failure delta: `5`
+- improved candidate count: `4`
+- technical regression count: `0`
+- repaired failure counts: `phrase_shape_missing_tension_release=2`, `rhythmic_monotony=2`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- dominant songlike label 제거 확인.
+- grammar/strict regression 없이 objective label 감소 확인.
+- 남은 label은 phrase shape와 rhythmic monotony로 분리.
+- audio rendering과 listening preference는 아직 claim하지 않음.
+- 다음 boundary는 songlike melody contour repair audio package.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-repair-sweep`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour repair audio package`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
