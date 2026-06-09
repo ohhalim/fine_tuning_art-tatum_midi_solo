@@ -61,6 +61,9 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
     audio = _dict(report.get("technical_audio_render"))
     objective = _dict(report.get("selected_scale_objective_path"))
     cli_objective = _dict(report.get("phrase_bank_cli_technical_path"))
+    model_conditioned_pitch_contour = _dict(
+        report.get("model_conditioned_pitch_contour_objective_path")
+    )
     decision = _dict(report.get("decision"))
     required_true = [
         "mvp_current_evidence_consolidated",
@@ -71,6 +74,7 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         "technical_wav_path_ready",
         "selected_scale_objective_path_complete",
         "phrase_bank_cli_technical_path_ready",
+        "model_conditioned_pitch_contour_objective_path_ready",
         "current_mvp_technical_execution_evidence_supported",
         "current_mvp_objective_repair_evidence_supported",
         "midi_to_solo_mvp_current_evidence_supported",
@@ -108,6 +112,40 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloMvpCompletionAuditError("CLI rendered WAV count below 3")
     if bool(cli_objective.get("preference_fill_allowed", True)):
         raise StageBMidiToSoloMvpCompletionAuditError("CLI preference fill should remain blocked")
+    if not bool(model_conditioned_pitch_contour):
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "model-conditioned pitch-contour objective path required"
+        )
+    if not bool(model_conditioned_pitch_contour.get("current_evidence_consolidation_ready", False)):
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "model-conditioned pitch-contour current evidence readiness required"
+        )
+    if not bool(model_conditioned_pitch_contour.get("pitch_contour_target_supported", False)):
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "model-conditioned pitch-contour target support required"
+        )
+    if _int(model_conditioned_pitch_contour.get("max_repaired_interval")) > _int(
+        model_conditioned_pitch_contour.get("max_interval_threshold")
+    ):
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "model-conditioned pitch-contour interval threshold exceeded"
+        )
+    if _int(model_conditioned_pitch_contour.get("rendered_audio_file_count")) < 3:
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "model-conditioned pitch-contour rendered WAV count below 3"
+        )
+    if not bool(model_conditioned_pitch_contour.get("technical_wav_validation", False)):
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "model-conditioned pitch-contour technical WAV validation required"
+        )
+    if bool(model_conditioned_pitch_contour.get("validated_review_input_present", True)):
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "model-conditioned pitch-contour review input should remain absent"
+        )
+    if bool(model_conditioned_pitch_contour.get("preference_fill_allowed", True)):
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "model-conditioned pitch-contour preference fill should remain blocked"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloMvpCompletionAuditError("critical user input should not be required")
     return {
@@ -140,6 +178,42 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         "cli_rendered_audio_file_count": _int(cli_objective.get("rendered_audio_file_count")),
         "cli_input_context_bars": _int(cli_objective.get("input_context_bars")),
         "cli_preference_fill_allowed": bool(cli_objective.get("preference_fill_allowed", True)),
+        "model_conditioned_pitch_contour_objective_path_ready": bool(
+            readiness.get("model_conditioned_pitch_contour_objective_path_ready", False)
+        ),
+        "model_conditioned_pitch_contour_current_evidence_ready": bool(
+            model_conditioned_pitch_contour.get("current_evidence_consolidation_ready", False)
+        ),
+        "model_conditioned_pitch_contour_rendered_audio_file_count": _int(
+            model_conditioned_pitch_contour.get("rendered_audio_file_count")
+        ),
+        "model_conditioned_pitch_contour_technical_wav_validation": bool(
+            model_conditioned_pitch_contour.get("technical_wav_validation", False)
+        ),
+        "model_conditioned_pitch_contour_max_interval": _int(
+            model_conditioned_pitch_contour.get("max_repaired_interval")
+        ),
+        "model_conditioned_pitch_contour_max_interval_threshold": _int(
+            model_conditioned_pitch_contour.get("max_interval_threshold")
+        ),
+        "model_conditioned_pitch_contour_target_supported": bool(
+            model_conditioned_pitch_contour.get("pitch_contour_target_supported", False)
+        ),
+        "model_conditioned_pitch_contour_max_pitch_changed_ratio": _float(
+            model_conditioned_pitch_contour.get("max_pitch_changed_ratio")
+        ),
+        "model_conditioned_pitch_contour_pitch_changed_ratio_review_required": bool(
+            model_conditioned_pitch_contour.get("pitch_changed_ratio_review_required", False)
+        ),
+        "model_conditioned_pitch_contour_audio_review_required": bool(
+            model_conditioned_pitch_contour.get("audio_review_required", False)
+        ),
+        "model_conditioned_pitch_contour_validated_review_input_present": bool(
+            model_conditioned_pitch_contour.get("validated_review_input_present", True)
+        ),
+        "model_conditioned_pitch_contour_preference_fill_allowed": bool(
+            model_conditioned_pitch_contour.get("preference_fill_allowed", True)
+        ),
     }
 
 
@@ -150,6 +224,12 @@ def validate_readme_refresh(readme_text: str) -> dict[str, Any]:
         "technical_path": "input MIDI -> context -> ranked MIDI -> WAV technical path: `true`",
         "objective_path": "selected-scale objective repair path complete: `true`",
         "cli_path": "phrase-bank CLI technical path included in current evidence: `true`",
+        "model_conditioned_pitch_contour": (
+            "model-conditioned pitch-contour objective path ready: `true`"
+        ),
+        "model_conditioned_pitch_contour_ratio": (
+            "model-conditioned pitch-contour changed-ratio review required: `true`"
+        ),
         "readme_refresh": "README evidence refreshed: `true`",
         "human_preference_false": "human/audio preference claim: `false`",
         "musical_quality_false": "MIDI-to-solo musical quality claim: `false`",
@@ -180,6 +260,7 @@ def build_mvp_completion_audit_report(
         and evidence["technical_execution_evidence_supported"]
         and evidence["selected_scale_objective_path_complete"]
         and evidence["phrase_bank_cli_technical_path_ready"]
+        and evidence["model_conditioned_pitch_contour_objective_path_ready"]
         and readme["readme_current_evidence_refreshed"]
     )
     return {
@@ -197,6 +278,7 @@ def build_mvp_completion_audit_report(
             "input_to_rendered_wav_completed": True,
             "selected_scale_objective_repair_completed": True,
             "phrase_bank_cli_technical_path_completed": True,
+            "model_conditioned_pitch_contour_objective_completed": True,
             "readme_evidence_boundary_refreshed": True,
             "musical_quality_mvp_completed": False,
             "human_audio_preference_completed": False,
@@ -208,6 +290,9 @@ def build_mvp_completion_audit_report(
             "boundary": BOUNDARY,
             "mvp_completion_audit_completed": True,
             "technical_model_core_mvp_completed": technical_model_core_mvp_completed,
+            "model_conditioned_pitch_contour_objective_path_ready": bool(
+                evidence["model_conditioned_pitch_contour_objective_path_ready"]
+            ),
             "quality_gap_decision_required": True,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -231,6 +316,7 @@ def build_mvp_completion_audit_report(
             "technical_wav_render_path",
             "selected_scale_objective_repair_path",
             "phrase_bank_cli_technical_path",
+            "model_conditioned_pitch_contour_objective_path",
             "readme_current_evidence_refresh",
         ],
         "not_proven": [
@@ -251,6 +337,7 @@ def validate_mvp_completion_audit_report(
     expected_next_boundary: str | None,
     require_technical_mvp_completion: bool,
     require_no_quality_claim: bool,
+    require_model_conditioned_pitch_contour_objective: bool,
 ) -> dict[str, Any]:
     boundary = str(report.get("boundary") or "")
     readiness = _dict(report.get("readiness"))
@@ -265,6 +352,12 @@ def validate_mvp_completion_audit_report(
         raise StageBMidiToSoloMvpCompletionAuditError("unexpected next boundary")
     if require_technical_mvp_completion and not bool(audit.get("technical_model_core_mvp_completed", False)):
         raise StageBMidiToSoloMvpCompletionAuditError("technical model-core MVP completion required")
+    if require_model_conditioned_pitch_contour_objective and not bool(
+        audit.get("model_conditioned_pitch_contour_objective_completed", False)
+    ):
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "model-conditioned pitch-contour objective completion required"
+        )
     if not bool(readiness.get("quality_gap_decision_required", False)):
         raise StageBMidiToSoloMvpCompletionAuditError("quality gap decision should be required")
     if bool(decision.get("critical_user_input_required", True)):
@@ -294,6 +387,9 @@ def validate_mvp_completion_audit_report(
         "phrase_bank_cli_technical_path_completed": bool(
             audit.get("phrase_bank_cli_technical_path_completed", False)
         ),
+        "model_conditioned_pitch_contour_objective_completed": bool(
+            audit.get("model_conditioned_pitch_contour_objective_completed", False)
+        ),
         "musical_quality_mvp_completed": bool(audit.get("musical_quality_mvp_completed", True)),
         "human_audio_preference_completed": bool(audit.get("human_audio_preference_completed", True)),
         "product_mvp_completed": bool(audit.get("product_mvp_completed", True)),
@@ -312,6 +408,24 @@ def validate_mvp_completion_audit_report(
         "cli_rendered_audio_file_count": _int(evidence.get("cli_rendered_audio_file_count")),
         "cli_input_context_bars": _int(evidence.get("cli_input_context_bars")),
         "cli_preference_fill_allowed": bool(evidence.get("cli_preference_fill_allowed", True)),
+        "model_conditioned_pitch_contour_objective_path_ready": bool(
+            evidence.get("model_conditioned_pitch_contour_objective_path_ready", False)
+        ),
+        "model_conditioned_pitch_contour_max_interval": _int(
+            evidence.get("model_conditioned_pitch_contour_max_interval")
+        ),
+        "model_conditioned_pitch_contour_max_interval_threshold": _int(
+            evidence.get("model_conditioned_pitch_contour_max_interval_threshold")
+        ),
+        "model_conditioned_pitch_contour_target_supported": bool(
+            evidence.get("model_conditioned_pitch_contour_target_supported", False)
+        ),
+        "model_conditioned_pitch_contour_pitch_changed_ratio_review_required": bool(
+            evidence.get("model_conditioned_pitch_contour_pitch_changed_ratio_review_required", False)
+        ),
+        "model_conditioned_pitch_contour_audio_review_required": bool(
+            evidence.get("model_conditioned_pitch_contour_audio_review_required", False)
+        ),
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
         "midi_to_solo_musical_quality_claimed": bool(
             readiness.get("midi_to_solo_musical_quality_claimed", True)
@@ -335,6 +449,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- next boundary: `{decision['next_boundary']}`",
         f"- technical model-core MVP completed: `{_bool_token(audit['technical_model_core_mvp_completed'])}`",
         f"- phrase-bank CLI technical path completed: `{_bool_token(audit['phrase_bank_cli_technical_path_completed'])}`",
+        f"- model-conditioned pitch-contour objective completed: `{_bool_token(audit['model_conditioned_pitch_contour_objective_completed'])}`",
         f"- musical quality MVP completed: `{_bool_token(audit['musical_quality_mvp_completed'])}`",
         f"- human/audio preference completed: `{_bool_token(audit['human_audio_preference_completed'])}`",
         f"- product MVP completed: `{_bool_token(audit['product_mvp_completed'])}`",
@@ -354,6 +469,15 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- CLI candidate / rendered WAV: `{evidence['cli_candidate_count']}` / `{evidence['cli_rendered_audio_file_count']}`",
         f"- CLI input context bars: `{evidence['cli_input_context_bars']}`",
         f"- CLI preference fill allowed: `{_bool_token(evidence['cli_preference_fill_allowed'])}`",
+        f"- model-conditioned pitch-contour objective path ready: `{_bool_token(evidence['model_conditioned_pitch_contour_objective_path_ready'])}`",
+        f"- model-conditioned pitch-contour rendered WAV files: `{evidence['model_conditioned_pitch_contour_rendered_audio_file_count']}`",
+        f"- model-conditioned pitch-contour technical WAV validation: `{_bool_token(evidence['model_conditioned_pitch_contour_technical_wav_validation'])}`",
+        f"- model-conditioned pitch-contour max interval / threshold: `{evidence['model_conditioned_pitch_contour_max_interval']}` / `{evidence['model_conditioned_pitch_contour_max_interval_threshold']}`",
+        f"- model-conditioned pitch-contour target supported: `{_bool_token(evidence['model_conditioned_pitch_contour_target_supported'])}`",
+        f"- model-conditioned pitch-contour max pitch changed ratio: `{evidence['model_conditioned_pitch_contour_max_pitch_changed_ratio']:.4f}`",
+        f"- model-conditioned pitch-contour changed-ratio review required: `{_bool_token(evidence['model_conditioned_pitch_contour_pitch_changed_ratio_review_required'])}`",
+        f"- model-conditioned pitch-contour audio review required: `{_bool_token(evidence['model_conditioned_pitch_contour_audio_review_required'])}`",
+        f"- model-conditioned pitch-contour preference fill allowed: `{_bool_token(evidence['model_conditioned_pitch_contour_preference_fill_allowed'])}`",
         "",
         "## Claim Boundary",
         "",
@@ -388,6 +512,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_technical_mvp_completion", action="store_true")
     parser.add_argument("--require_no_quality_claim", action="store_true")
+    parser.add_argument("--require_model_conditioned_pitch_contour_objective", action="store_true")
     return parser
 
 
@@ -410,6 +535,9 @@ def main() -> int:
         expected_next_boundary=str(args.expected_next_boundary or ""),
         require_technical_mvp_completion=bool(args.require_technical_mvp_completion),
         require_no_quality_claim=bool(args.require_no_quality_claim),
+        require_model_conditioned_pitch_contour_objective=bool(
+            args.require_model_conditioned_pitch_contour_objective
+        ),
     )
     output_dir.mkdir(parents=True, exist_ok=True)
     write_json(output_dir / "stage_b_midi_to_solo_mvp_completion_audit.json", report)

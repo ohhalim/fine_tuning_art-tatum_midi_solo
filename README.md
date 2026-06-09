@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- latest evidence boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -105,9 +105,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase-bank CLI technical path included in current evidence: `true`
 - README evidence refreshed: `true`
 - MVP completion audit completed: `true`
+- MVP completion audit model-conditioned pitch-contour objective included: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -707,6 +708,23 @@ README evidence refresh.
 - model-conditioned pitch-contour changed-ratio review required: `true`
 - quality/preference claim excluded: `true`
 - next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+
+MVP completion audit.
+
+- latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_completion_audit`
+- source current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- technical model-core MVP completed: `true`
+- input to ranked MIDI completed: `true`
+- input to rendered WAV completed: `true`
+- selected-scale objective repair completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour max interval / threshold: `11 / 12`
+- model-conditioned pitch-contour changed-ratio review required: `true`
+- musical quality MVP completed: `false`
+- human/audio preference completed: `false`
+- product MVP completed: `false`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
 
 MIDI-to-solo input contract.
 
