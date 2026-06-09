@@ -1,0 +1,545 @@
+"""Decide the follow-up target after songlike melody contour repair evidence."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from collections import Counter
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT_DIR))
+
+from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next import (  # noqa: E402
+    BOUNDARY as OBJECTIVE_NEXT_BOUNDARY,
+    FOLLOWUP_DECISION_NEXT_BOUNDARY,
+)
+from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep import (  # noqa: E402
+    BOUNDARY as REPAIR_SWEEP_BOUNDARY,
+)
+
+
+class StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(ValueError):
+    pass
+
+
+BOUNDARY = "stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision"
+NEXT_BOUNDARY = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep"
+SELECTED_TARGET = "songlike_melody_contour_phrase_rhythm_repair_sweep"
+SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision_v1"
+TIE_TARGET_LABELS = (
+    "phrase_shape_missing_tension_release",
+    "rhythmic_monotony",
+)
+
+QUALITY_CLAIM_KEYS = [
+    "human_audio_preference_claimed",
+    "midi_to_solo_musical_quality_claimed",
+    "musical_quality_claimed",
+    "audio_rendered_quality_claimed",
+    "model_checkpoint_generation_quality_claimed",
+    "model_direct_generation_quality_claimed",
+    "broad_trained_model_quality_claimed",
+    "brad_style_adaptation_claimed",
+    "production_ready_claimed",
+]
+
+
+def _dict(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def _list(value: Any) -> list[Any]:
+    return value if isinstance(value, list) else []
+
+
+def _int(value: Any) -> int:
+    try:
+        return int(value or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _bool_token(value: Any) -> str:
+    return "true" if bool(value) else "false"
+
+
+def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
+    claimed = [name for name in QUALITY_CLAIM_KEYS if bool(container.get(name, False))]
+    if claimed:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            f"unexpected quality claim in {label}: {claimed}"
+        )
+
+
+def validate_objective_next_source(report: dict[str, Any]) -> dict[str, Any]:
+    readiness = _dict(report.get("readiness"))
+    decision = _dict(report.get("decision"))
+    summary = _dict(report.get("objective_summary"))
+    if str(report.get("boundary") or "") != OBJECTIVE_NEXT_BOUNDARY:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "songlike contour objective-only next decision boundary required"
+        )
+    if str(decision.get("next_boundary") or "") != FOLLOWUP_DECISION_NEXT_BOUNDARY:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "objective-only next decision must route to follow-up decision"
+        )
+    if str(decision.get("next_boundary") or "") != BOUNDARY:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "follow-up decision boundary mismatch"
+        )
+    if not bool(readiness.get("objective_next_decision_completed", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "objective next decision completion required"
+        )
+    if not bool(readiness.get("songlike_contour_followup_required", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "songlike contour follow-up requirement required"
+        )
+    if bool(summary.get("validated_review_input_present", True)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "follow-up decision expects pending listening input"
+        )
+    if bool(summary.get("preference_fill_allowed", True)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "preference fill must remain blocked"
+        )
+    if bool(summary.get("current_quality_claim_ready", True)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "quality claim readiness must remain false"
+        )
+    if not bool(summary.get("technical_wav_validation", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "technical WAV validation required"
+        )
+    if bool(decision.get("critical_user_input_required", True)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "critical user input should not be required"
+        )
+    _require_no_quality_claim(readiness, label="objective next readiness")
+    return {
+        "boundary": OBJECTIVE_NEXT_BOUNDARY,
+        "review_item_count": _int(summary.get("review_item_count")),
+        "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
+        "failure_label_delta": _int(summary.get("failure_label_delta")),
+        "technical_wav_validation": bool(summary.get("technical_wav_validation", False)),
+        "validated_review_input_present": bool(
+            summary.get("validated_review_input_present", False)
+        ),
+        "preference_fill_allowed": bool(summary.get("preference_fill_allowed", False)),
+        "current_quality_claim_ready": False,
+    }
+
+
+def _candidate_label_counts(rows: list[Any], key: str) -> dict[str, int]:
+    counts: Counter[str] = Counter()
+    for row_value in rows:
+        row = _dict(row_value)
+        labeling = _dict(
+            row.get("contour_repaired_labeling") or row.get("repaired_labeling")
+        )
+        labels = _list(labeling.get(key))
+        for label in labels:
+            counts[str(label)] += 1
+    return dict(sorted(counts.items()))
+
+
+def validate_repair_sweep_source(report: dict[str, Any]) -> dict[str, Any]:
+    readiness = _dict(report.get("readiness"))
+    decision = _dict(report.get("decision"))
+    aggregate = _dict(report.get("aggregate"))
+    rows = _list(report.get("candidate_repairs"))
+    if str(report.get("boundary") or "") != REPAIR_SWEEP_BOUNDARY:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "songlike melody contour repair sweep boundary required"
+        )
+    if not bool(readiness.get("songlike_melody_contour_repair_sweep_completed", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "repair sweep completion required"
+        )
+    if not bool(readiness.get("songlike_melody_contour_repair_target_supported", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "songlike contour repair support required"
+        )
+    if _int(aggregate.get("candidate_count")) < 6:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "candidate count below 6"
+        )
+    if _int(aggregate.get("failure_label_delta")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "positive failure label delta required"
+        )
+    if _int(aggregate.get("technical_regression_count")) != 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "technical regression must remain zero"
+        )
+    if bool(decision.get("critical_user_input_required", True)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "critical user input should not be required"
+        )
+    _require_no_quality_claim(readiness, label="repair sweep readiness")
+
+    remaining_counts = {
+        str(label): _int(count)
+        for label, count in _dict(aggregate.get("repaired_failure_counts")).items()
+        if _int(count) > 0
+    }
+    if not remaining_counts:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "remaining failure label counts required"
+        )
+    primary_count = max(remaining_counts.values())
+    primary_labels = [
+        label
+        for label, count in sorted(remaining_counts.items())
+        if int(count) == int(primary_count)
+    ]
+    if not rows:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "candidate repair rows required"
+        )
+    return {
+        "boundary": REPAIR_SWEEP_BOUNDARY,
+        "candidate_count": _int(aggregate.get("candidate_count")),
+        "source_total_failure_label_count": _int(
+            aggregate.get("source_total_failure_label_count")
+        ),
+        "repaired_total_failure_label_count": _int(
+            aggregate.get("repaired_total_failure_label_count")
+        ),
+        "failure_label_delta": _int(aggregate.get("failure_label_delta")),
+        "improved_candidate_count": _int(aggregate.get("improved_candidate_count")),
+        "technical_regression_count": _int(aggregate.get("technical_regression_count")),
+        "remaining_failure_counts": remaining_counts,
+        "primary_remaining_failure_labels": primary_labels,
+        "primary_remaining_failure_count": primary_count,
+        "phrase_rhythm_tie_target_supported": all(
+            label in primary_labels for label in TIE_TARGET_LABELS
+        ),
+        "not_evaluable_counts": _candidate_label_counts(rows, "not_evaluable_labels"),
+    }
+
+
+def build_followup_decision_report(
+    *,
+    objective_next_report: dict[str, Any],
+    repair_sweep_report: dict[str, Any],
+    output_dir: Path,
+    issue_number: int,
+) -> dict[str, Any]:
+    objective = validate_objective_next_source(objective_next_report)
+    sweep = validate_repair_sweep_source(repair_sweep_report)
+    primary_labels = [str(label) for label in _list(sweep["primary_remaining_failure_labels"])]
+    tie_target_supported = bool(sweep["phrase_rhythm_tie_target_supported"])
+    selected_target = (
+        SELECTED_TARGET if tie_target_supported else "songlike_melody_contour_repair_followup_sweep"
+    )
+    next_boundary = (
+        NEXT_BOUNDARY
+        if tie_target_supported
+        else "stage_b_midi_to_solo_songlike_melody_contour_repair_followup_sweep"
+    )
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "created_at": datetime.now(timezone.utc)
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z"),
+        "output_dir": str(output_dir),
+        "issue_number": int(issue_number),
+        "boundary": BOUNDARY,
+        "source_boundary": objective["boundary"],
+        "repair_sweep_boundary": sweep["boundary"],
+        "objective_summary": objective,
+        "repair_sweep_summary": sweep,
+        "selected_next_target": {
+            "selected_target": selected_target,
+            "selected_next_boundary": next_boundary,
+            "primary_remaining_failure_labels": primary_labels,
+            "primary_remaining_failure_count": _int(
+                sweep["primary_remaining_failure_count"]
+            ),
+            "reason": "tied phrase-shape and rhythmic-monotony labels selected for objective repair sweep",
+        },
+        "followup_targets": {
+            "primary_labels": primary_labels,
+            "secondary_failure_counts": sweep["remaining_failure_counts"],
+            "not_evaluable_counts": sweep["not_evaluable_counts"],
+            "preserve_gates": [
+                "grammar_valid",
+                "strict_valid",
+                "technical_regression_count_zero",
+                "no_quality_claim",
+            ],
+        },
+        "readiness": {
+            "boundary": BOUNDARY,
+            "followup_decision_completed": True,
+            "phrase_rhythm_tie_target_selected": tie_target_supported,
+            "candidate_count": _int(sweep["candidate_count"]),
+            "source_total_failure_label_count": _int(
+                sweep["source_total_failure_label_count"]
+            ),
+            "repaired_total_failure_label_count": _int(
+                sweep["repaired_total_failure_label_count"]
+            ),
+            "failure_label_delta": _int(sweep["failure_label_delta"]),
+            "technical_regression_count": _int(sweep["technical_regression_count"]),
+            "human_audio_preference_claimed": False,
+            "audio_rendered_quality_claimed": False,
+            "midi_to_solo_musical_quality_claimed": False,
+            "model_checkpoint_generation_quality_claimed": False,
+            "model_direct_generation_quality_claimed": False,
+            "broad_trained_model_quality_claimed": False,
+            "brad_style_adaptation_claimed": False,
+            "production_ready_claimed": False,
+        },
+        "decision": {
+            "current_boundary": BOUNDARY,
+            "next_boundary": next_boundary,
+            "auto_progress_allowed": True,
+            "critical_user_input_required": False,
+            "reason": "remaining objective failure labels route to follow-up repair without quality claim",
+        },
+        "not_proven": [
+            "human_audio_preference",
+            "midi_to_solo_musical_quality",
+            "audio_rendered_quality",
+            "outside_soloing_without_context",
+            "weak_chord_tone_landing",
+            "broad_trained_model_quality",
+        ],
+        "next_recommended_issue": "Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep"
+        if next_boundary == NEXT_BOUNDARY
+        else "Stage B MIDI-to-solo songlike melody contour repair follow-up sweep",
+    }
+
+
+def validate_followup_decision_report(
+    report: dict[str, Any],
+    *,
+    expected_boundary: str | None,
+    expected_next_boundary: str | None,
+    expected_target: str | None,
+    require_followup_decision: bool,
+    require_phrase_rhythm_tie_target: bool,
+    require_no_quality_claim: bool,
+) -> dict[str, Any]:
+    boundary = str(report.get("boundary") or "")
+    readiness = _dict(report.get("readiness"))
+    decision = _dict(report.get("decision"))
+    selected = _dict(report.get("selected_next_target"))
+    sweep = _dict(report.get("repair_sweep_summary"))
+    if expected_boundary and boundary != expected_boundary:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            f"expected boundary {expected_boundary}, got {boundary}"
+        )
+    if expected_next_boundary and str(decision.get("next_boundary") or "") != expected_next_boundary:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "unexpected next boundary"
+        )
+    if expected_target and str(selected.get("selected_target") or "") != expected_target:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "unexpected selected target"
+        )
+    if require_followup_decision and not bool(
+        readiness.get("followup_decision_completed", False)
+    ):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "follow-up decision completion required"
+        )
+    if require_phrase_rhythm_tie_target and not bool(
+        readiness.get("phrase_rhythm_tie_target_selected", False)
+    ):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "phrase/rhythm tie target selection required"
+        )
+    if _int(readiness.get("technical_regression_count")) != 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "technical regression must remain zero"
+        )
+    if _int(readiness.get("failure_label_delta")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "positive failure label delta required"
+        )
+    if _int(selected.get("primary_remaining_failure_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "primary failure label count required"
+        )
+    if bool(decision.get("critical_user_input_required", True)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            "critical user input should not be required"
+        )
+    if require_no_quality_claim:
+        _require_no_quality_claim(readiness, label="follow-up readiness")
+    return {
+        "boundary": boundary,
+        "source_boundary": str(report.get("source_boundary") or ""),
+        "repair_sweep_boundary": str(report.get("repair_sweep_boundary") or ""),
+        "next_boundary": str(decision.get("next_boundary") or ""),
+        "selected_target": str(selected.get("selected_target") or ""),
+        "followup_decision_completed": bool(
+            readiness.get("followup_decision_completed", False)
+        ),
+        "phrase_rhythm_tie_target_selected": bool(
+            readiness.get("phrase_rhythm_tie_target_selected", False)
+        ),
+        "primary_remaining_failure_labels": [
+            str(label) for label in _list(selected.get("primary_remaining_failure_labels"))
+        ],
+        "primary_remaining_failure_count": _int(
+            selected.get("primary_remaining_failure_count")
+        ),
+        "candidate_count": _int(readiness.get("candidate_count")),
+        "source_total_failure_label_count": _int(
+            readiness.get("source_total_failure_label_count")
+        ),
+        "repaired_total_failure_label_count": _int(
+            readiness.get("repaired_total_failure_label_count")
+        ),
+        "failure_label_delta": _int(readiness.get("failure_label_delta")),
+        "technical_regression_count": _int(readiness.get("technical_regression_count")),
+        "remaining_failure_counts": _dict(sweep.get("remaining_failure_counts")),
+        "not_evaluable_counts": _dict(sweep.get("not_evaluable_counts")),
+        "human_audio_preference_claimed": bool(
+            readiness.get("human_audio_preference_claimed", True)
+        ),
+        "midi_to_solo_musical_quality_claimed": bool(
+            readiness.get("midi_to_solo_musical_quality_claimed", True)
+        ),
+        "critical_user_input_required": bool(
+            decision.get("critical_user_input_required", True)
+        ),
+        "next_recommended_issue": str(report.get("next_recommended_issue") or ""),
+    }
+
+
+def markdown_report(report: dict[str, Any]) -> str:
+    readiness = report["readiness"]
+    decision = report["decision"]
+    selected = report["selected_next_target"]
+    sweep = report["repair_sweep_summary"]
+    lines = [
+        "# Stage B MIDI-to-Solo Songlike Melody Contour Repair Follow-Up Decision",
+        "",
+        "## Summary",
+        "",
+        f"- boundary: `{report['boundary']}`",
+        f"- source boundary: `{report['source_boundary']}`",
+        f"- repair sweep boundary: `{report['repair_sweep_boundary']}`",
+        f"- next boundary: `{decision['next_boundary']}`",
+        f"- selected target: `{selected['selected_target']}`",
+        f"- primary remaining failure labels: `{','.join(selected['primary_remaining_failure_labels'])}`",
+        f"- primary remaining failure count: `{selected['primary_remaining_failure_count']}`",
+        f"- phrase/rhythm tie target selected: `{_bool_token(readiness['phrase_rhythm_tie_target_selected'])}`",
+        f"- candidate count: `{readiness['candidate_count']}`",
+        f"- source total failure labels: `{readiness['source_total_failure_label_count']}`",
+        f"- repaired total failure labels: `{readiness['repaired_total_failure_label_count']}`",
+        f"- failure label delta: `{readiness['failure_label_delta']}`",
+        f"- technical regression count: `{readiness['technical_regression_count']}`",
+        f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
+        f"- MIDI-to-solo musical quality claimed: `{_bool_token(readiness['midi_to_solo_musical_quality_claimed'])}`",
+        "",
+        "## Remaining Failure Counts",
+        "",
+    ]
+    for label, count in sweep["remaining_failure_counts"].items():
+        lines.append(f"- `{label}`: `{count}`")
+    lines.extend(
+        [
+            "",
+            "## Not Evaluable Counts",
+            "",
+        ]
+    )
+    for label, count in sweep["not_evaluable_counts"].items():
+        lines.append(f"- `{label}`: `{count}`")
+    lines.extend(
+        [
+            "",
+            "## Decision",
+            "",
+            f"- reason: `{decision['reason']}`",
+            f"- auto progress allowed: `{_bool_token(decision['auto_progress_allowed'])}`",
+            f"- critical user input required: `{_bool_token(decision['critical_user_input_required'])}`",
+            f"- next recommended issue: `{report['next_recommended_issue']}`",
+            "",
+            "## Claim Boundary",
+            "",
+        ]
+    )
+    for item in report["not_proven"]:
+        lines.append(f"- `{item}`")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Decide songlike melody contour repair follow-up target"
+    )
+    parser.add_argument("--objective_next_report", type=str, required=True)
+    parser.add_argument("--repair_sweep_report", type=str, required=True)
+    parser.add_argument(
+        "--output_root",
+        type=str,
+        default="outputs/stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision",
+    )
+    parser.add_argument("--run_id", type=str, default=None)
+    parser.add_argument("--doc_path", type=str, default="")
+    parser.add_argument("--issue_number", type=int, default=772)
+    parser.add_argument("--expected_boundary", type=str, default="")
+    parser.add_argument("--expected_next_boundary", type=str, default="")
+    parser.add_argument("--expected_target", type=str, default="")
+    parser.add_argument("--require_followup_decision", action="store_true")
+    parser.add_argument("--require_phrase_rhythm_tie_target", action="store_true")
+    parser.add_argument("--require_no_quality_claim", action="store_true")
+    return parser
+
+
+def main() -> int:
+    args = build_parser().parse_args()
+    run_id = args.run_id or datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    output_dir = Path(args.output_root) / run_id
+    report = build_followup_decision_report(
+        objective_next_report=read_json(Path(args.objective_next_report)),
+        repair_sweep_report=read_json(Path(args.repair_sweep_report)),
+        output_dir=output_dir,
+        issue_number=int(args.issue_number),
+    )
+    summary = validate_followup_decision_report(
+        report,
+        expected_boundary=str(args.expected_boundary or ""),
+        expected_next_boundary=str(args.expected_next_boundary or ""),
+        expected_target=str(args.expected_target or ""),
+        require_followup_decision=bool(args.require_followup_decision),
+        require_phrase_rhythm_tie_target=bool(args.require_phrase_rhythm_tie_target),
+        require_no_quality_claim=bool(args.require_no_quality_claim),
+    )
+    output_dir.mkdir(parents=True, exist_ok=True)
+    write_json(
+        output_dir
+        / "stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision.json",
+        report,
+    )
+    write_json(
+        output_dir
+        / "stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision_validation_summary.json",
+        summary,
+    )
+    markdown = markdown_report(report)
+    write_text(
+        output_dir / "stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision.md",
+        markdown,
+    )
+    if args.doc_path:
+        write_text(Path(args.doc_path), markdown)
+    print(json.dumps(summary, ensure_ascii=True, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -4875,6 +4875,47 @@ Issue #770은 Issue #768 input guard 이후 listening input 없이 objective evi
 
 - `Stage B MIDI-to-solo songlike melody contour repair follow-up decision`
 
+## 9.77 Stage B MIDI-to-solo songlike melody contour repair follow-up decision
+
+Issue #772는 Issue #770 objective-only next decision과 Issue #762 songlike contour repair sweep 결과를 함께 검증해 다음 repair target을 정한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision`
+- repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- selected target: `songlike_melody_contour_phrase_rhythm_repair_sweep`
+- primary remaining failure labels: `phrase_shape_missing_tension_release`, `rhythmic_monotony`
+- primary remaining failure count: `2`
+- phrase/rhythm tie target selected: `true`
+- candidate count: `6`
+- source total failure labels: `8`
+- repaired total failure labels: `4`
+- failure label delta: `4`
+- technical regression count: `0`
+- not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- songlike label은 `5 -> 0`으로 제거됐지만 품질 claim으로 승격하지 않음.
+- 잔여 failure label은 phrase shape와 rhythmic monotony가 각각 `2`로 동률.
+- 단일 dominant label 단정 대신 phrase/rhythm repair target으로 분리.
+- 다음 boundary는 songlike contour phrase/rhythm repair sweep.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_repair_followup.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-repair-followup-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
