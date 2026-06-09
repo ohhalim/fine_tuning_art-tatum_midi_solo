@@ -119,6 +119,11 @@
 - preference fill allowed: `false`
 - critical user input required: `false`
 - 다음 decision target: `songlike_melody_contour_repair_objective_only_next_decision`
+- songlike melody contour repair objective-only next decision 완료
+- songlike contour follow-up required: `true`
+- current quality claim ready: `false`
+- next boundary: `songlike_melody_contour_repair_followup_decision`
+- 다음 follow-up target: `songlike_melody_contour_repair_followup_decision`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
