@@ -276,6 +276,8 @@ Modes:
                 Select objective-only next boundary after songlike contour input guard.
   stage-b-midi-to-solo-songlike-melody-contour-repair-followup-decision
                 Select phrase/rhythm repair target after songlike contour objective evidence.
+  stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-sweep
+                Run phrase/rhythm repair sweep for songlike contour candidates.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision
                 Decide the next pitch-contour changed-ratio repair boundary.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-probe
@@ -6450,6 +6452,43 @@ run_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep() {
+  local followup_run_id="${FOLLOWUP_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision}"
+  local source_sweep_run_id="${SOURCE_SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep}"
+  local rubric_run_id="${RUBRIC_RUN_ID:-harness_stage_b_midi_to_solo_quality_rubric_baseline}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep}"
+  local followup_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision/${followup_run_id}/stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision.json"
+  local source_sweep_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_repair_sweep/${source_sweep_run_id}/stage_b_midi_to_solo_songlike_melody_contour_repair_sweep.json"
+  local rubric_report="outputs/stage_b_midi_to_solo_quality_rubric_baseline/${rubric_run_id}/stage_b_midi_to_solo_quality_rubric_baseline.json"
+  if [[ ! -f "$followup_report" ]]; then
+    print_header "Stage B MIDI-to-solo songlike melody contour repair follow-up decision"
+    RUN_ID="$followup_run_id" run_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision
+  fi
+  if [[ ! -f "$source_sweep_report" ]]; then
+    print_header "Stage B MIDI-to-solo songlike melody contour repair sweep"
+    RUN_ID="$source_sweep_run_id" run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep
+  fi
+  if [[ ! -f "$rubric_report" ]]; then
+    print_header "Stage B MIDI-to-solo quality rubric baseline"
+    RUN_ID="$rubric_run_id" run_stage_b_midi_to_solo_quality_rubric_baseline
+  fi
+  print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep"
+  "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep.py \
+    --run_id "$run_id" \
+    --followup_decision "$followup_report" \
+    --source_repair_sweep "$source_sweep_report" \
+    --rubric_baseline "$rubric_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_REPAIR_SWEEP_2026-06-09.md \
+    --issue_number 774 \
+    --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep \
+    --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package \
+    --min_candidate_count 6 \
+    --require_sweep_completed \
+    --require_target_supported \
+    --require_phrase_rhythm_delta \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision}"
@@ -8751,6 +8790,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-songlike-melody-contour-repair-followup-decision)
     run_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision
+    ;;
+  stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-sweep)
+    run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep
     ;;
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision)
     run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision

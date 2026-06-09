@@ -4916,6 +4916,49 @@ Issue #772는 Issue #770 objective-only next decision과 Issue #762 songlike con
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep`
 
+## 9.78 Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep
+
+Issue #774는 Issue #772 follow-up decision과 Issue #762 songlike contour repair sweep 결과를 기준으로 phrase shape와 rhythmic monotony 잔여 라벨을 줄이는 repair sweep을 검증한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
+- source repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package`
+- selected target: `songlike_melody_contour_phrase_rhythm_repair_audio_package`
+- candidate count: `6`
+- total failure labels: `4 -> 1`
+- failure label delta: `3`
+- phrase/rhythm failure count: `4 -> 1`
+- phrase/rhythm failure delta: `3`
+- improved candidate count: `2`
+- repaired failure counts: `rhythmic_monotony=1`
+- technical regression count: `0`
+- target supported: `true`
+- audio package ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- Issue #772에서 동률로 남은 `phrase_shape_missing_tension_release`, `rhythmic_monotony`를 repair target으로 분리.
+- phrase/rhythm failure label 기준 `4 -> 1` 감소.
+- technical regression은 `0`으로 유지.
+- 객관 지표 감소는 확인했지만 listening preference와 musical quality claim은 제외.
+- 다음 boundary는 phrase/rhythm repaired 후보 WAV package.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-sweep`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
