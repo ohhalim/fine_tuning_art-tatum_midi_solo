@@ -240,6 +240,8 @@ Modes:
                 Audit technical model-core MVP completion and separate remaining quality claims.
   stage-b-midi-to-solo-quality-gap-decision
                 Decide the next quality-gap repair target after technical MVP completion.
+  stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision
+                Decide the next pitch-contour changed-ratio repair boundary.
   stage-b-midi-to-solo-model-conditioned-input-path-quality-alignment
                 Decide model-conditioned input-path alignment requirements and next probe target.
   stage-b-midi-to-solo-model-conditioned-input-path-listening-review-input-guard
@@ -5953,6 +5955,28 @@ run_stage_b_midi_to_solo_quality_gap_decision() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision() {
+  local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision}"
+  local quality_gap="outputs/stage_b_midi_to_solo_quality_gap_decision/${quality_gap_run_id}/stage_b_midi_to_solo_quality_gap_decision.json"
+  if [[ ! -f "$quality_gap" ]]; then
+    print_header "Stage B MIDI-to-solo quality gap decision"
+    RUN_ID="$quality_gap_run_id" run_stage_b_midi_to_solo_quality_gap_decision
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review.py \
+    --run_id "$run_id" \
+    --quality_gap_decision "$quality_gap" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_PITCH_CONTOUR_CHANGED_RATIO_REVIEW_DECISION_2026-06-09.md \
+    --issue_number 716 \
+    --changed_ratio_review_threshold 0.5 \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe \
+    --expected_target lower_pitch_change_ratio_repair_probe \
+    --require_repair_probe \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment}"
@@ -8058,6 +8082,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-quality-gap-decision)
     run_stage_b_midi_to_solo_quality_gap_decision
+    ;;
+  stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision)
+    run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-quality-alignment)
     run_stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment
