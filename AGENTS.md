@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #692, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair audio package.
+- Latest functional issue completed: Issue #694, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair objective next decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-conditioned input path dead-air timing repair objective next decision.
+- Recommended next issue: Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1132,6 +1132,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-
 ```
 
 This harness renders repaired model-conditioned dead-air/timing MIDI candidates to WAV and verifies technical audio metadata without claiming musical quality.
+
+For Stage B MIDI-to-solo model-conditioned input path dead-air timing repair objective next decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-objective-next
+```
+
+This harness selects the next objective repair boundary after repaired dead-air/timing audio evidence without claiming musical quality.
 
 For Stage B MIDI-to-solo phrase-bank retrieval baseline changes, run:
 
