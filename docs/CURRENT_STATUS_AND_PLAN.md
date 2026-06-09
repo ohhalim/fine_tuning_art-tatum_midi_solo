@@ -113,6 +113,12 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 guard target: `songlike_melody_contour_repair_listening_review_input_guard`
+- songlike melody contour repair listening review input guard 완료
+- required input field count: `4`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- critical user input required: `false`
+- 다음 decision target: `songlike_melody_contour_repair_objective_only_next_decision`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
