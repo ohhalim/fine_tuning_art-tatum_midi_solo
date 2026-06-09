@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #746, Stage B MIDI-to-solo quality rubric baseline
-- 다음 권장 이슈: `Stage B MIDI-to-solo candidate failure labeling`
+- latest functional result: Issue #748, Stage B MIDI-to-solo candidate failure labeling
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair sweep`
 
 현재 범위가 아닌 것:
 
@@ -90,6 +90,7 @@
 - final status audit 완료
 - post-MVP musical quality iteration plan 완료
 - quality rubric baseline 완료
+- candidate failure labeling 완료
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
@@ -1940,6 +1941,53 @@ Issue #746은 Issue #744 post-MVP quality iteration plan 이후 candidate failur
 다음:
 
 - `Stage B MIDI-to-solo candidate failure labeling`
+
+## Stage B MIDI-to-Solo Candidate Failure Labeling Result
+
+Issue #748은 Issue #746 quality rubric baseline 이후 현재 MIDI 후보를 rubric 기준으로 labeling한 작업이다.
+
+변경:
+
+- candidate failure labeling script 추가
+- quality rubric baseline report와 MVP delivery package 입력 검증 연결
+- current candidate 6개 MIDI note metric 산출
+- chord context 부재 항목을 not_evaluable로 분리
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CANDIDATE_FAILURE_LABELING_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- source boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- selected target: `targeted_quality_repair_sweep`
+- candidate count: `6`
+- failed candidate count: `6`
+- failure label type count: `4`
+- not evaluable label type count: `2`
+- failure counts: `dead_air_or_density_gap=1`, `phrase_shape_missing_tension_release=2`, `rhythmic_monotony=3`, `songlike_melody_not_soloing=6`
+- not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
+- targeted quality repair sweep ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- 현재 후보 6개 모두 musical-quality rubric 기준 repair 대상.
+- 공통 실패 신호는 songlike melody. CLI 후보 3개는 rhythm monotony 동반.
+- chord context 없는 항목은 실패로 단정하지 않고 not_evaluable로 유지.
+- 다음 boundary는 targeted quality repair sweep.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_candidate_failure_labeling`
+- `.venv/bin/python -m py_compile scripts/label_stage_b_midi_to_solo_candidate_failures.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-candidate-failure-labeling`
+
+다음:
+
+- `Stage B MIDI-to-solo targeted quality repair sweep`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
