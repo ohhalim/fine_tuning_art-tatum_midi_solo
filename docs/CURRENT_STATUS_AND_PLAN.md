@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #696, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour probe`
+- latest functional result: Issue #698, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour probe
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour audio package`
 
 현재 범위가 아닌 것:
 
@@ -65,6 +65,57 @@
 - model-conditioned input path dead-air/timing repaired 후보 3개 WAV technical render 완료
 - model-conditioned input path dead-air/timing repaired evidence 기준 pitch-contour follow-up 필요 판정
 - model-conditioned input path dead-air/timing repaired evidence 기준 pitch-contour repair target 정의 완료
+- model-conditioned input path dead-air/timing repaired 후보 3개 pitch-contour objective repair 통과
+
+## Stage B MIDI-to-Solo Model-Conditioned Input Path Dead-Air Timing Repair Pitch Contour Probe Result
+
+Issue #698은 Issue #696 pitch-contour decision 결과와 Issue #690 dead-air timing repair MIDI를 source로 사용해 wide interval objective repair를 실행한 작업이다.
+
+변경:
+
+- model-conditioned input path dead-air timing repair pitch contour probe script 추가
+- pitch class 유지 + octave contour fold 기반 repaired MIDI export
+- max interval, dead-air, monophonic, unique pitch guardrail 검증
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_DEAD_AIR_TIMING_REPAIR_PITCH_CONTOUR_PROBE_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_probe`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package`
+- repaired / passed candidates: `3 / 3`
+- source max interval: `62`
+- repaired max interval: `11`
+- target max interval: `12`
+- interval reduction: `51`
+- required interval reduction min: `50`
+- source dead-air max: `0.0000`
+- repaired dead-air max: `0.0000`
+- max simultaneous notes: `1`
+- min repaired unique pitch count: `22`
+- max pitch changed ratio: `0.7174`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- max interval target 통과.
+- dead-air target 유지.
+- monophonic gate 유지.
+- pitch changed ratio `0.7174`로 audio review 필요.
+- 음악적 품질 claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_probe`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_probe.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-probe`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour audio package`
 
 ## Stage B MIDI-to-Solo Model-Conditioned Input Path Dead-Air Timing Repair Pitch Contour Decision Result
 
