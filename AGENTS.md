@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #722, Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair listening review package.
+- Latest functional issue completed: Issue #724, Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair listening review input guard.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair listening review input guard.
+- Recommended next issue: Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair objective-only next decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1076,6 +1076,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-pitch-conto
 ```
 
 This harness packages changed-ratio repaired WAV/MIDI candidates for pending listening review without claiming musical quality or human/audio preference.
+
+For Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair listening review input guard changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-listening-review-input-guard
+```
+
+This harness blocks changed-ratio repair preference fill while listening review input is pending.
 
 For Stage B MIDI-to-solo model-conditioned input path quality alignment changes, run:
 
