@@ -290,6 +290,8 @@ Modes:
                 Select chord-context pitch-role bridge after phrase/rhythm objective evidence.
   stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-context-pitch-role-bridge
                 Build chord-context pitch-role metrics for phrase/rhythm repair candidates.
+  stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-context-pitch-role-objective-decision
+                Select next repair target from chord-context pitch-role objective evidence.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision
                 Decide the next pitch-contour changed-ratio repair boundary.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-probe
@@ -6645,6 +6647,27 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pit
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision() {
+  local bridge_run_id="${BRIDGE_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision}"
+  local bridge_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge/${bridge_run_id}/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge.json"
+  if [[ ! -f "$bridge_report" ]]; then
+    print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge"
+    RUN_ID="$bridge_run_id" run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge
+  fi
+  print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective.py \
+    --run_id "$run_id" \
+    --bridge_report "$bridge_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_CONTEXT_PITCH_ROLE_OBJECTIVE_DECISION_2026-06-09.md \
+    --issue_number 788 \
+    --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision \
+    --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep \
+    --expected_target songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep \
+    --require_objective_decision \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision}"
@@ -8967,6 +8990,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-context-pitch-role-bridge)
     run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge
+    ;;
+  stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-context-pitch-role-objective-decision)
+    run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision
     ;;
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision)
     run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision
