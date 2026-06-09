@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #716, Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision.
+- Latest functional issue completed: Issue #718, Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair probe.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair probe.
+- Recommended next issue: Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair audio package.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1052,6 +1052,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-pitch-conto
 ```
 
 This harness routes pitch-contour changed-ratio review evidence to the next repair probe without claiming musical quality or human/audio preference.
+
+For Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair probe changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-probe
+```
+
+This harness repairs pitch-contour candidates with a lower pitch-change ratio objective and routes passed repaired MIDI candidates to audio render packaging without claiming musical quality.
 
 For Stage B MIDI-to-solo model-conditioned input path quality alignment changes, run:
 
