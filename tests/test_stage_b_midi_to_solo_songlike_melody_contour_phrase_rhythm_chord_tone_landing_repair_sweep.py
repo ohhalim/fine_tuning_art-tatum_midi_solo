@@ -1,0 +1,201 @@
+from __future__ import annotations
+
+import tempfile
+import unittest
+from pathlib import Path
+
+import pretty_midi
+
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
+    BOUNDARY as BRIDGE_BOUNDARY,
+)
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective import (
+    BOUNDARY as OBJECTIVE_BOUNDARY,
+    NEXT_BOUNDARY as OBJECTIVE_NEXT_BOUNDARY,
+    SELECTED_TARGET as OBJECTIVE_SELECTED_TARGET,
+)
+from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep import (
+    BOUNDARY,
+    NEXT_BOUNDARY,
+    SELECTED_TARGET,
+    StageBMidiToSoloChordToneLandingRepairSweepError,
+    build_repair_sweep_report,
+    validate_repair_sweep_report,
+)
+
+
+CHORDS = ["Cm7", "Fm7", "Bb7", "Ebmaj7"]
+
+
+def write_weak_landing_midi(path: Path, *, bpm: float = 124.0) -> None:
+    seconds_per_beat = 60.0 / bpm
+    midi = pretty_midi.PrettyMIDI(initial_tempo=bpm)
+    instrument = pretty_midi.Instrument(program=0)
+    weak_pitches = [61, 66, 59, 64]
+    for bar in range(8):
+        base_start = bar * 4.0 * seconds_per_beat
+        for offset, pitch in enumerate(weak_pitches):
+            start = base_start + offset * 1.0 * seconds_per_beat
+            end = start + 0.35 * seconds_per_beat
+            instrument.notes.append(
+                pretty_midi.Note(velocity=90, pitch=pitch, start=start, end=end)
+            )
+    midi.instruments.append(instrument)
+    midi.write(str(path))
+
+
+def objective_decision_report(*, quality_claim: bool = False) -> dict:
+    return {
+        "boundary": OBJECTIVE_BOUNDARY,
+        "selected_next_target": {
+            "selected_target": OBJECTIVE_SELECTED_TARGET,
+        },
+        "readiness": {
+            "pitch_role_objective_decision_completed": True,
+            "candidate_count": 6,
+            "weak_chord_tone_landing_risk_count": 6,
+            "outside_soloing_pitch_role_risk_count": 5,
+            "human_audio_preference_claimed": False,
+            "midi_to_solo_musical_quality_claimed": quality_claim,
+            "audio_rendered_quality_claimed": False,
+            "model_checkpoint_generation_quality_claimed": False,
+            "model_direct_generation_quality_claimed": False,
+            "broad_trained_model_quality_claimed": False,
+            "brad_style_adaptation_claimed": False,
+            "production_ready_claimed": False,
+        },
+        "decision": {
+            "next_boundary": OBJECTIVE_NEXT_BOUNDARY,
+            "critical_user_input_required": False,
+        },
+    }
+
+
+def bridge_report(midi_paths: list[Path], *, quality_claim: bool = False) -> dict:
+    return {
+        "boundary": BRIDGE_BOUNDARY,
+        "context": {
+            "chord_progression": CHORDS,
+            "bpm": 124.0,
+        },
+        "contextualized_candidates": [
+            {
+                "rank": index,
+                "midi_path": str(path),
+                "bridge_metrics": {
+                    "bar_count": 8,
+                    "chord_tone_ratio": 0.2,
+                    "strong_beat_chord_tone_ratio": 0.0,
+                    "cadence_landing_chord_tone": False,
+                    "cadence_landing_role": "approach",
+                    "max_non_chord_tone_run": 5,
+                },
+                "bridge_flags": ["weak_chord_tone_landing_risk"],
+            }
+            for index, path in enumerate(midi_paths, start=1)
+        ],
+        "readiness": {
+            "candidate_count": 6,
+            "not_evaluable_after_count": 0,
+            "human_audio_preference_claimed": False,
+            "midi_to_solo_musical_quality_claimed": quality_claim,
+            "audio_rendered_quality_claimed": False,
+            "model_checkpoint_generation_quality_claimed": False,
+            "model_direct_generation_quality_claimed": False,
+            "broad_trained_model_quality_claimed": False,
+            "brad_style_adaptation_claimed": False,
+            "production_ready_claimed": False,
+        },
+        "decision": {
+            "next_boundary": OBJECTIVE_BOUNDARY,
+            "critical_user_input_required": False,
+        },
+    }
+
+
+class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
+    def test_repairs_final_landing_and_routes_audio_package(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            midi_paths = []
+            for index in range(6):
+                midi_path = root / f"candidate_{index}.mid"
+                write_weak_landing_midi(midi_path)
+                midi_paths.append(midi_path)
+
+            report = build_repair_sweep_report(
+                objective_decision_report=objective_decision_report(),
+                bridge_report=bridge_report(midi_paths),
+                output_dir=root / "repair",
+                issue_number=790,
+            )
+            summary = validate_repair_sweep_report(
+                report,
+                expected_boundary=BOUNDARY,
+                expected_next_boundary=NEXT_BOUNDARY,
+                require_repair_completed=True,
+                require_target_supported=True,
+                require_no_quality_claim=True,
+            )
+
+            self.assertTrue(summary["chord_tone_landing_repair_sweep_completed"])
+            self.assertEqual(summary["candidate_count"], 6)
+            self.assertEqual(summary["repaired_midi_count"], 6)
+            self.assertGreater(summary["changed_note_total"], 0)
+            self.assertGreater(summary["weak_chord_tone_landing_risk_delta"], 0)
+            self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
+            self.assertEqual(summary["selected_target"], SELECTED_TARGET)
+            self.assertFalse(summary["human_audio_preference_claimed"])
+            self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
+
+    def test_rejects_objective_quality_claim(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            midi_paths = []
+            for index in range(6):
+                midi_path = root / f"candidate_{index}.mid"
+                write_weak_landing_midi(midi_path)
+                midi_paths.append(midi_path)
+
+            with self.assertRaises(StageBMidiToSoloChordToneLandingRepairSweepError):
+                build_repair_sweep_report(
+                    objective_decision_report=objective_decision_report(quality_claim=True),
+                    bridge_report=bridge_report(midi_paths),
+                    output_dir=root / "repair",
+                    issue_number=790,
+                )
+
+    def test_rejects_bridge_quality_claim(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            midi_paths = []
+            for index in range(6):
+                midi_path = root / f"candidate_{index}.mid"
+                write_weak_landing_midi(midi_path)
+                midi_paths.append(midi_path)
+
+            with self.assertRaises(StageBMidiToSoloChordToneLandingRepairSweepError):
+                build_repair_sweep_report(
+                    objective_decision_report=objective_decision_report(),
+                    bridge_report=bridge_report(midi_paths, quality_claim=True),
+                    output_dir=root / "repair",
+                    issue_number=790,
+                )
+
+    def test_constants_are_stable(self) -> None:
+        self.assertEqual(
+            BOUNDARY,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep",
+        )
+        self.assertEqual(
+            NEXT_BOUNDARY,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package",
+        )
+        self.assertEqual(
+            SELECTED_TARGET,
+            "songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package",
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()
