@@ -1,0 +1,265 @@
+from __future__ import annotations
+
+import tempfile
+import unittest
+from pathlib import Path
+
+from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
+    build_quality_rubric_baseline_report,
+)
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_repair_followup import (
+    BOUNDARY as FOLLOWUP_BOUNDARY,
+    NEXT_BOUNDARY as FOLLOWUP_NEXT_BOUNDARY,
+    SELECTED_TARGET as FOLLOWUP_SELECTED_TARGET,
+    TIE_TARGET_LABELS,
+)
+from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
+    BOUNDARY as POST_MVP_BOUNDARY,
+    NEXT_BOUNDARY as POST_MVP_NEXT_BOUNDARY,
+    SELECTED_TARGET as POST_MVP_SELECTED_TARGET,
+)
+from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep import (
+    BOUNDARY,
+    NEXT_BOUNDARY,
+    SELECTED_TARGET,
+    StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError,
+    build_songlike_melody_contour_phrase_rhythm_repair_sweep_report,
+    validate_songlike_melody_contour_phrase_rhythm_repair_sweep_report,
+)
+from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep import (
+    BOUNDARY as SOURCE_SWEEP_BOUNDARY,
+)
+
+
+def post_mvp_quality_plan() -> dict:
+    return {
+        "boundary": POST_MVP_BOUNDARY,
+        "selected_next_target": {
+            "selected_target": POST_MVP_SELECTED_TARGET,
+            "selected_next_boundary": POST_MVP_NEXT_BOUNDARY,
+        },
+        "ordered_work": [
+            {"target": "quality_rubric_baseline"},
+            {"target": "candidate_failure_labeling"},
+            {"target": "targeted_quality_repair_sweep"},
+            {"target": "audio_review_package"},
+        ],
+        "quality_failure_taxonomy_seed": [f"failure_{index}" for index in range(7)],
+        "post_mvp_status": {
+            "technical_mvp_complete": True,
+            "local_review_ready": True,
+            "human_audio_preference_claimed": False,
+            "midi_to_solo_musical_quality_claimed": False,
+        },
+        "readiness": {
+            "post_mvp_quality_iteration_plan_completed": True,
+            "quality_rubric_required": True,
+            "candidate_failure_labeling_required": True,
+            "targeted_quality_repair_sweep_required": True,
+            "audio_review_package_required": True,
+            "human_audio_preference_claimed": False,
+            "midi_to_solo_musical_quality_claimed": False,
+            "audio_rendered_quality_claimed": False,
+            "model_checkpoint_generation_quality_claimed": False,
+            "model_direct_generation_quality_claimed": False,
+            "broad_trained_model_quality_claimed": False,
+            "brad_style_adaptation_claimed": False,
+            "production_ready_claimed": False,
+        },
+        "decision": {
+            "next_boundary": POST_MVP_NEXT_BOUNDARY,
+            "critical_user_input_required": False,
+        },
+    }
+
+
+def rubric_baseline(root: Path) -> dict:
+    return build_quality_rubric_baseline_report(
+        post_mvp_quality_plan=post_mvp_quality_plan(),
+        output_dir=root / "rubric",
+        issue_number=746,
+    )
+
+
+def followup_decision(*, quality_claim: bool = False) -> dict:
+    return {
+        "boundary": FOLLOWUP_BOUNDARY,
+        "repair_sweep_summary": {
+            "remaining_failure_counts": {
+                "phrase_shape_missing_tension_release": 2,
+                "rhythmic_monotony": 2,
+            }
+        },
+        "selected_next_target": {
+            "selected_target": FOLLOWUP_SELECTED_TARGET,
+            "selected_next_boundary": FOLLOWUP_NEXT_BOUNDARY,
+            "primary_remaining_failure_labels": list(TIE_TARGET_LABELS),
+            "primary_remaining_failure_count": 2,
+        },
+        "readiness": {
+            "followup_decision_completed": True,
+            "phrase_rhythm_tie_target_selected": True,
+            "candidate_count": 6,
+            "source_total_failure_label_count": 8,
+            "repaired_total_failure_label_count": 4,
+            "failure_label_delta": 4,
+            "technical_regression_count": 0,
+            "human_audio_preference_claimed": False,
+            "midi_to_solo_musical_quality_claimed": quality_claim,
+            "audio_rendered_quality_claimed": False,
+            "model_checkpoint_generation_quality_claimed": False,
+            "model_direct_generation_quality_claimed": False,
+            "broad_trained_model_quality_claimed": False,
+            "brad_style_adaptation_claimed": False,
+            "production_ready_claimed": False,
+        },
+        "decision": {
+            "next_boundary": FOLLOWUP_NEXT_BOUNDARY,
+            "critical_user_input_required": False,
+        },
+    }
+
+
+def source_repair_sweep(*, technical_regression_count: int = 0) -> dict:
+    labels = [
+        [],
+        ["phrase_shape_missing_tension_release", "rhythmic_monotony"],
+        [],
+        ["rhythmic_monotony"],
+        [],
+        ["phrase_shape_missing_tension_release"],
+    ]
+    return {
+        "boundary": SOURCE_SWEEP_BOUNDARY,
+        "candidate_repairs": [
+            {
+                "source": "test",
+                "rank": index + 1,
+                "contour_repaired_midi_path": f"source_{index + 1}.mid",
+                "contour_repaired_labeling": {
+                    "failure_labels": row_labels,
+                    "not_evaluable_labels": [
+                        "outside_soloing_without_context",
+                        "weak_chord_tone_landing",
+                    ],
+                },
+            }
+            for index, row_labels in enumerate(labels)
+        ],
+        "aggregate": {
+            "candidate_count": 6,
+            "source_total_failure_label_count": 8,
+            "repaired_total_failure_label_count": 4,
+            "failure_label_delta": 4,
+            "source_songlike_failure_count": 5,
+            "repaired_songlike_failure_count": 0,
+            "songlike_failure_delta": 5,
+            "improved_candidate_count": 4,
+            "technical_regression_count": technical_regression_count,
+            "repaired_failure_counts": {
+                "phrase_shape_missing_tension_release": 2,
+                "rhythmic_monotony": 2,
+            },
+            "target_supported": True,
+        },
+        "readiness": {
+            "songlike_melody_contour_repair_sweep_completed": True,
+            "songlike_melody_contour_repair_target_supported": True,
+            "human_audio_preference_claimed": False,
+            "midi_to_solo_musical_quality_claimed": False,
+            "audio_rendered_quality_claimed": False,
+            "model_checkpoint_generation_quality_claimed": False,
+            "model_direct_generation_quality_claimed": False,
+            "broad_trained_model_quality_claimed": False,
+            "brad_style_adaptation_claimed": False,
+            "production_ready_claimed": False,
+        },
+    }
+
+
+class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
+    unittest.TestCase
+):
+    def test_reduces_phrase_rhythm_labels_without_quality_claim(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
+                followup_decision=followup_decision(),
+                source_repair_sweep=source_repair_sweep(),
+                rubric_baseline=rubric_baseline(root),
+                output_dir=root / "phrase_rhythm_repair",
+                issue_number=774,
+            )
+            summary = validate_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
+                report,
+                expected_boundary=BOUNDARY,
+                expected_next_boundary=NEXT_BOUNDARY,
+                min_candidate_count=6,
+                require_sweep_completed=True,
+                require_target_supported=True,
+                require_phrase_rhythm_delta=True,
+                require_no_quality_claim=True,
+            )
+
+            self.assertTrue(
+                summary[
+                    "songlike_melody_contour_phrase_rhythm_repair_sweep_completed"
+                ]
+            )
+            self.assertTrue(
+                summary[
+                    "songlike_melody_contour_phrase_rhythm_repair_target_supported"
+                ]
+            )
+            self.assertEqual(summary["candidate_count"], 6)
+            self.assertEqual(summary["source_phrase_rhythm_failure_count"], 4)
+            self.assertLess(summary["repaired_phrase_rhythm_failure_count"], 4)
+            self.assertGreater(summary["phrase_rhythm_failure_delta"], 0)
+            self.assertEqual(summary["technical_regression_count"], 0)
+            self.assertEqual(summary["selected_target"], SELECTED_TARGET)
+            self.assertFalse(summary["human_audio_preference_claimed"])
+            self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
+
+    def test_rejects_followup_quality_claim(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError
+            ):
+                build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
+                    followup_decision=followup_decision(quality_claim=True),
+                    source_repair_sweep=source_repair_sweep(),
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "phrase_rhythm_repair",
+                    issue_number=774,
+                )
+
+    def test_rejects_source_technical_regression(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError
+            ):
+                build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
+                    followup_decision=followup_decision(),
+                    source_repair_sweep=source_repair_sweep(technical_regression_count=1),
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "phrase_rhythm_repair",
+                    issue_number=774,
+                )
+
+    def test_constants_are_stable(self) -> None:
+        self.assertEqual(
+            BOUNDARY,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep",
+        )
+        self.assertEqual(
+            NEXT_BOUNDARY,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package",
+        )
+        self.assertEqual(
+            SELECTED_TARGET,
+            "songlike_melody_contour_phrase_rhythm_repair_audio_package",
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()
