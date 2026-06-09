@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #780, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision`
+- latest functional result: Issue #782, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision`
 
 현재 범위가 아닌 것:
 
@@ -163,6 +163,14 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 decision target: `songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision`
+- songlike melody contour phrase/rhythm repair objective-only next decision 완료
+- phrase/rhythm follow-up required: `true`
+- current quality claim ready: `false`
+- preference fill allowed: `false`
+- critical user input required: `false`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 follow-up target: `songlike_melody_contour_phrase_rhythm_repair_followup_decision`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
