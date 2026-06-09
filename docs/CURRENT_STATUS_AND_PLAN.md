@@ -124,6 +124,12 @@
 - current quality claim ready: `false`
 - next boundary: `songlike_melody_contour_repair_followup_decision`
 - 다음 follow-up target: `songlike_melody_contour_repair_followup_decision`
+- songlike melody contour repair follow-up decision 완료
+- primary remaining failure labels: `phrase_shape_missing_tension_release`, `rhythmic_monotony`
+- primary remaining failure count: `2`
+- phrase/rhythm tie target selected: `true`
+- technical regression count: `0`
+- 다음 repair target: `songlike_melody_contour_phrase_rhythm_repair_sweep`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
