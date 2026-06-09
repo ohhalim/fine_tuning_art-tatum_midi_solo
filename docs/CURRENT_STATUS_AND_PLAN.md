@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-06-08
+작성일: 2026-06-09
 
 ## Current Focus
 
@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #694, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair objective next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour decision`
+- latest functional result: Issue #696, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour probe`
 
 현재 범위가 아닌 것:
 
@@ -64,6 +64,58 @@
 - model-conditioned input path dead-air/timing repair probe 기준 repaired 후보 3개 objective target 통과
 - model-conditioned input path dead-air/timing repaired 후보 3개 WAV technical render 완료
 - model-conditioned input path dead-air/timing repaired evidence 기준 pitch-contour follow-up 필요 판정
+- model-conditioned input path dead-air/timing repaired evidence 기준 pitch-contour repair target 정의 완료
+
+## Stage B MIDI-to-Solo Model-Conditioned Input Path Dead-Air Timing Repair Pitch Contour Decision Result
+
+Issue #696은 Issue #694 objective next decision 결과를 source로 사용해 pitch-contour repair target과 다음 probe 경계를 정의한 작업이다.
+
+변경:
+
+- model-conditioned input path dead-air timing repair pitch contour decision script 추가
+- source max interval과 target max interval 기준 interval reduction target 기록
+- dead-air 유지, max simultaneous 유지, added-note ratio review guardrail 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_DEAD_AIR_TIMING_REPAIR_PITCH_CONTOUR_DECISION_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_decision`
+- source boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_probe`
+- selected target: `wide_interval_pitch_contour_repair`
+- technical WAV validation: `true`
+- dead-air target supported: `true`
+- source repaired dead-air max: `0.0000`
+- target dead-air max: `0.3500`
+- source max added-note ratio: `0.9167`
+- added-note ratio review required: `true`
+- source max interval: `62`
+- target max interval: `12`
+- required interval reduction min: `50`
+- repair probe required: `true`
+- current evidence consolidation ready: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- dead-air target은 유지 대상.
+- max interval `62`를 threshold `12` 이하로 줄이는 repair probe 필요.
+- added-note ratio `0.9167`은 review 신호로 유지.
+- 음악적 품질 claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-decision`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour probe`
 
 ## Stage B MIDI-to-Solo Model-Conditioned Input Path Dead-Air Timing Repair Objective Next Decision Result
 
