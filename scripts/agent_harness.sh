@@ -252,6 +252,8 @@ Modes:
                 Build the post-MVP MIDI evidence quality rubric baseline.
   stage-b-midi-to-solo-candidate-failure-labeling
                 Label current MIDI-to-solo candidates against the quality rubric.
+  stage-b-midi-to-solo-targeted-quality-repair-sweep
+                Run targeted MIDI-to-solo quality repair from candidate failure labels.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision
                 Decide the next pitch-contour changed-ratio repair boundary.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-probe
@@ -6133,6 +6135,34 @@ run_stage_b_midi_to_solo_candidate_failure_labeling() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_targeted_quality_repair_sweep() {
+  local labeling_run_id="${LABELING_RUN_ID:-harness_stage_b_midi_to_solo_candidate_failure_labeling}"
+  local rubric_run_id="${RUBRIC_RUN_ID:-harness_stage_b_midi_to_solo_quality_rubric_baseline}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_sweep}"
+  local labeling="outputs/stage_b_midi_to_solo_candidate_failure_labeling/${labeling_run_id}/stage_b_midi_to_solo_candidate_failure_labeling.json"
+  local rubric="outputs/stage_b_midi_to_solo_quality_rubric_baseline/${rubric_run_id}/stage_b_midi_to_solo_quality_rubric_baseline.json"
+  if [[ ! -f "$labeling" ]]; then
+    print_header "Stage B MIDI-to-solo candidate failure labeling"
+    RUN_ID="$labeling_run_id" run_stage_b_midi_to_solo_candidate_failure_labeling
+  fi
+  if [[ ! -f "$rubric" ]]; then
+    print_header "Stage B MIDI-to-solo quality rubric baseline"
+    RUN_ID="$rubric_run_id" run_stage_b_midi_to_solo_quality_rubric_baseline
+  fi
+  print_header "Stage B MIDI-to-solo targeted quality repair sweep"
+  "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_targeted_quality_repair_sweep.py \
+    --run_id "$run_id" \
+    --candidate_failure_labeling "$labeling" \
+    --rubric_baseline "$rubric" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_SWEEP_2026-06-09.md \
+    --issue_number 750 \
+    --expected_boundary stage_b_midi_to_solo_targeted_quality_repair_sweep \
+    --min_candidate_count 6 \
+    --require_sweep_completed \
+    --require_failure_delta \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision}"
@@ -8398,6 +8428,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-candidate-failure-labeling)
     run_stage_b_midi_to_solo_candidate_failure_labeling
+    ;;
+  stage-b-midi-to-solo-targeted-quality-repair-sweep)
+    run_stage_b_midi_to_solo_targeted_quality_repair_sweep
     ;;
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision)
     run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision
