@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #742, Stage B MIDI-to-solo final status audit
-- 다음 권장 이슈: `Stage B MIDI-to-solo post-MVP musical quality iteration plan`
+- latest functional result: Issue #744, Stage B MIDI-to-solo post-MVP musical quality iteration plan
+- 다음 권장 이슈: `Stage B MIDI-to-solo quality rubric baseline`
 
 현재 범위가 아닌 것:
 
@@ -88,6 +88,7 @@
 - MVP delivery package manifest 생성 완료
 - README final evidence refresh 완료
 - final status audit 완료
+- post-MVP musical quality iteration plan 완료
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
@@ -1848,6 +1849,54 @@ Issue #742는 Issue #740 README final evidence refresh와 Issue #738 MVP deliver
 다음:
 
 - `Stage B MIDI-to-solo post-MVP musical quality iteration plan`
+
+## Stage B MIDI-to-Solo Post-MVP Quality Iteration Plan Result
+
+Issue #744는 Issue #742 final status audit 이후 technical MVP 완료 상태에서 첫 post-MVP musical quality iteration boundary를 정의한 작업이다.
+
+변경:
+
+- post-MVP quality iteration plan script 추가
+- final status audit report 검증 연결
+- 다음 품질 작업 target을 `quality_rubric_baseline`으로 고정
+- quality failure taxonomy seed와 ordered work 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_POST_MVP_QUALITY_ITERATION_PLAN_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- source boundary: `stage_b_midi_to_solo_final_status_audit`
+- next boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- selected target: `quality_rubric_baseline`
+- technical MVP complete: `true`
+- local review ready: `true`
+- quality rubric required: `true`
+- candidate failure labeling required: `true`
+- targeted quality repair sweep required: `true`
+- audio review package required: `true`
+- ordered work count: `4`
+- quality failure taxonomy seed count: `7`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- technical MVP 완료 이후 무작위 repair 재진입 대신 quality rubric baseline 선행.
+- 현재 MIDI/WAV evidence와 objective metric 기준 candidate failure label 정의 필요.
+- musical quality, human/audio preference claim 제외 유지.
+- 다음 boundary는 quality rubric baseline.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- `.venv/bin/python -m py_compile scripts/plan_stage_b_midi_to_solo_post_mvp_quality_iteration.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-post-mvp-quality-iteration-plan`
+
+다음:
+
+- `Stage B MIDI-to-solo quality rubric baseline`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
