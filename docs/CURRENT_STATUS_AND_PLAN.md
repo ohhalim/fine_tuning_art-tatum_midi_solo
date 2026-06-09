@@ -73,6 +73,7 @@
 - model-conditioned input path pitch-contour objective path를 current evidence에 통합 완료
 - README current evidence boundary refresh 완료
 - MVP completion audit에 model-conditioned pitch-contour objective path 포함 완료
+- quality gap decision을 pitch-contour changed-ratio review target으로 갱신 완료
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
@@ -1145,6 +1146,52 @@ Issue #668은 Issue #664 current evidence와 Issue #666 README refresh를 기준
 다음:
 
 - `Stage B MIDI-to-solo quality gap decision`
+
+## Stage B MIDI-to-Solo Quality Gap Decision Result
+
+Issue #714는 Issue #712 MVP completion audit 이후 남은 quality gap target을 다시 선택한 작업이다.
+
+변경:
+
+- quality gap decision script에 model-conditioned pitch-contour objective completion 검증 추가
+- pitch-contour interval threshold 통과와 changed-ratio review 필요 상태를 target selection에 반영
+- 기존 fallback alignment 반복 진입을 방지하고 changed-ratio review decision boundary 선택
+- generated quality gap decision document를 2026-06-09 기준으로 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_QUALITY_GAP_DECISION_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision`
+- selected target: `model_conditioned_pitch_contour_changed_ratio_review`
+- fallback path active: `true`
+- model-conditioned input path alignment required: `false`
+- technical model-core MVP completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour max interval / threshold: `11 / 12`
+- pitch-contour changed-ratio review required: `true`
+- musical quality MVP completed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- model-conditioned pitch-contour objective path는 interval target 통과.
+- 남은 gap은 fallback replacement alignment가 아니라 pitch changed ratio review boundary.
+- human/audio preference와 musical quality claim 제외 유지.
+- 다음 작업은 changed-ratio review decision.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_quality_gap_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_quality_gap.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-quality-gap-decision`
+
+다음:
+
+- `Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
