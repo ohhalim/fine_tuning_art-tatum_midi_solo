@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #744, Stage B MIDI-to-solo post-MVP musical quality iteration plan
-- 다음 권장 이슈: `Stage B MIDI-to-solo quality rubric baseline`
+- latest functional result: Issue #746, Stage B MIDI-to-solo quality rubric baseline
+- 다음 권장 이슈: `Stage B MIDI-to-solo candidate failure labeling`
 
 현재 범위가 아닌 것:
 
@@ -89,6 +89,7 @@
 - README final evidence refresh 완료
 - final status audit 완료
 - post-MVP musical quality iteration plan 완료
+- quality rubric baseline 완료
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
@@ -1897,6 +1898,48 @@ Issue #744는 Issue #742 final status audit 이후 technical MVP 완료 상태�
 다음:
 
 - `Stage B MIDI-to-solo quality rubric baseline`
+
+## Stage B MIDI-to-Solo Quality Rubric Baseline Result
+
+Issue #746은 Issue #744 post-MVP quality iteration plan 이후 candidate failure labeling에 사용할 MIDI evidence quality rubric baseline을 정의한 작업이다.
+
+변경:
+
+- quality rubric baseline script 추가
+- post-MVP quality iteration plan report 검증 연결
+- failure taxonomy별 metric key와 threshold 기록
+- candidate failure labeling readiness 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_QUALITY_RUBRIC_BASELINE_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- source boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- next boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- selected target: `candidate_failure_labeling`
+- rubric item count: `8`
+- required metric group count: `29`
+- candidate failure labeling ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- sparse/empty, dead-air, rhythm monotony, songlike melody, outside soloing, chord-tone landing, phrase shape, technical regression rubric 정의 완료.
+- 다음 작업은 현재 MIDI 후보를 rubric에 맞춰 label하는 candidate failure labeling.
+- musical quality, human/audio preference claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_quality_rubric_baseline`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_quality_rubric_baseline.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-quality-rubric-baseline`
+
+다음:
+
+- `Stage B MIDI-to-solo candidate failure labeling`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
