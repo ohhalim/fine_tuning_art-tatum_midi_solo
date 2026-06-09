@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #760, Stage B MIDI-to-solo targeted quality repair follow-up decision.
+- Latest functional issue completed: Issue #762, Stage B MIDI-to-solo songlike melody contour repair sweep.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo songlike melody contour repair sweep.
+- Recommended next issue: Stage B MIDI-to-solo songlike melody contour repair audio package.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
