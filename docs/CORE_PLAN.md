@@ -5201,6 +5201,45 @@ Issue #786은 Issue #784 follow-up decision에서 선택한 chord-context pitch-
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision`
 
+## 9.85 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision
+
+Issue #788은 Issue #786 chord-context pitch-role bridge 결과를 기준으로 다음 repair target을 선택한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- primary risk label: `weak_chord_tone_landing_risk`
+- candidate count: `6`
+- not evaluable count: `12 -> 0`
+- weak chord-tone landing risk count: `6`
+- outside-soloing pitch-role risk count: `5`
+- min chord-tone ratio: `0.216`
+- max outside ratio: `0.027`
+- max non-chord run: `5`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- bridge 이후 outside/chord-tone landing 평가 불가 상태는 해소.
+- 전체 후보 `6/6`에서 weak chord-tone landing risk 관측.
+- outside-soloing pitch-role risk도 `5/6`이지만 primary risk count는 weak chord-tone landing.
+- 다음 boundary는 chord-tone landing repair sweep.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-context-pitch-role-objective-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
