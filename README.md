@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_audio_package`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next_decision`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -41,6 +41,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned dead-air timing repair WAV files: `3`
 - model-conditioned dead-air timing repair WAV technical validation: `true`
 - model-conditioned remaining wide-interval risk: `true`
+- model-conditioned dead-air timing repair objective next decision completed: `true`
+- model-conditioned wide-interval follow-up required: `true`
+- model-conditioned dead-air target supported: `true`
 - phrase-bank retrieval baseline completed: `true`
 - phrase-bank source records / motifs: `56 / 803`
 - phrase-bank exported / qualified MIDI candidates: `3 / 3`
@@ -80,7 +83,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_decision`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -125,6 +128,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned ranked MIDI/WAV listening review package 생성 가능
 - model-conditioned ranked MIDI 후보의 dead-air/timing repair probe 가능
 - model-conditioned dead-air/timing repaired MIDI 후보의 WAV technical render 가능
+- model-conditioned dead-air/timing repaired MIDI/WAV objective next decision 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -334,6 +338,23 @@ Model-conditioned input path dead-air timing repair audio package.
 - max repaired interval: `62`
 - remaining wide-interval risk: `true`
 - audio rendered quality claimed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+Model-conditioned input path dead-air timing repair objective next decision.
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_objective_next_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_decision`
+- selected target: `wide_interval_pitch_contour_repair`
+- technical WAV validation: `true`
+- rendered audio file count: `3`
+- repaired dead-air max: `0.0000`
+- max added-note ratio: `0.9167`
+- added-note ratio review required: `true`
+- max repaired interval: `62`
+- max interval threshold: `12`
+- wide-interval follow-up required: `true`
+- current evidence consolidation ready: `false`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 
