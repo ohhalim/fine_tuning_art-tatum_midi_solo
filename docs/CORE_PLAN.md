@@ -5076,6 +5076,47 @@ Issue #780은 Issue #778 listening review package의 validated review input 부�
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision`
 
+## 9.82 Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision
+
+Issue #782는 Issue #780 input guard 이후 listening input 없이 objective evidence만으로 다음 boundary를 선택한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- selected target: `songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- review item count: `6`
+- required input field count: `4`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- failure label delta: `3`
+- phrase/rhythm failure delta: `3`
+- phrase/rhythm follow-up required: `true`
+- current quality claim ready: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- listening input 부재 상태에서 quality claim 불가.
+- preference fill blocked 상태 유지.
+- repair 결과가 quality claim으로 승격되지 않았으므로 follow-up decision 필요.
+- 다음 boundary는 phrase/rhythm repair follow-up decision.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_next`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_next.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-objective-only-next-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

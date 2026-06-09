@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #780, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard.
+- Latest functional issue completed: Issue #782, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision.
+- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -180,6 +180,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phras
 ```
 
 This harness blocks preference fill while listening review input is pending and keeps quality claims false.
+
+For Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-objective-only-next-decision
+```
+
+This harness routes pending listening review input to the next objective-only follow-up boundary without claiming quality.
 
 For Stage A training-mode changes, run:
 

@@ -284,6 +284,8 @@ Modes:
                 Package phrase/rhythm repair WAV/MIDI candidates for listening review.
   stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-listening-review-input-guard
                 Block phrase/rhythm repair preference fill while listening review input is pending.
+  stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-objective-only-next-decision
+                Select objective-only next boundary after phrase/rhythm input guard.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision
                 Decide the next pitch-contour changed-ratio repair boundary.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-probe
@@ -6559,6 +6561,27 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision() {
+  local input_guard_run_id="${INPUT_GUARD_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision}"
+  local input_guard_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard/${input_guard_run_id}/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard.json"
+  if [[ ! -f "$input_guard_report" ]]; then
+    print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard"
+    RUN_ID="$input_guard_run_id" run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard
+  fi
+  print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_next.py \
+    --run_id "$run_id" \
+    --input_guard_report "$input_guard_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-09.md \
+    --issue_number 782 \
+    --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision \
+    --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision \
+    --require_objective_decision \
+    --require_followup_required \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision}"
@@ -8872,6 +8895,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-listening-review-input-guard)
     run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard
+    ;;
+  stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-objective-only-next-decision)
+    run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision
     ;;
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision)
     run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision
