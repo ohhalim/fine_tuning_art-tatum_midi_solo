@@ -401,6 +401,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo final status audit: technical MVP complete `true`, local review ready `true`, README final evidence reflected `true`, CLI/WAV count `3/3`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
 - MIDI-to-solo post-MVP quality iteration plan: selected target `quality_rubric_baseline`, ordered work `4`, taxonomy seed `7`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_rubric_baseline`
 - MIDI-to-solo quality rubric baseline: rubric items `8`, metric groups `29`, candidate failure labeling ready `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_candidate_failure_labeling`
+- MIDI-to-solo candidate failure labeling: candidates `6`, failed `6`, failure label types `4`, not-evaluable types `2`, targeted repair ready `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_sweep`
 - MIDI-to-solo pitch-contour changed-ratio review decision: selected target `lower_pitch_change_ratio_repair_probe`, repair probe required `true`, max interval/threshold `11/12`, changed-ratio review threshold `0.5`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
 - MIDI-to-solo pitch-contour changed-ratio repair probe: repaired/pass `3/3`, max pitch changed ratio `0.7174 -> 0.4348`, max interval `12`, dead-air max `0.0000`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package`
 - MIDI-to-solo pitch-contour changed-ratio repair audio package: rendered WAV `3`, duration `18.422s-18.978s`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package`
@@ -4386,6 +4387,44 @@ Issue #746은 Issue #744 post-MVP quality iteration plan 이후 candidate failur
 다음 작업:
 
 - `Stage B MIDI-to-solo candidate failure labeling`
+
+## 9.65 Stage B MIDI-to-solo candidate failure labeling
+
+Issue #748은 Issue #746 quality rubric baseline 이후 현재 MIDI 후보를 rubric 기준으로 labeling한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- source boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- selected target: `targeted_quality_repair_sweep`
+- candidate count: `6`
+- failed candidate count: `6`
+- failure label type count: `4`
+- not evaluable label type count: `2`
+- failure counts: `dead_air_or_density_gap=1`, `phrase_shape_missing_tension_release=2`, `rhythmic_monotony=3`, `songlike_melody_not_soloing=6`
+- not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
+- targeted quality repair sweep ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- 현재 후보 6개 모두 musical-quality rubric 기준 repair 대상.
+- 공통 실패 신호는 songlike melody. CLI 후보 3개는 rhythm monotony 동반.
+- chord context 없는 항목은 실패로 단정하지 않고 not_evaluable로 유지.
+- 다음 boundary는 targeted quality repair sweep.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_candidate_failure_labeling`
+- `.venv/bin/python -m py_compile scripts/label_stage_b_midi_to_solo_candidate_failures.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-candidate-failure-labeling`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo targeted quality repair sweep`
 
 ## 10. 한 문장 요약
 
