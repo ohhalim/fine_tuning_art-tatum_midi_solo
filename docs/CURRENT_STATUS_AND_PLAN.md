@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #734, Stage B MIDI-to-solo quality gap decision refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo listening review quality gap`
+- latest functional result: Issue #736, Stage B MIDI-to-solo listening review quality gap
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP delivery package`
 
 현재 범위가 아닌 것:
 
@@ -84,6 +84,7 @@
 - README current evidence block에 changed-ratio repair objective path 반영 완료
 - MVP completion audit에 changed-ratio repair objective path 포함 완료
 - quality gap decision을 listening review quality gap target으로 갱신 완료
+- listening review quality gap을 MVP delivery package target으로 분리 완료
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
@@ -1662,6 +1663,52 @@ Issue #734는 Issue #732 MVP completion audit 이후 quality gap decision을 갱
 다음:
 
 - `Stage B MIDI-to-solo listening review quality gap`
+
+## Stage B MIDI-to-Solo Listening Review Quality Gap Result
+
+Issue #736은 Issue #734 quality gap decision 이후 남은 listening review quality gap을 분리한 작업이다.
+
+변경:
+
+- listening review quality gap decision script 추가
+- quality gap decision report 검증 연결
+- changed-ratio repair objective evidence와 human/audio preference 미검증 범위 분리
+- next target을 `mvp_delivery_package`로 선택
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_LISTENING_REVIEW_QUALITY_GAP_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- source boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- next boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- selected target: `mvp_delivery_package`
+- technical model-core MVP completed: `true`
+- changed-ratio repair objective completed: `true`
+- changed-ratio repair max pitch changed ratio / target: `0.4348 / 0.5000`
+- changed-ratio repair max interval / target: `12 / 12`
+- listening review quality gap open: `true`
+- technical MVP delivery package ready: `true`
+- human review required now: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- technical delivery package 준비는 청음 preference claim 없이 진행 가능.
+- 남은 gap은 listening review와 musical quality evidence로 유지.
+- 다음 boundary는 MVP delivery package.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_listening_review_quality_gap`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_listening_review_quality_gap.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-listening-review-quality-gap`
+
+다음:
+
+- `Stage B MIDI-to-solo MVP delivery package`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
