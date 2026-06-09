@@ -25,6 +25,10 @@ class StageBMidiToSoloQualityGapDecisionError(ValueError):
 BOUNDARY = "stage_b_midi_to_solo_quality_gap_decision"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment"
 SELECTED_TARGET = "model_conditioned_input_path_quality_alignment"
+PITCH_CONTOUR_CHANGED_RATIO_TARGET = "model_conditioned_pitch_contour_changed_ratio_review"
+PITCH_CONTOUR_CHANGED_RATIO_NEXT_BOUNDARY = (
+    "stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision"
+)
 SCHEMA_VERSION = "stage_b_midi_to_solo_quality_gap_decision_v1"
 
 
@@ -71,6 +75,10 @@ def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloQualityGapDecisionError("product MVP should remain incomplete")
     if not bool(audit.get("phrase_bank_cli_technical_path_completed", False)):
         raise StageBMidiToSoloQualityGapDecisionError("phrase-bank CLI technical path completion required")
+    if not bool(audit.get("model_conditioned_pitch_contour_objective_completed", False)):
+        raise StageBMidiToSoloQualityGapDecisionError(
+            "model-conditioned pitch-contour objective completion required"
+        )
     if _int(evidence.get("exported_candidate_count")) < 3:
         raise StageBMidiToSoloQualityGapDecisionError("exported candidate count below 3")
     if _int(evidence.get("rendered_audio_file_count")) < 3:
@@ -83,6 +91,20 @@ def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloQualityGapDecisionError("CLI rendered WAV count below 3")
     if bool(evidence.get("cli_preference_fill_allowed", True)):
         raise StageBMidiToSoloQualityGapDecisionError("CLI preference fill should remain blocked")
+    if not bool(evidence.get("model_conditioned_pitch_contour_objective_path_ready", False)):
+        raise StageBMidiToSoloQualityGapDecisionError(
+            "model-conditioned pitch-contour objective path readiness required"
+        )
+    if _int(evidence.get("model_conditioned_pitch_contour_max_interval")) > _int(
+        evidence.get("model_conditioned_pitch_contour_max_interval_threshold")
+    ):
+        raise StageBMidiToSoloQualityGapDecisionError(
+            "model-conditioned pitch-contour interval threshold exceeded"
+        )
+    if not bool(evidence.get("model_conditioned_pitch_contour_target_supported", False)):
+        raise StageBMidiToSoloQualityGapDecisionError(
+            "model-conditioned pitch-contour target support required"
+        )
     if _int(evidence.get("objective_strict_valid_sample_count")) != _int(evidence.get("objective_sample_count")):
         raise StageBMidiToSoloQualityGapDecisionError("objective strict valid count must match sample count")
     blocked_claims = [
@@ -98,6 +120,7 @@ def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
     return {
         "technical_model_core_mvp_completed": True,
         "phrase_bank_cli_technical_path_completed": True,
+        "model_conditioned_pitch_contour_objective_completed": True,
         "musical_quality_mvp_completed": False,
         "human_audio_preference_completed": False,
         "product_mvp_completed": False,
@@ -120,23 +143,60 @@ def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
         "cli_rendered_audio_file_count": _int(evidence.get("cli_rendered_audio_file_count")),
         "cli_input_context_bars": _int(evidence.get("cli_input_context_bars")),
         "cli_preference_fill_allowed": bool(evidence.get("cli_preference_fill_allowed", True)),
+        "model_conditioned_pitch_contour_objective_path_ready": bool(
+            evidence.get("model_conditioned_pitch_contour_objective_path_ready", False)
+        ),
+        "model_conditioned_pitch_contour_max_interval": _int(
+            evidence.get("model_conditioned_pitch_contour_max_interval")
+        ),
+        "model_conditioned_pitch_contour_max_interval_threshold": _int(
+            evidence.get("model_conditioned_pitch_contour_max_interval_threshold")
+        ),
+        "model_conditioned_pitch_contour_target_supported": bool(
+            evidence.get("model_conditioned_pitch_contour_target_supported", False)
+        ),
+        "model_conditioned_pitch_contour_pitch_changed_ratio_review_required": bool(
+            evidence.get("model_conditioned_pitch_contour_pitch_changed_ratio_review_required", False)
+        ),
+        "model_conditioned_pitch_contour_audio_review_required": bool(
+            evidence.get("model_conditioned_pitch_contour_audio_review_required", False)
+        ),
     }
 
 
 def select_quality_gap_target(audit_summary: dict[str, Any]) -> dict[str, Any]:
     generation_source = str(audit_summary.get("generation_source") or "")
     fallback_path_active = generation_source == "context_conditioned_fallback"
-    target = SELECTED_TARGET if fallback_path_active else "listening_review_quality_gap"
-    next_boundary = NEXT_BOUNDARY if fallback_path_active else "stage_b_midi_to_solo_listening_review_quality_gap"
-    reason = (
-        "input-to-WAV path still uses context_conditioned_fallback while selected-scale and CLI paths are technical evidence, not model-conditioned quality"
-        if fallback_path_active
-        else "model-conditioned path is available; listening review gap remains"
+    pitch_contour_path_ready = bool(
+        audit_summary.get("model_conditioned_pitch_contour_objective_path_ready", False)
     )
+    pitch_contour_changed_ratio_review_required = bool(
+        audit_summary.get("model_conditioned_pitch_contour_pitch_changed_ratio_review_required", False)
+    )
+    if pitch_contour_path_ready and pitch_contour_changed_ratio_review_required:
+        target = PITCH_CONTOUR_CHANGED_RATIO_TARGET
+        next_boundary = PITCH_CONTOUR_CHANGED_RATIO_NEXT_BOUNDARY
+        reason = (
+            "model-conditioned pitch-contour path is objective-complete, but pitch changed ratio still requires "
+            "review before any musical quality claim"
+        )
+    elif fallback_path_active:
+        target = SELECTED_TARGET
+        next_boundary = NEXT_BOUNDARY
+        reason = (
+            "input-to-WAV path still uses context_conditioned_fallback while selected-scale and CLI paths are "
+            "technical evidence, not model-conditioned quality"
+        )
+    else:
+        target = "listening_review_quality_gap"
+        next_boundary = "stage_b_midi_to_solo_listening_review_quality_gap"
+        reason = "model-conditioned path is available; listening review gap remains"
     return {
         "selected_target": target,
         "selected_next_boundary": next_boundary,
         "fallback_path_active": fallback_path_active,
+        "model_conditioned_pitch_contour_objective_path_ready": pitch_contour_path_ready,
+        "pitch_contour_changed_ratio_review_required": pitch_contour_changed_ratio_review_required,
         "quality_gap_reason": reason,
         "human_review_required_now": False,
     }
@@ -161,11 +221,23 @@ def build_quality_gap_decision_report(
         "quality_gap": {
             "technical_model_core_mvp_completed": True,
             "phrase_bank_cli_technical_path_completed": True,
+            "model_conditioned_pitch_contour_objective_completed": bool(
+                audit_summary["model_conditioned_pitch_contour_objective_completed"]
+            ),
             "musical_quality_mvp_completed": False,
             "human_audio_preference_completed": False,
             "product_mvp_completed": False,
             "fallback_path_active": bool(target["fallback_path_active"]),
-            "model_conditioned_input_path_alignment_required": bool(target["fallback_path_active"]),
+            "model_conditioned_input_path_alignment_required": bool(
+                target["fallback_path_active"]
+                and str(target["selected_target"]) == SELECTED_TARGET
+            ),
+            "model_conditioned_pitch_contour_objective_path_ready": bool(
+                target["model_conditioned_pitch_contour_objective_path_ready"]
+            ),
+            "pitch_contour_changed_ratio_review_required": bool(
+                target["pitch_contour_changed_ratio_review_required"]
+            ),
             "human_review_required_now": False,
         },
         "selected_target": target,
@@ -195,7 +267,11 @@ def build_quality_gap_decision_report(
             "brad_style_adaptation",
             "production_ready_improviser",
         ],
-        "next_recommended_issue": "Stage B MIDI-to-solo model-conditioned input path quality alignment",
+        "next_recommended_issue": (
+            "Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision"
+            if str(target["selected_target"]) == PITCH_CONTOUR_CHANGED_RATIO_TARGET
+            else "Stage B MIDI-to-solo model-conditioned input path quality alignment"
+        ),
     }
 
 
@@ -221,6 +297,10 @@ def validate_quality_gap_decision_report(
         raise StageBMidiToSoloQualityGapDecisionError("quality gap decision completion required")
     if not bool(quality_gap.get("technical_model_core_mvp_completed", False)):
         raise StageBMidiToSoloQualityGapDecisionError("technical model-core MVP completion required")
+    if not bool(quality_gap.get("model_conditioned_pitch_contour_objective_completed", False)):
+        raise StageBMidiToSoloQualityGapDecisionError(
+            "model-conditioned pitch-contour objective completion required"
+        )
     if bool(quality_gap.get("musical_quality_mvp_completed", True)):
         raise StageBMidiToSoloQualityGapDecisionError("musical quality should remain incomplete")
     if bool(decision.get("critical_user_input_required", True)):
@@ -251,6 +331,15 @@ def validate_quality_gap_decision_report(
         "phrase_bank_cli_technical_path_completed": bool(
             quality_gap.get("phrase_bank_cli_technical_path_completed", False)
         ),
+        "model_conditioned_pitch_contour_objective_completed": bool(
+            quality_gap.get("model_conditioned_pitch_contour_objective_completed", False)
+        ),
+        "model_conditioned_pitch_contour_objective_path_ready": bool(
+            quality_gap.get("model_conditioned_pitch_contour_objective_path_ready", False)
+        ),
+        "pitch_contour_changed_ratio_review_required": bool(
+            quality_gap.get("pitch_contour_changed_ratio_review_required", False)
+        ),
         "musical_quality_mvp_completed": bool(quality_gap.get("musical_quality_mvp_completed", True)),
         "cli_candidate_count": _int(_dict(report.get("mvp_completion_summary")).get("cli_candidate_count")),
         "cli_rendered_audio_file_count": _int(
@@ -259,6 +348,21 @@ def validate_quality_gap_decision_report(
         "cli_input_context_bars": _int(_dict(report.get("mvp_completion_summary")).get("cli_input_context_bars")),
         "cli_preference_fill_allowed": bool(
             _dict(report.get("mvp_completion_summary")).get("cli_preference_fill_allowed", True)
+        ),
+        "model_conditioned_pitch_contour_max_interval": _int(
+            _dict(report.get("mvp_completion_summary")).get(
+                "model_conditioned_pitch_contour_max_interval"
+            )
+        ),
+        "model_conditioned_pitch_contour_max_interval_threshold": _int(
+            _dict(report.get("mvp_completion_summary")).get(
+                "model_conditioned_pitch_contour_max_interval_threshold"
+            )
+        ),
+        "model_conditioned_pitch_contour_target_supported": bool(
+            _dict(report.get("mvp_completion_summary")).get(
+                "model_conditioned_pitch_contour_target_supported", False
+            )
         ),
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
         "midi_to_solo_musical_quality_claimed": bool(
@@ -284,12 +388,14 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- next boundary: `{decision['next_boundary']}`",
         f"- selected target: `{selected['selected_target']}`",
         f"- fallback path active: `{_bool_token(quality_gap['fallback_path_active'])}`",
+        f"- pitch-contour changed-ratio review required: `{_bool_token(quality_gap['pitch_contour_changed_ratio_review_required'])}`",
         f"- human review required now: `{_bool_token(quality_gap['human_review_required_now'])}`",
         "",
         "## Evidence",
         "",
         f"- technical model-core MVP completed: `{_bool_token(summary['technical_model_core_mvp_completed'])}`",
         f"- phrase-bank CLI technical path completed: `{_bool_token(summary['phrase_bank_cli_technical_path_completed'])}`",
+        f"- model-conditioned pitch-contour objective completed: `{_bool_token(summary['model_conditioned_pitch_contour_objective_completed'])}`",
         f"- musical quality MVP completed: `{_bool_token(summary['musical_quality_mvp_completed'])}`",
         f"- generation source: `{summary['generation_source']}`",
         f"- exported candidates: `{summary['exported_candidate_count']}`",
@@ -299,6 +405,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- CLI candidate / rendered WAV: `{summary['cli_candidate_count']}` / `{summary['cli_rendered_audio_file_count']}`",
         f"- CLI input context bars: `{summary['cli_input_context_bars']}`",
         f"- CLI preference fill allowed: `{_bool_token(summary['cli_preference_fill_allowed'])}`",
+        f"- model-conditioned pitch-contour max interval / threshold: `{summary['model_conditioned_pitch_contour_max_interval']}` / `{summary['model_conditioned_pitch_contour_max_interval_threshold']}`",
+        f"- model-conditioned pitch-contour target supported: `{_bool_token(summary['model_conditioned_pitch_contour_target_supported'])}`",
+        f"- model-conditioned pitch-contour changed-ratio review required: `{_bool_token(summary['model_conditioned_pitch_contour_pitch_changed_ratio_review_required'])}`",
+        f"- model-conditioned pitch-contour audio review required: `{_bool_token(summary['model_conditioned_pitch_contour_audio_review_required'])}`",
         "",
         "## Claim Boundary",
         "",

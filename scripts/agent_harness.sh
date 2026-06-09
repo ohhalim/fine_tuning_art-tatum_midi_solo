@@ -5945,10 +5945,11 @@ run_stage_b_midi_to_solo_quality_gap_decision() {
   "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_quality_gap.py \
     --run_id "$run_id" \
     --mvp_completion_audit "$completion_audit" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_QUALITY_GAP_DECISION_2026-06-05.md \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_QUALITY_GAP_DECISION_2026-06-09.md \
+    --issue_number 714 \
     --expected_boundary stage_b_midi_to_solo_quality_gap_decision \
-    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment \
-    --expected_target model_conditioned_input_path_quality_alignment \
+    --expected_next_boundary stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision \
+    --expected_target model_conditioned_pitch_contour_changed_ratio_review \
     --require_no_quality_claim
 }
 

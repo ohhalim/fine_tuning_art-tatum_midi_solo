@@ -6,11 +6,11 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- latest evidence boundary: `stage_b_midi_to_solo_quality_gap_decision`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
-- selected quality gap target: `model_conditioned_input_path_quality_alignment`
+- selected quality gap target: `model_conditioned_pitch_contour_changed_ratio_review`
 - model-conditioned input path aligned: `false`
 - model-conditioned candidate source available: `true`
 - model-conditioned audio technical path available: `true`
@@ -107,8 +107,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - MVP completion audit model-conditioned pitch-contour objective included: `true`
 - quality gap decision completed: `true`
+- quality gap decision pitch-contour changed-ratio target selected: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -189,11 +190,14 @@ MVP completion audit.
 Quality gap decision.
 
 - boundary: `stage_b_midi_to_solo_quality_gap_decision`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment`
-- selected target: `model_conditioned_input_path_quality_alignment`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision`
+- selected target: `model_conditioned_pitch_contour_changed_ratio_review`
 - fallback path active: `true`
-- model-conditioned input path alignment required: `true`
+- model-conditioned input path alignment required: `false`
 - phrase-bank CLI technical path completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour max interval / threshold: `11 / 12`
+- model-conditioned pitch-contour changed-ratio review required: `true`
 - musical quality MVP completed: `false`
 - CLI candidate / rendered WAV: `3 / 3`
 - CLI preference fill allowed: `false`
