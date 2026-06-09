@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #758, Stage B MIDI-to-solo targeted quality repair objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair follow-up decision`
+- latest functional result: Issue #760, Stage B MIDI-to-solo targeted quality repair follow-up decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair sweep`
 
 현재 범위가 아닌 것:
 
@@ -91,6 +91,10 @@
 - post-MVP musical quality iteration plan 완료
 - quality rubric baseline 완료
 - candidate failure labeling 완료
+- targeted quality repair objective-only next decision 완료
+- targeted quality repair follow-up decision 완료
+- 남은 dominant failure label: `songlike_melody_not_soloing` = `5`
+- 다음 repair target: `songlike_melody_contour_repair_sweep`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

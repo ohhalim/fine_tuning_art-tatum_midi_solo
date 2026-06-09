@@ -4626,6 +4626,48 @@ Issue #758은 Issue #756 input guard 이후 listening input 없이 objective evi
 
 - `Stage B MIDI-to-solo targeted quality repair follow-up decision`
 
+## 9.71 Stage B MIDI-to-solo targeted quality repair follow-up decision
+
+Issue #760은 Issue #758 objective-only next decision과 Issue #750 repair sweep 결과를 함께 검증해 다음 repair target을 정한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
+- source boundary: `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
+- repair sweep boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- selected target: `songlike_melody_contour_repair_sweep`
+- candidate count: `6`
+- source total failure labels: `12`
+- repaired total failure labels: `8`
+- failure label delta: `4`
+- technical regression count: `0`
+- dominant remaining failure label: `songlike_melody_not_soloing`
+- dominant remaining failure count: `5`
+- remaining failure counts: `dead_air_or_density_gap=1`, `phrase_shape_missing_tension_release=2`, `songlike_melody_not_soloing=5`
+- not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- listening input 부재 상태이므로 quality/preference claim 제외 유지.
+- technical regression 없이 failure label은 `12 -> 8`로 감소.
+- 잔여 failure 중 `songlike_melody_not_soloing`이 dominant target.
+- chord-context 기반 항목은 미평가 상태로 분리.
+- 다음 boundary는 songlike melody contour repair sweep.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_targeted_quality_repair_followup.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-followup-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour repair sweep`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

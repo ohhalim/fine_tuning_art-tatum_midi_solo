@@ -262,6 +262,8 @@ Modes:
                 Block targeted quality repair preference fill while listening review input is pending.
   stage-b-midi-to-solo-targeted-quality-repair-objective-only-next-decision
                 Select the objective-only next boundary after targeted quality repair input guard.
+  stage-b-midi-to-solo-targeted-quality-repair-followup-decision
+                Select the dominant remaining quality label and next repair target.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision
                 Decide the next pitch-contour changed-ratio repair boundary.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-probe
@@ -6256,6 +6258,35 @@ run_stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision() 
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_targeted_quality_repair_followup_decision() {
+  local objective_run_id="${OBJECTIVE_RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision}"
+  local sweep_run_id="${SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_sweep}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_followup_decision}"
+  local objective_report="outputs/stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision/${objective_run_id}/stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision.json"
+  local sweep_report="outputs/stage_b_midi_to_solo_targeted_quality_repair_sweep/${sweep_run_id}/stage_b_midi_to_solo_targeted_quality_repair_sweep.json"
+  if [[ ! -f "$objective_report" ]]; then
+    print_header "Stage B MIDI-to-solo targeted quality repair objective-only next decision"
+    RUN_ID="$objective_run_id" run_stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision
+  fi
+  if [[ ! -f "$sweep_report" ]]; then
+    print_header "Stage B MIDI-to-solo targeted quality repair sweep"
+    RUN_ID="$sweep_run_id" run_stage_b_midi_to_solo_targeted_quality_repair_sweep
+  fi
+  print_header "Stage B MIDI-to-solo targeted quality repair follow-up decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_targeted_quality_repair_followup.py \
+    --run_id "$run_id" \
+    --objective_next_report "$objective_report" \
+    --repair_sweep_report "$sweep_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_FOLLOWUP_DECISION_2026-06-09.md \
+    --issue_number 760 \
+    --expected_boundary stage_b_midi_to_solo_targeted_quality_repair_followup_decision \
+    --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_sweep \
+    --expected_target songlike_melody_contour_repair_sweep \
+    --require_followup_decision \
+    --require_dominant_songlike_target \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision}"
@@ -8536,6 +8567,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-targeted-quality-repair-objective-only-next-decision)
     run_stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision
+    ;;
+  stage-b-midi-to-solo-targeted-quality-repair-followup-decision)
+    run_stage_b_midi_to_solo_targeted_quality_repair_followup_decision
     ;;
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision)
     run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision
