@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #782, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision`
+- latest functional result: Issue #784, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge`
 
 현재 범위가 아닌 것:
 
@@ -171,6 +171,16 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 follow-up target: `songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- songlike melody contour phrase/rhythm repair follow-up decision 완료
+- primary remaining failure labels: `rhythmic_monotony`
+- primary remaining failure count: `1`
+- not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
+- chord-context pitch-role bridge selected: `true`
+- context not-evaluable min count: `6`
+- technical regression count: `0`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 bridge target: `songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

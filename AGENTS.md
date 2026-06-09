@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #782, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision.
+- Latest functional issue completed: Issue #784, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision.
+- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -188,6 +188,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phras
 ```
 
 This harness routes pending listening review input to the next objective-only follow-up boundary without claiming quality.
+
+For Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-followup-decision
+```
+
+This harness selects the chord-context pitch-role bridge when phrase/rhythm repair leaves outside-soloing and chord-tone landing labels not evaluable.
 
 For Stage A training-mode changes, run:
 
