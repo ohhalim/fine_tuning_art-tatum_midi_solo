@@ -15,7 +15,12 @@ from scripts.consolidate_stage_b_midi_to_solo_mvp_current_evidence import (
 )
 
 
-def current_evidence(*, quality_claim: bool = False, strict_count: int = 9) -> dict:
+def current_evidence(
+    *,
+    quality_claim: bool = False,
+    strict_count: int = 9,
+    pitch_contour_supported: bool = True,
+) -> dict:
     return {
         "boundary": CURRENT_EVIDENCE_BOUNDARY,
         "readiness": {
@@ -27,9 +32,10 @@ def current_evidence(*, quality_claim: bool = False, strict_count: int = 9) -> d
             "technical_wav_path_ready": True,
             "selected_scale_objective_path_complete": True,
             "phrase_bank_cli_technical_path_ready": True,
+            "model_conditioned_pitch_contour_objective_path_ready": pitch_contour_supported,
             "current_mvp_technical_execution_evidence_supported": True,
             "current_mvp_objective_repair_evidence_supported": True,
-            "midi_to_solo_mvp_current_evidence_supported": True,
+            "midi_to_solo_mvp_current_evidence_supported": pitch_contour_supported,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "broad_trained_model_quality_claimed": False,
@@ -64,6 +70,25 @@ def current_evidence(*, quality_claim: bool = False, strict_count: int = 9) -> d
             "input_context_bars": 228,
             "preference_fill_allowed": False,
         },
+        "model_conditioned_pitch_contour_objective_path": {
+            "boundary": (
+                "stage_b_midi_to_solo_model_conditioned_input_path_"
+                "dead_air_timing_repair_pitch_contour_objective_only_next_decision"
+            ),
+            "objective_next_decision_completed": True,
+            "current_evidence_consolidation_ready": pitch_contour_supported,
+            "review_item_count": 3,
+            "validated_review_input_present": False,
+            "preference_fill_allowed": False,
+            "technical_wav_validation": True,
+            "rendered_audio_file_count": 3,
+            "max_repaired_interval": 11 if pitch_contour_supported else 13,
+            "max_interval_threshold": 12,
+            "pitch_contour_target_supported": pitch_contour_supported,
+            "max_pitch_changed_ratio": 0.7174,
+            "pitch_changed_ratio_review_required": True,
+            "audio_review_required": True,
+        },
         "decision": {
             "critical_user_input_required": False,
         },
@@ -80,6 +105,8 @@ def readme_text(*, missing_boundary: bool = False) -> str:
             "- input MIDI -> context -> ranked MIDI -> WAV technical path: `true`",
             "- selected-scale objective repair path complete: `true`",
             "- phrase-bank CLI technical path included in current evidence: `true`",
+            "- model-conditioned pitch-contour objective path ready: `true`",
+            "- model-conditioned pitch-contour changed-ratio review required: `true`",
             "- README evidence refreshed: `true`",
             "- human/audio preference claim: `false`",
             "- MIDI-to-solo musical quality claim: `false`",
@@ -103,6 +130,7 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
             expected_next_boundary=NEXT_BOUNDARY,
             require_technical_mvp_completion=True,
             require_no_quality_claim=True,
+            require_model_conditioned_pitch_contour_objective=True,
         )
 
         self.assertTrue(summary["technical_model_core_mvp_completed"])
@@ -124,6 +152,15 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
         self.assertEqual(summary["cli_rendered_audio_file_count"], 3)
         self.assertEqual(summary["cli_input_context_bars"], 228)
         self.assertFalse(summary["cli_preference_fill_allowed"])
+        self.assertTrue(summary["model_conditioned_pitch_contour_objective_completed"])
+        self.assertTrue(summary["model_conditioned_pitch_contour_objective_path_ready"])
+        self.assertEqual(summary["model_conditioned_pitch_contour_max_interval"], 11)
+        self.assertEqual(summary["model_conditioned_pitch_contour_max_interval_threshold"], 12)
+        self.assertTrue(summary["model_conditioned_pitch_contour_target_supported"])
+        self.assertTrue(
+            summary["model_conditioned_pitch_contour_pitch_changed_ratio_review_required"]
+        )
+        self.assertTrue(summary["model_conditioned_pitch_contour_audio_review_required"])
         self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
 
     def test_rejects_missing_readme_evidence_boundary(self) -> None:
@@ -151,6 +188,15 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
                 readme_text=readme_text(),
                 output_dir=Path("outputs/audit"),
                 issue_number=616,
+            )
+
+    def test_rejects_missing_pitch_contour_support(self) -> None:
+        with self.assertRaises(StageBMidiToSoloMvpCompletionAuditError):
+            build_mvp_completion_audit_report(
+                current_evidence=current_evidence(pitch_contour_supported=False),
+                readme_text=readme_text(),
+                output_dir=Path("outputs/audit"),
+                issue_number=712,
             )
 
     def test_boundary_constants_are_stable(self) -> None:

@@ -5924,10 +5924,12 @@ run_stage_b_midi_to_solo_mvp_completion_audit() {
     --run_id "$run_id" \
     --current_evidence "$current_evidence" \
     --readme_path README.md \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_2026-06-05.md \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_2026-06-09.md \
+    --issue_number 712 \
     --expected_boundary stage_b_midi_to_solo_mvp_completion_audit \
     --expected_next_boundary stage_b_midi_to_solo_quality_gap_decision \
     --require_technical_mvp_completion \
+    --require_model_conditioned_pitch_contour_objective \
     --require_no_quality_claim
 }
 

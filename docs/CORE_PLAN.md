@@ -393,6 +393,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision: objective path support `true`, valid/strict/grammar `9/9/9`, dead-air/collapse `0/0`, avg/max postprocess removal `0.2176/0.2917`, preference/quality claim `false`, next boundary `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - MIDI-to-solo MVP current evidence consolidation: evidence support `true`, technical path `true`, selected-scale objective path `true`, phrase-bank CLI path `true`, model-conditioned pitch-contour objective path `true`, exported/rendered `3/3`, objective valid/strict/grammar `9/9/9`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_readme_evidence_refresh`
 - MIDI-to-solo README evidence refresh: latest boundary `stage_b_midi_to_solo_mvp_current_evidence_consolidation`, input-to-WAV technical path `true`, selected-scale objective path `true`, phrase-bank CLI path `true`, model-conditioned pitch-contour objective path `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_mvp_completion_audit`
+- MIDI-to-solo MVP completion audit refresh: technical model-core MVP `true`, model-conditioned pitch-contour objective `true`, max interval/threshold `11/12`, musical/product MVP `false/false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_gap_decision`
 - MIDI-to-solo MVP completion audit: technical model-core MVP `true`, input ranked MIDI/WAV `true/true`, selected-scale objective repair `true`, musical/product MVP `false/false`, next boundary `stage_b_midi_to_solo_quality_gap_decision`
 - MIDI-to-solo quality gap decision: selected target `model_conditioned_input_path_quality_alignment`, fallback path active `true`, human review required now `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment`
 - MIDI-to-solo model-conditioned input path quality alignment: aligned `false`, fallback replacement probe required `true`, selected probe target `replace_fallback_with_model_conditioned_input_path_probe`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_probe`
@@ -3698,6 +3699,45 @@ Issue #710은 Issue #708 current evidence를 README 첫 상태 영역과 evidenc
 다음 작업:
 
 - `Stage B MIDI-to-solo MVP completion audit`
+
+## 9.47 Stage B MIDI-to-solo MVP completion audit refresh
+
+Issue #712는 Issue #708 current evidence와 Issue #710 README refresh를 기준으로 technical model-core MVP 완료 범위를 audit한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- source boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- technical model-core MVP completed: `true`
+- input to ranked MIDI completed: `true`
+- input to rendered WAV completed: `true`
+- selected-scale objective repair completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour max interval / threshold: `11 / 12`
+- model-conditioned pitch-contour changed-ratio review required: `true`
+- musical quality MVP completed: `false`
+- human/audio preference completed: `false`
+- product MVP completed: `false`
+
+판단:
+
+- current evidence 기준 technical model-core MVP 완료 범위 확인.
+- model-conditioned pitch-contour objective path는 completion audit 필수 근거에 포함.
+- 음악 품질, 사용자 선호, 제품 MVP 완료 claim 제외 유지.
+- 다음 boundary는 quality gap decision.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_completion_audit`
+- `.venv/bin/python -m py_compile scripts/audit_stage_b_midi_to_solo_mvp_completion.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo quality gap decision`
 
 ## 10. 한 문장 요약
 

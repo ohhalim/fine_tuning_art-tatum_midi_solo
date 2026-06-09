@@ -72,6 +72,7 @@
 - model-conditioned input path pitch-contour objective-only 기준 current evidence consolidation 준비 완료
 - model-conditioned input path pitch-contour objective path를 current evidence에 통합 완료
 - README current evidence boundary refresh 완료
+- MVP completion audit에 model-conditioned pitch-contour objective path 포함 완료
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
@@ -114,6 +115,53 @@ Issue #710은 Issue #708 current evidence를 README 첫 상태 영역과 evidenc
 다음:
 
 - `Stage B MIDI-to-solo MVP completion audit`
+
+## Stage B MIDI-to-Solo MVP Completion Audit Result
+
+Issue #712는 Issue #708 current evidence와 Issue #710 README refresh를 기준으로 technical model-core MVP 완료 범위를 audit한 작업이다.
+
+변경:
+
+- completion audit script에 model-conditioned pitch-contour objective path 검증 추가
+- README required snippet에 pitch-contour objective readiness와 changed-ratio review 필요 상태 추가
+- completion audit validation summary에 pitch-contour interval, threshold, review boundary 노출
+- generated audit document를 2026-06-09 current evidence 기준으로 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- source boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- technical model-core MVP completed: `true`
+- input to ranked MIDI completed: `true`
+- input to rendered WAV completed: `true`
+- selected-scale objective repair completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour max interval / threshold: `11 / 12`
+- model-conditioned pitch-contour changed-ratio review required: `true`
+- musical quality MVP completed: `false`
+- human/audio preference completed: `false`
+- product MVP completed: `false`
+
+판단:
+
+- current evidence 기준 technical model-core MVP 완료 범위 확인.
+- model-conditioned pitch-contour objective path는 MVP completion audit에 포함.
+- 음악 품질, 사용자 선호, 제품 MVP 완료 claim 제외 유지.
+- 다음 작업은 quality gap decision.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_completion_audit`
+- `.venv/bin/python -m py_compile scripts/audit_stage_b_midi_to_solo_mvp_completion.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit`
+
+다음:
+
+- `Stage B MIDI-to-solo quality gap decision`
 
 ## Stage B MIDI-to-Solo MVP Current Evidence Consolidation Result
 
