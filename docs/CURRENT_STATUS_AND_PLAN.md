@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #704, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour listening review input guard
-- 다음 권장 이슈: `Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour objective-only next decision`
+- latest functional result: Issue #706, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour objective-only next decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation`
 
 현재 범위가 아닌 것:
 
@@ -69,6 +69,59 @@
 - model-conditioned input path pitch-contour repaired 후보 3개 WAV technical render 완료
 - model-conditioned input path pitch-contour repaired WAV/MIDI 후보 3개 listening review package 준비 완료
 - model-conditioned input path pitch-contour review input pending 상태에서 preference fill 차단 완료
+- model-conditioned input path pitch-contour objective-only 기준 current evidence consolidation 준비 완료
+
+## Stage B MIDI-to-Solo Model-Conditioned Input Path Dead-Air Timing Repair Pitch Contour Objective-Only Next Decision Result
+
+Issue #706은 Issue #704 input guard 결과를 source로 사용해 청음 입력 없이 objective evidence 기준 다음 경계를 결정한 작업이다.
+
+변경:
+
+- model-conditioned input path dead-air timing repair pitch contour objective-only next decision script 추가
+- max interval target 통과 여부 검증
+- pitch changed ratio review 필요 상태 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_DEAD_AIR_TIMING_REPAIR_PITCH_CONTOUR_OBJECTIVE_NEXT_DECISION_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_only_next_decision`
+- source boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_input_guard`
+- next boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- review item count: `3`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `3`
+- max repaired interval: `11`
+- max interval threshold: `12`
+- pitch-contour target supported: `true`
+- max pitch changed ratio: `0.7174`
+- pitch changed ratio review required: `true`
+- audio review required: `true`
+- current evidence consolidation ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- max interval target 통과.
+- preference fill 차단 유지.
+- pitch changed ratio review 필요 상태 유지.
+- musical quality claim 제외 유지.
+- 다음 boundary는 current evidence consolidation.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_next`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_next.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-objective-next`
+
+다음:
+
+- `Stage B MIDI-to-solo MVP current evidence consolidation`
 
 ## Stage B MIDI-to-Solo Model-Conditioned Input Path Dead-Air Timing Repair Pitch Contour Listening Review Input Guard Result
 
