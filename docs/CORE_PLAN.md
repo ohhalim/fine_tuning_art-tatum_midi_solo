@@ -391,7 +391,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair audio review package: candidate/rendered `3/3`, sample rate `44100`, duration `6.866s-6.869s`, technical validation `true`, preference claim `false`, next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_listening_review`
 - MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair listening review: review template `true`, pending status/candidate/field `4/3/9`, preference fill `false`, quality claim `false`, next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_only_next_decision`
 - MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision: objective path support `true`, valid/strict/grammar `9/9/9`, dead-air/collapse `0/0`, avg/max postprocess removal `0.2176/0.2917`, preference/quality claim `false`, next boundary `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
-- MIDI-to-solo MVP current evidence consolidation: evidence support `true`, technical path `true`, selected-scale objective path `true`, exported/rendered `3/3`, objective valid/strict/grammar `9/9/9`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_readme_evidence_refresh`
+- MIDI-to-solo MVP current evidence consolidation: evidence support `true`, technical path `true`, selected-scale objective path `true`, phrase-bank CLI path `true`, model-conditioned pitch-contour objective path `true`, exported/rendered `3/3`, objective valid/strict/grammar `9/9/9`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_readme_evidence_refresh`
 - MIDI-to-solo README evidence refresh: latest boundary `stage_b_midi_to_solo_mvp_current_evidence_consolidation`, input-to-WAV technical path `true`, selected-scale objective path `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_mvp_completion_audit`
 - MIDI-to-solo MVP completion audit: technical model-core MVP `true`, input ranked MIDI/WAV `true/true`, selected-scale objective repair `true`, musical/product MVP `false/false`, next boundary `stage_b_midi_to_solo_quality_gap_decision`
 - MIDI-to-solo quality gap decision: selected target `model_conditioned_input_path_quality_alignment`, fallback path active `true`, human review required now `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment`
@@ -476,7 +476,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair audio review package: candidate/rendered `3/3`, sample rate `44100`, duration `6.866s-6.869s`, technical validation `true`, preference claim `false`, next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_listening_review`
 - Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair listening review: candidate/rendered `3/3`, validated review input `false`, pending fields `4/3/9`, preference fill `false`, quality claim `false`, next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_only_next_decision`
 - Stage B MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision: objective path support `true`, final boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_path_complete`, next boundary `stage_b_midi_to_solo_mvp_current_evidence_consolidation`, quality claim `false`
-- Stage B MIDI-to-solo MVP current evidence consolidation: current evidence support `true`, technical execution support `true`, selected-scale objective path complete `true`, generation source `context_conditioned_fallback`, rendered WAV `3`, quality claim `false`, next boundary `stage_b_midi_to_solo_readme_evidence_refresh`
+- Stage B MIDI-to-solo MVP current evidence consolidation: current evidence support `true`, technical execution support `true`, selected-scale objective path complete `true`, phrase-bank CLI technical path `true`, model-conditioned pitch-contour objective path `true`, generation source `context_conditioned_fallback`, rendered WAV `3`, quality claim `false`, next boundary `stage_b_midi_to_solo_readme_evidence_refresh`
 - Stage B MIDI-to-solo README evidence refresh: README current status refreshed to #612 evidence, stale boundary removed, implemented scope / problem-action-result / artifacts / validation commands reduced, quality claim `false`, next boundary `stage_b_midi_to_solo_mvp_completion_audit`
 - Stage B MIDI-to-solo MVP completion audit: technical model-core MVP completed `true`, musical quality MVP completed `false`, product MVP completed `false`, quality claim `false`, next boundary `stage_b_midi_to_solo_quality_gap_decision`
 - Stage B MIDI-to-solo quality gap decision: current input-to-WAV generation source `context_conditioned_fallback`, selected target `model_conditioned_input_path_quality_alignment`, human review required now `false`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment`
@@ -3623,6 +3623,47 @@ Issue #706은 Issue #704 input guard 결과를 source로 사용해 청음 입력
 다음 작업:
 
 - `Stage B MIDI-to-solo MVP current evidence consolidation`
+
+## 9.45 Stage B MIDI-to-solo MVP current evidence consolidation
+
+Issue #708은 Issue #706 pitch-contour objective-only next decision 결과를 기존 current evidence consolidation source에 추가한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- current MVP evidence supported: `true`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour max interval: `11`
+- model-conditioned pitch-contour target supported: `true`
+- model-conditioned pitch-contour changed-ratio review required: `true`
+- model-conditioned pitch-contour audio review required: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- objective valid / strict / grammar: `9 / 9 / 9`
+- objective dead-air / collapse failure count: `0 / 0`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- technical/objective current evidence support 유지.
+- model-conditioned pitch-contour objective path current evidence에 포함.
+- pitch changed ratio review 필요 상태 유지.
+- musical quality claim 제외 유지.
+- 다음 boundary는 README evidence refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-current-evidence-consolidation`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo README evidence refresh`
 
 ## 10. 한 문장 요약
 

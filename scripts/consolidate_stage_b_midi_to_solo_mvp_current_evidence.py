@@ -37,6 +37,10 @@ OBJECTIVE_FINAL_BOUNDARY = (
     "postprocess_removal_dead_air_repair_objective_path_complete"
 )
 CLI_OBJECTIVE_BOUNDARY = "stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision"
+MODEL_CONDITIONED_PITCH_CONTOUR_OBJECTIVE_BOUNDARY = (
+    "stage_b_midi_to_solo_model_conditioned_input_path_"
+    "dead_air_timing_repair_pitch_contour_objective_only_next_decision"
+)
 
 
 def _dict(value: Any) -> dict[str, Any]:
@@ -428,6 +432,93 @@ def validate_cli_objective_next(report: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def validate_model_conditioned_pitch_contour_objective_next(
+    report: dict[str, Any],
+) -> dict[str, Any]:
+    if str(report.get("boundary") or "") != MODEL_CONDITIONED_PITCH_CONTOUR_OBJECTIVE_BOUNDARY:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour objective boundary required"
+        )
+    summary = _dict(report.get("objective_summary"))
+    readiness = _dict(report.get("readiness"))
+    decision = _dict(report.get("decision"))
+    if str(decision.get("next_boundary") or "") != BOUNDARY:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour objective should route to current evidence"
+        )
+    if not bool(readiness.get("objective_next_decision_completed", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour objective completion required"
+        )
+    if not bool(summary.get("pitch_contour_target_supported", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour target support required"
+        )
+    if not bool(summary.get("current_evidence_consolidation_ready", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour current evidence readiness required"
+        )
+    if not bool(summary.get("technical_wav_validation", False)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour technical WAV validation required"
+        )
+    if _int(summary.get("rendered_audio_file_count")) < 3:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour rendered WAV count below 3"
+        )
+    if bool(summary.get("validated_review_input_present", True)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour review input should remain absent"
+        )
+    if bool(summary.get("preference_fill_allowed", True)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour preference fill should remain blocked"
+        )
+    if bool(decision.get("critical_user_input_required", True)):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour critical user input should not be required"
+        )
+    blocked_claims = [
+        "human_audio_preference_claimed",
+        "midi_to_solo_musical_quality_claimed",
+        "audio_rendered_quality_claimed",
+        "model_checkpoint_generation_quality_claimed",
+        "model_direct_generation_quality_claimed",
+        "broad_trained_model_quality_claimed",
+        "brad_style_adaptation_claimed",
+        "production_ready_claimed",
+    ]
+    claimed = [name for name in blocked_claims if bool(readiness.get(name, False))]
+    if claimed:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            f"unexpected model-conditioned pitch-contour claim: {claimed}"
+        )
+    return {
+        "boundary": MODEL_CONDITIONED_PITCH_CONTOUR_OBJECTIVE_BOUNDARY,
+        "objective_next_decision_completed": bool(
+            readiness.get("objective_next_decision_completed", False)
+        ),
+        "current_evidence_consolidation_ready": bool(
+            summary.get("current_evidence_consolidation_ready", False)
+        ),
+        "review_item_count": _int(summary.get("review_item_count")),
+        "validated_review_input_present": bool(
+            summary.get("validated_review_input_present", True)
+        ),
+        "preference_fill_allowed": bool(summary.get("preference_fill_allowed", True)),
+        "technical_wav_validation": bool(summary.get("technical_wav_validation", False)),
+        "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
+        "max_repaired_interval": _int(summary.get("max_repaired_interval")),
+        "max_interval_threshold": _int(summary.get("max_interval_threshold")),
+        "pitch_contour_target_supported": bool(summary.get("pitch_contour_target_supported", False)),
+        "max_pitch_changed_ratio": _float(summary.get("max_pitch_changed_ratio")),
+        "pitch_changed_ratio_review_required": bool(
+            summary.get("pitch_changed_ratio_review_required", False)
+        ),
+        "audio_review_required": bool(summary.get("audio_review_required", False)),
+    }
+
+
 def build_current_evidence_consolidation_report(
     *,
     contract_report: dict[str, Any],
@@ -437,6 +528,7 @@ def build_current_evidence_consolidation_report(
     audio_render: dict[str, Any],
     objective_next: dict[str, Any],
     cli_objective_next: dict[str, Any],
+    model_conditioned_pitch_contour_objective_next: dict[str, Any] | None = None,
     output_dir: Path,
     issue_number: int,
 ) -> dict[str, Any]:
@@ -447,6 +539,13 @@ def build_current_evidence_consolidation_report(
     audio = validate_audio(audio_render)
     objective = validate_objective_next(objective_next)
     cli_objective = validate_cli_objective_next(cli_objective_next)
+    model_conditioned_pitch_contour_objective = (
+        validate_model_conditioned_pitch_contour_objective_next(
+            model_conditioned_pitch_contour_objective_next
+        )
+        if model_conditioned_pitch_contour_objective_next
+        else {}
+    )
     technical_path_supported = (
         bool(resource["midi_to_solo_training_resource_ready"])
         and generation["exported_candidate_count"] >= 3
@@ -456,27 +555,39 @@ def build_current_evidence_consolidation_report(
     )
     selected_scale_objective_path_complete = bool(objective["objective_path_supported"])
     phrase_bank_cli_technical_path_ready = bool(cli_objective["technical_midi_to_solo_cli_path_ready"])
+    model_conditioned_pitch_contour_objective_path_ready = bool(
+        model_conditioned_pitch_contour_objective.get(
+            "current_evidence_consolidation_ready",
+            not bool(model_conditioned_pitch_contour_objective_next),
+        )
+    )
     current_evidence_supported = bool(
         technical_path_supported
         and selected_scale_objective_path_complete
         and phrase_bank_cli_technical_path_ready
+        and model_conditioned_pitch_contour_objective_path_ready
     )
+    source_boundaries = {
+        "contract": contract["boundary"],
+        "context": context["boundary"],
+        "resource": resource["boundary"],
+        "generation": generation["boundary"],
+        "audio": audio["boundary"],
+        "objective_next": objective["boundary"],
+        "objective_final": objective["final_boundary"],
+        "phrase_bank_cli_objective_next": cli_objective["boundary"],
+    }
+    if model_conditioned_pitch_contour_objective:
+        source_boundaries["model_conditioned_pitch_contour_objective_next"] = (
+            model_conditioned_pitch_contour_objective["boundary"]
+        )
     return {
         "schema_version": SCHEMA_VERSION,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "output_dir": str(output_dir),
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
-        "source_boundaries": {
-            "contract": contract["boundary"],
-            "context": context["boundary"],
-            "resource": resource["boundary"],
-            "generation": generation["boundary"],
-            "audio": audio["boundary"],
-            "objective_next": objective["boundary"],
-            "objective_final": objective["final_boundary"],
-            "phrase_bank_cli_objective_next": cli_objective["boundary"],
-        },
+        "source_boundaries": source_boundaries,
         "mvp_contract": contract,
         "context_extraction": context,
         "training_resource": resource,
@@ -484,6 +595,7 @@ def build_current_evidence_consolidation_report(
         "technical_audio_render": audio,
         "selected_scale_objective_path": objective,
         "phrase_bank_cli_technical_path": cli_objective,
+        "model_conditioned_pitch_contour_objective_path": model_conditioned_pitch_contour_objective,
         "readiness": {
             "boundary": BOUNDARY,
             "mvp_current_evidence_consolidated": True,
@@ -494,6 +606,9 @@ def build_current_evidence_consolidation_report(
             "technical_wav_path_ready": True,
             "selected_scale_objective_path_complete": selected_scale_objective_path_complete,
             "phrase_bank_cli_technical_path_ready": phrase_bank_cli_technical_path_ready,
+            "model_conditioned_pitch_contour_objective_path_ready": bool(
+                model_conditioned_pitch_contour_objective_path_ready
+            ),
             "current_mvp_technical_execution_evidence_supported": technical_path_supported,
             "current_mvp_objective_repair_evidence_supported": selected_scale_objective_path_complete,
             "midi_to_solo_mvp_current_evidence_supported": current_evidence_supported,
@@ -522,6 +637,11 @@ def build_current_evidence_consolidation_report(
             "technical_wav_render_path_validated",
             "selected_scale_objective_dead_air_repair_path_complete",
             "explicit_input_cli_ranked_midi_wav_path_validated",
+            *(
+                ["model_conditioned_pitch_contour_objective_path_ready"]
+                if model_conditioned_pitch_contour_objective
+                else []
+            ),
             "quality_claim_guard_preserved",
         ],
         "not_proven": [
@@ -545,6 +665,7 @@ def validate_current_evidence_consolidation_report(
     min_exported_candidates: int,
     min_rendered_wav_files: int,
     min_objective_sample_count: int,
+    require_model_conditioned_pitch_contour_objective: bool = False,
 ) -> dict[str, Any]:
     boundary = str(report.get("boundary") or "")
     readiness = _dict(report.get("readiness"))
@@ -553,6 +674,9 @@ def validate_current_evidence_consolidation_report(
     audio = _dict(report.get("technical_audio_render"))
     objective = _dict(report.get("selected_scale_objective_path"))
     cli_objective = _dict(report.get("phrase_bank_cli_technical_path"))
+    model_conditioned_pitch_contour = _dict(
+        report.get("model_conditioned_pitch_contour_objective_path")
+    )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -575,6 +699,18 @@ def validate_current_evidence_consolidation_report(
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI technical path support required")
     if bool(cli_objective.get("preference_fill_allowed", True)):
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("CLI preference fill should remain blocked")
+    if require_model_conditioned_pitch_contour_objective and not bool(
+        readiness.get("model_conditioned_pitch_contour_objective_path_ready", False)
+    ):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour objective path support required"
+        )
+    if model_conditioned_pitch_contour and bool(
+        model_conditioned_pitch_contour.get("preference_fill_allowed", True)
+    ):
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "model-conditioned pitch-contour preference fill should remain blocked"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("critical user input should not be required")
     for item in _list(generation.get("midi_paths")) + _list(audio.get("wav_paths")):
@@ -607,6 +743,21 @@ def validate_current_evidence_consolidation_report(
         ),
         "phrase_bank_cli_technical_path_ready": bool(
             readiness.get("phrase_bank_cli_technical_path_ready", False)
+        ),
+        "model_conditioned_pitch_contour_objective_path_ready": bool(
+            readiness.get("model_conditioned_pitch_contour_objective_path_ready", False)
+        ),
+        "model_conditioned_pitch_contour_max_interval": _int(
+            model_conditioned_pitch_contour.get("max_repaired_interval")
+        ),
+        "model_conditioned_pitch_contour_target_supported": bool(
+            model_conditioned_pitch_contour.get("pitch_contour_target_supported", False)
+        ),
+        "model_conditioned_pitch_contour_pitch_changed_ratio_review_required": bool(
+            model_conditioned_pitch_contour.get("pitch_changed_ratio_review_required", False)
+        ),
+        "model_conditioned_pitch_contour_audio_review_required": bool(
+            model_conditioned_pitch_contour.get("audio_review_required", False)
         ),
         "cli_candidate_count": _int(cli_objective.get("candidate_count")),
         "cli_rendered_audio_file_count": _int(cli_objective.get("rendered_audio_file_count")),
@@ -650,6 +801,9 @@ def markdown_report(report: dict[str, Any]) -> str:
     audio = report["technical_audio_render"]
     objective = report["selected_scale_objective_path"]
     cli_objective = report["phrase_bank_cli_technical_path"]
+    model_conditioned_pitch_contour = _dict(
+        report.get("model_conditioned_pitch_contour_objective_path")
+    )
     lines = [
         "# Stage B MIDI-to-Solo MVP Current Evidence Consolidation",
         "",
@@ -661,6 +815,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- technical execution evidence supported: `{_bool_token(readiness['current_mvp_technical_execution_evidence_supported'])}`",
         f"- selected-scale objective path complete: `{_bool_token(readiness['selected_scale_objective_path_complete'])}`",
         f"- phrase-bank CLI technical path ready: `{_bool_token(readiness['phrase_bank_cli_technical_path_ready'])}`",
+        f"- model-conditioned pitch-contour objective path ready: `{_bool_token(readiness['model_conditioned_pitch_contour_objective_path_ready'])}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         f"- MIDI-to-solo musical quality claimed: `{_bool_token(readiness['midi_to_solo_musical_quality_claimed'])}`",
         "",
@@ -710,9 +865,25 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- dead-air range: `{cli_objective['min_dead_air_ratio']:.4f}-{cli_objective['max_dead_air_ratio']:.4f}`",
         f"- preference fill allowed: `{_bool_token(cli_objective['preference_fill_allowed'])}`",
         "",
-        "## MIDI Paths",
-        "",
     ]
+    if model_conditioned_pitch_contour:
+        lines.extend(
+            [
+                "## Model-Conditioned Pitch-Contour Objective Path",
+                "",
+                f"- current evidence consolidation ready: `{_bool_token(model_conditioned_pitch_contour['current_evidence_consolidation_ready'])}`",
+                f"- rendered WAV files: `{model_conditioned_pitch_contour['rendered_audio_file_count']}`",
+                f"- technical WAV validation: `{_bool_token(model_conditioned_pitch_contour['technical_wav_validation'])}`",
+                f"- max interval / threshold: `{model_conditioned_pitch_contour['max_repaired_interval']}` / `{model_conditioned_pitch_contour['max_interval_threshold']}`",
+                f"- pitch-contour target supported: `{_bool_token(model_conditioned_pitch_contour['pitch_contour_target_supported'])}`",
+                f"- max pitch changed ratio: `{model_conditioned_pitch_contour['max_pitch_changed_ratio']:.4f}`",
+                f"- pitch changed ratio review required: `{_bool_token(model_conditioned_pitch_contour['pitch_changed_ratio_review_required'])}`",
+                f"- audio review required: `{_bool_token(model_conditioned_pitch_contour['audio_review_required'])}`",
+                f"- preference fill allowed: `{_bool_token(model_conditioned_pitch_contour['preference_fill_allowed'])}`",
+                "",
+            ]
+        )
+    lines.extend(["## MIDI Paths", ""])
     for item in generation["midi_paths"]:
         lines.append(f"- `{item}`")
     lines.extend(["", "## WAV Paths", ""])
@@ -734,6 +905,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--audio_render", type=str, required=True)
     parser.add_argument("--objective_next", type=str, required=True)
     parser.add_argument("--cli_objective_next", type=str, required=True)
+    parser.add_argument("--model_conditioned_pitch_contour_objective_next", type=str, default="")
     parser.add_argument(
         "--output_root",
         type=str,
@@ -745,6 +917,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_current_evidence_support", action="store_true")
+    parser.add_argument("--require_model_conditioned_pitch_contour_objective", action="store_true")
     parser.add_argument("--require_no_quality_claim", action="store_true")
     parser.add_argument("--min_exported_candidates", type=int, default=3)
     parser.add_argument("--min_rendered_wav_files", type=int, default=3)
@@ -764,6 +937,11 @@ def main() -> int:
         audio_render=read_json(Path(args.audio_render)),
         objective_next=read_json(Path(args.objective_next)),
         cli_objective_next=read_json(Path(args.cli_objective_next)),
+        model_conditioned_pitch_contour_objective_next=(
+            read_json(Path(args.model_conditioned_pitch_contour_objective_next))
+            if args.model_conditioned_pitch_contour_objective_next
+            else None
+        ),
         output_dir=output_dir,
         issue_number=int(args.issue_number),
     )
@@ -776,6 +954,9 @@ def main() -> int:
         min_exported_candidates=int(args.min_exported_candidates),
         min_rendered_wav_files=int(args.min_rendered_wav_files),
         min_objective_sample_count=int(args.min_objective_sample_count),
+        require_model_conditioned_pitch_contour_objective=bool(
+            args.require_model_conditioned_pitch_contour_objective
+        ),
     )
     output_dir.mkdir(parents=True, exist_ok=True)
     write_json(output_dir / "stage_b_midi_to_solo_mvp_current_evidence_consolidation.json", report)
