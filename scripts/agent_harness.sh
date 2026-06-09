@@ -264,6 +264,8 @@ Modes:
                 Package pitch-contour repaired WAV/MIDI candidates for pending listening review.
   stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-listening-review-input-guard
                 Block pitch-contour preference fill while listening review input is pending.
+  stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-objective-next
+                Select the next boundary after pitch-contour objective evidence.
   stage-b-midi-to-solo-model-direct-generation-repair
                 Define the model-direct generation repair boundary from sequence budget evidence.
   stage-b-midi-to-solo-model-direct-sequence-budget-repair-smoke
@@ -6392,6 +6394,29 @@ run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pit
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_next() {
+  local input_guard_run_id="${INPUT_GUARD_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_input_guard}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_next}"
+  local input_guard_report="outputs/stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_input_guard/${input_guard_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_input_guard.json"
+  if [[ ! -f "$input_guard_report" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour listening review input guard"
+    RUN_ID="$input_guard_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_input_guard
+  fi
+  print_header "Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour objective-only next decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_next.py \
+    --run_id "$run_id" \
+    --input_guard_report "$input_guard_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MODEL_CONDITIONED_INPUT_PATH_DEAD_AIR_TIMING_REPAIR_PITCH_CONTOUR_OBJECTIVE_NEXT_DECISION_2026-06-09.md \
+    --issue_number 706 \
+    --max_interval_threshold 12 \
+    --pitch_changed_ratio_review_threshold 0.5 \
+    --expected_boundary stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_only_next_decision \
+    --expected_next_boundary stage_b_midi_to_solo_mvp_current_evidence_consolidation \
+    --require_objective_decision \
+    --require_current_evidence_ready \
+    --require_no_quality_claim
+}
+
 run_stage_b_constrained_probe() {
   local run_id="${RUN_ID:-harness_stage_b_constrained_probe}"
   print_header "Stage B constrained probe"
@@ -8072,6 +8097,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-listening-review-input-guard)
     run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_input_guard
+    ;;
+  stage-b-midi-to-solo-model-conditioned-input-path-dead-air-timing-repair-pitch-contour-objective-next)
+    run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_next
     ;;
   stage-b-generic-tiny-checkpoint-generation-probe)
     run_stage_b_generic_tiny_checkpoint_generation_probe
