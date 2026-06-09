@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- latest evidence boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -106,6 +106,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - README evidence refreshed: `true`
 - MVP completion audit completed: `true`
 - MVP completion audit model-conditioned pitch-contour objective included: `true`
+- MVP completion audit changed-ratio repair objective included: `true`
 - quality gap decision completed: `true`
 - quality gap decision pitch-contour changed-ratio target selected: `true`
 - pitch-contour changed-ratio review decision completed: `true`
@@ -129,7 +130,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - pitch-contour changed-ratio repair max pitch changed ratio / target: `0.4348 / 0.5000`
 - current evidence changed-ratio repair objective path included: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -222,8 +223,11 @@ Quality gap decision.
 - model-conditioned input path alignment required: `false`
 - phrase-bank CLI technical path completed: `true`
 - model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour changed-ratio repair objective completed: `true`
 - model-conditioned pitch-contour max interval / threshold: `11 / 12`
 - model-conditioned pitch-contour changed-ratio review required: `true`
+- model-conditioned pitch-contour changed-ratio repair max ratio / target: `0.4348 / 0.5000`
+- model-conditioned pitch-contour changed-ratio repair max interval / target: `12 / 12`
 - musical quality MVP completed: `false`
 - CLI candidate / rendered WAV: `3 / 3`
 - CLI preference fill allowed: `false`
