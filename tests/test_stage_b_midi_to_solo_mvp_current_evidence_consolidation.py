@@ -27,6 +27,7 @@ def reports(
     strict_count: int = 9,
     dead_air_failure_count: int = 0,
     pitch_contour_supported: bool = True,
+    changed_ratio_repair_supported: bool = True,
     collapse_count: int = 0,
     quality_claim: bool = False,
 ) -> dict[str, dict]:
@@ -255,6 +256,47 @@ def reports(
                 "critical_user_input_required": False,
             },
         },
+        "model_conditioned_pitch_contour_changed_ratio_repair_objective": {
+            "boundary": (
+                "stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_"
+                "objective_only_next_decision"
+            ),
+            "objective_summary": {
+                "review_item_count": 3,
+                "required_input_field_count": 4,
+                "validated_review_input_present": False,
+                "preference_fill_allowed": False,
+                "technical_wav_validation": True,
+                "rendered_audio_file_count": 3,
+                "max_repaired_interval": 12,
+                "max_interval_threshold": 12,
+                "interval_target_supported": True,
+                "max_repaired_pitch_changed_ratio": 0.4348
+                if changed_ratio_repair_supported
+                else 0.6522,
+                "target_max_pitch_changed_ratio": 0.5,
+                "changed_ratio_target_supported": changed_ratio_repair_supported,
+                "audio_review_required": True,
+                "changed_ratio_repair_objective_path_supported": changed_ratio_repair_supported,
+                "current_evidence_consolidation_ready": changed_ratio_repair_supported,
+            },
+            "readiness": {
+                "objective_next_completed": True,
+                "objective_next_decision_completed": True,
+                "human_audio_preference_claimed": False,
+                "midi_to_solo_musical_quality_claimed": quality_claim,
+                "audio_rendered_quality_claimed": False,
+                "model_checkpoint_generation_quality_claimed": False,
+                "model_direct_generation_quality_claimed": False,
+                "broad_trained_model_quality_claimed": False,
+                "brad_style_adaptation_claimed": False,
+                "production_ready_claimed": False,
+            },
+            "decision": {
+                "next_boundary": "stage_b_midi_to_solo_mvp_current_evidence_consolidation",
+                "critical_user_input_required": False,
+            },
+        },
     }
 
 
@@ -273,8 +315,11 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                 model_conditioned_pitch_contour_objective_next=data[
                     "model_conditioned_pitch_contour_objective"
                 ],
+                model_conditioned_pitch_contour_changed_ratio_repair_objective_next=data[
+                    "model_conditioned_pitch_contour_changed_ratio_repair_objective"
+                ],
                 output_dir=Path(tmp) / "out",
-                issue_number=612,
+                issue_number=728,
             )
             summary = validate_current_evidence_consolidation_report(
                 report,
@@ -286,6 +331,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                 min_rendered_wav_files=3,
                 min_objective_sample_count=9,
                 require_model_conditioned_pitch_contour_objective=True,
+                require_model_conditioned_pitch_contour_changed_ratio_repair_objective=True,
             )
 
             self.assertTrue(summary["midi_to_solo_mvp_current_evidence_supported"])
@@ -293,6 +339,11 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
             self.assertTrue(summary["selected_scale_objective_path_complete"])
             self.assertTrue(summary["phrase_bank_cli_technical_path_ready"])
             self.assertTrue(summary["model_conditioned_pitch_contour_objective_path_ready"])
+            self.assertTrue(
+                summary[
+                    "model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready"
+                ]
+            )
             self.assertEqual(summary["generation_source"], "context_conditioned_fallback")
             self.assertEqual(summary["exported_candidate_count"], 3)
             self.assertEqual(summary["rendered_audio_file_count"], 3)
@@ -310,6 +361,29 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
             self.assertTrue(
                 summary[
                     "model_conditioned_pitch_contour_pitch_changed_ratio_review_required"
+                ]
+            )
+            self.assertEqual(
+                summary[
+                    "model_conditioned_pitch_contour_changed_ratio_repair_rendered_audio_file_count"
+                ],
+                3,
+            )
+            self.assertEqual(
+                summary[
+                    "model_conditioned_pitch_contour_changed_ratio_repair_max_interval"
+                ],
+                12,
+            )
+            self.assertAlmostEqual(
+                summary[
+                    "model_conditioned_pitch_contour_changed_ratio_repair_max_pitch_changed_ratio"
+                ],
+                0.4348,
+            )
+            self.assertTrue(
+                summary[
+                    "model_conditioned_pitch_contour_changed_ratio_repair_changed_ratio_target_supported"
                 ]
             )
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -397,6 +471,28 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     ],
                     output_dir=Path(tmp) / "out",
                     issue_number=612,
+                )
+
+    def test_rejects_missing_changed_ratio_repair_support(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp), changed_ratio_repair_supported=False)
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
+                    model_conditioned_pitch_contour_objective_next=data[
+                        "model_conditioned_pitch_contour_objective"
+                    ],
+                    model_conditioned_pitch_contour_changed_ratio_repair_objective_next=data[
+                        "model_conditioned_pitch_contour_changed_ratio_repair_objective"
+                    ],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=728,
                 )
 
     def test_boundary_constants_are_stable(self) -> None:
