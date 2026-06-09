@@ -107,7 +107,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -703,6 +703,8 @@ README evidence refresh.
 - technical execution evidence supported: `true`
 - selected-scale objective path complete: `true`
 - phrase-bank CLI technical path ready: `true`
+- model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio review required: `true`
 - quality/preference claim excluded: `true`
 - next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 
