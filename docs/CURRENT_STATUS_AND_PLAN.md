@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #730, Stage B MIDI-to-solo README evidence refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit`
+- latest functional result: Issue #732, Stage B MIDI-to-solo MVP completion audit
+- 다음 권장 이슈: `Stage B MIDI-to-solo quality gap decision`
 
 현재 범위가 아닌 것:
 
@@ -82,6 +82,7 @@
 - pitch-contour changed-ratio repaired objective-only 기준 current evidence consolidation 준비 완료
 - pitch-contour changed-ratio repaired objective path를 current evidence에 통합 완료
 - README current evidence block에 changed-ratio repair objective path 반영 완료
+- MVP completion audit에 changed-ratio repair objective path 포함 완료
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
@@ -1567,6 +1568,53 @@ Issue #730은 Issue #728 current evidence를 README 첫 상태 영역과 evidenc
 다음:
 
 - `Stage B MIDI-to-solo MVP completion audit`
+
+## Stage B MIDI-to-Solo MVP Completion Audit Result
+
+Issue #732는 Issue #730 README evidence refresh 이후 technical model-core MVP 완료 범위를 다시 audit한 작업이다.
+
+변경:
+
+- completion audit script에 changed-ratio repair objective path 검증 추가
+- README required snippet에 changed-ratio repair objective path 반영 여부 추가
+- completion audit validation summary에 changed-ratio repair ratio/interval 수치 노출
+- generated audit document, README, handoff/status/core plan 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- source boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- technical model-core MVP completed: `true`
+- input to ranked MIDI completed: `true`
+- input to rendered WAV completed: `true`
+- selected-scale objective repair completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour changed-ratio repair objective completed: `true`
+- changed-ratio repair max pitch changed ratio / target: `0.4348 / 0.5000`
+- changed-ratio repair max interval / target: `12 / 12`
+- musical quality MVP completed: `false`
+- human/audio preference completed: `false`
+- product MVP completed: `false`
+
+판단:
+
+- technical model-core MVP 완료 범위에 changed-ratio repair objective path 포함 완료.
+- 청음 preference와 musical quality claim 제외 유지.
+- 다음 boundary는 quality gap decision.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_completion_audit`
+- `.venv/bin/python -m py_compile scripts/audit_stage_b_midi_to_solo_mvp_completion.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit`
+
+다음:
+
+- `Stage B MIDI-to-solo quality gap decision`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

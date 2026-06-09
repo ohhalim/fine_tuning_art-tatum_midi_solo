@@ -7,6 +7,7 @@
 - technical model-core MVP completed: `true`
 - phrase-bank CLI technical path completed: `true`
 - model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour changed-ratio repair objective completed: `true`
 - musical quality MVP completed: `false`
 - human/audio preference completed: `false`
 - product MVP completed: `false`
@@ -35,6 +36,14 @@
 - model-conditioned pitch-contour changed-ratio review required: `true`
 - model-conditioned pitch-contour audio review required: `true`
 - model-conditioned pitch-contour preference fill allowed: `false`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair rendered WAV files: `3`
+- model-conditioned pitch-contour changed-ratio repair technical WAV validation: `true`
+- model-conditioned pitch-contour changed-ratio repair max interval / threshold: `12` / `12`
+- model-conditioned pitch-contour changed-ratio repair max ratio / target: `0.4348` / `0.5000`
+- model-conditioned pitch-contour changed-ratio repair target supported: `true`
+- model-conditioned pitch-contour changed-ratio repair audio review required: `true`
+- model-conditioned pitch-contour changed-ratio repair preference fill allowed: `false`
 
 ## Claim Boundary
 
