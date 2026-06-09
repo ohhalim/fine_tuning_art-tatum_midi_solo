@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #706, Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation`
+- latest functional result: Issue #708, Stage B MIDI-to-solo MVP current evidence consolidation
+- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence refresh`
 
 현재 범위가 아닌 것:
 
@@ -70,6 +70,59 @@
 - model-conditioned input path pitch-contour repaired WAV/MIDI 후보 3개 listening review package 준비 완료
 - model-conditioned input path pitch-contour review input pending 상태에서 preference fill 차단 완료
 - model-conditioned input path pitch-contour objective-only 기준 current evidence consolidation 준비 완료
+- model-conditioned input path pitch-contour objective path를 current evidence에 통합 완료
+
+## Stage B MIDI-to-Solo MVP Current Evidence Consolidation Result
+
+Issue #708은 Issue #706 pitch-contour objective-only next decision 결과를 기존 current evidence consolidation source에 추가한 작업이다.
+
+변경:
+
+- current evidence consolidation script에 model-conditioned pitch-contour objective source 추가
+- selected-scale objective path, phrase-bank CLI technical path, model-conditioned pitch-contour objective path 통합
+- current evidence support와 quality claim boundary 분리 유지
+- 전용 harness와 unit test 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_CURRENT_EVIDENCE_CONSOLIDATION_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- current MVP evidence supported: `true`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour max interval: `11`
+- model-conditioned pitch-contour target supported: `true`
+- model-conditioned pitch-contour changed-ratio review required: `true`
+- model-conditioned pitch-contour audio review required: `true`
+- CLI candidate / rendered WAV: `3 / 3`
+- CLI input context bars: `228`
+- objective valid / strict / grammar: `9 / 9 / 9`
+- objective dead-air / collapse failure count: `0 / 0`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- critical user input required: `false`
+
+판단:
+
+- technical/objective current evidence support 유지.
+- model-conditioned pitch-contour objective path current evidence에 포함.
+- pitch changed ratio review 필요 상태 유지.
+- musical quality claim 제외 유지.
+- 다음 boundary는 README evidence refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- `.venv/bin/python -m py_compile scripts/consolidate_stage_b_midi_to_solo_mvp_current_evidence.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-current-evidence-consolidation`
+
+다음:
+
+- `Stage B MIDI-to-solo README evidence refresh`
 
 ## Stage B MIDI-to-Solo Model-Conditioned Input Path Dead-Air Timing Repair Pitch Contour Objective-Only Next Decision Result
 

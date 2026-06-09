@@ -5846,6 +5846,7 @@ run_stage_b_midi_to_solo_mvp_current_evidence_consolidation() {
   local candidate_audio_run_id="${CANDIDATE_AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_candidate_audio_render_package}"
   local objective_next_run_id="${OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_next}"
   local cli_objective_next_run_id="${CLI_OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision}"
+  local model_conditioned_pitch_contour_objective_next_run_id="${MODEL_CONDITIONED_PITCH_CONTOUR_OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_next}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_current_evidence_consolidation}"
   local contract_report="outputs/stage_b_midi_to_solo_mvp_contract/${contract_run_id}/stage_b_midi_to_solo_mvp_contract.json"
   local context_report="outputs/stage_b_midi_to_solo_context_extraction/${context_run_id}/stage_b_midi_to_solo_context_extraction.json"
@@ -5854,6 +5855,7 @@ run_stage_b_midi_to_solo_mvp_current_evidence_consolidation() {
   local candidate_audio="outputs/stage_b_midi_to_solo_candidate_audio_render_package/${candidate_audio_run_id}/stage_b_midi_to_solo_candidate_audio_render_package.json"
   local objective_next="outputs/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_next/${objective_next_run_id}/stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_next.json"
   local cli_objective_next="outputs/stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision/${cli_objective_next_run_id}/stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision.json"
+  local model_conditioned_pitch_contour_objective_next="outputs/stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_only_next_decision/${model_conditioned_pitch_contour_objective_next_run_id}/stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_only_next_decision.json"
   if [[ ! -f "$contract_report" ]]; then
     print_header "Stage B MIDI-to-solo MVP input contract"
     RUN_ID="$contract_run_id" run_stage_b_midi_to_solo_mvp_contract
@@ -5882,6 +5884,10 @@ run_stage_b_midi_to_solo_mvp_current_evidence_consolidation() {
     print_header "Stage B MIDI-to-solo phrase-bank CLI objective-only next decision"
     RUN_ID="$cli_objective_next_run_id" run_stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision
   fi
+  if [[ ! -f "$model_conditioned_pitch_contour_objective_next" ]]; then
+    print_header "Stage B MIDI-to-solo model-conditioned input path dead-air timing repair pitch contour objective-only next decision"
+    RUN_ID="$model_conditioned_pitch_contour_objective_next_run_id" run_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_next
+  fi
   print_header "Stage B MIDI-to-solo MVP current evidence consolidation"
   "$PYTHON_BIN" scripts/consolidate_stage_b_midi_to_solo_mvp_current_evidence.py \
     --run_id "$run_id" \
@@ -5892,13 +5898,16 @@ run_stage_b_midi_to_solo_mvp_current_evidence_consolidation() {
     --audio_render "$candidate_audio" \
     --objective_next "$objective_next" \
     --cli_objective_next "$cli_objective_next" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_CURRENT_EVIDENCE_CONSOLIDATION_2026-06-05.md \
+    --model_conditioned_pitch_contour_objective_next "$model_conditioned_pitch_contour_objective_next" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_CURRENT_EVIDENCE_CONSOLIDATION_2026-06-09.md \
+    --issue_number 708 \
     --expected_boundary stage_b_midi_to_solo_mvp_current_evidence_consolidation \
     --expected_next_boundary stage_b_midi_to_solo_readme_evidence_refresh \
     --min_exported_candidates 3 \
     --min_rendered_wav_files 3 \
     --min_objective_sample_count 9 \
     --require_current_evidence_support \
+    --require_model_conditioned_pitch_contour_objective \
     --require_no_quality_claim
 }
 

@@ -26,6 +26,7 @@ def reports(
     *,
     strict_count: int = 9,
     dead_air_failure_count: int = 0,
+    pitch_contour_supported: bool = True,
     collapse_count: int = 0,
     quality_claim: bool = False,
 ) -> dict[str, dict]:
@@ -219,6 +220,41 @@ def reports(
                 "critical_user_input_required": False,
             },
         },
+        "model_conditioned_pitch_contour_objective": {
+            "boundary": (
+                "stage_b_midi_to_solo_model_conditioned_input_path_"
+                "dead_air_timing_repair_pitch_contour_objective_only_next_decision"
+            ),
+            "objective_summary": {
+                "review_item_count": 3,
+                "validated_review_input_present": False,
+                "preference_fill_allowed": False,
+                "technical_wav_validation": True,
+                "rendered_audio_file_count": 3,
+                "max_repaired_interval": 11 if pitch_contour_supported else 13,
+                "max_interval_threshold": 12,
+                "pitch_contour_target_supported": pitch_contour_supported,
+                "max_pitch_changed_ratio": 0.7174,
+                "pitch_changed_ratio_review_required": True,
+                "audio_review_required": True,
+                "current_evidence_consolidation_ready": pitch_contour_supported,
+            },
+            "readiness": {
+                "objective_next_decision_completed": True,
+                "human_audio_preference_claimed": False,
+                "midi_to_solo_musical_quality_claimed": quality_claim,
+                "audio_rendered_quality_claimed": False,
+                "model_checkpoint_generation_quality_claimed": False,
+                "model_direct_generation_quality_claimed": False,
+                "broad_trained_model_quality_claimed": False,
+                "brad_style_adaptation_claimed": False,
+                "production_ready_claimed": False,
+            },
+            "decision": {
+                "next_boundary": "stage_b_midi_to_solo_mvp_current_evidence_consolidation",
+                "critical_user_input_required": False,
+            },
+        },
     }
 
 
@@ -234,6 +270,9 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                 audio_render=data["audio"],
                 objective_next=data["objective"],
                 cli_objective_next=data["cli_objective"],
+                model_conditioned_pitch_contour_objective_next=data[
+                    "model_conditioned_pitch_contour_objective"
+                ],
                 output_dir=Path(tmp) / "out",
                 issue_number=612,
             )
@@ -246,12 +285,14 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                 min_exported_candidates=3,
                 min_rendered_wav_files=3,
                 min_objective_sample_count=9,
+                require_model_conditioned_pitch_contour_objective=True,
             )
 
             self.assertTrue(summary["midi_to_solo_mvp_current_evidence_supported"])
             self.assertTrue(summary["technical_execution_evidence_supported"])
             self.assertTrue(summary["selected_scale_objective_path_complete"])
             self.assertTrue(summary["phrase_bank_cli_technical_path_ready"])
+            self.assertTrue(summary["model_conditioned_pitch_contour_objective_path_ready"])
             self.assertEqual(summary["generation_source"], "context_conditioned_fallback")
             self.assertEqual(summary["exported_candidate_count"], 3)
             self.assertEqual(summary["rendered_audio_file_count"], 3)
@@ -264,6 +305,13 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
             self.assertEqual(summary["objective_grammar_gate_sample_count"], 9)
             self.assertEqual(summary["objective_dead_air_failure_count"], 0)
             self.assertEqual(summary["objective_collapse_warning_sample_count"], 0)
+            self.assertEqual(summary["model_conditioned_pitch_contour_max_interval"], 11)
+            self.assertTrue(summary["model_conditioned_pitch_contour_target_supported"])
+            self.assertTrue(
+                summary[
+                    "model_conditioned_pitch_contour_pitch_changed_ratio_review_required"
+                ]
+            )
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
             self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
@@ -328,6 +376,25 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     audio_render=data["audio"],
                     objective_next=data["objective"],
                     cli_objective_next=data["cli_objective"],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=612,
+                )
+
+    def test_rejects_missing_model_conditioned_pitch_contour_support(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp), pitch_contour_supported=False)
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
+                    model_conditioned_pitch_contour_objective_next=data[
+                        "model_conditioned_pitch_contour_objective"
+                    ],
                     output_dir=Path(tmp) / "out",
                     issue_number=612,
                 )
