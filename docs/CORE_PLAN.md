@@ -395,6 +395,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo README evidence refresh: latest boundary `stage_b_midi_to_solo_mvp_current_evidence_consolidation`, input-to-WAV technical path `true`, selected-scale objective path `true`, phrase-bank CLI path `true`, model-conditioned pitch-contour objective path `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_mvp_completion_audit`
 - MIDI-to-solo MVP completion audit refresh: technical model-core MVP `true`, model-conditioned pitch-contour objective `true`, max interval/threshold `11/12`, musical/product MVP `false/false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_gap_decision`
 - MIDI-to-solo quality gap decision refresh: selected target `model_conditioned_pitch_contour_changed_ratio_review`, fallback alignment required `false`, pitch-contour max interval/threshold `11/12`, changed-ratio review required `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision`
+- MIDI-to-solo pitch-contour changed-ratio review decision: selected target `lower_pitch_change_ratio_repair_probe`, repair probe required `true`, max interval/threshold `11/12`, changed-ratio review threshold `0.5`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
 - MIDI-to-solo MVP completion audit: technical model-core MVP `true`, input ranked MIDI/WAV `true/true`, selected-scale objective repair `true`, musical/product MVP `false/false`, next boundary `stage_b_midi_to_solo_quality_gap_decision`
 - MIDI-to-solo quality gap decision: selected target `model_conditioned_input_path_quality_alignment`, fallback path active `true`, human review required now `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_quality_alignment`
 - MIDI-to-solo model-conditioned input path quality alignment: aligned `false`, fallback replacement probe required `true`, selected probe target `replace_fallback_with_model_conditioned_input_path_probe`, quality claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_input_path_probe`
@@ -3777,6 +3778,43 @@ Issue #714는 Issue #712 MVP completion audit 이후 남은 quality gap target�
 다음 작업:
 
 - `Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision`
+
+## 9.49 Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision
+
+Issue #716은 Issue #714 quality gap decision 이후 changed-ratio review boundary에서 다음 repair target을 선택한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
+- selected target: `lower_pitch_change_ratio_repair_probe`
+- repair probe required: `true`
+- technical model-core MVP completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned input path alignment required: `false`
+- max interval / threshold: `11 / 12`
+- changed-ratio review threshold: `0.5`
+- changed-ratio review required: `true`
+- audio review required: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- interval target은 통과했으나 pitch changed ratio review 필요 상태 유지.
+- 다음 boundary는 changed-ratio repair probe.
+- 품질/선호 claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair probe`
 
 ## 10. 한 문장 요약
 

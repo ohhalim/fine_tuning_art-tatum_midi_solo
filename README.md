@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -108,8 +108,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit model-conditioned pitch-contour objective included: `true`
 - quality gap decision completed: `true`
 - quality gap decision pitch-contour changed-ratio target selected: `true`
+- pitch-contour changed-ratio review decision completed: `true`
+- pitch-contour changed-ratio repair probe required: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -202,6 +204,22 @@ Quality gap decision.
 - CLI candidate / rendered WAV: `3 / 3`
 - CLI preference fill allowed: `false`
 - human review required now: `false`
+
+Pitch-contour changed-ratio review decision.
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
+- selected target: `lower_pitch_change_ratio_repair_probe`
+- repair probe required: `true`
+- technical model-core MVP completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned input path alignment required: `false`
+- max interval / threshold: `11 / 12`
+- changed-ratio review threshold: `0.5`
+- changed-ratio review required: `true`
+- audio review required: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
 
 Model-conditioned input path alignment.
 

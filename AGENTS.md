@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #714, Stage B MIDI-to-solo quality gap decision.
+- Latest functional issue completed: Issue #716, Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision.
+- Recommended next issue: Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio repair probe.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1044,6 +1044,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-quality-gap-decision
 ```
 
 This harness selects the next quality-gap target after technical MVP completion without claiming musical quality or requiring immediate human review.
+
+For Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision
+```
+
+This harness routes pitch-contour changed-ratio review evidence to the next repair probe without claiming musical quality or human/audio preference.
 
 For Stage B MIDI-to-solo model-conditioned input path quality alignment changes, run:
 
