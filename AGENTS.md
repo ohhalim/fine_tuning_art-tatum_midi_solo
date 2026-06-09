@@ -12,9 +12,9 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #774, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep.
+- Latest functional issue completed: Issue #776, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package.
+- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -156,6 +156,14 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phras
 ```
 
 This harness checks whether phrase/rhythm failure labels are reduced without claiming listening or musical quality.
+
+For Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-audio-package
+```
+
+This harness renders phrase/rhythm repair MIDI candidates to WAV files and validates technical metadata without claiming listening or musical quality.
 
 For Stage A training-mode changes, run:
 
