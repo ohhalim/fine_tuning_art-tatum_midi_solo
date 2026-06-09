@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -117,8 +117,11 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - pitch-contour changed-ratio repair WAV files: `3`
 - pitch-contour changed-ratio repair WAV technical validation: `true`
 - pitch-contour changed-ratio repair WAV duration range: `18.422s - 18.978s`
+- pitch-contour changed-ratio repair listening review package ready: `true`
+- pitch-contour changed-ratio repair listening review items: `3`
+- pitch-contour changed-ratio repair validated review input: `false`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_input_guard`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -173,6 +176,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned dead-air/timing repaired MIDI/WAV objective next decision 가능
 - model-conditioned pitch-contour changed-ratio repair probe 가능
 - model-conditioned pitch-contour changed-ratio repaired MIDI 후보의 WAV technical render 가능
+- model-conditioned pitch-contour changed-ratio repaired WAV/MIDI 후보의 listening review package 생성 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -258,6 +262,20 @@ Pitch-contour changed-ratio repair audio package.
 - min repaired unique pitch count: `24`
 - audio review required: `true`
 - audio rendered quality claimed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+Pitch-contour changed-ratio repair listening review package.
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_input_guard`
+- package ready: `true`
+- review item count: `3`
+- validated review input: `false`
+- technical WAV validation: `true`
+- max repaired pitch changed ratio / target: `0.4348 / 0.5000`
+- max repaired interval: `12`
+- required input fields: `candidate_rank`, `listening_status`, `preference`, `issue_notes`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 
