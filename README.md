@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_probe`
+- latest evidence boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -54,6 +54,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned pitch-contour interval reduction: `51`
 - model-conditioned pitch-contour repaired dead-air max: `0.0000`
 - model-conditioned pitch-contour max pitch changed ratio: `0.7174`
+- model-conditioned pitch-contour WAV files: `3`
+- model-conditioned pitch-contour WAV technical validation: `true`
+- model-conditioned pitch-contour WAV duration range: `18.422s - 18.978s`
+- model-conditioned pitch-contour audio review required: `true`
 - phrase-bank retrieval baseline completed: `true`
 - phrase-bank source records / motifs: `56 / 803`
 - phrase-bank exported / qualified MIDI candidates: `3 / 3`
@@ -93,7 +97,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit completed: `true`
 - quality gap decision completed: `true`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_package`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -140,6 +144,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned dead-air/timing repaired MIDI 후보의 WAV technical render 가능
 - model-conditioned dead-air/timing repaired evidence 기준 pitch-contour repair target 정의 가능
 - model-conditioned dead-air/timing repaired MIDI 후보의 pitch-contour objective repair 가능
+- model-conditioned pitch-contour repaired MIDI 후보의 WAV technical render 가능
 - model-conditioned dead-air/timing repaired MIDI/WAV objective next decision 가능
 
 현재 README가 주장하지 않는 것.
@@ -403,6 +408,22 @@ Model-conditioned input path dead-air timing repair pitch contour probe.
 - repaired dead-air max: `0.0000`
 - min repaired unique pitch count: `22`
 - max pitch changed ratio: `0.7174`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+Model-conditioned input path dead-air timing repair pitch contour audio package.
+
+- boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_audio_package`
+- next boundary: `stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_listening_review_package`
+- rendered audio file count: `3`
+- technical WAV validation: `true`
+- duration range: `18.422s - 18.978s`
+- repaired dead-air max: `0.0000`
+- max repaired interval: `11`
+- min repaired unique pitch count: `22`
+- max pitch changed ratio: `0.7174`
+- audio review required: `true`
+- audio rendered quality claimed: `false`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 
