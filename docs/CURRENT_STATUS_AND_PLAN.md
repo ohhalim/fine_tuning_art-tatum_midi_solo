@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #748, Stage B MIDI-to-solo candidate failure labeling
-- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair sweep`
+- latest functional result: Issue #752, Stage B MIDI-to-solo targeted quality repair audio package
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair listening review package`
 
 현재 범위가 아닌 것:
 
@@ -2036,6 +2036,54 @@ Issue #750은 Issue #748 candidate failure labeling 결과를 입력으로 현�
 다음:
 
 - `Stage B MIDI-to-solo targeted quality repair audio package`
+
+## Stage B MIDI-to-Solo Targeted Quality Repair Audio Package Result
+
+Issue #752는 Issue #750 targeted quality repair sweep 결과의 repaired MIDI 후보 6개를 WAV로 렌더링한 작업이다.
+
+변경:
+
+- targeted quality repair audio package script 추가
+- targeted quality repair sweep report 입력 검증 연결
+- repaired MIDI candidate 6개 WAV 렌더링
+- WAV sample rate, duration, frame count, size, sha256 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_AUDIO_PACKAGE_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
+- source boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
+- rendered audio file count: `6`
+- sample rate: `44100`
+- duration range: `18.422s-18.984s`
+- technical WAV validation: `true`
+- failure labels: `12 -> 8`
+- failure label delta: `4`
+- improved candidate count: `4`
+- technical regression count: `0`
+- audio review required: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- repaired MIDI 후보 6개 모두 로컬 WAV 산출 완료.
+- WAV 기술 metadata 검증 완료.
+- audio rendered quality와 human/audio preference는 미검증.
+- 다음 boundary는 listening review package.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_audio`
+- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_targeted_quality_repair_audio.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-audio-package`
+
+다음:
+
+- `Stage B MIDI-to-solo targeted quality repair listening review package`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
