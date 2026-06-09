@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #784, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge`
+- latest functional result: Issue #786, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision`
 
 현재 범위가 아닌 것:
 
@@ -181,6 +181,19 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 bridge target: `songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- songlike melody contour phrase/rhythm chord-context pitch-role bridge 완료
+- chord progression: `Cm7,Fm7,Bb7,Ebmaj7`
+- context source: `fallback_default_harness_chords`
+- chord context available count: `6/6`
+- pitch-role metrics defined count: `6/6`
+- not evaluable count: `12 -> 0`
+- min chord-tone ratio: `0.216`
+- max outside ratio: `0.027`
+- max non-chord run: `5`
+- bridge flags: `outside_soloing_pitch_role_risk=5`, `weak_chord_tone_landing_risk=6`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 objective decision target: `songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
