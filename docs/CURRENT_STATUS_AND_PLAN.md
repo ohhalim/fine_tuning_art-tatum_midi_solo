@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #736, Stage B MIDI-to-solo listening review quality gap
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP delivery package`
+- latest functional result: Issue #738, Stage B MIDI-to-solo MVP delivery package
+- 다음 권장 이슈: `Stage B MIDI-to-solo README final evidence refresh`
 
 현재 범위가 아닌 것:
 
@@ -85,6 +85,7 @@
 - MVP completion audit에 changed-ratio repair objective path 포함 완료
 - quality gap decision을 listening review quality gap target으로 갱신 완료
 - listening review quality gap을 MVP delivery package target으로 분리 완료
+- MVP delivery package manifest 생성 완료
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
@@ -1709,6 +1710,51 @@ Issue #736은 Issue #734 quality gap decision 이후 남은 listening review qua
 다음:
 
 - `Stage B MIDI-to-solo MVP delivery package`
+
+## Stage B MIDI-to-Solo MVP Delivery Package Result
+
+Issue #738은 Issue #736 listening review quality gap 이후 technical MVP 전달 manifest를 정리한 작업이다.
+
+변경:
+
+- MVP delivery package manifest script 추가
+- listening review quality gap, phrase-bank CLI package, changed-ratio repair audio package 검증 연결
+- runnable CLI command와 local MIDI/WAV evidence path 기록
+- raw artifact upload 없이 local artifact path만 manifest에 기록
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_DELIVERY_PACKAGE_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
+- MVP delivery package completed: `true`
+- runnable CLI ready: `true`
+- input to ranked MIDI ready: `true`
+- input to rendered WAV evidence ready: `true`
+- changed-ratio repair audio evidence ready: `true`
+- CLI candidate count: `3`
+- changed-ratio repair WAV count: `3`
+- raw artifact upload required: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- 현재 technical MVP는 실행 명령과 evidence manifest 기준 전달 가능.
+- raw MIDI/WAV 업로드 없이 local output path 기준으로 추적.
+- listening review와 musical quality claim은 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_delivery_package`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_mvp_delivery_package.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-delivery-package`
+
+다음:
+
+- `Stage B MIDI-to-solo README final evidence refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

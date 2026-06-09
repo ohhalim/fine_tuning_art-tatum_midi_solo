@@ -242,6 +242,8 @@ Modes:
                 Decide the next quality-gap repair target after technical MVP completion.
   stage-b-midi-to-solo-listening-review-quality-gap
                 Separate remaining listening-review quality gap after objective repair evidence.
+  stage-b-midi-to-solo-mvp-delivery-package
+                Build the current technical MVP delivery manifest and claim boundary.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision
                 Decide the next pitch-contour changed-ratio repair boundary.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-probe
@@ -5997,6 +5999,40 @@ run_stage_b_midi_to_solo_listening_review_quality_gap() {
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_mvp_delivery_package() {
+  local listening_gap_run_id="${LISTENING_GAP_RUN_ID:-harness_stage_b_midi_to_solo_listening_review_quality_gap}"
+  local cli_package_run_id="${CLI_PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_cli_mvp_package}"
+  local changed_ratio_audio_run_id="${CHANGED_RATIO_AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_delivery_package}"
+  local listening_gap="outputs/stage_b_midi_to_solo_listening_review_quality_gap/${listening_gap_run_id}/stage_b_midi_to_solo_listening_review_quality_gap.json"
+  local cli_package="outputs/stage_b_midi_to_solo_phrase_bank_cli_mvp_package/${cli_package_run_id}/stage_b_midi_to_solo_phrase_bank_cli_mvp_package.json"
+  local changed_ratio_audio="outputs/stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package/${changed_ratio_audio_run_id}/stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package.json"
+  if [[ ! -f "$listening_gap" ]]; then
+    print_header "Stage B MIDI-to-solo listening review quality gap"
+    RUN_ID="$listening_gap_run_id" run_stage_b_midi_to_solo_listening_review_quality_gap
+  fi
+  if [[ ! -f "$cli_package" ]]; then
+    print_header "Stage B MIDI-to-solo phrase-bank CLI MVP package"
+    RUN_ID="$cli_package_run_id" run_stage_b_midi_to_solo_phrase_bank_cli_mvp_package
+  fi
+  if [[ ! -f "$changed_ratio_audio" ]]; then
+    print_header "Stage B MIDI-to-solo changed-ratio repair audio package"
+    RUN_ID="$changed_ratio_audio_run_id" run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package
+  fi
+  print_header "Stage B MIDI-to-solo MVP delivery package"
+  "$PYTHON_BIN" scripts/build_stage_b_midi_to_solo_mvp_delivery_package.py \
+    --run_id "$run_id" \
+    --listening_review_quality_gap "$listening_gap" \
+    --cli_mvp_package "$cli_package" \
+    --changed_ratio_audio_package "$changed_ratio_audio" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_DELIVERY_PACKAGE_2026-06-09.md \
+    --issue_number 738 \
+    --expected_boundary stage_b_midi_to_solo_mvp_delivery_package \
+    --expected_next_boundary stage_b_midi_to_solo_readme_final_evidence_refresh \
+    --require_delivery_completed \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision}"
@@ -8247,6 +8283,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-listening-review-quality-gap)
     run_stage_b_midi_to_solo_listening_review_quality_gap
+    ;;
+  stage-b-midi-to-solo-mvp-delivery-package)
+    run_stage_b_midi_to_solo_mvp_delivery_package
     ;;
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision)
     run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision

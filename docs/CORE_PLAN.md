@@ -396,6 +396,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo MVP completion audit refresh: technical model-core MVP `true`, model-conditioned pitch-contour objective `true`, changed-ratio repair objective `true`, max interval/threshold `11/12`, changed-ratio repair ratio/target `0.4348/0.5000`, musical/product MVP `false/false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_gap_decision`
 - MIDI-to-solo quality gap decision refresh: selected target `listening_review_quality_gap`, fallback alignment required `false`, changed-ratio repair objective `true`, changed-ratio repair ratio/target `0.4348/0.5000`, changed-ratio repair interval/target `12/12`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_listening_review_quality_gap`
 - MIDI-to-solo listening review quality gap: selected target `mvp_delivery_package`, technical delivery package ready `true`, listening gap open `true`, changed-ratio repair ratio/target `0.4348/0.5000`, interval/target `12/12`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_mvp_delivery_package`
+- MIDI-to-solo MVP delivery package: runnable CLI `true`, input ranked MIDI `true`, rendered WAV evidence `true`, CLI/changed-ratio audio candidate count `3/3`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_readme_final_evidence_refresh`
 - MIDI-to-solo pitch-contour changed-ratio review decision: selected target `lower_pitch_change_ratio_repair_probe`, repair probe required `true`, max interval/threshold `11/12`, changed-ratio review threshold `0.5`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
 - MIDI-to-solo pitch-contour changed-ratio repair probe: repaired/pass `3/3`, max pitch changed ratio `0.7174 -> 0.4348`, max interval `12`, dead-air max `0.0000`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package`
 - MIDI-to-solo pitch-contour changed-ratio repair audio package: rendered WAV `3`, duration `18.422s-18.978s`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package`
@@ -4199,6 +4200,42 @@ Issue #736은 Issue #734 quality gap decision 이후 남은 listening review qua
 다음 작업:
 
 - `Stage B MIDI-to-solo MVP delivery package`
+
+## 9.60 Stage B MIDI-to-solo MVP delivery package
+
+Issue #738은 Issue #736 listening review quality gap 이후 technical MVP 전달 manifest를 정리한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
+- MVP delivery package completed: `true`
+- runnable CLI ready: `true`
+- input to ranked MIDI ready: `true`
+- input to rendered WAV evidence ready: `true`
+- changed-ratio repair audio evidence ready: `true`
+- CLI candidate count: `3`
+- changed-ratio repair WAV count: `3`
+- raw artifact upload required: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- 현재 technical MVP는 실행 명령과 evidence manifest 기준 전달 가능.
+- raw MIDI/WAV 업로드 없이 local output path 기준으로 추적.
+- listening review와 musical quality claim은 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_delivery_package`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_mvp_delivery_package.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-delivery-package`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo README final evidence refresh`
 
 ## 10. 한 문장 요약
 
