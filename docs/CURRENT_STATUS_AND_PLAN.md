@@ -1989,6 +1989,54 @@ Issue #748은 Issue #746 quality rubric baseline 이후 현재 MIDI 후보를 ru
 
 - `Stage B MIDI-to-solo targeted quality repair sweep`
 
+## Stage B MIDI-to-Solo Targeted Quality Repair Sweep Result
+
+Issue #750은 Issue #748 candidate failure labeling 결과를 입력으로 현재 후보 MIDI 6개에 targeted quality repair를 적용한 작업이다.
+
+변경:
+
+- targeted quality repair sweep script 추가
+- candidate failure labeling report와 quality rubric baseline 입력 검증 연결
+- 기존 MIDI 후보별 timing/duration variation 적용
+- 제한된 pitch contour variation 적용
+- repair 전후 failure label 재측정
+- 전용 harness mode와 unit test 추가
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_SWEEP_2026-06-09.md`
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- source boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
+- selected target: `targeted_quality_repair_audio_package`
+- candidate count: `6`
+- source total failure label count: `12`
+- repaired total failure label count: `8`
+- failure label delta: `4`
+- improved candidate count: `4`
+- technical regression count: `0`
+- repaired failure counts: `dead_air_or_density_gap=1`, `phrase_shape_missing_tension_release=2`, `songlike_melody_not_soloing=5`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- objective failure label 총합 감소 확인.
+- technical gate regression 미관측.
+- songlike melody failure 잔존.
+- 다음 boundary는 repaired MIDI 후보 audio package.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_targeted_quality_repair_sweep.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-sweep`
+
+다음:
+
+- `Stage B MIDI-to-solo targeted quality repair audio package`
+
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
 Issue #666은 Issue #664 current evidence를 README 첫 상태 영역과 claim boundary에 반영하고, 다음 boundary를 MVP completion audit으로 넘긴 문서 작업이다.
