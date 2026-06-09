@@ -292,6 +292,8 @@ Modes:
                 Build chord-context pitch-role metrics for phrase/rhythm repair candidates.
   stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-context-pitch-role-objective-decision
                 Select next repair target from chord-context pitch-role objective evidence.
+  stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-repair-sweep
+                Repair final landing and strong-beat chord-tone roles for phrase/rhythm candidates.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision
                 Decide the next pitch-contour changed-ratio repair boundary.
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-repair-probe
@@ -6668,6 +6670,34 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pit
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep() {
+  local decision_run_id="${DECISION_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision}"
+  local bridge_run_id="${BRIDGE_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep}"
+  local decision_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision/${decision_run_id}/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision.json"
+  local bridge_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge/${bridge_run_id}/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge.json"
+  if [[ ! -f "$decision_report" ]]; then
+    print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision"
+    RUN_ID="$decision_run_id" run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision
+  fi
+  if [[ ! -f "$bridge_report" ]]; then
+    print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge"
+    RUN_ID="$bridge_run_id" run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge
+  fi
+  print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep"
+  "$PYTHON_BIN" scripts/run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep.py \
+    --run_id "$run_id" \
+    --objective_decision_report "$decision_report" \
+    --bridge_report "$bridge_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_REPAIR_SWEEP_2026-06-09.md \
+    --issue_number 790 \
+    --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep \
+    --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package \
+    --require_repair_completed \
+    --require_target_supported \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision}"
@@ -8993,6 +9023,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-context-pitch-role-objective-decision)
     run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision
+    ;;
+  stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-repair-sweep)
+    run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep
     ;;
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision)
     run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision

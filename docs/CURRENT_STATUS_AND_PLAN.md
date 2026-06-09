@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #788, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep`
+- latest functional result: Issue #790, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package`
 
 현재 범위가 아닌 것:
 
@@ -205,6 +205,17 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 repair target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- songlike melody contour phrase/rhythm chord-tone landing repair sweep 완료
+- repair policy: `strong_beat_and_final_note_nearest_chord_tone`
+- repaired MIDI count: `6`
+- changed note total: `40`
+- weak chord-tone landing risk count: `6 -> 0`
+- outside-soloing pitch-role risk count: `5 -> 2`
+- final landing chord-tone count: `1 -> 6`
+- target supported: `true`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 audio package target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

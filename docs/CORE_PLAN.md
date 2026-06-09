@@ -5240,6 +5240,48 @@ Issue #788은 Issue #786 chord-context pitch-role bridge 결과를 기준으로 
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep`
 
+## 9.86 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep
+
+Issue #790은 Issue #788 pitch-role objective decision에서 선택한 weak chord-tone landing risk를 대상으로 final landing/strong-beat chord-tone repair sweep을 실행한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
+- bridge boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package`
+- selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package`
+- repair policy: `strong_beat_and_final_note_nearest_chord_tone`
+- candidate count: `6`
+- repaired MIDI count: `6`
+- changed note total: `40`
+- weak chord-tone landing risk count: `6 -> 0`
+- outside-soloing pitch-role risk count: `5 -> 2`
+- final landing chord-tone count: `1 -> 6`
+- target supported: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- 분석 범위 내 final note 기준 repair 적용.
+- weak chord-tone landing risk는 `6 -> 0`으로 제거.
+- outside-soloing pitch-role risk는 `5 -> 2`로 감소했으나 잔여 risk 존재.
+- 현재 결과는 MIDI objective evidence와 repaired MIDI export 기준.
+- human/audio preference와 MIDI-to-solo musical quality claim은 제외.
+- 다음 boundary는 repaired MIDI audio package.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-repair-sweep`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
