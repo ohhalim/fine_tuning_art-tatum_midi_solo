@@ -3,8 +3,8 @@
 ## Summary
 
 - boundary: `stage_b_midi_to_solo_quality_gap_decision`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision`
-- selected target: `model_conditioned_pitch_contour_changed_ratio_review`
+- next boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- selected target: `listening_review_quality_gap`
 - fallback path active: `true`
 - pitch-contour changed-ratio review required: `true`
 - human review required now: `false`
@@ -14,6 +14,7 @@
 - technical model-core MVP completed: `true`
 - phrase-bank CLI technical path completed: `true`
 - model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour changed-ratio repair objective completed: `true`
 - musical quality MVP completed: `false`
 - generation source: `context_conditioned_fallback`
 - exported candidates: `3`
@@ -27,6 +28,14 @@
 - model-conditioned pitch-contour target supported: `true`
 - model-conditioned pitch-contour changed-ratio review required: `true`
 - model-conditioned pitch-contour audio review required: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair rendered WAV files: `3`
+- model-conditioned pitch-contour changed-ratio repair technical WAV validation: `true`
+- model-conditioned pitch-contour changed-ratio repair max interval / threshold: `12` / `12`
+- model-conditioned pitch-contour changed-ratio repair max ratio / target: `0.4348` / `0.5000`
+- model-conditioned pitch-contour changed-ratio repair target supported: `true`
+- model-conditioned pitch-contour changed-ratio repair audio review required: `true`
+- model-conditioned pitch-contour changed-ratio repair preference fill allowed: `false`
 
 ## Claim Boundary
 
@@ -37,4 +46,4 @@
 
 ## Next
 
-- `Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision`
+- `Stage B MIDI-to-solo listening review quality gap`
