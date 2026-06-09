@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #738, Stage B MIDI-to-solo MVP delivery package
-- 다음 권장 이슈: `Stage B MIDI-to-solo README final evidence refresh`
+- latest functional result: Issue #740, Stage B MIDI-to-solo README final evidence refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo final status audit`
 
 현재 범위가 아닌 것:
 
@@ -86,6 +86,7 @@
 - quality gap decision을 listening review quality gap target으로 갱신 완료
 - listening review quality gap을 MVP delivery package target으로 분리 완료
 - MVP delivery package manifest 생성 완료
+- README final evidence refresh 완료
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
@@ -1755,6 +1756,48 @@ Issue #738은 Issue #736 listening review quality gap 이후 technical MVP 전�
 다음:
 
 - `Stage B MIDI-to-solo README final evidence refresh`
+
+## Stage B MIDI-to-Solo README Final Evidence Refresh Result
+
+Issue #740은 Issue #738 MVP delivery package 결과를 README 첫 상태와 current evidence section에 반영한 문서 작업이다.
+
+변경:
+
+- README latest evidence boundary를 `stage_b_midi_to_solo_mvp_delivery_package`로 갱신
+- README 현재 상태에 runnable CLI, ranked MIDI, rendered WAV evidence, changed-ratio repair audio evidence 반영
+- README evidence section에 listening review quality gap과 MVP delivery package 결과 추가
+- claim boundary 유지
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_README_FINAL_EVIDENCE_REFRESH_2026-06-09.md`
+- source boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_delivery_package`
+- next boundary: `stage_b_midi_to_solo_final_status_audit`
+- runnable CLI ready: `true`
+- input to ranked MIDI ready: `true`
+- input to rendered WAV evidence ready: `true`
+- changed-ratio repair audio evidence ready: `true`
+- CLI candidate count: `3`
+- changed-ratio repair WAV count: `3`
+- raw artifact upload required: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- README 첫 상태에서 technical MVP delivery package 완료 범위 확인 가능.
+- listening review quality gap과 musical quality claim 제외 유지.
+- 다음 boundary는 final status audit.
+
+검증:
+
+- `git diff --check`
+- `bash scripts/agent_harness.sh quick`
+
+다음:
+
+- `Stage B MIDI-to-solo final status audit`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

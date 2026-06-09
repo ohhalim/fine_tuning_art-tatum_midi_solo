@@ -6,11 +6,11 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
-- selected quality gap target: `model_conditioned_pitch_contour_changed_ratio_review`
+- selected quality gap target: `mvp_delivery_package`
 - model-conditioned input path aligned: `false`
 - model-conditioned candidate source available: `true`
 - model-conditioned audio technical path available: `true`
@@ -108,7 +108,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit model-conditioned pitch-contour objective included: `true`
 - MVP completion audit changed-ratio repair objective included: `true`
 - quality gap decision completed: `true`
-- quality gap decision pitch-contour changed-ratio target selected: `true`
+- quality gap decision listening review target selected: `true`
 - pitch-contour changed-ratio review decision completed: `true`
 - pitch-contour changed-ratio repair probe required: `true`
 - pitch-contour changed-ratio repair probe completed: `true`
@@ -129,8 +129,18 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - pitch-contour changed-ratio repair max interval / target: `12 / 12`
 - pitch-contour changed-ratio repair max pitch changed ratio / target: `0.4348 / 0.5000`
 - current evidence changed-ratio repair objective path included: `true`
+- listening review quality gap completed: `true`
+- listening review quality gap open: `true`
+- MVP delivery package completed: `true`
+- runnable CLI ready: `true`
+- input to ranked MIDI ready: `true`
+- input to rendered WAV evidence ready: `true`
+- changed-ratio repair audio evidence ready: `true`
+- MVP delivery CLI candidates: `3`
+- MVP delivery changed-ratio repair WAV files: `3`
+- MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
@@ -189,6 +199,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned pitch-contour changed-ratio review input pending 상태에서 preference fill 차단 가능
 - model-conditioned pitch-contour changed-ratio objective evidence 기준 current evidence consolidation 경계 결정 가능
 - model-conditioned pitch-contour changed-ratio objective path를 current evidence로 통합 가능
+- listening review quality gap을 delivery package 경계로 분리 가능
+- runnable CLI command와 local MIDI/WAV evidence path를 delivery manifest로 기록 가능
+- raw MIDI/WAV artifact upload 없이 local output path 기준 MVP delivery package 기록 가능
 
 현재 README가 주장하지 않는 것.
 
@@ -217,8 +230,8 @@ MVP completion audit.
 Quality gap decision.
 
 - boundary: `stage_b_midi_to_solo_quality_gap_decision`
-- next boundary: `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision`
-- selected target: `model_conditioned_pitch_contour_changed_ratio_review`
+- next boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- selected target: `listening_review_quality_gap`
 - fallback path active: `true`
 - model-conditioned input path alignment required: `false`
 - phrase-bank CLI technical path completed: `true`
@@ -232,6 +245,38 @@ Quality gap decision.
 - CLI candidate / rendered WAV: `3 / 3`
 - CLI preference fill allowed: `false`
 - human review required now: `false`
+
+Listening review quality gap.
+
+- boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- next boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- selected target: `mvp_delivery_package`
+- technical model-core MVP completed: `true`
+- changed-ratio repair objective completed: `true`
+- changed-ratio repair max ratio / target: `0.4348 / 0.5000`
+- changed-ratio repair max interval / target: `12 / 12`
+- listening review quality gap open: `true`
+- technical MVP delivery package ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+MVP delivery package.
+
+- boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
+- runnable CLI ready: `true`
+- input to ranked MIDI ready: `true`
+- input to rendered WAV evidence ready: `true`
+- changed-ratio repair audio evidence ready: `true`
+- CLI candidate count: `3`
+- changed-ratio repair WAV count: `3`
+- CLI dead-air ratio range: `0.1895 - 0.2211`
+- changed-ratio repair max ratio / target: `0.4348 / 0.5000`
+- changed-ratio repair max interval / target: `12 / 12`
+- changed-ratio repair WAV duration range: `18.422s - 18.978s`
+- raw artifact upload required: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
 
 Pitch-contour changed-ratio review decision.
 
