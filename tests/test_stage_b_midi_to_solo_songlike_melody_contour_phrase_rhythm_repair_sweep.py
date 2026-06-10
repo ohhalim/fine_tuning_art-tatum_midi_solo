@@ -109,6 +109,14 @@ def followup_decision(*, quality_claim: bool = False) -> dict:
             "repaired_total_failure_label_count": 4,
             "failure_label_delta": 4,
             "technical_regression_count": 0,
+            "objective_source_outside_soloing_repair_evidence_ready": True,
+            "objective_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "objective_source_outside_soloing_not_evaluable_count": 6,
+            "objective_repaired_outside_soloing_not_evaluable_count": 6,
+            "repair_sweep_source_outside_soloing_repair_evidence_ready": True,
+            "repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "repair_sweep_source_outside_soloing_not_evaluable_count": 6,
+            "repair_sweep_repaired_outside_soloing_not_evaluable_count": 6,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
@@ -165,6 +173,10 @@ def source_repair_sweep(*, technical_regression_count: int = 0) -> dict:
                 "phrase_shape_missing_tension_release": 2,
                 "rhythmic_monotony": 2,
             },
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
             "target_supported": True,
         },
         "readiness": {
@@ -193,7 +205,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                 source_repair_sweep=source_repair_sweep(),
                 rubric_baseline=rubric_baseline(root),
                 output_dir=root / "phrase_rhythm_repair",
-                issue_number=774,
+                issue_number=858,
             )
             summary = validate_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
                 report,
@@ -221,6 +233,14 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
             self.assertLess(summary["repaired_phrase_rhythm_failure_count"], 4)
             self.assertGreater(summary["phrase_rhythm_failure_delta"], 0)
             self.assertEqual(summary["technical_regression_count"], 0)
+            self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(
+                summary["repaired_not_evaluable_counts"]["outside_soloing_without_context"],
+                6,
+            )
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
@@ -235,7 +255,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                     source_repair_sweep=source_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "phrase_rhythm_repair",
-                    issue_number=774,
+                    issue_number=858,
                 )
 
     def test_rejects_source_technical_regression(self) -> None:
@@ -248,7 +268,22 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                     source_repair_sweep=source_repair_sweep(technical_regression_count=1),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "phrase_rhythm_repair",
-                    issue_number=774,
+                    issue_number=858,
+                )
+
+    def test_rejects_missing_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = source_repair_sweep()
+            source["aggregate"]["source_outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError
+            ):
+                build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
+                    followup_decision=followup_decision(),
+                    source_repair_sweep=source,
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "phrase_rhythm_repair",
+                    issue_number=858,
                 )
 
     def test_constants_are_stable(self) -> None:

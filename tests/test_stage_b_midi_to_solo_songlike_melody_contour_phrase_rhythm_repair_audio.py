@@ -73,6 +73,10 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
                 "density_pattern": [5, 3, 6, 4, 5, 4, 6, 3],
                 "phrase_rhythm_repaired_labeling": {
                     "failure_labels": labels,
+                    "not_evaluable_labels": [
+                        "outside_soloing_without_context",
+                        "weak_chord_tone_landing",
+                    ],
                     "metrics": {
                         "note_count": 24,
                         "unique_pitch_count": 6,
@@ -98,6 +102,14 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "technical_regression_count": 0,
             "repaired_failure_counts": {
                 "rhythmic_monotony": 1,
+            },
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
+            "repaired_not_evaluable_counts": {
+                "outside_soloing_without_context": 6,
+                "weak_chord_tone_landing": 6,
             },
             "target_supported": True,
         },
