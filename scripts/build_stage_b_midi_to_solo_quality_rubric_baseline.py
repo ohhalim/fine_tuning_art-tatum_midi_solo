@@ -305,6 +305,9 @@ def build_quality_rubric_baseline_report(
             "outside_soloing_repair_pitch_role_risk_count_after": _int(
                 outside_context["outside_soloing_repair_pitch_role_risk_count_after"]
             ),
+            "outside_soloing_repair_pitch_role_risk_delta": _int(
+                outside_context["outside_soloing_repair_pitch_role_risk_delta"]
+            ),
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
         },
@@ -438,6 +441,9 @@ def validate_quality_rubric_baseline_report(
         ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             baseline.get("outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_pitch_role_risk_delta": _int(
+            baseline.get("outside_soloing_repair_pitch_role_risk_delta")
         ),
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)

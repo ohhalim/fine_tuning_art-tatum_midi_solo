@@ -114,6 +114,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         self.assertFalse(summary["outside_soloing_repair_source_targeted"])
         self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
+        self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
         self.assertEqual(

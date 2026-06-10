@@ -61,6 +61,12 @@ def post_mvp_quality_plan() -> dict:
             "outside_soloing_repair_evidence_ready": True,
             "outside_soloing_repair_wav_count": 6,
             "outside_soloing_repair_changed_note_total": 2,
+            "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+            "outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+            "outside_soloing_repair_source_pitch_role_risk_delta": 3,
+            "outside_soloing_repair_source_targeted": False,
+            "outside_soloing_repair_source_residual_risk_preserved": True,
             "outside_soloing_repair_pitch_role_risk_count_after": 0,
             "outside_soloing_repair_pitch_role_risk_delta": 2,
             "human_audio_preference_claimed": False,
@@ -178,13 +184,26 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
             self.assertGreaterEqual(summary["not_evaluable_label_type_count"], 2)
             self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
             self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
+            self.assertEqual(
+                summary["outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
+            )
+            self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_count_before"], 5)
+            self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_count_after"], 2)
+            self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_delta"], 3)
+            self.assertFalse(summary["outside_soloing_repair_source_targeted"])
+            self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
             self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["outside_soloing_not_evaluable_count"], 3)
             self.assertEqual(summary["selected_target"], REPAIR_TARGET)
             self.assertEqual(summary["next_boundary"], REPAIR_NEXT_BOUNDARY)
             self.assertTrue(summary["targeted_quality_repair_sweep_ready"])
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
+            self.assertEqual(
+                summary["next_recommended_issue"],
+                "Stage B MIDI-to-solo targeted quality repair sweep source-context refresh",
+            )
 
     def test_rejects_delivery_quality_claim(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

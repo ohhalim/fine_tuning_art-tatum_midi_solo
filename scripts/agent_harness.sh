@@ -6145,7 +6145,7 @@ run_stage_b_midi_to_solo_post_mvp_quality_iteration_plan() {
 
 run_stage_b_midi_to_solo_quality_rubric_baseline() {
   local post_mvp_plan_run_id="${POST_MVP_PLAN_RUN_ID:-harness_stage_b_midi_to_solo_post_mvp_quality_iteration_plan}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_quality_rubric_baseline}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_quality_rubric_baseline_source_context_refresh}"
   local post_mvp_plan="outputs/stage_b_midi_to_solo_post_mvp_quality_iteration_plan/${post_mvp_plan_run_id}/stage_b_midi_to_solo_post_mvp_quality_iteration_plan.json"
   if [[ ! -f "$post_mvp_plan" ]]; then
     print_header "Stage B MIDI-to-solo post-MVP quality iteration plan"
@@ -6166,9 +6166,9 @@ run_stage_b_midi_to_solo_quality_rubric_baseline() {
 }
 
 run_stage_b_midi_to_solo_candidate_failure_labeling() {
-  local rubric_run_id="${RUBRIC_RUN_ID:-harness_stage_b_midi_to_solo_quality_rubric_baseline}"
+  local rubric_run_id="${RUBRIC_RUN_ID:-harness_stage_b_midi_to_solo_quality_rubric_baseline_source_context_refresh}"
   local delivery_run_id="${DELIVERY_PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_mvp_delivery_package}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_candidate_failure_labeling}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_candidate_failure_labeling_source_context_refresh}"
   local rubric="outputs/stage_b_midi_to_solo_quality_rubric_baseline/${rubric_run_id}/stage_b_midi_to_solo_quality_rubric_baseline.json"
   local delivery="outputs/stage_b_midi_to_solo_mvp_delivery_package/${delivery_run_id}/stage_b_midi_to_solo_mvp_delivery_package.json"
   if [[ ! -f "$rubric" ]]; then
@@ -6184,8 +6184,8 @@ run_stage_b_midi_to_solo_candidate_failure_labeling() {
     --run_id "$run_id" \
     --rubric_baseline "$rubric" \
     --mvp_delivery_package "$delivery" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CANDIDATE_FAILURE_LABELING_2026-06-10.md \
-    --issue_number 832 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CANDIDATE_FAILURE_LABELING_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 918 \
     --expected_boundary stage_b_midi_to_solo_candidate_failure_labeling \
     --min_candidate_count 6 \
     --require_labeling_completed \
