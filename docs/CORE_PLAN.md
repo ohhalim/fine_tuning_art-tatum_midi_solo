@@ -5986,6 +5986,44 @@ Issue #822는 MVP delivery package manifest에 outside-soloing repair evidence�
 
 - `Stage B MIDI-to-solo README final evidence refresh`
 
+## 9.103 Stage B MIDI-to-solo README final evidence outside-soloing repair refresh
+
+Issue #824는 README final evidence에 Issue #822 MVP delivery package outside-soloing repair evidence를 반영한 문서 작업이다.
+
+결과:
+
+- latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_delivery_package`
+- source boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- next boundary: `stage_b_midi_to_solo_final_status_audit`
+- runnable CLI ready: `true`
+- input to ranked MIDI ready: `true`
+- input to rendered WAV evidence ready: `true`
+- changed-ratio repair audio evidence ready: `true`
+- outside-soloing repair evidence ready: `true`
+- CLI candidate count: `3`
+- changed-ratio repair WAV count: `3`
+- outside-soloing repair WAV count: `6`
+- outside-soloing repair pitch-role risk count after: `0`
+- raw artifact upload required: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- README 상단 latest evidence boundary를 delivery package 기준으로 갱신.
+- README delivery package section에 outside-soloing repair evidence 추가.
+- quality/preference claim 제외 유지.
+- 다음 boundary는 final status audit refresh.
+
+검증:
+
+- `git diff --check`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo final status audit refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

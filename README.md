@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -298,8 +298,13 @@ MVP delivery package.
 - input to ranked MIDI ready: `true`
 - input to rendered WAV evidence ready: `true`
 - changed-ratio repair audio evidence ready: `true`
+- outside-soloing repair evidence ready: `true`
 - CLI candidate count: `3`
 - changed-ratio repair WAV count: `3`
+- outside-soloing repair WAV count: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing pitch-role risk count after: `0`
+- outside-soloing pitch-role risk delta: `2`
 - CLI dead-air ratio range: `0.1895 - 0.2211`
 - changed-ratio repair max ratio / target: `0.4348 / 0.5000`
 - changed-ratio repair max interval / target: `12 / 12`
