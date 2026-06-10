@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from scripts.audit_stage_b_midi_to_solo_final_status import (
+    BRIDGE_SOURCE_CONTEXT_KEYS,
     BOUNDARY as FINAL_STATUS_BOUNDARY,
     NEXT_BOUNDARY as FINAL_STATUS_NEXT_BOUNDARY,
 )
@@ -15,6 +16,31 @@ from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
     build_post_mvp_quality_iteration_plan_report,
     validate_post_mvp_quality_iteration_plan_report,
 )
+
+
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
 
 
 def final_status_audit(
@@ -40,6 +66,7 @@ def final_status_audit(
             "cli_candidate_count": cli_count,
             "changed_ratio_repair_wav_count": wav_count,
             "outside_soloing_repair_evidence_ready": outside_ready,
+            "outside_soloing_repair_source_context_preserved": outside_ready,
             "outside_soloing_repair_wav_count": outside_wav_count,
             "outside_soloing_repair_changed_note_total": 2,
             "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
@@ -54,12 +81,14 @@ def final_status_audit(
             "raw_artifact_upload_required": False,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
+            **SOURCE_CONTEXT,
         },
         "readiness": {
             "final_status_audit_completed": True,
             "technical_mvp_complete": True,
             "technical_mvp_ready_for_local_review": True,
             "readme_final_evidence_reflected": True,
+            "outside_soloing_repair_source_context_preserved": outside_ready,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
@@ -99,6 +128,7 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
         self.assertEqual(summary["selected_target"], SELECTED_TARGET)
         self.assertTrue(summary["quality_rubric_required"])
         self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
+        self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
         self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
         self.assertEqual(summary["outside_soloing_repair_source_objective_pitch_role_risk_count"], 5)
@@ -109,6 +139,8 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
+        for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertTrue(summary["candidate_failure_labeling_required"])
         self.assertTrue(summary["targeted_quality_repair_sweep_required"])
         self.assertTrue(summary["audio_review_package_required"])
@@ -179,6 +211,18 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
                 final_status_audit=final_status_audit(outside_risk_after=1),
                 output_dir=Path("outputs/post_mvp_quality"),
                 issue_number=744,
+            )
+
+    def test_rejects_missing_outside_soloing_source_context_field(self) -> None:
+        source = final_status_audit()
+        source["final_status"].pop(
+            "followup_objective_source_outside_soloing_source_pitch_role_risk_delta"
+        )
+        with self.assertRaises(StageBMidiToSoloPostMvpQualityIterationPlanError):
+            build_post_mvp_quality_iteration_plan_report(
+                final_status_audit=source,
+                output_dir=Path("outputs/post_mvp_quality"),
+                issue_number=998,
             )
 
     def test_boundary_constants_are_stable(self) -> None:

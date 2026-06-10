@@ -6123,8 +6123,8 @@ run_stage_b_midi_to_solo_final_status_audit() {
 }
 
 run_stage_b_midi_to_solo_post_mvp_quality_iteration_plan() {
-  local final_status_run_id="${FINAL_STATUS_RUN_ID:-harness_stage_b_midi_to_solo_final_status_audit}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_post_mvp_quality_iteration_plan}"
+  local final_status_run_id="${FINAL_STATUS_RUN_ID:-harness_stage_b_midi_to_solo_final_status_audit_source_context_refresh}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_post_mvp_quality_iteration_plan_source_context_refresh}"
   local final_status="outputs/stage_b_midi_to_solo_final_status_audit/${final_status_run_id}/stage_b_midi_to_solo_final_status_audit.json"
   if [[ ! -f "$final_status" ]]; then
     print_header "Stage B MIDI-to-solo final status audit"
@@ -6135,7 +6135,7 @@ run_stage_b_midi_to_solo_post_mvp_quality_iteration_plan() {
     --run_id "$run_id" \
     --final_status_audit "$final_status" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_POST_MVP_QUALITY_ITERATION_PLAN_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 914 \
+    --issue_number 998 \
     --expected_boundary stage_b_midi_to_solo_post_mvp_quality_iteration_plan \
     --expected_next_boundary stage_b_midi_to_solo_quality_rubric_baseline \
     --expected_target quality_rubric_baseline \
