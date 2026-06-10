@@ -6067,10 +6067,10 @@ run_stage_b_midi_to_solo_listening_review_quality_gap() {
 }
 
 run_stage_b_midi_to_solo_mvp_delivery_package() {
-  local listening_gap_run_id="${LISTENING_GAP_RUN_ID:-harness_stage_b_midi_to_solo_listening_review_quality_gap}"
+  local listening_gap_run_id="${LISTENING_GAP_RUN_ID:-harness_stage_b_midi_to_solo_listening_review_quality_gap_source_context_refresh}"
   local cli_package_run_id="${CLI_PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_cli_mvp_package}"
   local changed_ratio_audio_run_id="${CHANGED_RATIO_AUDIO_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_delivery_package}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_delivery_package_source_context_refresh}"
   local listening_gap="outputs/stage_b_midi_to_solo_listening_review_quality_gap/${listening_gap_run_id}/stage_b_midi_to_solo_listening_review_quality_gap.json"
   local cli_package="outputs/stage_b_midi_to_solo_phrase_bank_cli_mvp_package/${cli_package_run_id}/stage_b_midi_to_solo_phrase_bank_cli_mvp_package.json"
   local changed_ratio_audio="outputs/stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package/${changed_ratio_audio_run_id}/stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package.json"
@@ -6093,7 +6093,7 @@ run_stage_b_midi_to_solo_mvp_delivery_package() {
     --cli_mvp_package "$cli_package" \
     --changed_ratio_audio_package "$changed_ratio_audio" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_DELIVERY_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 908 \
+    --issue_number 992 \
     --expected_boundary stage_b_midi_to_solo_mvp_delivery_package \
     --expected_next_boundary stage_b_midi_to_solo_readme_final_evidence_refresh \
     --require_delivery_completed \

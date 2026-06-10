@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
 from scripts.decide_stage_b_midi_to_solo_listening_review_quality_gap import (  # noqa: E402
+    BRIDGE_SOURCE_CONTEXT_KEYS,
     BOUNDARY as LISTENING_GAP_BOUNDARY,
     NEXT_BOUNDARY as LISTENING_GAP_NEXT_BOUNDARY,
 )
@@ -28,7 +29,7 @@ class StageBMidiToSoloMvpDeliveryPackageError(ValueError):
 
 BOUNDARY = "stage_b_midi_to_solo_mvp_delivery_package"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_readme_final_evidence_refresh"
-SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_delivery_package_v1"
+SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_delivery_package_v2"
 CHANGED_RATIO_AUDIO_BOUNDARY = (
     "stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package"
 )
@@ -89,6 +90,15 @@ def _require_existing_file(path: str, *, label: str) -> str:
     return path
 
 
+def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
+    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        if key not in container:
+            raise StageBMidiToSoloMvpDeliveryPackageError(
+                f"{label} source-context field required: {key}"
+            )
+    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
+
+
 def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
@@ -109,6 +119,18 @@ def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloMvpDeliveryPackageError(
             "outside-soloing repair objective completion required"
         )
+    if not bool(readiness.get("outside_soloing_repair_source_context_preserved", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair source context readiness required"
+        )
+    if not bool(summary.get("outside_soloing_repair_source_context_preserved", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair source context preservation required"
+        )
+    source_context = _source_context_fields(
+        summary,
+        label="listening review quality gap",
+    )
     if _int(summary.get("rendered_audio_file_count")) < 3:
         raise StageBMidiToSoloMvpDeliveryPackageError("changed-ratio repair rendered WAV count below 3")
     if _int(summary.get("max_repaired_interval")) > _int(summary.get("max_interval_threshold")):
@@ -172,6 +194,9 @@ def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
         "technical_model_core_mvp_completed": True,
         "changed_ratio_repair_objective_completed": True,
         "outside_soloing_repair_objective_completed": True,
+        "outside_soloing_repair_source_context_preserved": bool(
+            summary.get("outside_soloing_repair_source_context_preserved", False)
+        ),
         "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
         "max_repaired_interval": _int(summary.get("max_repaired_interval")),
         "max_interval_threshold": _int(summary.get("max_interval_threshold")),
@@ -208,6 +233,7 @@ def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
         "outside_soloing_repair_pitch_role_risk_delta": _int(
             summary.get("outside_soloing_repair_pitch_role_risk_delta")
         ),
+        **source_context,
     }
 
 
@@ -352,6 +378,9 @@ def build_delivery_package_report(
             "input_to_rendered_wav_evidence_ready": True,
             "changed_ratio_repair_audio_evidence_ready": True,
             "outside_soloing_repair_evidence_ready": True,
+            "outside_soloing_repair_source_context_preserved": bool(
+                listening["outside_soloing_repair_source_context_preserved"]
+            ),
             "listening_review_quality_gap_open": bool(
                 listening["listening_review_quality_gap_open"]
             ),
@@ -408,6 +437,7 @@ def build_delivery_package_report(
             "outside_soloing_repair_pitch_role_risk_delta": listening[
                 "outside_soloing_repair_pitch_role_risk_delta"
             ],
+            **{key: listening[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS},
         },
         "artifact_manifest": {
             "cli_repaired_midi_candidates": cli["candidate_manifest"],
@@ -420,6 +450,9 @@ def build_delivery_package_report(
             "runnable_cli_ready": True,
             "local_artifact_paths_recorded": True,
             "raw_artifact_upload_required": False,
+            "outside_soloing_repair_source_context_preserved": bool(
+                listening["outside_soloing_repair_source_context_preserved"]
+            ),
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
             "phrase_bank_musical_quality_claimed": False,
@@ -485,6 +518,18 @@ def validate_delivery_package_report(
         raise StageBMidiToSoloMvpDeliveryPackageError(
             "outside-soloing repair evidence readiness required"
         )
+    if not bool(readiness.get("outside_soloing_repair_source_context_preserved", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair source context readiness required"
+        )
+    if not bool(package.get("outside_soloing_repair_source_context_preserved", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair source context preservation required"
+        )
+    source_context = _source_context_fields(
+        package,
+        label="MVP delivery package",
+    )
     if _int(package.get("outside_soloing_repair_wav_count")) < 6:
         raise StageBMidiToSoloMvpDeliveryPackageError(
             "outside-soloing repair WAV count below 6"
@@ -546,6 +591,9 @@ def validate_delivery_package_report(
         "outside_soloing_repair_evidence_ready": bool(
             package.get("outside_soloing_repair_evidence_ready", False)
         ),
+        "outside_soloing_repair_source_context_preserved": bool(
+            package.get("outside_soloing_repair_source_context_preserved", False)
+        ),
         "cli_candidate_count": _int(package.get("cli_candidate_count")),
         "changed_ratio_repair_wav_count": _int(package.get("changed_ratio_repair_wav_count")),
         "outside_soloing_repair_wav_count": _int(
@@ -570,6 +618,7 @@ def validate_delivery_package_report(
         "outside_soloing_repair_pitch_role_risk_delta": _int(
             package.get("outside_soloing_repair_pitch_role_risk_delta")
         ),
+        **source_context,
         "listening_review_quality_gap_open": bool(
             package.get("listening_review_quality_gap_open", False)
         ),
@@ -600,6 +649,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- input to rendered WAV evidence ready: `{_bool_token(package['input_to_rendered_wav_evidence_ready'])}`",
         f"- changed-ratio repair audio evidence ready: `{_bool_token(package['changed_ratio_repair_audio_evidence_ready'])}`",
         f"- outside-soloing repair evidence ready: `{_bool_token(package['outside_soloing_repair_evidence_ready'])}`",
+        f"- outside-soloing repair source context preserved: `{_bool_token(package['outside_soloing_repair_source_context_preserved'])}`",
         f"- listening review quality gap open: `{_bool_token(package['listening_review_quality_gap_open'])}`",
         "",
         "## Run Command",
@@ -622,6 +672,12 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- outside-soloing source repair targeted: `{_bool_token(package['outside_soloing_repair_source_targeted'])}`",
         f"- outside-soloing source residual risk preserved: `{_bool_token(package['outside_soloing_repair_source_residual_risk_preserved'])}`",
         f"- outside-soloing current repair pitch-role risk after / delta: `{package['outside_soloing_repair_pitch_role_risk_count_after']}` / `{package['outside_soloing_repair_pitch_role_risk_delta']}`",
+        f"- follow-up objective source outside-soloing source pitch-role risk: `{package['followup_objective_source_outside_soloing_source_pitch_role_risk_count_before']} -> {package['followup_objective_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `{package['followup_objective_source_outside_soloing_current_pitch_role_risk_count_after']} / {package['followup_objective_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- follow-up repair sweep source outside-soloing source pitch-role risk: `{package['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {package['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `{package['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {package['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- bridge repair sweep source outside-soloing source pitch-role risk: `{package['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {package['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `{package['repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {package['repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
         "",
         "## Claim Boundary",
         "",

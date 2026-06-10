@@ -17,6 +17,31 @@ from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import (
 )
 
 
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
+
+
 def readme_text(*, missing_last: bool = False) -> str:
     snippets = REQUIRED_README_SNIPPETS[:-1] if missing_last else REQUIRED_README_SNIPPETS
     return "\n".join(snippets) + "\n"
@@ -31,6 +56,7 @@ def delivery_package(*, quality_claim: bool = False, cli_count: int = 3) -> dict
             "input_to_rendered_wav_evidence_ready": True,
             "changed_ratio_repair_audio_evidence_ready": True,
             "outside_soloing_repair_evidence_ready": True,
+            "outside_soloing_repair_source_context_preserved": True,
             "cli_candidate_count": cli_count,
             "changed_ratio_repair_wav_count": 3,
             "outside_soloing_repair_wav_count": 6,
@@ -44,6 +70,7 @@ def delivery_package(*, quality_claim: bool = False, cli_count: int = 3) -> dict
             "outside_soloing_repair_pitch_role_risk_count_after": 0,
             "outside_soloing_repair_pitch_role_risk_delta": 2,
             "listening_review_quality_gap_open": True,
+            **SOURCE_CONTEXT,
         },
         "artifact_manifest": {
             "cli_repaired_midi_candidates": [{} for _ in range(cli_count)],
@@ -52,6 +79,7 @@ def delivery_package(*, quality_claim: bool = False, cli_count: int = 3) -> dict
         "readiness": {
             "mvp_delivery_package_completed": True,
             "raw_artifact_upload_required": False,
+            "outside_soloing_repair_source_context_preserved": True,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "phrase_bank_musical_quality_claimed": False,
