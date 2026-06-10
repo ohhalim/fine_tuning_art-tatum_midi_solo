@@ -14,7 +14,7 @@
 
 - latest functional result: Issue #982, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest MVP completion audit: Issue #986, Stage B MIDI-to-solo MVP completion audit source-context refresh
-- latest quality gap decision: Issue #904, Stage B MIDI-to-solo quality gap decision source-context refresh
+- latest quality gap decision: Issue #988, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #906, Stage B MIDI-to-solo listening review quality gap source-context refresh
 - latest MVP delivery package: Issue #908, Stage B MIDI-to-solo MVP delivery package source-context refresh
 - latest README final evidence refresh: Issue #910, Stage B MIDI-to-solo README final evidence source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #982, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after MVP completion audit source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo quality gap decision source-context refresh`
+- open issue queue after quality gap decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo listening review quality gap source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -932,6 +932,7 @@
 - selected target: `listening_review_quality_gap`
 - next boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
 - outside-soloing repair objective completed: `true`
+- outside-soloing repair source context preserved: `true`
 - outside-soloing repair target supported: `true`
 - outside-soloing source objective pitch-role risk count: `5`
 - outside-soloing source pitch-role risk count: `5 -> 2`

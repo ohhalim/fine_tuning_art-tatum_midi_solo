@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from scripts.audit_stage_b_midi_to_solo_mvp_completion import (
+    BRIDGE_SOURCE_CONTEXT_KEYS,
     BOUNDARY as MVP_COMPLETION_BOUNDARY,
 )
 from scripts.decide_stage_b_midi_to_solo_quality_gap import (
@@ -18,6 +19,31 @@ from scripts.decide_stage_b_midi_to_solo_quality_gap import (
     build_quality_gap_decision_report,
     validate_quality_gap_decision_report,
 )
+
+
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
 
 
 def mvp_completion_audit(
@@ -37,6 +63,7 @@ def mvp_completion_audit(
             "mvp_completion_audit_completed": True,
             "technical_model_core_mvp_completed": True,
             "quality_gap_decision_required": True,
+            "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "broad_trained_model_quality_claimed": False,
@@ -54,6 +81,7 @@ def mvp_completion_audit(
                 changed_ratio_repair_supported
             ),
             "outside_soloing_repair_objective_completed": outside_soloing_repair_supported,
+            "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
             "readme_evidence_boundary_refreshed": True,
             "musical_quality_mvp_completed": musical_complete,
             "human_audio_preference_completed": False,
@@ -107,6 +135,7 @@ def mvp_completion_audit(
             "model_conditioned_pitch_contour_changed_ratio_repair_preference_fill_allowed": False,
             "outside_soloing_repair_objective_path_ready": outside_soloing_repair_supported,
             "outside_soloing_repair_current_evidence_ready": outside_soloing_repair_supported,
+            "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
             "outside_soloing_repair_rendered_audio_file_count": 6,
             "outside_soloing_repair_changed_note_total": 2,
             "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
@@ -125,6 +154,7 @@ def mvp_completion_audit(
             "outside_soloing_repair_final_landing_target_supported": True,
             "outside_soloing_repair_non_chord_run_target_supported": True,
             "outside_soloing_repair_preference_fill_allowed": False,
+            **SOURCE_CONTEXT,
         },
         "decision": {
             "next_boundary": "stage_b_midi_to_solo_quality_gap_decision",
@@ -157,6 +187,7 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
             summary["model_conditioned_pitch_contour_changed_ratio_repair_objective_completed"]
         )
         self.assertTrue(summary["outside_soloing_repair_objective_completed"])
+        self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
         self.assertTrue(summary["model_conditioned_pitch_contour_objective_path_ready"])
         self.assertTrue(summary["pitch_contour_changed_ratio_review_required"])
         self.assertTrue(summary["pitch_contour_changed_ratio_repair_objective_path_ready"])
@@ -205,6 +236,8 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
+        for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
         self.assertTrue(summary["outside_soloing_repair_weak_landing_target_supported"])
         self.assertTrue(summary["outside_soloing_repair_final_landing_target_supported"])
@@ -353,6 +386,19 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
                 mvp_completion_audit=source,
                 output_dir=Path("outputs/quality_gap"),
                 issue_number=904,
+            )
+
+    def test_rejects_missing_outside_soloing_source_context_field(self) -> None:
+        source = mvp_completion_audit()
+        source["current_evidence"].pop(
+            "followup_objective_source_outside_soloing_source_pitch_role_risk_delta"
+        )
+
+        with self.assertRaises(StageBMidiToSoloQualityGapDecisionError):
+            build_quality_gap_decision_report(
+                mvp_completion_audit=source,
+                output_dir=Path("outputs/quality_gap"),
+                issue_number=988,
             )
 
     def test_rejects_targeted_outside_soloing_source_repair(self) -> None:
