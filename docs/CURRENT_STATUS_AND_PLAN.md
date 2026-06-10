@@ -28,10 +28,11 @@
 - latest targeted quality repair listening review input guard: Issue #926, Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh
 - latest targeted quality repair objective-only next decision: Issue #928, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh
 - latest targeted quality repair follow-up decision: Issue #930, Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh
+- latest songlike melody contour repair sweep: Issue #932, Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after targeted quality repair follow-up decision source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh`
+- open issue queue after songlike melody contour repair sweep source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -774,7 +775,7 @@
 - audio rendered quality claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 repair target: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
-- songlike melody contour repair sweep outside-soloing context refresh 완료
+- songlike melody contour repair sweep source-context refresh 완료
 - candidate count: `6`
 - total failure labels: `8 -> 4`
 - failure label delta: `4`
@@ -782,7 +783,19 @@
 - songlike failure delta: `5`
 - improved candidate count: `4`
 - technical regression count: `0`
-- source outside-soloing repair pitch-role risk count after: `0`
+- objective source outside-soloing repair WAV count: `6`
+- objective source outside-soloing source pitch-role risk count: `5 -> 2`
+- objective source outside-soloing source pitch-role risk delta: `3`
+- objective source outside-soloing source repair targeted: `false`
+- objective source outside-soloing source residual risk preserved: `true`
+- objective source outside-soloing current repair pitch-role risk count after: `0`
+- objective source outside-soloing current repair pitch-role risk delta: `2`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing source pitch-role risk delta: `3`
+- source outside-soloing source repair targeted: `false`
+- source outside-soloing source residual risk preserved: `true`
+- source outside-soloing current repair pitch-role risk count after: `0`
+- source outside-soloing current repair pitch-role risk delta: `2`
 - source outside-soloing not evaluable count: `6`
 - repaired outside-soloing not evaluable count: `6`
 - repaired not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`

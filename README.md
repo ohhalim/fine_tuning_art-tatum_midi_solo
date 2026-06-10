@@ -22,9 +22,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest targeted quality repair listening review input guard: `Issue #926`
 - latest targeted quality repair objective-only next decision: `Issue #928`
 - latest targeted quality repair follow-up decision: `Issue #930`
+- latest songlike melody contour repair sweep: `Issue #932`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
-- open issue queue after targeted quality repair follow-up decision source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- open issue queue after songlike melody contour repair sweep source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -189,6 +190,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - targeted quality repair selected next target: `songlike_melody_contour_repair_sweep`
 - targeted quality repair source risk: `5 -> 2`
 - targeted quality repair current risk after / delta: `0 / 2`
+- songlike melody contour repair sweep completed: `true`
+- songlike failure count: `5 -> 0`
+- songlike contour total failure labels: `8 -> 4`
+- songlike contour audio package ready: `true`
 - outside-soloing repair objective path supported: `true`
 - current evidence outside-soloing repair objective path included: `true`
 - listening review quality gap completed: `true`

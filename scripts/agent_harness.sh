@@ -6335,10 +6335,10 @@ run_stage_b_midi_to_solo_targeted_quality_repair_followup_decision() {
 }
 
 run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep() {
-  local followup_run_id="${FOLLOWUP_RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_followup_decision}"
-  local targeted_sweep_run_id="${TARGETED_SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_sweep}"
+  local followup_run_id="${FOLLOWUP_RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_followup_decision_source_context_refresh}"
+  local targeted_sweep_run_id="${TARGETED_SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_sweep_source_context_refresh}"
   local rubric_run_id="${RUBRIC_RUN_ID:-harness_stage_b_midi_to_solo_quality_rubric_baseline}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_source_context_refresh}"
   local followup_report="outputs/stage_b_midi_to_solo_targeted_quality_repair_followup_decision/${followup_run_id}/stage_b_midi_to_solo_targeted_quality_repair_followup_decision.json"
   local targeted_sweep_report="outputs/stage_b_midi_to_solo_targeted_quality_repair_sweep/${targeted_sweep_run_id}/stage_b_midi_to_solo_targeted_quality_repair_sweep.json"
   local rubric_report="outputs/stage_b_midi_to_solo_quality_rubric_baseline/${rubric_run_id}/stage_b_midi_to_solo_quality_rubric_baseline.json"
@@ -6360,8 +6360,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep() {
     --followup_decision "$followup_report" \
     --targeted_repair_sweep "$targeted_sweep_report" \
     --rubric_baseline "$rubric_report" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_SWEEP_2026-06-10.md \
-    --issue_number 846 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_SWEEP_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 932 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_sweep \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package \
     --min_candidate_count 6 \
