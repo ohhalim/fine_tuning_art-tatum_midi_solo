@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #818, Stage B MIDI-to-solo quality gap decision outside-soloing repair refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo listening review quality gap refresh`
+- latest functional result: Issue #820, Stage B MIDI-to-solo listening review quality gap outside-soloing repair refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP delivery package refresh`
 
 현재 범위가 아닌 것:
 
@@ -383,6 +383,16 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 review target: `stage_b_midi_to_solo_listening_review_quality_gap`
+- listening review quality gap outside-soloing repair refresh 완료
+- selected target: `mvp_delivery_package`
+- technical MVP delivery package ready: `true`
+- outside-soloing repair objective completed: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair pitch-role risk count after: `0`
+- listening review quality gap open: `true`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 delivery target: `stage_b_midi_to_solo_mvp_delivery_package`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

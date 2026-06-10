@@ -114,6 +114,18 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloListeningReviewQualityGapError(
             "changed-ratio repair target support required"
         )
+    if not bool(quality_gap.get("outside_soloing_repair_objective_completed", False)):
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "outside-soloing repair objective completion required"
+        )
+    if not bool(quality_gap.get("outside_soloing_repair_objective_path_ready", False)):
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "outside-soloing repair objective path readiness required"
+        )
+    if not bool(quality_gap.get("outside_soloing_repair_target_supported", False)):
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "outside-soloing repair target support required"
+        )
     if bool(quality_gap.get("model_conditioned_input_path_alignment_required", True)):
         raise StageBMidiToSoloListeningReviewQualityGapError(
             "model-conditioned input path alignment should not be selected"
@@ -138,6 +150,25 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
         summary.get("model_conditioned_pitch_contour_changed_ratio_repair_target_max_pitch_changed_ratio")
     ):
         raise StageBMidiToSoloListeningReviewQualityGapError("changed-ratio repair ratio threshold exceeded")
+    if _int(summary.get("outside_soloing_repair_rendered_audio_file_count")) < 6:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "outside-soloing repair rendered WAV count below 6"
+        )
+    if _int(summary.get("outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "outside-soloing repair residual pitch-role risk should be zero"
+        )
+    outside_targets = [
+        "outside_soloing_repair_objective_path_supported",
+        "outside_soloing_repair_weak_landing_target_supported",
+        "outside_soloing_repair_final_landing_target_supported",
+        "outside_soloing_repair_non_chord_run_target_supported",
+    ]
+    missing_outside_targets = [name for name in outside_targets if not bool(summary.get(name, False))]
+    if missing_outside_targets:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            f"outside-soloing repair targets missing: {missing_outside_targets}"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloListeningReviewQualityGapError("critical user input should not be required")
     _require_no_quality_claim(readiness, label="quality gap decision readiness")
@@ -148,6 +179,7 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
         "phrase_bank_cli_technical_path_completed": True,
         "model_conditioned_pitch_contour_objective_completed": True,
         "changed_ratio_repair_objective_completed": True,
+        "outside_soloing_repair_objective_completed": True,
         "fallback_path_active": bool(quality_gap.get("fallback_path_active", False)),
         "model_conditioned_input_path_alignment_required": bool(
             quality_gap.get("model_conditioned_input_path_alignment_required", False)
@@ -166,6 +198,36 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
         ),
         "target_max_pitch_changed_ratio": _float(
             summary.get("model_conditioned_pitch_contour_changed_ratio_repair_target_max_pitch_changed_ratio")
+        ),
+        "outside_soloing_repair_objective_path_ready": bool(
+            quality_gap.get("outside_soloing_repair_objective_path_ready", False)
+        ),
+        "outside_soloing_repair_target_supported": bool(
+            quality_gap.get("outside_soloing_repair_target_supported", False)
+        ),
+        "outside_soloing_repair_rendered_audio_file_count": _int(
+            summary.get("outside_soloing_repair_rendered_audio_file_count")
+        ),
+        "outside_soloing_repair_changed_note_total": _int(
+            summary.get("outside_soloing_repair_changed_note_total")
+        ),
+        "outside_soloing_repair_pitch_role_risk_count_after": _int(
+            summary.get("outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_pitch_role_risk_delta": _int(
+            summary.get("outside_soloing_repair_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_objective_path_supported": bool(
+            summary.get("outside_soloing_repair_objective_path_supported", False)
+        ),
+        "outside_soloing_repair_weak_landing_target_supported": bool(
+            summary.get("outside_soloing_repair_weak_landing_target_supported", False)
+        ),
+        "outside_soloing_repair_final_landing_target_supported": bool(
+            summary.get("outside_soloing_repair_final_landing_target_supported", False)
+        ),
+        "outside_soloing_repair_non_chord_run_target_supported": bool(
+            summary.get("outside_soloing_repair_non_chord_run_target_supported", False)
         ),
         "human_review_required_now": bool(quality_gap.get("human_review_required_now", False)),
         "musical_quality_mvp_completed": False,
@@ -199,7 +261,7 @@ def build_listening_review_quality_gap_report(
             "selected_target": SELECTED_TARGET,
             "selected_next_boundary": NEXT_BOUNDARY,
             "reason": (
-                "technical MIDI-to-solo path and changed-ratio repair objective evidence are ready; "
+                "technical MIDI-to-solo path, changed-ratio repair, and outside-soloing repair objective evidence are ready; "
                 "delivery package can be prepared while listening and musical quality claims remain excluded"
             ),
         },
@@ -280,11 +342,44 @@ def validate_listening_review_quality_gap_report(
         "changed_ratio_repair_objective_completed": bool(
             summary.get("changed_ratio_repair_objective_completed", False)
         ),
+        "outside_soloing_repair_objective_completed": bool(
+            summary.get("outside_soloing_repair_objective_completed", False)
+        ),
         "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
         "max_repaired_interval": _int(summary.get("max_repaired_interval")),
         "max_interval_threshold": _int(summary.get("max_interval_threshold")),
         "max_repaired_pitch_changed_ratio": _float(summary.get("max_repaired_pitch_changed_ratio")),
         "target_max_pitch_changed_ratio": _float(summary.get("target_max_pitch_changed_ratio")),
+        "outside_soloing_repair_objective_path_ready": bool(
+            summary.get("outside_soloing_repair_objective_path_ready", False)
+        ),
+        "outside_soloing_repair_target_supported": bool(
+            summary.get("outside_soloing_repair_target_supported", False)
+        ),
+        "outside_soloing_repair_rendered_audio_file_count": _int(
+            summary.get("outside_soloing_repair_rendered_audio_file_count")
+        ),
+        "outside_soloing_repair_changed_note_total": _int(
+            summary.get("outside_soloing_repair_changed_note_total")
+        ),
+        "outside_soloing_repair_pitch_role_risk_count_after": _int(
+            summary.get("outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_pitch_role_risk_delta": _int(
+            summary.get("outside_soloing_repair_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_objective_path_supported": bool(
+            summary.get("outside_soloing_repair_objective_path_supported", False)
+        ),
+        "outside_soloing_repair_weak_landing_target_supported": bool(
+            summary.get("outside_soloing_repair_weak_landing_target_supported", False)
+        ),
+        "outside_soloing_repair_final_landing_target_supported": bool(
+            summary.get("outside_soloing_repair_final_landing_target_supported", False)
+        ),
+        "outside_soloing_repair_non_chord_run_target_supported": bool(
+            summary.get("outside_soloing_repair_non_chord_run_target_supported", False)
+        ),
         "listening_review_quality_gap_open": bool(
             summary.get("listening_review_quality_gap_open", False)
         ),
@@ -325,9 +420,19 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- phrase-bank CLI technical path completed: `{_bool_token(summary['phrase_bank_cli_technical_path_completed'])}`",
         f"- model-conditioned pitch-contour objective completed: `{_bool_token(summary['model_conditioned_pitch_contour_objective_completed'])}`",
         f"- changed-ratio repair objective completed: `{_bool_token(summary['changed_ratio_repair_objective_completed'])}`",
+        f"- outside-soloing repair objective completed: `{_bool_token(summary['outside_soloing_repair_objective_completed'])}`",
         f"- rendered WAV files: `{summary['rendered_audio_file_count']}`",
         f"- changed-ratio repair max interval / threshold: `{summary['max_repaired_interval']}` / `{summary['max_interval_threshold']}`",
         f"- changed-ratio repair max ratio / target: `{summary['max_repaired_pitch_changed_ratio']:.4f}` / `{summary['target_max_pitch_changed_ratio']:.4f}`",
+        f"- outside-soloing repair objective path ready: `{_bool_token(summary['outside_soloing_repair_objective_path_ready'])}`",
+        f"- outside-soloing repair target supported: `{_bool_token(summary['outside_soloing_repair_target_supported'])}`",
+        f"- outside-soloing repair rendered WAV files: `{summary['outside_soloing_repair_rendered_audio_file_count']}`",
+        f"- outside-soloing repair changed note total: `{summary['outside_soloing_repair_changed_note_total']}`",
+        f"- outside-soloing pitch-role risk after / delta: `{summary['outside_soloing_repair_pitch_role_risk_count_after']}` / `{summary['outside_soloing_repair_pitch_role_risk_delta']}`",
+        f"- outside-soloing repair objective path supported: `{_bool_token(summary['outside_soloing_repair_objective_path_supported'])}`",
+        f"- outside-soloing repair weak landing target supported: `{_bool_token(summary['outside_soloing_repair_weak_landing_target_supported'])}`",
+        f"- outside-soloing repair final landing target supported: `{_bool_token(summary['outside_soloing_repair_final_landing_target_supported'])}`",
+        f"- outside-soloing repair non-chord run target supported: `{_bool_token(summary['outside_soloing_repair_non_chord_run_target_supported'])}`",
         f"- musical quality MVP completed: `{_bool_token(summary['musical_quality_mvp_completed'])}`",
         f"- human/audio preference completed: `{_bool_token(summary['human_audio_preference_completed'])}`",
         f"- product MVP completed: `{_bool_token(summary['product_mvp_completed'])}`",

@@ -24,6 +24,7 @@ def quality_gap_decision(
     next_boundary: str = LISTENING_REVIEW_NEXT_BOUNDARY,
     quality_claim: bool = False,
     changed_ratio_supported: bool = True,
+    outside_soloing_repair_supported: bool = True,
 ) -> dict:
     return {
         "boundary": QUALITY_GAP_BOUNDARY,
@@ -34,6 +35,7 @@ def quality_gap_decision(
             "model_conditioned_pitch_contour_changed_ratio_repair_objective_completed": (
                 changed_ratio_supported
             ),
+            "outside_soloing_repair_objective_completed": outside_soloing_repair_supported,
             "musical_quality_mvp_completed": False,
             "human_audio_preference_completed": False,
             "product_mvp_completed": False,
@@ -45,6 +47,8 @@ def quality_gap_decision(
                 changed_ratio_supported
             ),
             "pitch_contour_changed_ratio_repair_target_supported": changed_ratio_supported,
+            "outside_soloing_repair_objective_path_ready": outside_soloing_repair_supported,
+            "outside_soloing_repair_target_supported": outside_soloing_repair_supported,
             "human_review_required_now": False,
         },
         "mvp_completion_summary": {
@@ -57,6 +61,16 @@ def quality_gap_decision(
                 0.4348 if changed_ratio_supported else 0.7174
             ),
             "model_conditioned_pitch_contour_changed_ratio_repair_target_max_pitch_changed_ratio": 0.5,
+            "outside_soloing_repair_rendered_audio_file_count": 6,
+            "outside_soloing_repair_changed_note_total": 2,
+            "outside_soloing_repair_pitch_role_risk_count_after": (
+                0 if outside_soloing_repair_supported else 1
+            ),
+            "outside_soloing_repair_pitch_role_risk_delta": 2,
+            "outside_soloing_repair_objective_path_supported": outside_soloing_repair_supported,
+            "outside_soloing_repair_weak_landing_target_supported": True,
+            "outside_soloing_repair_final_landing_target_supported": True,
+            "outside_soloing_repair_non_chord_run_target_supported": True,
         },
         "selected_target": {
             "selected_target": selected_target,
@@ -102,11 +116,22 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
         self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
         self.assertTrue(summary["technical_model_core_mvp_completed"])
         self.assertTrue(summary["changed_ratio_repair_objective_completed"])
+        self.assertTrue(summary["outside_soloing_repair_objective_completed"])
         self.assertEqual(summary["rendered_audio_file_count"], 3)
         self.assertEqual(summary["max_repaired_interval"], 12)
         self.assertEqual(summary["max_interval_threshold"], 12)
         self.assertAlmostEqual(summary["max_repaired_pitch_changed_ratio"], 0.4348, places=4)
         self.assertAlmostEqual(summary["target_max_pitch_changed_ratio"], 0.5, places=4)
+        self.assertTrue(summary["outside_soloing_repair_objective_path_ready"])
+        self.assertTrue(summary["outside_soloing_repair_target_supported"])
+        self.assertEqual(summary["outside_soloing_repair_rendered_audio_file_count"], 6)
+        self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
+        self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
+        self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
+        self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
+        self.assertTrue(summary["outside_soloing_repair_weak_landing_target_supported"])
+        self.assertTrue(summary["outside_soloing_repair_final_landing_target_supported"])
+        self.assertTrue(summary["outside_soloing_repair_non_chord_run_target_supported"])
         self.assertTrue(summary["listening_review_quality_gap_open"])
         self.assertTrue(summary["technical_mvp_delivery_package_ready"])
         self.assertFalse(summary["human_review_required_now"])
@@ -140,6 +165,16 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
                 quality_gap_decision=quality_gap_decision(changed_ratio_supported=False),
                 output_dir=Path("outputs/listening_review_quality_gap"),
                 issue_number=736,
+            )
+
+    def test_rejects_missing_outside_soloing_repair_support(self) -> None:
+        with self.assertRaises(StageBMidiToSoloListeningReviewQualityGapError):
+            build_listening_review_quality_gap_report(
+                quality_gap_decision=quality_gap_decision(
+                    outside_soloing_repair_supported=False
+                ),
+                output_dir=Path("outputs/listening_review_quality_gap"),
+                issue_number=820,
             )
 
     def test_rejects_quality_claim(self) -> None:
