@@ -1,0 +1,41 @@
+# Stage B MIDI-to-Solo README Evidence Source-Context Refresh
+
+## Summary
+
+- boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- source boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+
+## Evidence
+
+- current MVP evidence supported: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- source objective outside-soloing pitch-role risk count: `5`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- source outside-soloing pitch-role risk delta: `3`
+- source outside-soloing repair targeted: `false`
+- source outside-soloing residual risk preserved: `true`
+- current repair outside-soloing pitch-role risk count after: `0`
+- current repair outside-soloing pitch-role risk delta: `2`
+
+## Claim Boundary
+
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- broad trained-model quality claim: `false`
+- Brad style adaptation claim: `false`
+
+## Decision
+
+- README current evidence block에 source/current repair context 분리 기록
+- source repair residual risk boundary 보존
+- current repair objective support만 반영
+- 다음 boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+
+## Validation
+
+- `git diff --check`
+- `bash scripts/agent_harness.sh quick`

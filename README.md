@@ -7,8 +7,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 ## 현재 상태
 
 - latest functional result: `Issue #898`
+- latest README evidence refresh: `Issue #900`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
-- open issue queue after current evidence refresh merge: `0`
+- open issue queue after README evidence refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -137,6 +138,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - outside-soloing repair objective path included in current evidence: `true`
 - outside-soloing repair WAV files: `6`
 - outside-soloing repair changed note total: `2`
+- outside-soloing source pitch-role risk: `5 -> 2`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
 - outside-soloing pitch-role risk count after: `0`
 - outside-soloing pitch-role risk delta: `2`
 - outside-soloing repair objective path supported: `true`
@@ -255,6 +259,11 @@ MVP current evidence refresh.
 - outside-soloing repair objective path ready: `true`
 - outside-soloing repair rendered audio file count: `6`
 - outside-soloing repair changed note total: `2`
+- outside-soloing source objective pitch-role risk count: `5`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source pitch-role risk delta: `3`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
 - outside-soloing repair pitch-role risk count after: `0`
 - outside-soloing repair pitch-role risk delta: `2`
 - human/audio preference claimed: `false`
@@ -920,6 +929,10 @@ README evidence refresh.
 - model-conditioned pitch-contour changed-ratio review required: `true`
 - model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - model-conditioned pitch-contour changed-ratio repair max ratio / target: `0.4348 / 0.5000`
+- outside-soloing source-context evidence reflected: `true`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source residual risk preserved: `true`
+- outside-soloing current repair pitch-role risk count after: `0`
 - quality/preference claim excluded: `true`
 - next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 

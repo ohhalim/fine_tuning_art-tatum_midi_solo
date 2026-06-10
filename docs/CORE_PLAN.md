@@ -7690,6 +7690,43 @@ Issue #898은 Issue #894 outside-soloing repair objective-only next decision의 
 
 - `Stage B MIDI-to-solo README evidence source-context refresh`
 
+## 9.140 Stage B MIDI-to-solo README evidence source-context refresh
+
+Issue #900은 Issue #898 current evidence source-context refresh 결과를 README evidence block에 반영한 문서 작업이다.
+
+결과:
+
+- latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- current MVP evidence supported: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- source objective outside-soloing pitch-role risk count: `5`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- source outside-soloing pitch-role risk delta: `3`
+- source outside-soloing repair targeted: `false`
+- source outside-soloing residual risk preserved: `true`
+- current repair outside-soloing pitch-role risk count after: `0`
+- current repair outside-soloing pitch-role risk delta: `2`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+
+판단:
+
+- README current evidence block에 source/current repair context를 분리 기록.
+- source repair는 targeted repair가 아니며 residual risk boundary로 보존.
+- current repair `2 -> 0`은 objective evidence 범위에서만 반영.
+- human/audio preference와 MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `git diff --check`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo MVP completion audit source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
