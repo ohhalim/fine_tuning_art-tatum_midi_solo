@@ -6657,8 +6657,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pit
     --repair_sweep_report "$sweep_report" \
     --chords Cm7,Fm7,Bb7,Ebmaj7 \
     --bpm 124 \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_CONTEXT_PITCH_ROLE_BRIDGE_2026-06-09.md \
-    --issue_number 786 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_CONTEXT_PITCH_ROLE_BRIDGE_2026-06-10.md \
+    --issue_number 870 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision \
     --require_bridge_completed \
