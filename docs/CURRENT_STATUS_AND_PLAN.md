@@ -371,7 +371,12 @@
 - validated review input: `false`
 - technical WAV validation: `true`
 - rendered audio file count: `6`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- source outside-soloing repair targeted: `false`
+- source outside-soloing residual risk preserved: `true`
 - outside-soloing pitch-role risk count after: `0`
+- outside-soloing pitch-role risk delta: `2`
+- outside-soloing repair targeted: `true`
 - max non-chord-tone run after: `3`
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
