@@ -49,7 +49,23 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "repaired_songlike_failure_count": 0,
             "songlike_failure_delta": 5,
             "source_outside_soloing_repair_evidence_ready": True,
+            "objective_source_outside_soloing_repair_wav_count": 6,
+            "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+            "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+            "objective_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
+            "objective_source_outside_soloing_repair_source_targeted": False,
+            "objective_source_outside_soloing_repair_source_residual_risk_preserved": True,
+            "objective_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "objective_source_outside_soloing_repair_pitch_role_risk_delta": 2,
+            "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+            "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+            "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
+            "source_outside_soloing_repair_source_targeted": False,
+            "source_outside_soloing_repair_source_residual_risk_preserved": True,
             "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_repair_pitch_role_risk_delta": 2,
             "source_outside_soloing_not_evaluable_count": 6,
             "repaired_outside_soloing_not_evaluable_count": 6,
             "remaining_failure_counts": {
@@ -99,7 +115,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
             report = build_listening_review_input_guard_report(
                 source_package(),
                 output_dir=root / "guard",
-                issue_number=852,
+                issue_number=938,
             )
             summary = validate_listening_review_input_guard_report(
                 report,
@@ -119,7 +135,55 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
             self.assertEqual(summary["failure_label_delta"], 4)
             self.assertEqual(summary["songlike_failure_delta"], 5)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["objective_source_outside_soloing_repair_wav_count"], 6)
+            self.assertEqual(
+                summary[
+                    "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary[
+                    "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary[
+                    "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after"
+                ],
+                2,
+            )
+            self.assertEqual(
+                summary["objective_source_outside_soloing_repair_source_pitch_role_risk_delta"],
+                3,
+            )
+            self.assertFalse(summary["objective_source_outside_soloing_repair_source_targeted"])
+            self.assertTrue(
+                summary["objective_source_outside_soloing_repair_source_residual_risk_preserved"]
+            )
+            self.assertEqual(
+                summary["objective_source_outside_soloing_repair_pitch_role_risk_count_after"],
+                0,
+            )
+            self.assertEqual(summary["objective_source_outside_soloing_repair_pitch_role_risk_delta"], 2)
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_objective_pitch_role_risk_count"],
+                5,
+            )
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_pitch_role_risk_count_before"],
+                5,
+            )
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_pitch_role_risk_count_after"],
+                2,
+            )
+            self.assertEqual(summary["source_outside_soloing_repair_source_pitch_role_risk_delta"], 3)
+            self.assertFalse(summary["source_outside_soloing_repair_source_targeted"])
+            self.assertTrue(summary["source_outside_soloing_repair_source_residual_risk_preserved"])
             self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -145,6 +209,18 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                     source,
                     output_dir=root / "guard",
                     issue_number=852,
+                )
+
+    def test_rejects_source_context_delta_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = source_package()
+            source["source_summary"]["source_outside_soloing_repair_source_pitch_role_risk_delta"] = 9
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardError):
+                build_listening_review_input_guard_report(
+                    source,
+                    output_dir=root / "guard",
+                    issue_number=938,
                 )
 
     def test_constants_are_stable(self) -> None:

@@ -25,9 +25,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour repair sweep: `Issue #932`
 - latest songlike melody contour repair audio package: `Issue #934`
 - latest songlike melody contour repair listening review package: `Issue #936`
+- latest songlike melody contour repair listening review input guard: `Issue #938`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package`
-- open issue queue after songlike melody contour repair listening review package source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard`
+- open issue queue after songlike melody contour repair listening review input guard source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -203,6 +204,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - songlike contour audio technical validation: `true`
 - songlike contour listening review item count: `6`
 - songlike contour validated review input: `false`
+- songlike contour preference fill allowed: `false`
 - outside-soloing repair objective path supported: `true`
 - current evidence outside-soloing repair objective path included: `true`
 - listening review quality gap completed: `true`

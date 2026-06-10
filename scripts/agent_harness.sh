@@ -6415,8 +6415,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package
 }
 
 run_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard() {
-  local package_run_id="${PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package}"
-  local guard_run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard}"
+  local package_run_id="${PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package_source_context_refresh}"
+  local guard_run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard_source_context_refresh}"
   local source_package="outputs/stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package/${package_run_id}/stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package.json"
   if [[ ! -f "$source_package" ]]; then
     print_header "Stage B MIDI-to-solo songlike melody contour repair listening review package"
@@ -6426,8 +6426,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_g
   "$PYTHON_BIN" scripts/guard_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input.py \
     --run_id "$guard_run_id" \
     --source_package "$source_package" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_LISTENING_REVIEW_INPUT_GUARD_2026-06-10.md \
-    --issue_number 852 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_LISTENING_REVIEW_INPUT_GUARD_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 938 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision \
     --require_guard_completed \
