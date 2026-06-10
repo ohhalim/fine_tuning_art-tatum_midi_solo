@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pretty_midi
 
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
 from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import BOUNDARY as DELIVERY_BOUNDARY
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
     BOUNDARY as RUBRIC_BOUNDARY,
@@ -211,6 +212,7 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
             self.assertGreater(summary["failure_label_type_count"], 0)
             self.assertGreaterEqual(summary["not_evaluable_label_type_count"], 2)
             self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
+            self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
             self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
             self.assertEqual(
                 summary["outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
@@ -222,6 +224,8 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
             self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
             self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
             self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
+            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+                self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(summary["outside_soloing_not_evaluable_count"], 3)
             self.assertEqual(summary["selected_target"], REPAIR_TARGET)
             self.assertEqual(summary["next_boundary"], REPAIR_NEXT_BOUNDARY)
@@ -302,6 +306,24 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
                     mvp_delivery_package=delivery_package(paths),
                     output_dir=root / "labels",
                     issue_number=748,
+                )
+
+    def test_rejects_missing_rubric_source_context_field(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            paths = [root / f"candidate_{index}.mid" for index in range(3)]
+            for path in paths:
+                write_midi(path, [60, 62, 64, 65] * 4)
+            source = rubric_baseline(root)
+            source["rubric_baseline"].pop(
+                "followup_objective_source_outside_soloing_source_pitch_role_risk_delta"
+            )
+            with self.assertRaises(StageBMidiToSoloCandidateFailureLabelingError):
+                build_candidate_failure_labeling_report(
+                    rubric_baseline=source,
+                    mvp_delivery_package=delivery_package(paths),
+                    output_dir=root / "labels",
+                    issue_number=1002,
                 )
 
     def test_constants_are_stable(self) -> None:

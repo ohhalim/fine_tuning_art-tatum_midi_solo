@@ -10396,6 +10396,56 @@ Issue #1000은 Issue #998 post-MVP quality iteration plan의 source/current outs
 
 - `Stage B MIDI-to-solo candidate failure labeling source-context refresh`
 
+## 9.191 Stage B MIDI-to-solo candidate failure labeling source-context refresh
+
+Issue #1002는 Issue #1000 quality rubric baseline의 source/current outside-soloing context를 candidate failure labeling 결과까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- source boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- selected target: `targeted_quality_repair_sweep`
+- candidate count: `6`
+- failed candidate count: `6`
+- failure label type count: `4`
+- not evaluable label type count: `2`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
+- outside-soloing repair WAV count: `6`
+- outside-soloing source objective pitch-role risk count: `5`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source pitch-role risk delta: `3`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
+- outside-soloing current repair pitch-role risk count after: `0`
+- outside-soloing current repair pitch-role risk delta: `2`
+- outside-soloing not evaluable count: `6`
+- targeted quality repair sweep ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- candidate failure labeling source validation에 #1000 rubric baseline source-context preserved 조건 추가.
+- source-context preserved flag와 21개 context field를 aggregate와 validation summary에 보존.
+- outside-soloing label은 chord-context 부재로 not evaluable 유지.
+- 현재 후보 6개 모두 failure label 보유, 다음 targeted quality repair sweep 진입.
+- human/audio preference와 MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_candidate_failure_labeling`
+- `.venv/bin/python -m py_compile scripts/label_stage_b_midi_to_solo_candidate_failures.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-candidate-failure-labeling`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo targeted quality repair sweep source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
