@@ -405,7 +405,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo targeted quality repair sweep: candidates `6`, failure labels `12 -> 8`, improved candidates `4`, technical regression `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
 - MIDI-to-solo targeted quality repair audio package: rendered WAV `6`, duration `18.422s-18.984s`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
 - MIDI-to-solo targeted quality repair listening review package: review items `6`, validated input `false`, technical WAV validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
-- MIDI-to-solo targeted quality repair listening review input guard: review items `6`, preference fill `false`, validated input `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
+- MIDI-to-solo targeted quality repair listening review input guard: review items `6`, preference fill `false`, validated input `false`, source outside-soloing not evaluable `6`, repaired outside-soloing not evaluable `6`, source pitch-role risk after `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
 - MIDI-to-solo targeted quality repair objective-only next decision: follow-up required `true`, current quality claim ready `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
 - MIDI-to-solo pitch-contour changed-ratio review decision: selected target `lower_pitch_change_ratio_repair_probe`, repair probe required `true`, max interval/threshold `11/12`, changed-ratio review threshold `0.5`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
 - MIDI-to-solo pitch-contour changed-ratio repair probe: repaired/pass `3/3`, max pitch changed ratio `0.7174 -> 0.4348`, max interval `12`, dead-air max `0.0000`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package`
@@ -6302,6 +6302,45 @@ Issue #838은 targeted quality repair listening review package에 audio package 
 다음 작업:
 
 - `Stage B MIDI-to-solo targeted quality repair listening review input guard refresh`
+
+## 9.111 Stage B MIDI-to-solo targeted quality repair listening review input guard outside-soloing context refresh
+
+Issue #840은 targeted quality repair listening review input guard에 listening review package outside-soloing context를 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
+- review item count: `6`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- failure label delta: `4`
+- source outside-soloing repair pitch-role risk count after: `0`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- human/audio preference claimed: `false`
+- audio rendered quality claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- input guard가 listening review package outside-soloing not_evaluable boundary를 보존.
+- validated review input pending 기준 preference fill 차단 유지.
+- 음악적 품질, human/audio preference, audio rendered quality claim 제외 유지.
+- 다음 boundary는 objective-only next decision refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
+- `.venv/bin/python -m py_compile scripts/guard_stage_b_midi_to_solo_targeted_quality_repair_listening_review_input.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-listening-review-input-guard`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo targeted quality repair objective-only next decision refresh`
 
 ## 10. 한 문장 요약
 

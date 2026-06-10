@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #838, Stage B MIDI-to-solo targeted quality repair listening review package outside-soloing context refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair listening review input guard refresh`
+- latest functional result: Issue #840, Stage B MIDI-to-solo targeted quality repair listening review input guard outside-soloing context refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair objective-only next decision refresh`
 
 현재 범위가 아닌 것:
 
@@ -490,6 +490,19 @@
 - audio rendered quality claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 guard target: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
+- targeted quality repair listening review input guard outside-soloing context refresh 완료
+- review item count: `6`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- failure label delta: `4`
+- source outside-soloing repair pitch-role risk count after: `0`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- human/audio preference claim: `false`
+- audio rendered quality claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 objective target: `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
