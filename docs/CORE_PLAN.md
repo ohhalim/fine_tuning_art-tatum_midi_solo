@@ -5806,6 +5806,54 @@ Issue #814는 README 현재 상태와 claim boundary에 Issue #812 current evide
 
 - `Stage B MIDI-to-solo MVP completion audit refresh`
 
+## 9.99 Stage B MIDI-to-solo MVP completion audit outside-soloing repair refresh
+
+Issue #816은 MVP completion audit에 Issue #812 outside-soloing repair current evidence path를 필수 완료 조건으로 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- technical model-core MVP completed: `true`
+- input to ranked MIDI completed: `true`
+- input to rendered WAV completed: `true`
+- selected-scale objective repair completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour changed-ratio repair objective completed: `true`
+- outside-soloing repair objective completed: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair pitch-role risk delta: `2`
+- outside-soloing repair objective path supported: `true`
+- outside-soloing repair target supported: `true`
+- outside-soloing repair weak landing target supported: `true`
+- outside-soloing repair final landing target supported: `true`
+- outside-soloing repair non-chord run target supported: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- completion audit의 current evidence 필수 조건에 outside-soloing repair objective path 추가.
+- README required snippet에 outside-soloing repair current evidence 포함 상태 추가.
+- outside-soloing pitch-role risk count after `0` 기준 objective support 유지.
+- weak landing, final landing, non-chord run target support 모두 유지.
+- musical quality, human/audio preference, broad trained-model quality claim 제외 유지.
+- 다음 boundary는 quality gap decision refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_completion_audit`
+- `.venv/bin/python -m py_compile scripts/audit_stage_b_midi_to_solo_mvp_completion.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo quality gap decision refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
