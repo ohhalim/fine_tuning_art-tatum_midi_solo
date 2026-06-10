@@ -1,4 +1,4 @@
-# Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Repair Objective-Only Next Decision
+# Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Repair Objective-Only Next Decision Source Context Refresh
 
 ## Summary
 
@@ -17,11 +17,24 @@
 - phrase/rhythm failure count: `4 -> 1`
 - phrase/rhythm failure delta: `3`
 - source outside-soloing repair evidence ready: `true`
+- objective source outside-soloing source context preserved: `true`
+- objective source outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`
+- objective source outside-soloing source repair targeted: `false`
+- objective source outside-soloing source residual risk preserved: `true`
+- objective source outside-soloing current repair pitch-role risk after / delta: `0` / `2`
+- objective follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- objective follow-up objective current repair pitch-role risk after/delta: `0` / `2`
+- objective repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- objective repair sweep current repair pitch-role risk after/delta: `0` / `2`
+- source outside-soloing source context preserved: `true`
 - source outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`
 - source outside-soloing source repair targeted: `false`
 - source outside-soloing source residual risk preserved: `true`
-- source outside-soloing repair pitch-role risk count after: `0`
-- source outside-soloing current repair pitch-role risk delta: `2`
+- source outside-soloing current repair pitch-role risk after / delta: `0` / `2`
+- follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up objective current repair pitch-role risk after/delta: `0` / `2`
+- bridge repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- bridge repair sweep current repair pitch-role risk after/delta: `0` / `2`
 - source/repaired outside-soloing not evaluable count: `6/6`
 - phrase/rhythm follow-up required: `true`
 - current quality claim ready: `false`
