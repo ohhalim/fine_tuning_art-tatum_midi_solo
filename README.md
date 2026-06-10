@@ -11,7 +11,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest quality gap decision: `Issue #988`
 - latest listening review quality gap: `Issue #990`
 - latest MVP delivery package: `Issue #992`
-- latest README final evidence refresh: `Issue #910`
+- latest README final evidence refresh: `Issue #994`
 - latest final status audit: `Issue #912`
 - latest post-MVP quality iteration plan: `Issue #914`
 - latest quality rubric baseline: `Issue #916`
@@ -332,6 +332,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP delivery changed-ratio repair WAV files: `3`
 - MVP delivery outside-soloing repair WAV files: `6`
 - README final evidence source-context reflected: `true`
+- README final evidence outside-soloing source context preserved: `true`
 - MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
 - next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`

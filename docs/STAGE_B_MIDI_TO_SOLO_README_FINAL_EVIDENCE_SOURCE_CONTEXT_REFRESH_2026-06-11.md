@@ -15,6 +15,7 @@
 - input to rendered WAV evidence ready: `true`
 - changed-ratio repair audio evidence ready: `true`
 - outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
 - outside-soloing repair WAV count: `6`
 - outside-soloing source pitch-role risk count: `5 -> 2`
 - outside-soloing source repair targeted: `false`
