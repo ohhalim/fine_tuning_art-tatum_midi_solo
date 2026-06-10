@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #850, Stage B MIDI-to-solo songlike melody contour repair listening review package outside-soloing context refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair listening review input guard refresh`
+- latest functional result: Issue #852, Stage B MIDI-to-solo songlike melody contour repair listening review input guard outside-soloing context refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair objective-only next decision refresh`
 
 현재 범위가 아닌 것:
 
@@ -588,6 +588,23 @@
 - audio rendered quality claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 guard target: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard`
+- songlike melody contour repair listening review input guard outside-soloing context refresh 완료
+- review item count: `6`
+- required input field count: `4`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- WAV duration range: `18.849s-18.992s`
+- failure label delta: `4`
+- songlike failure delta: `5`
+- source outside-soloing repair pitch-role risk count after: `0`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- critical user input required: `false`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 decision target: `stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

@@ -48,6 +48,10 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "source_songlike_failure_count": 5,
             "repaired_songlike_failure_count": 0,
             "songlike_failure_delta": 5,
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
             "remaining_failure_counts": {
                 "phrase_shape_missing_tension_release": 2,
                 "rhythmic_monotony": 2,
@@ -95,7 +99,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
             report = build_listening_review_input_guard_report(
                 source_package(),
                 output_dir=root / "guard",
-                issue_number=768,
+                issue_number=852,
             )
             summary = validate_listening_review_input_guard_report(
                 report,
@@ -103,6 +107,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                 expected_next_boundary=OBJECTIVE_NEXT_BOUNDARY,
                 require_guard_completed=True,
                 require_preference_blocked=True,
+                require_pending_input=True,
                 require_no_quality_claim=True,
             )
 
@@ -113,6 +118,10 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
             self.assertEqual(summary["required_input_field_count"], 4)
             self.assertEqual(summary["failure_label_delta"], 4)
             self.assertEqual(summary["songlike_failure_delta"], 5)
+            self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
 
@@ -123,7 +132,19 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                 build_listening_review_input_guard_report(
                     source_package(quality_claim=True),
                     output_dir=root / "guard",
-                    issue_number=768,
+                    issue_number=852,
+                )
+
+    def test_rejects_missing_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = source_package()
+            source["source_summary"]["source_outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardError):
+                build_listening_review_input_guard_report(
+                    source,
+                    output_dir=root / "guard",
+                    issue_number=852,
                 )
 
     def test_constants_are_stable(self) -> None:
