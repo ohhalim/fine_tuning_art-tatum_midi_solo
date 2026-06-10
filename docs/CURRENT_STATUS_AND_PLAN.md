@@ -20,7 +20,7 @@
 - latest README final evidence refresh: Issue #994, Stage B MIDI-to-solo README final evidence source-context refresh
 - latest final status audit: Issue #996, Stage B MIDI-to-solo final status audit source-context refresh
 - latest post-MVP quality iteration plan: Issue #998, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
-- latest quality rubric baseline: Issue #916, Stage B MIDI-to-solo quality rubric baseline source-context refresh
+- latest quality rubric baseline: Issue #1000, Stage B MIDI-to-solo quality rubric baseline source-context refresh
 - latest candidate failure labeling: Issue #918, Stage B MIDI-to-solo candidate failure labeling source-context refresh
 - latest targeted quality repair sweep: Issue #920, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
 - latest targeted quality repair audio package: Issue #922, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
@@ -57,7 +57,7 @@
 - latest README evidence refresh: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
 - open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo quality rubric baseline source-context refresh`
+- 다음 권장 이슈: `Stage B MIDI-to-solo candidate failure labeling source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -1035,6 +1035,7 @@
 - required metric group count: `30`
 - candidate failure labeling ready: `true`
 - outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
 - outside-soloing repair WAV count: `6`
 - outside-soloing source objective pitch-role risk count: `5`
 - outside-soloing source pitch-role risk count: `5 -> 2`

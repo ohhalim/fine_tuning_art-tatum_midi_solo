@@ -6144,7 +6144,7 @@ run_stage_b_midi_to_solo_post_mvp_quality_iteration_plan() {
 }
 
 run_stage_b_midi_to_solo_quality_rubric_baseline() {
-  local post_mvp_plan_run_id="${POST_MVP_PLAN_RUN_ID:-harness_stage_b_midi_to_solo_post_mvp_quality_iteration_plan}"
+  local post_mvp_plan_run_id="${POST_MVP_PLAN_RUN_ID:-harness_stage_b_midi_to_solo_post_mvp_quality_iteration_plan_source_context_refresh}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_quality_rubric_baseline_source_context_refresh}"
   local post_mvp_plan="outputs/stage_b_midi_to_solo_post_mvp_quality_iteration_plan/${post_mvp_plan_run_id}/stage_b_midi_to_solo_post_mvp_quality_iteration_plan.json"
   if [[ ! -f "$post_mvp_plan" ]]; then
@@ -6156,7 +6156,7 @@ run_stage_b_midi_to_solo_quality_rubric_baseline() {
     --run_id "$run_id" \
     --post_mvp_quality_plan "$post_mvp_plan" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_QUALITY_RUBRIC_BASELINE_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 916 \
+    --issue_number 1000 \
     --expected_boundary stage_b_midi_to_solo_quality_rubric_baseline \
     --expected_next_boundary stage_b_midi_to_solo_candidate_failure_labeling \
     --expected_target candidate_failure_labeling \

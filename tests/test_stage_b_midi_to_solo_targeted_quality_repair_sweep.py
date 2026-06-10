@@ -27,6 +27,31 @@ from scripts.run_stage_b_midi_to_solo_targeted_quality_repair_sweep import (
 )
 
 
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
+
+
 def write_midi(path: Path, pitches: list[int]) -> None:
     midi = pretty_midi.PrettyMIDI(initial_tempo=120)
     midi.time_signature_changes.append(pretty_midi.TimeSignature(4, 4, 0.0))
@@ -58,6 +83,7 @@ def post_mvp_quality_plan() -> dict:
             "technical_mvp_complete": True,
             "local_review_ready": True,
             "outside_soloing_repair_evidence_ready": True,
+            "outside_soloing_repair_source_context_preserved": True,
             "outside_soloing_repair_wav_count": 6,
             "outside_soloing_repair_changed_note_total": 2,
             "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
@@ -70,6 +96,7 @@ def post_mvp_quality_plan() -> dict:
             "outside_soloing_repair_pitch_role_risk_delta": 2,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
+            **SOURCE_CONTEXT,
         },
         "readiness": {
             "post_mvp_quality_iteration_plan_completed": True,
@@ -77,6 +104,7 @@ def post_mvp_quality_plan() -> dict:
             "candidate_failure_labeling_required": True,
             "targeted_quality_repair_sweep_required": True,
             "audio_review_package_required": True,
+            "outside_soloing_repair_source_context_preserved": True,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
             "audio_rendered_quality_claimed": False,

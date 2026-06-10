@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
     BOUNDARY,
     NEXT_BOUNDARY,
@@ -16,6 +17,31 @@ from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
     NEXT_BOUNDARY as POST_MVP_NEXT_BOUNDARY,
     SELECTED_TARGET as POST_MVP_SELECTED_TARGET,
 )
+
+
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
 
 
 def post_mvp_quality_plan(
@@ -41,6 +67,7 @@ def post_mvp_quality_plan(
             "technical_mvp_complete": True,
             "local_review_ready": True,
             "outside_soloing_repair_evidence_ready": outside_ready,
+            "outside_soloing_repair_source_context_preserved": outside_ready,
             "outside_soloing_repair_wav_count": outside_wav_count,
             "outside_soloing_repair_changed_note_total": 2,
             "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
@@ -53,6 +80,7 @@ def post_mvp_quality_plan(
             "outside_soloing_repair_pitch_role_risk_delta": 2,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
+            **SOURCE_CONTEXT,
         },
         "selected_next_target": {
             "selected_target": selected_target,
@@ -66,6 +94,7 @@ def post_mvp_quality_plan(
             "candidate_failure_labeling_required": True,
             "targeted_quality_repair_sweep_required": True,
             "audio_review_package_required": True,
+            "outside_soloing_repair_source_context_preserved": outside_ready,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
@@ -106,6 +135,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         self.assertEqual(summary["rubric_item_count"], 8)
         self.assertGreaterEqual(summary["required_metric_group_count"], 20)
         self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
+        self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
         self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_source_objective_pitch_role_risk_count"], 5)
         self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_count_before"], 5)
@@ -115,6 +145,8 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
+        for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
         self.assertEqual(
@@ -180,6 +212,18 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
                 post_mvp_quality_plan=post_mvp_quality_plan(outside_risk_after=1),
                 output_dir=Path("outputs/quality_rubric"),
                 issue_number=746,
+            )
+
+    def test_rejects_missing_outside_soloing_source_context_field(self) -> None:
+        source = post_mvp_quality_plan()
+        source["post_mvp_status"].pop(
+            "followup_objective_source_outside_soloing_source_pitch_role_risk_delta"
+        )
+        with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
+            build_quality_rubric_baseline_report(
+                post_mvp_quality_plan=source,
+                output_dir=Path("outputs/quality_rubric"),
+                issue_number=1000,
             )
 
     def test_rejects_missing_required_rubric_item(self) -> None:
