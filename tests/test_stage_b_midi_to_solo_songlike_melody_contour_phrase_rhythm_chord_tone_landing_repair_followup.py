@@ -22,6 +22,30 @@ from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chor
     BOUNDARY as SWEEP_BOUNDARY,
 )
 
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
+
 
 def objective_next_report(*, quality_claim: bool = False, outside_after: int = 2) -> dict:
     return {
@@ -49,6 +73,7 @@ def objective_next_report(*, quality_claim: bool = False, outside_after: int = 2
             "audio_review_required": True,
             "chord_tone_landing_followup_required": True,
             "current_quality_claim_ready": False,
+            **SOURCE_CONTEXT,
         },
         "selected_next_target": {
             "target": OBJECTIVE_NEXT_SELECTED_TARGET,
@@ -94,6 +119,7 @@ def repair_sweep_report(*, target_supported: bool = True) -> dict:
             "final_landing_chord_tone_count_before": 1,
             "final_landing_chord_tone_count_after": 6,
             "target_supported": target_supported,
+            **SOURCE_CONTEXT,
         },
         "readiness": {
             "chord_tone_landing_repair_sweep_completed": True,
@@ -153,6 +179,36 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
             self.assertFalse(summary["outside_soloing_repair_targeted"])
             self.assertTrue(summary["outside_soloing_residual_risk_preserved"])
             self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
+            self.assertEqual(
+                summary[
+                    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary[
+                    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after"
+                ],
+                2,
+            )
+            self.assertEqual(
+                summary[
+                    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after"
+                ],
+                0,
+            )
+            self.assertEqual(
+                summary[
+                    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta"
+                ],
+                3,
+            )
+            self.assertEqual(
+                summary[
+                    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta"
+                ],
+                2,
+            )
             self.assertTrue(summary["technical_wav_validation"])
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
