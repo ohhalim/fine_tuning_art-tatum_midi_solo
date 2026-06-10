@@ -39,7 +39,12 @@ def objective_next_report(*, quality_claim: bool = False, outside_after: int = 2
             "duration_max_seconds": 19.0,
             "changed_note_total": 40,
             "weak_chord_tone_landing_risk_delta": 6,
+            "objective_outside_soloing_pitch_role_risk_count": 5,
+            "outside_soloing_pitch_role_risk_count_before": 5,
             "outside_soloing_pitch_role_risk_count_after": outside_after,
+            "outside_soloing_pitch_role_risk_delta": 5 - outside_after,
+            "outside_soloing_repair_targeted": False,
+            "outside_soloing_residual_risk_preserved": True,
             "final_landing_chord_tone_count_after": 6,
             "audio_review_required": True,
             "chord_tone_landing_followup_required": True,
@@ -122,7 +127,7 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                 objective_next_report=objective_next_report(),
                 repair_sweep_report=repair_sweep_report(),
                 output_dir=Path(tmp) / "followup",
-                issue_number=800,
+                issue_number=884,
             )
             summary = validate_followup_decision_report(
                 report,
@@ -141,7 +146,12 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
             self.assertTrue(summary["weak_chord_tone_landing_resolved"])
             self.assertEqual(summary["changed_note_total"], 40)
             self.assertEqual(summary["weak_chord_tone_landing_risk_delta"], 6)
+            self.assertEqual(summary["objective_outside_soloing_pitch_role_risk_count"], 5)
+            self.assertEqual(summary["outside_soloing_pitch_role_risk_count_before"], 5)
             self.assertEqual(summary["outside_soloing_pitch_role_risk_count_after"], 2)
+            self.assertEqual(summary["outside_soloing_pitch_role_risk_delta"], 3)
+            self.assertFalse(summary["outside_soloing_repair_targeted"])
+            self.assertTrue(summary["outside_soloing_residual_risk_preserved"])
             self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
             self.assertTrue(summary["technical_wav_validation"])
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -156,7 +166,7 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                     objective_next_report=objective_next_report(quality_claim=True),
                     repair_sweep_report=repair_sweep_report(),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=800,
+                    issue_number=884,
                 )
 
     def test_rejects_missing_repair_support(self) -> None:
@@ -168,7 +178,7 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                     objective_next_report=objective_next_report(),
                     repair_sweep_report=repair_sweep_report(target_supported=False),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=800,
+                    issue_number=884,
                 )
 
     def test_rejects_missing_outside_soloing_risk(self) -> None:
@@ -180,7 +190,7 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                     objective_next_report=objective_next_report(outside_after=0),
                     repair_sweep_report=repair_sweep_report(),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=800,
+                    issue_number=884,
                 )
 
     def test_constants_are_stable(self) -> None:
