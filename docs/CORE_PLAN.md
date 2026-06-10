@@ -5407,6 +5407,48 @@ Issue #796은 Issue #794 listening review package 결과에서 validated listeni
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision`
 
+## 9.90 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision
+
+Issue #798은 Issue #796 input guard 결과를 기준으로 청취 입력 없이 다음 자동 경계를 선택한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
+- selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
+- review item count: `6`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- changed note total: `40`
+- weak chord-tone landing risk delta: `6`
+- outside-soloing pitch-role risk count after: `2`
+- final landing chord-tone count after: `6`
+- chord-tone landing follow-up required: `true`
+- current quality claim ready: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- listening preference는 pending 상태.
+- weak chord-tone landing risk는 제거됐지만 outside-soloing pitch-role risk `2` 잔여.
+- current quality claim ready는 `false`.
+- 다음 boundary는 잔여 risk를 기준으로 follow-up target을 선택하는 decision.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_next`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_next.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-repair-objective-only-next-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
