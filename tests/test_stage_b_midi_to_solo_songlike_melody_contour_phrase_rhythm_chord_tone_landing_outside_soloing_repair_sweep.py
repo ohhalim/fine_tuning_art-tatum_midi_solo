@@ -73,8 +73,12 @@ def followup_report(*, quality_claim: bool = False) -> dict:
             "candidate_count": 6,
             "changed_note_total": 40,
             "weak_chord_tone_landing_risk_delta": 6,
+            "objective_outside_soloing_pitch_role_risk_count": 5,
             "outside_soloing_pitch_role_risk_count_before": 5,
             "outside_soloing_pitch_role_risk_count_after": 2,
+            "outside_soloing_pitch_role_risk_delta": 3,
+            "outside_soloing_repair_targeted": False,
+            "outside_soloing_residual_risk_preserved": True,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
@@ -170,7 +174,7 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepTest(unittest.Tes
                 followup_report=followup_report(),
                 chord_tone_repair_sweep_report=chord_tone_repair_sweep_report(midi_paths),
                 output_dir=root / "outside_repair",
-                issue_number=802,
+                issue_number=886,
             )
             summary = validate_outside_soloing_repair_sweep_report(
                 report,
@@ -185,8 +189,17 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepTest(unittest.Tes
             self.assertEqual(summary["candidate_count"], 6)
             self.assertEqual(summary["repaired_midi_count"], 6)
             self.assertGreater(summary["changed_note_total"], 0)
+            self.assertEqual(
+                summary["source_objective_outside_soloing_pitch_role_risk_count"], 5
+            )
+            self.assertEqual(summary["source_outside_soloing_pitch_role_risk_count_before"], 5)
+            self.assertEqual(summary["source_outside_soloing_pitch_role_risk_count_after"], 2)
+            self.assertEqual(summary["source_outside_soloing_pitch_role_risk_delta"], 3)
+            self.assertFalse(summary["source_outside_soloing_repair_targeted"])
+            self.assertTrue(summary["source_outside_soloing_residual_risk_preserved"])
             self.assertGreater(summary["outside_soloing_pitch_role_risk_delta"], 0)
             self.assertEqual(summary["outside_soloing_pitch_role_risk_count_after"], 0)
+            self.assertTrue(summary["outside_soloing_repair_targeted"])
             self.assertEqual(summary["weak_chord_tone_landing_risk_count_after"], 0)
             self.assertLess(
                 summary["max_non_chord_tone_run_after"],
@@ -212,7 +225,7 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepTest(unittest.Tes
                     followup_report=followup_report(quality_claim=True),
                     chord_tone_repair_sweep_report=chord_tone_repair_sweep_report(midi_paths),
                     output_dir=root / "outside_repair",
-                    issue_number=802,
+                    issue_number=886,
                 )
 
     def test_constants_are_stable(self) -> None:
