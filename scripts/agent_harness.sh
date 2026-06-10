@@ -6475,8 +6475,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision() {
     --run_id "$run_id" \
     --objective_next_report "$objective_report" \
     --repair_sweep_report "$sweep_report" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_FOLLOWUP_DECISION_2026-06-09.md \
-    --issue_number 772 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_FOLLOWUP_DECISION_2026-06-10.md \
+    --issue_number 856 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep \
     --expected_target songlike_melody_contour_phrase_rhythm_repair_sweep \
