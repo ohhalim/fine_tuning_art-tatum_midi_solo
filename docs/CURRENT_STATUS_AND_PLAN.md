@@ -52,10 +52,11 @@
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: Issue #974, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: Issue #976, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: Issue #978, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard source-context refresh
+- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: Issue #980, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh`
 
 현재 범위가 아닌 것:
 
