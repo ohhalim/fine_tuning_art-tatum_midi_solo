@@ -7642,6 +7642,54 @@ Issue #894는 Issue #892 input guard의 source/current repair context를 outside
 
 - `Stage B MIDI-to-solo MVP current evidence consolidation refresh`
 
+## 9.139 Stage B MIDI-to-solo current evidence source-context refresh
+
+Issue #898은 Issue #894 outside-soloing repair objective-only next decision의 source/current repair context를 MVP current evidence consolidation에 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- current MVP evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- source objective outside-soloing pitch-role risk count: `5`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- source outside-soloing pitch-role risk delta: `3`
+- source outside-soloing repair targeted: `false`
+- source outside-soloing residual risk preserved: `true`
+- outside-soloing pitch-role risk count after: `0`
+- outside-soloing pitch-role risk delta: `2`
+- outside-soloing repair target supported: `true`
+- weak landing target supported: `true`
+- final landing target supported: `true`
+- non-chord run target supported: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- current evidence에 current repair 결과 `2 -> 0`뿐 아니라 source repair context `5 -> 2`를 함께 보존.
+- source outside-soloing repair는 targeted repair가 아니며 residual risk 보존 경계로 분리.
+- README evidence refresh는 current evidence의 source/current context를 반영하는 방향.
+- human/audio preference와 MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- `.venv/bin/python -m py_compile scripts/consolidate_stage_b_midi_to_solo_mvp_current_evidence.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-current-evidence-consolidation`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo README evidence source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

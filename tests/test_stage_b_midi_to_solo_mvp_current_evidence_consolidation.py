@@ -310,6 +310,12 @@ def reports(
                 "technical_wav_validation": True,
                 "rendered_audio_file_count": 6,
                 "changed_note_total": 2,
+                "source_objective_outside_soloing_pitch_role_risk_count": 5,
+                "source_outside_soloing_pitch_role_risk_count_before": 5,
+                "source_outside_soloing_pitch_role_risk_count_after": 2,
+                "source_outside_soloing_pitch_role_risk_delta": 3,
+                "source_outside_soloing_repair_targeted": False,
+                "source_outside_soloing_residual_risk_preserved": True,
                 "outside_soloing_pitch_role_risk_count_after": 0
                 if outside_soloing_repair_supported
                 else 1,
@@ -439,6 +445,28 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
             )
             self.assertEqual(summary["outside_soloing_repair_rendered_audio_file_count"], 6)
             self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
+            self.assertEqual(
+                summary[
+                    "outside_soloing_repair_source_objective_pitch_role_risk_count"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary["outside_soloing_repair_source_pitch_role_risk_count_before"],
+                5,
+            )
+            self.assertEqual(
+                summary["outside_soloing_repair_source_pitch_role_risk_count_after"],
+                2,
+            )
+            self.assertEqual(
+                summary["outside_soloing_repair_source_pitch_role_risk_delta"],
+                3,
+            )
+            self.assertFalse(summary["outside_soloing_repair_source_targeted"])
+            self.assertTrue(
+                summary["outside_soloing_repair_source_residual_risk_preserved"]
+            )
             self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
             self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertTrue(summary["outside_soloing_repair_target_supported"])
@@ -578,6 +606,61 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     ],
                     output_dir=Path(tmp) / "out",
                     issue_number=812,
+                )
+
+    def test_rejects_missing_outside_soloing_source_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp))
+            data["outside_soloing_repair_objective"]["objective_summary"][
+                "source_outside_soloing_residual_risk_preserved"
+            ] = False
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
+                    model_conditioned_pitch_contour_objective_next=data[
+                        "model_conditioned_pitch_contour_objective"
+                    ],
+                    model_conditioned_pitch_contour_changed_ratio_repair_objective_next=data[
+                        "model_conditioned_pitch_contour_changed_ratio_repair_objective"
+                    ],
+                    outside_soloing_repair_objective_next=data[
+                        "outside_soloing_repair_objective"
+                    ],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=898,
+                )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp))
+            data["outside_soloing_repair_objective"]["objective_summary"][
+                "source_outside_soloing_pitch_role_risk_count_after"
+            ] = 6
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
+                    model_conditioned_pitch_contour_objective_next=data[
+                        "model_conditioned_pitch_contour_objective"
+                    ],
+                    model_conditioned_pitch_contour_changed_ratio_repair_objective_next=data[
+                        "model_conditioned_pitch_contour_changed_ratio_repair_objective"
+                    ],
+                    outside_soloing_repair_objective_next=data[
+                        "outside_soloing_repair_objective"
+                    ],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=898,
                 )
 
     def test_boundary_constants_are_stable(self) -> None:

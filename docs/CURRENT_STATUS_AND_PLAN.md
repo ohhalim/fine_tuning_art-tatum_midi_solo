@@ -12,10 +12,10 @@
 
 현재 active issue:
 
-- latest functional result: Issue #894, Stage B MIDI-to-solo outside-soloing repair objective next source context refresh
+- latest functional result: Issue #898, Stage B MIDI-to-solo current evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after sync merge: `0`
-- 다음 권장 이슈: 현재 open issue 없음. 다음 작업은 최신 objective evidence 기준으로 새 quality target 정의 후 시작
+- open issue queue after current evidence refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -419,7 +419,7 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 consolidation target: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
-- MVP current evidence consolidation outside-soloing repair refresh 완료
+- MVP current evidence consolidation source-context refresh 완료
 - current MVP evidence supported: `true`
 - selected-scale objective path complete: `true`
 - phrase-bank CLI technical path ready: `true`
@@ -428,6 +428,11 @@
 - outside-soloing repair objective path ready: `true`
 - outside-soloing repair rendered audio file count: `6`
 - outside-soloing repair changed note total: `2`
+- source objective outside-soloing pitch-role risk count: `5`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- source outside-soloing pitch-role risk delta: `3`
+- source outside-soloing repair targeted: `false`
+- source outside-soloing residual risk preserved: `true`
 - outside-soloing repair pitch-role risk count after: `0`
 - outside-soloing repair pitch-role risk delta: `2`
 - outside-soloing repair objective path supported: `true`
