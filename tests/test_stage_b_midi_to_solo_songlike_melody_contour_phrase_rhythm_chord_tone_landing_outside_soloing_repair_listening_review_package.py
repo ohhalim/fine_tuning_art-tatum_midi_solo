@@ -104,9 +104,16 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
             "duration_min_seconds": 0.1,
             "duration_max_seconds": 0.1,
             "changed_note_total": 2,
+            "source_objective_outside_soloing_pitch_role_risk_count": 5,
+            "source_outside_soloing_pitch_role_risk_count_before": 5,
+            "source_outside_soloing_pitch_role_risk_count_after": 2,
+            "source_outside_soloing_pitch_role_risk_delta": 3,
+            "source_outside_soloing_repair_targeted": False,
+            "source_outside_soloing_residual_risk_preserved": True,
             "outside_soloing_pitch_role_risk_count_before": 2,
             "outside_soloing_pitch_role_risk_count_after": 0,
             "outside_soloing_pitch_role_risk_delta": 2,
+            "outside_soloing_repair_targeted": True,
             "weak_chord_tone_landing_risk_count_after": 0,
             "final_landing_chord_tone_count_after": 6,
             "max_non_chord_tone_run_before": 4,
@@ -127,7 +134,7 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackage
             report = build_listening_review_package_report(
                 audio_package_report=audio_package_report(root),
                 output_dir=root / "review_package",
-                issue_number=806,
+                issue_number=890,
                 expected_count=6,
             )
             summary = validate_listening_review_package_report(
@@ -143,8 +150,17 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackage
             self.assertEqual(summary["review_item_count"], 6)
             self.assertFalse(summary["validated_review_input"])
             self.assertTrue(summary["technical_wav_validation"])
+            self.assertEqual(
+                summary["source_objective_outside_soloing_pitch_role_risk_count"], 5
+            )
+            self.assertEqual(summary["source_outside_soloing_pitch_role_risk_count_before"], 5)
+            self.assertEqual(summary["source_outside_soloing_pitch_role_risk_count_after"], 2)
+            self.assertEqual(summary["source_outside_soloing_pitch_role_risk_delta"], 3)
+            self.assertFalse(summary["source_outside_soloing_repair_targeted"])
+            self.assertTrue(summary["source_outside_soloing_residual_risk_preserved"])
             self.assertEqual(summary["outside_soloing_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["outside_soloing_pitch_role_risk_count_after"], 0)
+            self.assertTrue(summary["outside_soloing_repair_targeted"])
             self.assertEqual(summary["weak_chord_tone_landing_risk_count_after"], 0)
             self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
             self.assertEqual(summary["max_non_chord_tone_run_after"], 3)
@@ -160,7 +176,7 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackage
                 build_listening_review_package_report(
                     audio_package_report=audio_package_report(root, quality_claim=True),
                     output_dir=root / "review_package",
-                    issue_number=806,
+                    issue_number=890,
                     expected_count=6,
                 )
 
