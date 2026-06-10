@@ -92,7 +92,14 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "repaired_failure_counts": {"songlike_melody_not_soloing": 5},
             "source_outside_soloing_repair_evidence_ready": True,
             "source_outside_soloing_repair_wav_count": 6,
+            "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+            "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+            "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
+            "source_outside_soloing_repair_source_targeted": False,
+            "source_outside_soloing_repair_source_residual_risk_preserved": True,
             "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_repair_pitch_role_risk_delta": 2,
             "source_outside_soloing_not_evaluable_count": 6,
             "repaired_outside_soloing_not_evaluable_count": 6,
             "target_supported": True,
@@ -159,12 +166,30 @@ class StageBMidiToSoloTargetedQualityRepairAudioTest(unittest.TestCase):
             self.assertEqual(summary["failure_label_delta"], 7)
             self.assertEqual(summary["technical_regression_count"], 0)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
+            )
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_pitch_role_risk_count_before"], 5
+            )
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_pitch_role_risk_count_after"], 2
+            )
+            self.assertEqual(summary["source_outside_soloing_repair_source_pitch_role_risk_delta"], 3)
+            self.assertFalse(summary["source_outside_soloing_repair_source_targeted"])
+            self.assertTrue(summary["source_outside_soloing_repair_source_residual_risk_preserved"])
             self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertTrue(summary["audio_review_required"])
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
+            self.assertEqual(
+                summary["next_recommended_issue"],
+                "Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh",
+            )
 
     def test_rejects_source_quality_claim(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
