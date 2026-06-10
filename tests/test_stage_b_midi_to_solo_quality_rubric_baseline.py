@@ -24,6 +24,9 @@ def post_mvp_quality_plan(
     quality_claim: bool = False,
     ordered_work_count: int = 4,
     taxonomy_count: int = 7,
+    outside_ready: bool = True,
+    outside_wav_count: int = 6,
+    outside_risk_after: int = 0,
 ) -> dict:
     ordered_targets = [
         "quality_rubric_baseline",
@@ -37,6 +40,11 @@ def post_mvp_quality_plan(
         "post_mvp_status": {
             "technical_mvp_complete": True,
             "local_review_ready": True,
+            "outside_soloing_repair_evidence_ready": outside_ready,
+            "outside_soloing_repair_wav_count": outside_wav_count,
+            "outside_soloing_repair_changed_note_total": 2,
+            "outside_soloing_repair_pitch_role_risk_count_after": outside_risk_after,
+            "outside_soloing_repair_pitch_role_risk_delta": 2,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
         },
@@ -91,6 +99,9 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         self.assertEqual(summary["selected_target"], SELECTED_TARGET)
         self.assertEqual(summary["rubric_item_count"], 8)
         self.assertGreaterEqual(summary["required_metric_group_count"], 20)
+        self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
+        self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
+        self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
         self.assertEqual(
@@ -134,6 +145,26 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(taxonomy_count=6),
+                output_dir=Path("outputs/quality_rubric"),
+                issue_number=746,
+            )
+
+    def test_rejects_incomplete_outside_soloing_repair_context(self) -> None:
+        with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
+            build_quality_rubric_baseline_report(
+                post_mvp_quality_plan=post_mvp_quality_plan(outside_ready=False),
+                output_dir=Path("outputs/quality_rubric"),
+                issue_number=746,
+            )
+        with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
+            build_quality_rubric_baseline_report(
+                post_mvp_quality_plan=post_mvp_quality_plan(outside_wav_count=5),
+                output_dir=Path("outputs/quality_rubric"),
+                issue_number=746,
+            )
+        with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
+            build_quality_rubric_baseline_report(
+                post_mvp_quality_plan=post_mvp_quality_plan(outside_risk_after=1),
                 output_dir=Path("outputs/quality_rubric"),
                 issue_number=746,
             )

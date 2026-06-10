@@ -57,6 +57,11 @@ def post_mvp_quality_plan() -> dict:
         "post_mvp_status": {
             "technical_mvp_complete": True,
             "local_review_ready": True,
+            "outside_soloing_repair_evidence_ready": True,
+            "outside_soloing_repair_wav_count": 6,
+            "outside_soloing_repair_changed_note_total": 2,
+            "outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "outside_soloing_repair_pitch_role_risk_delta": 2,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
         },

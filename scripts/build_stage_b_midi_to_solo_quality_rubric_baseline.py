@@ -103,6 +103,18 @@ def validate_post_mvp_quality_iteration_plan_source(report: dict[str, Any]) -> d
         raise StageBMidiToSoloQualityRubricBaselineError("ordered work count below 4")
     if _int(summary.get("quality_failure_taxonomy_seed_count")) < 7:
         raise StageBMidiToSoloQualityRubricBaselineError("taxonomy seed count below 7")
+    if not bool(summary.get("outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloQualityRubricBaselineError(
+            "outside-soloing repair evidence readiness required"
+        )
+    if _int(summary.get("outside_soloing_repair_wav_count")) < 6:
+        raise StageBMidiToSoloQualityRubricBaselineError(
+            "outside-soloing repair WAV count below 6"
+        )
+    if _int(summary.get("outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloQualityRubricBaselineError(
+            "outside-soloing residual pitch-role risk should be zero"
+        )
     return summary
 
 
@@ -159,11 +171,16 @@ def build_rubric_items() -> list[dict[str, Any]]:
                 "non_chord_tone_ratio",
                 "avoid_tone_landing_count",
                 "outside_pitch_run_length",
+                "post_repair_pitch_role_risk_count_after",
                 "chord_context_available",
             ],
             "failure_rule": "outside_pitch_run_length >= 4 or avoid_tone_landing_count > 0 when chord_context_available",
-            "threshold": {"max_outside_pitch_run_length": 3, "max_avoid_tone_landing_count": 0},
-            "source_reason": "outside notes require chord-context support before being kept",
+            "threshold": {
+                "max_outside_pitch_run_length": 3,
+                "max_avoid_tone_landing_count": 0,
+                "max_post_repair_pitch_role_risk_count_after": 0,
+            },
+            "source_reason": "outside pitch-role repair evidence is complete; remaining label covers context/listening quality risk",
         },
         {
             "id": "weak_chord_tone_landing",
@@ -210,6 +227,24 @@ def build_quality_rubric_baseline_report(
 ) -> dict[str, Any]:
     source = validate_post_mvp_quality_iteration_plan_source(post_mvp_quality_plan)
     rubric_items = build_rubric_items()
+    outside_context = {
+        "outside_soloing_repair_evidence_ready": bool(
+            source["outside_soloing_repair_evidence_ready"]
+        ),
+        "outside_soloing_repair_wav_count": _int(
+            source["outside_soloing_repair_wav_count"]
+        ),
+        "outside_soloing_repair_changed_note_total": _int(
+            source["outside_soloing_repair_changed_note_total"]
+        ),
+        "outside_soloing_repair_pitch_role_risk_count_after": _int(
+            source["outside_soloing_repair_pitch_role_risk_count_after"]
+        ),
+        "outside_soloing_repair_pitch_role_risk_delta": _int(
+            source["outside_soloing_repair_pitch_role_risk_delta"]
+        ),
+        "outside_soloing_label_scope": "remaining context/listening quality risk after objective pitch-role repair",
+    }
     return {
         "schema_version": SCHEMA_VERSION,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
@@ -218,12 +253,22 @@ def build_quality_rubric_baseline_report(
         "boundary": BOUNDARY,
         "source_boundary": POST_MVP_PLAN_BOUNDARY,
         "source_summary": source,
+        "source_quality_context": outside_context,
         "rubric_baseline": {
             "rubric_item_count": len(rubric_items),
             "required_metric_group_count": len(
                 {metric for item in rubric_items for metric in _list(item.get("metric_keys"))}
             ),
             "candidate_failure_labeling_ready": True,
+            "outside_soloing_repair_evidence_ready": bool(
+                outside_context["outside_soloing_repair_evidence_ready"]
+            ),
+            "outside_soloing_repair_wav_count": _int(
+                outside_context["outside_soloing_repair_wav_count"]
+            ),
+            "outside_soloing_repair_pitch_role_risk_count_after": _int(
+                outside_context["outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
         },
@@ -331,6 +376,15 @@ def validate_quality_rubric_baseline_report(
         ),
         "rubric_item_count": len(rubric_items),
         "required_metric_group_count": _int(baseline.get("required_metric_group_count")),
+        "outside_soloing_repair_evidence_ready": bool(
+            baseline.get("outside_soloing_repair_evidence_ready", False)
+        ),
+        "outside_soloing_repair_wav_count": _int(
+            baseline.get("outside_soloing_repair_wav_count")
+        ),
+        "outside_soloing_repair_pitch_role_risk_count_after": _int(
+            baseline.get("outside_soloing_repair_pitch_role_risk_count_after")
+        ),
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)
         ),
@@ -344,6 +398,7 @@ def validate_quality_rubric_baseline_report(
 
 def markdown_report(report: dict[str, Any]) -> str:
     baseline = report["rubric_baseline"]
+    source_context = report["source_quality_context"]
     selected = report["selected_next_target"]
     readiness = report["readiness"]
     lines = [
@@ -357,6 +412,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- selected target: `{selected['selected_target']}`",
         f"- rubric item count: `{baseline['rubric_item_count']}`",
         f"- candidate failure labeling ready: `{_bool_token(baseline['candidate_failure_labeling_ready'])}`",
+        f"- outside-soloing repair evidence ready: `{_bool_token(source_context['outside_soloing_repair_evidence_ready'])}`",
+        f"- outside-soloing repair WAV count: `{source_context['outside_soloing_repair_wav_count']}`",
+        f"- outside-soloing pitch-role risk after / delta: `{source_context['outside_soloing_repair_pitch_role_risk_count_after']}` / `{source_context['outside_soloing_repair_pitch_role_risk_delta']}`",
         "",
         "## Rubric Items",
         "",

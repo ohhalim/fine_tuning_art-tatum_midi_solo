@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #828, Stage B MIDI-to-solo post-MVP quality iteration outside-soloing repair refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo quality rubric baseline refresh`
+- latest functional result: Issue #830, Stage B MIDI-to-solo quality rubric outside-soloing repair evidence refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo candidate failure labeling refresh`
 
 현재 범위가 아닌 것:
 
@@ -436,6 +436,16 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 rubric target: `stage_b_midi_to_solo_quality_rubric_baseline`
+- quality rubric outside-soloing repair evidence refresh 완료
+- rubric item count: `8`
+- candidate failure labeling ready: `true`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair WAV count: `6`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing label scope: `remaining context/listening quality risk after objective pitch-role repair`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 labeling target: `stage_b_midi_to_solo_candidate_failure_labeling`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
