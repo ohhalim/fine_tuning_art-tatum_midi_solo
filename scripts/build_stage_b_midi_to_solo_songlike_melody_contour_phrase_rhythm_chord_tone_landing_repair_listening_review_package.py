@@ -18,7 +18,7 @@ from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_c
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
 )
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
-    BRIDGE_SOURCE_CONTEXT_KEYS,
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
 )
 
 
@@ -33,7 +33,7 @@ NEXT_BOUNDARY = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard"
 )
 SCHEMA_VERSION = (
-    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_v1"
+    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_v2"
 )
 
 QUALITY_CLAIM_KEYS = [
@@ -88,12 +88,21 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
 
 
 def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
-    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in container:
             raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
                 f"{label} source-context field required: {key}"
             )
-    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
+    for key in (
+        "followup_objective_source_outside_soloing_source_context_preserved",
+        "followup_repair_sweep_source_outside_soloing_source_context_preserved",
+        "repair_sweep_source_outside_soloing_source_context_preserved",
+    ):
+        if not bool(container.get(key, False)):
+            raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
+                f"{label} source context should be preserved: {key}"
+            )
+    return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
 
 
 def validate_audio_package_report(
@@ -306,7 +315,7 @@ def build_listening_review_package_report(
             "brad_style_adaptation",
         ],
         "next_recommended_issue": (
-            "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard"
+            "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh"
         ),
     }
 
@@ -362,7 +371,7 @@ def validate_listening_review_package_report(
         raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
             "outside-soloing residual risk context must be preserved"
         )
-    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in source:
             raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
                 f"listening package source-context field required: {key}"
@@ -405,7 +414,7 @@ def validate_listening_review_package_report(
             source.get("final_landing_chord_tone_count_after")
         ),
         "audio_review_required": bool(source.get("audio_review_required", False)),
-        **{key: source.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
+        **{key: source.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
         "human_review_required_now": bool(readiness.get("human_review_required_now", True)),
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)
@@ -449,16 +458,19 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- outside-soloing residual risk preserved: `{_bool_token(source['outside_soloing_residual_risk_preserved'])}`",
         f"- follow-up objective source outside-soloing source pitch-role risk: `{source['followup_objective_source_outside_soloing_source_pitch_role_risk_count_before']} -> {source['followup_objective_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- follow-up objective source outside-soloing source pitch-role risk delta: `{source['followup_objective_source_outside_soloing_source_pitch_role_risk_delta']}`",
+        f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(source['followup_objective_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up objective source outside-soloing source targeted: `{_bool_token(source['followup_objective_source_outside_soloing_source_targeted'])}`",
         f"- follow-up objective source outside-soloing source residual risk preserved: `{_bool_token(source['followup_objective_source_outside_soloing_source_residual_risk_preserved'])}`",
         f"- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `{source['followup_objective_source_outside_soloing_current_pitch_role_risk_count_after']} / {source['followup_objective_source_outside_soloing_current_pitch_role_risk_delta']}`",
         f"- follow-up repair sweep source outside-soloing source pitch-role risk: `{source['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {source['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- follow-up repair sweep source outside-soloing source pitch-role risk delta: `{source['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta']}`",
+        f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(source['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing source targeted: `{_bool_token(source['followup_repair_sweep_source_outside_soloing_source_targeted'])}`",
         f"- follow-up repair sweep source outside-soloing source residual risk preserved: `{_bool_token(source['followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `{source['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {source['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
         f"- bridge repair sweep source outside-soloing source pitch-role risk: `{source['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {source['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- bridge repair sweep source outside-soloing source pitch-role risk delta: `{source['repair_sweep_source_outside_soloing_source_pitch_role_risk_delta']}`",
+        f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(source['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- bridge repair sweep source outside-soloing source targeted: `{_bool_token(source['repair_sweep_source_outside_soloing_source_targeted'])}`",
         f"- bridge repair sweep source outside-soloing source residual risk preserved: `{_bool_token(source['repair_sweep_source_outside_soloing_source_residual_risk_preserved'])}`",
         f"- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `{source['repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {source['repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
@@ -511,7 +523,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=964)
+    parser.add_argument("--issue_number", type=int, default=1048)
     parser.add_argument("--expected_review_item_count", type=int, default=6)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")

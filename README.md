@@ -38,7 +38,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: `Issue #1042`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: `Issue #1044`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: `Issue #1046`
-- latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: `Issue #964`
+- latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: `Issue #1048`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: `Issue #966`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: `Issue #968`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: `Issue #970`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #982`
 - latest README evidence refresh: `Issue #984`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
-- open issue queue after chord-tone landing repair audio package source-context refresh merge: `0`
+- open issue queue after chord-tone landing repair listening review package source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -95,7 +95,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase/rhythm chord-tone landing risk count: `6 -> 0`
 - phrase/rhythm final landing chord-tone count: `1 -> 6`
 - phrase/rhythm chord-tone landing changed note total: `40`
-- phrase/rhythm chord-tone landing next target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package`
+- phrase/rhythm chord-tone landing next target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard`
 - phrase/rhythm chord-tone landing rendered WAV count: `6`
 - phrase/rhythm chord-tone landing WAV duration range: `18.871s-19.000s`
 - phrase/rhythm chord-tone landing WAV technical validation: `true`
