@@ -427,6 +427,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package: review items `6`, validated input `false`, technical WAV validation `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: preference fill `false`, validated input `false`, review items `6`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: follow-up required `true`, selected target `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
+- MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: selected target `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`, primary risk `outside_soloing_pitch_role_risk=2`, weak landing resolved `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
 - MIDI-to-solo pitch-contour changed-ratio review decision: selected target `lower_pitch_change_ratio_repair_probe`, repair probe required `true`, max interval/threshold `11/12`, changed-ratio review threshold `0.5`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
 - MIDI-to-solo pitch-contour changed-ratio repair probe: repaired/pass `3/3`, max pitch changed ratio `0.7174 -> 0.4348`, max interval `12`, dead-air max `0.0000`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package`
 - MIDI-to-solo pitch-contour changed-ratio repair audio package: rendered WAV `3`, duration `18.422s-18.978s`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package`
@@ -9594,6 +9595,74 @@ Issue #968은 Issue #966 input guard의 source/current outside-soloing context�
 다음 작업:
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh`
+
+## 9.175 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh
+
+Issue #970은 Issue #968 objective-only next decision과 Issue #960 repair sweep의 source/current outside-soloing context를 follow-up decision에서 대조하고, 다음 repair target을 outside-soloing pitch-role risk로 선택한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision`
+- repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
+- selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
+- primary remaining risk label: `outside_soloing_pitch_role_risk`
+- primary remaining risk count: `2`
+- weak chord-tone landing resolved: `true`
+- outside-soloing repair selected: `true`
+- candidate count: `6`
+- repaired MIDI count: `6`
+- changed note total: `40`
+- weak chord-tone landing risk delta: `6`
+- objective outside-soloing pitch-role risk count: `5`
+- outside-soloing pitch-role risk count: `5 -> 2`
+- outside-soloing pitch-role risk delta: `3`
+- outside-soloing repair targeted: `false`
+- outside-soloing residual risk preserved: `true`
+- final landing chord-tone count after: `6`
+- technical WAV validation: `true`
+- follow-up objective source outside-soloing source pitch-role risk count: `5 -> 2`
+- follow-up objective source outside-soloing source pitch-role risk delta: `3`
+- follow-up objective source outside-soloing source repair targeted: `false`
+- follow-up objective source outside-soloing source residual risk preserved: `true`
+- follow-up objective source outside-soloing current repair pitch-role risk count after: `0`
+- follow-up objective source outside-soloing current repair pitch-role risk delta: `2`
+- follow-up repair sweep source outside-soloing source pitch-role risk count: `5 -> 2`
+- follow-up repair sweep source outside-soloing source pitch-role risk delta: `3`
+- follow-up repair sweep source outside-soloing source repair targeted: `false`
+- follow-up repair sweep source outside-soloing source residual risk preserved: `true`
+- follow-up repair sweep source outside-soloing current repair pitch-role risk count after: `0`
+- follow-up repair sweep source outside-soloing current repair pitch-role risk delta: `2`
+- bridge repair sweep source outside-soloing source pitch-role risk count: `5 -> 2`
+- bridge repair sweep source outside-soloing source pitch-role risk delta: `3`
+- bridge repair sweep source outside-soloing source repair targeted: `false`
+- bridge repair sweep source outside-soloing source residual risk preserved: `true`
+- bridge repair sweep source outside-soloing current repair pitch-role risk count after: `0`
+- bridge repair sweep source outside-soloing current repair pitch-role risk delta: `2`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- weak chord-tone landing risk는 resolved 상태로 보존.
+- residual outside-soloing pitch-role risk `2`건 기준 다음 repair sweep 선택.
+- objective-next와 repair sweep의 source/current outside-soloing context 일치 확인.
+- outside-soloing repair completed, human/audio preference, MIDI-to-solo musical quality claim 제외.
+- 다음 boundary는 outside-soloing repair sweep.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-repair-followup-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep source-context refresh`
 
 ## 10. 한 문장 요약
 
