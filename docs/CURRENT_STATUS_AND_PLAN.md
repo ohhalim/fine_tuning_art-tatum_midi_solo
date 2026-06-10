@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #870, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge outside-soloing context refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision refresh`
+- latest functional result: Issue #872, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision outside-soloing context refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep refresh`
 
 현재 범위가 아닌 것:
 
@@ -233,6 +233,9 @@
 - weak chord-tone landing risk count: `6`
 - outside-soloing pitch-role risk count: `5`
 - not evaluable count: `12 -> 0`
+- follow-up objective source/repaired outside-soloing not evaluable count: `6/6`
+- follow-up repair sweep source/repaired outside-soloing not evaluable count: `6/6`
+- bridge repair sweep source/repaired outside-soloing not evaluable count: `6/6`
 - min chord-tone ratio: `0.216`
 - max outside ratio: `0.027`
 - max non-chord run: `5`

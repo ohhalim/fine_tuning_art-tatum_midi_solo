@@ -43,6 +43,12 @@ def bridge_report(*, quality_claim: bool = False, weak_count: int = 6, outside_c
             "pitch_role_metrics_defined_count": 6,
             "not_evaluable_before_count": 12,
             "not_evaluable_after_count": 0,
+            "followup_objective_source_outside_soloing_not_evaluable_count": 6,
+            "followup_objective_repaired_outside_soloing_not_evaluable_count": 6,
+            "followup_repair_sweep_source_outside_soloing_not_evaluable_count": 6,
+            "followup_repair_sweep_repaired_outside_soloing_not_evaluable_count": 6,
+            "repair_sweep_source_outside_soloing_not_evaluable_count": 6,
+            "repair_sweep_repaired_outside_soloing_not_evaluable_count": 6,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
@@ -65,7 +71,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             report = build_objective_decision_report(
                 bridge_report=bridge_report(),
                 output_dir=Path(tmp) / "decision",
-                issue_number=788,
+                issue_number=872,
             )
             summary = validate_objective_decision_report(
                 report,
@@ -81,6 +87,27 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             self.assertEqual(summary["weak_chord_tone_landing_risk_count"], 6)
             self.assertEqual(summary["outside_soloing_pitch_role_risk_count"], 5)
             self.assertEqual(summary["not_evaluable_after_count"], 0)
+            self.assertEqual(
+                summary["followup_objective_source_outside_soloing_not_evaluable_count"],
+                6,
+            )
+            self.assertEqual(
+                summary["followup_objective_repaired_outside_soloing_not_evaluable_count"],
+                6,
+            )
+            self.assertEqual(
+                summary["followup_repair_sweep_source_outside_soloing_not_evaluable_count"],
+                6,
+            )
+            self.assertEqual(
+                summary["followup_repair_sweep_repaired_outside_soloing_not_evaluable_count"],
+                6,
+            )
+            self.assertEqual(summary["repair_sweep_source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(
+                summary["repair_sweep_repaired_outside_soloing_not_evaluable_count"],
+                6,
+            )
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
@@ -91,7 +118,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=bridge_report(quality_claim=True),
                     output_dir=Path(tmp) / "decision",
-                    issue_number=788,
+                    issue_number=872,
                 )
 
     def test_routes_outside_soloing_when_it_dominates(self) -> None:
@@ -99,7 +126,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             report = build_objective_decision_report(
                 bridge_report=bridge_report(weak_count=2, outside_count=5),
                 output_dir=Path(tmp) / "decision",
-                issue_number=788,
+                issue_number=872,
             )
             summary = validate_objective_decision_report(
                 report,
@@ -115,6 +142,18 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             )
 
             self.assertEqual(summary["primary_risk_label"], "outside_soloing_pitch_role_risk")
+
+    def test_rejects_missing_bridge_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = bridge_report()
+            del source["readiness"]["followup_objective_source_outside_soloing_not_evaluable_count"]
+
+            with self.assertRaises(StageBMidiToSoloPitchRoleObjectiveDecisionError):
+                build_objective_decision_report(
+                    bridge_report=source,
+                    output_dir=Path(tmp) / "decision",
+                    issue_number=872,
+                )
 
     def test_constants_are_stable(self) -> None:
         self.assertEqual(
