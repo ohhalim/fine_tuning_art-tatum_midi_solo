@@ -6426,8 +6426,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_g
   "$PYTHON_BIN" scripts/guard_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input.py \
     --run_id "$guard_run_id" \
     --source_package "$source_package" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_LISTENING_REVIEW_INPUT_GUARD_2026-06-09.md \
-    --issue_number 768 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_LISTENING_REVIEW_INPUT_GUARD_2026-06-10.md \
+    --issue_number 852 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision \
     --require_guard_completed \
