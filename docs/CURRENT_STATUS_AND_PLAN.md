@@ -337,8 +337,12 @@
 - 다음 repair target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
 - songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep 완료
 - changed note total: `2`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- source outside-soloing repair targeted: `false`
+- source outside-soloing residual risk preserved: `true`
 - outside-soloing pitch-role risk count: `2 -> 0`
 - outside-soloing pitch-role risk delta: `2`
+- outside-soloing repair targeted: `true`
 - weak chord-tone landing risk count after: `0`
 - final landing chord-tone count after: `6`
 - max non-chord-tone run: `4 -> 3`
