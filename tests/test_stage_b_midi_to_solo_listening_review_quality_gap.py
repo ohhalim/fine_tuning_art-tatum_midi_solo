@@ -12,10 +12,36 @@ from scripts.decide_stage_b_midi_to_solo_listening_review_quality_gap import (
     validate_listening_review_quality_gap_report,
 )
 from scripts.decide_stage_b_midi_to_solo_quality_gap import (
+    BRIDGE_SOURCE_CONTEXT_KEYS,
     BOUNDARY as QUALITY_GAP_BOUNDARY,
     LISTENING_REVIEW_NEXT_BOUNDARY,
     LISTENING_REVIEW_TARGET,
 )
+
+
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
 
 
 def quality_gap_decision(
@@ -36,6 +62,7 @@ def quality_gap_decision(
                 changed_ratio_supported
             ),
             "outside_soloing_repair_objective_completed": outside_soloing_repair_supported,
+            "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
             "musical_quality_mvp_completed": False,
             "human_audio_preference_completed": False,
             "product_mvp_completed": False,
@@ -56,6 +83,7 @@ def quality_gap_decision(
             "outside_soloing_repair_source_targeted": False,
             "outside_soloing_repair_source_residual_risk_preserved": True,
             "human_review_required_now": False,
+            **SOURCE_CONTEXT,
         },
         "mvp_completion_summary": {
             "model_conditioned_pitch_contour_changed_ratio_repair_rendered_audio_file_count": 3,
@@ -88,6 +116,7 @@ def quality_gap_decision(
             "quality_gap_decision_completed": True,
             "selected_target": selected_target,
             "next_boundary_selected": next_boundary,
+            "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
             "human_review_required_now": False,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
@@ -123,6 +152,7 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
         self.assertTrue(summary["technical_model_core_mvp_completed"])
         self.assertTrue(summary["changed_ratio_repair_objective_completed"])
         self.assertTrue(summary["outside_soloing_repair_objective_completed"])
+        self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
         self.assertEqual(summary["rendered_audio_file_count"], 3)
         self.assertEqual(summary["max_repaired_interval"], 12)
         self.assertEqual(summary["max_interval_threshold"], 12)
@@ -149,6 +179,8 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
+        for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
         self.assertTrue(summary["outside_soloing_repair_weak_landing_target_supported"])
         self.assertTrue(summary["outside_soloing_repair_final_landing_target_supported"])
@@ -207,6 +239,19 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
                 quality_gap_decision=source,
                 output_dir=Path("outputs/listening_review_quality_gap"),
                 issue_number=906,
+            )
+
+    def test_rejects_missing_outside_soloing_source_context_field(self) -> None:
+        source = quality_gap_decision()
+        source["quality_gap"].pop(
+            "followup_objective_source_outside_soloing_source_pitch_role_risk_delta"
+        )
+
+        with self.assertRaises(StageBMidiToSoloListeningReviewQualityGapError):
+            build_listening_review_quality_gap_report(
+                quality_gap_decision=source,
+                output_dir=Path("outputs/listening_review_quality_gap"),
+                issue_number=990,
             )
 
     def test_rejects_targeted_outside_soloing_source_repair(self) -> None:
