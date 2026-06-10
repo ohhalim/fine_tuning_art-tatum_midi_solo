@@ -6101,8 +6101,8 @@ run_stage_b_midi_to_solo_mvp_delivery_package() {
 }
 
 run_stage_b_midi_to_solo_final_status_audit() {
-  local delivery_package_run_id="${DELIVERY_PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_mvp_delivery_package}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_final_status_audit}"
+  local delivery_package_run_id="${DELIVERY_PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_mvp_delivery_package_source_context_refresh}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_final_status_audit_source_context_refresh}"
   local delivery_package="outputs/stage_b_midi_to_solo_mvp_delivery_package/${delivery_package_run_id}/stage_b_midi_to_solo_mvp_delivery_package.json"
   if [[ ! -f "$delivery_package" ]]; then
     print_header "Stage B MIDI-to-solo MVP delivery package"
@@ -6114,7 +6114,7 @@ run_stage_b_midi_to_solo_final_status_audit() {
     --delivery_package "$delivery_package" \
     --readme_path README.md \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_FINAL_STATUS_AUDIT_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 912 \
+    --issue_number 996 \
     --expected_boundary stage_b_midi_to_solo_final_status_audit \
     --expected_next_boundary stage_b_midi_to_solo_post_mvp_quality_iteration_plan \
     --require_technical_mvp_complete \

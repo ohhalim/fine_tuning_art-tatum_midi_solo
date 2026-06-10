@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
 from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import (  # noqa: E402
+    BRIDGE_SOURCE_CONTEXT_KEYS,
     BOUNDARY as DELIVERY_BOUNDARY,
     StageBMidiToSoloMvpDeliveryPackageError,
     validate_delivery_package_report,
@@ -26,7 +27,7 @@ class StageBMidiToSoloFinalStatusAuditError(ValueError):
 
 BOUNDARY = "stage_b_midi_to_solo_final_status_audit"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_post_mvp_quality_iteration_plan"
-SCHEMA_VERSION = "stage_b_midi_to_solo_final_status_audit_v1"
+SCHEMA_VERSION = "stage_b_midi_to_solo_final_status_audit_v2"
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -135,6 +136,9 @@ def build_final_status_audit_report(
         "outside_soloing_repair_evidence_ready": bool(
             delivery["outside_soloing_repair_evidence_ready"]
         ),
+        "outside_soloing_repair_source_context_preserved": bool(
+            delivery["outside_soloing_repair_source_context_preserved"]
+        ),
         "cli_candidate_count": _int(delivery["cli_candidate_count"]),
         "changed_ratio_repair_wav_count": _int(delivery["changed_ratio_repair_wav_count"]),
         "outside_soloing_repair_wav_count": _int(
@@ -167,6 +171,7 @@ def build_final_status_audit_report(
         "outside_soloing_repair_pitch_role_risk_delta": _int(
             delivery["outside_soloing_repair_pitch_role_risk_delta"]
         ),
+        **{key: delivery[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS},
         "listening_review_quality_gap_open": bool(delivery["listening_review_quality_gap_open"]),
         "raw_artifact_upload_required": bool(delivery["raw_artifact_upload_required"]),
         "human_audio_preference_claimed": bool(delivery["human_audio_preference_claimed"]),
@@ -193,6 +198,9 @@ def build_final_status_audit_report(
             ),
             "readme_final_evidence_reflected": bool(
                 final_status["readme_final_evidence_reflected"]
+            ),
+            "outside_soloing_repair_source_context_preserved": bool(
+                final_status["outside_soloing_repair_source_context_preserved"]
             ),
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -272,6 +280,9 @@ def validate_final_status_audit_report(
         "outside_soloing_repair_evidence_ready": bool(
             final_status.get("outside_soloing_repair_evidence_ready", False)
         ),
+        "outside_soloing_repair_source_context_preserved": bool(
+            final_status.get("outside_soloing_repair_source_context_preserved", False)
+        ),
         "outside_soloing_repair_wav_count": _int(
             final_status.get("outside_soloing_repair_wav_count")
         ),
@@ -302,6 +313,7 @@ def validate_final_status_audit_report(
         "outside_soloing_repair_pitch_role_risk_delta": _int(
             final_status.get("outside_soloing_repair_pitch_role_risk_delta")
         ),
+        **{key: final_status.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
         "listening_review_quality_gap_open": bool(
             final_status.get("listening_review_quality_gap_open", False)
         ),
@@ -339,6 +351,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- input to rendered WAV evidence ready: `{_bool_token(final_status['input_to_rendered_wav_evidence_ready'])}`",
         f"- changed-ratio repair audio evidence ready: `{_bool_token(final_status['changed_ratio_repair_audio_evidence_ready'])}`",
         f"- outside-soloing repair evidence ready: `{_bool_token(final_status['outside_soloing_repair_evidence_ready'])}`",
+        f"- outside-soloing repair source context preserved: `{_bool_token(final_status['outside_soloing_repair_source_context_preserved'])}`",
         f"- CLI candidate count: `{final_status['cli_candidate_count']}`",
         f"- changed-ratio repair WAV count: `{final_status['changed_ratio_repair_wav_count']}`",
         f"- outside-soloing repair WAV count: `{final_status['outside_soloing_repair_wav_count']}`",
@@ -348,6 +361,12 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- outside-soloing source repair targeted: `{_bool_token(final_status['outside_soloing_repair_source_targeted'])}`",
         f"- outside-soloing source residual risk preserved: `{_bool_token(final_status['outside_soloing_repair_source_residual_risk_preserved'])}`",
         f"- outside-soloing current repair pitch-role risk after / delta: `{final_status['outside_soloing_repair_pitch_role_risk_count_after']}` / `{final_status['outside_soloing_repair_pitch_role_risk_delta']}`",
+        f"- follow-up objective source outside-soloing source pitch-role risk: `{final_status['followup_objective_source_outside_soloing_source_pitch_role_risk_count_before']} -> {final_status['followup_objective_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `{final_status['followup_objective_source_outside_soloing_current_pitch_role_risk_count_after']} / {final_status['followup_objective_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- follow-up repair sweep source outside-soloing source pitch-role risk: `{final_status['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {final_status['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `{final_status['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {final_status['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- bridge repair sweep source outside-soloing source pitch-role risk: `{final_status['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {final_status['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `{final_status['repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {final_status['repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
         f"- listening review quality gap open: `{_bool_token(final_status['listening_review_quality_gap_open'])}`",
         f"- raw artifact upload required: `{_bool_token(final_status['raw_artifact_upload_required'])}`",
         "",
