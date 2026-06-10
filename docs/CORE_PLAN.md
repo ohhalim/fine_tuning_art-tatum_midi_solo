@@ -10608,6 +10608,61 @@ Issue #1008은 Issue #1006 targeted quality repair audio package의 source/curre
 
 - `Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh`
 
+## 9.195 Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh
+
+Issue #1010은 Issue #1008 targeted quality repair listening review package의 source/current outside-soloing context를 listening review input guard summary까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
+- source boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
+- review item count: `6`
+- required input field count: `4`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- sample rate: `44100`
+- duration range: `18.422s -> 18.984s`
+- failure label delta: `4`
+- source outside-soloing repair evidence ready: `true`
+- source outside-soloing repair source context preserved: `true`
+- source outside-soloing repair WAV count: `6`
+- source outside-soloing source objective pitch-role risk count: `5`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing source pitch-role risk delta: `3`
+- source outside-soloing source repair targeted: `false`
+- source outside-soloing source residual risk preserved: `true`
+- source outside-soloing current repair pitch-role risk count after: `0`
+- source outside-soloing current repair pitch-role risk delta: `2`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- audio review required: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- listening review input guard source validation에 #1008 package source-context preserved 조건 추가.
+- source-context preserved flag와 21개 context field를 guard source summary와 validation summary에 보존.
+- validated review input pending 상태에서 preference fill 차단 유지.
+- human/audio preference와 MIDI-to-solo musical quality claim 제외.
+- 다음 boundary는 objective-only next decision source-context refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
+- `.venv/bin/python -m py_compile scripts/guard_stage_b_midi_to_solo_targeted_quality_repair_listening_review_input.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-listening-review-input-guard`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
