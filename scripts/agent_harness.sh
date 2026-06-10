@@ -6285,8 +6285,8 @@ run_stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard() 
 }
 
 run_stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision() {
-  local input_guard_run_id="${INPUT_GUARD_RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision}"
+  local input_guard_run_id="${INPUT_GUARD_RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard_source_context_refresh}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision_source_context_refresh}"
   local input_guard_report="outputs/stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard/${input_guard_run_id}/stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard.json"
   if [[ ! -f "$input_guard_report" ]]; then
     print_header "Stage B MIDI-to-solo targeted quality repair listening review input guard"
@@ -6296,8 +6296,8 @@ run_stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision() 
   "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_targeted_quality_repair_objective_next.py \
     --run_id "$run_id" \
     --input_guard_report "$input_guard_report" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-10.md \
-    --issue_number 842 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 928 \
     --expected_boundary stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision \
     --expected_next_boundary stage_b_midi_to_solo_targeted_quality_repair_followup_decision \
     --require_objective_decision \
