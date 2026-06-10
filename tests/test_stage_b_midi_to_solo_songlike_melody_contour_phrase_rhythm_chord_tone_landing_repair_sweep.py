@@ -29,6 +29,7 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_objective_source_outside_soloing_source_targeted": False,
     "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -36,6 +37,7 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_source_targeted": False,
     "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -43,6 +45,7 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_source_targeted": False,
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -163,7 +166,7 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
                 objective_decision_report=objective_decision_report(),
                 bridge_report=bridge_report(midi_paths),
                 output_dir=root / "repair",
-                issue_number=960,
+                issue_number=1044,
             )
             summary = validate_repair_sweep_report(
                 report,
@@ -199,6 +202,9 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
                 summary["followup_objective_source_outside_soloing_source_pitch_role_risk_delta"],
                 3,
             )
+            self.assertTrue(
+                summary["followup_objective_source_outside_soloing_source_context_preserved"]
+            )
             self.assertFalse(
                 summary["followup_objective_source_outside_soloing_source_targeted"]
             )
@@ -212,6 +218,12 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
                     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after"
                 ],
                 0,
+            )
+            self.assertTrue(
+                summary["followup_repair_sweep_source_outside_soloing_source_context_preserved"]
+            )
+            self.assertTrue(
+                summary["repair_sweep_source_outside_soloing_source_context_preserved"]
             )
             self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
@@ -232,7 +244,7 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
                     objective_decision_report=objective_decision_report(quality_claim=True),
                     bridge_report=bridge_report(midi_paths),
                     output_dir=root / "repair",
-                    issue_number=960,
+                    issue_number=1044,
                 )
 
     def test_rejects_bridge_quality_claim(self) -> None:
@@ -249,7 +261,7 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
                     objective_decision_report=objective_decision_report(),
                     bridge_report=bridge_report(midi_paths, quality_claim=True),
                     output_dir=root / "repair",
-                    issue_number=960,
+                    issue_number=1044,
                 )
 
     def test_rejects_outside_soloing_count_mismatch(self) -> None:
@@ -268,7 +280,7 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
                     ),
                     bridge_report=bridge_report(midi_paths),
                     output_dir=root / "repair",
-                    issue_number=960,
+                    issue_number=1044,
                 )
 
     def test_rejects_missing_source_context_field(self) -> None:
@@ -289,7 +301,7 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
                     objective_decision_report=source,
                     bridge_report=bridge_report(midi_paths),
                     output_dir=root / "repair",
-                    issue_number=960,
+                    issue_number=1044,
                 )
 
     def test_rejects_objective_bridge_source_context_mismatch(self) -> None:
@@ -310,7 +322,28 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
                     objective_decision_report=objective_decision_report(),
                     bridge_report=source,
                     output_dir=root / "repair",
-                    issue_number=960,
+                    issue_number=1044,
+                )
+
+    def test_rejects_source_context_preservation_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            midi_paths = []
+            for index in range(6):
+                midi_path = root / f"candidate_{index}.mid"
+                write_weak_landing_midi(midi_path)
+                midi_paths.append(midi_path)
+            source = objective_decision_report()
+            source["readiness"][
+                "followup_objective_source_outside_soloing_source_context_preserved"
+            ] = False
+
+            with self.assertRaises(StageBMidiToSoloChordToneLandingRepairSweepError):
+                build_repair_sweep_report(
+                    objective_decision_report=source,
+                    bridge_report=bridge_report(midi_paths),
+                    output_dir=root / "repair",
+                    issue_number=1044,
                 )
 
     def test_constants_are_stable(self) -> None:
