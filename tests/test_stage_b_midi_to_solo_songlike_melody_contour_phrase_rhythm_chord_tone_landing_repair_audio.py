@@ -224,6 +224,9 @@ class StageBMidiToSoloChordToneLandingRepairAudioTest(unittest.TestCase):
                 summary["followup_objective_source_outside_soloing_source_pitch_role_risk_delta"],
                 3,
             )
+            self.assertTrue(
+                summary["followup_objective_source_outside_soloing_source_context_preserved"]
+            )
             self.assertFalse(
                 summary["followup_objective_source_outside_soloing_source_targeted"]
             )
@@ -237,6 +240,12 @@ class StageBMidiToSoloChordToneLandingRepairAudioTest(unittest.TestCase):
                     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after"
                 ],
                 0,
+            )
+            self.assertTrue(
+                summary["followup_repair_sweep_source_outside_soloing_source_context_preserved"]
+            )
+            self.assertTrue(
+                summary["repair_sweep_source_outside_soloing_source_context_preserved"]
             )
             self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
             self.assertTrue(summary["audio_review_required"])
@@ -253,6 +262,29 @@ class StageBMidiToSoloChordToneLandingRepairAudioTest(unittest.TestCase):
             with self.assertRaises(StageBMidiToSoloChordToneLandingRepairAudioError):
                 build_audio_render_report(
                     source_report(root, quality_claim=True),
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    runner=fake_runner,
+                )
+
+    def test_rejects_source_context_preservation_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            report = source_report(root)
+            key = "followup_objective_source_outside_soloing_source_context_preserved"
+            report["aggregate"][key] = False
+            report["readiness"][key] = False
+
+            with self.assertRaises(StageBMidiToSoloChordToneLandingRepairAudioError):
+                build_audio_render_report(
+                    report,
                     output_dir=root / "audio_package",
                     renderer_path=str(renderer),
                     soundfont_path=str(soundfont),
