@@ -110,6 +110,18 @@ def validate_bridge_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
             "not-evaluable labels must be cleared before objective decision"
         )
+    if _int(readiness.get("followup_objective_source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
+            "follow-up objective outside-soloing not-evaluable count should be preserved"
+        )
+    if _int(readiness.get("followup_repair_sweep_source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
+            "follow-up repair sweep outside-soloing not-evaluable count should be preserved"
+        )
+    if _int(readiness.get("repair_sweep_source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
+            "bridge repair sweep outside-soloing not-evaluable count should be preserved"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
             "critical user input should not be required"
@@ -122,6 +134,24 @@ def validate_bridge_source(report: dict[str, Any]) -> dict[str, Any]:
         "not_evaluable_after_count": _int(readiness.get("not_evaluable_after_count")),
         "weak_chord_tone_landing_risk_count": _int(flags.get(PRIMARY_RISK_LABEL)),
         "outside_soloing_pitch_role_risk_count": _int(flags.get(SECONDARY_RISK_LABEL)),
+        "followup_objective_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_objective_source_outside_soloing_not_evaluable_count")
+        ),
+        "followup_objective_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_objective_repaired_outside_soloing_not_evaluable_count")
+        ),
+        "followup_repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_repair_sweep_source_outside_soloing_not_evaluable_count")
+        ),
+        "followup_repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_repair_sweep_repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_source_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_repaired_outside_soloing_not_evaluable_count")
+        ),
         "min_chord_tone_ratio": _float(summary.get("min_chord_tone_ratio")),
         "max_outside_ratio": _float(summary.get("max_outside_ratio")),
         "max_non_chord_tone_run": _int(summary.get("max_non_chord_tone_run")),
@@ -178,6 +208,24 @@ def build_objective_decision_report(
             "primary_risk_label": primary_label,
             "weak_chord_tone_landing_risk_count": weak_count,
             "outside_soloing_pitch_role_risk_count": outside_count,
+            "followup_objective_source_outside_soloing_not_evaluable_count": _int(
+                bridge["followup_objective_source_outside_soloing_not_evaluable_count"]
+            ),
+            "followup_objective_repaired_outside_soloing_not_evaluable_count": _int(
+                bridge["followup_objective_repaired_outside_soloing_not_evaluable_count"]
+            ),
+            "followup_repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+                bridge["followup_repair_sweep_source_outside_soloing_not_evaluable_count"]
+            ),
+            "followup_repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+                bridge["followup_repair_sweep_repaired_outside_soloing_not_evaluable_count"]
+            ),
+            "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+                bridge["repair_sweep_source_outside_soloing_not_evaluable_count"]
+            ),
+            "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+                bridge["repair_sweep_repaired_outside_soloing_not_evaluable_count"]
+            ),
             "not_evaluable_after_count": _int(bridge["not_evaluable_after_count"]),
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
@@ -273,6 +321,24 @@ def validate_objective_decision_report(
             readiness.get("outside_soloing_pitch_role_risk_count")
         ),
         "not_evaluable_after_count": _int(readiness.get("not_evaluable_after_count")),
+        "followup_objective_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_objective_source_outside_soloing_not_evaluable_count")
+        ),
+        "followup_objective_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_objective_repaired_outside_soloing_not_evaluable_count")
+        ),
+        "followup_repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_repair_sweep_source_outside_soloing_not_evaluable_count")
+        ),
+        "followup_repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_repair_sweep_repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_source_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_repaired_outside_soloing_not_evaluable_count")
+        ),
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)
         ),
@@ -303,6 +369,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- primary risk label: `{selected['primary_risk_label']}`",
         f"- candidate count: `{summary['candidate_count']}`",
         f"- not evaluable count: `{summary['not_evaluable_before_count']} -> {summary['not_evaluable_after_count']}`",
+        f"- follow-up objective source/repaired outside-soloing not evaluable count: `{summary['followup_objective_source_outside_soloing_not_evaluable_count']}/{summary['followup_objective_repaired_outside_soloing_not_evaluable_count']}`",
+        f"- follow-up repair sweep source/repaired outside-soloing not evaluable count: `{summary['followup_repair_sweep_source_outside_soloing_not_evaluable_count']}/{summary['followup_repair_sweep_repaired_outside_soloing_not_evaluable_count']}`",
+        f"- bridge repair sweep source/repaired outside-soloing not evaluable count: `{summary['repair_sweep_source_outside_soloing_not_evaluable_count']}/{summary['repair_sweep_repaired_outside_soloing_not_evaluable_count']}`",
         f"- weak chord-tone landing risk count: `{summary['weak_chord_tone_landing_risk_count']}`",
         f"- outside-soloing pitch-role risk count: `{summary['outside_soloing_pitch_role_risk_count']}`",
         f"- min chord-tone ratio: `{summary['min_chord_tone_ratio']:.3f}`",
@@ -339,7 +408,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=788)
+    parser.add_argument("--issue_number", type=int, default=872)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--expected_target", type=str, default="")
