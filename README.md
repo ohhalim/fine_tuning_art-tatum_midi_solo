@@ -13,7 +13,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP delivery package: `Issue #992`
 - latest README final evidence refresh: `Issue #994`
 - latest final status audit: `Issue #996`
-- latest post-MVP quality iteration plan: `Issue #914`
+- latest post-MVP quality iteration plan: `Issue #998`
 - latest quality rubric baseline: `Issue #916`
 - latest candidate failure labeling: `Issue #918`
 - latest targeted quality repair sweep: `Issue #920`
