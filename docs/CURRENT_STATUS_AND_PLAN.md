@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #846, Stage B MIDI-to-solo songlike melody contour repair sweep outside-soloing context refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair audio package refresh`
+- latest functional result: Issue #848, Stage B MIDI-to-solo songlike melody contour repair audio package outside-soloing context refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair listening review package refresh`
 
 현재 범위가 아닌 것:
 
@@ -554,6 +554,23 @@
 - audio rendered quality claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 audio target: `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package`
+- songlike melody contour repair audio package outside-soloing context refresh 완료
+- rendered audio file count: `6`
+- technical WAV validation: `true`
+- WAV sample rate: `44100`
+- WAV duration range: `18.849s-18.992s`
+- total failure labels: `8 -> 4`
+- songlike failure count: `5 -> 0`
+- songlike failure delta: `5`
+- source outside-soloing repair pitch-role risk count after: `0`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- repaired not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
+- audio review required: `true`
+- human/audio preference claim: `false`
+- audio rendered quality claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 review target: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

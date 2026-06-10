@@ -70,6 +70,10 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
                 "density_pattern": [5, 3, 6, 4, 5, 4, 6, 3],
                 "contour_repaired_labeling": {
                     "failure_labels": labels,
+                    "not_evaluable_labels": [
+                        "outside_soloing_without_context",
+                        "weak_chord_tone_landing",
+                    ],
                     "metrics": {
                         "note_count": 24,
                         "unique_pitch_count": 6,
@@ -93,6 +97,14 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "songlike_failure_delta": 5,
             "improved_candidate_count": 4,
             "technical_regression_count": 0,
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
+            "repaired_not_evaluable_counts": {
+                "outside_soloing_without_context": 6,
+                "weak_chord_tone_landing": 6,
+            },
             "repaired_failure_counts": {
                 "phrase_shape_missing_tension_release": 2,
                 "rhythmic_monotony": 2,
@@ -163,6 +175,14 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
             self.assertTrue(summary["technical_wav_validation"])
             self.assertEqual(summary["songlike_failure_delta"], 5)
             self.assertEqual(summary["technical_regression_count"], 0)
+            self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(
+                summary["repaired_not_evaluable_counts"]["outside_soloing_without_context"],
+                6,
+            )
             self.assertTrue(summary["audio_review_required"])
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
@@ -177,6 +197,26 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
             with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairAudioError):
                 build_audio_render_report(
                     source_report(root, quality_claim=True),
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    runner=fake_runner,
+                )
+
+    def test_rejects_missing_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            source = source_report(root)
+            source["aggregate"]["repaired_outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairAudioError):
+                build_audio_render_report(
+                    source,
                     output_dir=root / "audio_package",
                     renderer_path=str(renderer),
                     soundfont_path=str(soundfont),

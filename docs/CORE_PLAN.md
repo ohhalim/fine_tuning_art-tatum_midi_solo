@@ -409,6 +409,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo targeted quality repair objective-only next decision: follow-up required `true`, current quality claim ready `false`, source outside-soloing not evaluable `6`, repaired outside-soloing not evaluable `6`, source pitch-role risk after `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
 - MIDI-to-solo targeted quality repair follow-up decision: selected target `songlike_melody_contour_repair_sweep`, dominant label/count `songlike_melody_not_soloing/5`, objective and repair sweep outside-soloing not evaluable `6/6`, pitch-role risk after `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
 - MIDI-to-solo songlike melody contour repair sweep: songlike failure `5 -> 0`, total failure labels `8 -> 4`, repaired outside-soloing not evaluable `6`, technical regression `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package`
+- MIDI-to-solo songlike melody contour repair audio package: rendered WAV `6`, duration `18.849s-18.992s`, source/repaired outside-soloing not evaluable `6/6`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package`
 - MIDI-to-solo pitch-contour changed-ratio review decision: selected target `lower_pitch_change_ratio_repair_probe`, repair probe required `true`, max interval/threshold `11/12`, changed-ratio review threshold `0.5`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
 - MIDI-to-solo pitch-contour changed-ratio repair probe: repaired/pass `3/3`, max pitch changed ratio `0.7174 -> 0.4348`, max interval `12`, dead-air max `0.0000`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package`
 - MIDI-to-solo pitch-contour changed-ratio repair audio package: rendered WAV `3`, duration `18.422s-18.978s`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package`
@@ -6477,6 +6478,49 @@ Issue #846은 songlike melody contour repair sweep에 follow-up decision outside
 다음 작업:
 
 - `Stage B MIDI-to-solo songlike melody contour repair audio package refresh`
+
+## 9.115 Stage B MIDI-to-solo songlike melody contour repair audio package outside-soloing context refresh
+
+Issue #848은 songlike melody contour repair audio package에 repair sweep outside-soloing context를 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package`
+- rendered audio file count: `6`
+- technical WAV validation: `true`
+- sample rate: `44100`
+- duration range: `18.849s-18.992s`
+- total failure labels: `8 -> 4`
+- songlike failure count: `5 -> 0`
+- songlike failure delta: `5`
+- source outside-soloing repair pitch-role risk count after: `0`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- repaired not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
+- audio review required: `true`
+- human/audio preference claimed: `false`
+- audio rendered quality claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- songlike contour repaired MIDI 후보 `6`개 WAV 렌더 완료.
+- WAV technical metadata 검증 완료.
+- outside-soloing without context와 weak chord-tone landing은 listening review package 대상 경계로 유지.
+- 음악적 품질, human/audio preference, audio rendered quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_audio`
+- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_songlike_melody_contour_repair_audio.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-repair-audio-package`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour repair listening review package refresh`
 
 ## 10. 한 문장 요약
 
