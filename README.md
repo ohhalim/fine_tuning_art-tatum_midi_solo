@@ -33,9 +33,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm repair listening review package: `Issue #948`
 - latest songlike melody contour phrase/rhythm repair listening review input guard: `Issue #950`
 - latest songlike melody contour phrase/rhythm repair objective-only next decision: `Issue #952`
+- latest songlike melody contour phrase/rhythm repair follow-up decision: `Issue #954`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision`
-- open issue queue after songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- open issue queue after songlike melody contour phrase/rhythm repair follow-up decision source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -61,6 +62,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase/rhythm repair listening review required input fields: `4`
 - phrase/rhythm repair objective follow-up required: `true`
 - phrase/rhythm repair current quality claim ready: `false`
+- phrase/rhythm repair follow-up selected target: `songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- phrase/rhythm repair residual rhythmic monotony count: `1`
+- phrase/rhythm repair context not-evaluable min count: `6`
 - phrase/rhythm repair technical WAV validation: `true`
 - phrase/rhythm repair source outside-soloing pitch-role risk: `5 -> 2`
 - phrase/rhythm repair current outside-soloing pitch-role risk after / delta: `0 / 2`
