@@ -44,10 +44,11 @@
 - latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: Issue #958, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: Issue #960, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: Issue #962, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh
+- latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: Issue #964, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -444,7 +445,18 @@
 - audio rendered quality claim: `false`
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
-- 다음 listening review target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package`
+- 다음 target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard`
+- songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh 완료
+- review item count: `6`
+- validated review input: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- WAV duration range: `18.871s-19.000s`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- current repair pitch-role risk count after / delta: `0 / 2`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 input guard target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard`
 - songlike melody contour repair follow-up decision 완료
 - primary remaining failure labels: `phrase_shape_missing_tension_release`, `rhythmic_monotony`
 - primary remaining failure count: `2`
