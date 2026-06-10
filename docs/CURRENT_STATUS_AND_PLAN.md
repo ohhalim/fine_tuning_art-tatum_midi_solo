@@ -33,7 +33,7 @@
 - latest songlike melody contour repair listening review package: Issue #1020, Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh
 - latest songlike melody contour repair listening review input guard: Issue #1022, Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh
 - latest songlike melody contour repair objective-only next decision: Issue #1024, Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh
-- latest songlike melody contour repair follow-up decision: Issue #942, Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh
+- latest songlike melody contour repair follow-up decision: Issue #1026, Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh
 - latest songlike melody contour phrase/rhythm repair sweep: Issue #944, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm repair audio package: Issue #946, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm repair listening review package: Issue #948, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh
@@ -57,7 +57,7 @@
 - latest README evidence refresh: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
 - open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -3884,6 +3884,57 @@ Issue #1024는 Issue #1022 input guard의 pending input 상태와 source-context
 다음:
 
 - `Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh`
+
+## Stage B MIDI-to-Solo Songlike Melody Contour Repair Follow-Up Decision Source Context Refresh Result
+
+Issue #1026은 Issue #1024 objective-only next decision과 songlike melody contour repair sweep의 source/current outside-soloing context를 follow-up decision까지 보존한 작업이다.
+
+변경:
+
+- follow-up decision source validation에 source-context preserved flag 필수화
+- bridge source-context 21개 키 누락 시 follow-up decision 실패 처리
+- objective/sweep source-context를 readiness/validation summary까지 전파
+- phrase/rhythm tie target 선택 기준 유지
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_FOLLOWUP_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision`
+- repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- selected target: `songlike_melody_contour_phrase_rhythm_repair_sweep`
+- primary remaining failure labels: `phrase_shape_missing_tension_release`, `rhythmic_monotony`
+- primary remaining failure count: `2`
+- candidate count: `6`
+- failure label delta: `4`
+- technical regression count: `0`
+- objective source outside-soloing source context preserved: `true`
+- repair sweep source outside-soloing source context preserved: `true`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing current repair pitch-role risk after / delta: `0 / 2`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- objective/sweep 양쪽 source-context preserved flag와 21개 context field 보존 확인.
+- 잔여 failure label 동률 기준 phrase/rhythm repair sweep 선택 유지.
+- outside-soloing과 weak chord-tone landing은 context 부재로 quality claim 제외 유지.
+- critical user input 없이 다음 repair sweep boundary로 진행 가능.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_repair_followup.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-repair-followup-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

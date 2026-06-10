@@ -17,6 +17,7 @@
 - technical regression count: `0`
 - objective source outside-soloing repair evidence ready: `true`
 - objective source outside-soloing repair WAV count: `6`
+- objective source outside-soloing source context preserved: `true`
 - objective source outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`
 - objective source outside-soloing source repair targeted: `false`
 - objective source outside-soloing source residual risk preserved: `true`
@@ -25,6 +26,7 @@
 - objective source outside-soloing not evaluable count: `6`
 - objective repaired outside-soloing not evaluable count: `6`
 - repair sweep source outside-soloing repair evidence ready: `true`
+- repair sweep source outside-soloing source context preserved: `true`
 - repair sweep source outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`
 - repair sweep source outside-soloing source repair targeted: `false`
 - repair sweep source outside-soloing source residual risk preserved: `true`
