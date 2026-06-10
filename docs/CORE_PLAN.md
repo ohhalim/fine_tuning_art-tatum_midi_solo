@@ -7773,6 +7773,53 @@ Issue #902는 Issue #898 current evidence와 Issue #900 README evidence refresh�
 
 - `Stage B MIDI-to-solo quality gap decision source-context refresh`
 
+## 9.142 Stage B MIDI-to-solo quality gap decision source-context refresh
+
+Issue #904는 Issue #902 MVP completion audit의 source/current outside-soloing context를 quality gap decision까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- source boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- next boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- selected target: `listening_review_quality_gap`
+- fallback path active: `true`
+- model-conditioned input path alignment required: `false`
+- technical model-core MVP completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour changed-ratio repair objective completed: `true`
+- outside-soloing repair objective completed: `true`
+- outside-soloing source objective pitch-role risk count: `5`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source pitch-role risk delta: `3`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
+- outside-soloing current repair pitch-role risk count after: `0`
+- outside-soloing current repair pitch-role risk delta: `2`
+- outside-soloing repair target supported: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- quality gap decision 입력 검증에 source/current outside-soloing context 필수화.
+- source repair는 targeted repair가 아니며 residual risk boundary로 보존.
+- current repair `2 -> 0`은 objective evidence 범위로 한정.
+- 다음 작업은 listening review quality gap의 source-context 반영.
+- human/audio preference와 MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_quality_gap_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_quality_gap.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-quality-gap-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo listening review quality gap source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

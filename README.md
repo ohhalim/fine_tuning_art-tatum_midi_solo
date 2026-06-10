@@ -8,9 +8,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 - latest functional result: `Issue #898`
 - latest MVP completion audit: `Issue #902`
+- latest quality gap decision: `Issue #904`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_mvp_completion_audit`
-- open issue queue after MVP completion audit refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- open issue queue after quality gap decision source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -117,6 +118,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - quality gap decision completed: `true`
 - quality gap decision listening review target selected: `true`
 - quality gap decision outside-soloing repair objective included: `true`
+- quality gap decision outside-soloing source context included: `true`
 - pitch-contour changed-ratio review decision completed: `true`
 - pitch-contour changed-ratio repair probe required: `true`
 - pitch-contour changed-ratio repair probe completed: `true`
@@ -289,6 +291,10 @@ Quality gap decision.
 - model-conditioned pitch-contour changed-ratio review required: `true`
 - model-conditioned pitch-contour changed-ratio repair max ratio / target: `0.4348 / 0.5000`
 - model-conditioned pitch-contour changed-ratio repair max interval / target: `12 / 12`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
+- outside-soloing current repair pitch-role risk count after: `0`
 - musical quality MVP completed: `false`
 - CLI candidate / rendered WAV: `3 / 3`
 - CLI preference fill allowed: `false`
