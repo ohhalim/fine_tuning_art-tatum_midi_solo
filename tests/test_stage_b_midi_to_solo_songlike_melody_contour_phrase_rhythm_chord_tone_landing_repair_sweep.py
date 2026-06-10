@@ -44,7 +44,11 @@ def write_weak_landing_midi(path: Path, *, bpm: float = 124.0) -> None:
     midi.write(str(path))
 
 
-def objective_decision_report(*, quality_claim: bool = False) -> dict:
+def objective_decision_report(
+    *,
+    quality_claim: bool = False,
+    outside_soloing_risk_count: int = 5,
+) -> dict:
     return {
         "boundary": OBJECTIVE_BOUNDARY,
         "selected_next_target": {
@@ -54,7 +58,7 @@ def objective_decision_report(*, quality_claim: bool = False) -> dict:
             "pitch_role_objective_decision_completed": True,
             "candidate_count": 6,
             "weak_chord_tone_landing_risk_count": 6,
-            "outside_soloing_pitch_role_risk_count": 5,
+            "outside_soloing_pitch_role_risk_count": outside_soloing_risk_count,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
@@ -90,7 +94,14 @@ def bridge_report(midi_paths: list[Path], *, quality_claim: bool = False) -> dic
                     "cadence_landing_role": "approach",
                     "max_non_chord_tone_run": 5,
                 },
-                "bridge_flags": ["weak_chord_tone_landing_risk"],
+                "bridge_flags": [
+                    "weak_chord_tone_landing_risk",
+                    *(
+                        ["outside_soloing_pitch_role_risk"]
+                        if index <= 5
+                        else []
+                    ),
+                ],
             }
             for index, path in enumerate(midi_paths, start=1)
         ],
@@ -127,7 +138,7 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
                 objective_decision_report=objective_decision_report(),
                 bridge_report=bridge_report(midi_paths),
                 output_dir=root / "repair",
-                issue_number=790,
+                issue_number=874,
             )
             summary = validate_repair_sweep_report(
                 report,
@@ -142,7 +153,11 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
             self.assertEqual(summary["candidate_count"], 6)
             self.assertEqual(summary["repaired_midi_count"], 6)
             self.assertGreater(summary["changed_note_total"], 0)
+            self.assertEqual(summary["objective_outside_soloing_pitch_role_risk_count"], 5)
             self.assertGreater(summary["weak_chord_tone_landing_risk_delta"], 0)
+            self.assertEqual(summary["outside_soloing_pitch_role_risk_count_before"], 5)
+            self.assertFalse(summary["outside_soloing_repair_targeted"])
+            self.assertTrue(summary["outside_soloing_residual_risk_preserved"])
             self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -162,7 +177,7 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
                     objective_decision_report=objective_decision_report(quality_claim=True),
                     bridge_report=bridge_report(midi_paths),
                     output_dir=root / "repair",
-                    issue_number=790,
+                    issue_number=874,
                 )
 
     def test_rejects_bridge_quality_claim(self) -> None:
@@ -179,7 +194,26 @@ class StageBMidiToSoloChordToneLandingRepairSweepTest(unittest.TestCase):
                     objective_decision_report=objective_decision_report(),
                     bridge_report=bridge_report(midi_paths, quality_claim=True),
                     output_dir=root / "repair",
-                    issue_number=790,
+                    issue_number=874,
+                )
+
+    def test_rejects_outside_soloing_count_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            midi_paths = []
+            for index in range(6):
+                midi_path = root / f"candidate_{index}.mid"
+                write_weak_landing_midi(midi_path)
+                midi_paths.append(midi_path)
+
+            with self.assertRaises(StageBMidiToSoloChordToneLandingRepairSweepError):
+                build_repair_sweep_report(
+                    objective_decision_report=objective_decision_report(
+                        outside_soloing_risk_count=4
+                    ),
+                    bridge_report=bridge_report(midi_paths),
+                    output_dir=root / "repair",
+                    issue_number=874,
                 )
 
     def test_constants_are_stable(self) -> None:

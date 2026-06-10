@@ -246,8 +246,11 @@
 - repair policy: `strong_beat_and_final_note_nearest_chord_tone`
 - repaired MIDI count: `6`
 - changed note total: `40`
+- objective outside-soloing pitch-role risk count: `5`
 - weak chord-tone landing risk count: `6 -> 0`
 - outside-soloing pitch-role risk count: `5 -> 2`
+- outside-soloing repair targeted: `false`
+- outside-soloing residual risk preserved: `true`
 - final landing chord-tone count: `1 -> 6`
 - target supported: `true`
 - human/audio preference claim: `false`
