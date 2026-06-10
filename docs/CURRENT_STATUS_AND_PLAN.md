@@ -12,7 +12,7 @@
 
 현재 active issue:
 
-- latest functional result: Issue #898, Stage B MIDI-to-solo current evidence source-context refresh
+- latest functional result: Issue #982, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest MVP completion audit: Issue #902, Stage B MIDI-to-solo MVP completion audit source-context refresh
 - latest quality gap decision: Issue #904, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #906, Stage B MIDI-to-solo listening review quality gap source-context refresh
@@ -53,10 +53,11 @@
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: Issue #976, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: Issue #978, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: Issue #980, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh
+- latest MVP current evidence consolidation: Issue #982, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh`
+- open issue queue after MVP current evidence consolidation source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence source-context refresh`
 
 현재 범위가 아닌 것:
 

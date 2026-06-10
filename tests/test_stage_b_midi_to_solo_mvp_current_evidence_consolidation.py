@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scripts.consolidate_stage_b_midi_to_solo_mvp_current_evidence import (
     BOUNDARY,
+    BRIDGE_SOURCE_CONTEXT_KEYS,
     NEXT_BOUNDARY,
     OBJECTIVE_FINAL_BOUNDARY,
     OBJECTIVE_NEXT_BOUNDARY,
@@ -19,6 +20,31 @@ def touch(path: Path) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(b"x")
     return str(path)
+
+
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
 
 
 def reports(
@@ -331,6 +357,7 @@ def reports(
                     outside_soloing_repair_supported
                 ),
                 "current_evidence_consolidation_ready": outside_soloing_repair_supported,
+                **SOURCE_CONTEXT,
             },
             "readiness": {
                 "objective_next_completed": True,
@@ -374,7 +401,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     "outside_soloing_repair_objective"
                 ],
                 output_dir=Path(tmp) / "out",
-                issue_number=812,
+                issue_number=982,
             )
             summary = validate_current_evidence_consolidation_report(
                 report,
@@ -474,6 +501,10 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
             self.assertTrue(summary["outside_soloing_repair_final_landing_target_supported"])
             self.assertTrue(summary["outside_soloing_repair_non_chord_run_target_supported"])
             self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
+            self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
+            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+                self.assertIn(key, report["outside_soloing_repair_objective_path"])
+                self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
             self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
@@ -634,6 +665,33 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     ],
                     output_dir=Path(tmp) / "out",
                     issue_number=898,
+                )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp))
+            del data["outside_soloing_repair_objective"]["objective_summary"][
+                "followup_objective_source_outside_soloing_source_pitch_role_risk_delta"
+            ]
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
+                    model_conditioned_pitch_contour_objective_next=data[
+                        "model_conditioned_pitch_contour_objective"
+                    ],
+                    model_conditioned_pitch_contour_changed_ratio_repair_objective_next=data[
+                        "model_conditioned_pitch_contour_changed_ratio_repair_objective"
+                    ],
+                    outside_soloing_repair_objective_next=data[
+                        "outside_soloing_repair_objective"
+                    ],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=982,
                 )
 
         with tempfile.TemporaryDirectory() as tmp:

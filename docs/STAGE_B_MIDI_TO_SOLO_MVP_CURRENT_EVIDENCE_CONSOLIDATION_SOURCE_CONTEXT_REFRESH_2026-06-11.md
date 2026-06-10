@@ -11,6 +11,7 @@
 - model-conditioned pitch-contour objective path ready: `true`
 - model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - outside-soloing repair objective path ready: `true`
+- outside-soloing repair source context preserved: `true`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 
@@ -96,6 +97,12 @@
 - source outside-soloing repair targeted: `false`
 - source outside-soloing residual risk preserved: `true`
 - outside-soloing pitch-role risk after / delta: `0` / `2`
+- follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- follow-up repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- bridge repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
 - outside-soloing target supported: `true`
 - weak landing target supported: `true`
 - final landing chord-tone count after: `6`

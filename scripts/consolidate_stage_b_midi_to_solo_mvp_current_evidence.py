@@ -21,7 +21,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationError(ValueError):
 
 BOUNDARY = "stage_b_midi_to_solo_mvp_current_evidence_consolidation"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_readme_evidence_refresh"
-SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_current_evidence_consolidation_v1"
+SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_current_evidence_consolidation_v2"
 
 CONTRACT_BOUNDARY = "stage_b_midi_to_solo_mvp_input_contract"
 CONTEXT_BOUNDARY = "stage_b_midi_to_solo_context_extraction_mvp"
@@ -48,6 +48,29 @@ MODEL_CONDITIONED_PITCH_CONTOUR_CHANGED_RATIO_REPAIR_OBJECTIVE_BOUNDARY = (
 OUTSIDE_SOLOING_REPAIR_OBJECTIVE_BOUNDARY = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
     "outside_soloing_repair_objective_only_next_decision"
+)
+BRIDGE_SOURCE_CONTEXT_KEYS = (
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before",
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after",
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta",
+    "followup_objective_source_outside_soloing_source_targeted",
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved",
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after",
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta",
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before",
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after",
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta",
+    "followup_repair_sweep_source_outside_soloing_source_targeted",
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved",
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after",
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta",
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before",
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after",
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta",
+    "repair_sweep_source_outside_soloing_source_targeted",
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved",
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after",
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta",
 )
 
 
@@ -79,6 +102,15 @@ def _bool_token(value: Any) -> str:
 
 def _artifact_exists(path: str) -> bool:
     return bool(path and Path(path).exists())
+
+
+def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
+    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        if key not in container:
+            raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+                f"{label} source-context field required: {key}"
+            )
+    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
 
 
 def _duration_range(items: list[dict[str, Any]]) -> dict[str, float]:
@@ -729,6 +761,10 @@ def validate_outside_soloing_repair_objective_next(
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
             f"unexpected outside-soloing repair claim: {claimed}"
         )
+    source_context = _source_context_fields(
+        summary,
+        label="outside-soloing repair objective summary",
+    )
     return {
         "boundary": OUTSIDE_SOLOING_REPAIR_OBJECTIVE_BOUNDARY,
         "objective_next_completed": bool(readiness.get("objective_next_completed", False)),
@@ -792,6 +828,7 @@ def validate_outside_soloing_repair_objective_next(
         "non_chord_run_target_supported": bool(
             summary.get("non_chord_run_target_supported", False)
         ),
+        **source_context,
     }
 
 
@@ -935,6 +972,13 @@ def build_current_evidence_consolidation_report(
             ),
             "outside_soloing_repair_objective_path_ready": bool(
                 outside_soloing_repair_objective_path_ready
+            ),
+            "outside_soloing_repair_source_context_preserved": bool(
+                outside_soloing_repair_objective
+            )
+            and all(
+                key in outside_soloing_repair_objective
+                for key in BRIDGE_SOURCE_CONTEXT_KEYS
             ),
             "current_mvp_technical_execution_evidence_supported": technical_path_supported,
             "current_mvp_objective_repair_evidence_supported": selected_scale_objective_path_complete,
@@ -1232,6 +1276,10 @@ def validate_current_evidence_consolidation_report(
                 False,
             )
         ),
+        "outside_soloing_repair_source_context_preserved": bool(
+            readiness.get("outside_soloing_repair_source_context_preserved", False)
+        ),
+        **{key: outside_soloing_repair.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
         "cli_candidate_count": _int(cli_objective.get("candidate_count")),
         "cli_rendered_audio_file_count": _int(cli_objective.get("rendered_audio_file_count")),
         "cli_input_context_bars": _int(cli_objective.get("input_context_bars")),
@@ -1295,6 +1343,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- model-conditioned pitch-contour objective path ready: `{_bool_token(readiness['model_conditioned_pitch_contour_objective_path_ready'])}`",
         f"- model-conditioned pitch-contour changed-ratio repair objective path ready: `{_bool_token(readiness['model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready'])}`",
         f"- outside-soloing repair objective path ready: `{_bool_token(readiness['outside_soloing_repair_objective_path_ready'])}`",
+        f"- outside-soloing repair source context preserved: `{_bool_token(readiness['outside_soloing_repair_source_context_preserved'])}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         f"- MIDI-to-solo musical quality claimed: `{_bool_token(readiness['midi_to_solo_musical_quality_claimed'])}`",
         "",
@@ -1394,6 +1443,12 @@ def markdown_report(report: dict[str, Any]) -> str:
                 f"- source outside-soloing repair targeted: `{_bool_token(outside_soloing_repair['source_outside_soloing_repair_targeted'])}`",
                 f"- source outside-soloing residual risk preserved: `{_bool_token(outside_soloing_repair['source_outside_soloing_residual_risk_preserved'])}`",
                 f"- outside-soloing pitch-role risk after / delta: `{outside_soloing_repair['outside_soloing_pitch_role_risk_count_after']}` / `{outside_soloing_repair['outside_soloing_pitch_role_risk_delta']}`",
+                f"- follow-up objective source outside-soloing source pitch-role risk: `{outside_soloing_repair['followup_objective_source_outside_soloing_source_pitch_role_risk_count_before']} -> {outside_soloing_repair['followup_objective_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+                f"- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `{outside_soloing_repair['followup_objective_source_outside_soloing_current_pitch_role_risk_count_after']} / {outside_soloing_repair['followup_objective_source_outside_soloing_current_pitch_role_risk_delta']}`",
+                f"- follow-up repair sweep source outside-soloing source pitch-role risk: `{outside_soloing_repair['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {outside_soloing_repair['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+                f"- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `{outside_soloing_repair['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {outside_soloing_repair['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
+                f"- bridge repair sweep source outside-soloing source pitch-role risk: `{outside_soloing_repair['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {outside_soloing_repair['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+                f"- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `{outside_soloing_repair['repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {outside_soloing_repair['repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
                 f"- outside-soloing target supported: `{_bool_token(outside_soloing_repair['outside_soloing_target_supported'])}`",
                 f"- weak landing target supported: `{_bool_token(outside_soloing_repair['weak_landing_target_supported'])}`",
                 f"- final landing chord-tone count after: `{outside_soloing_repair['final_landing_chord_tone_count_after']}`",
