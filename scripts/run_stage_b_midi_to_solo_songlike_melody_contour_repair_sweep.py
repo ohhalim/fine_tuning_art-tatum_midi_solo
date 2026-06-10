@@ -122,6 +122,38 @@ def validate_followup_decision(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
             "dominant remaining songlike count required"
         )
+    if not bool(readiness.get("objective_source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "objective outside-soloing repair evidence readiness required"
+        )
+    if _int(readiness.get("objective_source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "objective outside-soloing residual pitch-role risk should be zero"
+        )
+    if _int(readiness.get("objective_source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "objective source outside-soloing not-evaluable boundary required"
+        )
+    if _int(readiness.get("objective_repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "objective repaired outside-soloing not-evaluable boundary required"
+        )
+    if not bool(readiness.get("repair_sweep_source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "repair sweep outside-soloing repair evidence readiness required"
+        )
+    if _int(readiness.get("repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "repair sweep outside-soloing residual pitch-role risk should be zero"
+        )
+    if _int(readiness.get("repair_sweep_source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "repair sweep source outside-soloing not-evaluable boundary required"
+        )
+    if _int(readiness.get("repair_sweep_repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "repair sweep repaired outside-soloing not-evaluable boundary required"
+        )
     _require_no_quality_claim(readiness, label="follow-up readiness")
     return {
         "candidate_count": _int(readiness.get("candidate_count")),
@@ -135,6 +167,30 @@ def validate_followup_decision(report: dict[str, Any]) -> dict[str, Any]:
         "remaining_failure_counts": _dict(sweep.get("remaining_failure_counts")),
         "source_songlike_failure_count": _int(
             _dict(sweep.get("remaining_failure_counts")).get(SONGLIKE_LABEL)
+        ),
+        "objective_source_outside_soloing_repair_evidence_ready": bool(
+            readiness.get("objective_source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "objective_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            readiness.get("objective_source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "objective_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("objective_source_outside_soloing_not_evaluable_count")
+        ),
+        "objective_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("objective_repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_source_outside_soloing_repair_evidence_ready": bool(
+            readiness.get("repair_sweep_source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            readiness.get("repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_source_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_repaired_outside_soloing_not_evaluable_count")
         ),
     }
 
@@ -154,6 +210,22 @@ def validate_targeted_repair_sweep(report: dict[str, Any]) -> list[dict[str, Any
     if _int(aggregate.get("technical_regression_count")) != 0:
         raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
             "source technical regression must remain zero"
+        )
+    if not bool(aggregate.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "source outside-soloing repair evidence readiness required"
+        )
+    if _int(aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "source outside-soloing residual pitch-role risk should be zero"
+        )
+    if _int(aggregate.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "source outside-soloing not-evaluable boundary required"
+        )
+    if _int(aggregate.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
+            "repaired outside-soloing not-evaluable boundary required"
         )
     if len(rows) < 6:
         raise StageBMidiToSoloSonglikeMelodyContourRepairSweepError(
@@ -337,6 +409,14 @@ def failure_counts(rows: list[dict[str, Any]], *, key: str) -> Counter[str]:
     )
 
 
+def not_evaluable_counts(rows: list[dict[str, Any]], *, key: str) -> Counter[str]:
+    return Counter(
+        label
+        for row in rows
+        for label in _list(_dict(row.get(key)).get("not_evaluable_labels"))
+    )
+
+
 def build_songlike_melody_contour_repair_sweep_report(
     *,
     followup_decision: dict[str, Any],
@@ -398,6 +478,14 @@ def build_songlike_melody_contour_repair_sweep_report(
         < _int(item.get("source_failure_label_count"))
     )
     technical_regression_count = repaired_failures.get("technical_gate_regression", 0)
+    repaired_not_evaluable = not_evaluable_counts(
+        relabeled,
+        key="contour_repaired_labeling",
+    )
+    repaired_outside_soloing_count = repaired_not_evaluable.get(
+        "outside_soloing_without_context",
+        0,
+    )
     target_supported = (
         total_after < total_before
         and repaired_songlike_count < source_songlike_count
@@ -424,6 +512,19 @@ def build_songlike_melody_contour_repair_sweep_report(
             "songlike_failure_delta": source_songlike_count - repaired_songlike_count,
             "improved_candidate_count": improved_count,
             "technical_regression_count": technical_regression_count,
+            "source_outside_soloing_repair_evidence_ready": bool(
+                followup["repair_sweep_source_outside_soloing_repair_evidence_ready"]
+            ),
+            "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                followup["repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "source_outside_soloing_not_evaluable_count": _int(
+                followup["repair_sweep_repaired_outside_soloing_not_evaluable_count"]
+            ),
+            "repaired_outside_soloing_not_evaluable_count": _int(
+                repaired_outside_soloing_count
+            ),
+            "repaired_not_evaluable_counts": dict(sorted(repaired_not_evaluable.items())),
             "repaired_failure_counts": dict(sorted(repaired_failures.items())),
             "target_supported": target_supported,
         },
@@ -446,6 +547,18 @@ def build_songlike_melody_contour_repair_sweep_report(
             "failure_label_delta": total_before - total_after,
             "songlike_failure_delta": source_songlike_count - repaired_songlike_count,
             "technical_regression_count": technical_regression_count,
+            "source_outside_soloing_repair_evidence_ready": bool(
+                followup["repair_sweep_source_outside_soloing_repair_evidence_ready"]
+            ),
+            "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                followup["repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "source_outside_soloing_not_evaluable_count": _int(
+                followup["repair_sweep_repaired_outside_soloing_not_evaluable_count"]
+            ),
+            "repaired_outside_soloing_not_evaluable_count": _int(
+                repaired_outside_soloing_count
+            ),
             "audio_package_ready": target_supported,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -565,6 +678,21 @@ def validate_songlike_melody_contour_repair_sweep_report(
         "songlike_failure_delta": _int(aggregate.get("songlike_failure_delta")),
         "improved_candidate_count": _int(aggregate.get("improved_candidate_count")),
         "technical_regression_count": _int(aggregate.get("technical_regression_count")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            aggregate.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            aggregate.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            aggregate.get("repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_not_evaluable_counts": _dict(
+            aggregate.get("repaired_not_evaluable_counts")
+        ),
         "repaired_failure_counts": _dict(aggregate.get("repaired_failure_counts")),
         "audio_package_ready": bool(readiness.get("audio_package_ready", False)),
         "human_audio_preference_claimed": bool(
@@ -601,6 +729,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- songlike failure delta: `{aggregate['songlike_failure_delta']}`",
         f"- improved candidate count: `{aggregate['improved_candidate_count']}`",
         f"- technical regression count: `{aggregate['technical_regression_count']}`",
+        f"- source outside-soloing repair evidence ready: `{_bool_token(aggregate['source_outside_soloing_repair_evidence_ready'])}`",
+        f"- source outside-soloing repair pitch-role risk after: `{aggregate['source_outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- source outside-soloing not evaluable count: `{aggregate['source_outside_soloing_not_evaluable_count']}`",
+        f"- repaired outside-soloing not evaluable count: `{aggregate['repaired_outside_soloing_not_evaluable_count']}`",
         f"- target supported: `{_bool_token(aggregate['target_supported'])}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         f"- MIDI-to-solo musical quality claimed: `{_bool_token(readiness['midi_to_solo_musical_quality_claimed'])}`",
@@ -609,6 +741,15 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
     ]
     for label, count in aggregate["repaired_failure_counts"].items():
+        lines.append(f"- `{label}`: `{count}`")
+    lines.extend(
+        [
+            "",
+            "## Repaired Not Evaluable Counts",
+            "",
+        ]
+    )
+    for label, count in aggregate["repaired_not_evaluable_counts"].items():
         lines.append(f"- `{label}`: `{count}`")
     lines.extend(["", "## MIDI Files", ""])
     for item in report.get("candidate_repairs", []):
@@ -647,7 +788,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=762)
+    parser.add_argument("--issue_number", type=int, default=846)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--min_candidate_count", type=int, default=6)

@@ -110,6 +110,14 @@ def followup_decision(*, quality_claim: bool = False) -> dict:
             "repaired_total_failure_label_count": 8,
             "failure_label_delta": 4,
             "technical_regression_count": 0,
+            "objective_source_outside_soloing_repair_evidence_ready": True,
+            "objective_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "objective_source_outside_soloing_not_evaluable_count": 6,
+            "objective_repaired_outside_soloing_not_evaluable_count": 6,
+            "repair_sweep_source_outside_soloing_repair_evidence_ready": True,
+            "repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "repair_sweep_source_outside_soloing_not_evaluable_count": 6,
+            "repair_sweep_repaired_outside_soloing_not_evaluable_count": 6,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
@@ -159,6 +167,10 @@ def targeted_repair_sweep(*, technical_regression_count: int = 0) -> dict:
             "failure_label_delta": 4,
             "improved_candidate_count": 4,
             "technical_regression_count": technical_regression_count,
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
             "repaired_failure_counts": {
                 "dead_air_or_density_gap": 1,
                 "phrase_shape_missing_tension_release": 2,
@@ -208,6 +220,14 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
             self.assertLess(summary["repaired_songlike_failure_count"], 5)
             self.assertGreater(summary["songlike_failure_delta"], 0)
             self.assertEqual(summary["technical_regression_count"], 0)
+            self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(
+                summary["repaired_not_evaluable_counts"]["outside_soloing_without_context"],
+                6,
+            )
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
@@ -232,6 +252,32 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
                     issue_number=762,
+                )
+
+    def test_rejects_missing_followup_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = followup_decision()
+            source["readiness"]["repair_sweep_repaired_outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairSweepError):
+                build_songlike_melody_contour_repair_sweep_report(
+                    followup_decision=source,
+                    targeted_repair_sweep=targeted_repair_sweep(),
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "songlike_repair",
+                    issue_number=846,
+                )
+
+    def test_rejects_missing_targeted_sweep_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = targeted_repair_sweep()
+            source["aggregate"]["source_outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairSweepError):
+                build_songlike_melody_contour_repair_sweep_report(
+                    followup_decision=followup_decision(),
+                    targeted_repair_sweep=source,
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "songlike_repair",
+                    issue_number=846,
                 )
 
     def test_constants_are_stable(self) -> None:
