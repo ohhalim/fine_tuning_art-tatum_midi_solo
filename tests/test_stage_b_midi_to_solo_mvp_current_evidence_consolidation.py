@@ -28,6 +28,7 @@ def reports(
     dead_air_failure_count: int = 0,
     pitch_contour_supported: bool = True,
     changed_ratio_repair_supported: bool = True,
+    outside_soloing_repair_supported: bool = True,
     collapse_count: int = 0,
     quality_claim: bool = False,
 ) -> dict[str, dict]:
@@ -297,6 +298,51 @@ def reports(
                 "critical_user_input_required": False,
             },
         },
+        "outside_soloing_repair_objective": {
+            "boundary": (
+                "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_"
+                "chord_tone_landing_outside_soloing_repair_objective_only_next_decision"
+            ),
+            "objective_summary": {
+                "review_item_count": 6,
+                "validated_review_input_present": False,
+                "preference_fill_allowed": False,
+                "technical_wav_validation": True,
+                "rendered_audio_file_count": 6,
+                "changed_note_total": 2,
+                "outside_soloing_pitch_role_risk_count_after": 0
+                if outside_soloing_repair_supported
+                else 1,
+                "outside_soloing_pitch_role_risk_delta": 2,
+                "outside_soloing_target_supported": outside_soloing_repair_supported,
+                "weak_chord_tone_landing_risk_count_after": 0,
+                "weak_landing_target_supported": True,
+                "final_landing_chord_tone_count_after": 6,
+                "final_landing_target_supported": True,
+                "max_non_chord_tone_run_after": 3,
+                "non_chord_run_target_supported": True,
+                "outside_soloing_repair_objective_path_supported": (
+                    outside_soloing_repair_supported
+                ),
+                "current_evidence_consolidation_ready": outside_soloing_repair_supported,
+            },
+            "readiness": {
+                "objective_next_completed": True,
+                "objective_next_decision_completed": True,
+                "human_audio_preference_claimed": False,
+                "midi_to_solo_musical_quality_claimed": quality_claim,
+                "audio_rendered_quality_claimed": False,
+                "model_checkpoint_generation_quality_claimed": False,
+                "model_direct_generation_quality_claimed": False,
+                "broad_trained_model_quality_claimed": False,
+                "brad_style_adaptation_claimed": False,
+                "production_ready_claimed": False,
+            },
+            "decision": {
+                "next_boundary": "stage_b_midi_to_solo_mvp_current_evidence_consolidation",
+                "critical_user_input_required": False,
+            },
+        },
     }
 
 
@@ -318,8 +364,11 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                 model_conditioned_pitch_contour_changed_ratio_repair_objective_next=data[
                     "model_conditioned_pitch_contour_changed_ratio_repair_objective"
                 ],
+                outside_soloing_repair_objective_next=data[
+                    "outside_soloing_repair_objective"
+                ],
                 output_dir=Path(tmp) / "out",
-                issue_number=728,
+                issue_number=812,
             )
             summary = validate_current_evidence_consolidation_report(
                 report,
@@ -332,6 +381,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                 min_objective_sample_count=9,
                 require_model_conditioned_pitch_contour_objective=True,
                 require_model_conditioned_pitch_contour_changed_ratio_repair_objective=True,
+                require_outside_soloing_repair_objective=True,
             )
 
             self.assertTrue(summary["midi_to_solo_mvp_current_evidence_supported"])
@@ -344,6 +394,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     "model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready"
                 ]
             )
+            self.assertTrue(summary["outside_soloing_repair_objective_path_ready"])
             self.assertEqual(summary["generation_source"], "context_conditioned_fallback")
             self.assertEqual(summary["exported_candidate_count"], 3)
             self.assertEqual(summary["rendered_audio_file_count"], 3)
@@ -386,6 +437,15 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     "model_conditioned_pitch_contour_changed_ratio_repair_changed_ratio_target_supported"
                 ]
             )
+            self.assertEqual(summary["outside_soloing_repair_rendered_audio_file_count"], 6)
+            self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
+            self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
+            self.assertTrue(summary["outside_soloing_repair_target_supported"])
+            self.assertTrue(summary["outside_soloing_repair_weak_landing_target_supported"])
+            self.assertTrue(summary["outside_soloing_repair_final_landing_target_supported"])
+            self.assertTrue(summary["outside_soloing_repair_non_chord_run_target_supported"])
+            self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
             self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
@@ -493,6 +553,31 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     ],
                     output_dir=Path(tmp) / "out",
                     issue_number=728,
+                )
+
+    def test_rejects_missing_outside_soloing_repair_support(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp), outside_soloing_repair_supported=False)
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
+                    model_conditioned_pitch_contour_objective_next=data[
+                        "model_conditioned_pitch_contour_objective"
+                    ],
+                    model_conditioned_pitch_contour_changed_ratio_repair_objective_next=data[
+                        "model_conditioned_pitch_contour_changed_ratio_repair_objective"
+                    ],
+                    outside_soloing_repair_objective_next=data[
+                        "outside_soloing_repair_objective"
+                    ],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=812,
                 )
 
     def test_boundary_constants_are_stable(self) -> None:
