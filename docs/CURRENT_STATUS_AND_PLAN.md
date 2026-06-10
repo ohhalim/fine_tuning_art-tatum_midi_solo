@@ -355,7 +355,11 @@
 - WAV duration range: `18.871s-19.000s`
 - technical WAV validation: `true`
 - changed note total: `2`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- source outside-soloing repair targeted: `false`
+- source outside-soloing residual risk preserved: `true`
 - outside-soloing pitch-role risk count: `2 -> 0`
+- outside-soloing repair targeted: `true`
 - weak chord-tone landing risk count after: `0`
 - final landing chord-tone count after: `6`
 - audio rendered quality claim: `false`
