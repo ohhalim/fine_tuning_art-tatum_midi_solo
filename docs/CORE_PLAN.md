@@ -11961,6 +11961,55 @@ Issue #1064는 Issue #1062 input guard의 source-context preserved flag를 objec
 
 - `Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh`
 
+## 9.223 Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
+
+Issue #1066은 Issue #1064 outside-soloing repair objective decision의 source-context preserved flag를 MVP current evidence consolidation까지 보존하고, current evidence support를 재검증한 작업이다.
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_CURRENT_EVIDENCE_CONSOLIDATION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- current MVP evidence supported: `true`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair source context preserved: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair objective path supported: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- broad trained model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+
+판단:
+
+- Issue #1064 objective decision의 preserved flag 3개가 current evidence outside-soloing repair objective path와 validation summary까지 유지됨.
+- selected-scale objective path, phrase-bank CLI technical path, model-conditioned pitch-contour path, changed-ratio repair path, outside-soloing repair path 모두 current evidence support에 포함.
+- human/audio preference, MIDI-to-solo musical quality, broad trained model quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- `.venv/bin/python -m py_compile scripts/consolidate_stage_b_midi_to_solo_mvp_current_evidence.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-current-evidence-consolidation`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo README evidence refresh source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
