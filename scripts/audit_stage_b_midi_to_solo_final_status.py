@@ -142,6 +142,24 @@ def build_final_status_audit_report(
         "outside_soloing_repair_changed_note_total": _int(
             delivery["outside_soloing_repair_changed_note_total"]
         ),
+        "outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
+            delivery["outside_soloing_repair_source_objective_pitch_role_risk_count"]
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_before": _int(
+            delivery["outside_soloing_repair_source_pitch_role_risk_count_before"]
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_after": _int(
+            delivery["outside_soloing_repair_source_pitch_role_risk_count_after"]
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_delta": _int(
+            delivery["outside_soloing_repair_source_pitch_role_risk_delta"]
+        ),
+        "outside_soloing_repair_source_targeted": bool(
+            delivery["outside_soloing_repair_source_targeted"]
+        ),
+        "outside_soloing_repair_source_residual_risk_preserved": bool(
+            delivery["outside_soloing_repair_source_residual_risk_preserved"]
+        ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             delivery["outside_soloing_repair_pitch_role_risk_count_after"]
         ),
@@ -259,6 +277,24 @@ def validate_final_status_audit_report(
         "outside_soloing_repair_changed_note_total": _int(
             final_status.get("outside_soloing_repair_changed_note_total")
         ),
+        "outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
+            final_status.get("outside_soloing_repair_source_objective_pitch_role_risk_count")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_before": _int(
+            final_status.get("outside_soloing_repair_source_pitch_role_risk_count_before")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_after": _int(
+            final_status.get("outside_soloing_repair_source_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_delta": _int(
+            final_status.get("outside_soloing_repair_source_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_source_targeted": bool(
+            final_status.get("outside_soloing_repair_source_targeted", True)
+        ),
+        "outside_soloing_repair_source_residual_risk_preserved": bool(
+            final_status.get("outside_soloing_repair_source_residual_risk_preserved", False)
+        ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             final_status.get("outside_soloing_repair_pitch_role_risk_count_after")
         ),
@@ -306,7 +342,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- changed-ratio repair WAV count: `{final_status['changed_ratio_repair_wav_count']}`",
         f"- outside-soloing repair WAV count: `{final_status['outside_soloing_repair_wav_count']}`",
         f"- outside-soloing repair changed note total: `{final_status['outside_soloing_repair_changed_note_total']}`",
-        f"- outside-soloing pitch-role risk after / delta: `{final_status['outside_soloing_repair_pitch_role_risk_count_after']}` / `{final_status['outside_soloing_repair_pitch_role_risk_delta']}`",
+        f"- outside-soloing source objective pitch-role risk: `{final_status['outside_soloing_repair_source_objective_pitch_role_risk_count']}`",
+        f"- outside-soloing source pitch-role risk before / after / delta: `{final_status['outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{final_status['outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{final_status['outside_soloing_repair_source_pitch_role_risk_delta']}`",
+        f"- outside-soloing source repair targeted: `{_bool_token(final_status['outside_soloing_repair_source_targeted'])}`",
+        f"- outside-soloing source residual risk preserved: `{_bool_token(final_status['outside_soloing_repair_source_residual_risk_preserved'])}`",
+        f"- outside-soloing current repair pitch-role risk after / delta: `{final_status['outside_soloing_repair_pitch_role_risk_count_after']}` / `{final_status['outside_soloing_repair_pitch_role_risk_delta']}`",
         f"- listening review quality gap open: `{_bool_token(final_status['listening_review_quality_gap_open'])}`",
         f"- raw artifact upload required: `{_bool_token(final_status['raw_artifact_upload_required'])}`",
         "",
