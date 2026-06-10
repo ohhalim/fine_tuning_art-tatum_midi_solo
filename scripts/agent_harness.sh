@@ -6457,9 +6457,9 @@ run_stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_deci
 }
 
 run_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision() {
-  local objective_run_id="${OBJECTIVE_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision}"
-  local sweep_run_id="${SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision}"
+  local objective_run_id="${OBJECTIVE_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision_source_context_refresh}"
+  local sweep_run_id="${SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_source_context_refresh}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision_source_context_refresh}"
   local objective_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision/${objective_run_id}/stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision.json"
   local sweep_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_repair_sweep/${sweep_run_id}/stage_b_midi_to_solo_songlike_melody_contour_repair_sweep.json"
   if [[ ! -f "$objective_report" ]]; then
@@ -6475,8 +6475,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision() {
     --run_id "$run_id" \
     --objective_next_report "$objective_report" \
     --repair_sweep_report "$sweep_report" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_FOLLOWUP_DECISION_2026-06-10.md \
-    --issue_number 856 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_FOLLOWUP_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 942 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep \
     --expected_target songlike_melody_contour_phrase_rhythm_repair_sweep \

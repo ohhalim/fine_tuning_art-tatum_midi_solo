@@ -1,6 +1,6 @@
 # Current Status and Plan
 
-작성일: 2026-06-10
+작성일: 2026-06-11
 
 ## Current Focus
 
@@ -33,10 +33,11 @@
 - latest songlike melody contour repair listening review package: Issue #936, Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh
 - latest songlike melody contour repair listening review input guard: Issue #938, Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh
 - latest songlike melody contour repair objective-only next decision: Issue #940, Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh
+- latest songlike melody contour repair follow-up decision: Issue #942, Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour repair objective-only next decision source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh`
+- open issue queue after songlike melody contour repair follow-up decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -158,6 +159,29 @@
 - current quality claim ready: `false`
 - next boundary: `songlike_melody_contour_repair_followup_decision`
 - 다음 follow-up target: `songlike_melody_contour_repair_followup_decision`
+- songlike melody contour repair follow-up decision source-context refresh 완료
+- selected target: `songlike_melody_contour_phrase_rhythm_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- primary remaining failure labels: `phrase_shape_missing_tension_release`, `rhythmic_monotony`
+- primary remaining failure count: `2`
+- candidate count: `6`
+- failure label delta: `4`
+- technical regression count: `0`
+- objective source outside-soloing source pitch-role risk count: `5 -> 2`
+- objective source outside-soloing source pitch-role risk delta: `3`
+- objective source outside-soloing source repair targeted: `false`
+- objective source outside-soloing source residual risk preserved: `true`
+- objective source outside-soloing current repair pitch-role risk count after / delta: `0 / 2`
+- repair sweep source outside-soloing source pitch-role risk count: `5 -> 2`
+- repair sweep source outside-soloing source pitch-role risk delta: `3`
+- repair sweep source outside-soloing source repair targeted: `false`
+- repair sweep source outside-soloing source residual risk preserved: `true`
+- repair sweep source outside-soloing current repair pitch-role risk count after / delta: `0 / 2`
+- objective source/repaired outside-soloing not evaluable count: `6/6`
+- repair sweep source/repaired outside-soloing not evaluable count: `6/6`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 repair target: `songlike_melody_contour_phrase_rhythm_repair_sweep`
 - songlike melody contour repair follow-up decision 완료
 - primary remaining failure labels: `phrase_shape_missing_tension_release`, `rhythmic_monotony`
 - primary remaining failure count: `2`
