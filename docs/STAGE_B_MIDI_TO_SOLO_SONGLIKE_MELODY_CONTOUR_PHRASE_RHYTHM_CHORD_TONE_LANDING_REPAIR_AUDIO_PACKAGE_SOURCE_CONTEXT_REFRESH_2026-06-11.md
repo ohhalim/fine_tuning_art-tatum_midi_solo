@@ -16,16 +16,19 @@
 - outside-soloing residual risk preserved: `true`
 - follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
 - follow-up objective source outside-soloing source pitch-role risk delta: `3`
+- follow-up objective source outside-soloing source context preserved: `true`
 - follow-up objective source outside-soloing source targeted: `false`
 - follow-up objective source outside-soloing source residual risk preserved: `true`
 - follow-up objective source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
 - follow-up repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
 - follow-up repair sweep source outside-soloing source pitch-role risk delta: `3`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source targeted: `false`
 - follow-up repair sweep source outside-soloing source residual risk preserved: `true`
 - follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
 - bridge repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
 - bridge repair sweep source outside-soloing source pitch-role risk delta: `3`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source targeted: `false`
 - bridge repair sweep source outside-soloing source residual risk preserved: `true`
 - bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
