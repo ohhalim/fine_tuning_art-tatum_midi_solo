@@ -11,7 +11,7 @@ from scripts.audit_stage_b_midi_to_solo_mvp_completion import (
     validate_mvp_completion_audit_report,
 )
 from scripts.consolidate_stage_b_midi_to_solo_mvp_current_evidence import (
-    BRIDGE_SOURCE_CONTEXT_KEYS,
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BOUNDARY as CURRENT_EVIDENCE_BOUNDARY,
 )
 
@@ -24,6 +24,7 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
@@ -31,6 +32,7 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
@@ -38,6 +40,7 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
 }
 
 
@@ -205,6 +208,9 @@ def readme_text(*, missing_boundary: bool = False) -> str:
             "- outside-soloing source pitch-role risk count: `5 -> 2`",
             "- outside-soloing source residual risk preserved: `true`",
             "- outside-soloing current repair pitch-role risk count after: `0`",
+            "- follow-up objective source outside-soloing source context preserved: `true`",
+            "- follow-up repair sweep source outside-soloing source context preserved: `true`",
+            "- bridge repair sweep source outside-soloing source context preserved: `true`",
             "- README evidence refreshed: `true`",
             "- human/audio preference claim: `false`",
             "- MIDI-to-solo musical quality claim: `false`",
@@ -326,7 +332,7 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_final_landing_target_supported"])
         self.assertTrue(summary["outside_soloing_repair_non_chord_run_target_supported"])
         self.assertFalse(summary["outside_soloing_repair_preference_fill_allowed"])
-        for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
             self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
 
@@ -341,6 +347,19 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
                 readme_text=readme_text(),
                 output_dir=Path("outputs/audit"),
                 issue_number=986,
+            )
+
+    def test_rejects_false_outside_soloing_source_context_preserved_flag(self) -> None:
+        evidence = current_evidence()
+        evidence["outside_soloing_repair_objective_path"][
+            "followup_repair_sweep_source_outside_soloing_source_context_preserved"
+        ] = False
+        with self.assertRaises(StageBMidiToSoloMvpCompletionAuditError):
+            build_mvp_completion_audit_report(
+                current_evidence=evidence,
+                readme_text=readme_text(),
+                output_dir=Path("outputs/audit"),
+                issue_number=1068,
             )
 
     def test_rejects_missing_readme_evidence_boundary(self) -> None:

@@ -54,10 +54,10 @@
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: Issue #1062, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: Issue #1064, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
-- latest README evidence refresh: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh
+- latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after MVP current evidence consolidation source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence refresh source-context refresh`
+- open issue queue after README evidence refresh source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5067,6 +5067,53 @@ Issue #1066은 Issue #1064 outside-soloing repair objective decision의 source-c
 다음:
 
 - `Stage B MIDI-to-solo README evidence refresh source-context refresh`
+
+## Stage B MIDI-to-Solo README Evidence Source-Context Refresh Result
+
+Issue #1068은 Issue #1066 MVP current evidence consolidation 결과를 README evidence block과 MVP completion audit README snippet guard에 반영한 문서/검증 정합성 작업이다.
+
+변경:
+
+- README latest evidence refresh를 #1068 기준으로 갱신
+- README current evidence block에 source-context preserved flag 3개 반영
+- MVP completion audit README snippet guard에 preserved flag 3개 필수화
+- false preserved flag 입력 차단 테스트 추가
+- generated evidence doc, current status, core plan, handoff scope 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_README_EVIDENCE_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- source boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- current MVP evidence supported: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- current repair outside-soloing pitch-role risk count after / delta: `0 / 2`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+
+판단:
+
+- README evidence refresh 완료 조건에 preserved flag 3개 포함.
+- current evidence의 source/current outside-soloing risk 분리 유지.
+- listening review input, human/audio preference, MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_completion_audit`
+- `.venv/bin/python -m py_compile scripts/audit_stage_b_midi_to_solo_mvp_completion.py`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음:
+
+- `Stage B MIDI-to-solo MVP completion audit source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

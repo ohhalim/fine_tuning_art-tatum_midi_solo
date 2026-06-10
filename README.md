@@ -48,9 +48,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: `Issue #1062`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: `Issue #1064`
 - latest MVP current evidence consolidation: `Issue #1066`
-- latest README evidence refresh: `Issue #984`
-- latest functional boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
-- open issue queue after MVP current evidence consolidation source-context refresh merge: `0`
+- latest README evidence refresh: `Issue #1068`
+- latest functional boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- open issue queue after README evidence refresh source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -445,6 +445,9 @@ MVP current evidence refresh.
 - model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - outside-soloing repair objective path ready: `true`
 - outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - outside-soloing repair rendered audio file count: `6`
 - outside-soloing repair changed note total: `2`
 - outside-soloing source objective pitch-role risk count: `5`
@@ -1135,6 +1138,9 @@ README evidence refresh.
 - outside-soloing source pitch-role risk count: `5 -> 2`
 - outside-soloing source residual risk preserved: `true`
 - outside-soloing current repair pitch-role risk count after: `0`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - quality/preference claim excluded: `true`
 - next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 

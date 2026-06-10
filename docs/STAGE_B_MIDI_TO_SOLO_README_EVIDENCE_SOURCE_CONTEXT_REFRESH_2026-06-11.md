@@ -21,6 +21,9 @@
 - source outside-soloing residual risk preserved: `true`
 - current repair outside-soloing pitch-role risk count after: `0`
 - current repair outside-soloing pitch-role risk delta: `2`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 
 ## Claim Boundary
 
@@ -32,11 +35,16 @@
 ## Decision
 
 - README current evidence block에 source/current repair context 분리 기록
+- README evidence block에 source-context preserved flag 3개 반영
+- MVP completion audit README snippet guard에 preserved flag 3개 필수화
 - source repair residual risk boundary 보존
 - current repair objective support만 반영
 - 다음 boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 
 ## Validation
 
-- `git diff --check`
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_completion_audit`
+- `.venv/bin/python -m py_compile scripts/audit_stage_b_midi_to_solo_mvp_completion.py`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit`
 - `bash scripts/agent_harness.sh quick`
+- `git diff --check`
