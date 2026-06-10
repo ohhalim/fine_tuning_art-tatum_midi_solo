@@ -48,6 +48,10 @@ REQUIRED_README_SNIPPETS = [
     "- input to ranked MIDI ready: `true`",
     "- input to rendered WAV evidence ready: `true`",
     "- changed-ratio repair audio evidence ready: `true`",
+    "- outside-soloing repair evidence ready: `true`",
+    "- outside-soloing repair WAV count: `6`",
+    "- outside-soloing pitch-role risk count after: `0`",
+    "- outside-soloing pitch-role risk delta: `2`",
     "- MVP delivery raw artifact upload required: `false`",
     "- human/audio preference claim: `false`",
     "- MIDI-to-solo musical quality claim: `false`",
@@ -124,8 +128,23 @@ def build_final_status_audit_report(
         "changed_ratio_repair_audio_evidence_ready": bool(
             delivery["changed_ratio_repair_audio_evidence_ready"]
         ),
+        "outside_soloing_repair_evidence_ready": bool(
+            delivery["outside_soloing_repair_evidence_ready"]
+        ),
         "cli_candidate_count": _int(delivery["cli_candidate_count"]),
         "changed_ratio_repair_wav_count": _int(delivery["changed_ratio_repair_wav_count"]),
+        "outside_soloing_repair_wav_count": _int(
+            delivery["outside_soloing_repair_wav_count"]
+        ),
+        "outside_soloing_repair_changed_note_total": _int(
+            delivery["outside_soloing_repair_changed_note_total"]
+        ),
+        "outside_soloing_repair_pitch_role_risk_count_after": _int(
+            delivery["outside_soloing_repair_pitch_role_risk_count_after"]
+        ),
+        "outside_soloing_repair_pitch_role_risk_delta": _int(
+            delivery["outside_soloing_repair_pitch_role_risk_delta"]
+        ),
         "listening_review_quality_gap_open": bool(delivery["listening_review_quality_gap_open"]),
         "raw_artifact_upload_required": bool(delivery["raw_artifact_upload_required"]),
         "human_audio_preference_claimed": bool(delivery["human_audio_preference_claimed"]),
@@ -228,6 +247,21 @@ def validate_final_status_audit_report(
         "changed_ratio_repair_wav_count": _int(
             final_status.get("changed_ratio_repair_wav_count")
         ),
+        "outside_soloing_repair_evidence_ready": bool(
+            final_status.get("outside_soloing_repair_evidence_ready", False)
+        ),
+        "outside_soloing_repair_wav_count": _int(
+            final_status.get("outside_soloing_repair_wav_count")
+        ),
+        "outside_soloing_repair_changed_note_total": _int(
+            final_status.get("outside_soloing_repair_changed_note_total")
+        ),
+        "outside_soloing_repair_pitch_role_risk_count_after": _int(
+            final_status.get("outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_pitch_role_risk_delta": _int(
+            final_status.get("outside_soloing_repair_pitch_role_risk_delta")
+        ),
         "listening_review_quality_gap_open": bool(
             final_status.get("listening_review_quality_gap_open", False)
         ),
@@ -264,8 +298,12 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- input to ranked MIDI ready: `{_bool_token(final_status['input_to_ranked_midi_ready'])}`",
         f"- input to rendered WAV evidence ready: `{_bool_token(final_status['input_to_rendered_wav_evidence_ready'])}`",
         f"- changed-ratio repair audio evidence ready: `{_bool_token(final_status['changed_ratio_repair_audio_evidence_ready'])}`",
+        f"- outside-soloing repair evidence ready: `{_bool_token(final_status['outside_soloing_repair_evidence_ready'])}`",
         f"- CLI candidate count: `{final_status['cli_candidate_count']}`",
         f"- changed-ratio repair WAV count: `{final_status['changed_ratio_repair_wav_count']}`",
+        f"- outside-soloing repair WAV count: `{final_status['outside_soloing_repair_wav_count']}`",
+        f"- outside-soloing repair changed note total: `{final_status['outside_soloing_repair_changed_note_total']}`",
+        f"- outside-soloing pitch-role risk after / delta: `{final_status['outside_soloing_repair_pitch_role_risk_count_after']}` / `{final_status['outside_soloing_repair_pitch_role_risk_delta']}`",
         f"- listening review quality gap open: `{_bool_token(final_status['listening_review_quality_gap_open'])}`",
         f"- raw artifact upload required: `{_bool_token(final_status['raw_artifact_upload_required'])}`",
         "",
