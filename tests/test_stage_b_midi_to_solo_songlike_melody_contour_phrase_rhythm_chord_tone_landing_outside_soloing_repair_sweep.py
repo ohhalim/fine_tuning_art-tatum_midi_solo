@@ -31,6 +31,7 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_objective_source_outside_soloing_source_targeted": False,
     "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -38,6 +39,7 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_source_targeted": False,
     "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -45,6 +47,7 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_source_targeted": False,
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -200,7 +203,7 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepTest(unittest.Tes
                 followup_report=followup_report(),
                 chord_tone_repair_sweep_report=chord_tone_repair_sweep_report(midi_paths),
                 output_dir=root / "outside_repair",
-                issue_number=886,
+                issue_number=1056,
             )
             summary = validate_outside_soloing_repair_sweep_report(
                 report,
@@ -241,17 +244,30 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepTest(unittest.Tes
                 ],
                 0,
             )
+            self.assertTrue(
+                summary[
+                    "followup_objective_source_outside_soloing_source_context_preserved"
+                ]
+            )
             self.assertEqual(
                 summary[
                     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta"
                 ],
                 3,
             )
+            self.assertTrue(
+                summary[
+                    "followup_repair_sweep_source_outside_soloing_source_context_preserved"
+                ]
+            )
             self.assertEqual(
                 summary[
                     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta"
                 ],
                 2,
+            )
+            self.assertTrue(
+                summary["repair_sweep_source_outside_soloing_source_context_preserved"]
             )
             self.assertGreater(summary["outside_soloing_pitch_role_risk_delta"], 0)
             self.assertEqual(summary["outside_soloing_pitch_role_risk_count_after"], 0)
@@ -281,7 +297,30 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepTest(unittest.Tes
                     followup_report=followup_report(quality_claim=True),
                     chord_tone_repair_sweep_report=chord_tone_repair_sweep_report(midi_paths),
                     output_dir=root / "outside_repair",
-                    issue_number=886,
+                    issue_number=1056,
+                )
+
+    def test_rejects_source_context_preservation_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            midi_paths = []
+            for index in range(6):
+                midi_path = root / f"candidate_{index}.mid"
+                write_outside_run_midi(midi_path)
+                midi_paths.append(midi_path)
+
+            report = followup_report()
+            report["readiness"][
+                "followup_repair_sweep_source_outside_soloing_source_context_preserved"
+            ] = False
+            with self.assertRaises(
+                StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError
+            ):
+                build_outside_soloing_repair_sweep_report(
+                    followup_report=report,
+                    chord_tone_repair_sweep_report=chord_tone_repair_sweep_report(midi_paths),
+                    output_dir=root / "outside_repair",
+                    issue_number=1056,
                 )
 
     def test_constants_are_stable(self) -> None:
