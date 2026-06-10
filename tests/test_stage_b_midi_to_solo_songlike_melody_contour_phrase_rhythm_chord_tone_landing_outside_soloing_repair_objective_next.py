@@ -14,6 +14,34 @@ from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_ch
     BOUNDARY as SOURCE_BOUNDARY,
     OBJECTIVE_NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
 )
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
+    BRIDGE_SOURCE_CONTEXT_KEYS,
+)
+
+
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
 
 
 SOURCE_SUMMARY = {
@@ -36,6 +64,7 @@ SOURCE_SUMMARY = {
     "final_landing_chord_tone_count_after": 6,
     "max_non_chord_tone_run_after": 3,
     "audio_review_required": True,
+    **SOURCE_CONTEXT,
 }
 
 
@@ -78,7 +107,7 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
         report = build_objective_next_report(
             input_guard_report=input_guard(),
             output_dir="out",
-            issue_number=894,
+            issue_number=980,
             max_non_chord_tone_run_threshold=3,
             min_final_landing_chord_tone_count=6,
         )
@@ -118,6 +147,10 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
         self.assertTrue(summary["non_chord_run_target_supported"])
         self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
         self.assertTrue(summary["current_evidence_consolidation_ready"])
+        for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            self.assertIn(key, report["objective_summary"])
+            self.assertIn(key, report["readiness"])
+            self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
 
@@ -127,7 +160,7 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
         report = build_objective_next_report(
             input_guard_report=input_guard(source_summary=broken_summary),
             output_dir="out",
-            issue_number=894,
+            issue_number=980,
             max_non_chord_tone_run_threshold=3,
             min_final_landing_chord_tone_count=6,
         )
@@ -149,7 +182,7 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
             build_objective_next_report(
                 input_guard_report=input_guard(preference_fill_allowed=True),
                 output_dir="out",
-                issue_number=894,
+                issue_number=980,
                 max_non_chord_tone_run_threshold=3,
                 min_final_landing_chord_tone_count=6,
             )
@@ -159,7 +192,7 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
             build_objective_next_report(
                 input_guard_report=input_guard(quality_claim=True),
                 output_dir="out",
-                issue_number=894,
+                issue_number=980,
                 max_non_chord_tone_run_threshold=3,
                 min_final_landing_chord_tone_count=6,
             )

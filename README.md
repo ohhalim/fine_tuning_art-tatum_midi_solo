@@ -46,9 +46,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: `Issue #974`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: `Issue #976`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: `Issue #978`
+- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: `Issue #980`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input_guard`
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision`
+- open issue queue after songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -123,6 +124,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase/rhythm chord-tone landing outside-soloing repair input guard completed: `true`
 - phrase/rhythm chord-tone landing outside-soloing repair preference fill allowed: `false`
 - phrase/rhythm chord-tone landing outside-soloing repair required input fields: `4`
+- phrase/rhythm chord-tone landing outside-soloing repair objective next decision completed: `true`
+- phrase/rhythm chord-tone landing outside-soloing repair selected target: `current_evidence_consolidation`
+- phrase/rhythm chord-tone landing outside-soloing repair objective path supported: `true`
+- phrase/rhythm chord-tone landing outside-soloing repair current evidence consolidation ready: `true`
 - phrase/rhythm repair technical WAV validation: `true`
 - phrase/rhythm repair source outside-soloing pitch-role risk: `5 -> 2`
 - phrase/rhythm repair current outside-soloing pitch-role risk after / delta: `0 / 2`
