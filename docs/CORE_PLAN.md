@@ -5899,6 +5899,49 @@ Issue #818은 quality gap decision에 Issue #816 MVP completion audit의 outside
 
 - `Stage B MIDI-to-solo listening review quality gap refresh`
 
+## 9.101 Stage B MIDI-to-solo listening review quality gap outside-soloing repair refresh
+
+Issue #820은 listening review quality gap 경계에 Issue #818 quality gap decision의 outside-soloing repair evidence를 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- source boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- next boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- selected target: `mvp_delivery_package`
+- listening review quality gap open: `true`
+- technical MVP delivery package ready: `true`
+- changed-ratio repair objective completed: `true`
+- outside-soloing repair objective completed: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair target supported: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair pitch-role risk delta: `2`
+- musical quality MVP completed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- delivery package 이전 quality gap summary에 outside-soloing repair objective evidence 추가.
+- changed-ratio repair와 outside-soloing repair target support를 모두 delivery package readiness 전제로 검증.
+- listening review quality gap은 open 유지.
+- musical quality, human/audio preference, broad trained-model quality claim 제외 유지.
+- 다음 boundary는 MVP delivery package refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_listening_review_quality_gap`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_listening_review_quality_gap.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-listening-review-quality-gap`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo MVP delivery package refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

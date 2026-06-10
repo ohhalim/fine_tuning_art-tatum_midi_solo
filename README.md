@@ -140,6 +140,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - current evidence outside-soloing repair objective path included: `true`
 - listening review quality gap completed: `true`
 - listening review quality gap open: `true`
+- listening review quality gap outside-soloing repair objective included: `true`
 - MVP delivery package completed: `true`
 - runnable CLI ready: `true`
 - input to ranked MIDI ready: `true`
