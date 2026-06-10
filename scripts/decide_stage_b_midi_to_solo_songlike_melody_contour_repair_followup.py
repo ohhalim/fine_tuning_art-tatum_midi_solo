@@ -14,6 +14,9 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
+from scripts.audit_stage_b_midi_to_solo_final_status import (  # noqa: E402
+    BRIDGE_SOURCE_CONTEXT_KEYS,
+)
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next import (  # noqa: E402
     BOUNDARY as OBJECTIVE_NEXT_BOUNDARY,
     FOLLOWUP_DECISION_NEXT_BOUNDARY,
@@ -30,7 +33,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(ValueErro
 BOUNDARY = "stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep"
 SELECTED_TARGET = "songlike_melody_contour_phrase_rhythm_repair_sweep"
-SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision_v2"
+SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision_v3"
 TIE_TARGET_LABELS = (
     "phrase_shape_missing_tension_release",
     "rhythmic_monotony",
@@ -76,8 +79,23 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
         )
 
 
-def _source_context_fields(source: dict[str, Any]) -> dict[str, Any]:
+def _bridge_source_context_fields(source: dict[str, Any], *, label: str) -> dict[str, Any]:
+    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        if key not in source or source[key] is None:
+            raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+                f"{label} source-context field required: {key}"
+            )
+    return {key: source[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
+
+
+def _source_context_fields(source: dict[str, Any], *, label: str) -> dict[str, Any]:
     return {
+        "objective_source_outside_soloing_repair_source_context_preserved": bool(
+            source.get(
+                "objective_source_outside_soloing_repair_source_context_preserved",
+                False,
+            )
+        ),
         "objective_source_outside_soloing_repair_wav_count": _int(
             source.get("objective_source_outside_soloing_repair_wav_count")
         ),
@@ -117,6 +135,9 @@ def _source_context_fields(source: dict[str, Any]) -> dict[str, Any]:
         "source_outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
             source.get("source_outside_soloing_repair_source_objective_pitch_role_risk_count")
         ),
+        "source_outside_soloing_repair_source_context_preserved": bool(
+            source.get("source_outside_soloing_repair_source_context_preserved", False)
+        ),
         "source_outside_soloing_repair_source_pitch_role_risk_count_before": _int(
             source.get("source_outside_soloing_repair_source_pitch_role_risk_count_before")
         ),
@@ -138,6 +159,7 @@ def _source_context_fields(source: dict[str, Any]) -> dict[str, Any]:
         "source_outside_soloing_repair_pitch_role_risk_delta": _int(
             source.get("source_outside_soloing_repair_pitch_role_risk_delta")
         ),
+        **_bridge_source_context_fields(source, label=label),
     }
 
 
@@ -168,6 +190,10 @@ def _validate_source_context(source: dict[str, Any], *, base: str, label: str) -
         raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
             f"{label} source-targeted flag should remain false"
         )
+    if not bool(source.get(f"{base}_source_context_preserved", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
+            f"{label} source context preservation required"
+        )
     if not bool(source.get(f"{base}_source_residual_risk_preserved", False)):
         raise StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError(
             f"{label} source residual risk preservation required"
@@ -184,17 +210,26 @@ def _validate_source_context(source: dict[str, Any], *, base: str, label: str) -
 
 def _objective_context_for_followup(source: dict[str, Any]) -> dict[str, Any]:
     return {
-        key: value
-        for key, value in _source_context_fields(source).items()
-        if key.startswith("objective_source_outside_soloing_repair_")
+        **{
+            key: value
+            for key, value in _source_context_fields(source, label="objective follow-up").items()
+            if key.startswith("objective_source_outside_soloing_repair_")
+        },
+        **{f"objective_{key}": source[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS},
     }
 
 
 def _repair_sweep_context_for_followup(source: dict[str, Any]) -> dict[str, Any]:
     return {
-        f"repair_sweep_{key}": value
-        for key, value in _source_context_fields(source).items()
-        if key.startswith("source_outside_soloing_repair_")
+        **{
+            f"repair_sweep_{key}": value
+            for key, value in _source_context_fields(
+                source,
+                label="repair sweep follow-up",
+            ).items()
+            if key.startswith("source_outside_soloing_repair_")
+        },
+        **{f"repair_sweep_{key}": source[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS},
     }
 
 
@@ -291,7 +326,7 @@ def validate_objective_next_source(report: dict[str, Any]) -> dict[str, Any]:
         "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
             summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")
         ),
-        **_source_context_fields(summary),
+        **_source_context_fields(summary, label="objective summary"),
         "source_outside_soloing_not_evaluable_count": _int(
             summary.get("source_outside_soloing_not_evaluable_count")
         ),
@@ -419,7 +454,7 @@ def validate_repair_sweep_source(report: dict[str, Any]) -> dict[str, Any]:
         "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
             aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")
         ),
-        **_source_context_fields(aggregate),
+        **_source_context_fields(aggregate, label="repair sweep aggregate"),
         "source_outside_soloing_not_evaluable_count": _int(
             aggregate.get("source_outside_soloing_not_evaluable_count")
         ),
@@ -691,6 +726,9 @@ def validate_followup_decision_report(
                 "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count"
             )
         ),
+        "objective_source_outside_soloing_repair_source_context_preserved": bool(
+            targets.get("objective_source_outside_soloing_repair_source_context_preserved", False)
+        ),
         "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": _int(
             targets.get(
                 "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before"
@@ -716,6 +754,7 @@ def validate_followup_decision_report(
         "objective_source_outside_soloing_repair_pitch_role_risk_delta": _int(
             targets.get("objective_source_outside_soloing_repair_pitch_role_risk_delta")
         ),
+        **{f"objective_{key}": targets.get(f"objective_{key}") for key in BRIDGE_SOURCE_CONTEXT_KEYS},
         "repair_sweep_source_outside_soloing_repair_evidence_ready": bool(
             targets.get("repair_sweep_source_outside_soloing_repair_evidence_ready", False)
         ),
@@ -731,6 +770,12 @@ def validate_followup_decision_report(
         "repair_sweep_source_outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
             targets.get(
                 "repair_sweep_source_outside_soloing_repair_source_objective_pitch_role_risk_count"
+            )
+        ),
+        "repair_sweep_source_outside_soloing_repair_source_context_preserved": bool(
+            targets.get(
+                "repair_sweep_source_outside_soloing_repair_source_context_preserved",
+                False,
             )
         ),
         "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_before": _int(
@@ -758,6 +803,10 @@ def validate_followup_decision_report(
         "repair_sweep_source_outside_soloing_repair_pitch_role_risk_delta": _int(
             targets.get("repair_sweep_source_outside_soloing_repair_pitch_role_risk_delta")
         ),
+        **{
+            f"repair_sweep_{key}": targets.get(f"repair_sweep_{key}")
+            for key in BRIDGE_SOURCE_CONTEXT_KEYS
+        },
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)
         ),
@@ -796,6 +845,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- technical regression count: `{readiness['technical_regression_count']}`",
         f"- objective source outside-soloing repair evidence ready: `{_bool_token(readiness['objective_source_outside_soloing_repair_evidence_ready'])}`",
         f"- objective source outside-soloing repair WAV count: `{readiness['objective_source_outside_soloing_repair_wav_count']}`",
+        f"- objective source outside-soloing source context preserved: `{_bool_token(readiness['objective_source_outside_soloing_repair_source_context_preserved'])}`",
         f"- objective source outside-soloing source pitch-role risk before / after / delta: `{readiness['objective_source_outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{readiness['objective_source_outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{readiness['objective_source_outside_soloing_repair_source_pitch_role_risk_delta']}`",
         f"- objective source outside-soloing source repair targeted: `{_bool_token(readiness['objective_source_outside_soloing_repair_source_targeted'])}`",
         f"- objective source outside-soloing source residual risk preserved: `{_bool_token(readiness['objective_source_outside_soloing_repair_source_residual_risk_preserved'])}`",
@@ -804,6 +854,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- objective source outside-soloing not evaluable count: `{readiness['objective_source_outside_soloing_not_evaluable_count']}`",
         f"- objective repaired outside-soloing not evaluable count: `{readiness['objective_repaired_outside_soloing_not_evaluable_count']}`",
         f"- repair sweep source outside-soloing repair evidence ready: `{_bool_token(readiness['repair_sweep_source_outside_soloing_repair_evidence_ready'])}`",
+        f"- repair sweep source outside-soloing source context preserved: `{_bool_token(readiness['repair_sweep_source_outside_soloing_repair_source_context_preserved'])}`",
         f"- repair sweep source outside-soloing source pitch-role risk before / after / delta: `{readiness['repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{readiness['repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{readiness['repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_delta']}`",
         f"- repair sweep source outside-soloing source repair targeted: `{_bool_token(readiness['repair_sweep_source_outside_soloing_repair_source_targeted'])}`",
         f"- repair sweep source outside-soloing source residual risk preserved: `{_bool_token(readiness['repair_sweep_source_outside_soloing_repair_source_residual_risk_preserved'])}`",
