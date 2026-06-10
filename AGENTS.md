@@ -44,10 +44,11 @@ Current handoff scope:
 - Latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision completed: Issue #958, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh.
 - Latest songlike melody contour phrase/rhythm chord-tone landing repair sweep completed: Issue #960, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh.
 - Latest songlike melody contour phrase/rhythm chord-tone landing repair audio package completed: Issue #962, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh.
+- Latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package completed: Issue #964, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh.
 - Latest documentation issue completed: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh.
+- Open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -87,7 +88,7 @@ If the host UI still asks for tool approval, that is a runtime permission gate o
 
 Keep public GitHub artifacts project-focused and tool-neutral.
 
-- Do not include assistant/tool names in branch names, issue titles, issue bodies, PR titles, PR bodies, or commit messages unless the user explicitly asks.
+- Do not include implementation tool names in branch names, issue titles, issue bodies, PR titles, PR bodies, or commit messages unless the user explicitly asks.
 - Do not use PR title prefixes that identify the implementation tool.
 - Use neutral branch names such as `issue-123-short-topic`, `docs/short-topic`, `feat/short-topic`, or `fix/short-topic`.
 - Use issue and PR titles that describe the project change directly, for example `Stage B phrase duration repair` or `포트폴리오용 README 정리`.
