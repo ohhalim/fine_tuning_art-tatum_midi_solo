@@ -49,6 +49,12 @@ def quality_gap_decision(
             "pitch_contour_changed_ratio_repair_target_supported": changed_ratio_supported,
             "outside_soloing_repair_objective_path_ready": outside_soloing_repair_supported,
             "outside_soloing_repair_target_supported": outside_soloing_repair_supported,
+            "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+            "outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+            "outside_soloing_repair_source_pitch_role_risk_delta": 3,
+            "outside_soloing_repair_source_targeted": False,
+            "outside_soloing_repair_source_residual_risk_preserved": True,
             "human_review_required_now": False,
         },
         "mvp_completion_summary": {
@@ -126,6 +132,21 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_target_supported"])
         self.assertEqual(summary["outside_soloing_repair_rendered_audio_file_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
+        self.assertEqual(
+            summary["outside_soloing_repair_source_objective_pitch_role_risk_count"],
+            5,
+        )
+        self.assertEqual(
+            summary["outside_soloing_repair_source_pitch_role_risk_count_before"],
+            5,
+        )
+        self.assertEqual(
+            summary["outside_soloing_repair_source_pitch_role_risk_count_after"],
+            2,
+        )
+        self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_delta"], 3)
+        self.assertFalse(summary["outside_soloing_repair_source_targeted"])
+        self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
         self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
@@ -175,6 +196,41 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
                 ),
                 output_dir=Path("outputs/listening_review_quality_gap"),
                 issue_number=820,
+            )
+
+    def test_rejects_missing_outside_soloing_source_context(self) -> None:
+        source = quality_gap_decision()
+        source["quality_gap"].pop("outside_soloing_repair_source_residual_risk_preserved")
+
+        with self.assertRaises(StageBMidiToSoloListeningReviewQualityGapError):
+            build_listening_review_quality_gap_report(
+                quality_gap_decision=source,
+                output_dir=Path("outputs/listening_review_quality_gap"),
+                issue_number=906,
+            )
+
+    def test_rejects_targeted_outside_soloing_source_repair(self) -> None:
+        source = quality_gap_decision()
+        source["quality_gap"]["outside_soloing_repair_source_targeted"] = True
+
+        with self.assertRaises(StageBMidiToSoloListeningReviewQualityGapError):
+            build_listening_review_quality_gap_report(
+                quality_gap_decision=source,
+                output_dir=Path("outputs/listening_review_quality_gap"),
+                issue_number=906,
+            )
+
+    def test_rejects_outside_soloing_source_risk_delta_mismatch(self) -> None:
+        source = quality_gap_decision()
+        source["quality_gap"][
+            "outside_soloing_repair_source_pitch_role_risk_delta"
+        ] = 2
+
+        with self.assertRaises(StageBMidiToSoloListeningReviewQualityGapError):
+            build_listening_review_quality_gap_report(
+                quality_gap_decision=source,
+                output_dir=Path("outputs/listening_review_quality_gap"),
+                issue_number=906,
             )
 
     def test_rejects_quality_claim(self) -> None:

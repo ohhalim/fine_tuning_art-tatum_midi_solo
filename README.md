@@ -9,9 +9,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest functional result: `Issue #898`
 - latest MVP completion audit: `Issue #902`
 - latest quality gap decision: `Issue #904`
+- latest listening review quality gap: `Issue #906`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_quality_gap_decision`
-- open issue queue after quality gap decision source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- open issue queue after listening review quality gap source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -152,6 +153,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - listening review quality gap completed: `true`
 - listening review quality gap open: `true`
 - listening review quality gap outside-soloing repair objective included: `true`
+- listening review quality gap outside-soloing source context included: `true`
 - MVP delivery package completed: `true`
 - runnable CLI ready: `true`
 - input to ranked MIDI ready: `true`
@@ -309,6 +311,10 @@ Listening review quality gap.
 - changed-ratio repair objective completed: `true`
 - changed-ratio repair max ratio / target: `0.4348 / 0.5000`
 - changed-ratio repair max interval / target: `12 / 12`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
+- outside-soloing current repair pitch-role risk count after: `0`
 - listening review quality gap open: `true`
 - technical MVP delivery package ready: `true`
 - human/audio preference claimed: `false`
