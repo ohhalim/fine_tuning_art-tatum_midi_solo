@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #808, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision`
+- latest functional result: Issue #810, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation`
 
 현재 범위가 아닌 것:
 
@@ -328,6 +328,17 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 decision target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision`
+- songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision 완료
+- selected target: `current_evidence_consolidation`
+- outside-soloing target supported: `true`
+- weak landing target supported: `true`
+- final landing target supported: `true`
+- non-chord run target supported: `true`
+- outside-soloing repair objective path supported: `true`
+- current evidence consolidation ready: `true`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 consolidation target: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
