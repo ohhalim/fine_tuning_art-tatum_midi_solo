@@ -50,11 +50,6 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
 }
 
-AUDIO_PROPAGATED_SOURCE_CONTEXT_KEYS = tuple(
-    key for key in SOURCE_CONTEXT if not key.endswith("_context_preserved")
-)
-
-
 def write_midi(path: Path) -> None:
     midi = pretty_midi.PrettyMIDI(initial_tempo=124)
     midi.time_signature_changes.append(pretty_midi.TimeSignature(4, 4, 0.0))
@@ -216,8 +211,7 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioTest(unittest.Tes
             self.assertTrue(summary["outside_soloing_repair_targeted"])
             self.assertEqual(summary["weak_chord_tone_landing_risk_count_after"], 0)
             self.assertEqual(summary["max_non_chord_tone_run_after"], 3)
-            for key in AUDIO_PROPAGATED_SOURCE_CONTEXT_KEYS:
-                value = SOURCE_CONTEXT[key]
+            for key, value in SOURCE_CONTEXT.items():
                 self.assertEqual(report["summary"][key], value)
                 self.assertEqual(report["audio_render_boundary"][key], value)
                 self.assertEqual(summary[key], value)
@@ -237,6 +231,30 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioTest(unittest.Tes
             ):
                 build_audio_render_report(
                     source_report(root, quality_claim=True),
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    runner=fake_runner,
+                )
+
+    def test_rejects_source_context_preservation_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            report = source_report(root)
+            report["aggregate"][
+                "repair_sweep_source_outside_soloing_source_context_preserved"
+            ] = False
+            with self.assertRaises(
+                StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError
+            ):
+                build_audio_render_report(
+                    report,
                     output_dir=root / "audio_package",
                     renderer_path=str(renderer),
                     soundfont_path=str(soundfont),
