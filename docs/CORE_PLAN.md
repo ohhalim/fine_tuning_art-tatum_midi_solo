@@ -6266,6 +6266,43 @@ Issue #836은 targeted quality repair audio package에 repair sweep outside-solo
 
 - `Stage B MIDI-to-solo targeted quality repair listening review package refresh`
 
+## 9.110 Stage B MIDI-to-solo targeted quality repair listening review package outside-soloing context refresh
+
+Issue #838은 targeted quality repair listening review package에 audio package outside-soloing context를 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
+- review item count: `6`
+- validated review input: `false`
+- technical WAV validation: `true`
+- source outside-soloing repair pitch-role risk count after: `0`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- human/audio preference claimed: `false`
+- audio rendered quality claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- listening review package가 audio package outside-soloing not_evaluable boundary를 보존.
+- review input은 pending 유지.
+- 음악적 품질, human/audio preference, audio rendered quality claim 제외 유지.
+- 다음 boundary는 listening review input guard refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_targeted_quality_repair_listening_review_package.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-listening-review-package`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo targeted quality repair listening review input guard refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

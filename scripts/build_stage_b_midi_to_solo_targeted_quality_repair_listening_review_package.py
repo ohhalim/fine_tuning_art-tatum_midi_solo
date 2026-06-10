@@ -108,6 +108,22 @@ def validate_audio_package_report(
         raise StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError(
             "audio review requirement should be recorded"
         )
+    if not bool(summary.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError(
+            "outside-soloing repair evidence readiness required"
+        )
+    if _int(summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError(
+            "outside-soloing residual pitch-role risk should be zero"
+        )
+    if _int(summary.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError(
+            "source outside-soloing not-evaluable boundary required"
+        )
+    if _int(summary.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError(
+            "repaired outside-soloing not-evaluable boundary required"
+        )
     if _int(boundary.get("rendered_audio_file_count")) < int(expected_count):
         raise StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError(
             "rendered audio count below expected"
@@ -191,6 +207,18 @@ def build_listening_review_package_report(
             "failure_label_delta": _int(summary.get("failure_label_delta")),
             "improved_candidate_count": _int(summary.get("improved_candidate_count")),
             "technical_regression_count": _int(summary.get("technical_regression_count")),
+            "source_outside_soloing_repair_evidence_ready": bool(
+                summary.get("source_outside_soloing_repair_evidence_ready", False)
+            ),
+            "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+            ),
+            "source_outside_soloing_not_evaluable_count": _int(
+                summary.get("source_outside_soloing_not_evaluable_count")
+            ),
+            "repaired_outside_soloing_not_evaluable_count": _int(
+                summary.get("repaired_outside_soloing_not_evaluable_count")
+            ),
             "audio_review_required": bool(summary.get("audio_review_required", False)),
         },
         "review_package": {
@@ -291,6 +319,18 @@ def validate_listening_review_package_report(
         "duration_min_seconds": _float(source.get("duration_min_seconds")),
         "duration_max_seconds": _float(source.get("duration_max_seconds")),
         "failure_label_delta": _int(source.get("failure_label_delta")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            source.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            source.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            source.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            source.get("repaired_outside_soloing_not_evaluable_count")
+        ),
         "audio_review_required": bool(source.get("audio_review_required", False)),
         "human_review_required_now": bool(readiness.get("human_review_required_now", True)),
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
@@ -322,6 +362,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- rendered audio file count: `{source['rendered_audio_file_count']}`",
         f"- duration range: `{source['duration_min_seconds']:.3f}s-{source['duration_max_seconds']:.3f}s`",
         f"- failure label delta: `{source['failure_label_delta']}`",
+        f"- source outside-soloing repair evidence ready: `{_bool_token(source['source_outside_soloing_repair_evidence_ready'])}`",
+        f"- source outside-soloing repair pitch-role risk after: `{source['source_outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- source outside-soloing not evaluable count: `{source['source_outside_soloing_not_evaluable_count']}`",
+        f"- repaired outside-soloing not evaluable count: `{source['repaired_outside_soloing_not_evaluable_count']}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         "",
         "## Review Items",
