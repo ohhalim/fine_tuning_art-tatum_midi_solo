@@ -7,7 +7,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 ## 현재 상태
 
 - latest functional result: `Issue #982`
-- latest MVP completion audit: `Issue #902`
+- latest MVP completion audit: `Issue #986`
 - latest quality gap decision: `Issue #904`
 - latest listening review quality gap: `Issue #906`
 - latest MVP delivery package: `Issue #908`
@@ -218,6 +218,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit changed-ratio repair objective included: `true`
 - MVP completion audit outside-soloing repair objective included: `true`
 - MVP completion audit outside-soloing source context included: `true`
+- MVP completion audit outside-soloing source context preserved: `true`
 - quality gap decision completed: `true`
 - quality gap decision listening review target selected: `true`
 - quality gap decision outside-soloing repair objective included: `true`

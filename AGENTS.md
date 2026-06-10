@@ -13,7 +13,7 @@ Primary goal:
 Current handoff scope:
 
 - Latest functional issue completed: Issue #982, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh.
-- Latest audit issue completed: Issue #902, Stage B MIDI-to-solo MVP completion audit source-context refresh.
+- Latest audit issue completed: Issue #986, Stage B MIDI-to-solo MVP completion audit source-context refresh.
 - Latest quality gap decision completed: Issue #904, Stage B MIDI-to-solo quality gap decision source-context refresh.
 - Latest listening review quality gap completed: Issue #906, Stage B MIDI-to-solo listening review quality gap source-context refresh.
 - Latest MVP delivery package completed: Issue #908, Stage B MIDI-to-solo MVP delivery package source-context refresh.
@@ -55,8 +55,8 @@ Current handoff scope:
 - Latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision completed: Issue #980, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh.
 - Latest documentation issue completed: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after README evidence source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo MVP completion audit source-context refresh.
+- Open issue queue after MVP completion audit source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo quality gap decision source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
