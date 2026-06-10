@@ -27,10 +27,11 @@ Current handoff scope:
 - Latest targeted quality repair listening review package completed: Issue #924, Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh.
 - Latest targeted quality repair listening review input guard completed: Issue #926, Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh.
 - Latest targeted quality repair objective-only next decision completed: Issue #928, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh.
+- Latest targeted quality repair follow-up decision completed: Issue #930, Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh.
 - Latest documentation issue completed: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after targeted quality repair objective-only next decision source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh.
+- Open issue queue after targeted quality repair follow-up decision source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -242,6 +243,16 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-objec
 This harness routes pending listening review input to the next objective-only
 follow-up boundary, preserves source/current outside-soloing repair context,
 and avoids preference or musical quality claims.
+
+For Stage B MIDI-to-solo targeted quality repair follow-up decision changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-followup-decision
+```
+
+This harness selects the dominant remaining repair target, preserves
+source/current outside-soloing repair context, and avoids preference or musical
+quality claims.
 
 For Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep changes, run:
 

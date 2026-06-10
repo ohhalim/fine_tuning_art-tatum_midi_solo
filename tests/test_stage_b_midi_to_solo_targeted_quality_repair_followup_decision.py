@@ -32,7 +32,15 @@ def objective_next_report(*, quality_claim: bool = False) -> dict:
             "rendered_audio_file_count": 6,
             "failure_label_delta": 4,
             "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_wav_count": 6,
+            "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+            "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+            "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
+            "source_outside_soloing_repair_source_targeted": False,
+            "source_outside_soloing_repair_source_residual_risk_preserved": True,
             "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_repair_pitch_role_risk_delta": 2,
             "source_outside_soloing_not_evaluable_count": 6,
             "repaired_outside_soloing_not_evaluable_count": 6,
             "current_quality_claim_ready": False,
@@ -79,7 +87,14 @@ def repair_sweep_report(*, technical_regression_count: int = 0) -> dict:
             "improved_candidate_count": 4,
             "technical_regression_count": technical_regression_count,
             "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+            "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+            "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
+            "source_outside_soloing_repair_source_targeted": False,
+            "source_outside_soloing_repair_source_residual_risk_preserved": True,
             "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_repair_pitch_role_risk_delta": 2,
             "source_outside_soloing_not_evaluable_count": 6,
             "repaired_outside_soloing_not_evaluable_count": 6,
             "repaired_failure_counts": {
@@ -135,16 +150,74 @@ class StageBMidiToSoloTargetedQualityRepairFollowupDecisionTest(unittest.TestCas
             self.assertEqual(summary["failure_label_delta"], 4)
             self.assertEqual(summary["technical_regression_count"], 0)
             self.assertTrue(summary["objective_source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["objective_source_outside_soloing_repair_wav_count"], 6)
+            self.assertEqual(
+                summary[
+                    "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary[
+                    "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary[
+                    "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after"
+                ],
+                2,
+            )
+            self.assertEqual(
+                summary["objective_source_outside_soloing_repair_source_pitch_role_risk_delta"],
+                3,
+            )
+            self.assertFalse(summary["objective_source_outside_soloing_repair_source_targeted"])
+            self.assertTrue(
+                summary["objective_source_outside_soloing_repair_source_residual_risk_preserved"]
+            )
             self.assertEqual(
                 summary["objective_source_outside_soloing_repair_pitch_role_risk_count_after"],
                 0,
             )
+            self.assertEqual(summary["objective_source_outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["objective_source_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["objective_repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertTrue(summary["repair_sweep_source_outside_soloing_repair_evidence_ready"])
             self.assertEqual(
+                summary[
+                    "repair_sweep_source_outside_soloing_repair_source_objective_pitch_role_risk_count"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary[
+                    "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_before"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary[
+                    "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_after"
+                ],
+                2,
+            )
+            self.assertEqual(
+                summary["repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_delta"],
+                3,
+            )
+            self.assertFalse(summary["repair_sweep_source_outside_soloing_repair_source_targeted"])
+            self.assertTrue(
+                summary["repair_sweep_source_outside_soloing_repair_source_residual_risk_preserved"]
+            )
+            self.assertEqual(
                 summary["repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after"],
                 0,
+            )
+            self.assertEqual(
+                summary["repair_sweep_source_outside_soloing_repair_pitch_role_risk_delta"],
+                2,
             )
             self.assertEqual(summary["repair_sweep_source_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["repair_sweep_repaired_outside_soloing_not_evaluable_count"], 6)
@@ -152,6 +225,10 @@ class StageBMidiToSoloTargetedQualityRepairFollowupDecisionTest(unittest.TestCas
             self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
+            self.assertEqual(
+                summary["next_recommended_issue"],
+                "Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh",
+            )
 
     def test_rejects_objective_quality_claim(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -203,6 +280,22 @@ class StageBMidiToSoloTargetedQualityRepairFollowupDecisionTest(unittest.TestCas
                     repair_sweep_report=source,
                     output_dir=Path(tmp) / "followup",
                     issue_number=844,
+                )
+
+    def test_rejects_objective_source_risk_delta_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = objective_next_report()
+            source["objective_summary"][
+                "source_outside_soloing_repair_source_pitch_role_risk_delta"
+            ] = 1
+            with self.assertRaises(
+                StageBMidiToSoloTargetedQualityRepairFollowupDecisionError
+            ):
+                build_followup_decision_report(
+                    objective_next_report=source,
+                    repair_sweep_report=repair_sweep_report(),
+                    output_dir=Path(tmp) / "followup",
+                    issue_number=930,
                 )
 
     def test_constants_are_stable(self) -> None:
