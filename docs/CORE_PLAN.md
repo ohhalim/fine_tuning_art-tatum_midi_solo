@@ -6109,6 +6109,44 @@ Issue #828은 post-MVP quality iteration plan의 final status source validation�
 
 - `Stage B MIDI-to-solo quality rubric baseline refresh`
 
+## 9.106 Stage B MIDI-to-solo quality rubric outside-soloing repair evidence refresh
+
+Issue #830은 quality rubric baseline에 post-MVP outside-soloing repair evidence context를 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- source boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- next boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- selected target: `candidate_failure_labeling`
+- rubric item count: `8`
+- required metric group count: `30`
+- candidate failure labeling ready: `true`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair WAV count: `6`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing label scope: `remaining context/listening quality risk after objective pitch-role repair`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- quality rubric source validation이 post-MVP outside-soloing repair readiness/count/risk summary를 요구.
+- outside-soloing rubric은 residual pitch-role repair 대상이 아니라 context/listening quality risk labeling 대상으로 유지.
+- 음악적 품질, human/audio preference, broad trained-model quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_quality_rubric_baseline`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_quality_rubric_baseline.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-quality-rubric-baseline`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo candidate failure labeling refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
