@@ -38,7 +38,7 @@ REPAIR_NEXT_BOUNDARY = "stage_b_midi_to_solo_targeted_quality_repair_sweep"
 AUDIO_REVIEW_NEXT_BOUNDARY = "stage_b_midi_to_solo_audio_review_package"
 REPAIR_TARGET = "targeted_quality_repair_sweep"
 AUDIO_REVIEW_TARGET = "audio_review_package"
-SCHEMA_VERSION = "stage_b_midi_to_solo_candidate_failure_labeling_v1"
+SCHEMA_VERSION = "stage_b_midi_to_solo_candidate_failure_labeling_v2"
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -116,6 +116,36 @@ def validate_rubric_baseline(report: dict[str, Any]) -> dict[str, Any]:
     if _int(summary.get("outside_soloing_repair_pitch_role_risk_count_after")) != 0:
         raise StageBMidiToSoloCandidateFailureLabelingError(
             "outside-soloing residual pitch-role risk should be zero"
+        )
+    source_objective_risk = _int(
+        summary.get("outside_soloing_repair_source_objective_pitch_role_risk_count")
+    )
+    source_risk_before = _int(
+        summary.get("outside_soloing_repair_source_pitch_role_risk_count_before")
+    )
+    source_risk_after = _int(
+        summary.get("outside_soloing_repair_source_pitch_role_risk_count_after")
+    )
+    source_risk_delta = _int(summary.get("outside_soloing_repair_source_pitch_role_risk_delta"))
+    if source_objective_risk <= 0:
+        raise StageBMidiToSoloCandidateFailureLabelingError(
+            "outside-soloing source objective pitch-role risk count required"
+        )
+    if source_risk_after > source_risk_before:
+        raise StageBMidiToSoloCandidateFailureLabelingError(
+            "outside-soloing source pitch-role risk should not increase"
+        )
+    if source_risk_delta != source_risk_before - source_risk_after:
+        raise StageBMidiToSoloCandidateFailureLabelingError(
+            "outside-soloing source pitch-role risk delta mismatch"
+        )
+    if bool(summary.get("outside_soloing_repair_source_targeted", True)):
+        raise StageBMidiToSoloCandidateFailureLabelingError(
+            "outside-soloing source repair should remain non-targeted"
+        )
+    if not bool(summary.get("outside_soloing_repair_source_residual_risk_preserved", False)):
+        raise StageBMidiToSoloCandidateFailureLabelingError(
+            "outside-soloing source residual risk preservation required"
         )
     return {**summary, "rubric_items": rubric_items}
 
@@ -483,8 +513,29 @@ def build_candidate_failure_labeling_report(
         "outside_soloing_repair_wav_count": _int(
             rubric_summary["outside_soloing_repair_wav_count"]
         ),
+        "outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
+            rubric_summary["outside_soloing_repair_source_objective_pitch_role_risk_count"]
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_before": _int(
+            rubric_summary["outside_soloing_repair_source_pitch_role_risk_count_before"]
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_after": _int(
+            rubric_summary["outside_soloing_repair_source_pitch_role_risk_count_after"]
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_delta": _int(
+            rubric_summary["outside_soloing_repair_source_pitch_role_risk_delta"]
+        ),
+        "outside_soloing_repair_source_targeted": bool(
+            rubric_summary["outside_soloing_repair_source_targeted"]
+        ),
+        "outside_soloing_repair_source_residual_risk_preserved": bool(
+            rubric_summary["outside_soloing_repair_source_residual_risk_preserved"]
+        ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             rubric_summary["outside_soloing_repair_pitch_role_risk_count_after"]
+        ),
+        "outside_soloing_repair_pitch_role_risk_delta": _int(
+            rubric_summary.get("outside_soloing_repair_pitch_role_risk_delta")
         ),
         "outside_soloing_not_evaluable_count": _int(
             not_evaluable_counts.get("outside_soloing_without_context", 0)
@@ -552,9 +603,9 @@ def build_candidate_failure_labeling_report(
             "broad_trained_model_quality",
         ],
         "next_recommended_issue": (
-            "Stage B MIDI-to-solo targeted quality repair sweep"
+            "Stage B MIDI-to-solo targeted quality repair sweep source-context refresh"
             if failed_candidate_count > 0
-            else "Stage B MIDI-to-solo audio review package"
+            else "Stage B MIDI-to-solo audio review package source-context refresh"
         ),
     }
 
@@ -615,8 +666,29 @@ def validate_candidate_failure_labeling_report(
         "outside_soloing_repair_wav_count": _int(
             aggregate.get("outside_soloing_repair_wav_count")
         ),
+        "outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
+            aggregate.get("outside_soloing_repair_source_objective_pitch_role_risk_count")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_before": _int(
+            aggregate.get("outside_soloing_repair_source_pitch_role_risk_count_before")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_after": _int(
+            aggregate.get("outside_soloing_repair_source_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_delta": _int(
+            aggregate.get("outside_soloing_repair_source_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_source_targeted": bool(
+            aggregate.get("outside_soloing_repair_source_targeted", True)
+        ),
+        "outside_soloing_repair_source_residual_risk_preserved": bool(
+            aggregate.get("outside_soloing_repair_source_residual_risk_preserved", False)
+        ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             aggregate.get("outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_pitch_role_risk_delta": _int(
+            aggregate.get("outside_soloing_repair_pitch_role_risk_delta")
         ),
         "outside_soloing_not_evaluable_count": _int(
             aggregate.get("outside_soloing_not_evaluable_count")
@@ -641,7 +713,7 @@ def markdown_report(report: dict[str, Any]) -> str:
     selected = report["selected_next_target"]
     readiness = report["readiness"]
     lines = [
-        "# Stage B MIDI-to-Solo Candidate Failure Labeling",
+        "# Stage B MIDI-to-Solo Candidate Failure Labeling Source Context Refresh",
         "",
         "## Summary",
         "",
@@ -653,7 +725,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- failed candidate count: `{aggregate['failed_candidate_count']}`",
         f"- outside-soloing repair evidence ready: `{_bool_token(aggregate['outside_soloing_repair_evidence_ready'])}`",
         f"- outside-soloing repair WAV count: `{aggregate['outside_soloing_repair_wav_count']}`",
-        f"- outside-soloing pitch-role risk after: `{aggregate['outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- outside-soloing source objective pitch-role risk: `{aggregate['outside_soloing_repair_source_objective_pitch_role_risk_count']}`",
+        f"- outside-soloing source pitch-role risk before / after / delta: `{aggregate['outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{aggregate['outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{aggregate['outside_soloing_repair_source_pitch_role_risk_delta']}`",
+        f"- outside-soloing source repair targeted: `{_bool_token(aggregate['outside_soloing_repair_source_targeted'])}`",
+        f"- outside-soloing source residual risk preserved: `{_bool_token(aggregate['outside_soloing_repair_source_residual_risk_preserved'])}`",
+        f"- outside-soloing current repair pitch-role risk after / delta: `{aggregate['outside_soloing_repair_pitch_role_risk_count_after']}` / `{aggregate['outside_soloing_repair_pitch_role_risk_delta']}`",
         f"- outside-soloing not evaluable count: `{aggregate['outside_soloing_not_evaluable_count']}`",
         f"- targeted quality repair sweep ready: `{_bool_token(readiness['targeted_quality_repair_sweep_ready'])}`",
         "",

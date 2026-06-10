@@ -21,10 +21,11 @@
 - latest final status audit: Issue #912, Stage B MIDI-to-solo final status audit source-context refresh
 - latest post-MVP quality iteration plan: Issue #914, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
 - latest quality rubric baseline: Issue #916, Stage B MIDI-to-solo quality rubric baseline source-context refresh
+- latest candidate failure labeling: Issue #918, Stage B MIDI-to-solo candidate failure labeling source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after quality rubric baseline source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo candidate failure labeling source-context refresh`
+- open issue queue after candidate failure labeling source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair sweep source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -101,7 +102,7 @@
 - final status audit 완료
 - post-MVP quality iteration plan source-context refresh 완료
 - quality rubric baseline source-context refresh 완료
-- candidate failure labeling 완료
+- candidate failure labeling source-context refresh 완료
 - targeted quality repair objective-only next decision 완료
 - targeted quality repair follow-up decision 완료
 - 남은 dominant failure label: `songlike_melody_not_soloing` = `5`
@@ -586,12 +587,20 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 labeling target: `stage_b_midi_to_solo_candidate_failure_labeling`
-- candidate failure labeling outside-soloing repair context refresh 완료
+- candidate failure labeling source-context refresh 완료
 - candidate count: `6`
 - failed candidate count: `6`
+- failure label type count: `4`
+- not evaluable label type count: `2`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair WAV count: `6`
-- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing source objective pitch-role risk count: `5`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source pitch-role risk delta: `3`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
+- outside-soloing current repair pitch-role risk count after: `0`
+- outside-soloing current repair pitch-role risk delta: `2`
 - outside-soloing not evaluable count: `6`
 - targeted quality repair sweep ready: `true`
 - human/audio preference claim: `false`
