@@ -9,6 +9,7 @@ from typing import Sequence
 
 import pretty_midi
 
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
 from scripts.render_stage_b_midi_to_solo_targeted_quality_repair_audio import (
     BOUNDARY,
     NEXT_BOUNDARY,
@@ -20,6 +21,31 @@ from scripts.run_stage_b_midi_to_solo_targeted_quality_repair_sweep import (
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
 )
+
+
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
 
 
 def write_midi(path: Path, pitches: list[int]) -> None:
@@ -91,6 +117,7 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "technical_regression_count": 0,
             "repaired_failure_counts": {"songlike_melody_not_soloing": 5},
             "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_source_context_preserved": True,
             "source_outside_soloing_repair_wav_count": 6,
             "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
             "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
@@ -102,6 +129,7 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "source_outside_soloing_repair_pitch_role_risk_delta": 2,
             "source_outside_soloing_not_evaluable_count": 6,
             "repaired_outside_soloing_not_evaluable_count": 6,
+            **SOURCE_CONTEXT,
             "target_supported": True,
         },
         "selected_next_target": {
@@ -166,6 +194,7 @@ class StageBMidiToSoloTargetedQualityRepairAudioTest(unittest.TestCase):
             self.assertEqual(summary["failure_label_delta"], 7)
             self.assertEqual(summary["technical_regression_count"], 0)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
             self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
             self.assertEqual(
                 summary["source_outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
@@ -183,6 +212,8 @@ class StageBMidiToSoloTargetedQualityRepairAudioTest(unittest.TestCase):
             self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
+            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+                self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertTrue(summary["audio_review_required"])
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
@@ -218,6 +249,28 @@ class StageBMidiToSoloTargetedQualityRepairAudioTest(unittest.TestCase):
             soundfont.write_bytes(b"sf2")
             source = source_report(root)
             source["aggregate"]["repaired_outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairAudioError):
+                build_audio_render_report(
+                    source,
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    runner=fake_runner,
+                )
+
+    def test_rejects_missing_source_context_field(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            source = source_report(root)
+            source["aggregate"].pop(
+                "followup_objective_source_outside_soloing_source_pitch_role_risk_delta"
+            )
             with self.assertRaises(StageBMidiToSoloTargetedQualityRepairAudioError):
                 build_audio_render_report(
                     source,
