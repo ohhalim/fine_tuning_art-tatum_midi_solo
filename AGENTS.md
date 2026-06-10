@@ -39,7 +39,7 @@ Current handoff scope:
 - Latest songlike melody contour phrase/rhythm repair listening review package completed: Issue #1032, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh.
 - Latest songlike melody contour phrase/rhythm repair listening review input guard completed: Issue #1034, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh.
 - Latest songlike melody contour phrase/rhythm repair objective-only next decision completed: Issue #1036, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh.
-- Latest songlike melody contour phrase/rhythm repair follow-up decision completed: Issue #954, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh.
+- Latest songlike melody contour phrase/rhythm repair follow-up decision completed: Issue #1038, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh.
 - Latest songlike melody contour phrase/rhythm chord-context pitch-role bridge completed: Issue #956, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh.
 - Latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision completed: Issue #958, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh.
 - Latest songlike melody contour phrase/rhythm chord-tone landing repair sweep completed: Issue #960, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh.
@@ -56,7 +56,7 @@ Current handoff scope:
 - Latest documentation issue completed: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
 - Open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh.
+- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
