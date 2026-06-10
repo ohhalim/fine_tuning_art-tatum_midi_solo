@@ -28,7 +28,7 @@ class StageBMidiToSoloPostMvpQualityIterationPlanError(ValueError):
 BOUNDARY = "stage_b_midi_to_solo_post_mvp_quality_iteration_plan"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_quality_rubric_baseline"
 SELECTED_TARGET = "quality_rubric_baseline"
-SCHEMA_VERSION = "stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v1"
+SCHEMA_VERSION = "stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v2"
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -119,6 +119,38 @@ def validate_final_status_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloPostMvpQualityIterationPlanError(
             "outside-soloing residual pitch-role risk should be zero"
         )
+    source_objective_risk = _int(
+        summary.get("outside_soloing_repair_source_objective_pitch_role_risk_count")
+    )
+    source_risk_before = _int(
+        summary.get("outside_soloing_repair_source_pitch_role_risk_count_before")
+    )
+    source_risk_after = _int(
+        summary.get("outside_soloing_repair_source_pitch_role_risk_count_after")
+    )
+    source_risk_delta = _int(
+        summary.get("outside_soloing_repair_source_pitch_role_risk_delta")
+    )
+    if source_objective_risk <= 0:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing source objective pitch-role risk count required"
+        )
+    if source_risk_after > source_risk_before:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing source pitch-role risk should not increase"
+        )
+    if source_risk_delta != source_risk_before - source_risk_after:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing source pitch-role risk delta mismatch"
+        )
+    if bool(summary.get("outside_soloing_repair_source_targeted", True)):
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing source repair should remain non-targeted"
+        )
+    if not bool(summary.get("outside_soloing_repair_source_residual_risk_preserved", False)):
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing source residual risk preservation required"
+        )
     if not bool(summary.get("listening_review_quality_gap_open", False)):
         raise StageBMidiToSoloPostMvpQualityIterationPlanError(
             "listening review quality gap should remain open"
@@ -194,6 +226,24 @@ def build_post_mvp_quality_iteration_plan_report(
             "outside_soloing_repair_changed_note_total": _int(
                 source["outside_soloing_repair_changed_note_total"]
             ),
+            "outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
+                source["outside_soloing_repair_source_objective_pitch_role_risk_count"]
+            ),
+            "outside_soloing_repair_source_pitch_role_risk_count_before": _int(
+                source["outside_soloing_repair_source_pitch_role_risk_count_before"]
+            ),
+            "outside_soloing_repair_source_pitch_role_risk_count_after": _int(
+                source["outside_soloing_repair_source_pitch_role_risk_count_after"]
+            ),
+            "outside_soloing_repair_source_pitch_role_risk_delta": _int(
+                source["outside_soloing_repair_source_pitch_role_risk_delta"]
+            ),
+            "outside_soloing_repair_source_targeted": bool(
+                source["outside_soloing_repair_source_targeted"]
+            ),
+            "outside_soloing_repair_source_residual_risk_preserved": bool(
+                source["outside_soloing_repair_source_residual_risk_preserved"]
+            ),
             "outside_soloing_repair_pitch_role_risk_count_after": _int(
                 source["outside_soloing_repair_pitch_role_risk_count_after"]
             ),
@@ -256,7 +306,7 @@ def build_post_mvp_quality_iteration_plan_report(
             "midi_to_solo_musical_quality",
             "broad_trained_model_quality",
         ],
-        "next_recommended_issue": "Stage B MIDI-to-solo quality rubric baseline",
+        "next_recommended_issue": "Stage B MIDI-to-solo quality rubric baseline source-context refresh",
     }
 
 
@@ -321,6 +371,24 @@ def validate_post_mvp_quality_iteration_plan_report(
         "outside_soloing_repair_changed_note_total": _int(
             post_mvp_status.get("outside_soloing_repair_changed_note_total")
         ),
+        "outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
+            post_mvp_status.get("outside_soloing_repair_source_objective_pitch_role_risk_count")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_before": _int(
+            post_mvp_status.get("outside_soloing_repair_source_pitch_role_risk_count_before")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_after": _int(
+            post_mvp_status.get("outside_soloing_repair_source_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_delta": _int(
+            post_mvp_status.get("outside_soloing_repair_source_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_source_targeted": bool(
+            post_mvp_status.get("outside_soloing_repair_source_targeted", True)
+        ),
+        "outside_soloing_repair_source_residual_risk_preserved": bool(
+            post_mvp_status.get("outside_soloing_repair_source_residual_risk_preserved", False)
+        ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             post_mvp_status.get("outside_soloing_repair_pitch_role_risk_count_after")
         ),
@@ -358,7 +426,7 @@ def markdown_report(report: dict[str, Any]) -> str:
     selected = report["selected_next_target"]
     readiness = report["readiness"]
     lines = [
-        "# Stage B MIDI-to-Solo Post-MVP Quality Iteration Plan",
+        "# Stage B MIDI-to-Solo Post-MVP Quality Iteration Plan Source Context Refresh",
         "",
         "## Summary",
         "",
@@ -370,7 +438,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- local review ready: `{_bool_token(status['local_review_ready'])}`",
         f"- outside-soloing repair evidence ready: `{_bool_token(status['outside_soloing_repair_evidence_ready'])}`",
         f"- outside-soloing repair WAV count: `{status['outside_soloing_repair_wav_count']}`",
-        f"- outside-soloing pitch-role risk after / delta: `{status['outside_soloing_repair_pitch_role_risk_count_after']}` / `{status['outside_soloing_repair_pitch_role_risk_delta']}`",
+        f"- outside-soloing source objective pitch-role risk: `{status['outside_soloing_repair_source_objective_pitch_role_risk_count']}`",
+        f"- outside-soloing source pitch-role risk before / after / delta: `{status['outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{status['outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{status['outside_soloing_repair_source_pitch_role_risk_delta']}`",
+        f"- outside-soloing source repair targeted: `{_bool_token(status['outside_soloing_repair_source_targeted'])}`",
+        f"- outside-soloing source residual risk preserved: `{_bool_token(status['outside_soloing_repair_source_residual_risk_preserved'])}`",
+        f"- outside-soloing current repair pitch-role risk after / delta: `{status['outside_soloing_repair_pitch_role_risk_count_after']}` / `{status['outside_soloing_repair_pitch_role_risk_delta']}`",
         "",
         "## Required Work",
         "",

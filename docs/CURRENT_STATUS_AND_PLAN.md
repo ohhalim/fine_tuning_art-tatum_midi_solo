@@ -19,10 +19,11 @@
 - latest MVP delivery package: Issue #908, Stage B MIDI-to-solo MVP delivery package source-context refresh
 - latest README final evidence refresh: Issue #910, Stage B MIDI-to-solo README final evidence source-context refresh
 - latest final status audit: Issue #912, Stage B MIDI-to-solo final status audit source-context refresh
+- latest post-MVP quality iteration plan: Issue #914, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after final status audit source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh`
+- open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo quality rubric baseline source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -97,7 +98,7 @@
 - MVP delivery package manifest 생성 완료
 - README final evidence refresh 완료
 - final status audit 완료
-- post-MVP musical quality iteration plan 완료
+- post-MVP quality iteration plan source-context refresh 완료
 - quality rubric baseline 완료
 - candidate failure labeling 완료
 - targeted quality repair objective-only next decision 완료
@@ -550,11 +551,17 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 plan target: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
-- post-MVP quality iteration outside-soloing repair refresh 완료
+- post-MVP quality iteration plan source-context refresh 완료
 - selected target: `quality_rubric_baseline`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair WAV count: `6`
-- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing source objective pitch-role risk count: `5`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source pitch-role risk delta: `3`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
+- outside-soloing current repair pitch-role risk count after: `0`
+- outside-soloing current repair pitch-role risk delta: `2`
 - quality rubric required: `true`
 - candidate failure labeling required: `true`
 - targeted quality repair sweep required: `true`

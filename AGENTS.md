@@ -19,10 +19,11 @@ Current handoff scope:
 - Latest MVP delivery package completed: Issue #908, Stage B MIDI-to-solo MVP delivery package source-context refresh.
 - Latest README final evidence refresh completed: Issue #910, Stage B MIDI-to-solo README final evidence source-context refresh.
 - Latest final status audit completed: Issue #912, Stage B MIDI-to-solo final status audit source-context refresh.
+- Latest post-MVP quality iteration plan completed: Issue #914, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh.
 - Latest documentation issue completed: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after final status audit source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh.
+- Open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo quality rubric baseline source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -156,6 +157,16 @@ For changes that touch inference behavior, metrics, generation, or model loading
 ```bash
 bash scripts/agent_harness.sh demo
 ```
+
+For Stage B MIDI-to-solo post-MVP quality iteration plan changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-post-mvp-quality-iteration-plan
+```
+
+This harness selects the quality rubric baseline after technical MVP completion,
+preserves source/current outside-soloing repair context, and avoids musical
+quality or preference claims.
 
 For Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep changes, run:
 
