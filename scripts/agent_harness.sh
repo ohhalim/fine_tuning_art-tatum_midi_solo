@@ -6760,7 +6760,7 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landin
 
 run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard() {
   local package_run_id="${PACKAGE_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_source_context_refresh}"
-  local guard_run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard}"
+  local guard_run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard_source_context_refresh}"
   local source_package="outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package/${package_run_id}/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package.json"
   if [[ ! -f "$source_package" ]]; then
     print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package"
@@ -6770,8 +6770,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landin
   "$PYTHON_BIN" scripts/guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input.py \
     --run_id "$guard_run_id" \
     --source_package "$source_package" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_REPAIR_LISTENING_REVIEW_INPUT_GUARD_2026-06-10.md \
-    --issue_number 880 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_REPAIR_LISTENING_REVIEW_INPUT_GUARD_2026-06-11.md \
+    --issue_number 966 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision \
     --require_guard_completed \
@@ -6780,7 +6780,7 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landin
 }
 
 run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision() {
-  local input_guard_run_id="${INPUT_GUARD_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard}"
+  local input_guard_run_id="${INPUT_GUARD_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard_source_context_refresh}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision}"
   local input_guard_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard/${input_guard_run_id}/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard.json"
   if [[ ! -f "$input_guard_report" ]]; then
