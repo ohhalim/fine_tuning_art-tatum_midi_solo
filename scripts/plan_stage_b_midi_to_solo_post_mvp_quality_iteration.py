@@ -107,6 +107,18 @@ def validate_final_status_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloPostMvpQualityIterationPlanError(
             "changed-ratio repair WAV count below 3"
         )
+    if not bool(summary.get("outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing repair evidence readiness required"
+        )
+    if _int(summary.get("outside_soloing_repair_wav_count")) < 6:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing repair WAV count below 6"
+        )
+    if _int(summary.get("outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing residual pitch-role risk should be zero"
+        )
     if not bool(summary.get("listening_review_quality_gap_open", False)):
         raise StageBMidiToSoloPostMvpQualityIterationPlanError(
             "listening review quality gap should remain open"
@@ -173,6 +185,21 @@ def build_post_mvp_quality_iteration_plan_report(
             "readme_final_evidence_reflected": bool(source["readme_final_evidence_reflected"]),
             "cli_candidate_count": _int(source["cli_candidate_count"]),
             "changed_ratio_repair_wav_count": _int(source["changed_ratio_repair_wav_count"]),
+            "outside_soloing_repair_evidence_ready": bool(
+                source["outside_soloing_repair_evidence_ready"]
+            ),
+            "outside_soloing_repair_wav_count": _int(
+                source["outside_soloing_repair_wav_count"]
+            ),
+            "outside_soloing_repair_changed_note_total": _int(
+                source["outside_soloing_repair_changed_note_total"]
+            ),
+            "outside_soloing_repair_pitch_role_risk_count_after": _int(
+                source["outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "outside_soloing_repair_pitch_role_risk_delta": _int(
+                source["outside_soloing_repair_pitch_role_risk_delta"]
+            ),
             "listening_review_quality_gap_open": bool(
                 source["listening_review_quality_gap_open"]
             ),
@@ -285,6 +312,21 @@ def validate_post_mvp_quality_iteration_plan_report(
         "technical_mvp_complete": bool(post_mvp_status.get("technical_mvp_complete", False)),
         "local_review_ready": bool(post_mvp_status.get("local_review_ready", False)),
         "quality_rubric_required": bool(readiness.get("quality_rubric_required", False)),
+        "outside_soloing_repair_evidence_ready": bool(
+            post_mvp_status.get("outside_soloing_repair_evidence_ready", False)
+        ),
+        "outside_soloing_repair_wav_count": _int(
+            post_mvp_status.get("outside_soloing_repair_wav_count")
+        ),
+        "outside_soloing_repair_changed_note_total": _int(
+            post_mvp_status.get("outside_soloing_repair_changed_note_total")
+        ),
+        "outside_soloing_repair_pitch_role_risk_count_after": _int(
+            post_mvp_status.get("outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_pitch_role_risk_delta": _int(
+            post_mvp_status.get("outside_soloing_repair_pitch_role_risk_delta")
+        ),
         "candidate_failure_labeling_required": bool(
             readiness.get("candidate_failure_labeling_required", False)
         ),
@@ -326,6 +368,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- selected target: `{selected['selected_target']}`",
         f"- technical MVP complete: `{_bool_token(status['technical_mvp_complete'])}`",
         f"- local review ready: `{_bool_token(status['local_review_ready'])}`",
+        f"- outside-soloing repair evidence ready: `{_bool_token(status['outside_soloing_repair_evidence_ready'])}`",
+        f"- outside-soloing repair WAV count: `{status['outside_soloing_repair_wav_count']}`",
+        f"- outside-soloing pitch-role risk after / delta: `{status['outside_soloing_repair_pitch_role_risk_count_after']}` / `{status['outside_soloing_repair_pitch_role_risk_delta']}`",
         "",
         "## Required Work",
         "",

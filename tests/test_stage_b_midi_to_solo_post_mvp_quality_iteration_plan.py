@@ -23,6 +23,9 @@ def final_status_audit(
     listening_gap_open: bool = True,
     cli_count: int = 3,
     wav_count: int = 3,
+    outside_ready: bool = True,
+    outside_wav_count: int = 6,
+    outside_risk_after: int = 0,
 ) -> dict:
     return {
         "boundary": FINAL_STATUS_BOUNDARY,
@@ -36,6 +39,11 @@ def final_status_audit(
             "changed_ratio_repair_audio_evidence_ready": True,
             "cli_candidate_count": cli_count,
             "changed_ratio_repair_wav_count": wav_count,
+            "outside_soloing_repair_evidence_ready": outside_ready,
+            "outside_soloing_repair_wav_count": outside_wav_count,
+            "outside_soloing_repair_changed_note_total": 2,
+            "outside_soloing_repair_pitch_role_risk_count_after": outside_risk_after,
+            "outside_soloing_repair_pitch_role_risk_delta": 2,
             "listening_review_quality_gap_open": listening_gap_open,
             "raw_artifact_upload_required": False,
             "human_audio_preference_claimed": False,
@@ -84,6 +92,11 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
         self.assertTrue(summary["local_review_ready"])
         self.assertEqual(summary["selected_target"], SELECTED_TARGET)
         self.assertTrue(summary["quality_rubric_required"])
+        self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
+        self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
+        self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
+        self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
+        self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
         self.assertTrue(summary["candidate_failure_labeling_required"])
         self.assertTrue(summary["targeted_quality_repair_sweep_required"])
         self.assertTrue(summary["audio_review_package_required"])
@@ -132,6 +145,26 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
         with self.assertRaises(StageBMidiToSoloPostMvpQualityIterationPlanError):
             build_post_mvp_quality_iteration_plan_report(
                 final_status_audit=final_status_audit(wav_count=2),
+                output_dir=Path("outputs/post_mvp_quality"),
+                issue_number=744,
+            )
+
+    def test_rejects_incomplete_outside_soloing_repair_evidence(self) -> None:
+        with self.assertRaises(StageBMidiToSoloPostMvpQualityIterationPlanError):
+            build_post_mvp_quality_iteration_plan_report(
+                final_status_audit=final_status_audit(outside_ready=False),
+                output_dir=Path("outputs/post_mvp_quality"),
+                issue_number=744,
+            )
+        with self.assertRaises(StageBMidiToSoloPostMvpQualityIterationPlanError):
+            build_post_mvp_quality_iteration_plan_report(
+                final_status_audit=final_status_audit(outside_wav_count=5),
+                output_dir=Path("outputs/post_mvp_quality"),
+                issue_number=744,
+            )
+        with self.assertRaises(StageBMidiToSoloPostMvpQualityIterationPlanError):
+            build_post_mvp_quality_iteration_plan_report(
+                final_status_audit=final_status_audit(outside_risk_after=1),
                 output_dir=Path("outputs/post_mvp_quality"),
                 issue_number=744,
             )
