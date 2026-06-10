@@ -113,6 +113,10 @@ def validate_objective_decision(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloChordToneLandingRepairSweepError(
             "weak chord-tone landing risk required"
         )
+    if _int(readiness.get("outside_soloing_pitch_role_risk_count")) <= 0:
+        raise StageBMidiToSoloChordToneLandingRepairSweepError(
+            "outside-soloing pitch-role risk context required"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloChordToneLandingRepairSweepError(
             "critical user input should not be required"
@@ -345,10 +349,16 @@ def build_repair_sweep_report(
     weak_after = count_flag(rows, "after", "weak_chord_tone_landing_risk")
     outside_before = count_flag(rows, "before", "outside_soloing_pitch_role_risk")
     outside_after = count_flag(rows, "after", "outside_soloing_pitch_role_risk")
+    objective_outside_count = _int(objective["outside_soloing_pitch_role_risk_count"])
+    if outside_before != objective_outside_count:
+        raise StageBMidiToSoloChordToneLandingRepairSweepError(
+            "objective outside-soloing risk count must match bridge input"
+        )
     final_before = sum(1 for row in rows if bool(_dict(row.get("before")).get("cadence_landing_chord_tone", False)))
     final_after = sum(1 for row in rows if bool(_dict(row.get("after")).get("cadence_landing_chord_tone", False)))
     changed_note_total = sum(_int(_dict(row.get("repair")).get("changed_note_count")) for row in rows)
     target_supported = weak_after < weak_before and final_after > final_before
+    outside_context_preserved = outside_before == objective_outside_count and objective_outside_count > 0
     return {
         "schema_version": SCHEMA_VERSION,
         "created_at": datetime.now(timezone.utc)
@@ -369,11 +379,17 @@ def build_repair_sweep_report(
             "candidate_count": len(rows),
             "repaired_midi_count": len(rows),
             "changed_note_total": int(changed_note_total),
+            "objective_outside_soloing_pitch_role_risk_count": int(
+                objective_outside_count
+            ),
             "weak_chord_tone_landing_risk_count_before": int(weak_before),
             "weak_chord_tone_landing_risk_count_after": int(weak_after),
             "weak_chord_tone_landing_risk_delta": int(weak_before - weak_after),
             "outside_soloing_pitch_role_risk_count_before": int(outside_before),
             "outside_soloing_pitch_role_risk_count_after": int(outside_after),
+            "outside_soloing_pitch_role_risk_delta": int(outside_before - outside_after),
+            "outside_soloing_repair_targeted": False,
+            "outside_soloing_residual_risk_preserved": bool(outside_context_preserved),
             "final_landing_chord_tone_count_before": int(final_before),
             "final_landing_chord_tone_count_after": int(final_after),
             "target_supported": bool(target_supported),
@@ -384,6 +400,13 @@ def build_repair_sweep_report(
             "candidate_count": len(rows),
             "repaired_midi_count": len(rows),
             "target_supported": bool(target_supported),
+            "objective_outside_soloing_pitch_role_risk_count": int(
+                objective_outside_count
+            ),
+            "outside_soloing_pitch_role_risk_count_before": int(outside_before),
+            "outside_soloing_pitch_role_risk_count_after": int(outside_after),
+            "outside_soloing_repair_targeted": False,
+            "outside_soloing_residual_risk_preserved": bool(outside_context_preserved),
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -463,6 +486,20 @@ def validate_repair_sweep_report(
         raise StageBMidiToSoloChordToneLandingRepairSweepError(
             "critical user input should not be required"
         )
+    if _int(aggregate.get("objective_outside_soloing_pitch_role_risk_count")) != _int(
+        aggregate.get("outside_soloing_pitch_role_risk_count_before")
+    ):
+        raise StageBMidiToSoloChordToneLandingRepairSweepError(
+            "outside-soloing objective and bridge counts must match"
+        )
+    if not bool(aggregate.get("outside_soloing_residual_risk_preserved", False)):
+        raise StageBMidiToSoloChordToneLandingRepairSweepError(
+            "outside-soloing residual risk context must be preserved"
+        )
+    if bool(aggregate.get("outside_soloing_repair_targeted", True)):
+        raise StageBMidiToSoloChordToneLandingRepairSweepError(
+            "outside-soloing repair target should remain false in landing repair"
+        )
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="repair readiness")
     return {
@@ -477,6 +514,9 @@ def validate_repair_sweep_report(
         "candidate_count": _int(readiness.get("candidate_count")),
         "repaired_midi_count": _int(readiness.get("repaired_midi_count")),
         "changed_note_total": _int(aggregate.get("changed_note_total")),
+        "objective_outside_soloing_pitch_role_risk_count": _int(
+            aggregate.get("objective_outside_soloing_pitch_role_risk_count")
+        ),
         "weak_chord_tone_landing_risk_count_before": _int(
             aggregate.get("weak_chord_tone_landing_risk_count_before")
         ),
@@ -491,6 +531,15 @@ def validate_repair_sweep_report(
         ),
         "outside_soloing_pitch_role_risk_count_after": _int(
             aggregate.get("outside_soloing_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_pitch_role_risk_delta": _int(
+            aggregate.get("outside_soloing_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_targeted": bool(
+            aggregate.get("outside_soloing_repair_targeted", True)
+        ),
+        "outside_soloing_residual_risk_preserved": bool(
+            aggregate.get("outside_soloing_residual_risk_preserved", False)
         ),
         "final_landing_chord_tone_count_before": _int(
             aggregate.get("final_landing_chord_tone_count_before")
@@ -531,8 +580,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- candidate count: `{aggregate['candidate_count']}`",
         f"- repaired MIDI count: `{aggregate['repaired_midi_count']}`",
         f"- changed note total: `{aggregate['changed_note_total']}`",
+        f"- objective outside-soloing pitch-role risk count: `{aggregate['objective_outside_soloing_pitch_role_risk_count']}`",
         f"- weak chord-tone landing risk count: `{aggregate['weak_chord_tone_landing_risk_count_before']} -> {aggregate['weak_chord_tone_landing_risk_count_after']}`",
         f"- outside-soloing pitch-role risk count: `{aggregate['outside_soloing_pitch_role_risk_count_before']} -> {aggregate['outside_soloing_pitch_role_risk_count_after']}`",
+        f"- outside-soloing repair targeted: `{_bool_token(aggregate['outside_soloing_repair_targeted'])}`",
+        f"- outside-soloing residual risk preserved: `{_bool_token(aggregate['outside_soloing_residual_risk_preserved'])}`",
         f"- final landing chord-tone count: `{aggregate['final_landing_chord_tone_count_before']} -> {aggregate['final_landing_chord_tone_count_after']}`",
         f"- target supported: `{_bool_token(aggregate['target_supported'])}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
