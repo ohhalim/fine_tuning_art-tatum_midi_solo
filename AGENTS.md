@@ -12,9 +12,10 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #798, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision.
+- Latest functional issue completed: Issue #894, Stage B MIDI-to-solo outside-soloing repair objective next source context refresh.
 - Current branch should be `main` before starting new work.
-- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision.
+- Open issue queue after handoff sync merge: `0`.
+- Recommended next issue: none currently open; define the next quality target from the latest objective evidence before opening a new issue.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
