@@ -403,6 +403,11 @@
 - 다음 decision target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision`
 - songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision 완료
 - selected target: `current_evidence_consolidation`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- source outside-soloing repair targeted: `false`
+- source outside-soloing residual risk preserved: `true`
+- outside-soloing pitch-role risk count after: `0`
+- outside-soloing repair targeted: `true`
 - outside-soloing target supported: `true`
 - weak landing target supported: `true`
 - final landing target supported: `true`

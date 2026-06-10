@@ -6935,7 +6935,7 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landin
     --run_id "$run_id" \
     --input_guard_report "$input_guard_report" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_OUTSIDE_SOLOING_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-10.md \
-    --issue_number 810 \
+    --issue_number 894 \
     --max_non_chord_tone_run_threshold 3 \
     --min_final_landing_chord_tone_count 6 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision \
