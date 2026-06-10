@@ -20,7 +20,7 @@ Current handoff scope:
 - Latest README final evidence refresh completed: Issue #994, Stage B MIDI-to-solo README final evidence source-context refresh.
 - Latest final status audit completed: Issue #996, Stage B MIDI-to-solo final status audit source-context refresh.
 - Latest post-MVP quality iteration plan completed: Issue #998, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh.
-- Latest quality rubric baseline completed: Issue #916, Stage B MIDI-to-solo quality rubric baseline source-context refresh.
+- Latest quality rubric baseline completed: Issue #1000, Stage B MIDI-to-solo quality rubric baseline source-context refresh.
 - Latest candidate failure labeling completed: Issue #918, Stage B MIDI-to-solo candidate failure labeling source-context refresh.
 - Latest targeted quality repair sweep completed: Issue #920, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh.
 - Latest targeted quality repair audio package completed: Issue #922, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh.
@@ -56,7 +56,7 @@ Current handoff scope:
 - Latest documentation issue completed: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
 - Open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo quality rubric baseline source-context refresh.
+- Recommended next issue: Stage B MIDI-to-solo candidate failure labeling source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

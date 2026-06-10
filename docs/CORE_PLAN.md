@@ -10350,6 +10350,52 @@ Issue #998은 Issue #996 final status audit의 source/current outside-soloing co
 
 - `Stage B MIDI-to-solo quality rubric baseline source-context refresh`
 
+## 9.190 Stage B MIDI-to-solo quality rubric baseline source-context refresh
+
+Issue #1000은 Issue #998 post-MVP quality iteration plan의 source/current outside-soloing context를 quality rubric baseline까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- source boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- next boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- selected target: `candidate_failure_labeling`
+- rubric item count: `8`
+- required metric group count: `30`
+- candidate failure labeling ready: `true`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
+- outside-soloing repair WAV count: `6`
+- outside-soloing source objective pitch-role risk count: `5`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source pitch-role risk delta: `3`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
+- outside-soloing current repair pitch-role risk count after: `0`
+- outside-soloing current repair pitch-role risk delta: `2`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- quality rubric baseline source validation에 #998 post-MVP plan 검증 결과 사용.
+- source-context preserved flag와 21개 context field를 rubric baseline/source quality context/validation summary에 보존.
+- outside-soloing rubric은 residual pitch-role repair 대상이 아니라 context/listening quality risk labeling 대상으로 유지.
+- candidate failure labeling 진입 전 품질/선호 claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_quality_rubric_baseline`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_quality_rubric_baseline.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-quality-rubric-baseline`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo candidate failure labeling source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
