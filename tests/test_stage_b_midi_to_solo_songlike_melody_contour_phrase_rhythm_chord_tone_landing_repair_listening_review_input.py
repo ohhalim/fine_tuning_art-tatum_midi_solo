@@ -18,6 +18,7 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_objective_source_outside_soloing_source_targeted": False,
     "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -25,6 +26,7 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_source_targeted": False,
     "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -32,6 +34,7 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_source_targeted": False,
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -110,7 +113,7 @@ class StageBMidiToSoloChordToneLandingRepairListeningInputGuardTest(unittest.Tes
         report = build_listening_review_input_guard_report(
             source_package(),
             output_dir="unused",
-            issue_number=796,
+            issue_number=1050,
         )
         summary = validate_listening_review_input_guard_report(
             report,
@@ -152,17 +155,26 @@ class StageBMidiToSoloChordToneLandingRepairListeningInputGuardTest(unittest.Tes
             ],
             0,
         )
+        self.assertTrue(
+            summary["followup_objective_source_outside_soloing_source_context_preserved"]
+        )
         self.assertEqual(
             summary[
                 "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta"
             ],
             3,
         )
+        self.assertTrue(
+            summary["followup_repair_sweep_source_outside_soloing_source_context_preserved"]
+        )
         self.assertEqual(
             summary[
                 "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta"
             ],
             2,
+        )
+        self.assertTrue(
+            summary["repair_sweep_source_outside_soloing_source_context_preserved"]
         )
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
@@ -172,14 +184,26 @@ class StageBMidiToSoloChordToneLandingRepairListeningInputGuardTest(unittest.Tes
             build_listening_review_input_guard_report(
                 source_package(quality_claim=True),
                 output_dir="unused",
-                issue_number=796,
+                issue_number=1050,
+            )
+
+    def test_rejects_source_context_preservation_flag(self) -> None:
+        source = source_package()
+        key = "followup_objective_source_outside_soloing_source_context_preserved"
+        source["source_summary"][key] = False
+
+        with self.assertRaises(StageBMidiToSoloChordToneLandingRepairListeningInputGuardError):
+            build_listening_review_input_guard_report(
+                source,
+                output_dir="unused",
+                issue_number=1050,
             )
 
     def test_routes_to_fill_when_validated_input_exists(self) -> None:
         report = build_listening_review_input_guard_report(
             source_package(validated_input=True),
             output_dir="unused",
-            issue_number=796,
+            issue_number=1050,
         )
         self.assertTrue(report["guard_result"]["preference_fill_allowed"])
         self.assertTrue(report["guard_result"]["validated_review_input_present"])
