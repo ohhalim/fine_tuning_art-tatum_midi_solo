@@ -37,7 +37,14 @@ def input_guard_report(*, quality_claim: bool = False) -> dict:
                 "repaired_phrase_rhythm_failure_count": 1,
                 "phrase_rhythm_failure_delta": 3,
                 "source_outside_soloing_repair_evidence_ready": True,
+                "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+                "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+                "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+                "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
+                "source_outside_soloing_repair_source_targeted": False,
+                "source_outside_soloing_repair_source_residual_risk_preserved": True,
                 "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+                "source_outside_soloing_repair_pitch_role_risk_delta": 2,
                 "source_outside_soloing_not_evaluable_count": 6,
                 "repaired_outside_soloing_not_evaluable_count": 6,
                 "repaired_not_evaluable_counts": {
@@ -75,7 +82,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairObjectiveNextTest(u
             report = build_objective_next_report(
                 input_guard_report=input_guard_report(),
                 output_dir=root / "objective_next",
-                issue_number=866,
+                issue_number=952,
             )
             summary = validate_objective_next_report(
                 report,
@@ -96,9 +103,29 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairObjectiveNextTest(u
             self.assertEqual(summary["phrase_rhythm_failure_delta"], 3)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
             self.assertEqual(
+                summary[
+                    "source_outside_soloing_repair_source_objective_pitch_role_risk_count"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary[
+                    "source_outside_soloing_repair_source_pitch_role_risk_count_before"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_pitch_role_risk_count_after"],
+                2,
+            )
+            self.assertEqual(summary["source_outside_soloing_repair_source_pitch_role_risk_delta"], 3)
+            self.assertFalse(summary["source_outside_soloing_repair_source_targeted"])
+            self.assertTrue(summary["source_outside_soloing_repair_source_residual_risk_preserved"])
+            self.assertEqual(
                 summary["source_outside_soloing_repair_pitch_role_risk_count_after"],
                 0,
             )
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(
@@ -120,7 +147,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairObjectiveNextTest(u
                 build_objective_next_report(
                     input_guard_report=input_guard_report(quality_claim=True),
                     output_dir=root / "objective_next",
-                    issue_number=866,
+                    issue_number=952,
                 )
 
     def test_rejects_missing_outside_soloing_context(self) -> None:
@@ -133,7 +160,22 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairObjectiveNextTest(u
                 build_objective_next_report(
                     input_guard_report=source,
                     output_dir=root / "objective_next",
-                    issue_number=866,
+                    issue_number=952,
+                )
+
+    def test_rejects_source_context_delta_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = input_guard_report()
+            source["guard_result"]["source_summary"][
+                "source_outside_soloing_repair_source_pitch_role_risk_delta"
+            ] = 1
+
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairObjectiveNextError):
+                build_objective_next_report(
+                    input_guard_report=source,
+                    output_dir=root / "objective_next",
+                    issue_number=952,
                 )
 
     def test_constants_are_stable(self) -> None:

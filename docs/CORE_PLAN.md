@@ -418,7 +418,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo songlike melody contour phrase/rhythm repair audio package: rendered WAV `6`, duration `18.871s-19.000s`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package: review items `6`, validated input `false`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, technical WAV validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard: preference fill `false`, validated input `false`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision`
-- MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision: follow-up required `true`, source/repaired outside-soloing not evaluable `6/6`, current quality claim ready `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision: follow-up required `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, current quality claim ready `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision: selected target `songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`, remaining label/count `rhythmic_monotony/1`, objective/sweep outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge: chord context/pitch-role metrics `6/6`, not evaluable `12 -> 0`, bridge flags `outside_soloing_pitch_role_risk=5`, `weak_chord_tone_landing_risk=6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision: primary risk `weak_chord_tone_landing_risk=6`, outside risk `5`, not evaluable `12 -> 0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
@@ -9012,6 +9012,59 @@ Issue #950은 Issue #948 listening review package의 source/current outside-solo
 다음 작업:
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh`
+
+## 9.166 Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh
+
+Issue #952는 Issue #950 input guard의 source/current outside-soloing context를 objective-only next decision까지 보존하고, listening preference 부재 상태에서 follow-up decision route를 유지한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- selected target: `songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- review item count: `6`
+- required input field count: `4`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- WAV duration range: `18.871s-19.000s`
+- failure label delta: `3`
+- phrase/rhythm failure count: `4 -> 1`
+- phrase/rhythm failure delta: `3`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing source pitch-role risk delta: `3`
+- source outside-soloing source repair targeted: `false`
+- source outside-soloing source residual risk preserved: `true`
+- source outside-soloing current repair pitch-role risk count after: `0`
+- source outside-soloing current repair pitch-role risk delta: `2`
+- source/repaired outside-soloing not evaluable count: `6/6`
+- phrase/rhythm follow-up required: `true`
+- current quality claim ready: `false`
+- critical user input required: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- validated listening input 부재와 quality claim 불가 상태 기준 follow-up decision route 유지.
+- source/current outside-soloing risk context 보존.
+- current quality claim ready `false` 유지.
+- human/audio preference와 musical quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_next`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_next.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-objective-only-next-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh`
 
 ## 10. 한 문장 요약
 
