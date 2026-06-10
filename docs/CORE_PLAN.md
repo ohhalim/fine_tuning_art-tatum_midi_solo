@@ -11330,6 +11330,55 @@ Issue #1038은 Issue #1036 objective-only next decision과 Issue #1028 repair sw
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh`
 
+## 9.210 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh
+
+Issue #1040은 Issue #1038 follow-up decision과 Issue #1028 repair sweep의 source-context preserved flag를 chord-context pitch-role bridge까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
+- selected target: `songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
+- candidate count: `6`
+- chord context available count: `6/6`
+- pitch-role metrics defined count: `6/6`
+- not evaluable count: `12 -> 0`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- current repair pitch-role risk count after / delta: `0 / 2`
+- min chord-tone ratio: `0.216`
+- max outside ratio: `0.027`
+- max non-chord run: `5`
+- bridge flags: `outside_soloing_pitch_role_risk=5`, `weak_chord_tone_landing_risk=6`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- follow-up decision과 repair sweep의 source-context preserved flag 불일치 없음.
+- chord context와 pitch-role metrics가 후보 `6/6`개에 정의됨.
+- context 부재로 인한 not-evaluable label은 `12 -> 0`으로 해소.
+- 남은 objective risk는 `outside_soloing_pitch_role_risk=5`, `weak_chord_tone_landing_risk=6`.
+- 다음 boundary는 chord-context pitch-role objective decision.
+- quality/preference claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-context-pitch-role-bridge`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
