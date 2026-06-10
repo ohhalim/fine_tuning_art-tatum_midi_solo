@@ -34,7 +34,15 @@ def input_guard_report(*, quality_claim: bool = False) -> dict:
                 "duration_max_seconds": 18.984,
                 "failure_label_delta": 4,
                 "source_outside_soloing_repair_evidence_ready": True,
+                "source_outside_soloing_repair_wav_count": 6,
+                "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+                "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+                "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+                "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
+                "source_outside_soloing_repair_source_targeted": False,
+                "source_outside_soloing_repair_source_residual_risk_preserved": True,
                 "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+                "source_outside_soloing_repair_pitch_role_risk_delta": 2,
                 "source_outside_soloing_not_evaluable_count": 6,
                 "repaired_outside_soloing_not_evaluable_count": 6,
                 "audio_review_required": True,
@@ -86,13 +94,31 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
             self.assertEqual(summary["rendered_audio_file_count"], 6)
             self.assertEqual(summary["failure_label_delta"], 4)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
+            )
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_pitch_role_risk_count_before"], 5
+            )
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_pitch_role_risk_count_after"], 2
+            )
+            self.assertEqual(summary["source_outside_soloing_repair_source_pitch_role_risk_delta"], 3)
+            self.assertFalse(summary["source_outside_soloing_repair_source_targeted"])
+            self.assertTrue(summary["source_outside_soloing_repair_source_residual_risk_preserved"])
             self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertTrue(summary["targeted_quality_followup_required"])
             self.assertFalse(summary["current_quality_claim_ready"])
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
+            self.assertEqual(
+                summary["next_recommended_issue"],
+                "Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh",
+            )
 
     def test_rejects_source_quality_claim(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -116,6 +142,20 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
                     input_guard_report=source,
                     output_dir=root / "objective_next",
                     issue_number=842,
+                )
+
+    def test_rejects_source_risk_delta_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = input_guard_report()
+            source["guard_result"]["source_summary"][
+                "source_outside_soloing_repair_source_pitch_role_risk_delta"
+            ] = 1
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairObjectiveNextError):
+                build_objective_next_report(
+                    input_guard_report=source,
+                    output_dir=root / "objective_next",
+                    issue_number=928,
                 )
 
     def test_constants_are_stable(self) -> None:
