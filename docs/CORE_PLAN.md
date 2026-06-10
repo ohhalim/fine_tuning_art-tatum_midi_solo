@@ -407,7 +407,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo targeted quality repair listening review package: review items `6`, validated input `false`, source risk `5 -> 2`, current repair risk after `0`, technical WAV validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
 - MIDI-to-solo targeted quality repair listening review input guard: review items `6`, preference fill `false`, validated input `false`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
 - MIDI-to-solo targeted quality repair objective-only next decision: follow-up required `true`, current quality claim ready `false`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
-- MIDI-to-solo targeted quality repair follow-up decision: selected target `songlike_melody_contour_repair_sweep`, dominant label/count `songlike_melody_not_soloing/5`, objective and repair sweep outside-soloing not evaluable `6/6`, pitch-role risk after `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- MIDI-to-solo targeted quality repair follow-up decision: selected target `songlike_melody_contour_repair_sweep`, dominant label/count `songlike_melody_not_soloing/5`, objective and repair sweep source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
 - MIDI-to-solo songlike melody contour repair sweep: songlike failure `5 -> 0`, total failure labels `8 -> 4`, repaired outside-soloing not evaluable `6`, technical regression `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package`
 - MIDI-to-solo songlike melody contour repair audio package: rendered WAV `6`, duration `18.849s-18.992s`, source/repaired outside-soloing not evaluable `6/6`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package`
 - MIDI-to-solo songlike melody contour repair listening review package: review items `6`, validated input `false`, source/repaired outside-soloing not evaluable `6/6`, technical WAV validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard`
@@ -8407,6 +8407,66 @@ Issue #928은 Issue #926 targeted quality repair listening review input guard의
 다음 작업:
 
 - `Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh`
+
+## 9.155 Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh
+
+Issue #930은 Issue #928 objective-only next decision과 targeted repair sweep의 source/current outside-soloing context를 follow-up decision까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
+- source boundary: `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
+- repair sweep boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- selected target: `songlike_melody_contour_repair_sweep`
+- dominant remaining failure label: `songlike_melody_not_soloing`
+- dominant remaining failure count: `5`
+- candidate count: `6`
+- source total failure labels: `12`
+- repaired total failure labels: `8`
+- failure label delta: `4`
+- technical regression count: `0`
+- objective source outside-soloing repair evidence ready: `true`
+- objective source outside-soloing repair WAV count: `6`
+- objective source outside-soloing source pitch-role risk count: `5 -> 2`
+- objective source outside-soloing source pitch-role risk delta: `3`
+- objective source outside-soloing source repair targeted: `false`
+- objective source outside-soloing source residual risk preserved: `true`
+- objective source outside-soloing current repair pitch-role risk count after: `0`
+- objective source outside-soloing current repair pitch-role risk delta: `2`
+- objective source outside-soloing not evaluable count: `6`
+- objective repaired outside-soloing not evaluable count: `6`
+- repair sweep source outside-soloing repair evidence ready: `true`
+- repair sweep source outside-soloing source pitch-role risk count: `5 -> 2`
+- repair sweep source outside-soloing source pitch-role risk delta: `3`
+- repair sweep source outside-soloing source repair targeted: `false`
+- repair sweep source outside-soloing source residual risk preserved: `true`
+- repair sweep source outside-soloing current repair pitch-role risk count after: `0`
+- repair sweep source outside-soloing current repair pitch-role risk delta: `2`
+- repair sweep source outside-soloing not evaluable count: `6`
+- repair sweep repaired outside-soloing not evaluable count: `6`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- dominant remaining failure label 기준 songlike melody contour repair sweep 선택 유지.
+- objective summary와 repair sweep summary의 source/current risk 분리 보존.
+- technical regression count `0`, failure label delta `4` 조건 유지.
+- human/audio preference와 musical quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_targeted_quality_repair_followup.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-followup-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh`
 
 ## 10. 한 문장 요약
 
