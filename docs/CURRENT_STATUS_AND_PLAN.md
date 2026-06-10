@@ -23,7 +23,7 @@
 - latest quality rubric baseline: Issue #1000, Stage B MIDI-to-solo quality rubric baseline source-context refresh
 - latest candidate failure labeling: Issue #1002, Stage B MIDI-to-solo candidate failure labeling source-context refresh
 - latest targeted quality repair sweep: Issue #1004, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
-- latest targeted quality repair audio package: Issue #922, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
+- latest targeted quality repair audio package: Issue #1006, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
 - latest targeted quality repair listening review package: Issue #924, Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh
 - latest targeted quality repair listening review input guard: Issue #926, Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh
 - latest targeted quality repair objective-only next decision: Issue #928, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh
@@ -57,7 +57,7 @@
 - latest README evidence refresh: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
 - open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair audio package source-context refresh`
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -1103,6 +1103,7 @@
 - improved candidate count: `4`
 - technical regression count: `0`
 - source outside-soloing repair evidence ready: `true`
+- source outside-soloing repair source context preserved: `true`
 - source outside-soloing repair WAV count: `6`
 - source outside-soloing source objective pitch-role risk count: `5`
 - source outside-soloing source pitch-role risk count: `5 -> 2`
