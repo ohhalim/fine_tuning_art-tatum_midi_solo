@@ -6002,8 +6002,8 @@ run_stage_b_midi_to_solo_mvp_current_evidence_consolidation() {
 }
 
 run_stage_b_midi_to_solo_mvp_completion_audit() {
-  local current_evidence_run_id="${CURRENT_EVIDENCE_RUN_ID:-harness_stage_b_midi_to_solo_mvp_current_evidence_consolidation}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_completion_audit}"
+  local current_evidence_run_id="${CURRENT_EVIDENCE_RUN_ID:-harness_stage_b_midi_to_solo_mvp_current_evidence_consolidation_source_context_refresh}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_completion_audit_source_context_refresh}"
   local current_evidence="outputs/stage_b_midi_to_solo_mvp_current_evidence_consolidation/${current_evidence_run_id}/stage_b_midi_to_solo_mvp_current_evidence_consolidation.json"
   if [[ ! -f "$current_evidence" ]]; then
     print_header "Stage B MIDI-to-solo MVP current evidence consolidation"
@@ -6015,7 +6015,7 @@ run_stage_b_midi_to_solo_mvp_completion_audit() {
     --current_evidence "$current_evidence" \
     --readme_path README.md \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 902 \
+    --issue_number 986 \
     --expected_boundary stage_b_midi_to_solo_mvp_completion_audit \
     --expected_next_boundary stage_b_midi_to_solo_quality_gap_decision \
     --require_technical_mvp_completion \

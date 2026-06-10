@@ -13,7 +13,7 @@
 현재 active issue:
 
 - latest functional result: Issue #982, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
-- latest MVP completion audit: Issue #902, Stage B MIDI-to-solo MVP completion audit source-context refresh
+- latest MVP completion audit: Issue #986, Stage B MIDI-to-solo MVP completion audit source-context refresh
 - latest quality gap decision: Issue #904, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #906, Stage B MIDI-to-solo listening review quality gap source-context refresh
 - latest MVP delivery package: Issue #908, Stage B MIDI-to-solo MVP delivery package source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #982, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after README evidence source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit source-context refresh`
+- open issue queue after MVP completion audit source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo quality gap decision source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -917,6 +917,7 @@
 - MVP completion audit source-context refresh 완료
 - technical model-core MVP completed: `true`
 - outside-soloing repair objective completed: `true`
+- outside-soloing repair source context preserved: `true`
 - outside-soloing repair rendered audio file count: `6`
 - outside-soloing source pitch-role risk count: `5 -> 2`
 - outside-soloing source repair targeted: `false`

@@ -11,8 +11,34 @@ from scripts.audit_stage_b_midi_to_solo_mvp_completion import (
     validate_mvp_completion_audit_report,
 )
 from scripts.consolidate_stage_b_midi_to_solo_mvp_current_evidence import (
+    BRIDGE_SOURCE_CONTEXT_KEYS,
     BOUNDARY as CURRENT_EVIDENCE_BOUNDARY,
 )
+
+
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
 
 
 def current_evidence(
@@ -42,6 +68,7 @@ def current_evidence(
             "model_conditioned_pitch_contour_objective_path_ready": pitch_contour_supported,
             "model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready": changed_ratio_repair_supported,
             "outside_soloing_repair_objective_path_ready": outside_soloing_repair_supported,
+            "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
             "current_mvp_technical_execution_evidence_supported": True,
             "current_mvp_objective_repair_evidence_supported": True,
             "midi_to_solo_mvp_current_evidence_supported": current_evidence_supported,
@@ -150,6 +177,7 @@ def current_evidence(
             "final_landing_target_supported": True,
             "max_non_chord_tone_run_after": 3,
             "non_chord_run_target_supported": True,
+            **SOURCE_CONTEXT,
         },
         "decision": {
             "critical_user_input_required": False,
@@ -268,6 +296,7 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
         )
         self.assertTrue(summary["outside_soloing_repair_objective_completed"])
         self.assertTrue(summary["outside_soloing_repair_objective_path_ready"])
+        self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
         self.assertTrue(summary["outside_soloing_repair_current_evidence_ready"])
         self.assertEqual(summary["outside_soloing_repair_rendered_audio_file_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
@@ -297,7 +326,22 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_final_landing_target_supported"])
         self.assertTrue(summary["outside_soloing_repair_non_chord_run_target_supported"])
         self.assertFalse(summary["outside_soloing_repair_preference_fill_allowed"])
+        for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
+
+    def test_rejects_missing_outside_soloing_source_context_field(self) -> None:
+        evidence = current_evidence()
+        del evidence["outside_soloing_repair_objective_path"][
+            "followup_objective_source_outside_soloing_source_pitch_role_risk_delta"
+        ]
+        with self.assertRaises(StageBMidiToSoloMvpCompletionAuditError):
+            build_mvp_completion_audit_report(
+                current_evidence=evidence,
+                readme_text=readme_text(),
+                output_dir=Path("outputs/audit"),
+                issue_number=986,
+            )
 
     def test_rejects_missing_readme_evidence_boundary(self) -> None:
         with self.assertRaises(StageBMidiToSoloMvpCompletionAuditError):

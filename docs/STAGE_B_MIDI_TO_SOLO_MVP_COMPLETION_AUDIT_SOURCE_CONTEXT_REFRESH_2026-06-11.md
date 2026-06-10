@@ -9,6 +9,7 @@
 - model-conditioned pitch-contour objective completed: `true`
 - model-conditioned pitch-contour changed-ratio repair objective completed: `true`
 - outside-soloing repair objective completed: `true`
+- outside-soloing repair source context preserved: `true`
 - musical quality MVP completed: `false`
 - human/audio preference completed: `false`
 - product MVP completed: `false`
@@ -46,6 +47,7 @@
 - model-conditioned pitch-contour changed-ratio repair audio review required: `true`
 - model-conditioned pitch-contour changed-ratio repair preference fill allowed: `false`
 - outside-soloing repair objective path ready: `true`
+- outside-soloing repair source context preserved: `true`
 - outside-soloing repair current evidence ready: `true`
 - outside-soloing repair rendered WAV files: `6`
 - outside-soloing repair changed note total: `2`
@@ -54,6 +56,12 @@
 - outside-soloing source repair targeted: `false`
 - outside-soloing source residual risk preserved: `true`
 - outside-soloing pitch-role risk after / delta: `0` / `2`
+- follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- follow-up repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- bridge repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
 - outside-soloing repair objective path supported: `true`
 - outside-soloing repair target supported: `true`
 - outside-soloing repair weak landing target supported: `true`
