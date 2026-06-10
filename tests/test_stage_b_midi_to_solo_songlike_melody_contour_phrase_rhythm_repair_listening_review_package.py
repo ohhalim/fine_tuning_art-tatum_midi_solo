@@ -119,7 +119,14 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
                 "rhythmic_monotony": 1,
             },
             "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+            "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+            "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
+            "source_outside_soloing_repair_source_targeted": False,
+            "source_outside_soloing_repair_source_residual_risk_preserved": True,
             "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_repair_pitch_role_risk_delta": 2,
             "source_outside_soloing_not_evaluable_count": 6,
             "repaired_outside_soloing_not_evaluable_count": 6,
             "repaired_not_evaluable_counts": {
@@ -159,9 +166,30 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
             self.assertEqual(summary["phrase_rhythm_failure_delta"], 3)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
             self.assertEqual(
+                summary[
+                    "source_outside_soloing_repair_source_pitch_role_risk_count_before"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary[
+                    "source_outside_soloing_repair_source_pitch_role_risk_count_after"
+                ],
+                2,
+            )
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_pitch_role_risk_delta"],
+                3,
+            )
+            self.assertFalse(summary["source_outside_soloing_repair_source_targeted"])
+            self.assertTrue(
+                summary["source_outside_soloing_repair_source_residual_risk_preserved"]
+            )
+            self.assertEqual(
                 summary["source_outside_soloing_repair_pitch_role_risk_count_after"],
                 0,
             )
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(
@@ -200,6 +228,22 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
                     audio_package_report=source,
                     output_dir=root / "review_package",
                     issue_number=862,
+                    expected_count=6,
+                )
+
+    def test_rejects_source_context_delta_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = audio_package_report(root)
+            source["summary"]["source_outside_soloing_repair_source_pitch_role_risk_delta"] = 1
+
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError
+            ):
+                build_listening_review_package_report(
+                    audio_package_report=source,
+                    output_dir=root / "review_package",
+                    issue_number=948,
                     expected_count=6,
                 )
 

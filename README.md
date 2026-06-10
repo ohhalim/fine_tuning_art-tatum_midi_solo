@@ -30,9 +30,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour repair follow-up decision: `Issue #942`
 - latest songlike melody contour phrase/rhythm repair sweep: `Issue #944`
 - latest songlike melody contour phrase/rhythm repair audio package: `Issue #946`
+- latest songlike melody contour phrase/rhythm repair listening review package: `Issue #948`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package`
-- open issue queue after songlike melody contour phrase/rhythm repair audio package source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package`
+- open issue queue after songlike melody contour phrase/rhythm repair listening review package source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -52,6 +53,12 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned input path replacement consolidated: `true`
 - listening review package required: `true`
 - listening review package ready: `true`
+- phrase/rhythm repair listening review item count: `6`
+- phrase/rhythm repair listening review input validated: `false`
+- phrase/rhythm repair technical WAV validation: `true`
+- phrase/rhythm repair source outside-soloing pitch-role risk: `5 -> 2`
+- phrase/rhythm repair current outside-soloing pitch-role risk after / delta: `0 / 2`
+- phrase/rhythm repair human/audio preference claim: `false`
 - model-conditioned listening review input guard completed: `true`
 - model-conditioned preference fill allowed: `false`
 - model-conditioned objective-only next decision completed: `true`
