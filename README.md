@@ -37,9 +37,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-context pitch-role bridge: `Issue #956`
 - latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: `Issue #958`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: `Issue #960`
+- latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: `Issue #962`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package`
+- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -83,6 +84,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase/rhythm final landing chord-tone count: `1 -> 6`
 - phrase/rhythm chord-tone landing changed note total: `40`
 - phrase/rhythm chord-tone landing next target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package`
+- phrase/rhythm chord-tone landing rendered WAV count: `6`
+- phrase/rhythm chord-tone landing WAV duration range: `18.871s-19.000s`
+- phrase/rhythm chord-tone landing WAV technical validation: `true`
+- phrase/rhythm chord-tone landing audio review required: `true`
 - phrase/rhythm repair technical WAV validation: `true`
 - phrase/rhythm repair source outside-soloing pitch-role risk: `5 -> 2`
 - phrase/rhythm repair current outside-soloing pitch-role risk after / delta: `0 / 2`

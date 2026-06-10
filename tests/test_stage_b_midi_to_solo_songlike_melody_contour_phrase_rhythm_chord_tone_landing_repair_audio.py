@@ -205,6 +205,36 @@ class StageBMidiToSoloChordToneLandingRepairAudioTest(unittest.TestCase):
             self.assertEqual(summary["outside_soloing_pitch_role_risk_delta"], 3)
             self.assertFalse(summary["outside_soloing_repair_targeted"])
             self.assertTrue(summary["outside_soloing_residual_risk_preserved"])
+            self.assertEqual(
+                summary[
+                    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary[
+                    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after"
+                ],
+                2,
+            )
+            self.assertEqual(
+                summary["followup_objective_source_outside_soloing_source_pitch_role_risk_delta"],
+                3,
+            )
+            self.assertFalse(
+                summary["followup_objective_source_outside_soloing_source_targeted"]
+            )
+            self.assertTrue(
+                summary[
+                    "followup_objective_source_outside_soloing_source_residual_risk_preserved"
+                ]
+            )
+            self.assertEqual(
+                summary[
+                    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after"
+                ],
+                0,
+            )
             self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
             self.assertTrue(summary["audio_review_required"])
             self.assertFalse(summary["human_audio_preference_claimed"])
