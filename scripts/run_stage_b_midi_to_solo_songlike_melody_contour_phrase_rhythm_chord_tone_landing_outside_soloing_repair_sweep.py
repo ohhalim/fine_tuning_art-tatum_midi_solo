@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
-    BRIDGE_SOURCE_CONTEXT_KEYS,
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     bridge_candidate,
     parse_chords,
 )
@@ -48,7 +48,7 @@ SELECTED_TARGET = (
     "songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package"
 )
 SCHEMA_VERSION = (
-    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep_v1"
+    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep_v2"
 )
 OUTSIDE_RISK_FLAG = "outside_soloing_pitch_role_risk"
 WEAK_LANDING_FLAG = "weak_chord_tone_landing_risk"
@@ -101,12 +101,21 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
 
 
 def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
-    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in container:
             raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
                 f"{label} source-context field required: {key}"
             )
-    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
+    for key in (
+        "followup_objective_source_outside_soloing_source_context_preserved",
+        "followup_repair_sweep_source_outside_soloing_source_context_preserved",
+        "repair_sweep_source_outside_soloing_source_context_preserved",
+    ):
+        if not bool(container.get(key, False)):
+            raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
+                f"{label} source context should be preserved: {key}"
+            )
+    return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
 
 
 def _absolute_path(path: str | Path) -> Path:
@@ -463,7 +472,7 @@ def build_outside_soloing_repair_sweep_report(
         raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
             "follow-up and chord-tone sweep outside-soloing source flags must match"
         )
-    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if followup.get(key) != source.get(key):
             raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
                 f"follow-up and chord-tone sweep source-context field mismatch: {key}"
@@ -552,7 +561,7 @@ def build_outside_soloing_repair_sweep_report(
             "source_primary_remaining_risk_count": int(
                 followup["primary_remaining_risk_count"]
             ),
-            **{key: followup.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
+            **{key: followup.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
         },
         "readiness": {
             "boundary": BOUNDARY,
@@ -581,7 +590,7 @@ def build_outside_soloing_repair_sweep_report(
             "outside_soloing_repair_targeted": True,
             "outside_soloing_pitch_role_risk_delta": int(outside_before - outside_after),
             "weak_chord_tone_landing_risk_count_after": int(weak_after),
-            **{key: followup.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
+            **{key: followup.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -607,9 +616,9 @@ def build_outside_soloing_repair_sweep_report(
             "brad_style_adaptation",
         ],
         "next_recommended_issue": (
-            "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package"
+            "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package source-context refresh"
             if target_supported
-            else "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision"
+            else "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh"
         ),
     }
 
@@ -681,7 +690,7 @@ def validate_outside_soloing_repair_sweep_report(
         )
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="outside-soloing repair readiness")
-    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in aggregate:
             raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
                 f"outside-soloing repair aggregate source-context field required: {key}"
@@ -743,7 +752,7 @@ def validate_outside_soloing_repair_sweep_report(
             aggregate.get("max_non_chord_tone_run_after")
         ),
         "target_supported": bool(aggregate.get("target_supported", False)),
-        **{key: aggregate.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
+        **{key: aggregate.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)
         ),
@@ -786,16 +795,19 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- outside-soloing repair targeted: `{_bool_token(aggregate['outside_soloing_repair_targeted'])}`",
         f"- follow-up objective source outside-soloing source pitch-role risk: `{aggregate['followup_objective_source_outside_soloing_source_pitch_role_risk_count_before']} -> {aggregate['followup_objective_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- follow-up objective source outside-soloing source pitch-role risk delta: `{aggregate['followup_objective_source_outside_soloing_source_pitch_role_risk_delta']}`",
+        f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(aggregate['followup_objective_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up objective source outside-soloing source targeted: `{_bool_token(aggregate['followup_objective_source_outside_soloing_source_targeted'])}`",
         f"- follow-up objective source outside-soloing source residual risk preserved: `{_bool_token(aggregate['followup_objective_source_outside_soloing_source_residual_risk_preserved'])}`",
         f"- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `{aggregate['followup_objective_source_outside_soloing_current_pitch_role_risk_count_after']} / {aggregate['followup_objective_source_outside_soloing_current_pitch_role_risk_delta']}`",
         f"- follow-up repair sweep source outside-soloing source pitch-role risk: `{aggregate['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {aggregate['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- follow-up repair sweep source outside-soloing source pitch-role risk delta: `{aggregate['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta']}`",
+        f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(aggregate['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing source targeted: `{_bool_token(aggregate['followup_repair_sweep_source_outside_soloing_source_targeted'])}`",
         f"- follow-up repair sweep source outside-soloing source residual risk preserved: `{_bool_token(aggregate['followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `{aggregate['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {aggregate['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
         f"- bridge repair sweep source outside-soloing source pitch-role risk: `{aggregate['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {aggregate['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- bridge repair sweep source outside-soloing source pitch-role risk delta: `{aggregate['repair_sweep_source_outside_soloing_source_pitch_role_risk_delta']}`",
+        f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(aggregate['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- bridge repair sweep source outside-soloing source targeted: `{_bool_token(aggregate['repair_sweep_source_outside_soloing_source_targeted'])}`",
         f"- bridge repair sweep source outside-soloing source residual risk preserved: `{_bool_token(aggregate['repair_sweep_source_outside_soloing_source_residual_risk_preserved'])}`",
         f"- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `{aggregate['repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {aggregate['repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
@@ -859,7 +871,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=972)
+    parser.add_argument("--issue_number", type=int, default=1056)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_repair_completed", action="store_true")

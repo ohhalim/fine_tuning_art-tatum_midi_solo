@@ -27,6 +27,7 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_objective_source_outside_soloing_source_targeted": False,
     "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -34,6 +35,7 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_source_targeted": False,
     "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -41,11 +43,16 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_source_targeted": False,
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
 }
+
+AUDIO_PROPAGATED_SOURCE_CONTEXT_KEYS = tuple(
+    key for key in SOURCE_CONTEXT if not key.endswith("_context_preserved")
+)
 
 
 def write_midi(path: Path) -> None:
@@ -209,7 +216,8 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioTest(unittest.Tes
             self.assertTrue(summary["outside_soloing_repair_targeted"])
             self.assertEqual(summary["weak_chord_tone_landing_risk_count_after"], 0)
             self.assertEqual(summary["max_non_chord_tone_run_after"], 3)
-            for key, value in SOURCE_CONTEXT.items():
+            for key in AUDIO_PROPAGATED_SOURCE_CONTEXT_KEYS:
+                value = SOURCE_CONTEXT[key]
                 self.assertEqual(report["summary"][key], value)
                 self.assertEqual(report["audio_render_boundary"][key], value)
                 self.assertEqual(summary[key], value)
