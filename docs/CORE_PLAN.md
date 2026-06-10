@@ -10555,6 +10555,59 @@ Issue #1006은 Issue #1004 targeted quality repair sweep의 source/current outsi
 
 - `Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh`
 
+## 9.194 Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh
+
+Issue #1008은 Issue #1006 targeted quality repair audio package의 source/current outside-soloing context를 listening review package source summary까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
+- listening review package ready: `true`
+- review item count: `6`
+- validated review input: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- sample rate: `44100`
+- duration range: `18.422s -> 18.984s`
+- failure label delta: `4`
+- source outside-soloing repair evidence ready: `true`
+- source outside-soloing repair source context preserved: `true`
+- source outside-soloing repair WAV count: `6`
+- source outside-soloing source objective pitch-role risk count: `5`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing source pitch-role risk delta: `3`
+- source outside-soloing source repair targeted: `false`
+- source outside-soloing source residual risk preserved: `true`
+- source outside-soloing current repair pitch-role risk count after: `0`
+- source outside-soloing current repair pitch-role risk delta: `2`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- human review required now: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- listening review package source validation에 #1006 audio package source-context preserved 조건 추가.
+- source-context preserved flag와 21개 context field를 source summary와 validation summary에 보존.
+- review item 6개 패키징 완료.
+- validated review input은 아직 false, human review는 input guard 이후 별도 처리.
+- human/audio preference와 MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_targeted_quality_repair_listening_review_package.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-listening-review-package`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
