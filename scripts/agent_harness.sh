@@ -6014,8 +6014,8 @@ run_stage_b_midi_to_solo_mvp_completion_audit() {
     --run_id "$run_id" \
     --current_evidence "$current_evidence" \
     --readme_path README.md \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_OUTSIDE_SOLOING_REPAIR_REFRESH_2026-06-10.md \
-    --issue_number 816 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 902 \
     --expected_boundary stage_b_midi_to_solo_mvp_completion_audit \
     --expected_next_boundary stage_b_midi_to_solo_quality_gap_decision \
     --require_technical_mvp_completion \

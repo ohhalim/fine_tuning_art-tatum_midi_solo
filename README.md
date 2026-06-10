@@ -7,9 +7,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 ## 현재 상태
 
 - latest functional result: `Issue #898`
+- latest MVP completion audit: `Issue #902`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
-- open issue queue after README evidence refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- open issue queue after MVP completion audit refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -112,6 +113,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit model-conditioned pitch-contour objective included: `true`
 - MVP completion audit changed-ratio repair objective included: `true`
 - MVP completion audit outside-soloing repair objective included: `true`
+- MVP completion audit outside-soloing source context included: `true`
 - quality gap decision completed: `true`
 - quality gap decision listening review target selected: `true`
 - quality gap decision outside-soloing repair objective included: `true`
@@ -239,6 +241,10 @@ MVP completion audit.
 - technical model-core MVP completed: `true`
 - input to ranked MIDI completed: `true`
 - input to rendered WAV completed: `true`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
+- outside-soloing current repair pitch-role risk count after: `0`
 - selected-scale objective repair completed: `true`
 - phrase-bank CLI technical path included: `true`
 - phrase-bank CLI technical path completed: `true`

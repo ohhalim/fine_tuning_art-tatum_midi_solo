@@ -256,6 +256,22 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloMvpCompletionAuditError(
             "outside-soloing repair residual pitch-role risk should be zero"
         )
+    if _int(outside_soloing_repair.get("source_outside_soloing_pitch_role_risk_count_before")) < _int(
+        outside_soloing_repair.get("source_outside_soloing_pitch_role_risk_count_after")
+    ):
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "source outside-soloing risk should not increase"
+        )
+    if bool(outside_soloing_repair.get("source_outside_soloing_repair_targeted", True)):
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "source outside-soloing repair should remain non-targeted"
+        )
+    if not bool(
+        outside_soloing_repair.get("source_outside_soloing_residual_risk_preserved", False)
+    ):
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "source outside-soloing residual risk boundary should be preserved"
+        )
     if _int(outside_soloing_repair.get("weak_chord_tone_landing_risk_count_after")) != 0:
         raise StageBMidiToSoloMvpCompletionAuditError(
             "outside-soloing repair weak landing risk should be zero"
@@ -418,6 +434,33 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         "outside_soloing_repair_changed_note_total": _int(
             outside_soloing_repair.get("changed_note_total")
         ),
+        "outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
+            outside_soloing_repair.get(
+                "source_objective_outside_soloing_pitch_role_risk_count"
+            )
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_before": _int(
+            outside_soloing_repair.get(
+                "source_outside_soloing_pitch_role_risk_count_before"
+            )
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_after": _int(
+            outside_soloing_repair.get(
+                "source_outside_soloing_pitch_role_risk_count_after"
+            )
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_delta": _int(
+            outside_soloing_repair.get("source_outside_soloing_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_source_targeted": bool(
+            outside_soloing_repair.get("source_outside_soloing_repair_targeted", True)
+        ),
+        "outside_soloing_repair_source_residual_risk_preserved": bool(
+            outside_soloing_repair.get(
+                "source_outside_soloing_residual_risk_preserved",
+                False,
+            )
+        ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             outside_soloing_repair.get("outside_soloing_pitch_role_risk_count_after")
         ),
@@ -472,6 +515,18 @@ def validate_readme_refresh(readme_text: str) -> dict[str, Any]:
         ),
         "outside_soloing_repair_in_current_evidence": (
             "current evidence outside-soloing repair objective path included: `true`"
+        ),
+        "outside_soloing_source_context_reflected": (
+            "outside-soloing source-context evidence reflected: `true`"
+        ),
+        "outside_soloing_source_risk": (
+            "outside-soloing source pitch-role risk count: `5 -> 2`"
+        ),
+        "outside_soloing_source_residual": (
+            "outside-soloing source residual risk preserved: `true`"
+        ),
+        "outside_soloing_current_repair_risk_after": (
+            "outside-soloing current repair pitch-role risk count after: `0`"
         ),
         "readme_refresh": "README evidence refreshed: `true`",
         "human_preference_false": "human/audio preference claim: `false`",
@@ -766,6 +821,24 @@ def validate_mvp_completion_audit_report(
         "outside_soloing_repair_changed_note_total": _int(
             evidence.get("outside_soloing_repair_changed_note_total")
         ),
+        "outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
+            evidence.get("outside_soloing_repair_source_objective_pitch_role_risk_count")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_before": _int(
+            evidence.get("outside_soloing_repair_source_pitch_role_risk_count_before")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_after": _int(
+            evidence.get("outside_soloing_repair_source_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_delta": _int(
+            evidence.get("outside_soloing_repair_source_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_source_targeted": bool(
+            evidence.get("outside_soloing_repair_source_targeted", True)
+        ),
+        "outside_soloing_repair_source_residual_risk_preserved": bool(
+            evidence.get("outside_soloing_repair_source_residual_risk_preserved", False)
+        ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             evidence.get("outside_soloing_repair_pitch_role_risk_count_after")
         ),
@@ -856,6 +929,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- outside-soloing repair current evidence ready: `{_bool_token(evidence['outside_soloing_repair_current_evidence_ready'])}`",
         f"- outside-soloing repair rendered WAV files: `{evidence['outside_soloing_repair_rendered_audio_file_count']}`",
         f"- outside-soloing repair changed note total: `{evidence['outside_soloing_repair_changed_note_total']}`",
+        f"- outside-soloing source objective pitch-role risk: `{evidence['outside_soloing_repair_source_objective_pitch_role_risk_count']}`",
+        f"- outside-soloing source pitch-role risk before / after / delta: `{evidence['outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{evidence['outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{evidence['outside_soloing_repair_source_pitch_role_risk_delta']}`",
+        f"- outside-soloing source repair targeted: `{_bool_token(evidence['outside_soloing_repair_source_targeted'])}`",
+        f"- outside-soloing source residual risk preserved: `{_bool_token(evidence['outside_soloing_repair_source_residual_risk_preserved'])}`",
         f"- outside-soloing pitch-role risk after / delta: `{evidence['outside_soloing_repair_pitch_role_risk_count_after']}` / `{evidence['outside_soloing_repair_pitch_role_risk_delta']}`",
         f"- outside-soloing repair objective path supported: `{_bool_token(evidence['outside_soloing_repair_objective_path_supported'])}`",
         f"- outside-soloing repair target supported: `{_bool_token(evidence['outside_soloing_repair_target_supported'])}`",
