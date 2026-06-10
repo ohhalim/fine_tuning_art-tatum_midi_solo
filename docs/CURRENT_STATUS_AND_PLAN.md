@@ -46,7 +46,7 @@
 - latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: Issue #1046, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: Issue #1048, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: Issue #1050, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: Issue #968, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh
+- latest songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: Issue #1052, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: Issue #970, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep: Issue #972, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: Issue #974, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #982, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after chord-tone landing repair listening review input guard source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh`
+- open issue queue after chord-tone landing repair objective-only next decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -4578,6 +4578,60 @@ Issue #1050은 Issue #1048 listening review package의 source-context preserved 
 다음:
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh`
+
+## Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Chord-Tone Landing Repair Objective-Only Next Decision Source Context Refresh Result
+
+Issue #1052는 Issue #1050 input guard의 source-context preserved flag를 objective-only next decision까지 보존하고, pending input과 residual outside-soloing risk 기준으로 follow-up decision을 선택한 작업이다.
+
+변경:
+
+- objective-only next decision schema version `v2`
+- input guard required source-context key와 preserved flag 3개 필수 검증
+- objective summary, readiness, validation summary, markdown report source-context preserved field 전파
+- harness issue number와 generated doc path를 #1052 기준으로 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
+- selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- outside-soloing pitch-role risk count: `5 -> 2`
+- outside-soloing repair targeted: `false`
+- outside-soloing residual risk preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- chord-tone landing follow-up required: `true`
+- current quality claim ready: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- Issue #1050 input guard의 preserved flag 3개가 objective summary와 readiness까지 유지됨.
+- validated review input 부재로 preference fill blocked 유지.
+- residual outside-soloing pitch-role risk after `2`로 follow-up decision 필요.
+- current quality claim ready는 `false`.
+- human/audio preference, MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_next`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_next.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-repair-objective-only-next-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

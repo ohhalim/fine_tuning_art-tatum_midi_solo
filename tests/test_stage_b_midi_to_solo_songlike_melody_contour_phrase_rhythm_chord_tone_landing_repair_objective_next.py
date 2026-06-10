@@ -21,6 +21,7 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_objective_source_outside_soloing_source_targeted": False,
     "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -28,6 +29,7 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_source_targeted": False,
     "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -35,6 +37,7 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_source_targeted": False,
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -99,7 +102,7 @@ class StageBMidiToSoloChordToneLandingRepairObjectiveNextTest(unittest.TestCase)
             report = build_objective_next_report(
                 input_guard_report=input_guard_report(),
                 output_dir=root / "objective_next",
-                issue_number=882,
+                issue_number=1052,
             )
             summary = validate_objective_next_report(
                 report,
@@ -141,17 +144,26 @@ class StageBMidiToSoloChordToneLandingRepairObjectiveNextTest(unittest.TestCase)
                 ],
                 0,
             )
+            self.assertTrue(
+                summary["followup_objective_source_outside_soloing_source_context_preserved"]
+            )
             self.assertEqual(
                 summary[
                     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta"
                 ],
                 3,
             )
+            self.assertTrue(
+                summary["followup_repair_sweep_source_outside_soloing_source_context_preserved"]
+            )
             self.assertEqual(
                 summary[
                     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta"
                 ],
                 2,
+            )
+            self.assertTrue(
+                summary["repair_sweep_source_outside_soloing_source_context_preserved"]
             )
             self.assertTrue(summary["chord_tone_landing_followup_required"])
             self.assertFalse(summary["current_quality_claim_ready"])
@@ -165,7 +177,20 @@ class StageBMidiToSoloChordToneLandingRepairObjectiveNextTest(unittest.TestCase)
                 build_objective_next_report(
                     input_guard_report=input_guard_report(quality_claim=True),
                     output_dir=root / "objective_next",
-                    issue_number=882,
+                    issue_number=1052,
+                )
+
+    def test_rejects_source_context_preservation_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = input_guard_report()
+            key = "followup_objective_source_outside_soloing_source_context_preserved"
+            source["guard_result"]["source_summary"][key] = False
+            with self.assertRaises(StageBMidiToSoloChordToneLandingRepairObjectiveNextError):
+                build_objective_next_report(
+                    input_guard_report=source,
+                    output_dir=root / "objective_next",
+                    issue_number=1052,
                 )
 
     def test_constants_are_stable(self) -> None:
