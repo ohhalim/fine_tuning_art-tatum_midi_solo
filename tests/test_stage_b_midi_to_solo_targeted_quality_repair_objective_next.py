@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
 from scripts.decide_stage_b_midi_to_solo_targeted_quality_repair_objective_next import (
     BOUNDARY,
     FOLLOWUP_DECISION_NEXT_BOUNDARY,
@@ -15,6 +16,31 @@ from scripts.guard_stage_b_midi_to_solo_targeted_quality_repair_listening_review
     BOUNDARY as SOURCE_BOUNDARY,
     OBJECTIVE_NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
 )
+
+
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
 
 
 def input_guard_report(*, quality_claim: bool = False) -> dict:
@@ -34,6 +60,7 @@ def input_guard_report(*, quality_claim: bool = False) -> dict:
                 "duration_max_seconds": 18.984,
                 "failure_label_delta": 4,
                 "source_outside_soloing_repair_evidence_ready": True,
+                "source_outside_soloing_repair_source_context_preserved": True,
                 "source_outside_soloing_repair_wav_count": 6,
                 "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
                 "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
@@ -46,6 +73,7 @@ def input_guard_report(*, quality_claim: bool = False) -> dict:
                 "source_outside_soloing_not_evaluable_count": 6,
                 "repaired_outside_soloing_not_evaluable_count": 6,
                 "audio_review_required": True,
+                **SOURCE_CONTEXT,
             },
         },
         "readiness": {
@@ -94,6 +122,9 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
             self.assertEqual(summary["rendered_audio_file_count"], 6)
             self.assertEqual(summary["failure_label_delta"], 4)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+                self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
             self.assertEqual(
                 summary["source_outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
@@ -156,6 +187,20 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
                     input_guard_report=source,
                     output_dir=root / "objective_next",
                     issue_number=928,
+                )
+
+    def test_rejects_missing_source_context_field(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = input_guard_report()
+            source["guard_result"]["source_summary"].pop(
+                "followup_objective_source_outside_soloing_source_pitch_role_risk_delta"
+            )
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairObjectiveNextError):
+                build_objective_next_report(
+                    input_guard_report=source,
+                    output_dir=root / "objective_next",
+                    issue_number=1012,
                 )
 
     def test_constants_are_stable(self) -> None:

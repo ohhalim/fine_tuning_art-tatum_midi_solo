@@ -26,7 +26,7 @@
 - latest targeted quality repair audio package: Issue #1006, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
 - latest targeted quality repair listening review package: Issue #1008, Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh
 - latest targeted quality repair listening review input guard: Issue #1010, Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh
-- latest targeted quality repair objective-only next decision: Issue #928, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh
+- latest targeted quality repair objective-only next decision: Issue #1012, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh
 - latest targeted quality repair follow-up decision: Issue #930, Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh
 - latest songlike melody contour repair sweep: Issue #932, Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh
 - latest songlike melody contour repair audio package: Issue #934, Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh
@@ -57,7 +57,7 @@
 - latest README evidence refresh: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
 - open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh`
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -3483,21 +3483,22 @@ Issue #1010은 Issue #1008 listening review package의 validated review input �
 
 - `Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh`
 
-## Stage B MIDI-to-Solo Targeted Quality Repair Objective-Only Next Decision Result
+## Stage B MIDI-to-Solo Targeted Quality Repair Objective-Only Next Decision Source Context Refresh Result
 
-Issue #758은 Issue #756 input guard 이후 listening input 없이 objective evidence만으로 다음 boundary를 선택한 작업이다.
+Issue #1012는 Issue #1010 input guard 이후 listening input 없이 objective evidence만으로 다음 boundary를 선택하면서 source/current outside-soloing context를 objective decision summary까지 보존한 작업이다.
 
 변경:
 
-- targeted quality repair objective-only next decision script 추가
-- input guard report 입력 검증 연결
+- targeted quality repair objective-only next decision source-context 검증 추가
+- input guard source-context preserved flag 필수화
+- bridge source-context 21개 키 누락 시 objective decision 실패 처리
+- objective summary, readiness, validation summary, markdown report에 source-context 수치 전파
 - preference fill blocked 상태 유지
-- quality claim 불가 상태에서 follow-up repair decision 라우팅
-- 전용 harness mode와 unit test 추가
+- quality claim 불가 상태에서 follow-up repair decision 라우팅 유지
 
 결과:
 
-- document: `docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-09.md`
+- document: `docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
 - source boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
 - next boundary: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
@@ -3509,6 +3510,13 @@ Issue #758은 Issue #756 input guard 이후 listening input 없이 objective evi
 - technical WAV validation: `true`
 - rendered audio file count: `6`
 - failure label delta: `4`
+- source outside-soloing repair evidence ready: `true`
+- source outside-soloing repair source context preserved: `true`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing current repair pitch-role risk after / delta: `0 / 2`
+- follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- bridge repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
 - targeted quality follow-up required: `true`
 - current quality claim ready: `false`
 - human/audio preference claimed: `false`
@@ -3518,8 +3526,9 @@ Issue #758은 Issue #756 input guard 이후 listening input 없이 objective evi
 
 - listening input 부재 상태에서 quality claim 불가.
 - preference fill blocked 상태 유지.
+- source-context preserved flag와 21개 context field 보존 확인.
 - repair 결과가 quality claim으로 승격되지 않았으므로 follow-up decision 필요.
-- 다음 boundary는 targeted quality repair follow-up decision.
+- 다음 boundary는 targeted quality repair follow-up decision source-context refresh.
 
 검증:
 
@@ -3527,10 +3536,12 @@ Issue #758은 Issue #756 input guard 이후 listening input 없이 objective evi
 - `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_targeted_quality_repair_objective_next.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-objective-only-next-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
 
 다음:
 
-- `Stage B MIDI-to-solo targeted quality repair follow-up decision`
+- `Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
