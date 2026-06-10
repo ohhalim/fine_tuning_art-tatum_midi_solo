@@ -6113,8 +6113,8 @@ run_stage_b_midi_to_solo_final_status_audit() {
     --run_id "$run_id" \
     --delivery_package "$delivery_package" \
     --readme_path README.md \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_FINAL_STATUS_AUDIT_2026-06-09.md \
-    --issue_number 742 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_FINAL_STATUS_AUDIT_2026-06-10.md \
+    --issue_number 826 \
     --expected_boundary stage_b_midi_to_solo_final_status_audit \
     --expected_next_boundary stage_b_midi_to_solo_post_mvp_quality_iteration_plan \
     --require_technical_mvp_complete \
