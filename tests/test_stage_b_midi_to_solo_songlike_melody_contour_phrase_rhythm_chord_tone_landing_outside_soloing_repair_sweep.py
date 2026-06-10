@@ -27,6 +27,30 @@ from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chor
 
 CHORDS = ["Cm7", "Fm7", "Bb7", "Ebmaj7"]
 
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
+
 
 def _start(bar: int, position: int, *, bpm: float) -> float:
     seconds_per_beat = 60.0 / bpm
@@ -79,6 +103,7 @@ def followup_report(*, quality_claim: bool = False) -> dict:
             "outside_soloing_pitch_role_risk_delta": 3,
             "outside_soloing_repair_targeted": False,
             "outside_soloing_residual_risk_preserved": True,
+            **SOURCE_CONTEXT,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
@@ -134,6 +159,7 @@ def chord_tone_repair_sweep_report(midi_paths: list[Path]) -> dict:
             "final_landing_chord_tone_count_before": 1,
             "final_landing_chord_tone_count_after": 6,
             "target_supported": True,
+            **SOURCE_CONTEXT,
         },
         "readiness": {
             "chord_tone_landing_repair_sweep_completed": True,
@@ -197,6 +223,36 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepTest(unittest.Tes
             self.assertEqual(summary["source_outside_soloing_pitch_role_risk_delta"], 3)
             self.assertFalse(summary["source_outside_soloing_repair_targeted"])
             self.assertTrue(summary["source_outside_soloing_residual_risk_preserved"])
+            self.assertEqual(
+                summary[
+                    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before"
+                ],
+                5,
+            )
+            self.assertEqual(
+                summary[
+                    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after"
+                ],
+                2,
+            )
+            self.assertEqual(
+                summary[
+                    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after"
+                ],
+                0,
+            )
+            self.assertEqual(
+                summary[
+                    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta"
+                ],
+                3,
+            )
+            self.assertEqual(
+                summary[
+                    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta"
+                ],
+                2,
+            )
             self.assertGreater(summary["outside_soloing_pitch_role_risk_delta"], 0)
             self.assertEqual(summary["outside_soloing_pitch_role_risk_count_after"], 0)
             self.assertTrue(summary["outside_soloing_repair_targeted"])

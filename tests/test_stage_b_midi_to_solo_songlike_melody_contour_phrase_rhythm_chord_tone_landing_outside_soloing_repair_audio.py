@@ -23,6 +23,31 @@ from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chor
 )
 
 
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
+
+
 def write_midi(path: Path) -> None:
     midi = pretty_midi.PrettyMIDI(initial_tempo=124)
     midi.time_signature_changes.append(pretty_midi.TimeSignature(4, 4, 0.0))
@@ -106,6 +131,7 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "max_non_chord_tone_run_before": 4,
             "max_non_chord_tone_run_after": 3,
             "target_supported": True,
+            **SOURCE_CONTEXT,
         },
         "readiness": {
             "outside_soloing_repair_sweep_completed": True,
@@ -129,6 +155,7 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "broad_trained_model_quality_claimed": False,
             "brad_style_adaptation_claimed": False,
             "production_ready_claimed": False,
+            **SOURCE_CONTEXT,
         },
         "decision": {
             "current_boundary": SOURCE_BOUNDARY,
