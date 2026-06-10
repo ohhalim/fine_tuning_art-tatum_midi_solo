@@ -54,10 +54,10 @@
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: Issue #978, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: Issue #980, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh
 - latest MVP current evidence consolidation: Issue #982, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
-- latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
+- latest README evidence refresh: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after MVP current evidence consolidation source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence source-context refresh`
+- open issue queue after README evidence source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -887,6 +887,7 @@
 - model-conditioned pitch-contour objective path ready: `true`
 - model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - outside-soloing repair objective path ready: `true`
+- outside-soloing repair source context preserved: `true`
 - outside-soloing repair rendered audio file count: `6`
 - outside-soloing repair changed note total: `2`
 - source objective outside-soloing pitch-role risk count: `5`
@@ -904,6 +905,7 @@
 - latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence supported: `true`
 - outside-soloing repair objective path ready: `true`
+- outside-soloing repair source context preserved: `true`
 - outside-soloing repair rendered audio file count: `6`
 - outside-soloing source pitch-role risk count: `5 -> 2`
 - outside-soloing source residual risk preserved: `true`

@@ -48,9 +48,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: `Issue #978`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: `Issue #980`
 - latest MVP current evidence consolidation: `Issue #982`
-- latest README evidence refresh: `Issue #900`
+- latest README evidence refresh: `Issue #984`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
-- open issue queue after MVP current evidence consolidation source-context refresh merge: `0`
+- open issue queue after README evidence source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -432,6 +432,7 @@ MVP current evidence refresh.
 - model-conditioned pitch-contour objective path ready: `true`
 - model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - outside-soloing repair objective path ready: `true`
+- outside-soloing repair source context preserved: `true`
 - outside-soloing repair rendered audio file count: `6`
 - outside-soloing repair changed note total: `2`
 - outside-soloing source objective pitch-role risk count: `5`

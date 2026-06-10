@@ -11,6 +11,7 @@
 
 - current MVP evidence supported: `true`
 - outside-soloing repair objective path ready: `true`
+- outside-soloing repair source context preserved: `true`
 - outside-soloing repair rendered audio file count: `6`
 - outside-soloing repair changed note total: `2`
 - source objective outside-soloing pitch-role risk count: `5`
