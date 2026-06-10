@@ -38,10 +38,11 @@
 - latest songlike melody contour phrase/rhythm repair audio package: Issue #946, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm repair listening review package: Issue #948, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm repair listening review input guard: Issue #950, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh
+- latest songlike melody contour phrase/rhythm repair objective-only next decision: Issue #952, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm repair listening review input guard source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -265,6 +266,29 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 decision target: `songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision`
+- songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh 완료
+- selected target: `songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- review item count: `6`
+- required input field count: `4`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- duration range: `18.871s-19.000s`
+- failure label delta: `3`
+- phrase/rhythm failure delta: `3`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing source pitch-role risk delta: `3`
+- source outside-soloing source repair targeted: `false`
+- source outside-soloing source residual risk preserved: `true`
+- source outside-soloing current repair pitch-role risk count after / delta: `0 / 2`
+- source/repaired outside-soloing not evaluable count: `6/6`
+- phrase/rhythm follow-up required: `true`
+- current quality claim ready: `false`
+- critical user input required: `false`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 follow-up target: `songlike_melody_contour_phrase_rhythm_repair_followup_decision`
 - songlike melody contour repair follow-up decision 완료
 - primary remaining failure labels: `phrase_shape_missing_tension_release`, `rhythmic_monotony`
 - primary remaining failure count: `2`
