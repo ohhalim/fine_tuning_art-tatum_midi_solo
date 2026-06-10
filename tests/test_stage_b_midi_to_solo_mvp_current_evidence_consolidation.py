@@ -44,6 +44,9 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
 }
 
 
@@ -401,7 +404,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     "outside_soloing_repair_objective"
                 ],
                 output_dir=Path(tmp) / "out",
-                issue_number=982,
+                issue_number=1066,
             )
             summary = validate_current_evidence_consolidation_report(
                 report,
@@ -505,6 +508,15 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
             for key in BRIDGE_SOURCE_CONTEXT_KEYS:
                 self.assertIn(key, report["outside_soloing_repair_objective_path"])
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
+            self.assertTrue(
+                summary["followup_objective_source_outside_soloing_source_context_preserved"]
+            )
+            self.assertTrue(
+                summary["followup_repair_sweep_source_outside_soloing_source_context_preserved"]
+            )
+            self.assertTrue(
+                summary["repair_sweep_source_outside_soloing_source_context_preserved"]
+            )
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
             self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
@@ -691,7 +703,34 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                         "outside_soloing_repair_objective"
                     ],
                     output_dir=Path(tmp) / "out",
-                    issue_number=982,
+                    issue_number=1066,
+                )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp))
+            data["outside_soloing_repair_objective"]["objective_summary"][
+                "repair_sweep_source_outside_soloing_source_context_preserved"
+            ] = False
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
+                    model_conditioned_pitch_contour_objective_next=data[
+                        "model_conditioned_pitch_contour_objective"
+                    ],
+                    model_conditioned_pitch_contour_changed_ratio_repair_objective_next=data[
+                        "model_conditioned_pitch_contour_changed_ratio_repair_objective"
+                    ],
+                    outside_soloing_repair_objective_next=data[
+                        "outside_soloing_repair_objective"
+                    ],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=1066,
                 )
 
         with tempfile.TemporaryDirectory() as tmp:

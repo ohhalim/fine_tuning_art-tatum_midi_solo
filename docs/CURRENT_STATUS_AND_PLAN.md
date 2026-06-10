@@ -12,7 +12,7 @@
 
 현재 active issue:
 
-- latest functional result: Issue #982, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
+- latest functional result: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest MVP completion audit: Issue #986, Stage B MIDI-to-solo MVP completion audit source-context refresh
 - latest quality gap decision: Issue #988, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #990, Stage B MIDI-to-solo listening review quality gap source-context refresh
@@ -53,11 +53,11 @@
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: Issue #1060, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: Issue #1062, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: Issue #1064, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh
-- latest MVP current evidence consolidation: Issue #982, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
+- latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #984, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after chord-tone landing outside-soloing repair objective-only next decision source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh`
+- open issue queue after MVP current evidence consolidation source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence refresh source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -905,7 +905,7 @@
 - current evidence consolidation ready: `true`
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
-- 다음 consolidation target: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- 다음 consolidation target: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_source_context_refresh`
 - MVP current evidence consolidation source-context refresh 완료
 - current MVP evidence supported: `true`
 - selected-scale objective path complete: `true`
@@ -924,6 +924,9 @@
 - outside-soloing repair pitch-role risk count after: `0`
 - outside-soloing repair pitch-role risk delta: `2`
 - outside-soloing repair objective path supported: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 README target: `stage_b_midi_to_solo_readme_evidence_refresh`
@@ -5007,6 +5010,63 @@ Issue #1064는 Issue #1062 input guard의 source-context preserved flag를 objec
 다음:
 
 - `Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh`
+
+## Stage B MIDI-to-Solo MVP Current Evidence Consolidation Source-Context Refresh Result
+
+Issue #1066은 Issue #1064 outside-soloing repair objective decision의 source-context preserved flag를 MVP current evidence consolidation까지 보존하고, current evidence support를 재검증한 작업이다.
+
+변경:
+
+- current evidence consolidation schema v3 적용
+- outside-soloing repair objective required source-context key와 preserved flag 3개 필수 검증
+- outside-soloing repair objective path, readiness, validation summary source-context preserved field 전파
+- harness issue number를 #1066 기준으로 갱신
+- next recommended issue를 README evidence refresh source-context refresh로 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_CURRENT_EVIDENCE_CONSOLIDATION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- current MVP evidence supported: `true`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair source context preserved: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair objective path supported: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- broad trained model quality claimed: `false`
+- Brad style adaptation claimed: `false`
+
+판단:
+
+- Issue #1064 objective decision의 preserved flag 3개가 current evidence outside-soloing repair objective path와 validation summary까지 유지됨.
+- selected-scale objective path, phrase-bank CLI technical path, model-conditioned pitch-contour path, changed-ratio repair path, outside-soloing repair path 모두 current evidence support에 포함.
+- human/audio preference, MIDI-to-solo musical quality, broad trained model quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- `.venv/bin/python -m py_compile scripts/consolidate_stage_b_midi_to_solo_mvp_current_evidence.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-current-evidence-consolidation`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음:
+
+- `Stage B MIDI-to-solo README evidence refresh source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
