@@ -419,6 +419,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package: review items `6`, validated input `false`, source/repaired outside-soloing not evaluable `6/6`, technical WAV validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard: preference fill `false`, validated input `false`, source/repaired outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision: follow-up required `true`, source/repaired outside-soloing not evaluable `6/6`, current quality claim ready `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision: selected target `songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`, remaining label/count `rhythmic_monotony/1`, objective/sweep outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
 - MIDI-to-solo pitch-contour changed-ratio review decision: selected target `lower_pitch_change_ratio_repair_probe`, repair probe required `true`, max interval/threshold `11/12`, changed-ratio review threshold `0.5`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
 - MIDI-to-solo pitch-contour changed-ratio repair probe: repaired/pass `3/3`, max pitch changed ratio `0.7174 -> 0.4348`, max interval `12`, dead-air max `0.0000`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package`
 - MIDI-to-solo pitch-contour changed-ratio repair audio package: rendered WAV `3`, duration `18.422s-18.978s`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package`
@@ -6960,6 +6961,57 @@ Issue #866은 Issue #864 input guard의 outside-soloing context를 objective-onl
 다음 작업:
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision refresh`
+
+## 9.125 Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision outside-soloing context refresh
+
+Issue #868은 Issue #866 objective-only next decision과 phrase/rhythm repair sweep의 outside-soloing context를 follow-up decision까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision`
+- repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- selected target: `songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- follow-up decision completed: `true`
+- primary remaining failure labels: `rhythmic_monotony`
+- primary remaining failure count: `1`
+- candidate count: `6`
+- total failure labels: `4 -> 1`
+- phrase/rhythm failure count: `4 -> 1`
+- phrase/rhythm failure delta: `3`
+- residual rhythmic monotony count: `1`
+- not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
+- objective source/repaired outside-soloing not evaluable count: `6/6`
+- repair sweep source/repaired outside-soloing not evaluable count: `6/6`
+- objective source outside-soloing repair pitch-role risk count after: `0`
+- repair sweep source outside-soloing repair pitch-role risk count after: `0`
+- chord-context pitch-role bridge selected: `true`
+- context not-evaluable min count: `6`
+- technical regression count: `0`
+- critical user input required: `false`
+- human/audio preference claimed: `false`
+- audio rendered quality claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- remaining objective failure label은 `rhythmic_monotony=1`.
+- outside-soloing과 weak chord-tone landing은 chord-context/pitch-role bridge 전까지 not-evaluable 경계 유지.
+- objective next decision과 repair sweep 양쪽 outside-soloing context 보존.
+- 다음 boundary는 chord-context pitch-role bridge.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-followup-decision`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge refresh`
 
 ## 10. 한 문장 요약
 

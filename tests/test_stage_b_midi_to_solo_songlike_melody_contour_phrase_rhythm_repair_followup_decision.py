@@ -32,6 +32,14 @@ def objective_next_report(*, quality_claim: bool = False) -> dict:
             "rendered_audio_file_count": 6,
             "failure_label_delta": 3,
             "phrase_rhythm_failure_delta": 3,
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
+            "repaired_not_evaluable_counts": {
+                "outside_soloing_without_context": 6,
+                "weak_chord_tone_landing": 6,
+            },
             "current_quality_claim_ready": False,
         },
         "readiness": {
@@ -78,6 +86,14 @@ def repair_sweep_report(*, technical_regression_count: int = 0) -> dict:
             "repaired_failure_counts": {
                 "rhythmic_monotony": 1,
             },
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
+            "repaired_not_evaluable_counts": {
+                "outside_soloing_without_context": 6,
+                "weak_chord_tone_landing": 6,
+            },
         },
         "readiness": {
             "songlike_melody_contour_phrase_rhythm_repair_sweep_completed": True,
@@ -104,7 +120,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
                 objective_next_report=objective_next_report(),
                 repair_sweep_report=repair_sweep_report(),
                 output_dir=Path(tmp) / "followup",
-                issue_number=784,
+                issue_number=868,
             )
             summary = validate_followup_decision_report(
                 report,
@@ -127,6 +143,23 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
             self.assertEqual(summary["failure_label_delta"], 3)
             self.assertEqual(summary["phrase_rhythm_failure_delta"], 3)
             self.assertEqual(summary["context_not_evaluable_min_count"], 6)
+            self.assertTrue(summary["objective_source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(
+                summary["objective_source_outside_soloing_repair_pitch_role_risk_count_after"],
+                0,
+            )
+            self.assertEqual(summary["objective_source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["objective_repaired_outside_soloing_not_evaluable_count"], 6)
+            self.assertTrue(summary["repair_sweep_source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(
+                summary["repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after"],
+                0,
+            )
+            self.assertEqual(summary["repair_sweep_source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(
+                summary["repair_sweep_repaired_outside_soloing_not_evaluable_count"],
+                6,
+            )
             self.assertEqual(summary["technical_regression_count"], 0)
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
             self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
@@ -142,7 +175,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
                     objective_next_report=objective_next_report(quality_claim=True),
                     repair_sweep_report=repair_sweep_report(),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=772,
+                    issue_number=868,
                 )
 
     def test_rejects_technical_regression(self) -> None:
@@ -154,7 +187,37 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
                     objective_next_report=objective_next_report(),
                     repair_sweep_report=repair_sweep_report(technical_regression_count=1),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=772,
+                    issue_number=868,
+                )
+
+    def test_rejects_missing_objective_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = objective_next_report()
+            del source["objective_summary"]["source_outside_soloing_not_evaluable_count"]
+
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError
+            ):
+                build_followup_decision_report(
+                    objective_next_report=source,
+                    repair_sweep_report=repair_sweep_report(),
+                    output_dir=Path(tmp) / "followup",
+                    issue_number=868,
+                )
+
+    def test_rejects_missing_repair_sweep_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = repair_sweep_report()
+            del source["aggregate"]["repaired_outside_soloing_not_evaluable_count"]
+
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError
+            ):
+                build_followup_decision_report(
+                    objective_next_report=objective_next_report(),
+                    repair_sweep_report=source,
+                    output_dir=Path(tmp) / "followup",
+                    issue_number=868,
                 )
 
     def test_constants_are_stable(self) -> None:
