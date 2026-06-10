@@ -7156,6 +7156,51 @@ Issue #874는 Issue #872 pitch-role objective decision의 outside-soloing contex
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package refresh`
 
+## 9.129 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package outside-soloing context refresh
+
+Issue #876은 Issue #874 landing repair sweep의 outside-soloing residual context를 audio package summary까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package`
+- rendered audio file count: `6`
+- sample rate: `44100`
+- duration range: `18.871s-19.000s`
+- technical WAV validation: `true`
+- changed note total: `40`
+- objective outside-soloing pitch-role risk count: `5`
+- weak chord-tone landing risk count: `6 -> 0`
+- outside-soloing pitch-role risk count: `5 -> 2`
+- outside-soloing repair targeted: `false`
+- outside-soloing residual risk preserved: `true`
+- final landing chord-tone count: `1 -> 6`
+- audio review required: `true`
+- critical user input required: `false`
+- audio rendered quality claimed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- WAV 렌더는 technical metadata 검증 범위.
+- outside-soloing residual risk는 `2`로 다음 listening review package까지 전달 필요.
+- outside-soloing repair claim은 제외.
+- human/audio preference와 musical quality claim은 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio`
+- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-repair-audio-package`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
