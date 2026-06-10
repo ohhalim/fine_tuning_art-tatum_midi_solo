@@ -6556,8 +6556,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_
   "$PYTHON_BIN" scripts/build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package.py \
     --run_id "$review_run_id" \
     --audio_package_report "$audio_package_report" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_REPAIR_LISTENING_REVIEW_PACKAGE_2026-06-09.md \
-    --issue_number 778 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_REPAIR_LISTENING_REVIEW_PACKAGE_2026-06-10.md \
+    --issue_number 862 \
     --expected_review_item_count 6 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard \
