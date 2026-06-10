@@ -6134,8 +6134,8 @@ run_stage_b_midi_to_solo_post_mvp_quality_iteration_plan() {
   "$PYTHON_BIN" scripts/plan_stage_b_midi_to_solo_post_mvp_quality_iteration.py \
     --run_id "$run_id" \
     --final_status_audit "$final_status" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_POST_MVP_QUALITY_ITERATION_PLAN_2026-06-10.md \
-    --issue_number 828 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_POST_MVP_QUALITY_ITERATION_PLAN_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 914 \
     --expected_boundary stage_b_midi_to_solo_post_mvp_quality_iteration_plan \
     --expected_next_boundary stage_b_midi_to_solo_quality_rubric_baseline \
     --expected_target quality_rubric_baseline \
