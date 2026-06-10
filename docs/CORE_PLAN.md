@@ -11287,6 +11287,49 @@ Issue #1036은 Issue #1034 input guard의 pending input 상태와 objective/sour
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh`
 
+## 9.209 Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh
+
+Issue #1038은 Issue #1036 objective-only next decision과 Issue #1028 repair sweep의 source-context를 follow-up decision에서 비교 검증한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision`
+- repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- selected target: `songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- candidate count: `6`
+- failure label delta: `3`
+- phrase/rhythm failure delta: `3`
+- primary remaining failure labels: `rhythmic_monotony`
+- primary remaining failure count: `1`
+- context not-evaluable min count: `6`
+- objective source outside-soloing source context preserved: `true`
+- repair sweep source outside-soloing source context preserved: `true`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- current repair pitch-role risk count after / delta: `0 / 2`
+- technical regression count: `0`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- objective-only next decision과 repair sweep의 source-context 불일치 없음.
+- residual rhythmic monotony는 1개 남았지만, context not-evaluable target 2종이 candidate 6개 전체에서 유지.
+- 후속 repair보다 chord-context pitch-role bridge 진입 조건 우선.
+- quality/preference claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-followup-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

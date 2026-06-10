@@ -1,4 +1,4 @@
-# Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Repair Follow-Up Decision
+# Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Repair Follow-Up Decision Source Context Refresh
 
 ## Summary
 
@@ -19,13 +19,19 @@
 - residual rhythmic monotony count: `1`
 - context not-evaluable min count: `6`
 - objective source/repaired outside-soloing not evaluable count: `6/6`
+- objective source outside-soloing source context preserved: `true`
 - objective source outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`
 - objective source outside-soloing source repair targeted: `false`
 - objective source outside-soloing source residual risk preserved: `true`
+- objective follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- objective repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
 - repair sweep source/repaired outside-soloing not evaluable count: `6/6`
+- repair sweep source outside-soloing source context preserved: `true`
 - repair sweep source outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`
 - repair sweep source outside-soloing source repair targeted: `false`
 - repair sweep source outside-soloing source residual risk preserved: `true`
+- follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- bridge repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
 - objective source outside-soloing repair pitch-role risk count after: `0`
 - objective source outside-soloing current repair pitch-role risk delta: `2`
 - repair sweep source outside-soloing repair pitch-role risk count after: `0`
