@@ -6791,6 +6791,35 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landin
     --require_no_quality_claim
 }
 
+run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision() {
+  local objective_run_id="${OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision}"
+  local sweep_run_id="${REPAIR_SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision}"
+  local objective_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision/${objective_run_id}/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision.json"
+  local sweep_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep/${sweep_run_id}/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep.json"
+  if [[ ! -f "$objective_report" ]]; then
+    print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision"
+    RUN_ID="$objective_run_id" run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision
+  fi
+  if [[ ! -f "$sweep_report" ]]; then
+    print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep"
+    RUN_ID="$sweep_run_id" run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep
+  fi
+  print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision"
+  "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup.py \
+    --run_id "$run_id" \
+    --objective_next_report "$objective_report" \
+    --repair_sweep_report "$sweep_report" \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_REPAIR_FOLLOWUP_DECISION_2026-06-10.md \
+    --issue_number 800 \
+    --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision \
+    --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep \
+    --expected_target songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep \
+    --require_followup_decision \
+    --require_outside_soloing_repair \
+    --require_no_quality_claim
+}
+
 run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision() {
   local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
   local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision}"
@@ -9131,6 +9160,9 @@ case "$MODE" in
     ;;
   stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-repair-objective-only-next-decision)
     run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision
+    ;;
+  stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-repair-followup-decision)
+    run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision
     ;;
   stage-b-midi-to-solo-model-conditioned-pitch-contour-changed-ratio-review-decision)
     run_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_review_decision
