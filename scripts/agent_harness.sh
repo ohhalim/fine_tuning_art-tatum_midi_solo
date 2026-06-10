@@ -5922,8 +5922,8 @@ run_stage_b_midi_to_solo_mvp_current_evidence_consolidation() {
   local cli_objective_next_run_id="${CLI_OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_phrase_bank_cli_objective_only_next_decision}"
   local model_conditioned_pitch_contour_objective_next_run_id="${MODEL_CONDITIONED_PITCH_CONTOUR_OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_input_path_dead_air_timing_repair_pitch_contour_objective_next}"
   local model_conditioned_pitch_contour_changed_ratio_repair_objective_next_run_id="${MODEL_CONDITIONED_PITCH_CONTOUR_CHANGED_RATIO_REPAIR_OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_objective_next}"
-  local outside_soloing_repair_objective_next_run_id="${OUTSIDE_SOLOING_REPAIR_OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_current_evidence_consolidation}"
+  local outside_soloing_repair_objective_next_run_id="${OUTSIDE_SOLOING_REPAIR_OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision_source_context_refresh}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_mvp_current_evidence_consolidation_source_context_refresh}"
   local contract_report="outputs/stage_b_midi_to_solo_mvp_contract/${contract_run_id}/stage_b_midi_to_solo_mvp_contract.json"
   local context_report="outputs/stage_b_midi_to_solo_context_extraction/${context_run_id}/stage_b_midi_to_solo_context_extraction.json"
   local resource_probe="outputs/stage_b_midi_to_solo_training_resource_probe/${resource_run_id}/stage_b_midi_to_solo_training_resource_probe.json"
@@ -5988,7 +5988,7 @@ run_stage_b_midi_to_solo_mvp_current_evidence_consolidation() {
     --model_conditioned_pitch_contour_changed_ratio_repair_objective_next "$model_conditioned_pitch_contour_changed_ratio_repair_objective_next" \
     --outside_soloing_repair_objective_next "$outside_soloing_repair_objective_next" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_CURRENT_EVIDENCE_CONSOLIDATION_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 898 \
+    --issue_number 982 \
     --expected_boundary stage_b_midi_to_solo_mvp_current_evidence_consolidation \
     --expected_next_boundary stage_b_midi_to_solo_readme_evidence_refresh \
     --min_exported_candidates 3 \

@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest functional result: `Issue #898`
+- latest functional result: `Issue #982`
 - latest MVP completion audit: `Issue #902`
 - latest quality gap decision: `Issue #904`
 - latest listening review quality gap: `Issue #906`
@@ -47,9 +47,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: `Issue #976`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: `Issue #978`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: `Issue #980`
+- latest MVP current evidence consolidation: `Issue #982`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision`
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- open issue queue after MVP current evidence consolidation source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -128,6 +129,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase/rhythm chord-tone landing outside-soloing repair selected target: `current_evidence_consolidation`
 - phrase/rhythm chord-tone landing outside-soloing repair objective path supported: `true`
 - phrase/rhythm chord-tone landing outside-soloing repair current evidence consolidation ready: `true`
+- phrase/rhythm chord-tone landing outside-soloing repair source context preserved: `true`
 - phrase/rhythm repair technical WAV validation: `true`
 - phrase/rhythm repair source outside-soloing pitch-role risk: `5 -> 2`
 - phrase/rhythm repair current outside-soloing pitch-role risk after / delta: `0 / 2`
@@ -241,6 +243,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - pitch-contour changed-ratio repair max pitch changed ratio / target: `0.4348 / 0.5000`
 - current evidence changed-ratio repair objective path included: `true`
 - outside-soloing repair objective path included in current evidence: `true`
+- outside-soloing repair source context preserved in current evidence: `true`
 - outside-soloing repair WAV files: `6`
 - outside-soloing repair changed note total: `2`
 - outside-soloing source pitch-role risk: `5 -> 2`
