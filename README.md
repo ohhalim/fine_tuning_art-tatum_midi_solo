@@ -41,7 +41,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: `Issue #1048`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: `Issue #1050`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: `Issue #1052`
-- latest songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: `Issue #970`
+- latest songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: `Issue #1054`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep: `Issue #972`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: `Issue #974`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: `Issue #976`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #982`
 - latest README evidence refresh: `Issue #984`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
-- open issue queue after chord-tone landing repair objective-only next decision source-context refresh merge: `0`
+- open issue queue after chord-tone landing repair follow-up decision source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -111,6 +111,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase/rhythm chord-tone landing follow-up decision completed: `true`
 - phrase/rhythm chord-tone landing selected next target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
 - phrase/rhythm chord-tone landing primary remaining risk count: `2`
+- phrase/rhythm chord-tone landing follow-up source context preserved: `true`
 - phrase/rhythm chord-tone landing audio review required: `true`
 - phrase/rhythm chord-tone landing outside-soloing repair sweep completed: `true`
 - phrase/rhythm chord-tone landing outside-soloing risk count: `2 -> 0`

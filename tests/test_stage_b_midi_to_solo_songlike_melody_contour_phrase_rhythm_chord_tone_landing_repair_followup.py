@@ -26,6 +26,7 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_objective_source_outside_soloing_source_targeted": False,
     "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -33,6 +34,7 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_source_targeted": False,
     "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -40,6 +42,7 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_source_targeted": False,
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -153,7 +156,7 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                 objective_next_report=objective_next_report(),
                 repair_sweep_report=repair_sweep_report(),
                 output_dir=Path(tmp) / "followup",
-                issue_number=884,
+                issue_number=1054,
             )
             summary = validate_followup_decision_report(
                 report,
@@ -197,17 +200,30 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                 ],
                 0,
             )
+            self.assertTrue(
+                summary[
+                    "followup_objective_source_outside_soloing_source_context_preserved"
+                ]
+            )
             self.assertEqual(
                 summary[
                     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta"
                 ],
                 3,
             )
+            self.assertTrue(
+                summary[
+                    "followup_repair_sweep_source_outside_soloing_source_context_preserved"
+                ]
+            )
             self.assertEqual(
                 summary[
                     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta"
                 ],
                 2,
+            )
+            self.assertTrue(
+                summary["repair_sweep_source_outside_soloing_source_context_preserved"]
             )
             self.assertTrue(summary["technical_wav_validation"])
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -222,7 +238,7 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                     objective_next_report=objective_next_report(quality_claim=True),
                     repair_sweep_report=repair_sweep_report(),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=884,
+                    issue_number=1054,
                 )
 
     def test_rejects_missing_repair_support(self) -> None:
@@ -234,7 +250,7 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                     objective_next_report=objective_next_report(),
                     repair_sweep_report=repair_sweep_report(target_supported=False),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=884,
+                    issue_number=1054,
                 )
 
     def test_rejects_missing_outside_soloing_risk(self) -> None:
@@ -246,7 +262,23 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                     objective_next_report=objective_next_report(outside_after=0),
                     repair_sweep_report=repair_sweep_report(),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=884,
+                    issue_number=1054,
+                )
+
+    def test_rejects_source_context_preservation_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            report = objective_next_report()
+            report["objective_summary"][
+                "followup_objective_source_outside_soloing_source_context_preserved"
+            ] = False
+            with self.assertRaises(
+                StageBMidiToSoloChordToneLandingRepairFollowupDecisionError
+            ):
+                build_followup_decision_report(
+                    objective_next_report=report,
+                    repair_sweep_report=repair_sweep_report(),
+                    output_dir=Path(tmp) / "followup",
+                    issue_number=1054,
                 )
 
     def test_constants_are_stable(self) -> None:
