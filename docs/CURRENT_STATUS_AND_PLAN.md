@@ -41,10 +41,11 @@
 - latest songlike melody contour phrase/rhythm repair objective-only next decision: Issue #952, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh
 - latest songlike melody contour phrase/rhythm repair follow-up decision: Issue #954, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-context pitch-role bridge: Issue #956, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh
+- latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: Issue #958, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -352,6 +353,35 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 objective target: `songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
+- songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh 완료
+- selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- primary risk label: `weak_chord_tone_landing_risk`
+- candidate count: `6`
+- weak chord-tone landing risk count: `6`
+- outside-soloing pitch-role risk count: `5`
+- not evaluable count: `12 -> 0`
+- follow-up objective source/repaired outside-soloing not evaluable count: `6/6`
+- follow-up repair sweep source/repaired outside-soloing not evaluable count: `6/6`
+- bridge repair sweep source/repaired outside-soloing not evaluable count: `6/6`
+- follow-up objective source outside-soloing source pitch-role risk count: `5 -> 2`
+- follow-up objective source outside-soloing source pitch-role risk delta: `3`
+- follow-up objective source outside-soloing source repair targeted: `false`
+- follow-up objective source outside-soloing source residual risk preserved: `true`
+- follow-up objective source outside-soloing current repair pitch-role risk count after / delta: `0 / 2`
+- follow-up repair sweep source outside-soloing source pitch-role risk count: `5 -> 2`
+- follow-up repair sweep source outside-soloing source pitch-role risk delta: `3`
+- follow-up repair sweep source outside-soloing source repair targeted: `false`
+- follow-up repair sweep source outside-soloing source residual risk preserved: `true`
+- follow-up repair sweep source outside-soloing current repair pitch-role risk count after / delta: `0 / 2`
+- bridge repair sweep source outside-soloing source pitch-role risk count: `5 -> 2`
+- bridge repair sweep source outside-soloing source pitch-role risk delta: `3`
+- bridge repair sweep source outside-soloing source repair targeted: `false`
+- bridge repair sweep source outside-soloing source residual risk preserved: `true`
+- bridge repair sweep source outside-soloing current repair pitch-role risk count after / delta: `0 / 2`
+- critical user input required: `false`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 repair target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
 - songlike melody contour repair follow-up decision 완료
 - primary remaining failure labels: `phrase_shape_missing_tension_release`, `rhythmic_monotony`
 - primary remaining failure count: `2`

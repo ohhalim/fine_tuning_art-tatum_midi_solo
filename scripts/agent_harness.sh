@@ -6667,8 +6667,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pit
 }
 
 run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision() {
-  local bridge_run_id="${BRIDGE_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision}"
+  local bridge_run_id="${BRIDGE_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_source_context_refresh}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_source_context_refresh}"
   local bridge_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge/${bridge_run_id}/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge.json"
   if [[ ! -f "$bridge_report" ]]; then
     print_header "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge"
@@ -6678,8 +6678,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pit
   "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective.py \
     --run_id "$run_id" \
     --bridge_report "$bridge_report" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_CONTEXT_PITCH_ROLE_OBJECTIVE_DECISION_2026-06-10.md \
-    --issue_number 872 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_CONTEXT_PITCH_ROLE_OBJECTIVE_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 958 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep \
     --expected_target songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep \

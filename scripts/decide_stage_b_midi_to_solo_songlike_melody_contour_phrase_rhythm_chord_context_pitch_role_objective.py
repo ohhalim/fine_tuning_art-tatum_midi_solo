@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT_DIR))
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
     BOUNDARY as BRIDGE_BOUNDARY,
+    BRIDGE_SOURCE_CONTEXT_KEYS,
     NEXT_BOUNDARY as BRIDGE_NEXT_BOUNDARY,
 )
 
@@ -30,7 +31,7 @@ NEXT_BOUNDARY = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep"
 )
 SELECTED_TARGET = "songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep"
-SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v1"
+SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v2"
 PRIMARY_RISK_LABEL = "weak_chord_tone_landing_risk"
 SECONDARY_RISK_LABEL = "outside_soloing_pitch_role_risk"
 QUALITY_CLAIM_KEYS = [
@@ -127,6 +128,38 @@ def validate_bridge_source(report: dict[str, Any]) -> dict[str, Any]:
             "critical user input should not be required"
         )
     _require_no_quality_claim(readiness, label="bridge readiness")
+    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        if key not in readiness:
+            raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
+                f"bridge source-context field required: {key}"
+            )
+    for key in (
+        "followup_objective_source_outside_soloing_source_targeted",
+        "followup_repair_sweep_source_outside_soloing_source_targeted",
+        "repair_sweep_source_outside_soloing_source_targeted",
+    ):
+        if bool(readiness.get(key, True)):
+            raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
+                f"source outside-soloing target should remain false: {key}"
+            )
+    for key in (
+        "followup_objective_source_outside_soloing_source_residual_risk_preserved",
+        "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved",
+        "repair_sweep_source_outside_soloing_source_residual_risk_preserved",
+    ):
+        if not bool(readiness.get(key, False)):
+            raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
+                f"source outside-soloing residual risk should be preserved: {key}"
+            )
+    for key in (
+        "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after",
+        "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after",
+        "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after",
+    ):
+        if _int(readiness.get(key)) != 0:
+            raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
+                f"current outside-soloing risk should remain resolved: {key}"
+            )
     return {
         "boundary": BRIDGE_BOUNDARY,
         "candidate_count": candidate_count,
@@ -155,6 +188,7 @@ def validate_bridge_source(report: dict[str, Any]) -> dict[str, Any]:
         "min_chord_tone_ratio": _float(summary.get("min_chord_tone_ratio")),
         "max_outside_ratio": _float(summary.get("max_outside_ratio")),
         "max_non_chord_tone_run": _int(summary.get("max_non_chord_tone_run")),
+        **{key: readiness.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
     }
 
 
@@ -226,6 +260,7 @@ def build_objective_decision_report(
             "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
                 bridge["repair_sweep_repaired_outside_soloing_not_evaluable_count"]
             ),
+            **{key: bridge[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS},
             "not_evaluable_after_count": _int(bridge["not_evaluable_after_count"]),
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
@@ -252,9 +287,9 @@ def build_objective_decision_report(
             "brad_style_adaptation",
         ],
         "next_recommended_issue": (
-            "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep"
+            "Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh"
             if next_boundary == NEXT_BOUNDARY
-            else "Stage B MIDI-to-solo songlike melody contour phrase/rhythm outside-soloing pitch-role repair sweep"
+            else "Stage B MIDI-to-solo songlike melody contour phrase/rhythm outside-soloing pitch-role repair sweep source-context refresh"
         ),
     }
 
@@ -304,6 +339,11 @@ def validate_objective_decision_report(
         )
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="objective decision readiness")
+    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        if key not in readiness:
+            raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
+                f"objective source-context field required: {key}"
+            )
     return {
         "boundary": boundary,
         "source_boundary": str(report.get("source_boundary") or ""),
@@ -339,6 +379,7 @@ def validate_objective_decision_report(
         "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
             readiness.get("repair_sweep_repaired_outside_soloing_not_evaluable_count")
         ),
+        **{key: readiness.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)
         ),
@@ -372,6 +413,21 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- follow-up objective source/repaired outside-soloing not evaluable count: `{summary['followup_objective_source_outside_soloing_not_evaluable_count']}/{summary['followup_objective_repaired_outside_soloing_not_evaluable_count']}`",
         f"- follow-up repair sweep source/repaired outside-soloing not evaluable count: `{summary['followup_repair_sweep_source_outside_soloing_not_evaluable_count']}/{summary['followup_repair_sweep_repaired_outside_soloing_not_evaluable_count']}`",
         f"- bridge repair sweep source/repaired outside-soloing not evaluable count: `{summary['repair_sweep_source_outside_soloing_not_evaluable_count']}/{summary['repair_sweep_repaired_outside_soloing_not_evaluable_count']}`",
+        f"- follow-up objective source outside-soloing source pitch-role risk: `{summary['followup_objective_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['followup_objective_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up objective source outside-soloing source pitch-role risk delta: `{summary['followup_objective_source_outside_soloing_source_pitch_role_risk_delta']}`",
+        f"- follow-up objective source outside-soloing source targeted: `{_bool_token(summary['followup_objective_source_outside_soloing_source_targeted'])}`",
+        f"- follow-up objective source outside-soloing source residual risk preserved: `{_bool_token(summary['followup_objective_source_outside_soloing_source_residual_risk_preserved'])}`",
+        f"- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `{summary['followup_objective_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['followup_objective_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- follow-up repair sweep source outside-soloing source pitch-role risk: `{summary['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up repair sweep source outside-soloing source pitch-role risk delta: `{summary['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta']}`",
+        f"- follow-up repair sweep source outside-soloing source targeted: `{_bool_token(summary['followup_repair_sweep_source_outside_soloing_source_targeted'])}`",
+        f"- follow-up repair sweep source outside-soloing source residual risk preserved: `{_bool_token(summary['followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved'])}`",
+        f"- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `{summary['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- bridge repair sweep source outside-soloing source pitch-role risk: `{summary['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- bridge repair sweep source outside-soloing source pitch-role risk delta: `{summary['repair_sweep_source_outside_soloing_source_pitch_role_risk_delta']}`",
+        f"- bridge repair sweep source outside-soloing source targeted: `{_bool_token(summary['repair_sweep_source_outside_soloing_source_targeted'])}`",
+        f"- bridge repair sweep source outside-soloing source residual risk preserved: `{_bool_token(summary['repair_sweep_source_outside_soloing_source_residual_risk_preserved'])}`",
+        f"- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `{summary['repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
         f"- weak chord-tone landing risk count: `{summary['weak_chord_tone_landing_risk_count']}`",
         f"- outside-soloing pitch-role risk count: `{summary['outside_soloing_pitch_role_risk_count']}`",
         f"- min chord-tone ratio: `{summary['min_chord_tone_ratio']:.3f}`",
@@ -408,7 +464,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=872)
+    parser.add_argument("--issue_number", type=int, default=958)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--expected_target", type=str, default="")
