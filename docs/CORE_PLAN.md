@@ -11907,6 +11907,60 @@ Issue #1062는 Issue #1060 listening review package의 source-context preserved 
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh`
 
+## 9.222 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh
+
+Issue #1064는 Issue #1062 input guard의 source-context preserved flag를 objective-only next decision summary와 readiness까지 보존하고, objective evidence 기준 current evidence consolidation 경로를 유지한 작업이다.
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_OUTSIDE_SOLOING_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input_guard`
+- next boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- selected target: `current_evidence_consolidation`
+- review item count: `6`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- changed note total: `2`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- outside-soloing pitch-role risk count after: `0`
+- outside-soloing target supported: `true`
+- weak chord-tone landing risk count after: `0`
+- weak landing target supported: `true`
+- final landing chord-tone count after: `6`
+- final landing target supported: `true`
+- max non-chord-tone run after: `3`
+- non-chord run target supported: `true`
+- outside-soloing repair objective path supported: `true`
+- current evidence consolidation ready: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- audio rendered quality claimed: `false`
+
+판단:
+
+- Issue #1062 input guard의 preserved flag 3개가 objective summary와 readiness까지 유지됨.
+- outside-soloing, weak landing, final landing, non-chord run objective target 통과.
+- current evidence consolidation 준비 완료. 단, listening review input과 musical quality claim은 계속 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-outside-soloing-repair-objective-only-next-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

@@ -46,11 +46,11 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: `Issue #1058`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: `Issue #1060`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: `Issue #1062`
-- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: `Issue #980`
+- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: `Issue #1064`
 - latest MVP current evidence consolidation: `Issue #982`
 - latest README evidence refresh: `Issue #984`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
-- open issue queue after chord-tone landing outside-soloing repair listening review input guard source-context refresh merge: `0`
+- open issue queue after chord-tone landing outside-soloing repair objective-only next decision source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
