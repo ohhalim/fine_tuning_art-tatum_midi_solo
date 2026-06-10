@@ -1,6 +1,6 @@
 # Core Plan
 
-작성일: 2026-05-21
+작성일: 2026-06-11
 
 이 문서는 이 저장소의 기준 문서다.
 
@@ -413,7 +413,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo songlike melody contour repair listening review package: review items `6`, validated input `false`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, technical WAV validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard`
 - MIDI-to-solo songlike melody contour repair listening review input guard: preference fill `false`, validated input `false`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision`
 - MIDI-to-solo songlike melody contour repair objective-only next decision: follow-up required `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, current quality claim ready `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
-- MIDI-to-solo songlike melody contour repair follow-up decision: selected target `songlike_melody_contour_phrase_rhythm_repair_sweep`, primary labels `phrase_shape_missing_tension_release,rhythmic_monotony`, objective/sweep outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- MIDI-to-solo songlike melody contour repair follow-up decision: selected target `songlike_melody_contour_phrase_rhythm_repair_sweep`, primary labels `phrase_shape_missing_tension_release,rhythmic_monotony`, objective and repair sweep source risk `5 -> 2`, current repair risk after/delta `0/2`, objective/sweep outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair sweep: phrase/rhythm failure `4 -> 1`, total failure labels `4 -> 1`, source/repaired outside-soloing not evaluable `6/6`, technical regression `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair audio package: rendered WAV `6`, duration `18.871s-19.000s`, source/repaired outside-soloing not evaluable `6/6`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package: review items `6`, validated input `false`, source/repaired outside-soloing not evaluable `6/6`, technical WAV validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard`
@@ -8754,6 +8754,62 @@ Issue #940은 Issue #938 input guard의 source/current outside-soloing context�
 다음 작업:
 
 - `Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh`
+
+## 9.161 Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh
+
+Issue #942는 Issue #940 objective-only next decision과 songlike melody contour repair sweep의 source/current outside-soloing context를 follow-up decision까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision`
+- repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- selected target: `songlike_melody_contour_phrase_rhythm_repair_sweep`
+- primary remaining failure labels: `phrase_shape_missing_tension_release`, `rhythmic_monotony`
+- primary remaining failure count: `2`
+- candidate count: `6`
+- source total failure labels: `8`
+- repaired total failure labels: `4`
+- failure label delta: `4`
+- technical regression count: `0`
+- objective source outside-soloing repair WAV count: `6`
+- objective source outside-soloing source pitch-role risk count: `5 -> 2`
+- objective source outside-soloing source pitch-role risk delta: `3`
+- objective source outside-soloing source repair targeted: `false`
+- objective source outside-soloing source residual risk preserved: `true`
+- objective source outside-soloing current repair pitch-role risk count after: `0`
+- objective source outside-soloing current repair pitch-role risk delta: `2`
+- objective source/repaired outside-soloing not evaluable count: `6/6`
+- repair sweep source outside-soloing source pitch-role risk count: `5 -> 2`
+- repair sweep source outside-soloing source pitch-role risk delta: `3`
+- repair sweep source outside-soloing source repair targeted: `false`
+- repair sweep source outside-soloing source residual risk preserved: `true`
+- repair sweep source outside-soloing current repair pitch-role risk count after: `0`
+- repair sweep source outside-soloing current repair pitch-role risk delta: `2`
+- repair sweep source/repaired outside-soloing not evaluable count: `6/6`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- objective-only next decision과 repair sweep의 source/current outside-soloing risk context 보존.
+- phrase shape와 rhythmic monotony 잔여 라벨 동률 기준 follow-up target 선택.
+- outside-soloing과 weak chord-tone landing은 context 부재 상태에서 not-evaluable boundary 유지.
+- human/audio preference와 musical quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_repair_followup.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-repair-followup-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh`
 
 ## 10. 한 문장 요약
 
