@@ -179,6 +179,11 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
             self.assertEqual(summary["candidate_count"], 6)
             self.assertGreater(summary["failure_label_delta"], 0)
             self.assertEqual(summary["technical_regression_count"], 0)
+            self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
             self.assertTrue(summary["audio_package_ready"])
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -193,6 +198,19 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                         root,
                         quality_claim=True,
                     ),
+                    rubric_baseline=rubric_baseline(root),
+                    output_dir=root / "sweep",
+                    issue_number=750,
+                )
+
+    def test_rejects_missing_outside_soloing_labeling_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = candidate_failure_labeling(root)
+            source["aggregate"]["outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairSweepError):
+                build_targeted_quality_repair_sweep_report(
+                    candidate_failure_labeling=source,
                     rubric_baseline=rubric_baseline(root),
                     output_dir=root / "sweep",
                     issue_number=750,

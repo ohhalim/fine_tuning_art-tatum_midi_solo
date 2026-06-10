@@ -6211,8 +6211,8 @@ run_stage_b_midi_to_solo_targeted_quality_repair_sweep() {
     --run_id "$run_id" \
     --candidate_failure_labeling "$labeling" \
     --rubric_baseline "$rubric" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_SWEEP_2026-06-09.md \
-    --issue_number 750 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_SWEEP_2026-06-10.md \
+    --issue_number 834 \
     --expected_boundary stage_b_midi_to_solo_targeted_quality_repair_sweep \
     --min_candidate_count 6 \
     --require_sweep_completed \

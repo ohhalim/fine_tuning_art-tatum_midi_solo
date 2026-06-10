@@ -109,6 +109,22 @@ def validate_labeling_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloTargetedQualityRepairSweepError("targeted repair boundary required")
     if _int(summary.get("failed_candidate_count")) <= 0:
         raise StageBMidiToSoloTargetedQualityRepairSweepError("failure labels required")
+    if not bool(summary.get("outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "outside-soloing repair evidence readiness required"
+        )
+    if _int(summary.get("outside_soloing_repair_wav_count")) < 6:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "outside-soloing repair WAV count below 6"
+        )
+    if _int(summary.get("outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "outside-soloing residual pitch-role risk should be zero"
+        )
+    if _int(summary.get("outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "outside-soloing not-evaluable boundary required"
+        )
     return summary
 
 
@@ -291,6 +307,11 @@ def build_targeted_quality_repair_sweep_report(
         for item in relabeled
         for label in _list(_dict(item.get("repaired_labeling")).get("failure_labels"))
     )
+    not_evaluable_counts_after = Counter(
+        label
+        for item in relabeled
+        for label in _list(_dict(item.get("repaired_labeling")).get("not_evaluable_labels"))
+    )
     target_supported = total_after < total_before and technical_regression_count == 0
     next_boundary = NEXT_BOUNDARY if target_supported else FOLLOWUP_BOUNDARY
     return {
@@ -309,6 +330,21 @@ def build_targeted_quality_repair_sweep_report(
             "improved_candidate_count": improved_count,
             "technical_regression_count": technical_regression_count,
             "repaired_failure_counts": dict(sorted(failure_counts_after.items())),
+            "source_outside_soloing_repair_evidence_ready": bool(
+                source_summary["outside_soloing_repair_evidence_ready"]
+            ),
+            "source_outside_soloing_repair_wav_count": _int(
+                source_summary["outside_soloing_repair_wav_count"]
+            ),
+            "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                source_summary["outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "source_outside_soloing_not_evaluable_count": _int(
+                source_summary["outside_soloing_not_evaluable_count"]
+            ),
+            "repaired_outside_soloing_not_evaluable_count": _int(
+                not_evaluable_counts_after.get("outside_soloing_without_context", 0)
+            ),
             "target_supported": target_supported,
         },
         "selected_next_target": {
@@ -412,6 +448,21 @@ def validate_targeted_quality_repair_sweep_report(
         "failure_label_delta": _int(aggregate.get("failure_label_delta")),
         "improved_candidate_count": _int(aggregate.get("improved_candidate_count")),
         "technical_regression_count": _int(aggregate.get("technical_regression_count")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            aggregate.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_wav_count": _int(
+            aggregate.get("source_outside_soloing_repair_wav_count")
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            aggregate.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            aggregate.get("repaired_outside_soloing_not_evaluable_count")
+        ),
         "audio_package_ready": bool(readiness.get("audio_package_ready", False)),
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)
@@ -443,6 +494,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- failure label delta: `{aggregate['failure_label_delta']}`",
         f"- improved candidate count: `{aggregate['improved_candidate_count']}`",
         f"- technical regression count: `{aggregate['technical_regression_count']}`",
+        f"- source outside-soloing repair evidence ready: `{_bool_token(aggregate['source_outside_soloing_repair_evidence_ready'])}`",
+        f"- source outside-soloing repair pitch-role risk after: `{aggregate['source_outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- source outside-soloing not evaluable count: `{aggregate['source_outside_soloing_not_evaluable_count']}`",
+        f"- repaired outside-soloing not evaluable count: `{aggregate['repaired_outside_soloing_not_evaluable_count']}`",
         f"- target supported: `{_bool_token(aggregate['target_supported'])}`",
         "",
         "## Repaired Failure Counts",
