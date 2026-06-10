@@ -14,6 +14,30 @@ from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_ch
     validate_listening_review_input_guard_report,
 )
 
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
+
 
 def source_package(*, quality_claim: bool = False, validated_input: bool = False) -> dict:
     review_items = [
@@ -44,6 +68,7 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "outside_soloing_residual_risk_preserved": True,
             "final_landing_chord_tone_count_after": 6,
             "audio_review_required": True,
+            **SOURCE_CONTEXT,
         },
         "review_package": {
             "package_ready": True,
@@ -109,6 +134,36 @@ class StageBMidiToSoloChordToneLandingRepairListeningInputGuardTest(unittest.Tes
         self.assertFalse(summary["outside_soloing_repair_targeted"])
         self.assertTrue(summary["outside_soloing_residual_risk_preserved"])
         self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
+        self.assertEqual(
+            summary[
+                "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before"
+            ],
+            5,
+        )
+        self.assertEqual(
+            summary[
+                "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after"
+            ],
+            2,
+        )
+        self.assertEqual(
+            summary[
+                "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after"
+            ],
+            0,
+        )
+        self.assertEqual(
+            summary[
+                "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta"
+            ],
+            3,
+        )
+        self.assertEqual(
+            summary[
+                "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta"
+            ],
+            2,
+        )
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
 
