@@ -16,9 +16,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest post-MVP quality iteration plan: `Issue #914`
 - latest quality rubric baseline: `Issue #916`
 - latest candidate failure labeling: `Issue #918`
+- latest targeted quality repair sweep: `Issue #920`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
-- open issue queue after candidate failure labeling source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- open issue queue after targeted quality repair sweep source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -165,6 +166,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - candidate failure failed candidates: `6 / 6`
 - candidate failure label type count: `4`
 - candidate outside-soloing not evaluable count: `6`
+- targeted quality repair sweep completed: `true`
+- targeted quality repair failure label count: `12 -> 8`
+- targeted quality repair improved candidates: `4 / 6`
+- targeted quality repair technical regression count: `0`
 - outside-soloing repair objective path supported: `true`
 - current evidence outside-soloing repair objective path included: `true`
 - listening review quality gap completed: `true`

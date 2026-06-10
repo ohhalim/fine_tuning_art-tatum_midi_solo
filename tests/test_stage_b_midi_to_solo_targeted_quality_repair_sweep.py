@@ -187,13 +187,30 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
             self.assertEqual(summary["technical_regression_count"], 0)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
             self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
+            )
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_pitch_role_risk_count_before"], 5
+            )
+            self.assertEqual(
+                summary["source_outside_soloing_repair_source_pitch_role_risk_count_after"], 2
+            )
+            self.assertEqual(summary["source_outside_soloing_repair_source_pitch_role_risk_delta"], 3)
+            self.assertFalse(summary["source_outside_soloing_repair_source_targeted"])
+            self.assertTrue(summary["source_outside_soloing_repair_source_residual_risk_preserved"])
             self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
             self.assertTrue(summary["audio_package_ready"])
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
+            self.assertEqual(
+                summary["next_recommended_issue"],
+                "Stage B MIDI-to-solo targeted quality repair audio package source-context refresh",
+            )
 
     def test_rejects_labeling_quality_claim(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

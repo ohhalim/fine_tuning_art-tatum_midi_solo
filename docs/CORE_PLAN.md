@@ -402,7 +402,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo post-MVP quality iteration plan: selected target `quality_rubric_baseline`, source risk `5 -> 2`, current repair risk after `0`, ordered work `4`, taxonomy seed `7`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_rubric_baseline`
 - MIDI-to-solo quality rubric baseline: rubric items `8`, metric groups `30`, source risk `5 -> 2`, current repair risk after `0`, candidate failure labeling ready `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_candidate_failure_labeling`
 - MIDI-to-solo candidate failure labeling: candidates `6`, failed `6`, failure label types `4`, not-evaluable types `2`, source risk `5 -> 2`, current repair risk after `0`, targeted repair ready `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_sweep`
-- MIDI-to-solo targeted quality repair sweep: candidates `6`, failure labels `12 -> 8`, improved candidates `4`, technical regression `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
+- MIDI-to-solo targeted quality repair sweep: candidates `6`, failure labels `12 -> 8`, improved candidates `4`, technical regression `0`, source risk `5 -> 2`, current repair risk after `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
 - MIDI-to-solo targeted quality repair audio package: rendered WAV `6`, duration `18.422s-18.984s`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
 - MIDI-to-solo targeted quality repair listening review package: review items `6`, validated input `false`, technical WAV validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
 - MIDI-to-solo targeted quality repair listening review input guard: review items `6`, preference fill `false`, validated input `false`, source outside-soloing not evaluable `6`, repaired outside-soloing not evaluable `6`, source pitch-role risk after `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
@@ -8147,6 +8147,58 @@ Issue #918은 Issue #916 quality rubric baseline의 source/current outside-soloi
 다음 작업:
 
 - `Stage B MIDI-to-solo targeted quality repair sweep source-context refresh`
+
+## 9.150 Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
+
+Issue #920은 Issue #918 candidate failure labeling의 source/current outside-soloing context를 targeted quality repair sweep 결과까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- source boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
+- selected target: `targeted_quality_repair_audio_package`
+- candidate count: `6`
+- source total failure label count: `12`
+- repaired total failure label count: `8`
+- failure label delta: `4`
+- improved candidate count: `4`
+- technical regression count: `0`
+- source outside-soloing repair evidence ready: `true`
+- source outside-soloing repair WAV count: `6`
+- source outside-soloing source objective pitch-role risk count: `5`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing source pitch-role risk delta: `3`
+- source outside-soloing source repair targeted: `false`
+- source outside-soloing source residual risk preserved: `true`
+- source outside-soloing current repair pitch-role risk count after: `0`
+- source outside-soloing current repair pitch-role risk delta: `2`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- audio package ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- candidate failure labeling source validation에 source/current outside-soloing risk guard 추가.
+- targeted repair aggregate와 validation summary에 source/current risk 분리 반영.
+- objective failure label count는 `12 -> 8`로 감소, technical regression `0`.
+- outside-soloing은 chord-context 부재로 not evaluable `6` 유지.
+- 다음 단계는 repaired candidate WAV/audio package 생성.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_targeted_quality_repair_sweep.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-sweep`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo targeted quality repair audio package source-context refresh`
 
 ## 10. 한 문장 요약
 
