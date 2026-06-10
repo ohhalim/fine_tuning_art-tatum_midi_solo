@@ -13,8 +13,11 @@
 - rendered audio file count: `6`
 - duration range: `18.871s-19.000s`
 - changed note total: `40`
+- objective outside-soloing pitch-role risk count: `5`
 - weak chord-tone landing risk delta: `6`
-- outside-soloing pitch-role risk count after: `2`
+- outside-soloing pitch-role risk count: `5 -> 2`
+- outside-soloing repair targeted: `false`
+- outside-soloing residual risk preserved: `true`
 - final landing chord-tone count after: `6`
 - audio review required: `true`
 - human/audio preference claimed: `false`

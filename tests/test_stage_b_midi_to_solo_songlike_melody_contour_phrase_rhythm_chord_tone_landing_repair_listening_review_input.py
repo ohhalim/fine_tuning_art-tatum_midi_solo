@@ -35,8 +35,13 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "duration_min_seconds": 18.871,
             "duration_max_seconds": 19.000,
             "changed_note_total": 40,
+            "objective_outside_soloing_pitch_role_risk_count": 5,
             "weak_chord_tone_landing_risk_delta": 6,
+            "outside_soloing_pitch_role_risk_count_before": 5,
             "outside_soloing_pitch_role_risk_count_after": 2,
+            "outside_soloing_pitch_role_risk_delta": 3,
+            "outside_soloing_repair_targeted": False,
+            "outside_soloing_residual_risk_preserved": True,
             "final_landing_chord_tone_count_after": 6,
             "audio_review_required": True,
         },
@@ -97,7 +102,12 @@ class StageBMidiToSoloChordToneLandingRepairListeningInputGuardTest(unittest.Tes
         self.assertEqual(summary["review_item_count"], 6)
         self.assertEqual(summary["required_input_field_count"], 4)
         self.assertEqual(summary["weak_chord_tone_landing_risk_delta"], 6)
+        self.assertEqual(summary["objective_outside_soloing_pitch_role_risk_count"], 5)
+        self.assertEqual(summary["outside_soloing_pitch_role_risk_count_before"], 5)
         self.assertEqual(summary["outside_soloing_pitch_role_risk_count_after"], 2)
+        self.assertEqual(summary["outside_soloing_pitch_role_risk_delta"], 3)
+        self.assertFalse(summary["outside_soloing_repair_targeted"])
+        self.assertTrue(summary["outside_soloing_residual_risk_preserved"])
         self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
