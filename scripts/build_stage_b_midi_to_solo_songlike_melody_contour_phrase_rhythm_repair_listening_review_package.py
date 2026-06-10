@@ -112,6 +112,22 @@ def validate_audio_package_report(
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
             "rendered audio count below expected"
         )
+    if not bool(summary.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
+            "outside-soloing repair evidence should be ready"
+        )
+    if _int(summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
+            "source outside-soloing repair pitch-role risk should be resolved"
+        )
+    if _int(summary.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
+            "source outside-soloing not-evaluable count should be preserved"
+        )
+    if _int(summary.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
+            "repaired outside-soloing not-evaluable count should be preserved"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
             "critical user input should not be required"
@@ -199,6 +215,19 @@ def build_listening_review_package_report(
             "improved_candidate_count": _int(summary.get("improved_candidate_count")),
             "technical_regression_count": _int(summary.get("technical_regression_count")),
             "remaining_failure_counts": _dict(summary.get("remaining_failure_counts")),
+            "source_outside_soloing_repair_evidence_ready": bool(
+                summary.get("source_outside_soloing_repair_evidence_ready", False)
+            ),
+            "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+            ),
+            "source_outside_soloing_not_evaluable_count": _int(
+                summary.get("source_outside_soloing_not_evaluable_count")
+            ),
+            "repaired_outside_soloing_not_evaluable_count": _int(
+                summary.get("repaired_outside_soloing_not_evaluable_count")
+            ),
+            "repaired_not_evaluable_counts": _dict(summary.get("repaired_not_evaluable_counts")),
             "audio_review_required": bool(summary.get("audio_review_required", False)),
         },
         "review_package": {
@@ -300,6 +329,19 @@ def validate_listening_review_package_report(
         "duration_max_seconds": _float(source.get("duration_max_seconds")),
         "failure_label_delta": _int(source.get("failure_label_delta")),
         "phrase_rhythm_failure_delta": _int(source.get("phrase_rhythm_failure_delta")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            source.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            source.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            source.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            source.get("repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_not_evaluable_counts": _dict(source.get("repaired_not_evaluable_counts")),
         "audio_review_required": bool(source.get("audio_review_required", False)),
         "human_review_required_now": bool(readiness.get("human_review_required_now", True)),
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
@@ -333,6 +375,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- failure label delta: `{source['failure_label_delta']}`",
         f"- phrase/rhythm failure count: `{source['source_phrase_rhythm_failure_count']} -> {source['repaired_phrase_rhythm_failure_count']}`",
         f"- phrase/rhythm failure delta: `{source['phrase_rhythm_failure_delta']}`",
+        f"- source outside-soloing repair evidence ready: `{_bool_token(source['source_outside_soloing_repair_evidence_ready'])}`",
+        f"- source outside-soloing repair pitch-role risk count after: `{source['source_outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- source/repaired outside-soloing not evaluable count: `{source['source_outside_soloing_not_evaluable_count']}/{source['repaired_outside_soloing_not_evaluable_count']}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         "",
         "## Review Items",
@@ -348,6 +393,9 @@ def markdown_report(report: dict[str, Any]) -> str:
     lines.extend(["", "## Required Input Fields", ""])
     for field in package["required_input_fields"]:
         lines.append(f"- `{field}`")
+    lines.extend(["", "## Repaired Not Evaluable Counts", ""])
+    for label, count in sorted(source["repaired_not_evaluable_counts"].items()):
+        lines.append(f"- `{label}`: `{count}`")
     lines.extend(
         [
             "",
@@ -377,7 +425,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=778)
+    parser.add_argument("--issue_number", type=int, default=862)
     parser.add_argument("--expected_review_item_count", type=int, default=6)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
