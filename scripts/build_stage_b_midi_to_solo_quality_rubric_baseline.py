@@ -29,7 +29,7 @@ class StageBMidiToSoloQualityRubricBaselineError(ValueError):
 BOUNDARY = "stage_b_midi_to_solo_quality_rubric_baseline"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_candidate_failure_labeling"
 SELECTED_TARGET = "candidate_failure_labeling"
-SCHEMA_VERSION = "stage_b_midi_to_solo_quality_rubric_baseline_v1"
+SCHEMA_VERSION = "stage_b_midi_to_solo_quality_rubric_baseline_v2"
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -237,6 +237,24 @@ def build_quality_rubric_baseline_report(
         "outside_soloing_repair_changed_note_total": _int(
             source["outside_soloing_repair_changed_note_total"]
         ),
+        "outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
+            source["outside_soloing_repair_source_objective_pitch_role_risk_count"]
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_before": _int(
+            source["outside_soloing_repair_source_pitch_role_risk_count_before"]
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_after": _int(
+            source["outside_soloing_repair_source_pitch_role_risk_count_after"]
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_delta": _int(
+            source["outside_soloing_repair_source_pitch_role_risk_delta"]
+        ),
+        "outside_soloing_repair_source_targeted": bool(
+            source["outside_soloing_repair_source_targeted"]
+        ),
+        "outside_soloing_repair_source_residual_risk_preserved": bool(
+            source["outside_soloing_repair_source_residual_risk_preserved"]
+        ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             source["outside_soloing_repair_pitch_role_risk_count_after"]
         ),
@@ -265,6 +283,24 @@ def build_quality_rubric_baseline_report(
             ),
             "outside_soloing_repair_wav_count": _int(
                 outside_context["outside_soloing_repair_wav_count"]
+            ),
+            "outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
+                outside_context["outside_soloing_repair_source_objective_pitch_role_risk_count"]
+            ),
+            "outside_soloing_repair_source_pitch_role_risk_count_before": _int(
+                outside_context["outside_soloing_repair_source_pitch_role_risk_count_before"]
+            ),
+            "outside_soloing_repair_source_pitch_role_risk_count_after": _int(
+                outside_context["outside_soloing_repair_source_pitch_role_risk_count_after"]
+            ),
+            "outside_soloing_repair_source_pitch_role_risk_delta": _int(
+                outside_context["outside_soloing_repair_source_pitch_role_risk_delta"]
+            ),
+            "outside_soloing_repair_source_targeted": bool(
+                outside_context["outside_soloing_repair_source_targeted"]
+            ),
+            "outside_soloing_repair_source_residual_risk_preserved": bool(
+                outside_context["outside_soloing_repair_source_residual_risk_preserved"]
             ),
             "outside_soloing_repair_pitch_role_risk_count_after": _int(
                 outside_context["outside_soloing_repair_pitch_role_risk_count_after"]
@@ -307,7 +343,7 @@ def build_quality_rubric_baseline_report(
             "midi_to_solo_musical_quality",
             "broad_trained_model_quality",
         ],
-        "next_recommended_issue": "Stage B MIDI-to-solo candidate failure labeling",
+        "next_recommended_issue": "Stage B MIDI-to-solo candidate failure labeling source-context refresh",
     }
 
 
@@ -382,6 +418,24 @@ def validate_quality_rubric_baseline_report(
         "outside_soloing_repair_wav_count": _int(
             baseline.get("outside_soloing_repair_wav_count")
         ),
+        "outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
+            baseline.get("outside_soloing_repair_source_objective_pitch_role_risk_count")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_before": _int(
+            baseline.get("outside_soloing_repair_source_pitch_role_risk_count_before")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_count_after": _int(
+            baseline.get("outside_soloing_repair_source_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_source_pitch_role_risk_delta": _int(
+            baseline.get("outside_soloing_repair_source_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_source_targeted": bool(
+            baseline.get("outside_soloing_repair_source_targeted", True)
+        ),
+        "outside_soloing_repair_source_residual_risk_preserved": bool(
+            baseline.get("outside_soloing_repair_source_residual_risk_preserved", False)
+        ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             baseline.get("outside_soloing_repair_pitch_role_risk_count_after")
         ),
@@ -402,7 +456,7 @@ def markdown_report(report: dict[str, Any]) -> str:
     selected = report["selected_next_target"]
     readiness = report["readiness"]
     lines = [
-        "# Stage B MIDI-to-Solo Quality Rubric Baseline",
+        "# Stage B MIDI-to-Solo Quality Rubric Baseline Source Context Refresh",
         "",
         "## Summary",
         "",
@@ -414,7 +468,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- candidate failure labeling ready: `{_bool_token(baseline['candidate_failure_labeling_ready'])}`",
         f"- outside-soloing repair evidence ready: `{_bool_token(source_context['outside_soloing_repair_evidence_ready'])}`",
         f"- outside-soloing repair WAV count: `{source_context['outside_soloing_repair_wav_count']}`",
-        f"- outside-soloing pitch-role risk after / delta: `{source_context['outside_soloing_repair_pitch_role_risk_count_after']}` / `{source_context['outside_soloing_repair_pitch_role_risk_delta']}`",
+        f"- outside-soloing source objective pitch-role risk: `{source_context['outside_soloing_repair_source_objective_pitch_role_risk_count']}`",
+        f"- outside-soloing source pitch-role risk before / after / delta: `{source_context['outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{source_context['outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{source_context['outside_soloing_repair_source_pitch_role_risk_delta']}`",
+        f"- outside-soloing source repair targeted: `{_bool_token(source_context['outside_soloing_repair_source_targeted'])}`",
+        f"- outside-soloing source residual risk preserved: `{_bool_token(source_context['outside_soloing_repair_source_residual_risk_preserved'])}`",
+        f"- outside-soloing current repair pitch-role risk after / delta: `{source_context['outside_soloing_repair_pitch_role_risk_count_after']}` / `{source_context['outside_soloing_repair_pitch_role_risk_delta']}`",
         "",
         "## Rubric Items",
         "",
