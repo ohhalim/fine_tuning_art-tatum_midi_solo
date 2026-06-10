@@ -31,6 +31,10 @@ def objective_next_report(*, quality_claim: bool = False) -> dict:
             "technical_wav_validation": True,
             "rendered_audio_file_count": 6,
             "failure_label_delta": 4,
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
             "current_quality_claim_ready": False,
         },
         "readiness": {
@@ -74,6 +78,10 @@ def repair_sweep_report(*, technical_regression_count: int = 0) -> dict:
             "failure_label_delta": 4,
             "improved_candidate_count": 4,
             "technical_regression_count": technical_regression_count,
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
             "repaired_failure_counts": {
                 "dead_air_or_density_gap": 1,
                 "phrase_shape_missing_tension_release": 2,
@@ -126,6 +134,20 @@ class StageBMidiToSoloTargetedQualityRepairFollowupDecisionTest(unittest.TestCas
             self.assertEqual(summary["dominant_remaining_failure_count"], 5)
             self.assertEqual(summary["failure_label_delta"], 4)
             self.assertEqual(summary["technical_regression_count"], 0)
+            self.assertTrue(summary["objective_source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(
+                summary["objective_source_outside_soloing_repair_pitch_role_risk_count_after"],
+                0,
+            )
+            self.assertEqual(summary["objective_source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["objective_repaired_outside_soloing_not_evaluable_count"], 6)
+            self.assertTrue(summary["repair_sweep_source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(
+                summary["repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after"],
+                0,
+            )
+            self.assertEqual(summary["repair_sweep_source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repair_sweep_repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
             self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -153,6 +175,34 @@ class StageBMidiToSoloTargetedQualityRepairFollowupDecisionTest(unittest.TestCas
                     repair_sweep_report=repair_sweep_report(technical_regression_count=1),
                     output_dir=Path(tmp) / "followup",
                     issue_number=760,
+                )
+
+    def test_rejects_missing_objective_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = objective_next_report()
+            source["objective_summary"]["source_outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(
+                StageBMidiToSoloTargetedQualityRepairFollowupDecisionError
+            ):
+                build_followup_decision_report(
+                    objective_next_report=source,
+                    repair_sweep_report=repair_sweep_report(),
+                    output_dir=Path(tmp) / "followup",
+                    issue_number=844,
+                )
+
+    def test_rejects_missing_sweep_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = repair_sweep_report()
+            source["aggregate"]["repaired_outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(
+                StageBMidiToSoloTargetedQualityRepairFollowupDecisionError
+            ):
+                build_followup_decision_report(
+                    objective_next_report=objective_next_report(),
+                    repair_sweep_report=source,
+                    output_dir=Path(tmp) / "followup",
+                    issue_number=844,
                 )
 
     def test_constants_are_stable(self) -> None:

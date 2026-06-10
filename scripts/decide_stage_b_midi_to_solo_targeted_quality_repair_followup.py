@@ -113,6 +113,22 @@ def validate_objective_next_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
             "technical WAV validation required"
         )
+    if not bool(summary.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
+            "objective outside-soloing repair evidence readiness required"
+        )
+    if _int(summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
+            "objective outside-soloing residual pitch-role risk should be zero"
+        )
+    if _int(summary.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
+            "objective source outside-soloing not-evaluable boundary required"
+        )
+    if _int(summary.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
+            "objective repaired outside-soloing not-evaluable boundary required"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
             "critical user input should not be required"
@@ -124,6 +140,18 @@ def validate_objective_next_source(report: dict[str, Any]) -> dict[str, Any]:
         "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
         "failure_label_delta": _int(summary.get("failure_label_delta")),
         "technical_wav_validation": bool(summary.get("technical_wav_validation", False)),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            summary.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            summary.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            summary.get("repaired_outside_soloing_not_evaluable_count")
+        ),
         "validated_review_input_present": bool(
             summary.get("validated_review_input_present", False)
         ),
@@ -171,6 +199,22 @@ def validate_repair_sweep_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
             "technical regression must remain zero"
         )
+    if not bool(aggregate.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
+            "repair sweep outside-soloing repair evidence readiness required"
+        )
+    if _int(aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
+            "repair sweep outside-soloing residual pitch-role risk should be zero"
+        )
+    if _int(aggregate.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
+            "repair sweep source outside-soloing not-evaluable boundary required"
+        )
+    if _int(aggregate.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
+            "repair sweep repaired outside-soloing not-evaluable boundary required"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloTargetedQualityRepairFollowupDecisionError(
             "critical user input should not be required"
@@ -206,6 +250,18 @@ def validate_repair_sweep_source(report: dict[str, Any]) -> dict[str, Any]:
         "failure_label_delta": _int(aggregate.get("failure_label_delta")),
         "improved_candidate_count": _int(aggregate.get("improved_candidate_count")),
         "technical_regression_count": _int(aggregate.get("technical_regression_count")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            aggregate.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            aggregate.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            aggregate.get("repaired_outside_soloing_not_evaluable_count")
+        ),
         "remaining_failure_counts": remaining_counts,
         "dominant_remaining_failure_label": dominant_label,
         "dominant_remaining_failure_count": dominant_count,
@@ -274,6 +330,30 @@ def build_followup_decision_report(
             ),
             "failure_label_delta": _int(sweep["failure_label_delta"]),
             "technical_regression_count": _int(sweep["technical_regression_count"]),
+            "objective_source_outside_soloing_repair_evidence_ready": bool(
+                objective["source_outside_soloing_repair_evidence_ready"]
+            ),
+            "objective_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                objective["source_outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "objective_source_outside_soloing_not_evaluable_count": _int(
+                objective["source_outside_soloing_not_evaluable_count"]
+            ),
+            "objective_repaired_outside_soloing_not_evaluable_count": _int(
+                objective["repaired_outside_soloing_not_evaluable_count"]
+            ),
+            "repair_sweep_source_outside_soloing_repair_evidence_ready": bool(
+                sweep["source_outside_soloing_repair_evidence_ready"]
+            ),
+            "repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                sweep["source_outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+                sweep["source_outside_soloing_not_evaluable_count"]
+            ),
+            "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+                sweep["repaired_outside_soloing_not_evaluable_count"]
+            ),
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -388,6 +468,30 @@ def validate_followup_decision_report(
         ),
         "failure_label_delta": _int(readiness.get("failure_label_delta")),
         "technical_regression_count": _int(readiness.get("technical_regression_count")),
+        "objective_source_outside_soloing_repair_evidence_ready": bool(
+            readiness.get("objective_source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "objective_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            readiness.get("objective_source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "objective_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("objective_source_outside_soloing_not_evaluable_count")
+        ),
+        "objective_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("objective_repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_source_outside_soloing_repair_evidence_ready": bool(
+            readiness.get("repair_sweep_source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            readiness.get("repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_source_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_repaired_outside_soloing_not_evaluable_count")
+        ),
         "remaining_failure_counts": _dict(sweep.get("remaining_failure_counts")),
         "not_evaluable_counts": _dict(sweep.get("not_evaluable_counts")),
         "human_audio_preference_claimed": bool(
@@ -425,6 +529,14 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- repaired total failure labels: `{readiness['repaired_total_failure_label_count']}`",
         f"- failure label delta: `{readiness['failure_label_delta']}`",
         f"- technical regression count: `{readiness['technical_regression_count']}`",
+        f"- objective source outside-soloing repair evidence ready: `{_bool_token(readiness['objective_source_outside_soloing_repair_evidence_ready'])}`",
+        f"- objective source outside-soloing repair pitch-role risk after: `{readiness['objective_source_outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- objective source outside-soloing not evaluable count: `{readiness['objective_source_outside_soloing_not_evaluable_count']}`",
+        f"- objective repaired outside-soloing not evaluable count: `{readiness['objective_repaired_outside_soloing_not_evaluable_count']}`",
+        f"- repair sweep source outside-soloing repair evidence ready: `{_bool_token(readiness['repair_sweep_source_outside_soloing_repair_evidence_ready'])}`",
+        f"- repair sweep source outside-soloing repair pitch-role risk after: `{readiness['repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- repair sweep source outside-soloing not evaluable count: `{readiness['repair_sweep_source_outside_soloing_not_evaluable_count']}`",
+        f"- repair sweep repaired outside-soloing not evaluable count: `{readiness['repair_sweep_repaired_outside_soloing_not_evaluable_count']}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         f"- MIDI-to-solo musical quality claimed: `{_bool_token(readiness['midi_to_solo_musical_quality_claimed'])}`",
         "",
@@ -475,7 +587,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=760)
+    parser.add_argument("--issue_number", type=int, default=844)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--expected_target", type=str, default="")

@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #842, Stage B MIDI-to-solo targeted quality repair objective-only next decision outside-soloing context refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair follow-up decision refresh`
+- latest functional result: Issue #844, Stage B MIDI-to-solo targeted quality repair follow-up decision outside-soloing context refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair sweep refresh`
 
 현재 범위가 아닌 것:
 
@@ -518,6 +518,24 @@
 - audio rendered quality claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 follow-up target: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
+- targeted quality repair follow-up decision outside-soloing context refresh 완료
+- selected target: `songlike_melody_contour_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- dominant remaining failure label: `songlike_melody_not_soloing`
+- dominant remaining failure count: `5`
+- candidate count: `6`
+- failure label delta: `4`
+- technical regression count: `0`
+- objective source outside-soloing repair pitch-role risk count after: `0`
+- objective source outside-soloing not evaluable count: `6`
+- objective repaired outside-soloing not evaluable count: `6`
+- repair sweep source outside-soloing repair pitch-role risk count after: `0`
+- repair sweep source outside-soloing not evaluable count: `6`
+- repair sweep repaired outside-soloing not evaluable count: `6`
+- human/audio preference claim: `false`
+- audio rendered quality claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 repair target: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
