@@ -5766,6 +5766,46 @@ Issue #812는 current evidence consolidation에 Issue #810 outside-soloing repai
 
 - `Stage B MIDI-to-solo README evidence refresh`
 
+## 9.98 Stage B MIDI-to-solo README evidence refresh outside-soloing repair path
+
+Issue #814는 README 현재 상태와 claim boundary에 Issue #812 current evidence를 반영한 문서 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- source boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- current MVP evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair pitch-role risk delta: `2`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- README 첫 상태 영역에 Issue #812 current evidence 반영.
+- outside-soloing repair objective path 포함 상태 추가.
+- current evidence section에 outside-soloing repair 수치 추가.
+- 청음 preference와 musical quality claim 제외 유지.
+- 다음 boundary는 MVP completion audit refresh.
+
+검증:
+
+- `git diff --check`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo MVP completion audit refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
