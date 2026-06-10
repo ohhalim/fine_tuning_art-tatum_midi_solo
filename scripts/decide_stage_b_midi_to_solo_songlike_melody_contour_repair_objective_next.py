@@ -105,6 +105,22 @@ def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextError(
             "rendered WAV count below 6"
         )
+    if not bool(source.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextError(
+            "outside-soloing repair evidence readiness required"
+        )
+    if _int(source.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextError(
+            "outside-soloing residual pitch-role risk should be zero"
+        )
+    if _int(source.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextError(
+            "source outside-soloing not-evaluable boundary required"
+        )
+    if _int(source.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextError(
+            "repaired outside-soloing not-evaluable boundary required"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextError(
             "critical user input should not be required"
@@ -129,6 +145,18 @@ def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
             source.get("repaired_songlike_failure_count")
         ),
         "songlike_failure_delta": _int(source.get("songlike_failure_delta")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            source.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            source.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            source.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            source.get("repaired_outside_soloing_not_evaluable_count")
+        ),
         "audio_review_required": bool(source.get("audio_review_required", False)),
     }
 
@@ -170,6 +198,18 @@ def build_objective_next_report(
                 source["repaired_songlike_failure_count"]
             ),
             "songlike_failure_delta": _int(source["songlike_failure_delta"]),
+            "source_outside_soloing_repair_evidence_ready": bool(
+                source["source_outside_soloing_repair_evidence_ready"]
+            ),
+            "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                source["source_outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "source_outside_soloing_not_evaluable_count": _int(
+                source["source_outside_soloing_not_evaluable_count"]
+            ),
+            "repaired_outside_soloing_not_evaluable_count": _int(
+                source["repaired_outside_soloing_not_evaluable_count"]
+            ),
             "audio_review_required": bool(source["audio_review_required"]),
             "songlike_contour_followup_required": bool(followup_required),
             "current_quality_claim_ready": False,
@@ -187,6 +227,18 @@ def build_objective_next_report(
             "technical_wav_validation": bool(source["technical_wav_validation"]),
             "songlike_contour_followup_required": bool(followup_required),
             "current_quality_claim_ready": False,
+            "source_outside_soloing_repair_evidence_ready": bool(
+                source["source_outside_soloing_repair_evidence_ready"]
+            ),
+            "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                source["source_outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "source_outside_soloing_not_evaluable_count": _int(
+                source["source_outside_soloing_not_evaluable_count"]
+            ),
+            "repaired_outside_soloing_not_evaluable_count": _int(
+                source["repaired_outside_soloing_not_evaluable_count"]
+            ),
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -281,6 +333,18 @@ def validate_objective_next_report(
         "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
         "failure_label_delta": _int(summary.get("failure_label_delta")),
         "songlike_failure_delta": _int(summary.get("songlike_failure_delta")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            summary.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            summary.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            summary.get("repaired_outside_soloing_not_evaluable_count")
+        ),
         "audio_review_required": bool(summary.get("audio_review_required", False)),
         "songlike_contour_followup_required": bool(
             summary.get("songlike_contour_followup_required", False)
@@ -320,6 +384,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- failure label delta: `{summary['failure_label_delta']}`",
         f"- songlike failure count: `{summary['source_songlike_failure_count']} -> {summary['repaired_songlike_failure_count']}`",
         f"- songlike failure delta: `{summary['songlike_failure_delta']}`",
+        f"- source outside-soloing repair evidence ready: `{_bool_token(summary['source_outside_soloing_repair_evidence_ready'])}`",
+        f"- source outside-soloing repair pitch-role risk after: `{summary['source_outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- source outside-soloing not evaluable count: `{summary['source_outside_soloing_not_evaluable_count']}`",
+        f"- repaired outside-soloing not evaluable count: `{summary['repaired_outside_soloing_not_evaluable_count']}`",
         f"- songlike contour follow-up required: `{_bool_token(summary['songlike_contour_followup_required'])}`",
         f"- current quality claim ready: `{_bool_token(summary['current_quality_claim_ready'])}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
@@ -353,7 +421,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=770)
+    parser.add_argument("--issue_number", type=int, default=854)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_objective_decision", action="store_true")
