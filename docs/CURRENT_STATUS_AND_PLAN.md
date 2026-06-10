@@ -14,10 +14,11 @@
 
 - latest functional result: Issue #898, Stage B MIDI-to-solo current evidence source-context refresh
 - latest MVP completion audit: Issue #902, Stage B MIDI-to-solo MVP completion audit source-context refresh
+- latest quality gap decision: Issue #904, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after MVP completion audit refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo quality gap decision source-context refresh`
+- open issue queue after quality gap decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo listening review quality gap source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -466,12 +467,18 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 decision target: `stage_b_midi_to_solo_quality_gap_decision`
-- quality gap decision outside-soloing repair refresh 완료
+- quality gap decision source-context refresh 완료
 - selected target: `listening_review_quality_gap`
 - next boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
 - outside-soloing repair objective completed: `true`
 - outside-soloing repair target supported: `true`
+- outside-soloing source objective pitch-role risk count: `5`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source pitch-role risk delta: `3`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
 - outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair pitch-role risk delta: `2`
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 review target: `stage_b_midi_to_solo_listening_review_quality_gap`

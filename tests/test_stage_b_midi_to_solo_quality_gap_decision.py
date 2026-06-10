@@ -109,6 +109,12 @@ def mvp_completion_audit(
             "outside_soloing_repair_current_evidence_ready": outside_soloing_repair_supported,
             "outside_soloing_repair_rendered_audio_file_count": 6,
             "outside_soloing_repair_changed_note_total": 2,
+            "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+            "outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+            "outside_soloing_repair_source_pitch_role_risk_delta": 3,
+            "outside_soloing_repair_source_targeted": False,
+            "outside_soloing_repair_source_residual_risk_preserved": True,
             "outside_soloing_repair_pitch_role_risk_count_after": (
                 0 if outside_soloing_repair_supported else 1
             ),
@@ -182,6 +188,21 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_target_supported"])
         self.assertEqual(summary["outside_soloing_repair_rendered_audio_file_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
+        self.assertEqual(
+            summary["outside_soloing_repair_source_objective_pitch_role_risk_count"],
+            5,
+        )
+        self.assertEqual(
+            summary["outside_soloing_repair_source_pitch_role_risk_count_before"],
+            5,
+        )
+        self.assertEqual(
+            summary["outside_soloing_repair_source_pitch_role_risk_count_after"],
+            2,
+        )
+        self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_delta"], 3)
+        self.assertFalse(summary["outside_soloing_repair_source_targeted"])
+        self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
         self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
@@ -319,6 +340,43 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
                 ),
                 output_dir=Path("outputs/quality_gap"),
                 issue_number=818,
+            )
+
+    def test_rejects_missing_outside_soloing_source_context(self) -> None:
+        source = mvp_completion_audit()
+        source["current_evidence"].pop(
+            "outside_soloing_repair_source_residual_risk_preserved"
+        )
+
+        with self.assertRaises(StageBMidiToSoloQualityGapDecisionError):
+            build_quality_gap_decision_report(
+                mvp_completion_audit=source,
+                output_dir=Path("outputs/quality_gap"),
+                issue_number=904,
+            )
+
+    def test_rejects_targeted_outside_soloing_source_repair(self) -> None:
+        source = mvp_completion_audit()
+        source["current_evidence"]["outside_soloing_repair_source_targeted"] = True
+
+        with self.assertRaises(StageBMidiToSoloQualityGapDecisionError):
+            build_quality_gap_decision_report(
+                mvp_completion_audit=source,
+                output_dir=Path("outputs/quality_gap"),
+                issue_number=904,
+            )
+
+    def test_rejects_outside_soloing_source_risk_delta_mismatch(self) -> None:
+        source = mvp_completion_audit()
+        source["current_evidence"][
+            "outside_soloing_repair_source_pitch_role_risk_delta"
+        ] = 2
+
+        with self.assertRaises(StageBMidiToSoloQualityGapDecisionError):
+            build_quality_gap_decision_report(
+                mvp_completion_audit=source,
+                output_dir=Path("outputs/quality_gap"),
+                issue_number=904,
             )
 
     def test_boundary_constants_are_stable(self) -> None:

@@ -14,10 +14,11 @@ Current handoff scope:
 
 - Latest functional issue completed: Issue #898, Stage B MIDI-to-solo current evidence source-context refresh.
 - Latest audit issue completed: Issue #902, Stage B MIDI-to-solo MVP completion audit source-context refresh.
+- Latest quality gap decision completed: Issue #904, Stage B MIDI-to-solo quality gap decision source-context refresh.
 - Latest documentation issue completed: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after MVP completion audit refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo quality gap decision source-context refresh.
+- Open issue queue after quality gap decision source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo listening review quality gap source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -1150,7 +1151,7 @@ For Stage B MIDI-to-solo quality gap decision changes, run:
 bash scripts/agent_harness.sh stage-b-midi-to-solo-quality-gap-decision
 ```
 
-This harness selects the next quality-gap target after technical MVP completion without claiming musical quality or requiring immediate human review.
+This harness selects the next quality-gap target after technical MVP completion, preserves source/current outside-soloing repair context, and avoids musical quality or immediate human-review claims.
 
 For Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision changes, run:
 
