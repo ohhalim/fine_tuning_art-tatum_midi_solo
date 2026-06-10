@@ -131,6 +131,18 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
             "critical user input should not be required"
         )
+    if bool(source.get("source_outside_soloing_repair_targeted", True)):
+        raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
+            "source outside-soloing repair target should remain false"
+        )
+    if not bool(source.get("source_outside_soloing_residual_risk_preserved", False)):
+        raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
+            "source outside-soloing residual risk context must be preserved"
+        )
+    if not bool(source.get("outside_soloing_repair_targeted", False)):
+        raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
+            "outside-soloing repair should remain targeted before input guard"
+        )
     _require_no_quality_claim(readiness, label="outside-soloing repair listening package readiness")
     return {
         "boundary": SOURCE_BOUNDARY,
@@ -148,11 +160,32 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
             "duration_min_seconds": _float(source.get("duration_min_seconds")),
             "duration_max_seconds": _float(source.get("duration_max_seconds")),
             "changed_note_total": _int(source.get("changed_note_total")),
+            "source_objective_outside_soloing_pitch_role_risk_count": _int(
+                source.get("source_objective_outside_soloing_pitch_role_risk_count")
+            ),
+            "source_outside_soloing_pitch_role_risk_count_before": _int(
+                source.get("source_outside_soloing_pitch_role_risk_count_before")
+            ),
+            "source_outside_soloing_pitch_role_risk_count_after": _int(
+                source.get("source_outside_soloing_pitch_role_risk_count_after")
+            ),
+            "source_outside_soloing_pitch_role_risk_delta": _int(
+                source.get("source_outside_soloing_pitch_role_risk_delta")
+            ),
+            "source_outside_soloing_repair_targeted": bool(
+                source.get("source_outside_soloing_repair_targeted", True)
+            ),
+            "source_outside_soloing_residual_risk_preserved": bool(
+                source.get("source_outside_soloing_residual_risk_preserved", False)
+            ),
             "outside_soloing_pitch_role_risk_count_after": _int(
                 source.get("outside_soloing_pitch_role_risk_count_after")
             ),
             "outside_soloing_pitch_role_risk_delta": _int(
                 source.get("outside_soloing_pitch_role_risk_delta")
+            ),
+            "outside_soloing_repair_targeted": bool(
+                source.get("outside_soloing_repair_targeted", False)
             ),
             "weak_chord_tone_landing_risk_count_after": _int(
                 source.get("weak_chord_tone_landing_risk_count_after")
@@ -283,6 +316,18 @@ def validate_listening_review_input_guard_report(
         raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
             "critical user input should not be required"
         )
+    if bool(source.get("source_outside_soloing_repair_targeted", True)):
+        raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
+            "source outside-soloing repair target should remain false"
+        )
+    if not bool(source.get("source_outside_soloing_residual_risk_preserved", False)):
+        raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
+            "source outside-soloing residual risk context must be preserved"
+        )
+    if not bool(source.get("outside_soloing_repair_targeted", False)):
+        raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
+            "outside-soloing repair should remain targeted in guard summary"
+        )
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="outside-soloing repair input guard readiness")
     return {
@@ -300,11 +345,32 @@ def validate_listening_review_input_guard_report(
         "duration_min_seconds": _float(source.get("duration_min_seconds")),
         "duration_max_seconds": _float(source.get("duration_max_seconds")),
         "changed_note_total": _int(source.get("changed_note_total")),
+        "source_objective_outside_soloing_pitch_role_risk_count": _int(
+            source.get("source_objective_outside_soloing_pitch_role_risk_count")
+        ),
+        "source_outside_soloing_pitch_role_risk_count_before": _int(
+            source.get("source_outside_soloing_pitch_role_risk_count_before")
+        ),
+        "source_outside_soloing_pitch_role_risk_count_after": _int(
+            source.get("source_outside_soloing_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_pitch_role_risk_delta": _int(
+            source.get("source_outside_soloing_pitch_role_risk_delta")
+        ),
+        "source_outside_soloing_repair_targeted": bool(
+            source.get("source_outside_soloing_repair_targeted", True)
+        ),
+        "source_outside_soloing_residual_risk_preserved": bool(
+            source.get("source_outside_soloing_residual_risk_preserved", False)
+        ),
         "outside_soloing_pitch_role_risk_count_after": _int(
             source.get("outside_soloing_pitch_role_risk_count_after")
         ),
         "outside_soloing_pitch_role_risk_delta": _int(
             source.get("outside_soloing_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_targeted": bool(
+            source.get("outside_soloing_repair_targeted", False)
         ),
         "weak_chord_tone_landing_risk_count_after": _int(
             source.get("weak_chord_tone_landing_risk_count_after")
@@ -348,8 +414,14 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- rendered audio file count: `{source['rendered_audio_file_count']}`",
         f"- duration range: `{source['duration_min_seconds']:.3f}s-{source['duration_max_seconds']:.3f}s`",
         f"- changed note total: `{source['changed_note_total']}`",
+        f"- source objective outside-soloing pitch-role risk count: `{source['source_objective_outside_soloing_pitch_role_risk_count']}`",
+        f"- source outside-soloing pitch-role risk count: `{source['source_outside_soloing_pitch_role_risk_count_before']} -> {source['source_outside_soloing_pitch_role_risk_count_after']}`",
+        f"- source outside-soloing pitch-role risk delta: `{source['source_outside_soloing_pitch_role_risk_delta']}`",
+        f"- source outside-soloing repair targeted: `{_bool_token(source['source_outside_soloing_repair_targeted'])}`",
+        f"- source outside-soloing residual risk preserved: `{_bool_token(source['source_outside_soloing_residual_risk_preserved'])}`",
         f"- outside-soloing pitch-role risk count after: `{source['outside_soloing_pitch_role_risk_count_after']}`",
         f"- outside-soloing pitch-role risk delta: `{source['outside_soloing_pitch_role_risk_delta']}`",
+        f"- outside-soloing repair targeted: `{_bool_token(source['outside_soloing_repair_targeted'])}`",
         f"- weak chord-tone landing risk count after: `{source['weak_chord_tone_landing_risk_count_after']}`",
         f"- final landing chord-tone count after: `{source['final_landing_chord_tone_count_after']}`",
         f"- max non-chord-tone run after: `{source['max_non_chord_tone_run_after']}`",
@@ -394,7 +466,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=808)
+    parser.add_argument("--issue_number", type=int, default=892)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_guard_completed", action="store_true")
