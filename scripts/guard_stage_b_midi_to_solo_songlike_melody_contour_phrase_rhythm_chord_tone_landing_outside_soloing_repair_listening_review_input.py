@@ -13,6 +13,9 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
+    BRIDGE_SOURCE_CONTEXT_KEYS,
+)
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package import (  # noqa: E402
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
@@ -37,7 +40,7 @@ OBJECTIVE_NEXT_BOUNDARY = (
 )
 SCHEMA_VERSION = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
-    "outside_soloing_repair_listening_review_input_guard_v1"
+    "outside_soloing_repair_listening_review_input_guard_v2"
 )
 
 QUALITY_CLAIM_KEYS = [
@@ -85,6 +88,15 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
         raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
             f"unexpected quality claim in {label}: {claimed}"
         )
+
+
+def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
+    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        if key not in container:
+            raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
+                f"{label} source-context field required: {key}"
+            )
+    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
 
 
 def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
@@ -143,6 +155,7 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
             "outside-soloing repair should remain targeted before input guard"
         )
+    source_context = _source_context_fields(source, label="listening package source summary")
     _require_no_quality_claim(readiness, label="outside-soloing repair listening package readiness")
     return {
         "boundary": SOURCE_BOUNDARY,
@@ -195,6 +208,7 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
             ),
             "max_non_chord_tone_run_after": _int(source.get("max_non_chord_tone_run_after")),
             "audio_review_required": bool(source.get("audio_review_required", False)),
+            **source_context,
         },
     }
 
@@ -328,6 +342,11 @@ def validate_listening_review_input_guard_report(
         raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
             "outside-soloing repair should remain targeted in guard summary"
         )
+    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        if key not in source:
+            raise StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError(
+                f"input guard source-context field required: {key}"
+            )
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="outside-soloing repair input guard readiness")
     return {
@@ -380,6 +399,7 @@ def validate_listening_review_input_guard_report(
         ),
         "max_non_chord_tone_run_after": _int(source.get("max_non_chord_tone_run_after")),
         "audio_review_required": bool(source.get("audio_review_required", False)),
+        **{key: source.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)
         ),
@@ -426,6 +446,12 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- final landing chord-tone count after: `{source['final_landing_chord_tone_count_after']}`",
         f"- max non-chord-tone run after: `{source['max_non_chord_tone_run_after']}`",
         f"- audio review required: `{_bool_token(source['audio_review_required'])}`",
+        f"- follow-up objective source outside-soloing source pitch-role risk: `{source['followup_objective_source_outside_soloing_source_pitch_role_risk_count_before']} -> {source['followup_objective_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `{source['followup_objective_source_outside_soloing_current_pitch_role_risk_count_after']} / {source['followup_objective_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- follow-up repair sweep source outside-soloing source pitch-role risk: `{source['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {source['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `{source['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {source['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- bridge repair sweep source outside-soloing source pitch-role risk: `{source['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {source['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `{source['repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {source['repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         f"- MIDI-to-solo musical quality claimed: `{_bool_token(readiness['midi_to_solo_musical_quality_claimed'])}`",
         "",
@@ -466,7 +492,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=892)
+    parser.add_argument("--issue_number", type=int, default=978)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_guard_completed", action="store_true")
