@@ -11198,6 +11198,50 @@ Issue #1032는 Issue #1030 phrase/rhythm repair audio package 결과의 WAV/MIDI
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh`
 
+## 9.207 Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh
+
+Issue #1034는 Issue #1032 listening review package의 pending input 상태와 source/current outside-soloing context를 input guard summary까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision`
+- review item count: `6`
+- required input field count: `4`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- failure label delta: `3`
+- phrase/rhythm failure delta: `3`
+- objective source outside-soloing repair source context preserved: `true`
+- source outside-soloing repair source context preserved: `true`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing current repair pitch-role risk count after: `0`
+- source outside-soloing current repair pitch-role risk delta: `2`
+- source/repaired outside-soloing not evaluable count: `6/6`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- input guard source validation에 objective/source source-context preserved 조건 추가.
+- bridge source-context 21개 키를 guard/readiness/validation summary까지 보존.
+- validated review input 부재 상태에서 preference fill 차단 유지.
+- 다음 boundary는 phrase/rhythm repair objective-only next decision source-context refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard`
+- `.venv/bin/python -m py_compile scripts/guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-listening-review-input-guard`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
