@@ -6092,8 +6092,8 @@ run_stage_b_midi_to_solo_mvp_delivery_package() {
     --listening_review_quality_gap "$listening_gap" \
     --cli_mvp_package "$cli_package" \
     --changed_ratio_audio_package "$changed_ratio_audio" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_DELIVERY_PACKAGE_2026-06-09.md \
-    --issue_number 738 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_DELIVERY_PACKAGE_OUTSIDE_SOLOING_REPAIR_REFRESH_2026-06-10.md \
+    --issue_number 822 \
     --expected_boundary stage_b_midi_to_solo_mvp_delivery_package \
     --expected_next_boundary stage_b_midi_to_solo_readme_final_evidence_refresh \
     --require_delivery_completed \

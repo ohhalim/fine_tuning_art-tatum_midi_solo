@@ -105,6 +105,10 @@ def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloMvpDeliveryPackageError("technical model-core MVP completion required")
     if not bool(summary.get("changed_ratio_repair_objective_completed", False)):
         raise StageBMidiToSoloMvpDeliveryPackageError("changed-ratio repair objective completion required")
+    if not bool(summary.get("outside_soloing_repair_objective_completed", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair objective completion required"
+        )
     if _int(summary.get("rendered_audio_file_count")) < 3:
         raise StageBMidiToSoloMvpDeliveryPackageError("changed-ratio repair rendered WAV count below 3")
     if _int(summary.get("max_repaired_interval")) > _int(summary.get("max_interval_threshold")):
@@ -113,12 +117,29 @@ def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
         summary.get("target_max_pitch_changed_ratio")
     ):
         raise StageBMidiToSoloMvpDeliveryPackageError("changed-ratio repair ratio threshold exceeded")
+    if not bool(summary.get("outside_soloing_repair_objective_path_ready", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair objective path readiness required"
+        )
+    if not bool(summary.get("outside_soloing_repair_target_supported", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair target support required"
+        )
+    if _int(summary.get("outside_soloing_repair_rendered_audio_file_count")) < 6:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair rendered WAV count below 6"
+        )
+    if _int(summary.get("outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair residual pitch-role risk should be zero"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloMvpDeliveryPackageError("critical user input should not be required")
     _require_no_quality_claim(readiness, label="listening gap readiness")
     return {
         "technical_model_core_mvp_completed": True,
         "changed_ratio_repair_objective_completed": True,
+        "outside_soloing_repair_objective_completed": True,
         "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
         "max_repaired_interval": _int(summary.get("max_repaired_interval")),
         "max_interval_threshold": _int(summary.get("max_interval_threshold")),
@@ -126,6 +147,24 @@ def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
         "target_max_pitch_changed_ratio": _float(summary.get("target_max_pitch_changed_ratio")),
         "listening_review_quality_gap_open": bool(
             summary.get("listening_review_quality_gap_open", False)
+        ),
+        "outside_soloing_repair_objective_path_ready": bool(
+            summary.get("outside_soloing_repair_objective_path_ready", False)
+        ),
+        "outside_soloing_repair_target_supported": bool(
+            summary.get("outside_soloing_repair_target_supported", False)
+        ),
+        "outside_soloing_repair_rendered_audio_file_count": _int(
+            summary.get("outside_soloing_repair_rendered_audio_file_count")
+        ),
+        "outside_soloing_repair_changed_note_total": _int(
+            summary.get("outside_soloing_repair_changed_note_total")
+        ),
+        "outside_soloing_repair_pitch_role_risk_count_after": _int(
+            summary.get("outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_pitch_role_risk_delta": _int(
+            summary.get("outside_soloing_repair_pitch_role_risk_delta")
         ),
     }
 
@@ -270,6 +309,7 @@ def build_delivery_package_report(
             "input_to_ranked_midi_ready": True,
             "input_to_rendered_wav_evidence_ready": True,
             "changed_ratio_repair_audio_evidence_ready": True,
+            "outside_soloing_repair_evidence_ready": True,
             "listening_review_quality_gap_open": bool(
                 listening["listening_review_quality_gap_open"]
             ),
@@ -295,6 +335,18 @@ def build_delivery_package_report(
             "changed_ratio_repair_wav_duration_range": [
                 audio["duration_min_seconds"],
                 audio["duration_max_seconds"],
+            ],
+            "outside_soloing_repair_wav_count": listening[
+                "outside_soloing_repair_rendered_audio_file_count"
+            ],
+            "outside_soloing_repair_changed_note_total": listening[
+                "outside_soloing_repair_changed_note_total"
+            ],
+            "outside_soloing_repair_pitch_role_risk_count_after": listening[
+                "outside_soloing_repair_pitch_role_risk_count_after"
+            ],
+            "outside_soloing_repair_pitch_role_risk_delta": listening[
+                "outside_soloing_repair_pitch_role_risk_delta"
             ],
         },
         "artifact_manifest": {
@@ -369,6 +421,18 @@ def validate_delivery_package_report(
         raise StageBMidiToSoloMvpDeliveryPackageError("CLI candidate manifest below 3")
     if _int(package.get("changed_ratio_repair_wav_count")) < 3 or len(audio_candidates) < 3:
         raise StageBMidiToSoloMvpDeliveryPackageError("changed-ratio audio manifest below 3")
+    if not bool(package.get("outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair evidence readiness required"
+        )
+    if _int(package.get("outside_soloing_repair_wav_count")) < 6:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair WAV count below 6"
+        )
+    if _int(package.get("outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair residual pitch-role risk should be zero"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloMvpDeliveryPackageError("critical user input should not be required")
     if require_no_quality_claim:
@@ -387,8 +451,23 @@ def validate_delivery_package_report(
         "changed_ratio_repair_audio_evidence_ready": bool(
             package.get("changed_ratio_repair_audio_evidence_ready", False)
         ),
+        "outside_soloing_repair_evidence_ready": bool(
+            package.get("outside_soloing_repair_evidence_ready", False)
+        ),
         "cli_candidate_count": _int(package.get("cli_candidate_count")),
         "changed_ratio_repair_wav_count": _int(package.get("changed_ratio_repair_wav_count")),
+        "outside_soloing_repair_wav_count": _int(
+            package.get("outside_soloing_repair_wav_count")
+        ),
+        "outside_soloing_repair_changed_note_total": _int(
+            package.get("outside_soloing_repair_changed_note_total")
+        ),
+        "outside_soloing_repair_pitch_role_risk_count_after": _int(
+            package.get("outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_repair_pitch_role_risk_delta": _int(
+            package.get("outside_soloing_repair_pitch_role_risk_delta")
+        ),
         "listening_review_quality_gap_open": bool(
             package.get("listening_review_quality_gap_open", False)
         ),
@@ -418,6 +497,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- input to ranked MIDI ready: `{_bool_token(package['input_to_ranked_midi_ready'])}`",
         f"- input to rendered WAV evidence ready: `{_bool_token(package['input_to_rendered_wav_evidence_ready'])}`",
         f"- changed-ratio repair audio evidence ready: `{_bool_token(package['changed_ratio_repair_audio_evidence_ready'])}`",
+        f"- outside-soloing repair evidence ready: `{_bool_token(package['outside_soloing_repair_evidence_ready'])}`",
         f"- listening review quality gap open: `{_bool_token(package['listening_review_quality_gap_open'])}`",
         "",
         "## Run Command",
@@ -433,6 +513,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- changed-ratio repair max ratio / target: `{package['changed_ratio_repair_ratio_target'][0]:.4f}` / `{package['changed_ratio_repair_ratio_target'][1]:.4f}`",
         f"- changed-ratio repair max interval / target: `{package['changed_ratio_repair_interval_target'][0]}` / `{package['changed_ratio_repair_interval_target'][1]}`",
         f"- changed-ratio repair WAV duration range: `{package['changed_ratio_repair_wav_duration_range'][0]:.3f}s` - `{package['changed_ratio_repair_wav_duration_range'][1]:.3f}s`",
+        f"- outside-soloing repair WAV count: `{package['outside_soloing_repair_wav_count']}`",
+        f"- outside-soloing repair changed note total: `{package['outside_soloing_repair_changed_note_total']}`",
+        f"- outside-soloing pitch-role risk after / delta: `{package['outside_soloing_repair_pitch_role_risk_count_after']}` / `{package['outside_soloing_repair_pitch_role_risk_delta']}`",
         "",
         "## Claim Boundary",
         "",

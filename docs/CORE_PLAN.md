@@ -5942,6 +5942,50 @@ Issue #820은 listening review quality gap 경계에 Issue #818 quality gap deci
 
 - `Stage B MIDI-to-solo MVP delivery package refresh`
 
+## 9.102 Stage B MIDI-to-solo MVP delivery package outside-soloing repair refresh
+
+Issue #822는 MVP delivery package manifest에 outside-soloing repair evidence를 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
+- technical MVP delivery package completed: `true`
+- runnable CLI ready: `true`
+- input to ranked MIDI ready: `true`
+- input to rendered WAV evidence ready: `true`
+- changed-ratio repair audio evidence ready: `true`
+- outside-soloing repair evidence ready: `true`
+- CLI candidate count: `3`
+- changed-ratio repair WAV count: `3`
+- outside-soloing repair WAV count: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair pitch-role risk delta: `2`
+- listening review quality gap open: `true`
+- raw artifact upload required: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- delivery package validation에 outside-soloing repair evidence readiness 추가.
+- local artifact path 기록 범위는 기존 CLI repaired MIDI와 changed-ratio repair WAV 유지.
+- outside-soloing repair evidence는 count/risk summary로 delivery manifest에 포함.
+- raw artifact upload와 품질 claim 제외 유지.
+- 다음 boundary는 README final evidence refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_delivery_package`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_mvp_delivery_package.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-delivery-package`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo README final evidence refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
