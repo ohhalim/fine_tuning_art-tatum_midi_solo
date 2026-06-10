@@ -29,6 +29,7 @@ def mvp_completion_audit(
     pitch_contour_changed_ratio_review_required: bool = True,
     pitch_contour_supported: bool = True,
     changed_ratio_repair_supported: bool = True,
+    outside_soloing_repair_supported: bool = True,
 ) -> dict:
     return {
         "boundary": MVP_COMPLETION_BOUNDARY,
@@ -52,6 +53,7 @@ def mvp_completion_audit(
             "model_conditioned_pitch_contour_changed_ratio_repair_objective_completed": (
                 changed_ratio_repair_supported
             ),
+            "outside_soloing_repair_objective_completed": outside_soloing_repair_supported,
             "readme_evidence_boundary_refreshed": True,
             "musical_quality_mvp_completed": musical_complete,
             "human_audio_preference_completed": False,
@@ -103,6 +105,20 @@ def mvp_completion_audit(
             ),
             "model_conditioned_pitch_contour_changed_ratio_repair_audio_review_required": True,
             "model_conditioned_pitch_contour_changed_ratio_repair_preference_fill_allowed": False,
+            "outside_soloing_repair_objective_path_ready": outside_soloing_repair_supported,
+            "outside_soloing_repair_current_evidence_ready": outside_soloing_repair_supported,
+            "outside_soloing_repair_rendered_audio_file_count": 6,
+            "outside_soloing_repair_changed_note_total": 2,
+            "outside_soloing_repair_pitch_role_risk_count_after": (
+                0 if outside_soloing_repair_supported else 1
+            ),
+            "outside_soloing_repair_pitch_role_risk_delta": 2,
+            "outside_soloing_repair_objective_path_supported": outside_soloing_repair_supported,
+            "outside_soloing_repair_target_supported": outside_soloing_repair_supported,
+            "outside_soloing_repair_weak_landing_target_supported": True,
+            "outside_soloing_repair_final_landing_target_supported": True,
+            "outside_soloing_repair_non_chord_run_target_supported": True,
+            "outside_soloing_repair_preference_fill_allowed": False,
         },
         "decision": {
             "next_boundary": "stage_b_midi_to_solo_quality_gap_decision",
@@ -134,6 +150,7 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
         self.assertTrue(
             summary["model_conditioned_pitch_contour_changed_ratio_repair_objective_completed"]
         )
+        self.assertTrue(summary["outside_soloing_repair_objective_completed"])
         self.assertTrue(summary["model_conditioned_pitch_contour_objective_path_ready"])
         self.assertTrue(summary["pitch_contour_changed_ratio_review_required"])
         self.assertTrue(summary["pitch_contour_changed_ratio_repair_objective_path_ready"])
@@ -161,6 +178,16 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
             places=4,
         )
         self.assertTrue(summary["model_conditioned_pitch_contour_target_supported"])
+        self.assertTrue(summary["outside_soloing_repair_objective_path_ready"])
+        self.assertTrue(summary["outside_soloing_repair_target_supported"])
+        self.assertEqual(summary["outside_soloing_repair_rendered_audio_file_count"], 6)
+        self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
+        self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
+        self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
+        self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
+        self.assertTrue(summary["outside_soloing_repair_weak_landing_target_supported"])
+        self.assertTrue(summary["outside_soloing_repair_final_landing_target_supported"])
+        self.assertTrue(summary["outside_soloing_repair_non_chord_run_target_supported"])
         self.assertFalse(summary["human_review_required_now"])
         self.assertTrue(summary["technical_model_core_mvp_completed"])
         self.assertTrue(summary["phrase_bank_cli_technical_path_completed"])
@@ -282,6 +309,16 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
                 mvp_completion_audit=source,
                 output_dir=Path("outputs/quality_gap"),
                 issue_number=734,
+            )
+
+    def test_rejects_missing_outside_soloing_repair_support(self) -> None:
+        with self.assertRaises(StageBMidiToSoloQualityGapDecisionError):
+            build_quality_gap_decision_report(
+                mvp_completion_audit=mvp_completion_audit(
+                    outside_soloing_repair_supported=False
+                ),
+                output_dir=Path("outputs/quality_gap"),
+                issue_number=818,
             )
 
     def test_boundary_constants_are_stable(self) -> None:

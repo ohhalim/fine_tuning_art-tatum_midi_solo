@@ -5854,6 +5854,51 @@ Issue #816은 MVP completion audit에 Issue #812 outside-soloing repair current 
 
 - `Stage B MIDI-to-solo quality gap decision refresh`
 
+## 9.100 Stage B MIDI-to-solo quality gap decision outside-soloing repair refresh
+
+Issue #818은 quality gap decision에 Issue #816 MVP completion audit의 outside-soloing repair evidence를 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- next boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- selected target: `listening_review_quality_gap`
+- technical model-core MVP completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour changed-ratio repair objective completed: `true`
+- outside-soloing repair objective completed: `true`
+- pitch-contour changed-ratio repair objective path ready: `true`
+- pitch-contour changed-ratio repair target supported: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair target supported: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair pitch-role risk delta: `2`
+- musical quality MVP completed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- quality gap decision 입력 검증에 outside-soloing repair objective completion 추가.
+- changed-ratio repair와 outside-soloing repair target support를 모두 만족할 때 listening review quality gap으로 이동.
+- remaining gap은 추가 objective repair가 아니라 listening review와 musical quality evidence.
+- musical quality, human/audio preference, broad trained-model quality claim 제외 유지.
+- 다음 boundary는 listening review quality gap refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_quality_gap_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_quality_gap.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-quality-gap-decision`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo listening review quality gap refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

@@ -110,6 +110,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit outside-soloing repair objective included: `true`
 - quality gap decision completed: `true`
 - quality gap decision listening review target selected: `true`
+- quality gap decision outside-soloing repair objective included: `true`
 - pitch-contour changed-ratio review decision completed: `true`
 - pitch-contour changed-ratio repair probe required: `true`
 - pitch-contour changed-ratio repair probe completed: `true`
