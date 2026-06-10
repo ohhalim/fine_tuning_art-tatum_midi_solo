@@ -133,6 +133,12 @@ def current_evidence(
             "technical_wav_validation": True,
             "rendered_audio_file_count": 6,
             "changed_note_total": 2,
+            "source_objective_outside_soloing_pitch_role_risk_count": 5,
+            "source_outside_soloing_pitch_role_risk_count_before": 5,
+            "source_outside_soloing_pitch_role_risk_count_after": 2,
+            "source_outside_soloing_pitch_role_risk_delta": 3,
+            "source_outside_soloing_repair_targeted": False,
+            "source_outside_soloing_residual_risk_preserved": True,
             "outside_soloing_pitch_role_risk_count_after": (
                 0 if outside_soloing_repair_supported else 1
             ),
@@ -167,6 +173,10 @@ def readme_text(*, missing_boundary: bool = False) -> str:
             "- current evidence changed-ratio repair objective path included: `true`",
             "- outside-soloing repair objective path included in current evidence: `true`",
             "- current evidence outside-soloing repair objective path included: `true`",
+            "- outside-soloing source-context evidence reflected: `true`",
+            "- outside-soloing source pitch-role risk count: `5 -> 2`",
+            "- outside-soloing source residual risk preserved: `true`",
+            "- outside-soloing current repair pitch-role risk count after: `0`",
             "- README evidence refreshed: `true`",
             "- human/audio preference claim: `false`",
             "- MIDI-to-solo musical quality claim: `false`",
@@ -261,6 +271,24 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_current_evidence_ready"])
         self.assertEqual(summary["outside_soloing_repair_rendered_audio_file_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
+        self.assertEqual(
+            summary["outside_soloing_repair_source_objective_pitch_role_risk_count"],
+            5,
+        )
+        self.assertEqual(
+            summary["outside_soloing_repair_source_pitch_role_risk_count_before"],
+            5,
+        )
+        self.assertEqual(
+            summary["outside_soloing_repair_source_pitch_role_risk_count_after"],
+            2,
+        )
+        self.assertEqual(
+            summary["outside_soloing_repair_source_pitch_role_risk_delta"],
+            3,
+        )
+        self.assertFalse(summary["outside_soloing_repair_source_targeted"])
+        self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
         self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
