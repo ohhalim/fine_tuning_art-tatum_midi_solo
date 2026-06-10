@@ -12,10 +12,10 @@ Primary goal:
 
 Current handoff scope:
 
-- Latest functional issue completed: Issue #894, Stage B MIDI-to-solo outside-soloing repair objective next source context refresh.
+- Latest functional issue completed: Issue #898, Stage B MIDI-to-solo current evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after handoff sync merge: `0`.
-- Recommended next issue: none currently open; define the next quality target from the latest objective evidence before opening a new issue.
+- Open issue queue after current evidence refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo README evidence source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
