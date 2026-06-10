@@ -95,7 +95,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             report = build_objective_decision_report(
                 bridge_report=bridge_report(),
                 output_dir=Path(tmp) / "decision",
-                issue_number=958,
+                issue_number=1042,
             )
             summary = validate_objective_decision_report(
                 report,
@@ -148,6 +148,9 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 summary["followup_objective_source_outside_soloing_source_pitch_role_risk_delta"],
                 3,
             )
+            self.assertTrue(
+                summary["followup_objective_source_outside_soloing_source_context_preserved"]
+            )
             self.assertFalse(
                 summary["followup_objective_source_outside_soloing_source_targeted"]
             )
@@ -172,9 +175,15 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 ],
                 5,
             )
+            self.assertTrue(
+                summary["followup_repair_sweep_source_outside_soloing_source_context_preserved"]
+            )
             self.assertEqual(
                 summary["repair_sweep_source_outside_soloing_source_pitch_role_risk_delta"],
                 3,
+            )
+            self.assertTrue(
+                summary["repair_sweep_source_outside_soloing_source_context_preserved"]
             )
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -186,7 +195,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=bridge_report(quality_claim=True),
                     output_dir=Path(tmp) / "decision",
-                    issue_number=958,
+                    issue_number=1042,
                 )
 
     def test_routes_outside_soloing_when_it_dominates(self) -> None:
@@ -194,7 +203,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             report = build_objective_decision_report(
                 bridge_report=bridge_report(weak_count=2, outside_count=5),
                 output_dir=Path(tmp) / "decision",
-                issue_number=958,
+                issue_number=1042,
             )
             summary = validate_objective_decision_report(
                 report,
@@ -220,7 +229,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=958,
+                    issue_number=1042,
                 )
 
     def test_rejects_missing_bridge_source_context_field(self) -> None:
@@ -234,7 +243,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=958,
+                    issue_number=1042,
                 )
 
     def test_rejects_source_context_targeted_flag(self) -> None:
@@ -248,7 +257,21 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=958,
+                    issue_number=1042,
+                )
+
+    def test_rejects_source_context_preservation_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = bridge_report()
+            source["readiness"][
+                "followup_objective_source_outside_soloing_source_context_preserved"
+            ] = False
+
+            with self.assertRaises(StageBMidiToSoloPitchRoleObjectiveDecisionError):
+                build_objective_decision_report(
+                    bridge_report=source,
+                    output_dir=Path(tmp) / "decision",
+                    issue_number=1042,
                 )
 
     def test_constants_are_stable(self) -> None:

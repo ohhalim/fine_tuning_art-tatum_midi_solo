@@ -11379,6 +11379,52 @@ Issue #1040은 Issue #1038 follow-up decision과 Issue #1028 repair sweep의 sou
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh`
 
+## 9.211 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh
+
+Issue #1042는 Issue #1040 chord-context pitch-role bridge의 source-context preserved flag를 objective decision까지 보존하고, 다음 repair target을 선택한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- primary risk label: `weak_chord_tone_landing_risk`
+- candidate count: `6`
+- not evaluable count: `12 -> 0`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- current repair pitch-role risk count after / delta: `0 / 2`
+- weak chord-tone landing risk count: `6`
+- outside-soloing pitch-role risk count: `5`
+- min chord-tone ratio: `0.216`
+- max outside ratio: `0.027`
+- max non-chord run: `5`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- bridge에서 추가된 preserved flag 3개가 objective summary와 readiness까지 유지됨.
+- weak chord-tone landing risk count `6`이 outside-soloing pitch-role risk count `5`보다 큼.
+- 다음 repair target은 chord-tone landing repair sweep.
+- quality/preference claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-context-pitch-role-objective-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
