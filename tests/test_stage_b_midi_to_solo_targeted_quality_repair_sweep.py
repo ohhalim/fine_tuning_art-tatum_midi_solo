@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pretty_midi
 
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
 from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import BOUNDARY as DELIVERY_BOUNDARY
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
     build_quality_rubric_baseline_report,
@@ -214,6 +215,7 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
             self.assertGreater(summary["failure_label_delta"], 0)
             self.assertEqual(summary["technical_regression_count"], 0)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
             self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
             self.assertEqual(
                 summary["source_outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
@@ -231,6 +233,8 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
             self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
+            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+                self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
             self.assertTrue(summary["audio_package_ready"])
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -265,6 +269,21 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                     rubric_baseline=rubric_baseline(root),
                     output_dir=root / "sweep",
                     issue_number=750,
+                )
+
+    def test_rejects_missing_labeling_source_context_field(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = candidate_failure_labeling(root)
+            source["aggregate"].pop(
+                "followup_objective_source_outside_soloing_source_pitch_role_risk_delta"
+            )
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairSweepError):
+                build_targeted_quality_repair_sweep_report(
+                    candidate_failure_labeling=source,
+                    rubric_baseline=rubric_baseline(root),
+                    output_dir=root / "sweep",
+                    issue_number=1004,
                 )
 
     def test_constants_are_stable(self) -> None:

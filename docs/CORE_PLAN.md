@@ -10446,6 +10446,59 @@ Issue #1002는 Issue #1000 quality rubric baseline의 source/current outside-sol
 
 - `Stage B MIDI-to-solo targeted quality repair sweep source-context refresh`
 
+## 9.192 Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
+
+Issue #1004는 Issue #1002 candidate failure labeling의 source/current outside-soloing context를 targeted quality repair sweep 결과까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- source boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
+- selected target: `targeted_quality_repair_audio_package`
+- candidate count: `6`
+- source total failure label count: `12`
+- repaired total failure label count: `8`
+- failure label delta: `4`
+- improved candidate count: `4`
+- technical regression count: `0`
+- source outside-soloing repair evidence ready: `true`
+- source outside-soloing repair source context preserved: `true`
+- source outside-soloing repair WAV count: `6`
+- source outside-soloing source objective pitch-role risk count: `5`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing source pitch-role risk delta: `3`
+- source outside-soloing source repair targeted: `false`
+- source outside-soloing source residual risk preserved: `true`
+- source outside-soloing current repair pitch-role risk count after: `0`
+- source outside-soloing current repair pitch-role risk delta: `2`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- audio package ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- targeted repair sweep source validation에 #1002 labeling source-context preserved 조건 추가.
+- source-context preserved flag와 21개 context field를 aggregate와 validation summary에 보존.
+- repair sweep 결과 objective failure label delta `4`, technical regression `0`.
+- outside-soloing/chord-tone 계열은 chord context 부재로 not evaluable 유지.
+- human/audio preference와 MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_targeted_quality_repair_sweep.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-sweep`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo targeted quality repair audio package source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
