@@ -49,6 +49,14 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "remaining_failure_counts": {
                 "rhythmic_monotony": 1,
             },
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
+            "repaired_not_evaluable_counts": {
+                "outside_soloing_without_context": 6,
+                "weak_chord_tone_landing": 6,
+            },
             "audio_review_required": True,
         },
         "review_package": {
@@ -92,7 +100,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningInputGuard
             report = build_listening_review_input_guard_report(
                 source_package(),
                 output_dir=root / "guard",
-                issue_number=780,
+                issue_number=864,
             )
             summary = validate_listening_review_input_guard_report(
                 report,
@@ -110,6 +118,20 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningInputGuard
             self.assertEqual(summary["required_input_field_count"], 4)
             self.assertEqual(summary["failure_label_delta"], 3)
             self.assertEqual(summary["phrase_rhythm_failure_delta"], 3)
+            self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_pitch_role_risk_count_after"],
+                0,
+            )
+            self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(
+                summary["repaired_not_evaluable_counts"],
+                {
+                    "outside_soloing_without_context": 6,
+                    "weak_chord_tone_landing": 6,
+                },
+            )
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
 
@@ -120,7 +142,20 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningInputGuard
                 build_listening_review_input_guard_report(
                     source_package(quality_claim=True),
                     output_dir=root / "guard",
-                    issue_number=780,
+                    issue_number=864,
+                )
+
+    def test_rejects_missing_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = source_package()
+            del source["source_summary"]["repaired_outside_soloing_not_evaluable_count"]
+
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningInputGuardError):
+                build_listening_review_input_guard_report(
+                    source,
+                    output_dir=root / "guard",
+                    issue_number=864,
                 )
 
     def test_constants_are_stable(self) -> None:
