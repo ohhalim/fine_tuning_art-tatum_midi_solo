@@ -112,6 +112,10 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
             "failure_label_delta": 7,
             "improved_candidate_count": 6,
             "technical_regression_count": 0,
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
             "audio_review_required": True,
         },
         "rendered_audio_files": rendered,
@@ -142,6 +146,10 @@ class StageBMidiToSoloTargetedQualityRepairListeningReviewPackageTest(unittest.T
             self.assertFalse(summary["validated_review_input"])
             self.assertTrue(summary["technical_wav_validation"])
             self.assertEqual(summary["failure_label_delta"], 7)
+            self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
 
@@ -153,6 +161,21 @@ class StageBMidiToSoloTargetedQualityRepairListeningReviewPackageTest(unittest.T
             ):
                 build_listening_review_package_report(
                     audio_package_report=audio_package_report(root, quality_claim=True),
+                    output_dir=root / "review_package",
+                    issue_number=754,
+                    expected_count=6,
+                )
+
+    def test_rejects_missing_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = audio_package_report(root)
+            source["summary"]["repaired_outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(
+                StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError
+            ):
+                build_listening_review_package_report(
+                    audio_package_report=source,
                     output_dir=root / "review_package",
                     issue_number=754,
                     expected_count=6,
