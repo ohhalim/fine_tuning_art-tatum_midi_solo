@@ -312,7 +312,10 @@
 - rendered audio file count: `6`
 - changed note total: `40`
 - weak chord-tone landing risk delta: `6`
-- outside-soloing pitch-role risk count after: `2`
+- objective outside-soloing pitch-role risk count: `5`
+- outside-soloing pitch-role risk count: `5 -> 2`
+- outside-soloing repair targeted: `false`
+- outside-soloing residual risk preserved: `true`
 - final landing chord-tone count after: `6`
 - chord-tone landing follow-up required: `true`
 - current quality claim ready: `false`

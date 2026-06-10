@@ -110,6 +110,20 @@ def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
             "rendered WAV count below 6"
         )
+    if _int(source.get("objective_outside_soloing_pitch_role_risk_count")) != _int(
+        source.get("outside_soloing_pitch_role_risk_count_before")
+    ):
+        raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
+            "outside-soloing objective and source counts must match"
+        )
+    if bool(source.get("outside_soloing_repair_targeted", True)):
+        raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
+            "outside-soloing repair target should remain false in objective next"
+        )
+    if not bool(source.get("outside_soloing_residual_risk_preserved", False)):
+        raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
+            "outside-soloing residual risk context must be preserved"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
             "critical user input should not be required"
@@ -129,11 +143,26 @@ def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
         "duration_min_seconds": _float(source.get("duration_min_seconds")),
         "duration_max_seconds": _float(source.get("duration_max_seconds")),
         "changed_note_total": _int(source.get("changed_note_total")),
+        "objective_outside_soloing_pitch_role_risk_count": _int(
+            source.get("objective_outside_soloing_pitch_role_risk_count")
+        ),
         "weak_chord_tone_landing_risk_delta": _int(
             source.get("weak_chord_tone_landing_risk_delta")
         ),
+        "outside_soloing_pitch_role_risk_count_before": _int(
+            source.get("outside_soloing_pitch_role_risk_count_before")
+        ),
         "outside_soloing_pitch_role_risk_count_after": _int(
             source.get("outside_soloing_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_pitch_role_risk_delta": _int(
+            source.get("outside_soloing_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_targeted": bool(
+            source.get("outside_soloing_repair_targeted", True)
+        ),
+        "outside_soloing_residual_risk_preserved": bool(
+            source.get("outside_soloing_residual_risk_preserved", False)
         ),
         "final_landing_chord_tone_count_after": _int(
             source.get("final_landing_chord_tone_count_after")
@@ -173,10 +202,25 @@ def build_objective_next_report(
             "duration_min_seconds": _float(source["duration_min_seconds"]),
             "duration_max_seconds": _float(source["duration_max_seconds"]),
             "changed_note_total": _int(source["changed_note_total"]),
+            "objective_outside_soloing_pitch_role_risk_count": _int(
+                source["objective_outside_soloing_pitch_role_risk_count"]
+            ),
             "weak_chord_tone_landing_risk_delta": _int(
                 source["weak_chord_tone_landing_risk_delta"]
             ),
+            "outside_soloing_pitch_role_risk_count_before": _int(
+                source["outside_soloing_pitch_role_risk_count_before"]
+            ),
             "outside_soloing_pitch_role_risk_count_after": residual_outside_risk,
+            "outside_soloing_pitch_role_risk_delta": _int(
+                source["outside_soloing_pitch_role_risk_delta"]
+            ),
+            "outside_soloing_repair_targeted": bool(
+                source["outside_soloing_repair_targeted"]
+            ),
+            "outside_soloing_residual_risk_preserved": bool(
+                source["outside_soloing_residual_risk_preserved"]
+            ),
             "final_landing_chord_tone_count_after": _int(
                 source["final_landing_chord_tone_count_after"]
             ),
@@ -195,6 +239,19 @@ def build_objective_next_report(
             "boundary": BOUNDARY,
             "objective_next_decision_completed": True,
             "technical_wav_validation": bool(source["technical_wav_validation"]),
+            "objective_outside_soloing_pitch_role_risk_count": _int(
+                source["objective_outside_soloing_pitch_role_risk_count"]
+            ),
+            "outside_soloing_pitch_role_risk_count_before": _int(
+                source["outside_soloing_pitch_role_risk_count_before"]
+            ),
+            "outside_soloing_pitch_role_risk_count_after": residual_outside_risk,
+            "outside_soloing_repair_targeted": bool(
+                source["outside_soloing_repair_targeted"]
+            ),
+            "outside_soloing_residual_risk_preserved": bool(
+                source["outside_soloing_residual_risk_preserved"]
+            ),
             "chord_tone_landing_followup_required": bool(followup_required),
             "current_quality_claim_ready": False,
             "human_audio_preference_claimed": False,
@@ -268,6 +325,20 @@ def validate_objective_next_report(
         raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
             "quality claim readiness must remain false"
         )
+    if _int(summary.get("objective_outside_soloing_pitch_role_risk_count")) != _int(
+        summary.get("outside_soloing_pitch_role_risk_count_before")
+    ):
+        raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
+            "outside-soloing objective and source counts must match"
+        )
+    if bool(summary.get("outside_soloing_repair_targeted", True)):
+        raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
+            "outside-soloing repair target should remain false in objective next"
+        )
+    if not bool(summary.get("outside_soloing_residual_risk_preserved", False)):
+        raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
+            "outside-soloing residual risk context must be preserved"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
             "critical user input should not be required"
@@ -291,11 +362,26 @@ def validate_objective_next_report(
         "technical_wav_validation": bool(summary.get("technical_wav_validation", False)),
         "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
         "changed_note_total": _int(summary.get("changed_note_total")),
+        "objective_outside_soloing_pitch_role_risk_count": _int(
+            summary.get("objective_outside_soloing_pitch_role_risk_count")
+        ),
         "weak_chord_tone_landing_risk_delta": _int(
             summary.get("weak_chord_tone_landing_risk_delta")
         ),
+        "outside_soloing_pitch_role_risk_count_before": _int(
+            summary.get("outside_soloing_pitch_role_risk_count_before")
+        ),
         "outside_soloing_pitch_role_risk_count_after": _int(
             summary.get("outside_soloing_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_pitch_role_risk_delta": _int(
+            summary.get("outside_soloing_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_targeted": bool(
+            summary.get("outside_soloing_repair_targeted", True)
+        ),
+        "outside_soloing_residual_risk_preserved": bool(
+            summary.get("outside_soloing_residual_risk_preserved", False)
         ),
         "final_landing_chord_tone_count_after": _int(
             summary.get("final_landing_chord_tone_count_after")
@@ -337,8 +423,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- technical WAV validation: `{_bool_token(summary['technical_wav_validation'])}`",
         f"- rendered audio file count: `{summary['rendered_audio_file_count']}`",
         f"- changed note total: `{summary['changed_note_total']}`",
+        f"- objective outside-soloing pitch-role risk count: `{summary['objective_outside_soloing_pitch_role_risk_count']}`",
         f"- weak chord-tone landing risk delta: `{summary['weak_chord_tone_landing_risk_delta']}`",
-        f"- outside-soloing pitch-role risk count after: `{summary['outside_soloing_pitch_role_risk_count_after']}`",
+        f"- outside-soloing pitch-role risk count: `{summary['outside_soloing_pitch_role_risk_count_before']} -> {summary['outside_soloing_pitch_role_risk_count_after']}`",
+        f"- outside-soloing repair targeted: `{_bool_token(summary['outside_soloing_repair_targeted'])}`",
+        f"- outside-soloing residual risk preserved: `{_bool_token(summary['outside_soloing_residual_risk_preserved'])}`",
         f"- final landing chord-tone count after: `{summary['final_landing_chord_tone_count_after']}`",
         f"- chord-tone landing follow-up required: `{_bool_token(summary['chord_tone_landing_followup_required'])}`",
         f"- current quality claim ready: `{_bool_token(summary['current_quality_claim_ready'])}`",
@@ -376,7 +465,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=798)
+    parser.add_argument("--issue_number", type=int, default=882)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_objective_decision", action="store_true")

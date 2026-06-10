@@ -34,8 +34,13 @@ def input_guard_report(*, quality_claim: bool = False, outside_after: int = 2) -
                 "duration_min_seconds": 18.871,
                 "duration_max_seconds": 19.000,
                 "changed_note_total": 40,
+                "objective_outside_soloing_pitch_role_risk_count": 5,
                 "weak_chord_tone_landing_risk_delta": 6,
+                "outside_soloing_pitch_role_risk_count_before": 5,
                 "outside_soloing_pitch_role_risk_count_after": outside_after,
+                "outside_soloing_pitch_role_risk_delta": 5 - outside_after,
+                "outside_soloing_repair_targeted": False,
+                "outside_soloing_residual_risk_preserved": True,
                 "final_landing_chord_tone_count_after": 6,
                 "audio_review_required": True,
             },
@@ -69,7 +74,7 @@ class StageBMidiToSoloChordToneLandingRepairObjectiveNextTest(unittest.TestCase)
             report = build_objective_next_report(
                 input_guard_report=input_guard_report(),
                 output_dir=root / "objective_next",
-                issue_number=798,
+                issue_number=882,
             )
             summary = validate_objective_next_report(
                 report,
@@ -87,7 +92,12 @@ class StageBMidiToSoloChordToneLandingRepairObjectiveNextTest(unittest.TestCase)
             self.assertTrue(summary["technical_wav_validation"])
             self.assertEqual(summary["rendered_audio_file_count"], 6)
             self.assertEqual(summary["weak_chord_tone_landing_risk_delta"], 6)
+            self.assertEqual(summary["objective_outside_soloing_pitch_role_risk_count"], 5)
+            self.assertEqual(summary["outside_soloing_pitch_role_risk_count_before"], 5)
             self.assertEqual(summary["outside_soloing_pitch_role_risk_count_after"], 2)
+            self.assertEqual(summary["outside_soloing_pitch_role_risk_delta"], 3)
+            self.assertFalse(summary["outside_soloing_repair_targeted"])
+            self.assertTrue(summary["outside_soloing_residual_risk_preserved"])
             self.assertTrue(summary["chord_tone_landing_followup_required"])
             self.assertFalse(summary["current_quality_claim_ready"])
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -100,7 +110,7 @@ class StageBMidiToSoloChordToneLandingRepairObjectiveNextTest(unittest.TestCase)
                 build_objective_next_report(
                     input_guard_report=input_guard_report(quality_claim=True),
                     output_dir=root / "objective_next",
-                    issue_number=798,
+                    issue_number=882,
                 )
 
     def test_constants_are_stable(self) -> None:
