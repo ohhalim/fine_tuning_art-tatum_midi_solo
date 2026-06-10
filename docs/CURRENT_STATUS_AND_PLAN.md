@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #866, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision outside-soloing context refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision refresh`
+- latest functional result: Issue #868, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision outside-soloing context refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge refresh`
 
 현재 범위가 아닌 것:
 
@@ -202,6 +202,10 @@
 - primary remaining failure labels: `rhythmic_monotony`
 - primary remaining failure count: `1`
 - not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
+- objective source/repaired outside-soloing not evaluable count: `6/6`
+- repair sweep source/repaired outside-soloing not evaluable count: `6/6`
+- objective source outside-soloing repair pitch-role risk count after: `0`
+- repair sweep source outside-soloing repair pitch-role risk count after: `0`
 - chord-context pitch-role bridge selected: `true`
 - context not-evaluable min count: `6`
 - technical regression count: `0`

@@ -119,6 +119,22 @@ def validate_objective_next_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
             "technical WAV validation required"
         )
+    if not bool(summary.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
+            "objective outside-soloing repair evidence should be ready"
+        )
+    if _int(summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
+            "objective source outside-soloing repair pitch-role risk should be resolved"
+        )
+    if _int(summary.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
+            "objective source outside-soloing not-evaluable count should be preserved"
+        )
+    if _int(summary.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
+            "objective repaired outside-soloing not-evaluable count should be preserved"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
             "critical user input should not be required"
@@ -131,6 +147,19 @@ def validate_objective_next_source(report: dict[str, Any]) -> dict[str, Any]:
         "failure_label_delta": _int(summary.get("failure_label_delta")),
         "phrase_rhythm_failure_delta": _int(summary.get("phrase_rhythm_failure_delta")),
         "technical_wav_validation": bool(summary.get("technical_wav_validation", False)),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            summary.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            summary.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            summary.get("repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_not_evaluable_counts": _dict(summary.get("repaired_not_evaluable_counts")),
         "validated_review_input_present": bool(
             summary.get("validated_review_input_present", False)
         ),
@@ -187,6 +216,22 @@ def validate_repair_sweep_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
             "technical regression must remain zero"
         )
+    if not bool(aggregate.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
+            "repair sweep outside-soloing repair evidence should be ready"
+        )
+    if _int(aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
+            "repair sweep source outside-soloing repair pitch-role risk should be resolved"
+        )
+    if _int(aggregate.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
+            "repair sweep source outside-soloing not-evaluable count should be preserved"
+        )
+    if _int(aggregate.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
+            "repair sweep repaired outside-soloing not-evaluable count should be preserved"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError(
             "critical user input should not be required"
@@ -236,6 +281,19 @@ def validate_repair_sweep_source(report: dict[str, Any]) -> dict[str, Any]:
         "phrase_rhythm_failure_delta": _int(aggregate.get("phrase_rhythm_failure_delta")),
         "improved_candidate_count": _int(aggregate.get("improved_candidate_count")),
         "technical_regression_count": _int(aggregate.get("technical_regression_count")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            aggregate.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            aggregate.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            aggregate.get("repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_not_evaluable_counts": _dict(aggregate.get("repaired_not_evaluable_counts")),
         "remaining_failure_counts": remaining_counts,
         "primary_remaining_failure_labels": primary_labels,
         "primary_remaining_failure_count": primary_count,
@@ -342,6 +400,30 @@ def build_followup_decision_report(
             ),
             "context_not_evaluable_min_count": _int(
                 sweep["context_not_evaluable_min_count"]
+            ),
+            "objective_source_outside_soloing_repair_evidence_ready": bool(
+                objective["source_outside_soloing_repair_evidence_ready"]
+            ),
+            "objective_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                objective["source_outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "objective_source_outside_soloing_not_evaluable_count": _int(
+                objective["source_outside_soloing_not_evaluable_count"]
+            ),
+            "objective_repaired_outside_soloing_not_evaluable_count": _int(
+                objective["repaired_outside_soloing_not_evaluable_count"]
+            ),
+            "repair_sweep_source_outside_soloing_repair_evidence_ready": bool(
+                sweep["source_outside_soloing_repair_evidence_ready"]
+            ),
+            "repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                sweep["source_outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+                sweep["source_outside_soloing_not_evaluable_count"]
+            ),
+            "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+                sweep["repaired_outside_soloing_not_evaluable_count"]
             ),
             "technical_regression_count": _int(sweep["technical_regression_count"]),
             "human_audio_preference_claimed": False,
@@ -484,6 +566,30 @@ def validate_followup_decision_report(
         "technical_regression_count": _int(readiness.get("technical_regression_count")),
         "remaining_failure_counts": _dict(sweep.get("remaining_failure_counts")),
         "not_evaluable_counts": _dict(sweep.get("not_evaluable_counts")),
+        "objective_source_outside_soloing_repair_evidence_ready": bool(
+            readiness.get("objective_source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "objective_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            readiness.get("objective_source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "objective_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("objective_source_outside_soloing_not_evaluable_count")
+        ),
+        "objective_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("objective_repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_source_outside_soloing_repair_evidence_ready": bool(
+            readiness.get("repair_sweep_source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            readiness.get("repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_source_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_repaired_outside_soloing_not_evaluable_count")
+        ),
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)
         ),
@@ -523,6 +629,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- phrase/rhythm failure delta: `{readiness['phrase_rhythm_failure_delta']}`",
         f"- residual rhythmic monotony count: `{readiness['residual_rhythmic_monotony_count']}`",
         f"- context not-evaluable min count: `{readiness['context_not_evaluable_min_count']}`",
+        f"- objective source/repaired outside-soloing not evaluable count: `{readiness['objective_source_outside_soloing_not_evaluable_count']}/{readiness['objective_repaired_outside_soloing_not_evaluable_count']}`",
+        f"- repair sweep source/repaired outside-soloing not evaluable count: `{readiness['repair_sweep_source_outside_soloing_not_evaluable_count']}/{readiness['repair_sweep_repaired_outside_soloing_not_evaluable_count']}`",
+        f"- objective source outside-soloing repair pitch-role risk count after: `{readiness['objective_source_outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- repair sweep source outside-soloing repair pitch-role risk count after: `{readiness['repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after']}`",
         f"- technical regression count: `{readiness['technical_regression_count']}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         f"- MIDI-to-solo musical quality claimed: `{_bool_token(readiness['midi_to_solo_musical_quality_claimed'])}`",
