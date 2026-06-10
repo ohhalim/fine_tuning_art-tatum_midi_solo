@@ -6068,6 +6068,47 @@ Issue #826은 final status audit에 Issue #822/#824 outside-soloing repair evide
 
 - `Stage B MIDI-to-solo post-MVP quality iteration plan refresh`
 
+## 9.105 Stage B MIDI-to-solo post-MVP quality iteration outside-soloing repair refresh
+
+Issue #828은 post-MVP quality iteration plan의 final status source validation에 outside-soloing repair evidence를 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- source boundary: `stage_b_midi_to_solo_final_status_audit`
+- next boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- selected target: `quality_rubric_baseline`
+- technical MVP complete: `true`
+- local review ready: `true`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair WAV count: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing repair pitch-role risk count after: `0`
+- quality rubric required: `true`
+- candidate failure labeling required: `true`
+- targeted quality repair sweep required: `true`
+- audio review package required: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- post-MVP plan source validation이 final status outside-soloing repair readiness/count/risk summary를 요구.
+- 다음 quality rubric baseline에서 outside-soloing label을 현재 repair evidence와 분리해서 다룰 수 있음.
+- 음악적 품질, human/audio preference, broad trained-model quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- `.venv/bin/python -m py_compile scripts/plan_stage_b_midi_to_solo_post_mvp_quality_iteration.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-post-mvp-quality-iteration-plan`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo quality rubric baseline refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
