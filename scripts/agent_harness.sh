@@ -6221,8 +6221,8 @@ run_stage_b_midi_to_solo_targeted_quality_repair_sweep() {
 }
 
 run_stage_b_midi_to_solo_targeted_quality_repair_audio_package() {
-  local repair_sweep_run_id="${REPAIR_SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_sweep}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_audio_package}"
+  local repair_sweep_run_id="${REPAIR_SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_sweep_source_context_refresh}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_targeted_quality_repair_audio_package_source_context_refresh}"
   local repair_sweep_report="outputs/stage_b_midi_to_solo_targeted_quality_repair_sweep/${repair_sweep_run_id}/stage_b_midi_to_solo_targeted_quality_repair_sweep.json"
   if [[ ! -f "$repair_sweep_report" ]]; then
     print_header "Stage B MIDI-to-solo targeted quality repair sweep"
@@ -6232,8 +6232,8 @@ run_stage_b_midi_to_solo_targeted_quality_repair_audio_package() {
   "$PYTHON_BIN" scripts/render_stage_b_midi_to_solo_targeted_quality_repair_audio.py \
     --run_id "$run_id" \
     --targeted_quality_repair_sweep_report "$repair_sweep_report" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_AUDIO_PACKAGE_2026-06-10.md \
-    --issue_number 836 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_AUDIO_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 922 \
     --expected_boundary stage_b_midi_to_solo_targeted_quality_repair_audio_package \
     --expected_next_boundary stage_b_midi_to_solo_targeted_quality_repair_listening_review_package \
     --expected_file_count 6 \

@@ -23,10 +23,11 @@
 - latest quality rubric baseline: Issue #916, Stage B MIDI-to-solo quality rubric baseline source-context refresh
 - latest candidate failure labeling: Issue #918, Stage B MIDI-to-solo candidate failure labeling source-context refresh
 - latest targeted quality repair sweep: Issue #920, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
+- latest targeted quality repair audio package: Issue #922, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after targeted quality repair sweep source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair audio package source-context refresh`
+- open issue queue after targeted quality repair audio package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -626,15 +627,29 @@
 - source outside-soloing not evaluable count: `6`
 - repaired outside-soloing not evaluable count: `6`
 - audio package ready: `true`
-- audio package ready: `true`
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 audio target: `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
-- targeted quality repair audio package outside-soloing context refresh 완료
+- targeted quality repair audio package source-context refresh 완료
+- render attempted: `true`
 - rendered audio file count: `6`
 - technical WAV validation: `true`
+- sample rate: `44100`
+- duration range: `18.422s - 18.984s`
+- source total failure label count: `12`
+- repaired total failure label count: `8`
 - failure label delta: `4`
-- source outside-soloing repair pitch-role risk count after: `0`
+- improved candidate count: `4`
+- technical regression count: `0`
+- source outside-soloing repair evidence ready: `true`
+- source outside-soloing repair WAV count: `6`
+- source outside-soloing source objective pitch-role risk count: `5`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing source pitch-role risk delta: `3`
+- source outside-soloing source repair targeted: `false`
+- source outside-soloing source residual risk preserved: `true`
+- source outside-soloing current repair pitch-role risk count after: `0`
+- source outside-soloing current repair pitch-role risk delta: `2`
 - source outside-soloing not evaluable count: `6`
 - repaired outside-soloing not evaluable count: `6`
 - audio review required: `true`

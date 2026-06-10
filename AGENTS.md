@@ -23,10 +23,11 @@ Current handoff scope:
 - Latest quality rubric baseline completed: Issue #916, Stage B MIDI-to-solo quality rubric baseline source-context refresh.
 - Latest candidate failure labeling completed: Issue #918, Stage B MIDI-to-solo candidate failure labeling source-context refresh.
 - Latest targeted quality repair sweep completed: Issue #920, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh.
+- Latest targeted quality repair audio package completed: Issue #922, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh.
 - Latest documentation issue completed: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after targeted quality repair sweep source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo targeted quality repair audio package source-context refresh.
+- Open issue queue after targeted quality repair audio package source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
@@ -198,6 +199,16 @@ bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-sweep
 
 This harness runs the targeted repair sweep, preserves source/current
 outside-soloing repair context, and avoids musical quality or preference claims.
+
+For Stage B MIDI-to-solo targeted quality repair audio package changes, run:
+
+```bash
+bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-audio-package
+```
+
+This harness renders targeted repair MIDI candidates to WAV, preserves
+source/current outside-soloing repair context, and avoids audio quality or
+preference claims.
 
 For Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep changes, run:
 
