@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
     build_quality_rubric_baseline_report,
 )
@@ -146,6 +147,7 @@ def followup_decision(*, quality_claim: bool = False) -> dict:
             "objective_source_outside_soloing_repair_evidence_ready": True,
             "objective_source_outside_soloing_repair_wav_count": 6,
             "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "objective_source_outside_soloing_repair_source_context_preserved": True,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -155,8 +157,10 @@ def followup_decision(*, quality_claim: bool = False) -> dict:
             "objective_source_outside_soloing_repair_pitch_role_risk_delta": 2,
             "objective_source_outside_soloing_not_evaluable_count": 6,
             "objective_repaired_outside_soloing_not_evaluable_count": 6,
+            **{f"objective_{key}": value for key, value in SOURCE_CONTEXT.items()},
             "repair_sweep_source_outside_soloing_repair_evidence_ready": True,
             "repair_sweep_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "repair_sweep_source_outside_soloing_repair_source_context_preserved": True,
             "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -166,6 +170,7 @@ def followup_decision(*, quality_claim: bool = False) -> dict:
             "repair_sweep_source_outside_soloing_repair_pitch_role_risk_delta": 2,
             "repair_sweep_source_outside_soloing_not_evaluable_count": 6,
             "repair_sweep_repaired_outside_soloing_not_evaluable_count": 6,
+            **{f"repair_sweep_{key}": value for key, value in SOURCE_CONTEXT.items()},
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
@@ -224,6 +229,7 @@ def source_repair_sweep(*, technical_regression_count: int = 0) -> dict:
             },
             "source_outside_soloing_repair_evidence_ready": True,
             "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "source_outside_soloing_repair_source_context_preserved": True,
             "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -233,6 +239,7 @@ def source_repair_sweep(*, technical_regression_count: int = 0) -> dict:
             "source_outside_soloing_repair_pitch_role_risk_delta": 2,
             "source_outside_soloing_not_evaluable_count": 6,
             "repaired_outside_soloing_not_evaluable_count": 6,
+            **SOURCE_CONTEXT,
             "target_supported": True,
         },
         "readiness": {
@@ -290,6 +297,13 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
             self.assertGreater(summary["phrase_rhythm_failure_delta"], 0)
             self.assertEqual(summary["technical_regression_count"], 0)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertTrue(
+                summary["objective_source_outside_soloing_repair_source_context_preserved"]
+            )
+            self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+                self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
+                self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(
                 summary[
                     "source_outside_soloing_repair_source_pitch_role_risk_count_before"
@@ -378,6 +392,38 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "phrase_rhythm_repair",
                     issue_number=944,
+                )
+
+    def test_rejects_missing_bridge_source_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = source_repair_sweep()
+            source["aggregate"].pop(BRIDGE_SOURCE_CONTEXT_KEYS[0])
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError
+            ):
+                build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
+                    followup_decision=followup_decision(),
+                    source_repair_sweep=source,
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "phrase_rhythm_repair",
+                    issue_number=1028,
+                )
+
+    def test_rejects_source_context_preservation_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = followup_decision()
+            source["readiness"][
+                "repair_sweep_source_outside_soloing_repair_source_context_preserved"
+            ] = False
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError
+            ):
+                build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
+                    followup_decision=source,
+                    source_repair_sweep=source_repair_sweep(),
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "phrase_rhythm_repair",
+                    issue_number=1028,
                 )
 
     def test_constants_are_stable(self) -> None:
