@@ -16,10 +16,11 @@
 - latest MVP completion audit: Issue #902, Stage B MIDI-to-solo MVP completion audit source-context refresh
 - latest quality gap decision: Issue #904, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #906, Stage B MIDI-to-solo listening review quality gap source-context refresh
+- latest MVP delivery package: Issue #908, Stage B MIDI-to-solo MVP delivery package source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after listening review quality gap source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP delivery package source-context refresh`
+- open issue queue after MVP delivery package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo README final evidence source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -499,14 +500,20 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 delivery target: `stage_b_midi_to_solo_mvp_delivery_package`
-- MVP delivery package outside-soloing repair refresh 완료
+- MVP delivery package source-context refresh 완료
 - runnable CLI ready: `true`
 - input to ranked MIDI ready: `true`
 - input to rendered WAV evidence ready: `true`
 - changed-ratio repair audio evidence ready: `true`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair WAV count: `6`
+- outside-soloing source objective pitch-role risk count: `5`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source pitch-role risk delta: `3`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
 - outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair pitch-role risk delta: `2`
 - raw artifact upload required: `false`
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`

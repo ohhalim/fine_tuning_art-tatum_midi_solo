@@ -47,6 +47,12 @@ def listening_gap_report(
             "outside_soloing_repair_target_supported": outside_soloing_repair_supported,
             "outside_soloing_repair_rendered_audio_file_count": 6,
             "outside_soloing_repair_changed_note_total": 2,
+            "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+            "outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+            "outside_soloing_repair_source_pitch_role_risk_delta": 3,
+            "outside_soloing_repair_source_targeted": False,
+            "outside_soloing_repair_source_residual_risk_preserved": True,
             "outside_soloing_repair_pitch_role_risk_count_after": (
                 0 if outside_soloing_repair_supported else 1
             ),
@@ -179,6 +185,21 @@ class StageBMidiToSoloMvpDeliveryPackageTest(unittest.TestCase):
         self.assertEqual(summary["changed_ratio_repair_wav_count"], 3)
         self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
+        self.assertEqual(
+            summary["outside_soloing_repair_source_objective_pitch_role_risk_count"],
+            5,
+        )
+        self.assertEqual(
+            summary["outside_soloing_repair_source_pitch_role_risk_count_before"],
+            5,
+        )
+        self.assertEqual(
+            summary["outside_soloing_repair_source_pitch_role_risk_count_after"],
+            2,
+        )
+        self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_delta"], 3)
+        self.assertFalse(summary["outside_soloing_repair_source_targeted"])
+        self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
         self.assertTrue(summary["listening_review_quality_gap_open"])
@@ -238,6 +259,52 @@ class StageBMidiToSoloMvpDeliveryPackageTest(unittest.TestCase):
                     changed_ratio_audio_package=changed_ratio_audio_report(tmp_path),
                     output_dir=tmp_path / "delivery",
                     issue_number=822,
+                )
+
+    def test_rejects_missing_outside_soloing_source_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            source = listening_gap_report()
+            source["quality_gap_summary"].pop(
+                "outside_soloing_repair_source_residual_risk_preserved"
+            )
+            with self.assertRaises(StageBMidiToSoloMvpDeliveryPackageError):
+                build_delivery_package_report(
+                    listening_review_quality_gap=source,
+                    cli_mvp_package=cli_package_report(tmp_path),
+                    changed_ratio_audio_package=changed_ratio_audio_report(tmp_path),
+                    output_dir=tmp_path / "delivery",
+                    issue_number=908,
+                )
+
+    def test_rejects_targeted_outside_soloing_source_repair(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            source = listening_gap_report()
+            source["quality_gap_summary"]["outside_soloing_repair_source_targeted"] = True
+            with self.assertRaises(StageBMidiToSoloMvpDeliveryPackageError):
+                build_delivery_package_report(
+                    listening_review_quality_gap=source,
+                    cli_mvp_package=cli_package_report(tmp_path),
+                    changed_ratio_audio_package=changed_ratio_audio_report(tmp_path),
+                    output_dir=tmp_path / "delivery",
+                    issue_number=908,
+                )
+
+    def test_rejects_outside_soloing_source_risk_delta_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            source = listening_gap_report()
+            source["quality_gap_summary"][
+                "outside_soloing_repair_source_pitch_role_risk_delta"
+            ] = 2
+            with self.assertRaises(StageBMidiToSoloMvpDeliveryPackageError):
+                build_delivery_package_report(
+                    listening_review_quality_gap=source,
+                    cli_mvp_package=cli_package_report(tmp_path),
+                    changed_ratio_audio_package=changed_ratio_audio_report(tmp_path),
+                    output_dir=tmp_path / "delivery",
+                    issue_number=908,
                 )
 
     def test_boundary_constants_are_stable(self) -> None:
