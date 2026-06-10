@@ -209,6 +209,10 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioTest(unittest.Tes
             self.assertTrue(summary["outside_soloing_repair_targeted"])
             self.assertEqual(summary["weak_chord_tone_landing_risk_count_after"], 0)
             self.assertEqual(summary["max_non_chord_tone_run_after"], 3)
+            for key, value in SOURCE_CONTEXT.items():
+                self.assertEqual(report["summary"][key], value)
+                self.assertEqual(report["audio_render_boundary"][key], value)
+                self.assertEqual(summary[key], value)
             self.assertTrue(summary["audio_review_required"])
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])

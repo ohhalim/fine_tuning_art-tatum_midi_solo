@@ -429,6 +429,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: follow-up required `true`, selected target `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: selected target `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`, primary risk `outside_soloing_pitch_role_risk=2`, weak landing resolved `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep: outside risk `2 -> 0`, changed notes `2`, max non-chord run `4 -> 3`, weak landing after `0`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package`
+- MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: rendered WAV `6`, duration `18.871s-19.000s`, technical validation `true`, source risk `5 -> 2`, current repair risk `2 -> 0`, source/current context preserved, audio/preference/quality claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package`
 - MIDI-to-solo pitch-contour changed-ratio review decision: selected target `lower_pitch_change_ratio_repair_probe`, repair probe required `true`, max interval/threshold `11/12`, changed-ratio review threshold `0.5`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
 - MIDI-to-solo pitch-contour changed-ratio repair probe: repaired/pass `3/3`, max pitch changed ratio `0.7174 -> 0.4348`, max interval `12`, dead-air max `0.0000`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package`
 - MIDI-to-solo pitch-contour changed-ratio repair audio package: rendered WAV `3`, duration `18.422s-18.978s`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_listening_review_package`
@@ -9715,6 +9716,57 @@ Issue #972는 Issue #970 follow-up decision과 Issue #960 chord-tone landing rep
 다음 작업:
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package source-context refresh`
+
+## 9.177 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package source-context refresh
+
+Issue #974는 Issue #972 outside-soloing repair sweep의 source/current outside-soloing context를 WAV audio package summary와 validation output까지 보존하고, repaired MIDI 6개 렌더 결과를 기록한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package`
+- rendered audio file count: `6`
+- technical WAV validation: `true`
+- sample rate: `44100`
+- duration range: `18.871s-19.000s`
+- changed note total: `2`
+- source objective outside-soloing pitch-role risk count: `5`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- source outside-soloing pitch-role risk delta: `3`
+- source outside-soloing repair targeted: `false`
+- source outside-soloing residual risk preserved: `true`
+- outside-soloing pitch-role risk count: `2 -> 0`
+- outside-soloing pitch-role risk delta: `2`
+- outside-soloing repair targeted: `true`
+- weak chord-tone landing risk count after: `0`
+- final landing chord-tone count after: `6`
+- max non-chord-tone run: `4 -> 3`
+- audio review required: `true`
+- audio rendered quality claimed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- WAV 파일 6개 생성, sample rate/frame count/size 기준 technical validation 통과.
+- source outside-soloing context `5 -> 2`와 current repair result `2 -> 0` 분리 보존.
+- follow-up objective, follow-up repair sweep, bridge repair sweep source-context key 보존.
+- audio rendered quality, human/audio preference, MIDI-to-solo musical quality claim 제외.
+- 다음 boundary는 rendered WAV/MIDI 후보의 listening review package.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio`
+- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-outside-soloing-repair-audio-package`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package source-context refresh`
 
 ## 10. 한 문장 요약
 

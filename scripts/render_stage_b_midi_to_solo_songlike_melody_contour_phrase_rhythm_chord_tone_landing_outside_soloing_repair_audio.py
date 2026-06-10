@@ -20,6 +20,9 @@ from scripts.render_stage_b_midi_to_solo_candidate_audio import (  # noqa: E402
     sha256_file,
     wav_meta,
 )
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
+    BRIDGE_SOURCE_CONTEXT_KEYS,
+)
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep import (  # noqa: E402
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
@@ -39,7 +42,7 @@ NEXT_BOUNDARY = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package"
 )
 SCHEMA_VERSION = (
-    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package_v1"
+    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package_v2"
 )
 CommandRunner = Callable[[Sequence[str]], subprocess.CompletedProcess[str]]
 
@@ -92,6 +95,15 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
         raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
             f"unexpected quality claim in {label}: {claimed}"
         )
+
+
+def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
+    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        if key not in container:
+            raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
+                f"{label} source-context field required: {key}"
+            )
+    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
 
 
 def validate_source_report(
@@ -267,7 +279,7 @@ def build_audio_render_report(
     soundfont_path: str,
     sample_rate: int,
     expected_file_count: int,
-    issue_number: int = 804,
+    issue_number: int = 974,
     runner: CommandRunner = default_runner,
 ) -> dict[str, Any]:
     candidates = validate_source_report(source_report, expected_count=expected_file_count)
@@ -282,6 +294,7 @@ def build_audio_render_report(
     )
     rendered = execute_render_plan(plan, runner=runner)
     aggregate = _dict(source_report.get("aggregate"))
+    source_context = _source_context_fields(aggregate, label="repair sweep aggregate")
     durations = [
         _float(_dict(item.get("wav_file")).get("duration_seconds")) for item in rendered
     ]
@@ -353,6 +366,7 @@ def build_audio_render_report(
                 aggregate.get("max_non_chord_tone_run_after")
             ),
             "target_supported": bool(aggregate.get("target_supported", False)),
+            **source_context,
             "audio_review_required": True,
         },
         "audio_render_boundary": {
@@ -382,6 +396,7 @@ def build_audio_render_report(
             "outside_soloing_repair_targeted": bool(
                 aggregate.get("outside_soloing_repair_targeted", False)
             ),
+            **source_context,
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -479,6 +494,11 @@ def validate_audio_render_report(
         raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
             "outside-soloing repair must be targeted before audio package"
         )
+    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        if key not in summary:
+            raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
+                f"audio package source-context field required: {key}"
+            )
     if require_no_quality_claim:
         _require_no_quality_claim(boundary, label="audio render boundary")
     return {
@@ -538,6 +558,7 @@ def validate_audio_render_report(
         ),
         "target_supported": bool(summary.get("target_supported", False)),
         "audio_review_required": bool(summary.get("audio_review_required", False)),
+        **{key: summary.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
         "audio_rendered_quality_claimed": bool(
             boundary.get("audio_rendered_quality_claimed", True)
         ),
@@ -582,6 +603,12 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- weak chord-tone landing risk count after: `{summary['weak_chord_tone_landing_risk_count_after']}`",
         f"- final landing chord-tone count after: `{summary['final_landing_chord_tone_count_after']}`",
         f"- max non-chord-tone run: `{summary['max_non_chord_tone_run_before']} -> {summary['max_non_chord_tone_run_after']}`",
+        f"- follow-up objective source outside-soloing source pitch-role risk: `{summary['followup_objective_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['followup_objective_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `{summary['followup_objective_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['followup_objective_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- follow-up repair sweep source outside-soloing source pitch-role risk: `{summary['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `{summary['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- bridge repair sweep source outside-soloing source pitch-role risk: `{summary['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `{summary['repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
         f"- audio review required: `{_bool_token(summary['audio_review_required'])}`",
         f"- audio rendered quality claimed: `{_bool_token(boundary['audio_rendered_quality_claimed'])}`",
         f"- human/audio preference claimed: `{_bool_token(boundary['human_audio_preference_claimed'])}`",
@@ -622,7 +649,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=888)
+    parser.add_argument("--issue_number", type=int, default=974)
     parser.add_argument("--renderer", type=str, default=shutil.which("fluidsynth") or "")
     parser.add_argument("--soundfont", type=str, default="")
     parser.add_argument("--sample_rate", type=int, default=44100)
