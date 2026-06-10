@@ -6037,8 +6037,8 @@ run_stage_b_midi_to_solo_quality_gap_decision() {
   "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_quality_gap.py \
     --run_id "$run_id" \
     --mvp_completion_audit "$completion_audit" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_QUALITY_GAP_DECISION_2026-06-09.md \
-    --issue_number 734 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_QUALITY_GAP_DECISION_OUTSIDE_SOLOING_REPAIR_REFRESH_2026-06-10.md \
+    --issue_number 818 \
     --expected_boundary stage_b_midi_to_solo_quality_gap_decision \
     --expected_next_boundary stage_b_midi_to_solo_listening_review_quality_gap \
     --expected_target listening_review_quality_gap \
