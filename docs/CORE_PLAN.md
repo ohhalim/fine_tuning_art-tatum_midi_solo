@@ -6147,6 +6147,45 @@ Issue #830은 quality rubric baseline에 post-MVP outside-soloing repair evidenc
 
 - `Stage B MIDI-to-solo candidate failure labeling refresh`
 
+## 9.107 Stage B MIDI-to-solo candidate failure labeling outside-soloing repair context refresh
+
+Issue #832는 candidate failure labeling에 quality rubric outside-soloing repair context를 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- source boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- selected target: `targeted_quality_repair_sweep`
+- candidate count: `6`
+- failed candidate count: `6`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair WAV count: `6`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing not evaluable count: `6`
+- targeted quality repair sweep ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- candidate failure labeling이 rubric outside-soloing repair readiness/count/risk summary를 요구.
+- current candidate의 `outside_soloing_without_context`는 chord context 부재로 not_evaluable 유지.
+- residual pitch-role repair failure와 context/listening quality labeling boundary 분리.
+- 다음 boundary는 targeted quality repair sweep refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_candidate_failure_labeling`
+- `.venv/bin/python -m py_compile scripts/label_stage_b_midi_to_solo_candidate_failures.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-candidate-failure-labeling`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo targeted quality repair sweep refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

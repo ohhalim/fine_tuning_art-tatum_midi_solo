@@ -105,6 +105,18 @@ def validate_rubric_baseline(report: dict[str, Any]) -> dict[str, Any]:
     rubric_items = [_dict(item) for item in _list(report.get("rubric_items"))]
     if len(rubric_items) < 8:
         raise StageBMidiToSoloCandidateFailureLabelingError("rubric items below 8")
+    if not bool(summary.get("outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloCandidateFailureLabelingError(
+            "outside-soloing repair evidence readiness required"
+        )
+    if _int(summary.get("outside_soloing_repair_wav_count")) < 6:
+        raise StageBMidiToSoloCandidateFailureLabelingError(
+            "outside-soloing repair WAV count below 6"
+        )
+    if _int(summary.get("outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloCandidateFailureLabelingError(
+            "outside-soloing residual pitch-role risk should be zero"
+        )
     return {**summary, "rubric_items": rubric_items}
 
 
@@ -464,6 +476,21 @@ def build_candidate_failure_labeling_report(
     not_evaluable_counts = Counter(
         label for item in labeled for label in _list(item.get("not_evaluable_labels"))
     )
+    outside_context = {
+        "outside_soloing_repair_evidence_ready": bool(
+            rubric_summary["outside_soloing_repair_evidence_ready"]
+        ),
+        "outside_soloing_repair_wav_count": _int(
+            rubric_summary["outside_soloing_repair_wav_count"]
+        ),
+        "outside_soloing_repair_pitch_role_risk_count_after": _int(
+            rubric_summary["outside_soloing_repair_pitch_role_risk_count_after"]
+        ),
+        "outside_soloing_not_evaluable_count": _int(
+            not_evaluable_counts.get("outside_soloing_without_context", 0)
+        ),
+        "outside_soloing_label_scope": "not_evaluable chord-context gap after objective pitch-role repair",
+    }
     failed_candidate_count = sum(1 for item in labeled if _list(item.get("failure_labels")))
     selected_target = REPAIR_TARGET if failed_candidate_count > 0 else AUDIO_REVIEW_TARGET
     next_boundary = REPAIR_NEXT_BOUNDARY if failed_candidate_count > 0 else AUDIO_REVIEW_NEXT_BOUNDARY
@@ -488,6 +515,7 @@ def build_candidate_failure_labeling_report(
             "candidate_sources": dict(
                 sorted(Counter(str(item.get("source") or "") for item in labeled).items())
             ),
+            **outside_context,
         },
         "selected_next_target": {
             "selected_target": selected_target,
@@ -581,6 +609,18 @@ def validate_candidate_failure_labeling_report(
         "failed_candidate_count": _int(aggregate.get("failed_candidate_count")),
         "failure_label_type_count": len(_dict(aggregate.get("failure_counts"))),
         "not_evaluable_label_type_count": len(_dict(aggregate.get("not_evaluable_counts"))),
+        "outside_soloing_repair_evidence_ready": bool(
+            aggregate.get("outside_soloing_repair_evidence_ready", False)
+        ),
+        "outside_soloing_repair_wav_count": _int(
+            aggregate.get("outside_soloing_repair_wav_count")
+        ),
+        "outside_soloing_repair_pitch_role_risk_count_after": _int(
+            aggregate.get("outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_not_evaluable_count": _int(
+            aggregate.get("outside_soloing_not_evaluable_count")
+        ),
         "targeted_quality_repair_sweep_ready": bool(
             readiness.get("targeted_quality_repair_sweep_ready", False)
         ),
@@ -611,6 +651,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- selected target: `{selected['selected_target']}`",
         f"- candidate count: `{aggregate['candidate_count']}`",
         f"- failed candidate count: `{aggregate['failed_candidate_count']}`",
+        f"- outside-soloing repair evidence ready: `{_bool_token(aggregate['outside_soloing_repair_evidence_ready'])}`",
+        f"- outside-soloing repair WAV count: `{aggregate['outside_soloing_repair_wav_count']}`",
+        f"- outside-soloing pitch-role risk after: `{aggregate['outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- outside-soloing not evaluable count: `{aggregate['outside_soloing_not_evaluable_count']}`",
         f"- targeted quality repair sweep ready: `{_bool_token(readiness['targeted_quality_repair_sweep_ready'])}`",
         "",
         "## Failure Counts",

@@ -6184,8 +6184,8 @@ run_stage_b_midi_to_solo_candidate_failure_labeling() {
     --run_id "$run_id" \
     --rubric_baseline "$rubric" \
     --mvp_delivery_package "$delivery" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CANDIDATE_FAILURE_LABELING_2026-06-09.md \
-    --issue_number 748 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_CANDIDATE_FAILURE_LABELING_2026-06-10.md \
+    --issue_number 832 \
     --expected_boundary stage_b_midi_to_solo_candidate_failure_labeling \
     --min_candidate_count 6 \
     --require_labeling_completed \

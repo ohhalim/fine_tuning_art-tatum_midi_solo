@@ -176,6 +176,10 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
             self.assertGreater(summary["failed_candidate_count"], 0)
             self.assertGreater(summary["failure_label_type_count"], 0)
             self.assertGreaterEqual(summary["not_evaluable_label_type_count"], 2)
+            self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
+            self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["outside_soloing_not_evaluable_count"], 3)
             self.assertEqual(summary["selected_target"], REPAIR_TARGET)
             self.assertEqual(summary["next_boundary"], REPAIR_NEXT_BOUNDARY)
             self.assertTrue(summary["targeted_quality_repair_sweep_ready"])
@@ -233,6 +237,22 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
                 build_candidate_failure_labeling_report(
                     rubric_baseline=source,
                     mvp_delivery_package=delivery_package([root / "a.mid"] * 3),
+                    output_dir=root / "labels",
+                    issue_number=748,
+                )
+
+    def test_rejects_incomplete_rubric_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            paths = [root / f"candidate_{index}.mid" for index in range(3)]
+            for path in paths:
+                write_midi(path, [60, 62, 64, 65] * 4)
+            source = rubric_baseline(root)
+            source["rubric_baseline"]["outside_soloing_repair_evidence_ready"] = False
+            with self.assertRaises(StageBMidiToSoloCandidateFailureLabelingError):
+                build_candidate_failure_labeling_report(
+                    rubric_baseline=source,
+                    mvp_delivery_package=delivery_package(paths),
                     output_dir=root / "labels",
                     issue_number=748,
                 )
