@@ -22,10 +22,11 @@
 - latest post-MVP quality iteration plan: Issue #914, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
 - latest quality rubric baseline: Issue #916, Stage B MIDI-to-solo quality rubric baseline source-context refresh
 - latest candidate failure labeling: Issue #918, Stage B MIDI-to-solo candidate failure labeling source-context refresh
+- latest targeted quality repair sweep: Issue #920, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after candidate failure labeling source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair sweep source-context refresh`
+- open issue queue after targeted quality repair sweep source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair audio package source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -103,7 +104,7 @@
 - post-MVP quality iteration plan source-context refresh 완료
 - quality rubric baseline source-context refresh 완료
 - candidate failure labeling source-context refresh 완료
-- targeted quality repair objective-only next decision 완료
+- targeted quality repair sweep source-context refresh 완료
 - targeted quality repair follow-up decision 완료
 - 남은 dominant failure label: `songlike_melody_not_soloing` = `5`
 - 다음 repair target: `songlike_melody_contour_repair_sweep`
@@ -606,13 +607,25 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 repair target: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
-- targeted quality repair outside-soloing context refresh 완료
+- targeted quality repair sweep source-context refresh 완료
 - candidate count: `6`
+- source total failure label count: `12`
+- repaired total failure label count: `8`
 - failure label delta: `4`
+- improved candidate count: `4`
 - technical regression count: `0`
-- source outside-soloing repair pitch-role risk count after: `0`
+- source outside-soloing repair evidence ready: `true`
+- source outside-soloing repair WAV count: `6`
+- source outside-soloing source objective pitch-role risk count: `5`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing source pitch-role risk delta: `3`
+- source outside-soloing source repair targeted: `false`
+- source outside-soloing source residual risk preserved: `true`
+- source outside-soloing current repair pitch-role risk count after: `0`
+- source outside-soloing current repair pitch-role risk delta: `2`
 - source outside-soloing not evaluable count: `6`
 - repaired outside-soloing not evaluable count: `6`
+- audio package ready: `true`
 - audio package ready: `true`
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
