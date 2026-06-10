@@ -13,9 +13,10 @@
 현재 active issue:
 
 - latest functional result: Issue #898, Stage B MIDI-to-solo current evidence source-context refresh
+- latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after current evidence refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence source-context refresh`
+- open issue queue after README evidence refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -439,11 +440,13 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 README target: `stage_b_midi_to_solo_readme_evidence_refresh`
-- README evidence refresh outside-soloing repair path 완료
+- README evidence refresh source-context 완료
 - latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence supported: `true`
 - outside-soloing repair objective path ready: `true`
 - outside-soloing repair rendered audio file count: `6`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source residual risk preserved: `true`
 - outside-soloing repair pitch-role risk count after: `0`
 - outside-soloing repair pitch-role risk delta: `2`
 - human/audio preference claim: `false`
