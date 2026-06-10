@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package import (
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
@@ -15,6 +16,31 @@ from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_repair_listening
     build_listening_review_input_guard_report,
     validate_listening_review_input_guard_report,
 )
+
+
+SOURCE_CONTEXT = {
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_objective_source_outside_soloing_source_targeted": False,
+    "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "followup_repair_sweep_source_outside_soloing_source_targeted": False,
+    "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
+    "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
+    "repair_sweep_source_outside_soloing_source_targeted": False,
+    "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
+    "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+}
 
 
 def source_package(*, quality_claim: bool = False, validated_input: bool = False) -> dict:
@@ -51,6 +77,7 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "source_outside_soloing_repair_evidence_ready": True,
             "objective_source_outside_soloing_repair_wav_count": 6,
             "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "objective_source_outside_soloing_repair_source_context_preserved": True,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -58,7 +85,9 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "objective_source_outside_soloing_repair_source_residual_risk_preserved": True,
             "objective_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
             "objective_source_outside_soloing_repair_pitch_role_risk_delta": 2,
+            **{f"objective_{key}": value for key, value in SOURCE_CONTEXT.items()},
             "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "source_outside_soloing_repair_source_context_preserved": True,
             "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -66,6 +95,7 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "source_outside_soloing_repair_source_residual_risk_preserved": True,
             "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
             "source_outside_soloing_repair_pitch_role_risk_delta": 2,
+            **SOURCE_CONTEXT,
             "source_outside_soloing_not_evaluable_count": 6,
             "repaired_outside_soloing_not_evaluable_count": 6,
             "remaining_failure_counts": {
@@ -142,6 +172,9 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                 ],
                 5,
             )
+            self.assertTrue(summary["objective_source_outside_soloing_repair_source_context_preserved"])
+            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+                self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
             self.assertEqual(
                 summary[
                     "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before"
@@ -171,6 +204,9 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                 summary["source_outside_soloing_repair_source_objective_pitch_role_risk_count"],
                 5,
             )
+            self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+                self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(
                 summary["source_outside_soloing_repair_source_pitch_role_risk_count_before"],
                 5,
@@ -221,6 +257,22 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                     source,
                     output_dir=root / "guard",
                     issue_number=938,
+                )
+
+    def test_rejects_missing_source_context_field(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = source_package()
+            source["source_summary"].pop(
+                "followup_objective_source_outside_soloing_source_pitch_role_risk_delta"
+            )
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardError
+            ):
+                build_listening_review_input_guard_report(
+                    source,
+                    output_dir=root / "guard",
+                    issue_number=1022,
                 )
 
     def test_constants_are_stable(self) -> None:
