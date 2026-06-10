@@ -328,6 +328,10 @@
 - weak chord-tone landing resolved: `true`
 - outside-soloing repair selected: `true`
 - technical WAV validation: `true`
+- objective outside-soloing pitch-role risk count: `5`
+- outside-soloing pitch-role risk delta: `3`
+- outside-soloing repair targeted: `false`
+- outside-soloing residual risk preserved: `true`
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 repair target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`

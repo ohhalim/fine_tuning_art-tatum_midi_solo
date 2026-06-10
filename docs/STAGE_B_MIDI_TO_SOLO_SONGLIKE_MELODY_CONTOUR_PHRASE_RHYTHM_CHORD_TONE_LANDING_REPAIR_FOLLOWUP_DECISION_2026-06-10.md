@@ -15,7 +15,11 @@
 - repaired MIDI count: `6`
 - changed note total: `40`
 - weak chord-tone landing risk delta: `6`
+- objective outside-soloing pitch-role risk count: `5`
 - outside-soloing pitch-role risk count: `5 -> 2`
+- outside-soloing pitch-role risk delta: `3`
+- outside-soloing repair targeted: `false`
+- outside-soloing residual risk preserved: `true`
 - final landing chord-tone count after: `6`
 - technical WAV validation: `true`
 - human/audio preference claimed: `false`

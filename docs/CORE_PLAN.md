@@ -7339,6 +7339,56 @@ Issue #882는 Issue #880 input guard의 outside-soloing residual context를 obje
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision refresh`
 
+## 9.133 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up outside-soloing context refresh
+
+Issue #884는 Issue #882 objective-only next decision과 Issue #874 repair sweep의 outside-soloing residual context를 follow-up decision까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision`
+- repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
+- selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
+- primary remaining risk label: `outside_soloing_pitch_role_risk`
+- primary remaining risk count: `2`
+- weak chord-tone landing resolved: `true`
+- outside-soloing repair selected: `true`
+- candidate count: `6`
+- repaired MIDI count: `6`
+- changed note total: `40`
+- weak chord-tone landing risk delta: `6`
+- objective outside-soloing pitch-role risk count: `5`
+- outside-soloing pitch-role risk count: `5 -> 2`
+- outside-soloing pitch-role risk delta: `3`
+- outside-soloing repair targeted: `false`
+- outside-soloing residual risk preserved: `true`
+- final landing chord-tone count after: `6`
+- technical WAV validation: `true`
+- critical user input required: `false`
+- human/audio preference claimed: `false`
+- audio rendered quality claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- weak chord-tone landing risk는 `6 -> 0`으로 resolved.
+- outside-soloing pitch-role risk `2` 잔여.
+- outside-soloing repair는 아직 targeted `false`이며 다음 sweep에서 처리 대상.
+- listening preference와 musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-repair-followup-decision`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
