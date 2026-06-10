@@ -10,9 +10,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP completion audit: `Issue #902`
 - latest quality gap decision: `Issue #904`
 - latest listening review quality gap: `Issue #906`
+- latest MVP delivery package: `Issue #908`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
-- open issue queue after listening review quality gap source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- open issue queue after MVP delivery package source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -333,6 +334,9 @@ MVP delivery package.
 - changed-ratio repair WAV count: `3`
 - outside-soloing repair WAV count: `6`
 - outside-soloing repair changed note total: `2`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
 - outside-soloing pitch-role risk count after: `0`
 - outside-soloing pitch-role risk delta: `2`
 - CLI dead-air ratio range: `0.1895 - 0.2211`

@@ -133,6 +133,38 @@ def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloMvpDeliveryPackageError(
             "outside-soloing repair residual pitch-role risk should be zero"
         )
+    source_objective_risk = _int(
+        summary.get("outside_soloing_repair_source_objective_pitch_role_risk_count")
+    )
+    source_risk_before = _int(
+        summary.get("outside_soloing_repair_source_pitch_role_risk_count_before")
+    )
+    source_risk_after = _int(
+        summary.get("outside_soloing_repair_source_pitch_role_risk_count_after")
+    )
+    source_risk_delta = _int(
+        summary.get("outside_soloing_repair_source_pitch_role_risk_delta")
+    )
+    if source_objective_risk <= 0:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing source objective pitch-role risk count required"
+        )
+    if source_risk_after > source_risk_before:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing source pitch-role risk should not increase"
+        )
+    if source_risk_delta != source_risk_before - source_risk_after:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing source pitch-role risk delta mismatch"
+        )
+    if bool(summary.get("outside_soloing_repair_source_targeted", True)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing source repair should remain non-targeted"
+        )
+    if not bool(summary.get("outside_soloing_repair_source_residual_risk_preserved", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing source residual risk preservation required"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloMvpDeliveryPackageError("critical user input should not be required")
     _require_no_quality_claim(readiness, label="listening gap readiness")
@@ -159,6 +191,16 @@ def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
         ),
         "outside_soloing_repair_changed_note_total": _int(
             summary.get("outside_soloing_repair_changed_note_total")
+        ),
+        "outside_soloing_repair_source_objective_pitch_role_risk_count": source_objective_risk,
+        "outside_soloing_repair_source_pitch_role_risk_count_before": source_risk_before,
+        "outside_soloing_repair_source_pitch_role_risk_count_after": source_risk_after,
+        "outside_soloing_repair_source_pitch_role_risk_delta": source_risk_delta,
+        "outside_soloing_repair_source_targeted": bool(
+            summary.get("outside_soloing_repair_source_targeted", True)
+        ),
+        "outside_soloing_repair_source_residual_risk_preserved": bool(
+            summary.get("outside_soloing_repair_source_residual_risk_preserved", False)
         ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             summary.get("outside_soloing_repair_pitch_role_risk_count_after")
@@ -342,6 +384,24 @@ def build_delivery_package_report(
             "outside_soloing_repair_changed_note_total": listening[
                 "outside_soloing_repair_changed_note_total"
             ],
+            "outside_soloing_repair_source_objective_pitch_role_risk_count": listening[
+                "outside_soloing_repair_source_objective_pitch_role_risk_count"
+            ],
+            "outside_soloing_repair_source_pitch_role_risk_count_before": listening[
+                "outside_soloing_repair_source_pitch_role_risk_count_before"
+            ],
+            "outside_soloing_repair_source_pitch_role_risk_count_after": listening[
+                "outside_soloing_repair_source_pitch_role_risk_count_after"
+            ],
+            "outside_soloing_repair_source_pitch_role_risk_delta": listening[
+                "outside_soloing_repair_source_pitch_role_risk_delta"
+            ],
+            "outside_soloing_repair_source_targeted": listening[
+                "outside_soloing_repair_source_targeted"
+            ],
+            "outside_soloing_repair_source_residual_risk_preserved": listening[
+                "outside_soloing_repair_source_residual_risk_preserved"
+            ],
             "outside_soloing_repair_pitch_role_risk_count_after": listening[
                 "outside_soloing_repair_pitch_role_risk_count_after"
             ],
@@ -433,6 +493,38 @@ def validate_delivery_package_report(
         raise StageBMidiToSoloMvpDeliveryPackageError(
             "outside-soloing repair residual pitch-role risk should be zero"
         )
+    source_objective_risk = _int(
+        package.get("outside_soloing_repair_source_objective_pitch_role_risk_count")
+    )
+    source_risk_before = _int(
+        package.get("outside_soloing_repair_source_pitch_role_risk_count_before")
+    )
+    source_risk_after = _int(
+        package.get("outside_soloing_repair_source_pitch_role_risk_count_after")
+    )
+    source_risk_delta = _int(
+        package.get("outside_soloing_repair_source_pitch_role_risk_delta")
+    )
+    if source_objective_risk <= 0:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing source objective pitch-role risk count required"
+        )
+    if source_risk_after > source_risk_before:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing source pitch-role risk should not increase"
+        )
+    if source_risk_delta != source_risk_before - source_risk_after:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing source pitch-role risk delta mismatch"
+        )
+    if bool(package.get("outside_soloing_repair_source_targeted", True)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing source repair should remain non-targeted"
+        )
+    if not bool(package.get("outside_soloing_repair_source_residual_risk_preserved", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing source residual risk preservation required"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloMvpDeliveryPackageError("critical user input should not be required")
     if require_no_quality_claim:
@@ -461,6 +553,16 @@ def validate_delivery_package_report(
         ),
         "outside_soloing_repair_changed_note_total": _int(
             package.get("outside_soloing_repair_changed_note_total")
+        ),
+        "outside_soloing_repair_source_objective_pitch_role_risk_count": source_objective_risk,
+        "outside_soloing_repair_source_pitch_role_risk_count_before": source_risk_before,
+        "outside_soloing_repair_source_pitch_role_risk_count_after": source_risk_after,
+        "outside_soloing_repair_source_pitch_role_risk_delta": source_risk_delta,
+        "outside_soloing_repair_source_targeted": bool(
+            package.get("outside_soloing_repair_source_targeted", True)
+        ),
+        "outside_soloing_repair_source_residual_risk_preserved": bool(
+            package.get("outside_soloing_repair_source_residual_risk_preserved", False)
         ),
         "outside_soloing_repair_pitch_role_risk_count_after": _int(
             package.get("outside_soloing_repair_pitch_role_risk_count_after")
@@ -515,7 +617,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- changed-ratio repair WAV duration range: `{package['changed_ratio_repair_wav_duration_range'][0]:.3f}s` - `{package['changed_ratio_repair_wav_duration_range'][1]:.3f}s`",
         f"- outside-soloing repair WAV count: `{package['outside_soloing_repair_wav_count']}`",
         f"- outside-soloing repair changed note total: `{package['outside_soloing_repair_changed_note_total']}`",
-        f"- outside-soloing pitch-role risk after / delta: `{package['outside_soloing_repair_pitch_role_risk_count_after']}` / `{package['outside_soloing_repair_pitch_role_risk_delta']}`",
+        f"- outside-soloing source objective pitch-role risk: `{package['outside_soloing_repair_source_objective_pitch_role_risk_count']}`",
+        f"- outside-soloing source pitch-role risk before / after / delta: `{package['outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{package['outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{package['outside_soloing_repair_source_pitch_role_risk_delta']}`",
+        f"- outside-soloing source repair targeted: `{_bool_token(package['outside_soloing_repair_source_targeted'])}`",
+        f"- outside-soloing source residual risk preserved: `{_bool_token(package['outside_soloing_repair_source_residual_risk_preserved'])}`",
+        f"- outside-soloing current repair pitch-role risk after / delta: `{package['outside_soloing_repair_pitch_role_risk_count_after']}` / `{package['outside_soloing_repair_pitch_role_risk_delta']}`",
         "",
         "## Claim Boundary",
         "",
