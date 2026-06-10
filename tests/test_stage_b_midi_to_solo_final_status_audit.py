@@ -93,6 +93,21 @@ class StageBMidiToSoloFinalStatusAuditTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
         self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
+        self.assertEqual(
+            summary["outside_soloing_repair_source_objective_pitch_role_risk_count"],
+            5,
+        )
+        self.assertEqual(
+            summary["outside_soloing_repair_source_pitch_role_risk_count_before"],
+            5,
+        )
+        self.assertEqual(
+            summary["outside_soloing_repair_source_pitch_role_risk_count_after"],
+            2,
+        )
+        self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_delta"], 3)
+        self.assertFalse(summary["outside_soloing_repair_source_targeted"])
+        self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
         self.assertTrue(summary["listening_review_quality_gap_open"])

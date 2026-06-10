@@ -12,9 +12,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest listening review quality gap: `Issue #906`
 - latest MVP delivery package: `Issue #908`
 - latest README final evidence refresh: `Issue #910`
+- latest final status audit: `Issue #912`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
-- open issue queue after README final evidence source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_final_status_audit`
+- open issue queue after final status audit source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
