@@ -105,6 +105,22 @@ def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
             "rendered WAV count below 6"
         )
+    if not bool(source.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
+            "outside-soloing repair evidence readiness required"
+        )
+    if _int(source.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
+            "outside-soloing residual pitch-role risk should be zero"
+        )
+    if _int(source.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
+            "source outside-soloing not-evaluable boundary required"
+        )
+    if _int(source.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
+            "repaired outside-soloing not-evaluable boundary required"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
             "critical user input should not be required"
@@ -124,6 +140,18 @@ def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
         "duration_min_seconds": _float(source.get("duration_min_seconds")),
         "duration_max_seconds": _float(source.get("duration_max_seconds")),
         "failure_label_delta": _int(source.get("failure_label_delta")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            source.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            source.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            source.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            source.get("repaired_outside_soloing_not_evaluable_count")
+        ),
         "audio_review_required": bool(source.get("audio_review_required", False)),
     }
 
@@ -158,6 +186,18 @@ def build_objective_next_report(
             "duration_min_seconds": _float(source["duration_min_seconds"]),
             "duration_max_seconds": _float(source["duration_max_seconds"]),
             "failure_label_delta": _int(source["failure_label_delta"]),
+            "source_outside_soloing_repair_evidence_ready": bool(
+                source["source_outside_soloing_repair_evidence_ready"]
+            ),
+            "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                source["source_outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "source_outside_soloing_not_evaluable_count": _int(
+                source["source_outside_soloing_not_evaluable_count"]
+            ),
+            "repaired_outside_soloing_not_evaluable_count": _int(
+                source["repaired_outside_soloing_not_evaluable_count"]
+            ),
             "audio_review_required": bool(source["audio_review_required"]),
             "targeted_quality_followup_required": bool(followup_required),
             "current_quality_claim_ready": False,
@@ -173,6 +213,18 @@ def build_objective_next_report(
             "boundary": BOUNDARY,
             "objective_next_decision_completed": True,
             "technical_wav_validation": bool(source["technical_wav_validation"]),
+            "source_outside_soloing_repair_evidence_ready": bool(
+                source["source_outside_soloing_repair_evidence_ready"]
+            ),
+            "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                source["source_outside_soloing_repair_pitch_role_risk_count_after"]
+            ),
+            "source_outside_soloing_not_evaluable_count": _int(
+                source["source_outside_soloing_not_evaluable_count"]
+            ),
+            "repaired_outside_soloing_not_evaluable_count": _int(
+                source["repaired_outside_soloing_not_evaluable_count"]
+            ),
             "targeted_quality_followup_required": bool(followup_required),
             "current_quality_claim_ready": False,
             "human_audio_preference_claimed": False,
@@ -268,6 +320,18 @@ def validate_objective_next_report(
         "technical_wav_validation": bool(summary.get("technical_wav_validation", False)),
         "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
         "failure_label_delta": _int(summary.get("failure_label_delta")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            summary.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            summary.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            summary.get("repaired_outside_soloing_not_evaluable_count")
+        ),
         "audio_review_required": bool(summary.get("audio_review_required", False)),
         "targeted_quality_followup_required": bool(
             summary.get("targeted_quality_followup_required", False)
@@ -305,6 +369,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- technical WAV validation: `{_bool_token(summary['technical_wav_validation'])}`",
         f"- rendered audio file count: `{summary['rendered_audio_file_count']}`",
         f"- failure label delta: `{summary['failure_label_delta']}`",
+        f"- source outside-soloing repair evidence ready: `{_bool_token(summary['source_outside_soloing_repair_evidence_ready'])}`",
+        f"- source outside-soloing repair pitch-role risk after: `{summary['source_outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- source outside-soloing not evaluable count: `{summary['source_outside_soloing_not_evaluable_count']}`",
+        f"- repaired outside-soloing not evaluable count: `{summary['repaired_outside_soloing_not_evaluable_count']}`",
         f"- targeted quality follow-up required: `{_bool_token(summary['targeted_quality_followup_required'])}`",
         f"- current quality claim ready: `{_bool_token(summary['current_quality_claim_ready'])}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
@@ -338,7 +406,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=758)
+    parser.add_argument("--issue_number", type=int, default=842)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_objective_decision", action="store_true")
