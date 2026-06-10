@@ -30,8 +30,13 @@ def delivery_package(*, quality_claim: bool = False, cli_count: int = 3) -> dict
             "input_to_ranked_midi_ready": True,
             "input_to_rendered_wav_evidence_ready": True,
             "changed_ratio_repair_audio_evidence_ready": True,
+            "outside_soloing_repair_evidence_ready": True,
             "cli_candidate_count": cli_count,
             "changed_ratio_repair_wav_count": 3,
+            "outside_soloing_repair_wav_count": 6,
+            "outside_soloing_repair_changed_note_total": 2,
+            "outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "outside_soloing_repair_pitch_role_risk_delta": 2,
             "listening_review_quality_gap_open": True,
         },
         "artifact_manifest": {

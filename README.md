@@ -146,8 +146,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - input to ranked MIDI ready: `true`
 - input to rendered WAV evidence ready: `true`
 - changed-ratio repair audio evidence ready: `true`
+- outside-soloing repair evidence ready: `true`
 - MVP delivery CLI candidates: `3`
 - MVP delivery changed-ratio repair WAV files: `3`
+- MVP delivery outside-soloing repair WAV files: `6`
 - MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
 - next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
