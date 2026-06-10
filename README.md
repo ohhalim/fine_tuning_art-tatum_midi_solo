@@ -44,13 +44,13 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: `Issue #1054`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep: `Issue #1056`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: `Issue #1058`
-- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: `Issue #976`
+- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: `Issue #1060`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: `Issue #978`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: `Issue #980`
 - latest MVP current evidence consolidation: `Issue #982`
 - latest README evidence refresh: `Issue #984`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
-- open issue queue after chord-tone landing outside-soloing repair audio package source-context refresh merge: `0`
+- open issue queue after chord-tone landing outside-soloing repair listening review package source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -125,6 +125,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase/rhythm chord-tone landing outside-soloing repair listening review package ready: `true`
 - phrase/rhythm chord-tone landing outside-soloing repair listening review item count: `6`
 - phrase/rhythm chord-tone landing outside-soloing repair validated review input: `false`
+- phrase/rhythm chord-tone landing outside-soloing repair listening package source context preserved: `true`
 - phrase/rhythm chord-tone landing outside-soloing repair input guard completed: `true`
 - phrase/rhythm chord-tone landing outside-soloing repair preference fill allowed: `false`
 - phrase/rhythm chord-tone landing outside-soloing repair required input fields: `4`
