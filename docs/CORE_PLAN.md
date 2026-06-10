@@ -10769,6 +10769,59 @@ Issue #1014는 Issue #1012 objective-only next decision과 Issue #1004 repair sw
 
 - `Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh`
 
+## 9.198 Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh
+
+Issue #1016은 Issue #1014 follow-up decision의 selected target에 따라 songlike melody contour repair sweep을 실행하고 source-context를 sweep aggregate까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- source boundary: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
+- targeted repair sweep boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package`
+- selected target: `songlike_melody_contour_repair_audio_package`
+- candidate count: `6`
+- source total failure labels: `8`
+- repaired total failure labels: `4`
+- failure label delta: `4`
+- source songlike failure count: `5`
+- repaired songlike failure count: `0`
+- songlike failure delta: `5`
+- improved candidate count: `4`
+- technical regression count: `0`
+- objective source outside-soloing repair source context preserved: `true`
+- source outside-soloing repair source context preserved: `true`
+- objective source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing source pitch-role risk count: `5 -> 2`
+- source outside-soloing current repair pitch-role risk count after: `0`
+- source outside-soloing current repair pitch-role risk delta: `2`
+- repaired failure counts: `phrase_shape_missing_tension_release=2`, `rhythmic_monotony=2`
+- repaired not-evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
+- audio package ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- songlike melody contour repair sweep source validation에 #1014 follow-up decision source-context preserved 조건 추가.
+- source-context preserved flag와 21개 context field를 aggregate/readiness/validation summary에 보존.
+- songlike failure label은 `5 -> 0`으로 감소.
+- remaining failure labels는 phrase shape/rhythmic monotony 중심으로 남음.
+- human/audio preference와 MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-repair-sweep`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
