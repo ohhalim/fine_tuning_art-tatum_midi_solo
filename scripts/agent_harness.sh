@@ -6046,8 +6046,8 @@ run_stage_b_midi_to_solo_quality_gap_decision() {
 }
 
 run_stage_b_midi_to_solo_listening_review_quality_gap() {
-  local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_listening_review_quality_gap}"
+  local quality_gap_run_id="${QUALITY_GAP_RUN_ID:-harness_stage_b_midi_to_solo_quality_gap_decision_source_context_refresh}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_listening_review_quality_gap_source_context_refresh}"
   local quality_gap="outputs/stage_b_midi_to_solo_quality_gap_decision/${quality_gap_run_id}/stage_b_midi_to_solo_quality_gap_decision.json"
   if [[ ! -f "$quality_gap" ]]; then
     print_header "Stage B MIDI-to-solo quality gap decision"
@@ -6058,7 +6058,7 @@ run_stage_b_midi_to_solo_listening_review_quality_gap() {
     --run_id "$run_id" \
     --quality_gap_decision "$quality_gap" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_LISTENING_REVIEW_QUALITY_GAP_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 906 \
+    --issue_number 990 \
     --expected_boundary stage_b_midi_to_solo_listening_review_quality_gap \
     --expected_next_boundary stage_b_midi_to_solo_mvp_delivery_package \
     --expected_target mvp_delivery_package \

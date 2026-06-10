@@ -9,7 +9,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest functional result: `Issue #982`
 - latest MVP completion audit: `Issue #986`
 - latest quality gap decision: `Issue #988`
-- latest listening review quality gap: `Issue #906`
+- latest listening review quality gap: `Issue #990`
 - latest MVP delivery package: `Issue #908`
 - latest README final evidence refresh: `Issue #910`
 - latest final status audit: `Issue #912`
@@ -320,6 +320,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - listening review quality gap open: `true`
 - listening review quality gap outside-soloing repair objective included: `true`
 - listening review quality gap outside-soloing source context included: `true`
+- listening review quality gap outside-soloing source context preserved: `true`
 - MVP delivery package completed: `true`
 - runnable CLI ready: `true`
 - input to ranked MIDI ready: `true`
@@ -480,6 +481,7 @@ Listening review quality gap.
 - changed-ratio repair objective completed: `true`
 - changed-ratio repair max ratio / target: `0.4348 / 0.5000`
 - changed-ratio repair max interval / target: `12 / 12`
+- outside-soloing repair source context preserved: `true`
 - outside-soloing source pitch-role risk count: `5 -> 2`
 - outside-soloing source repair targeted: `false`
 - outside-soloing source residual risk preserved: `true`
