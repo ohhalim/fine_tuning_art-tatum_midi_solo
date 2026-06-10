@@ -35,9 +35,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm repair objective-only next decision: `Issue #952`
 - latest songlike melody contour phrase/rhythm repair follow-up decision: `Issue #954`
 - latest songlike melody contour phrase/rhythm chord-context pitch-role bridge: `Issue #956`
+- latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: `Issue #958`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
-- open issue queue after songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
+- open issue queue after songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -72,6 +73,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase/rhythm chord-context bridge flags: `outside_soloing_pitch_role_risk=5`, `weak_chord_tone_landing_risk=6`
 - phrase/rhythm chord-context source outside-soloing pitch-role risk: `5 -> 2`
 - phrase/rhythm chord-context current outside-soloing pitch-role risk after / delta: `0 / 2`
+- phrase/rhythm pitch-role objective decision completed: `true`
+- phrase/rhythm pitch-role primary risk: `weak_chord_tone_landing_risk=6`
+- phrase/rhythm pitch-role secondary risk: `outside_soloing_pitch_role_risk=5`
+- phrase/rhythm pitch-role selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
 - phrase/rhythm repair technical WAV validation: `true`
 - phrase/rhythm repair source outside-soloing pitch-role risk: `5 -> 2`
 - phrase/rhythm repair current outside-soloing pitch-role risk after / delta: `0 / 2`
