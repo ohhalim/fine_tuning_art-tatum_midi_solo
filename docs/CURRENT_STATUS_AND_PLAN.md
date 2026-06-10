@@ -12,8 +12,10 @@
 
 현재 active issue:
 
-- latest functional result: Issue #872, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision outside-soloing context refresh
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep refresh`
+- latest functional result: Issue #894, Stage B MIDI-to-solo outside-soloing repair objective next source context refresh
+- latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
+- open issue queue after sync merge: `0`
+- 다음 권장 이슈: 현재 open issue 없음. 다음 작업은 최신 objective evidence 기준으로 새 quality target 정의 후 시작
 
 현재 범위가 아닌 것:
 
