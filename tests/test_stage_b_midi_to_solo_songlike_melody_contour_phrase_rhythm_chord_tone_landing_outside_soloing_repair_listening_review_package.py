@@ -43,6 +43,9 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
 }
 
 
@@ -160,7 +163,7 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackage
             report = build_listening_review_package_report(
                 audio_package_report=audio_package_report(root),
                 output_dir=root / "review_package",
-                issue_number=890,
+                issue_number=1060,
                 expected_count=6,
             )
             summary = validate_listening_review_package_report(
@@ -206,7 +209,24 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackage
                 build_listening_review_package_report(
                     audio_package_report=audio_package_report(root, quality_claim=True),
                     output_dir=root / "review_package",
-                    issue_number=890,
+                    issue_number=1060,
+                    expected_count=6,
+                )
+
+    def test_rejects_missing_source_context_preserved_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = audio_package_report(root)
+            source["summary"][
+                "repair_sweep_source_outside_soloing_source_context_preserved"
+            ] = False
+            with self.assertRaises(
+                StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackageError
+            ):
+                build_listening_review_package_report(
+                    audio_package_report=source,
+                    output_dir=root / "review_package",
+                    issue_number=1060,
                     expected_count=6,
                 )
 
