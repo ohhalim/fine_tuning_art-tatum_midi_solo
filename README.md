@@ -6,7 +6,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- latest evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -129,6 +129,13 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - pitch-contour changed-ratio repair max interval / target: `12 / 12`
 - pitch-contour changed-ratio repair max pitch changed ratio / target: `0.4348 / 0.5000`
 - current evidence changed-ratio repair objective path included: `true`
+- outside-soloing repair objective path included in current evidence: `true`
+- outside-soloing repair WAV files: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing pitch-role risk count after: `0`
+- outside-soloing pitch-role risk delta: `2`
+- outside-soloing repair objective path supported: `true`
+- current evidence outside-soloing repair objective path included: `true`
 - listening review quality gap completed: `true`
 - listening review quality gap open: `true`
 - MVP delivery package completed: `true`
@@ -199,6 +206,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - model-conditioned pitch-contour changed-ratio review input pending 상태에서 preference fill 차단 가능
 - model-conditioned pitch-contour changed-ratio objective evidence 기준 current evidence consolidation 경계 결정 가능
 - model-conditioned pitch-contour changed-ratio objective path를 current evidence로 통합 가능
+- outside-soloing repair objective path를 current evidence로 통합 가능
 - listening review quality gap을 delivery package 경계로 분리 가능
 - runnable CLI command와 local MIDI/WAV evidence path를 delivery manifest로 기록 가능
 - raw MIDI/WAV artifact upload 없이 local output path 기준 MVP delivery package 기록 가능
@@ -226,6 +234,23 @@ MVP completion audit.
 - human/audio preference completed: `false`
 - product MVP completed: `false`
 - next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+
+MVP current evidence refresh.
+
+- boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- current MVP evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair pitch-role risk delta: `2`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
 
 Quality gap decision.
 
