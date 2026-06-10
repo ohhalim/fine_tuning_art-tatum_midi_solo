@@ -13,11 +13,18 @@
 - improved candidate count: `4`
 - technical regression count: `0`
 - source outside-soloing repair evidence ready: `true`
+- source outside-soloing repair source context preserved: `true`
 - source outside-soloing source objective pitch-role risk: `5`
 - source outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`
 - source outside-soloing source repair targeted: `false`
 - source outside-soloing source residual risk preserved: `true`
 - source outside-soloing current repair pitch-role risk after / delta: `0` / `2`
+- follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- follow-up repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- bridge repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
 - source outside-soloing not evaluable count: `6`
 - repaired outside-soloing not evaluable count: `6`
 - target supported: `true`
