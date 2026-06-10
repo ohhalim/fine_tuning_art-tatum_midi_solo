@@ -33,6 +33,10 @@ def input_guard_report(*, quality_claim: bool = False) -> dict:
                 "duration_min_seconds": 18.422,
                 "duration_max_seconds": 18.984,
                 "failure_label_delta": 4,
+                "source_outside_soloing_repair_evidence_ready": True,
+                "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+                "source_outside_soloing_not_evaluable_count": 6,
+                "repaired_outside_soloing_not_evaluable_count": 6,
                 "audio_review_required": True,
             },
         },
@@ -81,6 +85,10 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
             self.assertTrue(summary["technical_wav_validation"])
             self.assertEqual(summary["rendered_audio_file_count"], 6)
             self.assertEqual(summary["failure_label_delta"], 4)
+            self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertTrue(summary["targeted_quality_followup_required"])
             self.assertFalse(summary["current_quality_claim_ready"])
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -94,6 +102,20 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
                     input_guard_report=input_guard_report(quality_claim=True),
                     output_dir=root / "objective_next",
                     issue_number=758,
+                )
+
+    def test_rejects_missing_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = input_guard_report()
+            source["guard_result"]["source_summary"][
+                "source_outside_soloing_repair_evidence_ready"
+            ] = False
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairObjectiveNextError):
+                build_objective_next_report(
+                    input_guard_report=source,
+                    output_dir=root / "objective_next",
+                    issue_number=842,
                 )
 
     def test_constants_are_stable(self) -> None:

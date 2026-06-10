@@ -6296,8 +6296,8 @@ run_stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision() 
   "$PYTHON_BIN" scripts/decide_stage_b_midi_to_solo_targeted_quality_repair_objective_next.py \
     --run_id "$run_id" \
     --input_guard_report "$input_guard_report" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-09.md \
-    --issue_number 758 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-10.md \
+    --issue_number 842 \
     --expected_boundary stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision \
     --expected_next_boundary stage_b_midi_to_solo_targeted_quality_repair_followup_decision \
     --require_objective_decision \
