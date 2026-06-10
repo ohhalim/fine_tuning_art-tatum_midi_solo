@@ -30,10 +30,11 @@
 - latest targeted quality repair follow-up decision: Issue #930, Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh
 - latest songlike melody contour repair sweep: Issue #932, Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh
 - latest songlike melody contour repair audio package: Issue #934, Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh
+- latest songlike melody contour repair listening review package: Issue #936, Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh
 - latest README evidence refresh: Issue #900, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour repair audio package source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh`
+- open issue queue after songlike melody contour repair listening review package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh`
 
 현재 범위가 아닌 것:
 
