@@ -35,8 +35,15 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "duration_min_seconds": 18.871,
             "duration_max_seconds": 19.000,
             "changed_note_total": 2,
+            "source_objective_outside_soloing_pitch_role_risk_count": 5,
+            "source_outside_soloing_pitch_role_risk_count_before": 5,
+            "source_outside_soloing_pitch_role_risk_count_after": 2,
+            "source_outside_soloing_pitch_role_risk_delta": 3,
+            "source_outside_soloing_repair_targeted": False,
+            "source_outside_soloing_residual_risk_preserved": True,
             "outside_soloing_pitch_role_risk_count_after": 0,
             "outside_soloing_pitch_role_risk_delta": 2,
+            "outside_soloing_repair_targeted": True,
             "weak_chord_tone_landing_risk_count_after": 0,
             "final_landing_chord_tone_count_after": 6,
             "max_non_chord_tone_run_after": 3,
@@ -82,7 +89,7 @@ class StageBMidiToSoloOutsideSoloingRepairListeningInputGuardTest(unittest.TestC
         report = build_listening_review_input_guard_report(
             source_package(),
             output_dir="unused",
-            issue_number=808,
+            issue_number=892,
         )
         summary = validate_listening_review_input_guard_report(
             report,
@@ -101,8 +108,17 @@ class StageBMidiToSoloOutsideSoloingRepairListeningInputGuardTest(unittest.TestC
         self.assertTrue(summary["technical_wav_validation"])
         self.assertEqual(summary["rendered_audio_file_count"], 6)
         self.assertEqual(summary["changed_note_total"], 2)
+        self.assertEqual(
+            summary["source_objective_outside_soloing_pitch_role_risk_count"], 5
+        )
+        self.assertEqual(summary["source_outside_soloing_pitch_role_risk_count_before"], 5)
+        self.assertEqual(summary["source_outside_soloing_pitch_role_risk_count_after"], 2)
+        self.assertEqual(summary["source_outside_soloing_pitch_role_risk_delta"], 3)
+        self.assertFalse(summary["source_outside_soloing_repair_targeted"])
+        self.assertTrue(summary["source_outside_soloing_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_pitch_role_risk_delta"], 2)
+        self.assertTrue(summary["outside_soloing_repair_targeted"])
         self.assertEqual(summary["weak_chord_tone_landing_risk_count_after"], 0)
         self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
         self.assertEqual(summary["max_non_chord_tone_run_after"], 3)
@@ -114,14 +130,14 @@ class StageBMidiToSoloOutsideSoloingRepairListeningInputGuardTest(unittest.TestC
             build_listening_review_input_guard_report(
                 source_package(quality_claim=True),
                 output_dir="unused",
-                issue_number=808,
+                issue_number=892,
             )
 
     def test_routes_to_fill_when_validated_input_exists(self) -> None:
         report = build_listening_review_input_guard_report(
             source_package(validated_input=True),
             output_dir="unused",
-            issue_number=808,
+            issue_number=892,
         )
         self.assertTrue(report["guard_result"]["preference_fill_allowed"])
         self.assertTrue(report["guard_result"]["validated_review_input_present"])

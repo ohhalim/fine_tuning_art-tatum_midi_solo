@@ -7538,6 +7538,56 @@ Issue #890은 Issue #888 audio package의 source/current repair context를 liste
 
 - `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard refresh`
 
+## 9.137 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair input guard source context refresh
+
+Issue #892는 Issue #890 listening review package의 source/current repair context를 input guard까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input_guard`
+- source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision`
+- review item count: `6`
+- required input field count: `4`
+- validated review input present: `false`
+- preference fill allowed: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- changed note total: `2`
+- source objective outside-soloing pitch-role risk count: `5`
+- source outside-soloing pitch-role risk count: `5 -> 2`
+- source outside-soloing pitch-role risk delta: `3`
+- source outside-soloing repair targeted: `false`
+- source outside-soloing residual risk preserved: `true`
+- outside-soloing pitch-role risk count after: `0`
+- outside-soloing pitch-role risk delta: `2`
+- outside-soloing repair targeted: `true`
+- weak chord-tone landing risk count after: `0`
+- final landing chord-tone count after: `6`
+- max non-chord-tone run after: `3`
+- audio review required: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- validated review input pending 상태로 preference fill 차단.
+- source/current repair context 보존 완료.
+- human/audio preference와 MIDI-to-solo musical quality claim 제외.
+- 다음 boundary는 objective-only next decision.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input`
+- `.venv/bin/python -m py_compile scripts/guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-chord-tone-landing-outside-soloing-repair-listening-review-input-guard`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
