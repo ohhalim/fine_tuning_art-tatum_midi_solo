@@ -6227,6 +6227,45 @@ Issue #834는 targeted quality repair sweep에 candidate failure labeling outsid
 
 - `Stage B MIDI-to-solo targeted quality repair audio package refresh`
 
+## 9.109 Stage B MIDI-to-solo targeted quality repair audio package outside-soloing context refresh
+
+Issue #836은 targeted quality repair audio package에 repair sweep outside-soloing context를 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
+- rendered audio file count: `6`
+- sample rate: `44100`
+- technical WAV validation: `true`
+- failure label delta: `4`
+- technical regression count: `0`
+- source outside-soloing repair pitch-role risk count after: `0`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- audio review required: `true`
+- human/audio preference claimed: `false`
+- audio rendered quality claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- WAV package가 repair sweep의 outside-soloing not_evaluable boundary를 보존.
+- audio rendered quality와 listening preference claim 제외 유지.
+- 다음 boundary는 targeted quality repair listening review package refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_audio`
+- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_targeted_quality_repair_audio.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-audio-package`
+- `bash scripts/agent_harness.sh quick`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo targeted quality repair listening review package refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

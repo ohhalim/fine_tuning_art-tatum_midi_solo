@@ -90,6 +90,11 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "improved_candidate_count": 6,
             "technical_regression_count": 0,
             "repaired_failure_counts": {"songlike_melody_not_soloing": 5},
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_wav_count": 6,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
             "target_supported": True,
         },
         "selected_next_target": {
@@ -153,6 +158,10 @@ class StageBMidiToSoloTargetedQualityRepairAudioTest(unittest.TestCase):
             self.assertTrue(summary["technical_wav_validation"])
             self.assertEqual(summary["failure_label_delta"], 7)
             self.assertEqual(summary["technical_regression_count"], 0)
+            self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertTrue(summary["audio_review_required"])
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
@@ -167,6 +176,26 @@ class StageBMidiToSoloTargetedQualityRepairAudioTest(unittest.TestCase):
             with self.assertRaises(StageBMidiToSoloTargetedQualityRepairAudioError):
                 build_audio_render_report(
                     source_report(root, quality_claim=True),
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    runner=fake_runner,
+                )
+
+    def test_rejects_missing_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            source = source_report(root)
+            source["aggregate"]["repaired_outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairAudioError):
+                build_audio_render_report(
+                    source,
                     output_dir=root / "audio_package",
                     renderer_path=str(renderer),
                     soundfont_path=str(soundfont),
