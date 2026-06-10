@@ -15,6 +15,7 @@
 - input to rendered WAV evidence ready: `true`
 - changed-ratio repair audio evidence ready: `true`
 - outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
 - CLI candidate count: `3`
 - changed-ratio repair WAV count: `3`
 - outside-soloing repair WAV count: `6`
@@ -24,6 +25,12 @@
 - outside-soloing source repair targeted: `false`
 - outside-soloing source residual risk preserved: `true`
 - outside-soloing current repair pitch-role risk after / delta: `0` / `2`
+- follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- follow-up repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- bridge repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
 - listening review quality gap open: `true`
 - raw artifact upload required: `false`
 

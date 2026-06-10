@@ -12,6 +12,7 @@ from scripts.audit_stage_b_midi_to_solo_final_status import (
     validate_final_status_audit_report,
 )
 from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import (
+    BRIDGE_SOURCE_CONTEXT_KEYS,
     BOUNDARY as DELIVERY_BOUNDARY,
     NEXT_BOUNDARY as DELIVERY_NEXT_BOUNDARY,
 )
@@ -119,6 +120,7 @@ class StageBMidiToSoloFinalStatusAuditTest(unittest.TestCase):
         self.assertEqual(summary["cli_candidate_count"], 3)
         self.assertEqual(summary["changed_ratio_repair_wav_count"], 3)
         self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
+        self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
         self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
         self.assertEqual(
@@ -138,6 +140,8 @@ class StageBMidiToSoloFinalStatusAuditTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
+        for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertTrue(summary["listening_review_quality_gap_open"])
         self.assertFalse(summary["raw_artifact_upload_required"])
         self.assertFalse(summary["human_audio_preference_claimed"])
