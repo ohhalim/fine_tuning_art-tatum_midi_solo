@@ -130,6 +130,22 @@ def validate_source_report(
         raise StageBMidiToSoloSonglikeMelodyContourRepairAudioError(
             "technical regression count should be zero"
         )
+    if not bool(aggregate.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourRepairAudioError(
+            "source outside-soloing repair evidence readiness required"
+        )
+    if _int(aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairAudioError(
+            "source outside-soloing residual pitch-role risk should be zero"
+        )
+    if _int(aggregate.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairAudioError(
+            "source outside-soloing not-evaluable boundary required"
+        )
+    if _int(aggregate.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloSonglikeMelodyContourRepairAudioError(
+            "repaired outside-soloing not-evaluable boundary required"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloSonglikeMelodyContourRepairAudioError(
             "critical user input should not be required"
@@ -343,6 +359,21 @@ def build_audio_render_report(
             "songlike_failure_delta": _int(aggregate.get("songlike_failure_delta")),
             "improved_candidate_count": _int(aggregate.get("improved_candidate_count")),
             "technical_regression_count": _int(aggregate.get("technical_regression_count")),
+            "source_outside_soloing_repair_evidence_ready": bool(
+                aggregate.get("source_outside_soloing_repair_evidence_ready", False)
+            ),
+            "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+            ),
+            "source_outside_soloing_not_evaluable_count": _int(
+                aggregate.get("source_outside_soloing_not_evaluable_count")
+            ),
+            "repaired_outside_soloing_not_evaluable_count": _int(
+                aggregate.get("repaired_outside_soloing_not_evaluable_count")
+            ),
+            "repaired_not_evaluable_counts": _dict(
+                aggregate.get("repaired_not_evaluable_counts")
+            ),
             "remaining_failure_counts": dict(sorted(failure_counts.items())),
             "audio_review_required": True,
         },
@@ -469,6 +500,21 @@ def validate_audio_render_report(
         "songlike_failure_delta": _int(summary.get("songlike_failure_delta")),
         "improved_candidate_count": _int(summary.get("improved_candidate_count")),
         "technical_regression_count": _int(summary.get("technical_regression_count")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            summary.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            summary.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            summary.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            summary.get("repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_not_evaluable_counts": _dict(
+            summary.get("repaired_not_evaluable_counts")
+        ),
         "audio_review_required": bool(summary.get("audio_review_required", False)),
         "audio_rendered_quality_claimed": bool(
             boundary.get("audio_rendered_quality_claimed", True)
@@ -507,6 +553,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- songlike failure delta: `{summary['songlike_failure_delta']}`",
         f"- improved candidate count: `{summary['improved_candidate_count']}`",
         f"- technical regression count: `{summary['technical_regression_count']}`",
+        f"- source outside-soloing repair evidence ready: `{_bool_token(summary['source_outside_soloing_repair_evidence_ready'])}`",
+        f"- source outside-soloing repair pitch-role risk after: `{summary['source_outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- source outside-soloing not evaluable count: `{summary['source_outside_soloing_not_evaluable_count']}`",
+        f"- repaired outside-soloing not evaluable count: `{summary['repaired_outside_soloing_not_evaluable_count']}`",
         f"- audio review required: `{_bool_token(summary['audio_review_required'])}`",
         f"- audio rendered quality claimed: `{_bool_token(boundary['audio_rendered_quality_claimed'])}`",
         f"- human/audio preference claimed: `{_bool_token(boundary['human_audio_preference_claimed'])}`",
@@ -523,6 +573,9 @@ def markdown_report(report: dict[str, Any]) -> str:
             f"`{','.join(item['repaired_failure_labels']) or 'none'}`, "
             f"sha256 `{str(wav_file['sha256'])[:12]}`"
         )
+    lines.extend(["", "## Repaired Not Evaluable Counts", ""])
+    for label, count in summary["repaired_not_evaluable_counts"].items():
+        lines.append(f"- `{label}`: `{count}`")
     lines.extend(["", "## Claim Boundary", ""])
     for item in report.get("not_proven", []):
         lines.append(f"- `{item}`")
@@ -542,7 +595,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=764)
+    parser.add_argument("--issue_number", type=int, default=848)
     parser.add_argument("--renderer", type=str, default=shutil.which("fluidsynth") or "")
     parser.add_argument("--soundfont", type=str, default="")
     parser.add_argument("--sample_rate", type=int, default=44100)
