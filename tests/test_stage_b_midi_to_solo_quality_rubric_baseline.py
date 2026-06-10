@@ -43,6 +43,12 @@ def post_mvp_quality_plan(
             "outside_soloing_repair_evidence_ready": outside_ready,
             "outside_soloing_repair_wav_count": outside_wav_count,
             "outside_soloing_repair_changed_note_total": 2,
+            "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+            "outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+            "outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+            "outside_soloing_repair_source_pitch_role_risk_delta": 3,
+            "outside_soloing_repair_source_targeted": False,
+            "outside_soloing_repair_source_residual_risk_preserved": True,
             "outside_soloing_repair_pitch_role_risk_count_after": outside_risk_after,
             "outside_soloing_repair_pitch_role_risk_delta": 2,
             "human_audio_preference_claimed": False,
@@ -73,7 +79,7 @@ def post_mvp_quality_plan(
             "next_boundary": POST_MVP_NEXT_BOUNDARY,
             "critical_user_input_required": False,
         },
-        "next_recommended_issue": "Stage B MIDI-to-solo quality rubric baseline",
+        "next_recommended_issue": "Stage B MIDI-to-solo quality rubric baseline source-context refresh",
     }
 
 
@@ -101,12 +107,18 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         self.assertGreaterEqual(summary["required_metric_group_count"], 20)
         self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
         self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
+        self.assertEqual(summary["outside_soloing_repair_source_objective_pitch_role_risk_count"], 5)
+        self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_count_before"], 5)
+        self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_count_after"], 2)
+        self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_delta"], 3)
+        self.assertFalse(summary["outside_soloing_repair_source_targeted"])
+        self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
         self.assertEqual(
             summary["next_recommended_issue"],
-            "Stage B MIDI-to-solo candidate failure labeling",
+            "Stage B MIDI-to-solo candidate failure labeling source-context refresh",
         )
 
     def test_rejects_wrong_source_boundary(self) -> None:

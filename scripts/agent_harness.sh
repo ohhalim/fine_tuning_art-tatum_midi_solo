@@ -6155,8 +6155,8 @@ run_stage_b_midi_to_solo_quality_rubric_baseline() {
   "$PYTHON_BIN" scripts/build_stage_b_midi_to_solo_quality_rubric_baseline.py \
     --run_id "$run_id" \
     --post_mvp_quality_plan "$post_mvp_plan" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_QUALITY_RUBRIC_BASELINE_2026-06-10.md \
-    --issue_number 830 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_QUALITY_RUBRIC_BASELINE_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 916 \
     --expected_boundary stage_b_midi_to_solo_quality_rubric_baseline \
     --expected_next_boundary stage_b_midi_to_solo_candidate_failure_labeling \
     --expected_target candidate_failure_labeling \

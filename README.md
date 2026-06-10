@@ -14,9 +14,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest README final evidence refresh: `Issue #910`
 - latest final status audit: `Issue #912`
 - latest post-MVP quality iteration plan: `Issue #914`
+- latest quality rubric baseline: `Issue #916`
 - latest README evidence refresh: `Issue #900`
-- latest functional boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
-- open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`
+- latest functional boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- open issue queue after quality rubric baseline source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -156,6 +157,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - post-MVP quality iteration plan completed: `true`
 - post-MVP selected target: `quality_rubric_baseline`
 - post-MVP quality rubric required: `true`
+- quality rubric baseline completed: `true`
+- quality rubric item / metric group count: `8 / 30`
+- quality rubric candidate failure labeling ready: `true`
 - outside-soloing repair objective path supported: `true`
 - current evidence outside-soloing repair objective path included: `true`
 - listening review quality gap completed: `true`
