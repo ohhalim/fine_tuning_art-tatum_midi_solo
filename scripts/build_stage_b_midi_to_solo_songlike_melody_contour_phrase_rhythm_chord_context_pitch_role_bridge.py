@@ -132,6 +132,22 @@ def validate_followup_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
             "critical user input should not be required"
         )
+    if not bool(readiness.get("objective_source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
+            "objective outside-soloing repair evidence should be ready"
+        )
+    if _int(readiness.get("objective_source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
+            "objective outside-soloing repair pitch-role risk should be resolved"
+        )
+    if _int(readiness.get("objective_source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
+            "objective outside-soloing not-evaluable count should be preserved"
+        )
+    if _int(readiness.get("repair_sweep_source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
+            "repair sweep outside-soloing not-evaluable count should be preserved"
+        )
     _require_no_quality_claim(readiness, label="follow-up readiness")
     return {
         "boundary": FOLLOWUP_BOUNDARY,
@@ -140,6 +156,30 @@ def validate_followup_source(report: dict[str, Any]) -> dict[str, Any]:
         "phrase_rhythm_failure_delta": _int(readiness.get("phrase_rhythm_failure_delta")),
         "context_not_evaluable_min_count": _int(
             readiness.get("context_not_evaluable_min_count")
+        ),
+        "objective_source_outside_soloing_repair_evidence_ready": bool(
+            readiness.get("objective_source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "objective_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            readiness.get("objective_source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "objective_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("objective_source_outside_soloing_not_evaluable_count")
+        ),
+        "objective_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("objective_repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_source_outside_soloing_repair_evidence_ready": bool(
+            readiness.get("repair_sweep_source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            readiness.get("repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_source_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_repaired_outside_soloing_not_evaluable_count")
         ),
     }
 
@@ -193,6 +233,22 @@ def validate_repair_sweep_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
             "positive phrase/rhythm failure delta required"
         )
+    if not bool(aggregate.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
+            "repair sweep outside-soloing repair evidence should be ready"
+        )
+    if _int(aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
+            "repair sweep outside-soloing repair pitch-role risk should be resolved"
+        )
+    if _int(aggregate.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
+            "repair sweep source outside-soloing not-evaluable count should be preserved"
+        )
+    if _int(aggregate.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
+            "repair sweep repaired outside-soloing not-evaluable count should be preserved"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
             "critical user input should not be required"
@@ -225,6 +281,19 @@ def validate_repair_sweep_source(report: dict[str, Any]) -> dict[str, Any]:
         ),
         "phrase_rhythm_failure_delta": _int(aggregate.get("phrase_rhythm_failure_delta")),
         "technical_regression_count": _int(aggregate.get("technical_regression_count")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            aggregate.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            aggregate.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            aggregate.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            aggregate.get("repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_not_evaluable_counts": _dict(aggregate.get("repaired_not_evaluable_counts")),
         "not_evaluable_counts_before": dict(sorted(not_evaluable_counts.items())),
     }
 
@@ -373,6 +442,24 @@ def build_bridge_report(
         "not_evaluable_before_count": not_evaluable_before_count,
         "not_evaluable_after_count": not_evaluable_after_count,
         "not_evaluable_counts_before": sweep["not_evaluable_counts_before"],
+        "followup_objective_source_outside_soloing_not_evaluable_count": _int(
+            followup["objective_source_outside_soloing_not_evaluable_count"]
+        ),
+        "followup_objective_repaired_outside_soloing_not_evaluable_count": _int(
+            followup["objective_repaired_outside_soloing_not_evaluable_count"]
+        ),
+        "followup_repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            followup["repair_sweep_source_outside_soloing_not_evaluable_count"]
+        ),
+        "followup_repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            followup["repair_sweep_repaired_outside_soloing_not_evaluable_count"]
+        ),
+        "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            sweep["source_outside_soloing_not_evaluable_count"]
+        ),
+        "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            sweep["repaired_outside_soloing_not_evaluable_count"]
+        ),
         "bridge_flag_counts": dict(sorted(bridge_flag_counts.items())),
         "min_chord_tone_ratio": min_chord_tone_ratio,
         "max_outside_ratio": max_outside_ratio,
@@ -411,6 +498,24 @@ def build_bridge_report(
             "pitch_role_metrics_defined_count": pitch_role_metrics_defined_count,
             "not_evaluable_before_count": not_evaluable_before_count,
             "not_evaluable_after_count": not_evaluable_after_count,
+            "followup_objective_source_outside_soloing_not_evaluable_count": _int(
+                followup["objective_source_outside_soloing_not_evaluable_count"]
+            ),
+            "followup_objective_repaired_outside_soloing_not_evaluable_count": _int(
+                followup["objective_repaired_outside_soloing_not_evaluable_count"]
+            ),
+            "followup_repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+                followup["repair_sweep_source_outside_soloing_not_evaluable_count"]
+            ),
+            "followup_repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+                followup["repair_sweep_repaired_outside_soloing_not_evaluable_count"]
+            ),
+            "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+                sweep["source_outside_soloing_not_evaluable_count"]
+            ),
+            "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+                sweep["repaired_outside_soloing_not_evaluable_count"]
+            ),
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -535,6 +640,24 @@ def validate_bridge_report(
         ),
         "not_evaluable_before_count": _int(readiness.get("not_evaluable_before_count")),
         "not_evaluable_after_count": _int(readiness.get("not_evaluable_after_count")),
+        "followup_objective_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_objective_source_outside_soloing_not_evaluable_count")
+        ),
+        "followup_objective_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_objective_repaired_outside_soloing_not_evaluable_count")
+        ),
+        "followup_repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_repair_sweep_source_outside_soloing_not_evaluable_count")
+        ),
+        "followup_repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("followup_repair_sweep_repaired_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_source_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_source_outside_soloing_not_evaluable_count")
+        ),
+        "repair_sweep_repaired_outside_soloing_not_evaluable_count": _int(
+            readiness.get("repair_sweep_repaired_outside_soloing_not_evaluable_count")
+        ),
         "min_chord_tone_ratio": _float(summary.get("min_chord_tone_ratio")),
         "max_outside_ratio": _float(summary.get("max_outside_ratio")),
         "max_non_chord_tone_run": _int(summary.get("max_non_chord_tone_run")),
@@ -573,6 +696,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- chord context available count: `{readiness['chord_context_available_count']}`",
         f"- pitch-role metrics defined count: `{readiness['pitch_role_metrics_defined_count']}`",
         f"- not evaluable count: `{readiness['not_evaluable_before_count']} -> {readiness['not_evaluable_after_count']}`",
+        f"- follow-up objective source/repaired outside-soloing not evaluable count: `{readiness['followup_objective_source_outside_soloing_not_evaluable_count']}/{readiness['followup_objective_repaired_outside_soloing_not_evaluable_count']}`",
+        f"- follow-up repair sweep source/repaired outside-soloing not evaluable count: `{readiness['followup_repair_sweep_source_outside_soloing_not_evaluable_count']}/{readiness['followup_repair_sweep_repaired_outside_soloing_not_evaluable_count']}`",
+        f"- bridge repair sweep source/repaired outside-soloing not evaluable count: `{readiness['repair_sweep_source_outside_soloing_not_evaluable_count']}/{readiness['repair_sweep_repaired_outside_soloing_not_evaluable_count']}`",
         f"- min chord-tone ratio: `{summary['min_chord_tone_ratio']:.3f}`",
         f"- max outside ratio: `{summary['max_outside_ratio']:.3f}`",
         f"- max non-chord run: `{summary['max_non_chord_tone_run']}`",
@@ -644,7 +770,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=786)
+    parser.add_argument("--issue_number", type=int, default=870)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_bridge_completed", action="store_true")

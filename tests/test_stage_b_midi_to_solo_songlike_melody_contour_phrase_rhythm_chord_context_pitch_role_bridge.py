@@ -60,6 +60,14 @@ def followup_report(*, quality_claim: bool = False) -> dict:
             "failure_label_delta": 3,
             "phrase_rhythm_failure_delta": 3,
             "context_not_evaluable_min_count": 6,
+            "objective_source_outside_soloing_repair_evidence_ready": True,
+            "objective_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "objective_source_outside_soloing_not_evaluable_count": 6,
+            "objective_repaired_outside_soloing_not_evaluable_count": 6,
+            "repair_sweep_source_outside_soloing_repair_evidence_ready": True,
+            "repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "repair_sweep_source_outside_soloing_not_evaluable_count": 6,
+            "repair_sweep_repaired_outside_soloing_not_evaluable_count": 6,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
@@ -107,6 +115,14 @@ def repair_sweep_report(midi_paths: list[Path], *, technical_regression_count: i
             "repaired_phrase_rhythm_failure_count": 1,
             "phrase_rhythm_failure_delta": 3,
             "technical_regression_count": technical_regression_count,
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
+            "repaired_not_evaluable_counts": {
+                "outside_soloing_without_context": 6,
+                "weak_chord_tone_landing": 6,
+            },
         },
         "readiness": {
             "songlike_melody_contour_phrase_rhythm_repair_sweep_completed": True,
@@ -141,7 +157,7 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                 chords=list(DEFAULT_CHORDS),
                 bpm=124.0,
                 output_dir=root / "bridge",
-                issue_number=786,
+                issue_number=870,
             )
             summary = validate_bridge_report(
                 report,
@@ -158,6 +174,27 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
             self.assertEqual(summary["pitch_role_metrics_defined_count"], 6)
             self.assertEqual(summary["not_evaluable_before_count"], 12)
             self.assertEqual(summary["not_evaluable_after_count"], 0)
+            self.assertEqual(
+                summary["followup_objective_source_outside_soloing_not_evaluable_count"],
+                6,
+            )
+            self.assertEqual(
+                summary["followup_objective_repaired_outside_soloing_not_evaluable_count"],
+                6,
+            )
+            self.assertEqual(
+                summary["followup_repair_sweep_source_outside_soloing_not_evaluable_count"],
+                6,
+            )
+            self.assertEqual(
+                summary["followup_repair_sweep_repaired_outside_soloing_not_evaluable_count"],
+                6,
+            )
+            self.assertEqual(summary["repair_sweep_source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(
+                summary["repair_sweep_repaired_outside_soloing_not_evaluable_count"],
+                6,
+            )
             self.assertGreater(summary["min_chord_tone_ratio"], 0.0)
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -179,7 +216,7 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                     chords=list(DEFAULT_CHORDS),
                     bpm=124.0,
                     output_dir=root / "bridge",
-                    issue_number=786,
+                    issue_number=870,
                 )
 
     def test_rejects_technical_regression(self) -> None:
@@ -200,7 +237,49 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                     chords=list(DEFAULT_CHORDS),
                     bpm=124.0,
                     output_dir=root / "bridge",
-                    issue_number=786,
+                    issue_number=870,
+                )
+
+    def test_rejects_missing_followup_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            midi_paths = []
+            for index in range(6):
+                midi_path = root / f"candidate_{index}.mid"
+                write_fixture_midi(midi_path)
+                midi_paths.append(midi_path)
+            source = followup_report()
+            del source["readiness"]["objective_source_outside_soloing_not_evaluable_count"]
+
+            with self.assertRaises(StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError):
+                build_bridge_report(
+                    followup_report=source,
+                    repair_sweep_report=repair_sweep_report(midi_paths),
+                    chords=list(DEFAULT_CHORDS),
+                    bpm=124.0,
+                    output_dir=root / "bridge",
+                    issue_number=870,
+                )
+
+    def test_rejects_missing_repair_sweep_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            midi_paths = []
+            for index in range(6):
+                midi_path = root / f"candidate_{index}.mid"
+                write_fixture_midi(midi_path)
+                midi_paths.append(midi_path)
+            source = repair_sweep_report(midi_paths)
+            del source["aggregate"]["source_outside_soloing_not_evaluable_count"]
+
+            with self.assertRaises(StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError):
+                build_bridge_report(
+                    followup_report=followup_report(),
+                    repair_sweep_report=source,
+                    chords=list(DEFAULT_CHORDS),
+                    bpm=124.0,
+                    output_dir=root / "bridge",
+                    issue_number=870,
                 )
 
     def test_constants_are_stable(self) -> None:
