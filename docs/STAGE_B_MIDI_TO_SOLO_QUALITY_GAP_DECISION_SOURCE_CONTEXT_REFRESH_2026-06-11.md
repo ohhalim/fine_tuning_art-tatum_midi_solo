@@ -16,6 +16,7 @@
 - model-conditioned pitch-contour objective completed: `true`
 - model-conditioned pitch-contour changed-ratio repair objective completed: `true`
 - outside-soloing repair objective completed: `true`
+- outside-soloing repair source context preserved: `true`
 - musical quality MVP completed: `false`
 - generation source: `context_conditioned_fallback`
 - exported candidates: `3`
@@ -45,6 +46,12 @@
 - outside-soloing source repair targeted: `false`
 - outside-soloing source residual risk preserved: `true`
 - outside-soloing current repair pitch-role risk after / delta: `0` / `2`
+- follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- follow-up repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- bridge repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
 - outside-soloing repair objective path supported: `true`
 - outside-soloing repair target supported: `true`
 - outside-soloing repair weak landing target supported: `true`

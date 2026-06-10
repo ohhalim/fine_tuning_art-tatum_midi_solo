@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
 from scripts.audit_stage_b_midi_to_solo_mvp_completion import (  # noqa: E402
+    BRIDGE_SOURCE_CONTEXT_KEYS,
     BOUNDARY as MVP_COMPLETION_AUDIT_BOUNDARY,
 )
 
@@ -31,7 +32,7 @@ PITCH_CONTOUR_CHANGED_RATIO_NEXT_BOUNDARY = (
 )
 LISTENING_REVIEW_TARGET = "listening_review_quality_gap"
 LISTENING_REVIEW_NEXT_BOUNDARY = "stage_b_midi_to_solo_listening_review_quality_gap"
-SCHEMA_VERSION = "stage_b_midi_to_solo_quality_gap_decision_v1"
+SCHEMA_VERSION = "stage_b_midi_to_solo_quality_gap_decision_v2"
 
 
 def _dict(value: Any) -> dict[str, Any]:
@@ -54,6 +55,15 @@ def _float(value: Any) -> float:
 
 def _bool_token(value: Any) -> str:
     return "true" if bool(value) else "false"
+
+
+def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
+    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        if key not in container:
+            raise StageBMidiToSoloQualityGapDecisionError(
+                f"{label} source-context field required: {key}"
+            )
+    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
 
 
 def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
@@ -84,6 +94,14 @@ def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
     if not bool(audit.get("outside_soloing_repair_objective_completed", False)):
         raise StageBMidiToSoloQualityGapDecisionError(
             "outside-soloing repair objective completion required"
+        )
+    if not bool(readiness.get("outside_soloing_repair_source_context_preserved", False)):
+        raise StageBMidiToSoloQualityGapDecisionError(
+            "outside-soloing repair source context readiness required"
+        )
+    if not bool(audit.get("outside_soloing_repair_source_context_preserved", False)):
+        raise StageBMidiToSoloQualityGapDecisionError(
+            "outside-soloing repair source context audit preservation required"
         )
     if _int(evidence.get("exported_candidate_count")) < 3:
         raise StageBMidiToSoloQualityGapDecisionError("exported candidate count below 3")
@@ -165,6 +183,14 @@ def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloQualityGapDecisionError(
             "outside-soloing repair current evidence readiness required"
         )
+    if not bool(evidence.get("outside_soloing_repair_source_context_preserved", False)):
+        raise StageBMidiToSoloQualityGapDecisionError(
+            "outside-soloing repair source context evidence preservation required"
+        )
+    source_context = _source_context_fields(
+        evidence,
+        label="MVP completion audit evidence",
+    )
     if _int(evidence.get("outside_soloing_repair_rendered_audio_file_count")) < 6:
         raise StageBMidiToSoloQualityGapDecisionError(
             "outside-soloing repair rendered WAV count below 6"
@@ -244,6 +270,9 @@ def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
         ),
         "outside_soloing_repair_objective_completed": bool(
             audit.get("outside_soloing_repair_objective_completed", False)
+        ),
+        "outside_soloing_repair_source_context_preserved": bool(
+            evidence.get("outside_soloing_repair_source_context_preserved", False)
         ),
         "musical_quality_mvp_completed": False,
         "human_audio_preference_completed": False,
@@ -364,6 +393,7 @@ def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
         "outside_soloing_repair_preference_fill_allowed": bool(
             evidence.get("outside_soloing_repair_preference_fill_allowed", True)
         ),
+        **source_context,
     }
 
 
@@ -468,6 +498,9 @@ def build_quality_gap_decision_report(
             "outside_soloing_repair_objective_completed": bool(
                 audit_summary["outside_soloing_repair_objective_completed"]
             ),
+            "outside_soloing_repair_source_context_preserved": bool(
+                audit_summary["outside_soloing_repair_source_context_preserved"]
+            ),
             "musical_quality_mvp_completed": False,
             "human_audio_preference_completed": False,
             "product_mvp_completed": False,
@@ -512,6 +545,7 @@ def build_quality_gap_decision_report(
             "outside_soloing_repair_source_residual_risk_preserved": bool(
                 audit_summary["outside_soloing_repair_source_residual_risk_preserved"]
             ),
+            **{key: audit_summary[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS},
             "human_review_required_now": False,
         },
         "selected_target": target,
@@ -520,6 +554,9 @@ def build_quality_gap_decision_report(
             "quality_gap_decision_completed": True,
             "selected_target": str(target["selected_target"]),
             "next_boundary_selected": str(target["selected_next_boundary"]),
+            "outside_soloing_repair_source_context_preserved": bool(
+                audit_summary["outside_soloing_repair_source_context_preserved"]
+            ),
             "human_review_required_now": False,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -583,6 +620,18 @@ def validate_quality_gap_decision_report(
         raise StageBMidiToSoloQualityGapDecisionError(
             "outside-soloing repair objective completion required"
         )
+    if not bool(readiness.get("outside_soloing_repair_source_context_preserved", False)):
+        raise StageBMidiToSoloQualityGapDecisionError(
+            "outside-soloing repair source context readiness required"
+        )
+    if not bool(quality_gap.get("outside_soloing_repair_source_context_preserved", False)):
+        raise StageBMidiToSoloQualityGapDecisionError(
+            "outside-soloing repair source context preservation required"
+        )
+    source_context = _source_context_fields(
+        quality_gap,
+        label="quality gap",
+    )
     if bool(quality_gap.get("musical_quality_mvp_completed", True)):
         raise StageBMidiToSoloQualityGapDecisionError("musical quality should remain incomplete")
     if bool(decision.get("critical_user_input_required", True)):
@@ -657,6 +706,9 @@ def validate_quality_gap_decision_report(
         "outside_soloing_repair_objective_completed": bool(
             quality_gap.get("outside_soloing_repair_objective_completed", False)
         ),
+        "outside_soloing_repair_source_context_preserved": bool(
+            quality_gap.get("outside_soloing_repair_source_context_preserved", False)
+        ),
         "model_conditioned_pitch_contour_objective_path_ready": bool(
             quality_gap.get("model_conditioned_pitch_contour_objective_path_ready", False)
         ),
@@ -693,6 +745,7 @@ def validate_quality_gap_decision_report(
         "outside_soloing_repair_source_residual_risk_preserved": bool(
             quality_gap.get("outside_soloing_repair_source_residual_risk_preserved", False)
         ),
+        **source_context,
         "musical_quality_mvp_completed": bool(quality_gap.get("musical_quality_mvp_completed", True)),
         "cli_candidate_count": _int(_dict(report.get("mvp_completion_summary")).get("cli_candidate_count")),
         "cli_rendered_audio_file_count": _int(
@@ -820,6 +873,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- model-conditioned pitch-contour objective completed: `{_bool_token(summary['model_conditioned_pitch_contour_objective_completed'])}`",
         f"- model-conditioned pitch-contour changed-ratio repair objective completed: `{_bool_token(summary['model_conditioned_pitch_contour_changed_ratio_repair_objective_completed'])}`",
         f"- outside-soloing repair objective completed: `{_bool_token(summary['outside_soloing_repair_objective_completed'])}`",
+        f"- outside-soloing repair source context preserved: `{_bool_token(summary['outside_soloing_repair_source_context_preserved'])}`",
         f"- musical quality MVP completed: `{_bool_token(summary['musical_quality_mvp_completed'])}`",
         f"- generation source: `{summary['generation_source']}`",
         f"- exported candidates: `{summary['exported_candidate_count']}`",
@@ -849,6 +903,12 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- outside-soloing source repair targeted: `{_bool_token(summary['outside_soloing_repair_source_targeted'])}`",
         f"- outside-soloing source residual risk preserved: `{_bool_token(summary['outside_soloing_repair_source_residual_risk_preserved'])}`",
         f"- outside-soloing current repair pitch-role risk after / delta: `{summary['outside_soloing_repair_pitch_role_risk_count_after']}` / `{summary['outside_soloing_repair_pitch_role_risk_delta']}`",
+        f"- follow-up objective source outside-soloing source pitch-role risk: `{summary['followup_objective_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['followup_objective_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `{summary['followup_objective_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['followup_objective_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- follow-up repair sweep source outside-soloing source pitch-role risk: `{summary['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `{summary['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- bridge repair sweep source outside-soloing source pitch-role risk: `{summary['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
+        f"- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `{summary['repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
         f"- outside-soloing repair objective path supported: `{_bool_token(summary['outside_soloing_repair_objective_path_supported'])}`",
         f"- outside-soloing repair target supported: `{_bool_token(summary['outside_soloing_repair_target_supported'])}`",
         f"- outside-soloing repair weak landing target supported: `{_bool_token(summary['outside_soloing_repair_weak_landing_target_supported'])}`",
