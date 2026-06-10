@@ -37,6 +37,9 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
 }
 
 
@@ -116,7 +119,7 @@ class StageBMidiToSoloOutsideSoloingRepairListeningInputGuardTest(unittest.TestC
         report = build_listening_review_input_guard_report(
             source_package(),
             output_dir="unused",
-            issue_number=892,
+            issue_number=1062,
         )
         summary = validate_listening_review_input_guard_report(
             report,
@@ -161,17 +164,29 @@ class StageBMidiToSoloOutsideSoloingRepairListeningInputGuardTest(unittest.TestC
             build_listening_review_input_guard_report(
                 source_package(quality_claim=True),
                 output_dir="unused",
-                issue_number=892,
+                issue_number=1062,
             )
 
     def test_routes_to_fill_when_validated_input_exists(self) -> None:
         report = build_listening_review_input_guard_report(
             source_package(validated_input=True),
             output_dir="unused",
-            issue_number=892,
+            issue_number=1062,
         )
         self.assertTrue(report["guard_result"]["preference_fill_allowed"])
         self.assertTrue(report["guard_result"]["validated_review_input_present"])
+
+    def test_rejects_missing_source_context_preserved_flag(self) -> None:
+        source = source_package()
+        source["source_summary"][
+            "repair_sweep_source_outside_soloing_source_context_preserved"
+        ] = False
+        with self.assertRaises(StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError):
+            build_listening_review_input_guard_report(
+                source,
+                output_dir="unused",
+                issue_number=1062,
+            )
 
     def test_constants_are_stable(self) -> None:
         self.assertEqual(

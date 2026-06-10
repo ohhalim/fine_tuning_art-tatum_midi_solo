@@ -6912,8 +6912,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landin
   "$PYTHON_BIN" scripts/guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input.py \
     --run_id "$guard_run_id" \
     --source_package "$review_package_report" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_OUTSIDE_SOLOING_REPAIR_LISTENING_REVIEW_INPUT_GUARD_2026-06-11.md \
-    --issue_number 978 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_OUTSIDE_SOLOING_REPAIR_LISTENING_REVIEW_INPUT_GUARD_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 1062 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input_guard \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision \
     --require_guard_completed \
