@@ -10160,6 +10160,57 @@ Issue #990은 Issue #988 quality gap decision의 source/current outside-soloing 
 
 - `Stage B MIDI-to-solo MVP delivery package source-context refresh`
 
+## 9.186 Stage B MIDI-to-solo MVP delivery package source-context refresh
+
+Issue #992는 Issue #990 listening review quality gap의 source/current outside-soloing context를 MVP delivery package manifest까지 보존한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
+- technical MVP delivery package completed: `true`
+- runnable CLI ready: `true`
+- input to ranked MIDI ready: `true`
+- input to rendered WAV evidence ready: `true`
+- changed-ratio repair audio evidence ready: `true`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
+- CLI candidate count: `3`
+- changed-ratio repair WAV count: `3`
+- outside-soloing repair WAV count: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing source objective pitch-role risk count: `5`
+- outside-soloing source pitch-role risk count: `5 -> 2`
+- outside-soloing source pitch-role risk delta: `3`
+- outside-soloing source repair targeted: `false`
+- outside-soloing source residual risk preserved: `true`
+- outside-soloing current repair pitch-role risk count after: `0`
+- outside-soloing current repair pitch-role risk delta: `2`
+- raw artifact upload required: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- #990 listening review quality gap의 source-context preserved flag와 21개 context field를 delivery manifest에 보존.
+- delivery package는 local artifact path manifest 범위.
+- raw MIDI/WAV artifact upload 제외.
+- human/audio preference와 MIDI-to-solo musical quality claim 제외.
+- 다음 boundary는 README final evidence refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_delivery_package`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_mvp_delivery_package.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-delivery-package`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo README final evidence source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
