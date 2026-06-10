@@ -5718,6 +5718,54 @@ Issue #810은 Issue #808 input guard 결과를 objective-only 기준으로 판�
 
 - `Stage B MIDI-to-solo MVP current evidence consolidation`
 
+## 9.97 Stage B MIDI-to-solo MVP current evidence consolidation outside-soloing repair refresh
+
+Issue #812는 current evidence consolidation에 Issue #810 outside-soloing repair objective path를 추가 반영한 작업이다.
+
+결과:
+
+- boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- next boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
+- current MVP evidence supported: `true`
+- technical execution evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair pitch-role risk delta: `2`
+- outside-soloing repair target supported: `true`
+- outside-soloing repair weak landing target supported: `true`
+- outside-soloing repair final landing target supported: `true`
+- outside-soloing repair non-chord run target supported: `true`
+- outside-soloing repair objective path supported: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- 기존 current evidence consolidation 입력 유지.
+- Issue #810 outside-soloing repair objective-only next decision을 추가 evidence path로 연결.
+- outside-soloing pitch-role risk count after `0` 기준 support 유지.
+- weak landing, final landing, non-chord run target support 모두 유지.
+- current evidence support는 technical path, selected-scale objective path, phrase-bank CLI path, model-conditioned pitch-contour path, changed-ratio repair path, outside-soloing repair path를 모두 포함.
+- human/audio preference와 MIDI-to-solo musical quality claim은 제외.
+- 다음 boundary는 README evidence refresh.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- `.venv/bin/python -m py_compile scripts/consolidate_stage_b_midi_to_solo_mvp_current_evidence.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-current-evidence-consolidation`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo README evidence refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

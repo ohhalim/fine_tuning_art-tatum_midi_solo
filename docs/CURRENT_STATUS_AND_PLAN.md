@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #810, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation`
+- latest functional result: Issue #812, Stage B MIDI-to-solo MVP current evidence consolidation outside-soloing repair refresh
+- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence refresh`
 
 현재 범위가 아닌 것:
 
@@ -339,6 +339,21 @@
 - human/audio preference claim: `false`
 - MIDI-to-solo musical quality claim: `false`
 - 다음 consolidation target: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- MVP current evidence consolidation outside-soloing repair refresh 완료
+- current MVP evidence supported: `true`
+- selected-scale objective path complete: `true`
+- phrase-bank CLI technical path ready: `true`
+- model-conditioned pitch-contour objective path ready: `true`
+- model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
+- outside-soloing repair objective path ready: `true`
+- outside-soloing repair rendered audio file count: `6`
+- outside-soloing repair changed note total: `2`
+- outside-soloing repair pitch-role risk count after: `0`
+- outside-soloing repair pitch-role risk delta: `2`
+- outside-soloing repair objective path supported: `true`
+- human/audio preference claim: `false`
+- MIDI-to-solo musical quality claim: `false`
+- 다음 README target: `stage_b_midi_to_solo_readme_evidence_refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
