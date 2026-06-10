@@ -36,6 +36,14 @@ def input_guard_report(*, quality_claim: bool = False) -> dict:
                 "source_phrase_rhythm_failure_count": 4,
                 "repaired_phrase_rhythm_failure_count": 1,
                 "phrase_rhythm_failure_delta": 3,
+                "source_outside_soloing_repair_evidence_ready": True,
+                "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+                "source_outside_soloing_not_evaluable_count": 6,
+                "repaired_outside_soloing_not_evaluable_count": 6,
+                "repaired_not_evaluable_counts": {
+                    "outside_soloing_without_context": 6,
+                    "weak_chord_tone_landing": 6,
+                },
                 "audio_review_required": True,
             },
         },
@@ -67,7 +75,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairObjectiveNextTest(u
             report = build_objective_next_report(
                 input_guard_report=input_guard_report(),
                 output_dir=root / "objective_next",
-                issue_number=782,
+                issue_number=866,
             )
             summary = validate_objective_next_report(
                 report,
@@ -83,8 +91,23 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairObjectiveNextTest(u
             self.assertFalse(summary["preference_fill_allowed"])
             self.assertTrue(summary["technical_wav_validation"])
             self.assertEqual(summary["rendered_audio_file_count"], 6)
+            self.assertEqual(summary["sample_rate"], 44100)
             self.assertEqual(summary["failure_label_delta"], 3)
             self.assertEqual(summary["phrase_rhythm_failure_delta"], 3)
+            self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_pitch_role_risk_count_after"],
+                0,
+            )
+            self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(
+                summary["repaired_not_evaluable_counts"],
+                {
+                    "outside_soloing_without_context": 6,
+                    "weak_chord_tone_landing": 6,
+                },
+            )
             self.assertTrue(summary["phrase_rhythm_followup_required"])
             self.assertFalse(summary["current_quality_claim_ready"])
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -97,7 +120,20 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairObjectiveNextTest(u
                 build_objective_next_report(
                     input_guard_report=input_guard_report(quality_claim=True),
                     output_dir=root / "objective_next",
-                    issue_number=782,
+                    issue_number=866,
+                )
+
+    def test_rejects_missing_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = input_guard_report()
+            del source["guard_result"]["source_summary"]["source_outside_soloing_not_evaluable_count"]
+
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairObjectiveNextError):
+                build_objective_next_report(
+                    input_guard_report=source,
+                    output_dir=root / "objective_next",
+                    issue_number=866,
                 )
 
     def test_constants_are_stable(self) -> None:
