@@ -6608,9 +6608,9 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_
 }
 
 run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision() {
-  local objective_run_id="${OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision}"
-  local sweep_run_id="${REPAIR_SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep}"
-  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision}"
+  local objective_run_id="${OBJECTIVE_NEXT_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision_source_context_refresh}"
+  local sweep_run_id="${REPAIR_SWEEP_RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_source_context_refresh}"
+  local run_id="${RUN_ID:-harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision_source_context_refresh}"
   local objective_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision/${objective_run_id}/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision.json"
   local sweep_report="outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep/${sweep_run_id}/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep.json"
   if [[ ! -f "$objective_report" ]]; then
@@ -6626,8 +6626,8 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_d
     --run_id "$run_id" \
     --objective_next_report "$objective_report" \
     --repair_sweep_report "$sweep_report" \
-    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_REPAIR_FOLLOWUP_DECISION_2026-06-10.md \
-    --issue_number 868 \
+    --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_REPAIR_FOLLOWUP_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
+    --issue_number 954 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge \
     --expected_target songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge \
