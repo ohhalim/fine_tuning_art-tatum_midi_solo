@@ -117,6 +117,22 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
             "audio review requirement should remain recorded"
         )
+    if not bool(source.get("source_outside_soloing_repair_evidence_ready", False)):
+        raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+            "outside-soloing repair evidence readiness required"
+        )
+    if _int(source.get("source_outside_soloing_repair_pitch_role_risk_count_after")) != 0:
+        raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+            "outside-soloing residual pitch-role risk should be zero"
+        )
+    if _int(source.get("source_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+            "source outside-soloing not-evaluable boundary required"
+        )
+    if _int(source.get("repaired_outside_soloing_not_evaluable_count")) <= 0:
+        raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+            "repaired outside-soloing not-evaluable boundary required"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
             "critical user input should not be required"
@@ -138,6 +154,18 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
             "duration_min_seconds": _float(source.get("duration_min_seconds")),
             "duration_max_seconds": _float(source.get("duration_max_seconds")),
             "failure_label_delta": _int(source.get("failure_label_delta")),
+            "source_outside_soloing_repair_evidence_ready": bool(
+                source.get("source_outside_soloing_repair_evidence_ready", False)
+            ),
+            "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+                source.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+            ),
+            "source_outside_soloing_not_evaluable_count": _int(
+                source.get("source_outside_soloing_not_evaluable_count")
+            ),
+            "repaired_outside_soloing_not_evaluable_count": _int(
+                source.get("repaired_outside_soloing_not_evaluable_count")
+            ),
             "audio_review_required": bool(source.get("audio_review_required", False)),
         },
     }
@@ -224,7 +252,8 @@ def validate_listening_review_input_guard_report(
     expected_next_boundary: str | None,
     require_guard_completed: bool,
     require_preference_blocked: bool,
-    require_no_quality_claim: bool,
+    require_pending_input: bool = False,
+    require_no_quality_claim: bool = False,
 ) -> dict[str, Any]:
     boundary = str(report.get("boundary") or "")
     readiness = _dict(report.get("readiness"))
@@ -249,6 +278,10 @@ def validate_listening_review_input_guard_report(
         raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
             "preference fill should remain blocked"
         )
+    if require_pending_input and bool(guard.get("validated_review_input_present", True)):
+        raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+            "validated input should remain pending"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
             "critical user input should not be required"
@@ -270,6 +303,18 @@ def validate_listening_review_input_guard_report(
         "duration_min_seconds": _float(source.get("duration_min_seconds")),
         "duration_max_seconds": _float(source.get("duration_max_seconds")),
         "failure_label_delta": _int(source.get("failure_label_delta")),
+        "source_outside_soloing_repair_evidence_ready": bool(
+            source.get("source_outside_soloing_repair_evidence_ready", False)
+        ),
+        "source_outside_soloing_repair_pitch_role_risk_count_after": _int(
+            source.get("source_outside_soloing_repair_pitch_role_risk_count_after")
+        ),
+        "source_outside_soloing_not_evaluable_count": _int(
+            source.get("source_outside_soloing_not_evaluable_count")
+        ),
+        "repaired_outside_soloing_not_evaluable_count": _int(
+            source.get("repaired_outside_soloing_not_evaluable_count")
+        ),
         "audio_review_required": bool(source.get("audio_review_required", False)),
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)
@@ -305,6 +350,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- rendered audio file count: `{source['rendered_audio_file_count']}`",
         f"- duration range: `{source['duration_min_seconds']:.3f}s-{source['duration_max_seconds']:.3f}s`",
         f"- failure label delta: `{source['failure_label_delta']}`",
+        f"- source outside-soloing repair evidence ready: `{_bool_token(source['source_outside_soloing_repair_evidence_ready'])}`",
+        f"- source outside-soloing repair pitch-role risk after: `{source['source_outside_soloing_repair_pitch_role_risk_count_after']}`",
+        f"- source outside-soloing not evaluable count: `{source['source_outside_soloing_not_evaluable_count']}`",
+        f"- repaired outside-soloing not evaluable count: `{source['repaired_outside_soloing_not_evaluable_count']}`",
         f"- audio review required: `{_bool_token(source['audio_review_required'])}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         f"- MIDI-to-solo musical quality claimed: `{_bool_token(readiness['midi_to_solo_musical_quality_claimed'])}`",
@@ -343,7 +392,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=756)
+    parser.add_argument("--issue_number", type=int, default=840)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_guard_completed", action="store_true")
@@ -370,6 +419,7 @@ def main() -> int:
         require_preference_blocked=bool(
             args.require_preference_blocked or args.require_pending_input
         ),
+        require_pending_input=bool(args.require_pending_input),
         require_no_quality_claim=bool(args.require_no_quality_claim),
     )
     output_dir.mkdir(parents=True, exist_ok=True)

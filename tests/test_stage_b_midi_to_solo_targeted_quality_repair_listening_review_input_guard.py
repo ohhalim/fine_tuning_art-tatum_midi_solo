@@ -45,6 +45,10 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "duration_min_seconds": 0.1,
             "duration_max_seconds": 0.1,
             "failure_label_delta": 4,
+            "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+            "source_outside_soloing_not_evaluable_count": 6,
+            "repaired_outside_soloing_not_evaluable_count": 6,
             "audio_review_required": True,
         },
         "review_package": {
@@ -96,6 +100,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
                 expected_next_boundary=OBJECTIVE_NEXT_BOUNDARY,
                 require_guard_completed=True,
                 require_preference_blocked=True,
+                require_pending_input=True,
                 require_no_quality_claim=True,
             )
 
@@ -105,6 +110,10 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
             self.assertEqual(summary["review_item_count"], 6)
             self.assertEqual(summary["required_input_field_count"], 4)
             self.assertEqual(summary["failure_label_delta"], 4)
+            self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_count_after"], 0)
+            self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
+            self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
 
@@ -116,6 +125,18 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
                     source_package(quality_claim=True),
                     output_dir=root / "guard",
                     issue_number=756,
+                )
+
+    def test_rejects_missing_outside_soloing_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = source_package()
+            source["source_summary"]["repaired_outside_soloing_not_evaluable_count"] = 0
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairListeningInputGuardError):
+                build_listening_review_input_guard_report(
+                    source,
+                    output_dir=root / "guard",
+                    issue_number=840,
                 )
 
     def test_constants_are_stable(self) -> None:
