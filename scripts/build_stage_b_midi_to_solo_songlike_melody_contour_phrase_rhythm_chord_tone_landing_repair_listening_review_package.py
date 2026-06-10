@@ -114,6 +114,20 @@ def validate_audio_package_report(
         raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
             "audio review requirement should be recorded"
         )
+    if _int(summary.get("objective_outside_soloing_pitch_role_risk_count")) != _int(
+        summary.get("outside_soloing_pitch_role_risk_count_before")
+    ):
+        raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
+            "outside-soloing objective and source counts must match"
+        )
+    if bool(summary.get("outside_soloing_repair_targeted", True)):
+        raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
+            "outside-soloing repair target should remain false in review package"
+        )
+    if not bool(summary.get("outside_soloing_residual_risk_preserved", False)):
+        raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
+            "outside-soloing residual risk context must be preserved"
+        )
     if _int(boundary.get("rendered_audio_file_count")) < int(expected_count):
         raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
             "rendered audio count below expected"
@@ -199,6 +213,9 @@ def build_listening_review_package_report(
             "duration_min_seconds": _float(summary.get("duration_min_seconds")),
             "duration_max_seconds": _float(summary.get("duration_max_seconds")),
             "changed_note_total": _int(summary.get("changed_note_total")),
+            "objective_outside_soloing_pitch_role_risk_count": _int(
+                summary.get("objective_outside_soloing_pitch_role_risk_count")
+            ),
             "weak_chord_tone_landing_risk_count_before": _int(
                 summary.get("weak_chord_tone_landing_risk_count_before")
             ),
@@ -213,6 +230,15 @@ def build_listening_review_package_report(
             ),
             "outside_soloing_pitch_role_risk_count_after": _int(
                 summary.get("outside_soloing_pitch_role_risk_count_after")
+            ),
+            "outside_soloing_pitch_role_risk_delta": _int(
+                summary.get("outside_soloing_pitch_role_risk_delta")
+            ),
+            "outside_soloing_repair_targeted": bool(
+                summary.get("outside_soloing_repair_targeted", True)
+            ),
+            "outside_soloing_residual_risk_preserved": bool(
+                summary.get("outside_soloing_residual_risk_preserved", False)
             ),
             "final_landing_chord_tone_count_before": _int(
                 summary.get("final_landing_chord_tone_count_before")
@@ -307,6 +333,20 @@ def validate_listening_review_package_report(
         raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
             "critical user input should not be required"
         )
+    if _int(source.get("objective_outside_soloing_pitch_role_risk_count")) != _int(
+        source.get("outside_soloing_pitch_role_risk_count_before")
+    ):
+        raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
+            "outside-soloing objective and source counts must match"
+        )
+    if bool(source.get("outside_soloing_repair_targeted", True)):
+        raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
+            "outside-soloing repair target should remain false in review package"
+        )
+    if not bool(source.get("outside_soloing_residual_risk_preserved", False)):
+        raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
+            "outside-soloing residual risk context must be preserved"
+        )
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="listening package readiness")
     return {
@@ -323,11 +363,23 @@ def validate_listening_review_package_report(
         "duration_min_seconds": _float(source.get("duration_min_seconds")),
         "duration_max_seconds": _float(source.get("duration_max_seconds")),
         "changed_note_total": _int(source.get("changed_note_total")),
+        "objective_outside_soloing_pitch_role_risk_count": _int(
+            source.get("objective_outside_soloing_pitch_role_risk_count")
+        ),
         "weak_chord_tone_landing_risk_delta": _int(
             source.get("weak_chord_tone_landing_risk_delta")
         ),
         "outside_soloing_pitch_role_risk_count_after": _int(
             source.get("outside_soloing_pitch_role_risk_count_after")
+        ),
+        "outside_soloing_pitch_role_risk_delta": _int(
+            source.get("outside_soloing_pitch_role_risk_delta")
+        ),
+        "outside_soloing_repair_targeted": bool(
+            source.get("outside_soloing_repair_targeted", True)
+        ),
+        "outside_soloing_residual_risk_preserved": bool(
+            source.get("outside_soloing_residual_risk_preserved", False)
         ),
         "final_landing_chord_tone_count_after": _int(
             source.get("final_landing_chord_tone_count_after")
@@ -369,8 +421,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- rendered audio file count: `{source['rendered_audio_file_count']}`",
         f"- duration range: `{source['duration_min_seconds']:.3f}s-{source['duration_max_seconds']:.3f}s`",
         f"- changed note total: `{source['changed_note_total']}`",
+        f"- objective outside-soloing pitch-role risk count: `{source['objective_outside_soloing_pitch_role_risk_count']}`",
         f"- weak chord-tone landing risk delta: `{source['weak_chord_tone_landing_risk_delta']}`",
-        f"- outside-soloing pitch-role risk count after: `{source['outside_soloing_pitch_role_risk_count_after']}`",
+        f"- outside-soloing pitch-role risk count: `{source['outside_soloing_pitch_role_risk_count_before']} -> {source['outside_soloing_pitch_role_risk_count_after']}`",
+        f"- outside-soloing repair targeted: `{_bool_token(source['outside_soloing_repair_targeted'])}`",
+        f"- outside-soloing residual risk preserved: `{_bool_token(source['outside_soloing_residual_risk_preserved'])}`",
         f"- final landing chord-tone count after: `{source['final_landing_chord_tone_count_after']}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         "",
