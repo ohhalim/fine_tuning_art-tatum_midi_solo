@@ -82,6 +82,7 @@ raw model generation은 note grammar가 자주 깨졌다.
 - next boundary: `music_transformer_solo_yield_4bar_phrase_expansion_probe`
 - 4bar phrase expansion: total candidates `24`, strict `20 / 24`, grammar-valid `24 / 24`
 - 4bar min case strict rate: `0.6667`, rendered WAV files `8`, musical quality claim `false`
+- 4bar listening package: MIDI `8`, WAV `8`, review input template ready
 
 ## 결과 파일
 
@@ -118,6 +119,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_LARGER_SAMPLE_LISTENING_INPUT_GUARD_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_LARGER_SAMPLE_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_4BAR_PHRASE_EXPANSION_PROBE_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_4BAR_LISTENING_PACKAGE_2026-06-11.md`
 
 ## 실행 방법
 
@@ -192,4 +194,5 @@ Report:
 - larger sample objective-only next decision
 - 4bar phrase expansion probe
 - 4bar candidate listening review package
+- 4bar listening input guard
 - 더 긴 4마디 phrase로 확장 검토
