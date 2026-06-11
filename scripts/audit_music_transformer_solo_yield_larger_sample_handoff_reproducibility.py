@@ -84,11 +84,16 @@ def validate_source_handoff(
     *,
     expected_candidate_count: int,
     expected_selected_count: int,
+    expected_handoff_schema_version: str,
 ) -> dict[str, Any]:
-    if str(handoff_report.get("schema_version") or "") != HANDOFF_SCHEMA_VERSION:
+    if str(handoff_report.get("schema_version") or "") != expected_handoff_schema_version:
         raise SoloYieldLargerSampleHandoffReproducibilityAuditError("handoff schema required")
     try:
-        summary = validate_handoff_report(handoff_report, require_no_quality_claim=True)
+        summary = validate_handoff_report(
+            handoff_report,
+            require_no_quality_claim=True,
+            expected_schema_version=expected_handoff_schema_version,
+        )
     except ValueError as exc:
         raise SoloYieldLargerSampleHandoffReproducibilityAuditError(str(exc)) from exc
     if _int(summary.get("candidate_count")) != int(expected_candidate_count):
@@ -176,12 +181,21 @@ def build_reproducibility_audit(
     output_dir: Path,
     expected_candidate_count: int,
     expected_selected_count: int,
+    expected_handoff_schema_version: str = HANDOFF_SCHEMA_VERSION,
+    schema_version: str = SCHEMA_VERSION,
+    boundary: str = BOUNDARY,
+    next_boundary: str = NEXT_BOUNDARY,
+    output_basename: str = "larger_sample_handoff_reproducibility_audit",
+    title: str = "Music Transformer Solo Yield Larger Sample Handoff Reproducibility Audit",
+    selected_next_target: str = "broader_repaired_sampling_repeatability_audit",
+    decision_reason: str = "larger-sample handoff is reproducible; next objective-only check is broader repaired sampling repeatability",
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     source_summary = validate_source_handoff(
         handoff_report,
         expected_candidate_count=int(expected_candidate_count),
         expected_selected_count=int(expected_selected_count),
+        expected_handoff_schema_version=expected_handoff_schema_version,
     )
     _require_no_quality_claim(handoff_report)
     candidate_rows = [_dict(row) for row in _list(handoff_report.get("candidate_handoff"))]
@@ -194,10 +208,11 @@ def build_reproducibility_audit(
             f"handoff reproducibility audit failed: {aggregate}"
         )
     report = {
-        "schema_version": SCHEMA_VERSION,
+        "schema_version": schema_version,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "output_dir": str(output_dir),
-        "boundary": BOUNDARY,
+        "boundary": boundary,
+        "title": title,
         "source_handoff": {
             "schema_version": handoff_report.get("schema_version"),
             "output_dir": handoff_report.get("output_dir"),
@@ -226,11 +241,11 @@ def build_reproducibility_audit(
             "production_ready_claimed": False,
         },
         "decision": {
-            "current_boundary": BOUNDARY,
-            "selected_next_target": "broader_repaired_sampling_repeatability_audit",
-            "next_boundary": NEXT_BOUNDARY,
+            "current_boundary": boundary,
+            "selected_next_target": selected_next_target,
+            "next_boundary": next_boundary,
             "critical_user_input_required": False,
-            "reason": "larger-sample handoff is reproducible; next objective-only check is broader repaired sampling repeatability",
+            "reason": decision_reason,
         },
         "not_proven": [
             "human_audio_preference",
@@ -239,17 +254,26 @@ def build_reproducibility_audit(
             "production_ready_improviser",
         ],
     }
-    write_json(output_dir / "larger_sample_handoff_reproducibility_audit.json", report)
+    write_json(output_dir / f"{output_basename}.json", report)
     write_json(
-        output_dir / "larger_sample_handoff_reproducibility_audit_summary.json",
-        validate_report(report, require_no_quality_claim=True),
+        output_dir / f"{output_basename}_summary.json",
+        validate_report(
+            report,
+            require_no_quality_claim=True,
+            expected_schema_version=schema_version,
+        ),
     )
-    write_text(output_dir / "larger_sample_handoff_reproducibility_audit.md", markdown_report(report))
+    write_text(output_dir / f"{output_basename}.md", markdown_report(report))
     return report
 
 
-def validate_report(report: dict[str, Any], *, require_no_quality_claim: bool) -> dict[str, Any]:
-    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+def validate_report(
+    report: dict[str, Any],
+    *,
+    require_no_quality_claim: bool,
+    expected_schema_version: str = SCHEMA_VERSION,
+) -> dict[str, Any]:
+    if str(report.get("schema_version") or "") != expected_schema_version:
         raise SoloYieldLargerSampleHandoffReproducibilityAuditError("schema version mismatch")
     if require_no_quality_claim:
         _require_no_quality_claim(report)
@@ -281,7 +305,7 @@ def markdown_report(report: dict[str, Any]) -> str:
     readiness = report["readiness"]
     decision = report["decision"]
     lines = [
-        "# Music Transformer Solo Yield Larger Sample Handoff Reproducibility Audit",
+        f"# {report.get('title') or 'Music Transformer Solo Yield Handoff Reproducibility Audit'}",
         "",
         "## Summary",
         "",
@@ -335,6 +359,33 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--expected_candidate_count", type=int, default=8)
     parser.add_argument("--expected_selected_count", type=int, default=4)
     parser.add_argument("--doc_path", type=str, default="")
+    parser.add_argument("--expected_handoff_schema_version", type=str, default=HANDOFF_SCHEMA_VERSION)
+    parser.add_argument("--schema_version", type=str, default=SCHEMA_VERSION)
+    parser.add_argument("--boundary", type=str, default=BOUNDARY)
+    parser.add_argument("--next_boundary", type=str, default=NEXT_BOUNDARY)
+    parser.add_argument(
+        "--output_basename",
+        type=str,
+        default="larger_sample_handoff_reproducibility_audit",
+    )
+    parser.add_argument(
+        "--title",
+        type=str,
+        default="Music Transformer Solo Yield Larger Sample Handoff Reproducibility Audit",
+    )
+    parser.add_argument(
+        "--selected_next_target",
+        type=str,
+        default="broader_repaired_sampling_repeatability_audit",
+    )
+    parser.add_argument(
+        "--decision_reason",
+        type=str,
+        default=(
+            "larger-sample handoff is reproducible; next objective-only check is "
+            "broader repaired sampling repeatability"
+        ),
+    )
     parser.add_argument("--require_no_quality_claim", action="store_true")
     return parser
 
@@ -348,8 +399,20 @@ def main() -> int:
         output_dir=output_dir,
         expected_candidate_count=int(args.expected_candidate_count),
         expected_selected_count=int(args.expected_selected_count),
+        expected_handoff_schema_version=str(args.expected_handoff_schema_version),
+        schema_version=str(args.schema_version),
+        boundary=str(args.boundary),
+        next_boundary=str(args.next_boundary),
+        output_basename=str(args.output_basename),
+        title=str(args.title),
+        selected_next_target=str(args.selected_next_target),
+        decision_reason=str(args.decision_reason),
     )
-    summary = validate_report(report, require_no_quality_claim=bool(args.require_no_quality_claim))
+    summary = validate_report(
+        report,
+        require_no_quality_claim=bool(args.require_no_quality_claim),
+        expected_schema_version=str(args.schema_version),
+    )
     if args.doc_path:
         write_text(Path(args.doc_path), markdown_report(report))
     print(json.dumps(summary, ensure_ascii=True, indent=2))

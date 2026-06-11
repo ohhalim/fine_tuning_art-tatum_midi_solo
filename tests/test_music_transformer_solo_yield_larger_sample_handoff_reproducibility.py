@@ -127,6 +127,42 @@ class MusicTransformerSoloYieldLargerSampleHandoffReproducibilityTest(unittest.T
                     expected_selected_count=1,
                 )
 
+    def test_supports_custom_schema_boundary_and_output_basename(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            custom_handoff_schema = "custom_handoff_v1"
+            custom_schema = "custom_handoff_audit_v1"
+            custom_boundary = "custom_handoff_audit"
+            custom_next = "custom_next_boundary"
+            source = handoff_report(root)
+            source["schema_version"] = custom_handoff_schema
+            report = build_reproducibility_audit(
+                source,
+                output_dir=root / "out",
+                expected_candidate_count=1,
+                expected_selected_count=1,
+                expected_handoff_schema_version=custom_handoff_schema,
+                schema_version=custom_schema,
+                boundary=custom_boundary,
+                next_boundary=custom_next,
+                output_basename="custom_handoff_audit",
+                title="Custom Handoff Audit",
+                selected_next_target="custom_target",
+            )
+            summary = validate_report(
+                report,
+                require_no_quality_claim=True,
+                expected_schema_version=custom_schema,
+            )
+
+            self.assertEqual(summary["schema_version"], custom_schema)
+            self.assertEqual(summary["boundary"], custom_boundary)
+            self.assertEqual(summary["selected_next_target"], "custom_target")
+            self.assertEqual(summary["next_boundary"], custom_next)
+            self.assertTrue((root / "out" / "custom_handoff_audit.json").exists())
+            self.assertTrue((root / "out" / "custom_handoff_audit_summary.json").exists())
+            self.assertTrue((root / "out" / "custom_handoff_audit.md").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
