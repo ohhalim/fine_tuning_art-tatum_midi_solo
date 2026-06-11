@@ -17,13 +17,13 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
-from scripts.audit_stage_b_midi_to_solo_final_status import (  # noqa: E402
-    BRIDGE_SOURCE_CONTEXT_KEYS,
-)
 from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import (  # noqa: E402
     BOUNDARY as DELIVERY_BOUNDARY,
 )
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (  # noqa: E402
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as RUBRIC_BOUNDARY,
     NEXT_BOUNDARY as RUBRIC_NEXT_BOUNDARY,
     SELECTED_TARGET as RUBRIC_SELECTED_TARGET,
@@ -91,12 +91,19 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
 
 
 def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
-    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in container or container[key] is None:
             raise StageBMidiToSoloCandidateFailureLabelingError(
                 f"{label} source-context field required: {key}"
             )
-    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
+    missing_preserved = [
+        key for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS if not bool(container.get(key))
+    ]
+    if missing_preserved:
+        raise StageBMidiToSoloCandidateFailureLabelingError(
+            f"{label} source-context preserved field must be true: {missing_preserved}"
+        )
+    return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
 
 
 def validate_rubric_baseline(report: dict[str, Any]) -> dict[str, Any]:
@@ -560,7 +567,7 @@ def build_candidate_failure_labeling_report(
         "outside_soloing_not_evaluable_count": _int(
             not_evaluable_counts.get("outside_soloing_without_context", 0)
         ),
-        **{key: rubric_summary[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS},
+        **{key: rubric_summary[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
         "outside_soloing_label_scope": "not_evaluable chord-context gap after objective pitch-role repair",
     }
     failed_candidate_count = sum(1 for item in labeled if _list(item.get("failure_labels")))
@@ -603,6 +610,15 @@ def build_candidate_failure_labeling_report(
             "audio_review_package_ready": failed_candidate_count == 0,
             "outside_soloing_repair_source_context_preserved": bool(
                 outside_context["outside_soloing_repair_source_context_preserved"]
+            ),
+            "followup_objective_source_outside_soloing_source_context_preserved": bool(
+                outside_context["followup_objective_source_outside_soloing_source_context_preserved"]
+            ),
+            "followup_repair_sweep_source_outside_soloing_source_context_preserved": bool(
+                outside_context["followup_repair_sweep_source_outside_soloing_source_context_preserved"]
+            ),
+            "repair_sweep_source_outside_soloing_source_context_preserved": bool(
+                outside_context["repair_sweep_source_outside_soloing_source_context_preserved"]
             ),
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -722,7 +738,7 @@ def validate_candidate_failure_labeling_report(
         ),
         **{
             key: aggregate.get(key)
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
         },
         "targeted_quality_repair_sweep_ready": bool(
             readiness.get("targeted_quality_repair_sweep_ready", False)
@@ -756,6 +772,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- failed candidate count: `{aggregate['failed_candidate_count']}`",
         f"- outside-soloing repair evidence ready: `{_bool_token(aggregate['outside_soloing_repair_evidence_ready'])}`",
         f"- outside-soloing repair source context preserved: `{_bool_token(aggregate['outside_soloing_repair_source_context_preserved'])}`",
+        f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(aggregate['followup_objective_source_outside_soloing_source_context_preserved'])}`",
+        f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(aggregate['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
+        f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(aggregate['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- outside-soloing repair WAV count: `{aggregate['outside_soloing_repair_wav_count']}`",
         f"- outside-soloing source objective pitch-role risk: `{aggregate['outside_soloing_repair_source_objective_pitch_role_risk_count']}`",
         f"- outside-soloing source pitch-role risk before / after / delta: `{aggregate['outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{aggregate['outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{aggregate['outside_soloing_repair_source_pitch_role_risk_delta']}`",

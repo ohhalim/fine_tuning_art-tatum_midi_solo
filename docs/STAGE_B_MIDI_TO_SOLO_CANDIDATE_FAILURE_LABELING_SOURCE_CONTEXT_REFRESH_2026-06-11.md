@@ -10,6 +10,9 @@
 - failed candidate count: `6`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - outside-soloing repair WAV count: `6`
 - outside-soloing source objective pitch-role risk: `5`
 - outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`
