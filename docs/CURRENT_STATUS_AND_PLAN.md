@@ -34,7 +34,7 @@
 - latest songlike melody contour repair listening review input guard: Issue #1106, Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh
 - latest songlike melody contour repair objective-only next decision: Issue #1108, Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh
 - latest songlike melody contour repair follow-up decision: Issue #1110, Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh
-- latest songlike melody contour phrase/rhythm repair sweep: Issue #1028, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh
+- latest songlike melody contour phrase/rhythm repair sweep: Issue #1112, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm repair audio package: Issue #1030, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm repair listening review package: Issue #1032, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm repair listening review input guard: Issue #1034, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour repair follow-up decision source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm repair sweep source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -4129,12 +4129,12 @@ Issue #1026은 Issue #1024 objective-only next decision과 songlike melody conto
 
 ## Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Repair Sweep Source Context Refresh Result
 
-Issue #1028은 Issue #1026 follow-up decision에서 선택된 phrase/rhythm repair sweep에 source/current outside-soloing context를 보존한 작업이다.
+Issue #1112는 Issue #1110 follow-up decision에서 선택된 phrase/rhythm repair sweep에 source/current outside-soloing context를 보존한 작업이다.
 
 변경:
 
 - phrase/rhythm repair sweep input validation에 source-context preserved flag 필수화
-- follow-up decision과 source repair sweep의 bridge source-context 21개 키 일치 검증 추가
+- follow-up decision과 source repair sweep의 required source-context key 일치 검증 추가
 - objective/source context를 aggregate/readiness/validation summary까지 전파
 - stale quality rubric baseline run_id를 source-context refresh 기준으로 교체
 
@@ -4155,6 +4155,9 @@ Issue #1028은 Issue #1026 follow-up decision에서 선택된 phrase/rhythm repa
 - technical regression count: `0`
 - objective source outside-soloing source context preserved: `true`
 - source outside-soloing source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - source outside-soloing source pitch-role risk count: `5 -> 2`
 - source outside-soloing current repair pitch-role risk after / delta: `0 / 2`
 - repaired outside-soloing not evaluable count: `6`
@@ -4164,7 +4167,7 @@ Issue #1028은 Issue #1026 follow-up decision에서 선택된 phrase/rhythm repa
 판단:
 
 - phrase/rhythm repair sweep에서 target label 감소 확인.
-- source-context preserved flag와 21개 context field 보존 확인.
+- source-context preserved flag `3/3` 보존 확인.
 - outside-soloing과 weak chord-tone landing은 context 부재로 quality claim 제외 유지.
 - 다음 boundary는 audio package source-context refresh.
 
