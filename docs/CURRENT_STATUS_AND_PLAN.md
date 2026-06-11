@@ -21,7 +21,7 @@
 - latest final status audit: Issue #1080, Stage B MIDI-to-solo final status audit source-context refresh
 - latest post-MVP quality iteration plan: Issue #1082, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
 - latest quality rubric baseline: Issue #1084, Stage B MIDI-to-solo quality rubric baseline source-context refresh
-- latest candidate failure labeling: Issue #1002, Stage B MIDI-to-solo candidate failure labeling source-context refresh
+- latest candidate failure labeling: Issue #1086, Stage B MIDI-to-solo candidate failure labeling source-context refresh
 - latest targeted quality repair sweep: Issue #1004, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
 - latest targeted quality repair audio package: Issue #1006, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
 - latest targeted quality repair listening review package: Issue #1008, Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after quality rubric baseline source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo candidate failure labeling source-context refresh`
+- open issue queue after candidate failure labeling source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair sweep source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -1016,6 +1016,9 @@
 - latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_delivery_package`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair source context preserved: `true`
+- candidate failure follow-up objective source outside-soloing source context preserved: `true`
+- candidate failure follow-up repair sweep source outside-soloing source context preserved: `true`
+- candidate failure bridge repair sweep source outside-soloing source context preserved: `true`
 - outside-soloing repair WAV count: `6`
 - outside-soloing source pitch-role risk count: `5 -> 2`
 - outside-soloing source repair targeted: `false`
@@ -5524,6 +5527,63 @@ Issue #1084는 Issue #1082 post-MVP quality iteration plan 결과를 기준으�
 다음:
 
 - `Stage B MIDI-to-solo candidate failure labeling source-context refresh`
+
+## Stage B MIDI-to-Solo Candidate Failure Labeling Source-Context Refresh Result
+
+Issue #1086은 Issue #1084 quality rubric baseline 결과를 기준으로 candidate failure labeling aggregate와 validation summary에 source-context preserved flag 3개를 보존한 작업이다.
+
+변경:
+
+- candidate failure labeling source validation을 required source-context key 기준으로 갱신
+- source-context preserved flag 3개 false 입력 차단
+- aggregate, readiness, generated markdown report, validation summary preserved flag 전파
+- harness issue number #1086 반영
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_CANDIDATE_FAILURE_LABELING_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- source boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- selected target: `targeted_quality_repair_sweep`
+- candidate failure labeling completed: `true`
+- candidate count: `6`
+- failed candidate count: `6`
+- failure label type count: `4`
+- not evaluable label type count: `2`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- outside-soloing source pitch-role risk: `5 -> 2`
+- outside-soloing current repair pitch-role risk after / delta: `0 / 2`
+- outside-soloing not evaluable count: `6`
+- targeted quality repair sweep ready: `true`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- candidate failure labeling source validation에 quality rubric baseline preserved flag 3개 포함.
+- preserved flag false 입력은 validation error로 차단.
+- 현재 후보 6개 모두 failure label 보유.
+- 다음 검증 대상은 targeted quality repair sweep 유지.
+- musical quality와 human/audio preference claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_candidate_failure_labeling`
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- `.venv/bin/python -m py_compile scripts/label_stage_b_midi_to_solo_candidate_failures.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-candidate-failure-labeling`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음:
+
+- `Stage B MIDI-to-solo targeted quality repair sweep source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

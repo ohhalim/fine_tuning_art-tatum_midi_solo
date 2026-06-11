@@ -15,7 +15,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest final status audit: `Issue #1080`
 - latest post-MVP quality iteration plan: `Issue #1082`
 - latest quality rubric baseline: `Issue #1084`
-- latest candidate failure labeling: `Issue #1002`
+- latest candidate failure labeling: `Issue #1086`
 - latest targeted quality repair sweep: `Issue #1004`
 - latest targeted quality repair audio package: `Issue #1006`
 - latest targeted quality repair listening review package: `Issue #1008`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1066`
 - latest README evidence refresh: `Issue #1068`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after quality rubric baseline source-context refresh merge: `0`
+- open issue queue after candidate failure labeling source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -277,6 +277,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - candidate failure failed candidates: `6 / 6`
 - candidate failure label type count: `4`
 - candidate outside-soloing not evaluable count: `6`
+- candidate failure follow-up objective source outside-soloing source context preserved: `true`
+- candidate failure follow-up repair sweep source outside-soloing source context preserved: `true`
+- candidate failure bridge repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair sweep completed: `true`
 - targeted quality repair failure label count: `12 -> 8`
 - targeted quality repair improved candidates: `4 / 6`
@@ -357,7 +360,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - final status bridge repair sweep source outside-soloing source context preserved: `true`
 - MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
