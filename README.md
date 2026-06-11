@@ -13,7 +13,7 @@ MIDI 데이터를 token sequence로 변환하고, Music Transformer 계열 symbo
 - broader repaired sampling audit: strict `40 / 40`, grammar-valid `40 / 40`
 - broader repaired review package: MIDI `8`, WAV `8`
 - broader repaired handoff audit: reproducible `true`, missing MIDI/WAV `0 / 0`, checksum mismatch `0 / 0`
-- final status audit: technical evidence ready `true`
+- final status audit: technical evidence ready `true`, strict/grammar `40 / 40`
 - 음악적 품질 claim: `false`
 - 사람 기준 청취 선호 입력: `false`
 
@@ -107,7 +107,8 @@ raw model generation은 note grammar가 자주 깨졌다.
 - next boundary: `music_transformer_solo_yield_objective_only_next_decision`
 - 4bar repaired objective-only decision: candidate `8`, selected objective candidates `4`, dead-air range `0.5152 - 0.7241`
 - next boundary: `music_transformer_solo_yield_final_status_audit`
-- final status audit: technical evidence ready `true`, strict `22 / 24`, grammar-valid `24 / 24`, rendered WAV `8`
+- final status audit: technical evidence ready `true`, strict `40 / 40`, grammar-valid `40 / 40`, rendered WAV `8`
+- final status audit handoff: final MIDI/WAV `8 / 8`, reproducible handoff `true`, missing MIDI/WAV `0 / 0`, checksum mismatch MIDI/WAV `0 / 0`
 - final status audit claim boundary: musical quality claim `false`, raw artifact upload required `false`
 - next boundary: `music_transformer_solo_yield_readme_final_evidence_refresh`
 - 4bar repaired top8 objective failure review: final landing not chord-tone `8 / 8`, package low chord-tone ratio `8 / 8`, MIDI low chord-tone ratio `6 / 8`, dead-air still high `3 / 8`
@@ -229,6 +230,7 @@ raw model generation은 note grammar가 자주 깨졌다.
 - listening package: `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1346_broader_repaired_listening_package/listening_review_package.md`
 - final handoff: `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_final_handoff/issue_1352_broader_repaired_final_handoff/broader_repaired_final_review_handoff.md`
 - reproducibility audit: `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_handoff_audit/issue_1354_broader_repaired_handoff_audit/broader_repaired_handoff_reproducibility_audit.md`
+- final status audit: `docs/STAGE_B_MIDI_TO_SOLO_FINAL_STATUS_AUDIT_EVIDENCE_REFRESH_2026-06-11.md`
 - sampling report: `outputs/music_transformer_finetune_mvp/solo_yield_sweep/issue_1344_broader_repaired_sampling_repeatability/solo_yield_sweep_report.md`
 
 결과 히스토리:
@@ -305,6 +307,7 @@ WAV 후보:
 
 Report:
 
+- `docs/STAGE_B_MIDI_TO_SOLO_FINAL_STATUS_AUDIT_EVIDENCE_REFRESH_2026-06-11.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_handoff_audit/issue_1354_broader_repaired_handoff_audit/broader_repaired_handoff_reproducibility_audit.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_final_handoff/issue_1352_broader_repaired_final_handoff/broader_repaired_final_review_handoff.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_sweep/issue_1344_broader_repaired_sampling_repeatability/solo_yield_sweep_report.md`
