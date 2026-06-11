@@ -12,7 +12,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest listening review quality gap: `Issue #1158`
 - latest MVP delivery package: `Issue #1160`
 - latest README final evidence refresh: `Issue #1162`
-- latest final status audit: `Issue #1080`
+- latest final status audit: `Issue #1164`
 - latest post-MVP quality iteration plan: `Issue #1082`
 - latest quality rubric baseline: `Issue #1084`
 - latest candidate failure labeling: `Issue #1086`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after README final evidence source-context refresh merge: `0`
+- open issue queue after final status audit source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
@@ -420,8 +420,15 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - README final evidence follow-up repair sweep source outside-soloing source context preserved: `true`
 - README final evidence bridge repair sweep source outside-soloing source context preserved: `true`
 - final status audit completed: `true`
+- final status audit schema version: `stage_b_midi_to_solo_final_status_audit_v4`
+- final status source delivery package schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- final status source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- final status source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- final status source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - technical MVP complete: `true`
 - technical MVP ready for local review: `true`
+- final status outside-soloing schema context preserved: `true`
+- final status outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - final status follow-up objective source outside-soloing source context preserved: `true`
 - final status follow-up repair sweep source outside-soloing source context preserved: `true`
 - final status bridge repair sweep source outside-soloing source context preserved: `true`

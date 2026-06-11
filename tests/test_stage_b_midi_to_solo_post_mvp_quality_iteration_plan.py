@@ -6,7 +6,13 @@ from pathlib import Path
 from scripts.audit_stage_b_midi_to_solo_final_status import (
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BOUNDARY as FINAL_STATUS_BOUNDARY,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
+    DELIVERY_SCHEMA_VERSION,
+    LISTENING_GAP_SCHEMA_VERSION,
     NEXT_BOUNDARY as FINAL_STATUS_NEXT_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    QUALITY_GAP_DECISION_SCHEMA_VERSION,
+    SCHEMA_VERSION as FINAL_STATUS_SCHEMA_VERSION,
 )
 from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
     BOUNDARY,
@@ -58,12 +64,23 @@ def final_status_audit(
     outside_risk_after: int = 0,
 ) -> dict:
     return {
+        "schema_version": FINAL_STATUS_SCHEMA_VERSION,
         "boundary": FINAL_STATUS_BOUNDARY,
         "source_boundary": "stage_b_midi_to_solo_mvp_delivery_package",
+        "source_schema_versions": {
+            "delivery_package": DELIVERY_SCHEMA_VERSION,
+            "listening_review_quality_gap": LISTENING_GAP_SCHEMA_VERSION,
+            "quality_gap_decision": QUALITY_GAP_DECISION_SCHEMA_VERSION,
+            "current_evidence": CURRENT_EVIDENCE_SCHEMA_VERSION,
+        },
         "final_status": {
             "technical_mvp_complete": True,
             "technical_mvp_ready_for_local_review": True,
             "readme_final_evidence_reflected": True,
+            "delivery_package_schema_version": DELIVERY_SCHEMA_VERSION,
+            "delivery_source_listening_gap_schema_version": LISTENING_GAP_SCHEMA_VERSION,
+            "delivery_source_quality_gap_schema_version": QUALITY_GAP_DECISION_SCHEMA_VERSION,
+            "delivery_source_current_evidence_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
             "input_to_ranked_midi_ready": True,
             "input_to_rendered_wav_evidence_ready": True,
             "changed_ratio_repair_audio_evidence_ready": True,
@@ -71,6 +88,10 @@ def final_status_audit(
             "changed_ratio_repair_wav_count": wav_count,
             "outside_soloing_repair_evidence_ready": outside_ready,
             "outside_soloing_repair_source_context_preserved": outside_ready,
+            "outside_soloing_repair_schema_context_preserved": outside_ready,
+            "outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "outside_soloing_repair_wav_count": outside_wav_count,
             "outside_soloing_repair_changed_note_total": 2,
             "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
@@ -93,6 +114,7 @@ def final_status_audit(
             "technical_mvp_ready_for_local_review": True,
             "readme_final_evidence_reflected": True,
             "outside_soloing_repair_source_context_preserved": outside_ready,
+            "outside_soloing_repair_schema_context_preserved": outside_ready,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
