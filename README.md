@@ -112,6 +112,8 @@ raw model generation은 note grammar가 자주 깨졌다.
 - next boundary: `music_transformer_solo_yield_chord_tone_landing_repair_sweep`
 - chord-tone landing repair: repaired MIDI `8`, changed note `8`, max pitch shift `2`, final landing not chord-tone `8 / 8 -> 0 / 8`
 - next boundary: `music_transformer_solo_yield_chord_tone_landing_repair_audio_package`
+- chord-tone landing repair audio package: rendered WAV `8`, technical WAV validation `true`, duration range `10.725s - 10.739s`
+- next boundary: `music_transformer_solo_yield_chord_tone_landing_repair_listening_package`
 
 ## 결과 파일
 
@@ -158,6 +160,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_FINAL_HANDOFF_SUMMARY_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_REPAIRED_TOP8_OBJECTIVE_FAILURE_REVIEW_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_CHORD_TONE_LANDING_REPAIR_SWEEP_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_CHORD_TONE_LANDING_REPAIR_AUDIO_PACKAGE_2026-06-11.md`
 
 ## 실행 방법
 
@@ -218,10 +221,8 @@ Report:
 
 ## 다음 작업
 
-- chord-tone landing repair MIDI audio package
-- repaired MIDI WAV render
-- repair 후 strict / grammar / final landing / dead-air 지표 비교
-- repaired candidate listening package 갱신
+- chord-tone landing repair listening package 생성
+- repaired MIDI/WAV review input template 갱신
 - WAV/MIDI 청취 리뷰
 - 청취 결과 기준 keep/reject 후보 기록
 - 음악적 품질 claim 여부는 청취 리뷰 이후 재판단
