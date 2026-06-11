@@ -3,13 +3,16 @@
 ## Summary
 
 - boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- schema version: `stage_b_midi_to_solo_mvp_completion_audit_v4`
 - next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - technical model-core MVP completed: `true`
 - phrase-bank CLI technical path completed: `true`
 - model-conditioned pitch-contour objective completed: `true`
 - model-conditioned pitch-contour changed-ratio repair objective completed: `true`
 - outside-soloing repair objective completed: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
 - musical quality MVP completed: `false`
 - human/audio preference completed: `false`
 - product MVP completed: `false`
@@ -17,6 +20,7 @@
 ## Evidence
 
 - source boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- source schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - generation source: `context_conditioned_fallback`
 - exported / qualified candidates: `3` / `3`
 - rendered WAV files: `3`
@@ -48,6 +52,8 @@
 - model-conditioned pitch-contour changed-ratio repair preference fill allowed: `false`
 - outside-soloing repair objective path ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - outside-soloing repair current evidence ready: `true`
 - outside-soloing repair rendered WAV files: `6`
 - outside-soloing repair changed note total: `2`

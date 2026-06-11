@@ -15,6 +15,7 @@ from scripts.consolidate_stage_b_midi_to_solo_mvp_current_evidence import (
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BOUNDARY as CURRENT_EVIDENCE_BOUNDARY,
     OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    SCHEMA_VERSION as CURRENT_EVIDENCE_SCHEMA_VERSION,
     SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS,
 )
 
@@ -109,6 +110,7 @@ def current_evidence(
         and outside_soloing_repair_supported
     )
     return {
+        "schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
         "boundary": CURRENT_EVIDENCE_BOUNDARY,
         "readiness": {
             "mvp_current_evidence_consolidated": True,
@@ -250,6 +252,7 @@ def readme_text(*, missing_boundary: bool = False) -> str:
         [
             "- latest evidence boundary: `stage_b_midi_to_solo_mvp_completion_audit`",
             f"- current evidence boundary: `{boundary}`",
+            f"- current evidence schema version: `{CURRENT_EVIDENCE_SCHEMA_VERSION}`",
             "- current MVP evidence support: `true`",
             "- input MIDI -> context -> ranked MIDI -> WAV technical path: `true`",
             "- selected-scale objective repair path complete: `true`",
@@ -285,7 +288,7 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
             current_evidence=current_evidence(),
             readme_text=readme_text(),
             output_dir=Path("outputs/audit"),
-            issue_number=1070,
+            issue_number=1154,
         )
         summary = validate_mvp_completion_audit_report(
             report,
@@ -306,6 +309,15 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
         self.assertFalse(summary["musical_quality_mvp_completed"])
         self.assertFalse(summary["human_audio_preference_completed"])
         self.assertFalse(summary["product_mvp_completed"])
+        self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(
+            summary["source_schema_version"],
+            CURRENT_EVIDENCE_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            summary["current_evidence_schema_version"],
+            CURRENT_EVIDENCE_SCHEMA_VERSION,
+        )
         self.assertEqual(summary["generation_source"], "context_conditioned_fallback")
         self.assertEqual(summary["exported_candidate_count"], 3)
         self.assertEqual(summary["rendered_audio_file_count"], 3)
@@ -405,7 +417,23 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
             self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
         self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-        self.assertEqual(report["issue_number"], 1070)
+        self.assertEqual(report["source_schema_version"], CURRENT_EVIDENCE_SCHEMA_VERSION)
+        self.assertEqual(
+            report["completion_audit"]["current_evidence_schema_version"],
+            CURRENT_EVIDENCE_SCHEMA_VERSION,
+        )
+        self.assertEqual(report["issue_number"], 1154)
+
+    def test_rejects_current_evidence_schema_mismatch(self) -> None:
+        evidence = current_evidence()
+        evidence["schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloMvpCompletionAuditError):
+            build_mvp_completion_audit_report(
+                current_evidence=evidence,
+                readme_text=readme_text(),
+                output_dir=Path("outputs/audit"),
+                issue_number=1154,
+            )
 
     def test_rejects_missing_outside_soloing_source_context_field(self) -> None:
         evidence = current_evidence()
@@ -463,6 +491,26 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
                 issue_number=616,
             )
 
+    def test_rejects_completion_audit_schema_mismatch(self) -> None:
+        report = build_mvp_completion_audit_report(
+            current_evidence=current_evidence(),
+            readme_text=readme_text(),
+            output_dir=Path("outputs/audit"),
+            issue_number=1154,
+        )
+        report["schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloMvpCompletionAuditError):
+            validate_mvp_completion_audit_report(
+                report,
+                expected_boundary=BOUNDARY,
+                expected_next_boundary=NEXT_BOUNDARY,
+                require_technical_mvp_completion=True,
+                require_no_quality_claim=True,
+                require_model_conditioned_pitch_contour_objective=True,
+                require_model_conditioned_pitch_contour_changed_ratio_repair_objective=True,
+                require_outside_soloing_repair_objective=True,
+            )
+
     def test_rejects_quality_claim(self) -> None:
         with self.assertRaises(StageBMidiToSoloMvpCompletionAuditError):
             build_mvp_completion_audit_report(
@@ -511,7 +559,7 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
     def test_boundary_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_mvp_completion_audit")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_quality_gap_decision")
-        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_mvp_completion_audit_v3")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_mvp_completion_audit_v4")
 
 
 if __name__ == "__main__":

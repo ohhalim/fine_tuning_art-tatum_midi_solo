@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest functional result: `Issue #1076`
-- latest MVP completion audit: `Issue #1070`
+- latest functional result: `Issue #1150`
+- latest MVP completion audit: `Issue #1154`
 - latest quality gap decision: `Issue #1072`
 - latest listening review quality gap: `Issue #1074`
 - latest MVP delivery package: `Issue #1076`
@@ -50,9 +50,10 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after README evidence refresh source-context refresh merge: `0`
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- open issue queue after MVP completion audit source-context refresh merge: `0`
+- latest evidence boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
 - selected quality gap target: `mvp_delivery_package`
@@ -228,6 +229,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - MVP completion audit outside-soloing repair objective included: `true`
 - MVP completion audit outside-soloing source context included: `true`
 - MVP completion audit outside-soloing source context preserved: `true`
+- MVP completion audit outside-soloing schema context preserved: `true`
 - quality gap decision completed: `true`
 - quality gap decision listening review target selected: `true`
 - quality gap decision outside-soloing repair objective included: `true`
@@ -510,10 +512,13 @@ MVP completion audit.
 - technical model-core MVP completed: `true`
 - input to ranked MIDI completed: `true`
 - input to rendered WAV completed: `true`
+- current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - outside-soloing source pitch-role risk count: `5 -> 2`
 - outside-soloing source repair targeted: `false`
 - outside-soloing source residual risk preserved: `true`
 - outside-soloing current repair pitch-role risk count after: `0`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - selected-scale objective repair completed: `true`
 - phrase-bank CLI technical path included: `true`
 - phrase-bank CLI technical path completed: `true`
@@ -1249,6 +1254,7 @@ MVP completion audit.
 
 - latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_completion_audit`
 - source current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - technical model-core MVP completed: `true`
 - input to ranked MIDI completed: `true`
 - input to rendered WAV completed: `true`
@@ -1258,6 +1264,8 @@ MVP completion audit.
 - model-conditioned pitch-contour changed-ratio repair objective completed: `true`
 - outside-soloing repair objective completed: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`

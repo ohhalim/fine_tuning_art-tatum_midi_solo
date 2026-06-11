@@ -19,6 +19,7 @@ from scripts.consolidate_stage_b_midi_to_solo_mvp_current_evidence import (  # n
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as CURRENT_EVIDENCE_BOUNDARY,
     OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    SCHEMA_VERSION as CURRENT_EVIDENCE_SCHEMA_VERSION,
     SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS,
 )
 
@@ -29,7 +30,7 @@ class StageBMidiToSoloMvpCompletionAuditError(ValueError):
 
 BOUNDARY = "stage_b_midi_to_solo_mvp_completion_audit"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_quality_gap_decision"
-SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_completion_audit_v3"
+SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_completion_audit_v4"
 
 
 def _dict(value: Any) -> dict[str, Any]:
@@ -75,6 +76,10 @@ def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str
 
 
 def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
+    if str(report.get("schema_version") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "current evidence schema version mismatch"
+        )
     if str(report.get("boundary") or "") != CURRENT_EVIDENCE_BOUNDARY:
         raise StageBMidiToSoloMvpCompletionAuditError("current evidence boundary required")
     readiness = _dict(report.get("readiness"))
@@ -344,6 +349,7 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloMvpCompletionAuditError("critical user input should not be required")
     return {
         "current_evidence_boundary": CURRENT_EVIDENCE_BOUNDARY,
+        "current_evidence_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
         "current_evidence_supported": True,
         "technical_execution_evidence_supported": True,
         "selected_scale_objective_path_complete": True,
@@ -552,6 +558,9 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
 def validate_readme_refresh(readme_text: str) -> dict[str, Any]:
     required_snippets = {
         "current_evidence_boundary": f"current evidence boundary: `{CURRENT_EVIDENCE_BOUNDARY}`",
+        "current_evidence_schema_version": (
+            f"current evidence schema version: `{CURRENT_EVIDENCE_SCHEMA_VERSION}`"
+        ),
         "current_evidence_support": "current MVP evidence support: `true`",
         "technical_path": "input MIDI -> context -> ranked MIDI -> WAV technical path: `true`",
         "objective_path": "selected-scale objective repair path complete: `true`",
@@ -637,10 +646,14 @@ def build_mvp_completion_audit_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": CURRENT_EVIDENCE_BOUNDARY,
+        "source_schema_version": evidence["current_evidence_schema_version"],
         "current_evidence": evidence,
         "readme_refresh": readme,
         "completion_audit": {
             "technical_model_core_mvp_completed": technical_model_core_mvp_completed,
+            "current_evidence_schema_version": evidence[
+                "current_evidence_schema_version"
+            ],
             "input_to_ranked_midi_completed": True,
             "input_to_rendered_wav_completed": True,
             "selected_scale_objective_repair_completed": True,
@@ -648,6 +661,9 @@ def build_mvp_completion_audit_report(
             "model_conditioned_pitch_contour_objective_completed": True,
             "model_conditioned_pitch_contour_changed_ratio_repair_objective_completed": True,
             "outside_soloing_repair_objective_completed": True,
+            "outside_soloing_repair_objective_schema_version": evidence[
+                "outside_soloing_repair_objective_schema_version"
+            ],
             "outside_soloing_repair_source_context_preserved": bool(
                 evidence["outside_soloing_repair_source_context_preserved"]
             ),
@@ -737,6 +753,24 @@ def validate_mvp_completion_audit_report(
     decision = _dict(report.get("decision"))
     audit = _dict(report.get("completion_audit"))
     evidence = _dict(report.get("current_evidence"))
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpCompletionAuditError("completion audit schema version mismatch")
+    if str(report.get("source_schema_version") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpCompletionAuditError("source schema version mismatch")
+    if str(evidence.get("current_evidence_schema_version") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "current evidence summary schema version mismatch"
+        )
+    if str(audit.get("current_evidence_schema_version") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "audit current evidence schema version mismatch"
+        )
+    if str(
+        audit.get("outside_soloing_repair_objective_schema_version") or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "audit outside-soloing repair objective schema version mismatch"
+        )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloMvpCompletionAuditError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -782,7 +816,12 @@ def validate_mvp_completion_audit_report(
         if claimed:
             raise StageBMidiToSoloMvpCompletionAuditError(f"unexpected quality claim: {claimed}")
     return {
+        "schema_version": str(report.get("schema_version") or ""),
         "boundary": boundary,
+        "source_schema_version": str(report.get("source_schema_version") or ""),
+        "current_evidence_schema_version": str(
+            evidence.get("current_evidence_schema_version") or ""
+        ),
         "next_boundary": str(decision.get("next_boundary") or ""),
         "technical_model_core_mvp_completed": bool(
             audit.get("technical_model_core_mvp_completed", False)
@@ -982,13 +1021,16 @@ def markdown_report(report: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- boundary: `{report['boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
         f"- next boundary: `{decision['next_boundary']}`",
+        f"- current evidence schema version: `{report['source_schema_version']}`",
         f"- technical model-core MVP completed: `{_bool_token(audit['technical_model_core_mvp_completed'])}`",
         f"- phrase-bank CLI technical path completed: `{_bool_token(audit['phrase_bank_cli_technical_path_completed'])}`",
         f"- model-conditioned pitch-contour objective completed: `{_bool_token(audit['model_conditioned_pitch_contour_objective_completed'])}`",
         f"- model-conditioned pitch-contour changed-ratio repair objective completed: `{_bool_token(audit['model_conditioned_pitch_contour_changed_ratio_repair_objective_completed'])}`",
         f"- outside-soloing repair objective completed: `{_bool_token(audit['outside_soloing_repair_objective_completed'])}`",
         f"- outside-soloing repair source context preserved: `{_bool_token(audit['outside_soloing_repair_source_context_preserved'])}`",
+        f"- outside-soloing repair schema context preserved: `{_bool_token(audit['outside_soloing_repair_schema_context_preserved'])}`",
         f"- musical quality MVP completed: `{_bool_token(audit['musical_quality_mvp_completed'])}`",
         f"- human/audio preference completed: `{_bool_token(audit['human_audio_preference_completed'])}`",
         f"- product MVP completed: `{_bool_token(audit['product_mvp_completed'])}`",
@@ -996,6 +1038,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         "## Evidence",
         "",
         f"- source boundary: `{report['source_boundary']}`",
+        f"- source schema version: `{report['source_schema_version']}`",
         f"- generation source: `{evidence['generation_source']}`",
         f"- exported / qualified candidates: `{evidence['exported_candidate_count']}` / `{evidence['exported_qualified_candidate_count']}`",
         f"- rendered WAV files: `{evidence['rendered_audio_file_count']}`",
@@ -1027,6 +1070,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- model-conditioned pitch-contour changed-ratio repair preference fill allowed: `{_bool_token(evidence['model_conditioned_pitch_contour_changed_ratio_repair_preference_fill_allowed'])}`",
         f"- outside-soloing repair objective path ready: `{_bool_token(evidence['outside_soloing_repair_objective_path_ready'])}`",
         f"- outside-soloing repair source context preserved: `{_bool_token(evidence['outside_soloing_repair_source_context_preserved'])}`",
+        f"- outside-soloing repair schema context preserved: `{_bool_token(evidence['outside_soloing_repair_schema_context_preserved'])}`",
+        f"- outside-soloing repair objective schema version: `{evidence['outside_soloing_repair_objective_schema_version']}`",
         f"- outside-soloing repair current evidence ready: `{_bool_token(evidence['outside_soloing_repair_current_evidence_ready'])}`",
         f"- outside-soloing repair rendered WAV files: `{evidence['outside_soloing_repair_rendered_audio_file_count']}`",
         f"- outside-soloing repair changed note total: `{evidence['outside_soloing_repair_changed_note_total']}`",
@@ -1079,7 +1124,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=616)
+    parser.add_argument("--issue_number", type=int, default=1154)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_technical_mvp_completion", action="store_true")
