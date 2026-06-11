@@ -41,6 +41,7 @@
 - rhythm syncopation repair: syncopation avg `0.7951 -> 0.8160`, low count `1 -> 0`
 - residual-aware final review package: candidate `8`, MIDI/WAV `8 / 8`, proxy pass/fail `6 / 2`
 - residual-aware listening input guard: preference fill `false`, listening review completed `false`
+- residual-aware MVP handoff freeze: local artifacts verified `true`, checksum mismatch `0`
 
 ## 최신 산출물
 
@@ -50,6 +51,7 @@
 - WAV 후보: `outputs/music_transformer_finetune_mvp/solo_yield_rhythm_syncopation_balance_repair/issue_1384_rhythm_syncopation_balance_repair_package/audio/`
 - final review doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_FINAL_REVIEW_PACKAGE_2026-06-11.md`
 - listening input guard doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_INPUT_GUARD_2026-06-11.md`
+- MVP handoff freeze doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_MVP_HANDOFF_FREEZE_2026-06-11.md`
 
 ## 재현 명령
 
@@ -73,6 +75,18 @@
   --require_no_quality_claim
 ```
 
+```bash
+.venv/bin/python scripts/freeze_music_transformer_solo_yield_residual_aware_mvp_handoff.py \
+  --run_id issue_1396_residual_aware_mvp_handoff_freeze \
+  --final_review_package outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_final_review/issue_1388_residual_aware_final_review_package/residual_aware_final_review_package.json \
+  --input_guard_report outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_listening_input_guard/issue_1390_residual_aware_listening_input_guard/residual_aware_listening_input_guard.json \
+  --status_audit_report outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_status_audit/issue_1394_residual_aware_status_audit/residual_aware_status_audit.json \
+  --expected_next_boundary music_transformer_solo_yield_residual_aware_listening_review_pending \
+  --require_local_artifacts_verified \
+  --require_pending_input \
+  --require_no_quality_claim
+```
+
 ## 아닌 것
 
 - 완성형 jazz solo quality claim 아님
@@ -86,7 +100,9 @@
 - `scripts/build_music_transformer_solo_yield_rhythm_syncopation_balance_repair_package.py`
 - `scripts/build_music_transformer_solo_yield_residual_aware_final_review_package.py`
 - `scripts/guard_music_transformer_solo_yield_residual_aware_listening_input.py`
+- `scripts/freeze_music_transformer_solo_yield_residual_aware_mvp_handoff.py`
 - `scripts/build_music_transformer_solo_yield_objective_quality_rubric_baseline.py`
 - `scripts/decide_music_transformer_solo_yield_residual_tension_target.py`
 - `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_FINAL_REVIEW_PACKAGE_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_INPUT_GUARD_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_MVP_HANDOFF_FREEZE_2026-06-11.md`

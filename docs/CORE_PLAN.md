@@ -13538,6 +13538,53 @@ Issue #1394는 #1388 residual-aware final review package, #1390 listening input 
 
 - `Stage B MIDI-to-solo residual-aware MVP handoff freeze`
 
+## 9.247 Stage B MIDI-to-solo residual-aware MVP handoff freeze
+
+Issue #1396은 #1388 final review package, #1390 input guard, #1394 status audit를 기준으로 로컬 MVP handoff를 고정한 작업이다.
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_MVP_HANDOFF_FREEZE_2026-06-11.md`
+- output: `outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_mvp_handoff_freeze/issue_1396_residual_aware_mvp_handoff_freeze/`
+- boundary: `music_transformer_solo_yield_residual_aware_mvp_handoff_freeze`
+- source final review schema: `music_transformer_solo_yield_residual_aware_final_review_package_v1`
+- source input guard schema: `music_transformer_solo_yield_residual_aware_listening_input_guard_v1`
+- source status audit schema: `music_transformer_solo_yield_residual_aware_status_audit_v1`
+- candidate count: `8`
+- MIDI/WAV: `8 / 8`
+- quality proxy pass/fail: `6 / 2`
+- residual major label: `low_tension_color=2`
+- residual watch label: `dead_air_watch=3`
+- local candidate artifacts verified: `true`
+- missing file count: `0`
+- checksum mismatch count: `0`
+- missing support file count: `0`
+- review input template available: `true`
+- validated listening input present: `false`
+- preference fill allowed: `false`
+- listening review completed: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+- raw artifact upload required: `false`
+- next boundary: `music_transformer_solo_yield_residual_aware_listening_review_pending`
+
+판단:
+
+- final review package candidate manifest의 MIDI/WAV 경로와 SHA-256 재검증 완료.
+- review package, review input template, status audit 연결 경로 보존.
+- raw MIDI/WAV 업로드 없이 로컬 산출물 경로와 checksum 기준으로 handoff freeze 정의.
+- listening input pending 상태에서 preference fill과 musical quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_music_transformer_solo_yield_residual_aware_mvp_handoff_freeze`
+- `.venv/bin/python -m py_compile scripts/freeze_music_transformer_solo_yield_residual_aware_mvp_handoff.py tests/test_music_transformer_solo_yield_residual_aware_mvp_handoff_freeze.py`
+- `.venv/bin/python scripts/freeze_music_transformer_solo_yield_residual_aware_mvp_handoff.py --run_id issue_1396_residual_aware_mvp_handoff_freeze --issue_number 1396 --final_review_package outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_final_review/issue_1388_residual_aware_final_review_package/residual_aware_final_review_package.json --input_guard_report outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_listening_input_guard/issue_1390_residual_aware_listening_input_guard/residual_aware_listening_input_guard.json --status_audit_report outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_status_audit/issue_1394_residual_aware_status_audit/residual_aware_status_audit.json --doc_path docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_MVP_HANDOFF_FREEZE_2026-06-11.md --expected_next_boundary music_transformer_solo_yield_residual_aware_listening_review_pending --require_local_artifacts_verified --require_pending_input --require_no_quality_claim`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo residual-aware listening review pending boundary`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.
