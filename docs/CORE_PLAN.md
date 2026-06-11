@@ -11262,7 +11262,7 @@ Issue #1118은 Issue #1116 listening review package의 pending input 상태와 s
 
 ## 9.208 Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh
 
-Issue #1036은 Issue #1034 input guard의 pending input 상태와 objective/source outside-soloing context를 objective-only next decision summary까지 보존한 작업이다.
+Issue #1120은 Issue #1118 input guard의 pending input 상태와 objective/source outside-soloing context를 objective-only next decision summary까지 보존한 작업이다.
 
 결과:
 
@@ -11279,6 +11279,12 @@ Issue #1036은 Issue #1034 input guard의 pending input 상태와 objective/sour
 - phrase/rhythm failure delta: `3`
 - objective source outside-soloing repair source context preserved: `true`
 - source outside-soloing repair source context preserved: `true`
+- objective follow-up objective source outside-soloing source context preserved: `true`
+- objective follow-up repair sweep source outside-soloing source context preserved: `true`
+- objective bridge repair sweep source outside-soloing source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - source outside-soloing source pitch-role risk count: `5 -> 2`
 - source outside-soloing current repair pitch-role risk count after / delta: `0 / 2`
 - source/repaired outside-soloing not evaluable count: `6/6`
@@ -11289,8 +11295,8 @@ Issue #1036은 Issue #1034 input guard의 pending input 상태와 objective/sour
 
 판단:
 
-- objective-only next decision source validation에 objective/source source-context preserved 조건 추가.
-- bridge source-context 21개 키를 objective summary, readiness, validation summary까지 보존.
+- objective-only next decision source validation에 required source-context key와 preserved flag true 조건 추가.
+- bridge source-context key를 objective summary, readiness, validation summary까지 보존.
 - validated review input 부재 상태에서 human/audio preference와 musical quality claim 제외 유지.
 - 다음 boundary는 phrase/rhythm repair follow-up decision source-context refresh.
 
@@ -11300,6 +11306,8 @@ Issue #1036은 Issue #1034 input guard의 pending input 상태와 objective/sour
 - `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_next.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-objective-only-next-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
 
 다음 작업:
 
