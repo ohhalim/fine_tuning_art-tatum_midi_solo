@@ -43,7 +43,7 @@
 - latest songlike melody contour phrase/rhythm chord-context pitch-role bridge: Issue #1208, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh
 - latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: Issue #1210, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: Issue #1212, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: Issue #1130, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh
+- latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: Issue #1214, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: Issue #1132, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: Issue #1134, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: Issue #1136, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh`
+- open issue queue after Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -4730,20 +4730,24 @@ Issue #1212는 Issue #1210 objective decision v5와 Issue #1208 bridge v5의 sou
 
 ## Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Chord-Tone Landing Repair Audio Package Source Context Refresh Result
 
-Issue #1130은 Issue #1128 chord-tone landing repair sweep v4의 source-context preserved flag를 audio package까지 보존하고, rendered WAV technical metadata를 기록한 작업이다.
+Issue #1214는 Issue #1212 chord-tone landing repair sweep v5의 source schema chain과 source/schema-context preserved flag를 audio package까지 보존하고, rendered WAV technical metadata를 기록한 작업이다.
 
 변경:
 
-- audio package schema version `v4`
-- repair sweep schema v4와 required source-context key, preserved flag 3개 필수 검증
-- audio package summary, validation summary, markdown report source-context preserved field 전파
-- harness issue number를 #1130 기준으로 갱신
+- audio package schema version `v5`
+- repair sweep schema v5와 upstream source schema chain 필수 검증
+- required source-context key, schema-context key, preserved flag 필수 검증
+- audio package summary, validation summary, markdown report source/schema-context field 전파
+- harness issue number를 #1214 기준으로 갱신
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_REPAIR_AUDIO_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package`
-- source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep_v4`
+- schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v5`
+- source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep_v5`
+- source objective decision schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v5`
+- source bridge schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_v5`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package`
 - rendered audio file count: `6`
 - technical WAV validation: `true`
@@ -4755,8 +4759,11 @@ Issue #1130은 Issue #1128 chord-tone landing repair sweep v4의 source-context 
 - outside-soloing repair targeted: `false`
 - outside-soloing residual risk preserved: `true`
 - follow-up objective source outside-soloing source context preserved: `true`
+- follow-up objective source outside-soloing schema context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing schema context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing schema context preserved: `true`
 - final landing chord-tone count: `1 -> 6`
 - audio review required: `true`
 - audio rendered quality claimed: `false`
@@ -4765,7 +4772,7 @@ Issue #1130은 Issue #1128 chord-tone landing repair sweep v4의 source-context 
 
 판단:
 
-- Issue #1128 repair sweep v4의 preserved flag 3개가 audio package summary와 validation summary까지 유지됨.
+- Issue #1212 repair sweep v5의 source schema chain과 preserved flag가 audio package summary와 validation summary까지 유지됨.
 - repaired MIDI `6`개 모두 WAV 렌더 완료.
 - WAV technical metadata 검증 완료.
 - outside-soloing risk는 repair target이 아니며 residual context preserved 상태 유지.
