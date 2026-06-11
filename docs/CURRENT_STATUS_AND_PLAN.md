@@ -42,7 +42,7 @@
 - latest songlike melody contour phrase/rhythm repair follow-up decision: Issue #1122, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-context pitch-role bridge: Issue #1124, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh
 - latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: Issue #1126, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: Issue #1044, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh
+- latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: Issue #1128, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: Issue #1046, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: Issue #1048, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: Issue #1050, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -4586,22 +4586,24 @@ Issue #1126은 Issue #1124 chord-context pitch-role bridge v4의 source-context 
 
 ## Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Chord-Tone Landing Repair Sweep Source Context Refresh Result
 
-Issue #1044는 Issue #1042 objective decision과 Issue #1040 bridge의 source-context preserved flag를 chord-tone landing repair sweep까지 보존하고, weak chord-tone landing repair 결과를 기록한 작업이다.
+Issue #1128은 Issue #1126 objective decision v4와 Issue #1124 bridge v4의 source-context preserved flag를 chord-tone landing repair sweep까지 보존하고, weak chord-tone landing repair 결과를 기록한 작업이다.
 
 변경:
 
-- repair sweep schema version `v3`
-- objective decision source-context preserved flag 3개 필수 검증
+- repair sweep schema version `v4`
+- objective decision v4와 bridge v4 source-context preserved flag 3개 필수 검증
 - objective/bridge source-context consistency 범위에 preserved flag 포함
 - repair sweep aggregate, readiness, validation summary, markdown report source-context preserved field 전파
-- harness issue number를 #1044 기준으로 갱신
+- harness issue number를 #1128 기준으로 갱신
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_REPAIR_SWEEP_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
 - source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
+- source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v4`
 - bridge boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- bridge schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_v4`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package`
 - selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package`
 - candidate count: `6`
@@ -4621,7 +4623,7 @@ Issue #1044는 Issue #1042 objective decision과 Issue #1040 bridge의 source-co
 
 판단:
 
-- objective decision과 bridge의 source-context preserved flag 불일치 없음.
+- objective decision v4와 bridge v4의 source-context preserved flag 불일치 없음.
 - weak chord-tone landing risk는 `6 -> 0`으로 감소.
 - final landing chord-tone count는 `1 -> 6`으로 증가.
 - outside-soloing risk는 repair target이 아니며 residual context preserved 상태 유지.
