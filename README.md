@@ -21,7 +21,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest targeted quality repair listening review package: `Issue #1176`
 - latest targeted quality repair listening review input guard: `Issue #1178`
 - latest targeted quality repair objective-only next decision: `Issue #1180`
-- latest targeted quality repair follow-up decision: `Issue #1098`
+- latest targeted quality repair follow-up decision: `Issue #1182`
 - latest songlike melody contour repair sweep: `Issue #1100`
 - latest songlike melody contour repair audio package: `Issue #1102`
 - latest songlike melody contour repair listening review package: `Issue #1104`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after targeted quality repair objective-only next decision source-context refresh merge: `0`
+- open issue queue after targeted quality repair follow-up decision source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
@@ -389,9 +389,16 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - targeted quality repair objective next follow-up repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair objective next bridge repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair follow-up required: `true`
+- targeted quality repair follow-up schema version: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision_v5`
+- targeted quality repair follow-up source objective next schema version: `stage_b_midi_to_solo_targeted_quality_repair_objective_next_v5`
+- targeted quality repair follow-up source sweep schema version: `stage_b_midi_to_solo_targeted_quality_repair_sweep_v4`
 - targeted quality repair follow-up decision completed: `true`
 - targeted quality repair follow-up objective source outside-soloing source context preserved: `true`
+- targeted quality repair follow-up objective source outside-soloing schema context preserved: `true`
+- targeted quality repair follow-up objective source outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - targeted quality repair follow-up repair sweep source outside-soloing source context preserved: `true`
+- targeted quality repair follow-up repair sweep source outside-soloing schema context preserved: `true`
+- targeted quality repair follow-up repair sweep source outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - targeted quality repair follow-up bridge repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair selected next target: `songlike_melody_contour_repair_sweep`
 - targeted quality repair source risk: `5 -> 2`
