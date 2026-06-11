@@ -397,7 +397,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo quality gap decision refresh: schema `stage_b_midi_to_solo_quality_gap_decision_v4`, source audit schema `stage_b_midi_to_solo_mvp_completion_audit_v4`, current evidence schema `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`, selected target `listening_review_quality_gap`, outside-soloing schema-context preserved `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_listening_review_quality_gap`
 - MIDI-to-solo listening review quality gap: schema `stage_b_midi_to_solo_listening_review_quality_gap_v4`, source quality gap schema `stage_b_midi_to_solo_quality_gap_decision_v4`, current evidence schema `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`, selected target `mvp_delivery_package`, technical delivery package ready `true`, listening gap open `true`, outside-soloing schema-context preserved `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_mvp_delivery_package`
 - MIDI-to-solo MVP delivery package: schema `stage_b_midi_to_solo_mvp_delivery_package_v4`, source listening gap schema `stage_b_midi_to_solo_listening_review_quality_gap_v4`, current evidence schema `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`, runnable CLI `true`, input ranked MIDI `true`, rendered WAV evidence `true`, CLI/changed-ratio audio candidate count `3/3`, outside-soloing schema-context preserved `true`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_readme_final_evidence_refresh`
-- MIDI-to-solo README final evidence refresh: latest evidence boundary `stage_b_midi_to_solo_mvp_delivery_package`, runnable CLI `true`, input ranked MIDI/WAV evidence `true/true`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_final_status_audit`
+- MIDI-to-solo README final evidence refresh: latest evidence boundary `stage_b_midi_to_solo_mvp_delivery_package`, delivery schema `stage_b_midi_to_solo_mvp_delivery_package_v4`, source listening gap schema `stage_b_midi_to_solo_listening_review_quality_gap_v4`, current evidence schema `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`, outside-soloing schema-context preserved `true`, runnable CLI `true`, input ranked MIDI/WAV evidence `true/true`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_final_status_audit`
 - MIDI-to-solo final status audit: technical MVP complete `true`, local review ready `true`, README final evidence reflected `true`, CLI/WAV count `3/3`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
 - MIDI-to-solo post-MVP quality iteration plan: selected target `quality_rubric_baseline`, source risk `5 -> 2`, current repair risk after `0`, source-context preserved flags `3/3`, ordered work `4`, taxonomy seed `7`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_rubric_baseline`
 - MIDI-to-solo quality rubric baseline: rubric items `8`, metric groups `30`, source risk `5 -> 2`, current repair risk after `0`, source-context preserved flags `3/3`, candidate failure labeling ready `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_candidate_failure_labeling`
@@ -12340,16 +12340,23 @@ Issue #1160은 Issue #1158 listening review quality gap의 schema/source-context
 
 ## 9.229 Stage B MIDI-to-solo README final evidence refresh source-context refresh
 
-Issue #1078은 Issue #1076 MVP delivery package의 source-context preserved flag 3개를 README final evidence와 final status audit README snippet 계약에 반영한 작업이다.
+Issue #1162는 Issue #1160 MVP delivery package의 schema/source-context 결과를 README final evidence와 final status audit README snippet 계약에 반영한 작업이다.
 
 결과:
 
 - source boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - next boundary: `stage_b_midi_to_solo_final_status_audit`
 - latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_delivery_package`
+- README final evidence delivery schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- README final evidence source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- README final evidence source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- README final evidence source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - README final evidence source-context reflected: `true`
+- README final evidence source schema reflected: `true`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -12359,8 +12366,8 @@ Issue #1078은 Issue #1076 MVP delivery package의 source-context preserved flag
 
 판단:
 
-- README final evidence와 final status audit README snippet 계약에 #1076 delivery package preserved flag 반영.
-- final status summary preserved flag 3개 전파는 다음 final status audit refresh 대상.
+- README final evidence와 final status audit README snippet 계약에 #1160 delivery package schema/source-context 결과 반영.
+- final status summary schema/source-context 전파는 다음 final status audit refresh 대상.
 - raw artifact upload, human/audio preference, MIDI-to-solo musical quality claim 제외 유지.
 
 검증:
