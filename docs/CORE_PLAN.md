@@ -13627,6 +13627,49 @@ Issue #1398은 #1396 handoff freeze 결과를 기준으로 listening review 입�
 
 - `Stage B MIDI-to-solo residual-aware completion audit`
 
+## 9.249 Stage B MIDI-to-solo residual-aware completion audit
+
+Issue #1400은 #1398 listening review pending boundary와 #1396 handoff freeze를 기준으로 residual-aware technical MVP 완료 상태를 감사한 작업이다.
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_COMPLETION_AUDIT_2026-06-11.md`
+- output: `outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_completion_audit/issue_1400_residual_aware_completion_audit/`
+- boundary: `music_transformer_solo_yield_residual_aware_completion_audit`
+- source pending schema: `music_transformer_solo_yield_residual_aware_listening_review_pending_v1`
+- source handoff freeze schema: `music_transformer_solo_yield_residual_aware_mvp_handoff_freeze_v1`
+- technical MVP complete: `true`
+- local review ready: `true`
+- candidate count: `8`
+- MIDI/WAV: `8 / 8`
+- pending candidate count: `8`
+- quality proxy pass/fail: `6 / 2`
+- residual major label: `low_tension_color=2`
+- residual watch label: `dead_air_watch=3`
+- missing file count: `0`
+- checksum mismatch count: `0`
+- raw artifact upload required: `false`
+- manual review required for quality claim: `true`
+- MIDI-to-solo musical quality claimed: `false`
+- next boundary: `music_transformer_solo_yield_residual_aware_final_status_sync`
+
+판단:
+
+- input MIDI/chord context to ranked solo MIDI/WAV review candidates 범위의 technical MVP 완료 판정.
+- local review package와 review input template은 준비됐지만 listening review는 pending 상태.
+- technical MVP completion과 musical quality claim 분리 유지.
+- final status sync에서 README/current status 최종 boundary 갱신 필요.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_music_transformer_solo_yield_residual_aware_completion_audit`
+- `.venv/bin/python -m py_compile scripts/audit_music_transformer_solo_yield_residual_aware_completion.py tests/test_music_transformer_solo_yield_residual_aware_completion_audit.py`
+- `.venv/bin/python scripts/audit_music_transformer_solo_yield_residual_aware_completion.py --run_id issue_1400_residual_aware_completion_audit --issue_number 1400 --pending_report outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_listening_review_pending/issue_1398_residual_aware_listening_review_pending/residual_aware_listening_review_pending.json --handoff_freeze_report outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_mvp_handoff_freeze/issue_1396_residual_aware_mvp_handoff_freeze/residual_aware_mvp_handoff_freeze.json --doc_path docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_COMPLETION_AUDIT_2026-06-11.md --expected_next_boundary music_transformer_solo_yield_residual_aware_final_status_sync --require_technical_complete --require_no_quality_claim`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo residual-aware final status sync`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

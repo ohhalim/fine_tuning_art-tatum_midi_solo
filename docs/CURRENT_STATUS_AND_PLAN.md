@@ -17,9 +17,10 @@
 - latest residual-aware README/status sync: Issue #1392, Stage B MIDI-to-solo residual-aware README and status sync
 - latest residual-aware status audit: Issue #1394, Stage B MIDI-to-solo residual-aware status audit
 - latest residual-aware MVP handoff freeze: Issue #1396, Stage B MIDI-to-solo residual-aware MVP handoff freeze
-- current issue: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
+- latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
+- current issue: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - open issue queue after residual-aware listening input guard merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware completion audit`
+- 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware final status sync`
 
 현재 범위가 아닌 것:
 
@@ -57,6 +58,10 @@
 - residual-aware listening review pending manual review required for quality claim: `true`
 - residual-aware listening review pending quality claim: `false`
 - residual-aware listening review pending next boundary: `music_transformer_solo_yield_residual_aware_completion_audit`
+- residual-aware completion audit technical MVP complete: `true`
+- residual-aware completion audit local review ready: `true`
+- residual-aware completion audit quality claim: `false`
+- residual-aware completion audit next boundary: `music_transformer_solo_yield_residual_aware_final_status_sync`
 - broader repaired sampling audit strict/grammar: `40 / 40` / `40 / 40`
 - broader repaired review package MIDI/WAV: `8 / 8`
 - broader repaired final handoff selected objective candidates: `4`
