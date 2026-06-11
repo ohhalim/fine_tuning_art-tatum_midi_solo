@@ -10,7 +10,7 @@ MIDI 데이터를 token sequence로 변환하고, Music Transformer 계열 symbo
 - 2마디 후보 생성: strict `24 / 24`, grammar-valid `24 / 24`
 - 4마디 확장 후보 생성: strict `20 / 24`, grammar-valid `24 / 24`
 - 4마디 dead-air repair 이후: strict `22 / 24`, grammar-valid `24 / 24`
-- phrase direction repair audio package: WAV `8`, technical validation `true`
+- phrase direction repair listening package: MIDI `8`, WAV `8`
 - final status audit: technical evidence ready `true`
 - 음악적 품질 claim: `false`
 - 사람 기준 청취 선호 입력: `false`
@@ -124,22 +124,24 @@ raw model generation은 note grammar가 자주 깨졌다.
 - next boundary: `music_transformer_solo_yield_phrase_direction_repair_audio_package`
 - phrase direction repair audio package: rendered WAV `8`, technical WAV validation `true`, duration range `10.725s - 10.739s`
 - next boundary: `music_transformer_solo_yield_phrase_direction_repair_listening_package`
+- phrase direction repair listening package: MIDI `8`, WAV `8`, review input template `true`, validated listening input `false`, preference fill `false`
+- next boundary: `music_transformer_solo_yield_phrase_direction_repair_listening_input_guard`
 
 ## 결과 파일
 
 최신 리뷰 패키지:
 
-- `outputs/music_transformer_finetune_mvp/solo_yield_chord_tone_landing_repair_listening_review/issue_1268_chord_tone_landing_listening_package/listening_review_package.md`
-- `outputs/music_transformer_finetune_mvp/solo_yield_chord_tone_landing_repair_listening_review/issue_1268_chord_tone_landing_listening_package/listening_review_package.json`
-- `outputs/music_transformer_finetune_mvp/solo_yield_chord_tone_landing_repair_listening_review/issue_1268_chord_tone_landing_listening_package/listening_review_input_template.json`
+- `outputs/music_transformer_finetune_mvp/solo_yield_phrase_direction_repair_listening_review/issue_1278_phrase_direction_listening_package/listening_review_package.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_phrase_direction_repair_listening_review/issue_1278_phrase_direction_listening_package/listening_review_package.json`
+- `outputs/music_transformer_finetune_mvp/solo_yield_phrase_direction_repair_listening_review/issue_1278_phrase_direction_listening_package/listening_review_input_template.json`
 
 MIDI 후보:
 
-- `outputs/music_transformer_finetune_mvp/solo_yield_chord_tone_landing_repair_listening_review/issue_1268_chord_tone_landing_listening_package/midi/`
+- `outputs/music_transformer_finetune_mvp/solo_yield_phrase_direction_repair_listening_review/issue_1278_phrase_direction_listening_package/midi/`
 
 WAV 후보:
 
-- `outputs/music_transformer_finetune_mvp/solo_yield_chord_tone_landing_repair_listening_review/issue_1268_chord_tone_landing_listening_package/audio/`
+- `outputs/music_transformer_finetune_mvp/solo_yield_phrase_direction_repair_listening_review/issue_1278_phrase_direction_listening_package/audio/`
 
 Report:
 
@@ -176,6 +178,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_CHORD_TONE_LANDING_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_DIRECTION_REPAIR_SWEEP_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_DIRECTION_REPAIR_AUDIO_PACKAGE_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_DIRECTION_REPAIR_LISTENING_PACKAGE_2026-06-11.md`
 
 ## 실행 방법
 
@@ -236,8 +239,8 @@ Report:
 
 ## 다음 작업
 
-- phrase direction repair listening package
-- repaired MIDI/WAV `8` review package 생성
+- phrase direction repair listening input guard
+- validated listening input 존재 여부 확인
 - WAV/MIDI 청취 리뷰
 - 청취 결과 기준 keep/reject 후보 기록
 - 음악적 품질 claim 여부는 청취 리뷰 이후 재판단
