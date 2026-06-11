@@ -4,12 +4,16 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import (
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+)
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup import (
     BOUNDARY,
     CONTEXT_TARGET_LABELS,
     NEXT_BOUNDARY,
     SELECTED_TARGET,
+    SCHEMA_VERSION,
     StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError,
     build_followup_decision_report,
     validate_followup_decision_report,
@@ -24,6 +28,7 @@ from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repa
 
 SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "followup_objective_source_outside_soloing_source_targeted": False,
@@ -31,6 +36,7 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "followup_repair_sweep_source_outside_soloing_source_targeted": False,
@@ -38,6 +44,7 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "repair_sweep_source_outside_soloing_source_targeted": False,
@@ -184,7 +191,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
                 objective_next_report=objective_next_report(),
                 repair_sweep_report=repair_sweep_report(),
                 output_dir=Path(tmp) / "followup",
-                issue_number=1038,
+                issue_number=1122,
             )
             summary = validate_followup_decision_report(
                 report,
@@ -197,6 +204,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
             )
 
             self.assertTrue(summary["followup_decision_completed"])
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
             self.assertTrue(summary["chord_context_pitch_role_bridge_selected"])
             self.assertEqual(
                 summary["context_target_labels"],
@@ -221,8 +229,10 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
             self.assertTrue(
                 summary["objective_source_outside_soloing_repair_source_context_preserved"]
             )
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
+            for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
+                self.assertTrue(summary[f"objective_{key}"])
             self.assertEqual(
                 summary[
                     "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after"
@@ -259,8 +269,10 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
             self.assertTrue(
                 summary["repair_sweep_source_outside_soloing_repair_source_context_preserved"]
             )
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"repair_sweep_{key}"], SOURCE_CONTEXT[key])
+            for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
+                self.assertTrue(summary[f"repair_sweep_{key}"])
             self.assertEqual(
                 summary[
                     "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_after"
@@ -301,7 +313,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
                     objective_next_report=objective_next_report(quality_claim=True),
                     repair_sweep_report=repair_sweep_report(),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=1038,
+                    issue_number=1122,
                 )
 
     def test_rejects_technical_regression(self) -> None:
@@ -313,7 +325,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
                     objective_next_report=objective_next_report(),
                     repair_sweep_report=repair_sweep_report(technical_regression_count=1),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=1038,
+                    issue_number=1122,
                 )
 
     def test_rejects_missing_objective_outside_soloing_context(self) -> None:
@@ -328,7 +340,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
                     objective_next_report=source,
                     repair_sweep_report=repair_sweep_report(),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=1038,
+                    issue_number=1122,
                 )
 
     def test_rejects_missing_repair_sweep_outside_soloing_context(self) -> None:
@@ -343,7 +355,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
                     objective_next_report=objective_next_report(),
                     repair_sweep_report=source,
                     output_dir=Path(tmp) / "followup",
-                    issue_number=1038,
+                    issue_number=1122,
                 )
 
     def test_rejects_repair_sweep_source_context_delta_mismatch(self) -> None:
@@ -358,13 +370,13 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
                     objective_next_report=objective_next_report(),
                     repair_sweep_report=source,
                     output_dir=Path(tmp) / "followup",
-                    issue_number=1038,
+                    issue_number=1122,
                 )
 
     def test_rejects_missing_bridge_source_context_field(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             source = objective_next_report()
-            source["objective_summary"].pop(BRIDGE_SOURCE_CONTEXT_KEYS[0])
+            source["objective_summary"].pop(BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS[0])
 
             with self.assertRaises(
                 StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError
@@ -373,7 +385,37 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
                     objective_next_report=source,
                     repair_sweep_report=repair_sweep_report(),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=1038,
+                    issue_number=1122,
+                )
+
+    def test_rejects_source_context_preservation_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = objective_next_report()
+            source["objective_summary"][BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS[0]] = False
+
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError
+            ):
+                build_followup_decision_report(
+                    objective_next_report=source,
+                    repair_sweep_report=repair_sweep_report(),
+                    output_dir=Path(tmp) / "followup",
+                    issue_number=1122,
+                )
+
+    def test_rejects_repair_sweep_source_context_preservation_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = repair_sweep_report()
+            source["aggregate"][BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS[0]] = False
+
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionError
+            ):
+                build_followup_decision_report(
+                    objective_next_report=objective_next_report(),
+                    repair_sweep_report=source,
+                    output_dir=Path(tmp) / "followup",
+                    issue_number=1122,
                 )
 
     def test_rejects_objective_repair_sweep_context_mismatch(self) -> None:
@@ -388,13 +430,17 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairFollowupDecisionTes
                     objective_next_report=objective_next_report(),
                     repair_sweep_report=source,
                     output_dir=Path(tmp) / "followup",
-                    issue_number=1038,
+                    issue_number=1122,
                 )
 
     def test_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge")
         self.assertEqual(SELECTED_TARGET, "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge")
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision_v4",
+        )
 
 
 if __name__ == "__main__":

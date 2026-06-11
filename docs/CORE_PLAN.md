@@ -11315,7 +11315,7 @@ Issue #1120은 Issue #1118 input guard의 pending input 상태와 objective/sour
 
 ## 9.209 Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh
 
-Issue #1038은 Issue #1036 objective-only next decision과 Issue #1028 repair sweep의 source-context를 follow-up decision에서 비교 검증한 작업이다.
+Issue #1122는 Issue #1120 objective-only next decision과 Issue #1112 repair sweep의 source-context를 follow-up decision에서 비교 검증한 작업이다.
 
 결과:
 
@@ -11332,6 +11332,12 @@ Issue #1038은 Issue #1036 objective-only next decision과 Issue #1028 repair sw
 - context not-evaluable min count: `6`
 - objective source outside-soloing source context preserved: `true`
 - repair sweep source outside-soloing source context preserved: `true`
+- objective follow-up objective source outside-soloing source context preserved: `true`
+- objective follow-up repair sweep source outside-soloing source context preserved: `true`
+- objective bridge repair sweep source outside-soloing source context preserved: `true`
+- repair sweep follow-up objective source outside-soloing source context preserved: `true`
+- repair sweep follow-up repair sweep source outside-soloing source context preserved: `true`
+- repair sweep bridge repair sweep source outside-soloing source context preserved: `true`
 - source outside-soloing source pitch-role risk count: `5 -> 2`
 - current repair pitch-role risk count after / delta: `0 / 2`
 - technical regression count: `0`
@@ -11340,7 +11346,7 @@ Issue #1038은 Issue #1036 objective-only next decision과 Issue #1028 repair sw
 
 판단:
 
-- objective-only next decision과 repair sweep의 source-context 불일치 없음.
+- objective-only next decision과 repair sweep의 required source-context key 불일치 없음.
 - residual rhythmic monotony는 1개 남았지만, context not-evaluable target 2종이 candidate 6개 전체에서 유지.
 - 후속 repair보다 chord-context pitch-role bridge 진입 조건 우선.
 - quality/preference claim 제외 유지.
@@ -11351,6 +11357,8 @@ Issue #1038은 Issue #1036 objective-only next decision과 Issue #1028 repair sw
 - `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-followup-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
 
 다음 작업:
 
