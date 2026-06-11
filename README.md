@@ -71,6 +71,8 @@ raw model generation은 note grammar가 자주 깨졌다.
 - repaired full sweep: `fill_n10` 기준 strict `24 / 24`, grammar-valid `24 / 24`, rendered WAV `8`
 - listening review package: MIDI `8`, WAV `8`, review input template ready
 - listening input guard: validated input `false`, preference fill `false`, next `objective_only_next_decision`
+- objective-only decision: candidate `8`, selected objective candidates `4`, musical quality claim `false`
+- next boundary: `music_transformer_solo_yield_larger_sample_repeatability_sweep`
 
 ## 결과 파일
 
@@ -101,6 +103,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_REPAIRED_PROGRESSION_RETRY_SWEEP_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_REPAIRED_CANDIDATE_LISTENING_PACKAGE_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_LISTENING_INPUT_GUARD_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-11.md`
 
 ## 실행 방법
 
@@ -169,5 +172,5 @@ Report:
 - retry top candidates listening review
 - listening review input guard
 - objective-only next decision
-- 20개 후보 이상 기준 수율 재측정
+- larger sample repeatability sweep
 - 더 긴 4마디 phrase로 확장 검토
