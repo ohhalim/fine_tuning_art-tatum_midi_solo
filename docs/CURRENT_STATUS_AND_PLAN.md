@@ -44,7 +44,7 @@
 - latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: Issue #1126, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: Issue #1128, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: Issue #1130, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: Issue #1048, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh
+- latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: Issue #1132, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: Issue #1050, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: Issue #1052, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: Issue #1054, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -4702,19 +4702,20 @@ Issue #1130은 Issue #1128 chord-tone landing repair sweep v4의 source-context 
 
 ## Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Chord-Tone Landing Repair Listening Review Package Source Context Refresh Result
 
-Issue #1048은 Issue #1046 audio package의 source-context preserved flag를 listening review package까지 보존하고, WAV/MIDI review item package 경계를 기록한 작업이다.
+Issue #1132는 Issue #1130 audio package v4의 source-context preserved flag를 listening review package까지 보존하고, WAV/MIDI review item package 경계를 기록한 작업이다.
 
 변경:
 
-- listening review package schema version `v2`
-- audio package required source-context key와 preserved flag 3개 필수 검증
+- listening review package schema version `v3`
+- audio package schema v4와 required source-context key, preserved flag 3개 필수 검증
 - source summary, validation summary, markdown report source-context preserved field 전파
-- harness issue number와 generated doc path를 #1048 기준으로 갱신
+- harness issue number와 generated doc path를 #1132 기준으로 갱신
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_REPAIR_LISTENING_REVIEW_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package`
+- source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v4`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard`
 - review item count: `6`
 - validated review input: `false`
@@ -4735,7 +4736,7 @@ Issue #1048은 Issue #1046 audio package의 source-context preserved flag를 lis
 
 판단:
 
-- Issue #1046 audio package의 preserved flag 3개가 listening review package source summary와 validation summary까지 유지됨.
+- Issue #1130 audio package v4의 preserved flag 3개가 listening review package source summary와 validation summary까지 유지됨.
 - WAV/MIDI review item `6`개 package 완료.
 - validated listening input은 없음.
 - human/audio preference, MIDI-to-solo musical quality claim 제외.
