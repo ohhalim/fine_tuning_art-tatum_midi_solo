@@ -10,7 +10,9 @@ MIDI 데이터를 token sequence로 변환하고, Music Transformer 계열 symbo
 - 2마디 후보 생성: strict `24 / 24`, grammar-valid `24 / 24`
 - 4마디 확장 후보 생성: strict `20 / 24`, grammar-valid `24 / 24`
 - 4마디 dead-air repair 이후: strict `22 / 24`, grammar-valid `24 / 24`
-- broader repaired handoff audit: reproducible `true`, checksum mismatch `0`
+- broader repaired sampling audit: strict `40 / 40`, grammar-valid `40 / 40`
+- broader repaired review package: MIDI `8`, WAV `8`
+- broader repaired handoff audit: reproducible `true`, missing MIDI/WAV `0 / 0`, checksum mismatch `0 / 0`
 - final status audit: technical evidence ready `true`
 - 음악적 품질 claim: `false`
 - 사람 기준 청취 선호 입력: `false`
@@ -220,7 +222,16 @@ raw model generation은 note grammar가 자주 깨졌다.
 
 ## 결과 파일
 
-최신 리뷰 패키지:
+최신 접근 경로:
+
+- MIDI 후보: `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1346_broader_repaired_listening_package/midi/`
+- WAV 후보: `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1346_broader_repaired_listening_package/audio/`
+- listening package: `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1346_broader_repaired_listening_package/listening_review_package.md`
+- final handoff: `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_final_handoff/issue_1352_broader_repaired_final_handoff/broader_repaired_final_review_handoff.md`
+- reproducibility audit: `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_handoff_audit/issue_1354_broader_repaired_handoff_audit/broader_repaired_handoff_reproducibility_audit.md`
+- sampling report: `outputs/music_transformer_finetune_mvp/solo_yield_sweep/issue_1344_broader_repaired_sampling_repeatability/solo_yield_sweep_report.md`
+
+결과 히스토리:
 
 - `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_final_handoff/issue_1314_interval_contour_final_handoff/interval_contour_final_review_handoff.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_final_handoff/issue_1314_interval_contour_final_handoff/interval_contour_final_review_handoff.json`
@@ -286,14 +297,17 @@ raw model generation은 note grammar가 자주 깨졌다.
 
 MIDI 후보:
 
-- `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare_listening_review/issue_1308_interval_contour_listening_package/midi/`
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1346_broader_repaired_listening_package/midi/`
 
 WAV 후보:
 
-- `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare_listening_review/issue_1308_interval_contour_listening_package/audio/`
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1346_broader_repaired_listening_package/audio/`
 
 Report:
 
+- `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_handoff_audit/issue_1354_broader_repaired_handoff_audit/broader_repaired_handoff_reproducibility_audit.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_final_handoff/issue_1352_broader_repaired_final_handoff/broader_repaired_final_review_handoff.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_sweep/issue_1344_broader_repaired_sampling_repeatability/solo_yield_sweep_report.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_final_status_audit/issue_1256_final_status_audit/final_status_audit.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_final_status_audit/issue_1256_final_status_audit/final_status_audit_summary.json`
 - `outputs/music_transformer_finetune_mvp/solo_yield_objective_next_decision/issue_1254_4bar_repaired_objective_next_decision/objective_next_decision.md`
