@@ -21,7 +21,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest targeted quality repair listening review package: `Issue #1092`
 - latest targeted quality repair listening review input guard: `Issue #1094`
 - latest targeted quality repair objective-only next decision: `Issue #1096`
-- latest targeted quality repair follow-up decision: `Issue #1014`
+- latest targeted quality repair follow-up decision: `Issue #1098`
 - latest songlike melody contour repair sweep: `Issue #1016`
 - latest songlike melody contour repair audio package: `Issue #1018`
 - latest songlike melody contour repair listening review package: `Issue #1020`
@@ -310,6 +310,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - targeted quality repair objective next bridge repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair follow-up required: `true`
 - targeted quality repair follow-up decision completed: `true`
+- targeted quality repair follow-up objective source outside-soloing source context preserved: `true`
+- targeted quality repair follow-up repair sweep source outside-soloing source context preserved: `true`
+- targeted quality repair follow-up bridge repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair selected next target: `songlike_melody_contour_repair_sweep`
 - targeted quality repair source risk: `5 -> 2`
 - targeted quality repair current risk after / delta: `0 / 2`
@@ -375,7 +378,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - final status bridge repair sweep source outside-soloing source context preserved: `true`
 - MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`

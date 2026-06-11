@@ -407,7 +407,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo targeted quality repair listening review package: review items `6`, validated input `false`, source risk `5 -> 2`, current repair risk after `0`, source-context preserved flags `3/3`, technical WAV validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
 - MIDI-to-solo targeted quality repair listening review input guard: review items `6`, preference fill `false`, validated input `false`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source-context preserved flags `3/3`, source/repaired outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
 - MIDI-to-solo targeted quality repair objective-only next decision: follow-up required `true`, current quality claim ready `false`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source-context preserved flags `3/3`, source/repaired outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
-- MIDI-to-solo targeted quality repair follow-up decision: selected target `songlike_melody_contour_repair_sweep`, dominant label/count `songlike_melody_not_soloing/5`, objective and repair sweep source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- MIDI-to-solo targeted quality repair follow-up decision: selected target `songlike_melody_contour_repair_sweep`, dominant label/count `songlike_melody_not_soloing/5`, objective and repair sweep source risk `5 -> 2`, current repair risk after/delta `0/2`, source-context preserved flags `3/3`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
 - MIDI-to-solo songlike melody contour repair sweep: songlike failure `5 -> 0`, total failure labels `8 -> 4`, source risk `5 -> 2`, current repair risk after/delta `0/2`, technical regression `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package`
 - MIDI-to-solo songlike melody contour repair audio package: rendered WAV `6`, duration `18.849s-18.992s`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package`
 - MIDI-to-solo songlike melody contour repair listening review package: review items `6`, validated input `false`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, technical WAV validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard`
@@ -12710,6 +12710,58 @@ Issue #1096은 Issue #1094 targeted quality repair listening review input guard 
 다음 작업:
 
 - `Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh`
+
+## 9.239 Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh
+
+Issue #1098은 Issue #1096 targeted quality repair objective-only next decision 결과를 기준으로 follow-up decision의 source-context validation과 summary에 source-context preserved flag 3개를 보존한 작업이다.
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_FOLLOWUP_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
+- source boundary: `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
+- repair sweep boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- selected target: `songlike_melody_contour_repair_sweep`
+- dominant remaining failure label/count: `songlike_melody_not_soloing` / `5`
+- candidate count: `6`
+- source total failure labels: `12`
+- repaired total failure labels: `8`
+- failure label delta: `4`
+- technical regression count: `0`
+- objective source outside-soloing repair evidence ready: `true`
+- objective source outside-soloing repair WAV count: `6`
+- objective source outside-soloing source context preserved: `true`
+- objective preserved source-context flags: `3 / 3`
+- repair sweep source outside-soloing repair evidence ready: `true`
+- repair sweep source outside-soloing source context preserved: `true`
+- repair sweep preserved source-context flags: `3 / 3`
+- objective and repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- objective and repair sweep current repair pitch-role risk after / delta: `0 / 2`
+- objective and repair sweep outside-soloing not evaluable count: `6 / 6`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- follow-up decision source validation에 objective next preserved flag 3개 포함.
+- repair sweep source validation에 targeted repair sweep preserved flag 3개 포함.
+- preserved flag false 입력은 validation error로 차단.
+- dominant remaining failure label 기준 songlike melody contour repair sweep 선택.
+- human/audio preference와 musical quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_targeted_quality_repair_followup.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-followup-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh`
 
 ## 10. 한 문장 요약
 

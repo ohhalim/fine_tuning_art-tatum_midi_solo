@@ -23,8 +23,11 @@
 - objective source outside-soloing source residual risk preserved: `true`
 - objective source outside-soloing current repair pitch-role risk after / delta: `0` / `2`
 - objective follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- objective follow-up objective source outside-soloing source context preserved: `true`
 - objective follow-up objective current repair pitch-role risk after/delta: `0` / `2`
 - objective repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
+- objective follow-up repair sweep source outside-soloing source context preserved: `true`
+- objective bridge repair sweep source outside-soloing source context preserved: `true`
 - objective repair sweep current repair pitch-role risk after/delta: `0` / `2`
 - objective source outside-soloing not evaluable count: `6`
 - objective repaired outside-soloing not evaluable count: `6`
@@ -36,8 +39,11 @@
 - repair sweep source outside-soloing source residual risk preserved: `true`
 - repair sweep source outside-soloing current repair pitch-role risk after / delta: `0` / `2`
 - repair sweep follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
+- repair sweep follow-up objective source outside-soloing source context preserved: `true`
 - repair sweep follow-up objective current repair pitch-role risk after/delta: `0` / `2`
 - repair sweep bridge source outside-soloing source pitch-role risk: `5 -> 2`
+- repair sweep follow-up repair sweep source outside-soloing source context preserved: `true`
+- repair sweep bridge source outside-soloing source context preserved: `true`
 - repair sweep bridge current repair pitch-role risk after/delta: `0` / `2`
 - repair sweep source outside-soloing not evaluable count: `6`
 - repair sweep repaired outside-soloing not evaluable count: `6`
