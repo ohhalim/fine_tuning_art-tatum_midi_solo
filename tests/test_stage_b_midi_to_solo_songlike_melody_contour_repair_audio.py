@@ -221,7 +221,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
                 soundfont_path=str(soundfont),
                 sample_rate=44100,
                 expected_file_count=6,
-                issue_number=1102,
+                issue_number=1186,
                 runner=fake_runner,
             )
             summary = validate_audio_render_report(
@@ -235,7 +235,11 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
             )
 
             self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-            self.assertEqual(report["issue_number"], 1102)
+            self.assertEqual(report["issue_number"], 1186)
+            self.assertEqual(
+                summary["source_songlike_melody_contour_repair_sweep_schema_version"],
+                SOURCE_SCHEMA_VERSION,
+            )
             self.assertTrue(
                 summary["songlike_melody_contour_repair_audio_package_completed"]
             )
@@ -252,6 +256,13 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
                 5,
             )
             self.assertTrue(summary["objective_source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(
+                summary["objective_source_outside_soloing_repair_schema_context_preserved"]
+            )
+            self.assertEqual(
+                summary["objective_source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
             self.assertEqual(
@@ -284,6 +295,11 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
                 5,
             )
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(summary["source_outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(
@@ -324,7 +340,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
                     soundfont_path=str(soundfont),
                     sample_rate=44100,
                     expected_file_count=6,
-                    issue_number=1102,
+                    issue_number=1186,
                     runner=fake_runner,
                 )
 
@@ -345,7 +361,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
                     soundfont_path=str(soundfont),
                     sample_rate=44100,
                     expected_file_count=6,
-                    issue_number=1102,
+                    issue_number=1186,
                     runner=fake_runner,
                 )
 
@@ -366,7 +382,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
                     soundfont_path=str(soundfont),
                     sample_rate=44100,
                     expected_file_count=6,
-                    issue_number=1102,
+                    issue_number=1186,
                     runner=fake_runner,
                 )
 
@@ -389,7 +405,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
                     soundfont_path=str(soundfont),
                     sample_rate=44100,
                     expected_file_count=6,
-                    issue_number=1102,
+                    issue_number=1186,
                     runner=fake_runner,
                 )
 
@@ -412,7 +428,49 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
                     soundfont_path=str(soundfont),
                     sample_rate=44100,
                     expected_file_count=6,
-                    issue_number=1102,
+                    issue_number=1186,
+                    runner=fake_runner,
+                )
+
+    def test_rejects_source_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            source = source_report(root)
+            source["source_schema_versions"]["targeted_quality_repair_followup_decision"] = "old"
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairAudioError):
+                build_audio_render_report(
+                    source,
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    issue_number=1186,
+                    runner=fake_runner,
+                )
+
+    def test_rejects_false_schema_context_preserved(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            source = source_report(root)
+            source["aggregate"]["source_outside_soloing_repair_schema_context_preserved"] = False
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairAudioError):
+                build_audio_render_report(
+                    source,
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    issue_number=1186,
                     runner=fake_runner,
                 )
 
@@ -421,7 +479,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairAudioTest(unittest.TestCase):
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package")
         self.assertEqual(
             SCHEMA_VERSION,
-            "stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package_v4",
+            "stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package_v5",
         )
 
 
