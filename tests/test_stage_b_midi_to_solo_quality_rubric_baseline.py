@@ -148,7 +148,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         report = build_quality_rubric_baseline_report(
             post_mvp_quality_plan=post_mvp_quality_plan(),
             output_dir=Path("outputs/quality_rubric"),
-            issue_number=1084,
+            issue_number=1168,
         )
         summary = validate_quality_rubric_baseline_report(
             report,
@@ -161,7 +161,14 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         )
 
         self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-        self.assertEqual(report["issue_number"], 1084)
+        self.assertEqual(report["issue_number"], 1168)
+        self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(summary["source_post_mvp_plan_schema_version"], POST_MVP_SCHEMA_VERSION)
+        self.assertEqual(summary["source_final_status_schema_version"], FINAL_STATUS_SCHEMA_VERSION)
+        self.assertEqual(summary["source_delivery_package_schema_version"], DELIVERY_SCHEMA_VERSION)
+        self.assertEqual(summary["source_listening_gap_schema_version"], LISTENING_GAP_SCHEMA_VERSION)
+        self.assertEqual(summary["source_quality_gap_schema_version"], QUALITY_GAP_DECISION_SCHEMA_VERSION)
+        self.assertEqual(summary["source_current_evidence_schema_version"], CURRENT_EVIDENCE_SCHEMA_VERSION)
         self.assertTrue(summary["quality_rubric_baseline_completed"])
         self.assertTrue(summary["candidate_failure_labeling_ready"])
         self.assertEqual(summary["selected_target"], SELECTED_TARGET)
@@ -169,6 +176,11 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         self.assertGreaterEqual(summary["required_metric_group_count"], 20)
         self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
         self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
+        self.assertTrue(summary["outside_soloing_repair_schema_context_preserved"])
+        self.assertEqual(
+            summary["outside_soloing_repair_objective_schema_version"],
+            OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+        )
         self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_source_objective_pitch_role_risk_count"], 5)
         self.assertEqual(summary["outside_soloing_repair_source_pitch_role_risk_count_before"], 5)
@@ -194,7 +206,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=source,
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=1084,
+                issue_number=1168,
             )
 
     def test_rejects_wrong_selected_target(self) -> None:
@@ -202,7 +214,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(selected_target="repair_sweep"),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=1084,
+                issue_number=1168,
             )
 
     def test_rejects_quality_claim(self) -> None:
@@ -210,7 +222,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(quality_claim=True),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=1084,
+                issue_number=1168,
             )
 
     def test_rejects_incomplete_plan_inputs(self) -> None:
@@ -218,13 +230,13 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(ordered_work_count=3),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=1084,
+                issue_number=1168,
             )
         with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(taxonomy_count=6),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=1084,
+                issue_number=1168,
             )
 
     def test_rejects_incomplete_outside_soloing_repair_context(self) -> None:
@@ -232,19 +244,40 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(outside_ready=False),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=1084,
+                issue_number=1168,
             )
         with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(outside_wav_count=5),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=1084,
+                issue_number=1168,
             )
         with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(outside_risk_after=1),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=1084,
+                issue_number=1168,
+            )
+
+    def test_rejects_post_mvp_source_schema_mismatch(self) -> None:
+        source = post_mvp_quality_plan()
+        source["source_schema_versions"]["final_status_audit"] = "wrong_schema"
+        with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
+            build_quality_rubric_baseline_report(
+                post_mvp_quality_plan=source,
+                output_dir=Path("outputs/quality_rubric"),
+                issue_number=1168,
+            )
+
+    def test_rejects_missing_outside_soloing_schema_context(self) -> None:
+        source = post_mvp_quality_plan()
+        source["post_mvp_status"]["outside_soloing_repair_schema_context_preserved"] = False
+        source["readiness"]["outside_soloing_repair_schema_context_preserved"] = False
+        with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
+            build_quality_rubric_baseline_report(
+                post_mvp_quality_plan=source,
+                output_dir=Path("outputs/quality_rubric"),
+                issue_number=1168,
             )
 
     def test_rejects_missing_outside_soloing_source_context_field(self) -> None:
@@ -256,7 +289,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=source,
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=1084,
+                issue_number=1168,
             )
 
     def test_rejects_false_source_context_preserved_field(self) -> None:
@@ -268,14 +301,14 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=source,
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=1084,
+                issue_number=1168,
             )
 
     def test_rejects_missing_required_rubric_item(self) -> None:
         report = build_quality_rubric_baseline_report(
             post_mvp_quality_plan=post_mvp_quality_plan(),
             output_dir=Path("outputs/quality_rubric"),
-            issue_number=1084,
+            issue_number=1168,
         )
         report["rubric_items"] = [
             item for item in report["rubric_items"] if item["id"] != "weak_chord_tone_landing"
@@ -295,7 +328,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_quality_rubric_baseline")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_candidate_failure_labeling")
         self.assertEqual(SELECTED_TARGET, "candidate_failure_labeling")
-        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_quality_rubric_baseline_v3")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_quality_rubric_baseline_v4")
 
 
 if __name__ == "__main__":
