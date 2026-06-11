@@ -32,7 +32,7 @@
 - latest songlike melody contour repair audio package: Issue #1186, Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh
 - latest songlike melody contour repair listening review package: Issue #1188, Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh
 - latest songlike melody contour repair listening review input guard: Issue #1190, Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh
-- latest songlike melody contour repair objective-only next decision: Issue #1108, Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh
+- latest songlike melody contour repair objective-only next decision: Issue #1192, Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh
 - latest songlike melody contour repair follow-up decision: Issue #1110, Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh
 - latest songlike melody contour phrase/rhythm repair sweep: Issue #1112, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm repair audio package: Issue #1114, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh`
+- open issue queue after Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -3909,13 +3909,18 @@ Issue #1022는 Issue #1020 listening review package의 pending input 상태와 s
 
 ## 9.244 Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh
 
-Issue #1108은 Issue #1190 input guard의 pending input 상태와 source-context preserved flag 3개를 objective-only next decision summary까지 보존한 작업이다.
+Issue #1192는 Issue #1190 input guard v5의 pending input 상태, source schema chain, source-context, schema-context를 objective-only next decision summary까지 보존한 작업이다.
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision`
 - source boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard`
+- schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next_v5`
+- source input guard schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard_v5`
+- source listening review package schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package_v5`
+- source audio package schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package_v5`
+- source sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_v5`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
 - selected target: `songlike_melody_contour_repair_followup_decision`
 - objective next decision completed: `true`
@@ -3930,8 +3935,12 @@ Issue #1108은 Issue #1190 input guard의 pending input 상태와 source-context
 - source outside-soloing repair evidence ready: `true`
 - objective source outside-soloing repair WAV count: `6`
 - objective source outside-soloing source context preserved: `true`
+- objective source outside-soloing schema context preserved: `true`
+- objective source outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - objective preserved source-context flags: `3 / 3`
 - source outside-soloing source context preserved: `true`
+- source outside-soloing schema context preserved: `true`
+- source outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - source preserved source-context flags: `3 / 3`
 - source outside-soloing source pitch-role risk: `5 -> 2`
 - source outside-soloing current repair pitch-role risk after / delta: `0 / 2`
@@ -3945,16 +3954,16 @@ Issue #1108은 Issue #1190 input guard의 pending input 상태와 source-context
 
 판단:
 
-- objective-only next decision source validation에 #1106 preserved flag 3개 포함.
-- objective summary와 readiness에 objective/source preserved flag 보존.
-- preserved flag false 입력은 validation error로 차단.
+- objective-only next decision source validation에 input guard v5, listening review package v5, audio package v5, sweep v5 schema chain 포함.
+- objective summary와 readiness에 objective/source source-context 및 schema-context flag 보존.
+- schema version mismatch, schema-context false, preserved flag false 입력은 validation error로 차단.
 - review input 부재와 quality claim unavailable 상태에서 follow-up decision boundary 선택.
 - human/audio preference와 musical quality claim 제외 유지.
 
 검증:
 
-- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next`
-- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next.py`
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next.py tests/test_stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-repair-objective-only-next-decision`
 - `bash scripts/agent_harness.sh quick`

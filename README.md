@@ -26,7 +26,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour repair audio package: `Issue #1186`
 - latest songlike melody contour repair listening review package: `Issue #1188`
 - latest songlike melody contour repair listening review input guard: `Issue #1190`
-- latest songlike melody contour repair objective-only next decision: `Issue #1108`
+- latest songlike melody contour repair objective-only next decision: `Issue #1192`
 - latest songlike melody contour repair follow-up decision: `Issue #1110`
 - latest songlike melody contour phrase/rhythm repair sweep: `Issue #1112`
 - latest songlike melody contour phrase/rhythm repair audio package: `Issue #1114`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after songlike melody contour repair listening review input guard source-context refresh merge: `0`
+- open issue queue after songlike melody contour repair objective-only next decision source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
@@ -468,6 +468,15 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - songlike contour input guard follow-up objective source outside-soloing source context preserved: `true`
 - songlike contour input guard follow-up repair sweep source outside-soloing source context preserved: `true`
 - songlike contour input guard bridge repair sweep source outside-soloing source context preserved: `true`
+- songlike contour objective next schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next_v5`
+- songlike contour objective next source input guard schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard_v5`
+- songlike contour objective next source listening review package schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package_v5`
+- songlike contour objective next source audio package schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package_v5`
+- songlike contour objective next source sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_v5`
+- songlike contour objective next objective source outside-soloing schema context preserved: `true`
+- songlike contour objective next objective source outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
+- songlike contour objective next source outside-soloing schema context preserved: `true`
+- songlike contour objective next source outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - songlike contour objective next objective follow-up objective source outside-soloing source context preserved: `true`
 - songlike contour objective next objective follow-up repair sweep source outside-soloing source context preserved: `true`
 - songlike contour objective next objective bridge repair sweep source outside-soloing source context preserved: `true`
