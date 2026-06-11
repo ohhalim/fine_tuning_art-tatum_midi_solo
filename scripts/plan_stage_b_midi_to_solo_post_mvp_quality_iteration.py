@@ -14,7 +14,9 @@ sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
 from scripts.audit_stage_b_midi_to_solo_final_status import (  # noqa: E402
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as FINAL_STATUS_BOUNDARY,
     NEXT_BOUNDARY as FINAL_STATUS_NEXT_BOUNDARY,
     StageBMidiToSoloFinalStatusAuditError,
@@ -69,12 +71,19 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
 
 
 def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
-    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in container or container[key] is None:
             raise StageBMidiToSoloPostMvpQualityIterationPlanError(
                 f"{label} source-context field required: {key}"
             )
-    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
+    missing_preserved = [
+        key for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS if not bool(container.get(key))
+    ]
+    if missing_preserved:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            f"{label} source-context preserved field must be true: {missing_preserved}"
+        )
+    return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
 
 
 def validate_final_status_source(report: dict[str, Any]) -> dict[str, Any]:
@@ -268,7 +277,7 @@ def build_post_mvp_quality_iteration_plan_report(
             "outside_soloing_repair_pitch_role_risk_delta": _int(
                 source["outside_soloing_repair_pitch_role_risk_delta"]
             ),
-            **{key: source[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS},
+            **{key: source[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
             "listening_review_quality_gap_open": bool(
                 source["listening_review_quality_gap_open"]
             ),
@@ -298,6 +307,15 @@ def build_post_mvp_quality_iteration_plan_report(
             "technical_mvp_complete": True,
             "outside_soloing_repair_source_context_preserved": bool(
                 source["outside_soloing_repair_source_context_preserved"]
+            ),
+            "followup_objective_source_outside_soloing_source_context_preserved": bool(
+                source["followup_objective_source_outside_soloing_source_context_preserved"]
+            ),
+            "followup_repair_sweep_source_outside_soloing_source_context_preserved": bool(
+                source["followup_repair_sweep_source_outside_soloing_source_context_preserved"]
+            ),
+            "repair_sweep_source_outside_soloing_source_context_preserved": bool(
+                source["repair_sweep_source_outside_soloing_source_context_preserved"]
             ),
             "quality_rubric_required": True,
             "candidate_failure_labeling_required": True,
@@ -422,7 +440,7 @@ def validate_post_mvp_quality_iteration_plan_report(
         ),
         **{
             key: post_mvp_status.get(key)
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
         },
         "candidate_failure_labeling_required": bool(
             readiness.get("candidate_failure_labeling_required", False)
@@ -467,6 +485,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- local review ready: `{_bool_token(status['local_review_ready'])}`",
         f"- outside-soloing repair evidence ready: `{_bool_token(status['outside_soloing_repair_evidence_ready'])}`",
         f"- outside-soloing repair source context preserved: `{_bool_token(status['outside_soloing_repair_source_context_preserved'])}`",
+        f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(status['followup_objective_source_outside_soloing_source_context_preserved'])}`",
+        f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(status['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
+        f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(status['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- outside-soloing repair WAV count: `{status['outside_soloing_repair_wav_count']}`",
         f"- outside-soloing source objective pitch-role risk: `{status['outside_soloing_repair_source_objective_pitch_role_risk_count']}`",
         f"- outside-soloing source pitch-role risk before / after / delta: `{status['outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{status['outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{status['outside_soloing_repair_source_pitch_role_risk_delta']}`",

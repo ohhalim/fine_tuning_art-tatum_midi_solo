@@ -13,7 +13,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP delivery package: `Issue #1076`
 - latest README final evidence refresh: `Issue #1078`
 - latest final status audit: `Issue #1080`
-- latest post-MVP quality iteration plan: `Issue #998`
+- latest post-MVP quality iteration plan: `Issue #1082`
 - latest quality rubric baseline: `Issue #1000`
 - latest candidate failure labeling: `Issue #1002`
 - latest targeted quality repair sweep: `Issue #1004`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1066`
 - latest README evidence refresh: `Issue #1068`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after final status audit source-context refresh merge: `0`
+- open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -264,6 +264,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - post-MVP quality iteration plan completed: `true`
 - post-MVP selected target: `quality_rubric_baseline`
 - post-MVP quality rubric required: `true`
+- post-MVP follow-up objective source outside-soloing source context preserved: `true`
+- post-MVP follow-up repair sweep source outside-soloing source context preserved: `true`
+- post-MVP bridge repair sweep source outside-soloing source context preserved: `true`
 - quality rubric baseline completed: `true`
 - quality rubric item / metric group count: `8 / 30`
 - quality rubric candidate failure labeling ready: `true`
@@ -351,7 +354,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - final status bridge repair sweep source outside-soloing source context preserved: `true`
 - MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- next boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
