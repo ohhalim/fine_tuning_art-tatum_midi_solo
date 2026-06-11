@@ -37,7 +37,7 @@
 - latest songlike melody contour phrase/rhythm repair sweep: Issue #1112, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm repair audio package: Issue #1114, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm repair listening review package: Issue #1116, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh
-- latest songlike melody contour phrase/rhythm repair listening review input guard: Issue #1034, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh
+- latest songlike melody contour phrase/rhythm repair listening review input guard: Issue #1118, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh
 - latest songlike melody contour phrase/rhythm repair objective-only next decision: Issue #1036, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh
 - latest songlike melody contour phrase/rhythm repair follow-up decision: Issue #1038, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-context pitch-role bridge: Issue #1040, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm repair listening review package source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm repair listening review input guard source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -4296,14 +4296,14 @@ Issue #1116은 Issue #1114 phrase/rhythm repair audio package 결과의 WAV/MIDI
 
 ## Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Repair Listening Review Input Guard Source Context Refresh Result
 
-Issue #1034는 Issue #1032 listening review package의 pending input 상태와 source/current outside-soloing context를 input guard summary까지 보존한 작업이다.
+Issue #1118은 Issue #1116 listening review package의 pending input 상태와 source/current outside-soloing context를 input guard summary까지 보존한 작업이다.
 
 변경:
 
-- input guard source validation에 objective/source source-context preserved flag 필수화
-- listening review package bridge source-context 21개 키 보존 검증 추가
+- input guard source validation에 required source-context key와 preserved flag true 조건 추가
+- listening review package bridge source-context key 보존 검증 추가
 - pending input, preference fill 차단, source context를 guard/readiness/validation summary까지 전파
-- harness issue number를 #1034 기준으로 갱신
+- harness issue number를 #1118 기준으로 갱신
 
 결과:
 
@@ -4320,6 +4320,9 @@ Issue #1034는 Issue #1032 listening review package의 pending input 상태와 s
 - phrase/rhythm failure delta: `3`
 - objective source outside-soloing source context preserved: `true`
 - source outside-soloing source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - source outside-soloing source pitch-role risk count: `5 -> 2`
 - source outside-soloing current repair pitch-role risk after / delta: `0 / 2`
 - source/repaired outside-soloing not evaluable count: `6/6`
@@ -4329,7 +4332,7 @@ Issue #1034는 Issue #1032 listening review package의 pending input 상태와 s
 판단:
 
 - validated review input 부재 상태에서 preference fill 차단 유지.
-- source-context preserved flag와 21개 context field 보존 확인.
+- source-context preserved flag와 required context field 보존 확인.
 - quality/preference claim 제외 유지.
 - critical user input 없이 objective-only next decision boundary로 진행 가능.
 
@@ -4339,6 +4342,8 @@ Issue #1034는 Issue #1032 listening review package의 pending input 상태와 s
 - `.venv/bin/python -m py_compile scripts/guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-listening-review-input-guard`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
 
 다음:
 
