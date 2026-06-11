@@ -16,7 +16,7 @@
 - latest MVP completion audit: Issue #1154, Stage B MIDI-to-solo MVP completion audit source-context refresh
 - latest quality gap decision: Issue #1156, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #1158, Stage B MIDI-to-solo listening review quality gap source-context refresh
-- latest MVP delivery package: Issue #1076, Stage B MIDI-to-solo MVP delivery package source-context refresh
+- latest MVP delivery package: Issue #1160, Stage B MIDI-to-solo MVP delivery package source-context refresh
 - latest README final evidence refresh: Issue #1078, Stage B MIDI-to-solo README final evidence refresh source-context refresh
 - latest final status audit: Issue #1080, Stage B MIDI-to-solo final status audit source-context refresh
 - latest post-MVP quality iteration plan: Issue #1082, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo listening review quality gap source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP delivery package source-context refresh`
+- open issue queue after Stage B MIDI-to-solo MVP delivery package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo README final evidence refresh source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5545,20 +5545,24 @@ Issue #1158은 Issue #1156 quality gap decision의 schema/source-context preserv
 
 ## Stage B MIDI-to-Solo MVP Delivery Package Source-Context Refresh Result
 
-Issue #1076은 Issue #1074 listening review quality gap의 source-context preserved flag 3개를 MVP delivery package manifest와 validation summary까지 보존하고, 다음 boundary를 README final evidence refresh로 유지한 작업이다.
+Issue #1160은 Issue #1158 listening review quality gap의 schema/source-context 결과를 MVP delivery package manifest와 validation summary까지 보존하고, 다음 boundary를 README final evidence refresh로 유지한 작업이다.
 
 변경:
 
-- MVP delivery package schema v3 적용
-- source-context required key를 preserved flag 3개 포함으로 확장
-- false preserved flag 입력 차단 테스트 추가
-- delivery package manifest, generated markdown report, validation summary source-context preserved field 전파
-- harness issue number #1076 반영
+- MVP delivery package schema v4 적용
+- source listening gap schema v4, quality gap decision schema v4, current evidence schema v4 필수 검증
+- outside-soloing schema-context preserved flag와 objective schema version 필수 검증
+- delivery package manifest, generated markdown report, validation summary schema/source-context field 전파
+- harness issue number #1160 반영
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_DELIVERY_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
 - technical MVP delivery package completed: `true`
 - runnable CLI ready: `true`
@@ -5567,6 +5571,8 @@ Issue #1076은 Issue #1074 listening review quality gap의 source-context preser
 - changed-ratio repair audio evidence ready: `true`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`

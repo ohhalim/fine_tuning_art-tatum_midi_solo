@@ -18,7 +18,11 @@ from scripts.decide_stage_b_midi_to_solo_listening_review_quality_gap import (  
     BRIDGE_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as LISTENING_GAP_BOUNDARY,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
     NEXT_BOUNDARY as LISTENING_GAP_NEXT_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    QUALITY_GAP_DECISION_SCHEMA_VERSION,
+    SCHEMA_VERSION as LISTENING_GAP_SCHEMA_VERSION,
 )
 from scripts.run_stage_b_midi_to_solo_phrase_bank_cli_mvp_package import (  # noqa: E402
     BOUNDARY as CLI_PACKAGE_BOUNDARY,
@@ -31,7 +35,7 @@ class StageBMidiToSoloMvpDeliveryPackageError(ValueError):
 
 BOUNDARY = "stage_b_midi_to_solo_mvp_delivery_package"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_readme_final_evidence_refresh"
-SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_delivery_package_v3"
+SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_delivery_package_v4"
 CHANGED_RATIO_AUDIO_BOUNDARY = (
     "stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_audio_package"
 )
@@ -112,6 +116,18 @@ def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
     summary = _dict(report.get("quality_gap_summary"))
+    if str(report.get("schema_version") or "") != LISTENING_GAP_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "listening review quality gap schema version mismatch"
+        )
+    if str(report.get("source_schema_version") or "") != QUALITY_GAP_DECISION_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "listening review source quality gap schema version mismatch"
+        )
+    if str(report.get("source_current_evidence_schema_version") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "listening review source current evidence schema version mismatch"
+        )
     if str(report.get("boundary") or "") != LISTENING_GAP_BOUNDARY:
         raise StageBMidiToSoloMvpDeliveryPackageError("listening review quality gap boundary required")
     if str(decision.get("next_boundary") or "") != LISTENING_GAP_NEXT_BOUNDARY:
@@ -132,14 +148,32 @@ def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloMvpDeliveryPackageError(
             "outside-soloing repair source context readiness required"
         )
+    if not bool(readiness.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair schema context readiness required"
+        )
     if not bool(summary.get("outside_soloing_repair_source_context_preserved", False)):
         raise StageBMidiToSoloMvpDeliveryPackageError(
             "outside-soloing repair source context preservation required"
+        )
+    if not bool(summary.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair schema context preservation required"
+        )
+    if str(
+        summary.get("outside_soloing_repair_objective_schema_version") or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair objective schema version mismatch"
         )
     source_context = _source_context_fields(
         summary,
         label="listening review quality gap",
     )
+    if str(summary.get("current_evidence_schema_version") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "listening review summary current evidence schema version mismatch"
+        )
     if _int(summary.get("rendered_audio_file_count")) < 3:
         raise StageBMidiToSoloMvpDeliveryPackageError("changed-ratio repair rendered WAV count below 3")
     if _int(summary.get("max_repaired_interval")) > _int(summary.get("max_interval_threshold")):
@@ -200,11 +234,23 @@ def validate_listening_gap(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloMvpDeliveryPackageError("critical user input should not be required")
     _require_no_quality_claim(readiness, label="listening gap readiness")
     return {
+        "listening_gap_schema_version": LISTENING_GAP_SCHEMA_VERSION,
+        "source_quality_gap_schema_version": QUALITY_GAP_DECISION_SCHEMA_VERSION,
+        "source_current_evidence_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
+        "current_evidence_schema_version": str(
+            summary.get("current_evidence_schema_version") or ""
+        ),
         "technical_model_core_mvp_completed": True,
         "changed_ratio_repair_objective_completed": True,
         "outside_soloing_repair_objective_completed": True,
         "outside_soloing_repair_source_context_preserved": bool(
             summary.get("outside_soloing_repair_source_context_preserved", False)
+        ),
+        "outside_soloing_repair_schema_context_preserved": bool(
+            summary.get("outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "outside_soloing_repair_objective_schema_version": str(
+            summary.get("outside_soloing_repair_objective_schema_version") or ""
         ),
         "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
         "max_repaired_interval": _int(summary.get("max_repaired_interval")),
@@ -375,6 +421,11 @@ def build_delivery_package_report(
         "output_dir": str(output_dir),
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
+        "source_schema_versions": {
+            "listening_review_quality_gap": listening["listening_gap_schema_version"],
+            "quality_gap_decision": listening["source_quality_gap_schema_version"],
+            "current_evidence": listening["source_current_evidence_schema_version"],
+        },
         "source_boundaries": {
             "listening_review_quality_gap": LISTENING_GAP_BOUNDARY,
             "phrase_bank_cli_mvp_package": CLI_PACKAGE_BOUNDARY,
@@ -390,6 +441,12 @@ def build_delivery_package_report(
             "outside_soloing_repair_source_context_preserved": bool(
                 listening["outside_soloing_repair_source_context_preserved"]
             ),
+            "outside_soloing_repair_schema_context_preserved": bool(
+                listening["outside_soloing_repair_schema_context_preserved"]
+            ),
+            "outside_soloing_repair_objective_schema_version": listening[
+                "outside_soloing_repair_objective_schema_version"
+            ],
             "listening_review_quality_gap_open": bool(
                 listening["listening_review_quality_gap_open"]
             ),
@@ -462,6 +519,9 @@ def build_delivery_package_report(
             "outside_soloing_repair_source_context_preserved": bool(
                 listening["outside_soloing_repair_source_context_preserved"]
             ),
+            "outside_soloing_repair_schema_context_preserved": bool(
+                listening["outside_soloing_repair_schema_context_preserved"]
+            ),
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
             "phrase_bank_musical_quality_claimed": False,
@@ -504,9 +564,30 @@ def validate_delivery_package_report(
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
     package = _dict(report.get("delivery_package"))
+    source_schema_versions = _dict(report.get("source_schema_versions"))
     artifact_manifest = _dict(report.get("artifact_manifest"))
     cli_candidates = _list(artifact_manifest.get("cli_repaired_midi_candidates"))
     audio_candidates = _list(artifact_manifest.get("changed_ratio_repair_audio_candidates"))
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "MVP delivery package schema version mismatch"
+        )
+    if str(
+        source_schema_versions.get("listening_review_quality_gap") or ""
+    ) != LISTENING_GAP_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "delivery package source listening gap schema version mismatch"
+        )
+    if str(
+        source_schema_versions.get("quality_gap_decision") or ""
+    ) != QUALITY_GAP_DECISION_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "delivery package source quality gap schema version mismatch"
+        )
+    if str(source_schema_versions.get("current_evidence") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "delivery package source current evidence schema version mismatch"
+        )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloMvpDeliveryPackageError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -531,9 +612,23 @@ def validate_delivery_package_report(
         raise StageBMidiToSoloMvpDeliveryPackageError(
             "outside-soloing repair source context readiness required"
         )
+    if not bool(readiness.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair schema context readiness required"
+        )
     if not bool(package.get("outside_soloing_repair_source_context_preserved", False)):
         raise StageBMidiToSoloMvpDeliveryPackageError(
             "outside-soloing repair source context preservation required"
+        )
+    if not bool(package.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair schema context preservation required"
+        )
+    if str(
+        package.get("outside_soloing_repair_objective_schema_version") or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpDeliveryPackageError(
+            "outside-soloing repair objective schema version mismatch"
         )
     source_context = _source_context_fields(
         package,
@@ -584,6 +679,16 @@ def validate_delivery_package_report(
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="MVP delivery package readiness")
     return {
+        "schema_version": str(report.get("schema_version") or ""),
+        "source_listening_gap_schema_version": str(
+            source_schema_versions.get("listening_review_quality_gap") or ""
+        ),
+        "source_quality_gap_schema_version": str(
+            source_schema_versions.get("quality_gap_decision") or ""
+        ),
+        "source_current_evidence_schema_version": str(
+            source_schema_versions.get("current_evidence") or ""
+        ),
         "boundary": boundary,
         "next_boundary": str(decision.get("next_boundary") or ""),
         "mvp_delivery_package_completed": bool(
@@ -602,6 +707,12 @@ def validate_delivery_package_report(
         ),
         "outside_soloing_repair_source_context_preserved": bool(
             package.get("outside_soloing_repair_source_context_preserved", False)
+        ),
+        "outside_soloing_repair_schema_context_preserved": bool(
+            package.get("outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "outside_soloing_repair_objective_schema_version": str(
+            package.get("outside_soloing_repair_objective_schema_version") or ""
         ),
         "cli_candidate_count": _int(package.get("cli_candidate_count")),
         "changed_ratio_repair_wav_count": _int(package.get("changed_ratio_repair_wav_count")),
@@ -651,7 +762,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- boundary: `{report['boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
         f"- next boundary: `{decision['next_boundary']}`",
+        f"- source listening gap schema version: `{report['source_schema_versions']['listening_review_quality_gap']}`",
+        f"- source quality gap schema version: `{report['source_schema_versions']['quality_gap_decision']}`",
+        f"- source current evidence schema version: `{report['source_schema_versions']['current_evidence']}`",
         f"- technical MVP delivery package completed: `{_bool_token(package['technical_mvp_delivery_package_completed'])}`",
         f"- runnable CLI ready: `{_bool_token(package['runnable_cli_ready'])}`",
         f"- input to ranked MIDI ready: `{_bool_token(package['input_to_ranked_midi_ready'])}`",
@@ -659,6 +774,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- changed-ratio repair audio evidence ready: `{_bool_token(package['changed_ratio_repair_audio_evidence_ready'])}`",
         f"- outside-soloing repair evidence ready: `{_bool_token(package['outside_soloing_repair_evidence_ready'])}`",
         f"- outside-soloing repair source context preserved: `{_bool_token(package['outside_soloing_repair_source_context_preserved'])}`",
+        f"- outside-soloing repair schema context preserved: `{_bool_token(package['outside_soloing_repair_schema_context_preserved'])}`",
         f"- listening review quality gap open: `{_bool_token(package['listening_review_quality_gap_open'])}`",
         "",
         "## Run Command",
@@ -675,6 +791,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- changed-ratio repair max interval / target: `{package['changed_ratio_repair_interval_target'][0]}` / `{package['changed_ratio_repair_interval_target'][1]}`",
         f"- changed-ratio repair WAV duration range: `{package['changed_ratio_repair_wav_duration_range'][0]:.3f}s` - `{package['changed_ratio_repair_wav_duration_range'][1]:.3f}s`",
         f"- outside-soloing repair WAV count: `{package['outside_soloing_repair_wav_count']}`",
+        f"- outside-soloing repair objective schema version: `{package['outside_soloing_repair_objective_schema_version']}`",
         f"- outside-soloing repair changed note total: `{package['outside_soloing_repair_changed_note_total']}`",
         f"- outside-soloing source objective pitch-role risk: `{package['outside_soloing_repair_source_objective_pitch_role_risk_count']}`",
         f"- outside-soloing source pitch-role risk before / after / delta: `{package['outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{package['outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{package['outside_soloing_repair_source_pitch_role_risk_delta']}`",
@@ -718,7 +835,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=738)
+    parser.add_argument("--issue_number", type=int, default=1160)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_delivery_completed", action="store_true")
