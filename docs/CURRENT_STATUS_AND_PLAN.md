@@ -14,7 +14,7 @@
 
 - latest functional result: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest MVP completion audit: Issue #1154, Stage B MIDI-to-solo MVP completion audit source-context refresh
-- latest quality gap decision: Issue #1072, Stage B MIDI-to-solo quality gap decision source-context refresh
+- latest quality gap decision: Issue #1156, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #1074, Stage B MIDI-to-solo listening review quality gap source-context refresh
 - latest MVP delivery package: Issue #1076, Stage B MIDI-to-solo MVP delivery package source-context refresh
 - latest README final evidence refresh: Issue #1078, Stage B MIDI-to-solo README final evidence refresh source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo MVP completion audit source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo quality gap decision source-context refresh`
+- open issue queue after Stage B MIDI-to-solo quality gap decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo listening review quality gap source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5431,21 +5431,24 @@ Issue #1154는 Issue #1150 current evidence와 Issue #1152 README evidence refre
 
 ## Stage B MIDI-to-Solo Quality Gap Decision Source-Context Refresh Result
 
-Issue #1072는 Issue #1070 MVP completion audit의 source-context preserved flag 3개를 quality gap decision summary와 validation summary까지 보존하고, 다음 target을 listening review quality gap으로 유지한 작업이다.
+Issue #1156은 Issue #1154 MVP completion audit의 schema/source-context preserved flag를 quality gap decision summary와 validation summary까지 보존하고, 다음 target을 listening review quality gap으로 유지한 작업이다.
 
 변경:
 
-- quality gap decision schema v3 적용
-- source-context required key를 preserved flag 3개 포함으로 확장
-- false preserved flag 입력 차단 테스트 추가
-- quality gap summary, generated markdown report, validation summary source-context preserved field 전파
-- harness issue number #1072 반영
+- quality gap decision schema v4 적용
+- MVP completion audit schema v4 입력 검증 추가
+- source current evidence schema v4 보존 검증 추가
+- outside-soloing schema-context preserved field와 objective schema version 전파
+- harness issue number #1156 반영
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_QUALITY_GAP_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_quality_gap_decision`
 - next boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source schema version: `stage_b_midi_to_solo_mvp_completion_audit_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - selected target: `listening_review_quality_gap`
 - fallback path active: `true`
 - model-conditioned input path alignment required: `false`
@@ -5454,6 +5457,8 @@ Issue #1072는 Issue #1070 MVP completion audit의 source-context preserved flag
 - model-conditioned pitch-contour changed-ratio repair objective completed: `true`
 - outside-soloing repair objective completed: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -5463,6 +5468,7 @@ Issue #1072는 Issue #1070 MVP completion audit의 source-context preserved flag
 
 판단:
 
+- #1154 completion audit schema v4와 source current evidence schema v4가 decision report까지 보존됨.
 - changed-ratio repair와 outside-soloing repair objective path는 현재 target 통과.
 - 다음 gap은 추가 objective repair가 아니라 listening review evidence.
 - human/audio preference, MIDI-to-solo musical quality claim 제외.

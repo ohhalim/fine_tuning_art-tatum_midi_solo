@@ -394,7 +394,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo MVP current evidence consolidation: schema `v4`, evidence support `true`, technical path `true`, selected-scale objective path `true`, phrase-bank CLI path `true`, model-conditioned pitch-contour objective path `true`, changed-ratio repair objective path `true`, outside-soloing objective/schema context `true/true`, exported/rendered `3/3`, objective valid/strict/grammar `9/9/9`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_readme_evidence_refresh`
 - MIDI-to-solo README evidence refresh: latest boundary `stage_b_midi_to_solo_mvp_current_evidence_consolidation`, input-to-WAV technical path `true`, selected-scale objective path `true`, phrase-bank CLI path `true`, model-conditioned pitch-contour objective path `true`, changed-ratio repair objective path `true`, outside-soloing schema-context evidence reflected `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_mvp_completion_audit`
 - MIDI-to-solo MVP completion audit refresh: schema `stage_b_midi_to_solo_mvp_completion_audit_v4`, current evidence schema `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`, technical model-core MVP `true`, model-conditioned pitch-contour objective `true`, changed-ratio repair objective `true`, outside-soloing schema-context preserved `true`, musical/product MVP `false/false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_gap_decision`
-- MIDI-to-solo quality gap decision refresh: selected target `listening_review_quality_gap`, fallback alignment required `false`, changed-ratio repair objective `true`, changed-ratio repair ratio/target `0.4348/0.5000`, changed-ratio repair interval/target `12/12`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_listening_review_quality_gap`
+- MIDI-to-solo quality gap decision refresh: schema `stage_b_midi_to_solo_quality_gap_decision_v4`, source audit schema `stage_b_midi_to_solo_mvp_completion_audit_v4`, current evidence schema `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`, selected target `listening_review_quality_gap`, outside-soloing schema-context preserved `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_listening_review_quality_gap`
 - MIDI-to-solo listening review quality gap: selected target `mvp_delivery_package`, technical delivery package ready `true`, listening gap open `true`, changed-ratio repair ratio/target `0.4348/0.5000`, interval/target `12/12`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_mvp_delivery_package`
 - MIDI-to-solo MVP delivery package: runnable CLI `true`, input ranked MIDI `true`, rendered WAV evidence `true`, CLI/changed-ratio audio candidate count `3/3`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_readme_final_evidence_refresh`
 - MIDI-to-solo README final evidence refresh: latest evidence boundary `stage_b_midi_to_solo_mvp_delivery_package`, runnable CLI `true`, input ranked MIDI/WAV evidence `true/true`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_final_status_audit`
@@ -12193,13 +12193,16 @@ Issue #1154는 Issue #1150 current evidence와 Issue #1152 README evidence refre
 
 ## 9.226 Stage B MIDI-to-solo quality gap decision source-context refresh
 
-Issue #1072는 Issue #1070 MVP completion audit의 source-context preserved flag 3개를 quality gap decision summary와 validation summary까지 보존하고, 다음 target을 listening review quality gap으로 유지한 작업이다.
+Issue #1156은 Issue #1154 MVP completion audit의 schema/source-context preserved flag를 quality gap decision summary와 validation summary까지 보존하고, 다음 target을 listening review quality gap으로 유지한 작업이다.
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_QUALITY_GAP_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_quality_gap_decision`
 - next boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source schema version: `stage_b_midi_to_solo_mvp_completion_audit_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - selected target: `listening_review_quality_gap`
 - fallback path active: `true`
 - model-conditioned input path alignment required: `false`
@@ -12208,6 +12211,8 @@ Issue #1072는 Issue #1070 MVP completion audit의 source-context preserved flag
 - model-conditioned pitch-contour changed-ratio repair objective completed: `true`
 - outside-soloing repair objective completed: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -12217,6 +12222,7 @@ Issue #1072는 Issue #1070 MVP completion audit의 source-context preserved flag
 
 판단:
 
+- #1154 completion audit schema v4와 source current evidence schema v4가 decision report까지 보존됨.
 - changed-ratio repair와 outside-soloing repair objective path는 현재 target 통과.
 - 다음 gap은 추가 objective repair가 아니라 listening review evidence.
 - human/audio preference, MIDI-to-solo musical quality claim 제외.

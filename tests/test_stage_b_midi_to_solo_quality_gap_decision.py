@@ -6,6 +6,9 @@ from pathlib import Path
 from scripts.audit_stage_b_midi_to_solo_mvp_completion import (
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BOUNDARY as MVP_COMPLETION_BOUNDARY,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    SCHEMA_VERSION as MVP_COMPLETION_AUDIT_SCHEMA_VERSION,
 )
 from scripts.decide_stage_b_midi_to_solo_quality_gap import (
     BOUNDARY,
@@ -62,12 +65,15 @@ def mvp_completion_audit(
     outside_soloing_repair_supported: bool = True,
 ) -> dict:
     return {
+        "schema_version": MVP_COMPLETION_AUDIT_SCHEMA_VERSION,
         "boundary": MVP_COMPLETION_BOUNDARY,
+        "source_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
         "readiness": {
             "mvp_completion_audit_completed": True,
             "technical_model_core_mvp_completed": True,
             "quality_gap_decision_required": True,
             "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_schema_context_preserved": outside_soloing_repair_supported,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "broad_trained_model_quality_claimed": False,
@@ -85,7 +91,12 @@ def mvp_completion_audit(
                 changed_ratio_repair_supported
             ),
             "outside_soloing_repair_objective_completed": outside_soloing_repair_supported,
+            "outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_schema_context_preserved": outside_soloing_repair_supported,
+            "current_evidence_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
             "readme_evidence_boundary_refreshed": True,
             "musical_quality_mvp_completed": musical_complete,
             "human_audio_preference_completed": False,
@@ -94,6 +105,7 @@ def mvp_completion_audit(
             "product_mvp_completed": False,
         },
         "current_evidence": {
+            "current_evidence_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
             "generation_source": generation_source,
             "exported_candidate_count": 3,
             "rendered_audio_file_count": 3,
@@ -140,6 +152,10 @@ def mvp_completion_audit(
             "outside_soloing_repair_objective_path_ready": outside_soloing_repair_supported,
             "outside_soloing_repair_current_evidence_ready": outside_soloing_repair_supported,
             "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_schema_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "outside_soloing_repair_rendered_audio_file_count": 6,
             "outside_soloing_repair_changed_note_total": 2,
             "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
@@ -172,7 +188,7 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
         report = build_quality_gap_decision_report(
             mvp_completion_audit=mvp_completion_audit(),
             output_dir=Path("outputs/quality_gap"),
-            issue_number=1072,
+            issue_number=1156,
         )
         summary = validate_quality_gap_decision_report(
             report,
@@ -186,12 +202,30 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
         self.assertEqual(summary["next_boundary"], LISTENING_REVIEW_NEXT_BOUNDARY)
         self.assertTrue(summary["fallback_path_active"])
         self.assertFalse(summary["model_conditioned_input_path_alignment_required"])
+        self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(
+            summary["source_schema_version"],
+            MVP_COMPLETION_AUDIT_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            summary["source_current_evidence_schema_version"],
+            CURRENT_EVIDENCE_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            summary["current_evidence_schema_version"],
+            CURRENT_EVIDENCE_SCHEMA_VERSION,
+        )
         self.assertTrue(summary["model_conditioned_pitch_contour_objective_completed"])
         self.assertTrue(
             summary["model_conditioned_pitch_contour_changed_ratio_repair_objective_completed"]
         )
         self.assertTrue(summary["outside_soloing_repair_objective_completed"])
         self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
+        self.assertTrue(summary["outside_soloing_repair_schema_context_preserved"])
+        self.assertEqual(
+            summary["outside_soloing_repair_objective_schema_version"],
+            OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+        )
         self.assertTrue(summary["model_conditioned_pitch_contour_objective_path_ready"])
         self.assertTrue(summary["pitch_contour_changed_ratio_review_required"])
         self.assertTrue(summary["pitch_contour_changed_ratio_repair_objective_path_ready"])
@@ -261,7 +295,32 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
             "Stage B MIDI-to-solo listening review quality gap source-context refresh",
         )
         self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-        self.assertEqual(report["issue_number"], 1072)
+        self.assertEqual(report["source_schema_version"], MVP_COMPLETION_AUDIT_SCHEMA_VERSION)
+        self.assertEqual(
+            report["source_current_evidence_schema_version"],
+            CURRENT_EVIDENCE_SCHEMA_VERSION,
+        )
+        self.assertEqual(report["issue_number"], 1156)
+
+    def test_rejects_mvp_completion_audit_schema_mismatch(self) -> None:
+        source = mvp_completion_audit()
+        source["schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloQualityGapDecisionError):
+            build_quality_gap_decision_report(
+                mvp_completion_audit=source,
+                output_dir=Path("outputs/quality_gap"),
+                issue_number=1156,
+            )
+
+    def test_rejects_mvp_completion_audit_source_schema_mismatch(self) -> None:
+        source = mvp_completion_audit()
+        source["source_schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloQualityGapDecisionError):
+            build_quality_gap_decision_report(
+                mvp_completion_audit=source,
+                output_dir=Path("outputs/quality_gap"),
+                issue_number=1156,
+            )
 
     def test_selects_pitch_contour_changed_ratio_review_without_repair_path(self) -> None:
         report = build_quality_gap_decision_report(
@@ -420,6 +479,33 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
                 issue_number=1072,
             )
 
+    def test_rejects_false_outside_soloing_schema_context_preserved_flag(self) -> None:
+        source = mvp_completion_audit()
+        source["current_evidence"]["outside_soloing_repair_schema_context_preserved"] = False
+
+        with self.assertRaises(StageBMidiToSoloQualityGapDecisionError):
+            build_quality_gap_decision_report(
+                mvp_completion_audit=source,
+                output_dir=Path("outputs/quality_gap"),
+                issue_number=1156,
+            )
+
+    def test_rejects_quality_gap_decision_schema_mismatch(self) -> None:
+        report = build_quality_gap_decision_report(
+            mvp_completion_audit=mvp_completion_audit(),
+            output_dir=Path("outputs/quality_gap"),
+            issue_number=1156,
+        )
+        report["schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloQualityGapDecisionError):
+            validate_quality_gap_decision_report(
+                report,
+                expected_boundary=BOUNDARY,
+                expected_next_boundary=LISTENING_REVIEW_NEXT_BOUNDARY,
+                expected_target=LISTENING_REVIEW_TARGET,
+                require_no_quality_claim=True,
+            )
+
     def test_rejects_targeted_outside_soloing_source_repair(self) -> None:
         source = mvp_completion_audit()
         source["current_evidence"]["outside_soloing_repair_source_targeted"] = True
@@ -464,7 +550,7 @@ class StageBMidiToSoloQualityGapDecisionTest(unittest.TestCase):
             LISTENING_REVIEW_NEXT_BOUNDARY,
             "stage_b_midi_to_solo_listening_review_quality_gap",
         )
-        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_quality_gap_decision_v3")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_quality_gap_decision_v4")
 
 
 if __name__ == "__main__":
