@@ -33,7 +33,7 @@ Current handoff scope:
 - Latest songlike melody contour repair listening review package completed: Issue #1104, Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh.
 - Latest songlike melody contour repair listening review input guard completed: Issue #1106, Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh.
 - Latest songlike melody contour repair objective-only next decision completed: Issue #1108, Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh.
-- Latest songlike melody contour repair follow-up decision completed: Issue #1026, Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh.
+- Latest songlike melody contour repair follow-up decision completed: Issue #1110, Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh.
 - Latest songlike melody contour phrase/rhythm repair sweep completed: Issue #1028, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh.
 - Latest songlike melody contour phrase/rhythm repair audio package completed: Issue #1030, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh.
 - Latest songlike melody contour phrase/rhythm repair listening review package completed: Issue #1032, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh.
@@ -55,8 +55,8 @@ Current handoff scope:
 - Latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision completed: Issue #1064, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh.
 - Latest documentation issue completed: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after songlike melody contour repair objective-only next decision source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh.
+- Open issue queue after songlike melody contour repair follow-up decision source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

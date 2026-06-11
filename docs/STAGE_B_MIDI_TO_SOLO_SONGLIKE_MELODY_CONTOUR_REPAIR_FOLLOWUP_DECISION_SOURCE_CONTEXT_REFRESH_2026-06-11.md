@@ -25,6 +25,9 @@
 - objective source outside-soloing current repair pitch-role risk delta: `2`
 - objective source outside-soloing not evaluable count: `6`
 - objective repaired outside-soloing not evaluable count: `6`
+- objective follow-up objective source outside-soloing source context preserved: `true`
+- objective follow-up repair sweep source outside-soloing source context preserved: `true`
+- objective bridge repair sweep source outside-soloing source context preserved: `true`
 - repair sweep source outside-soloing repair evidence ready: `true`
 - repair sweep source outside-soloing source context preserved: `true`
 - repair sweep source outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`
@@ -34,6 +37,9 @@
 - repair sweep source outside-soloing current repair pitch-role risk delta: `2`
 - repair sweep source outside-soloing not evaluable count: `6`
 - repair sweep repaired outside-soloing not evaluable count: `6`
+- repair sweep follow-up objective source outside-soloing source context preserved: `true`
+- repair sweep follow-up repair sweep source outside-soloing source context preserved: `true`
+- repair sweep bridge source outside-soloing source context preserved: `true`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 
