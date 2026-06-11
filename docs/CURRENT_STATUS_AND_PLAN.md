@@ -19,7 +19,7 @@
 - latest MVP delivery package: Issue #1160, Stage B MIDI-to-solo MVP delivery package source-context refresh
 - latest README final evidence refresh: Issue #1162, Stage B MIDI-to-solo README final evidence refresh source-context refresh
 - latest final status audit: Issue #1164, Stage B MIDI-to-solo final status audit source-context refresh
-- latest post-MVP quality iteration plan: Issue #1082, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
+- latest post-MVP quality iteration plan: Issue #1166, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
 - latest quality rubric baseline: Issue #1084, Stage B MIDI-to-solo quality rubric baseline source-context refresh
 - latest candidate failure labeling: Issue #1086, Stage B MIDI-to-solo candidate failure labeling source-context refresh
 - latest targeted quality repair sweep: Issue #1088, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo final status audit source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh`
+- open issue queue after Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo quality rubric baseline source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5712,21 +5712,29 @@ Issue #1164는 Issue #1162 README final evidence와 Issue #1160 MVP delivery pac
 
 ## Stage B MIDI-to-Solo Post-MVP Quality Iteration Plan Source-Context Refresh Result
 
-Issue #1082는 Issue #1080 final status audit 결과를 기준으로 post-MVP quality iteration plan의 source-context validation과 summary에 source-context preserved flag 3개를 보존한 작업이다.
+Issue #1166은 Issue #1164 final status audit 결과를 기준으로 post-MVP quality iteration plan의 schema/source-context validation과 summary에 final status schema chain을 보존한 작업이다.
 
 변경:
 
-- post-MVP quality iteration plan source validation을 required source-context key 기준으로 갱신
-- source-context preserved flag 3개 false 입력 차단
-- post-MVP status, generated markdown report, validation summary preserved flag 전파
-- harness issue number #1082 반영
+- post-MVP quality iteration plan schema v4 적용
+- final status audit schema v4와 delivery/source schema chain 필수 검증
+- outside-soloing schema-context preserved flag와 objective schema version 전파
+- post-MVP status, generated markdown report, validation summary schema/source-context field 전파
+- stale schema 입력 차단 테스트 추가
+- harness issue number #1166 반영
 - quality rubric baseline fixture 입력 계약 갱신
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_POST_MVP_QUALITY_ITERATION_PLAN_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- schema version: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4`
 - source boundary: `stage_b_midi_to_solo_final_status_audit`
+- source final status schema version: `stage_b_midi_to_solo_final_status_audit_v4`
+- source delivery package schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - next boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
 - selected target: `quality_rubric_baseline`
 - post-MVP quality iteration plan completed: `true`
@@ -5734,6 +5742,8 @@ Issue #1082는 Issue #1080 final status audit 결과를 기준으로 post-MVP qu
 - local review ready: `true`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -5746,8 +5756,8 @@ Issue #1082는 Issue #1080 final status audit 결과를 기준으로 post-MVP qu
 
 판단:
 
-- post-MVP plan source validation에 final status audit preserved flag 3개 포함.
-- preserved flag false 입력은 validation error로 차단.
+- post-MVP plan source validation에 final status audit schema/source-context 결과 포함.
+- stale schema와 preserved flag false 입력은 validation error로 차단.
 - 다음 검증 대상은 quality rubric baseline 유지.
 - musical quality와 human/audio preference claim 제외 유지.
 

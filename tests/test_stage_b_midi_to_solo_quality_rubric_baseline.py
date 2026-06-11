@@ -3,7 +3,15 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import (
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
+    DELIVERY_SCHEMA_VERSION,
+    LISTENING_GAP_SCHEMA_VERSION,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    QUALITY_GAP_DECISION_SCHEMA_VERSION,
+    SCHEMA_VERSION as FINAL_STATUS_SCHEMA_VERSION,
+)
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
     BOUNDARY,
     NEXT_BOUNDARY,
@@ -17,6 +25,7 @@ from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
     BOUNDARY as POST_MVP_BOUNDARY,
     NEXT_BOUNDARY as POST_MVP_NEXT_BOUNDARY,
     SELECTED_TARGET as POST_MVP_SELECTED_TARGET,
+    SCHEMA_VERSION as POST_MVP_SCHEMA_VERSION,
 )
 
 
@@ -65,13 +74,30 @@ def post_mvp_quality_plan(
         "audio_review_package",
     ][:ordered_work_count]
     return {
+        "schema_version": POST_MVP_SCHEMA_VERSION,
         "boundary": POST_MVP_BOUNDARY,
         "source_boundary": "stage_b_midi_to_solo_final_status_audit",
+        "source_schema_versions": {
+            "final_status_audit": FINAL_STATUS_SCHEMA_VERSION,
+            "delivery_package": DELIVERY_SCHEMA_VERSION,
+            "listening_review_quality_gap": LISTENING_GAP_SCHEMA_VERSION,
+            "quality_gap_decision": QUALITY_GAP_DECISION_SCHEMA_VERSION,
+            "current_evidence": CURRENT_EVIDENCE_SCHEMA_VERSION,
+        },
         "post_mvp_status": {
+            "source_final_status_schema_version": FINAL_STATUS_SCHEMA_VERSION,
+            "source_delivery_package_schema_version": DELIVERY_SCHEMA_VERSION,
+            "source_listening_gap_schema_version": LISTENING_GAP_SCHEMA_VERSION,
+            "source_quality_gap_schema_version": QUALITY_GAP_DECISION_SCHEMA_VERSION,
+            "source_current_evidence_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
             "technical_mvp_complete": True,
             "local_review_ready": True,
             "outside_soloing_repair_evidence_ready": outside_ready,
             "outside_soloing_repair_source_context_preserved": outside_ready,
+            "outside_soloing_repair_schema_context_preserved": outside_ready,
+            "outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "outside_soloing_repair_wav_count": outside_wav_count,
             "outside_soloing_repair_changed_note_total": 2,
             "outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
@@ -99,6 +125,7 @@ def post_mvp_quality_plan(
             "targeted_quality_repair_sweep_required": True,
             "audio_review_package_required": True,
             "outside_soloing_repair_source_context_preserved": outside_ready,
+            "outside_soloing_repair_schema_context_preserved": outside_ready,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
