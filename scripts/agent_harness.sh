@@ -5988,7 +5988,7 @@ run_stage_b_midi_to_solo_mvp_current_evidence_consolidation() {
     --model_conditioned_pitch_contour_changed_ratio_repair_objective_next "$model_conditioned_pitch_contour_changed_ratio_repair_objective_next" \
     --outside_soloing_repair_objective_next "$outside_soloing_repair_objective_next" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_CURRENT_EVIDENCE_CONSOLIDATION_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 1066 \
+    --issue_number 1150 \
     --expected_boundary stage_b_midi_to_solo_mvp_current_evidence_consolidation \
     --expected_next_boundary stage_b_midi_to_solo_readme_evidence_refresh \
     --min_exported_candidates 3 \

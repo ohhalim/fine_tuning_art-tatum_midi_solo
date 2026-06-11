@@ -12,6 +12,7 @@
 - model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - outside-soloing repair objective path ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
 - human/audio preference claimed: `false`
 - MIDI-to-solo musical quality claimed: `false`
 
@@ -88,6 +89,11 @@
 ## Outside-Soloing Repair Objective Path
 
 - current evidence consolidation ready: `true`
+- objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
+- source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input_guard_v4`
+- source listening package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package_v4`
+- source audio package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package_v4`
+- source repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep_v3`
 - objective path supported: `true`
 - rendered WAV files: `6`
 - technical WAV validation: `true`

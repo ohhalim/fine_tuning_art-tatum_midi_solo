@@ -391,7 +391,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair audio review package: candidate/rendered `3/3`, sample rate `44100`, duration `6.866s-6.869s`, technical validation `true`, preference claim `false`, next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_listening_review`
 - MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair listening review: review template `true`, pending status/candidate/field `4/3/9`, preference fill `false`, quality claim `false`, next boundary `stage_b_midi_to_solo_controlled_scale_checkpoint_training_scale_postprocess_removal_dead_air_repair_objective_only_next_decision`
 - MIDI-to-solo controlled scale checkpoint training scale postprocess removal dead-air repair objective-only next decision: objective path support `true`, valid/strict/grammar `9/9/9`, dead-air/collapse `0/0`, avg/max postprocess removal `0.2176/0.2917`, preference/quality claim `false`, next boundary `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
-- MIDI-to-solo MVP current evidence consolidation: evidence support `true`, technical path `true`, selected-scale objective path `true`, phrase-bank CLI path `true`, model-conditioned pitch-contour objective path `true`, changed-ratio repair objective path `true`, exported/rendered `3/3`, objective valid/strict/grammar `9/9/9`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_readme_evidence_refresh`
+- MIDI-to-solo MVP current evidence consolidation: schema `v4`, evidence support `true`, technical path `true`, selected-scale objective path `true`, phrase-bank CLI path `true`, model-conditioned pitch-contour objective path `true`, changed-ratio repair objective path `true`, outside-soloing objective/schema context `true/true`, exported/rendered `3/3`, objective valid/strict/grammar `9/9/9`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_readme_evidence_refresh`
 - MIDI-to-solo README evidence refresh: latest boundary `stage_b_midi_to_solo_mvp_current_evidence_consolidation`, input-to-WAV technical path `true`, selected-scale objective path `true`, phrase-bank CLI path `true`, model-conditioned pitch-contour objective path `true`, changed-ratio repair objective path `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_mvp_completion_audit`
 - MIDI-to-solo MVP completion audit refresh: technical model-core MVP `true`, model-conditioned pitch-contour objective `true`, changed-ratio repair objective `true`, max interval/threshold `11/12`, changed-ratio repair ratio/target `0.4348/0.5000`, musical/product MVP `false/false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_gap_decision`
 - MIDI-to-solo quality gap decision refresh: selected target `listening_review_quality_gap`, fallback alignment required `false`, changed-ratio repair objective `true`, changed-ratio repair ratio/target `0.4348/0.5000`, changed-ratio repair interval/target `12/12`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_listening_review_quality_gap`
@@ -12053,7 +12053,7 @@ Issue #1148은 Issue #1146 input guard v4의 source schema chain을 objective-on
 
 ## 9.223 Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 
-Issue #1066은 Issue #1064 outside-soloing repair objective decision의 source-context preserved flag를 MVP current evidence consolidation까지 보존하고, current evidence support를 재검증한 작업이다.
+Issue #1150은 Issue #1148 outside-soloing repair objective decision v4의 source schema chain을 MVP current evidence consolidation까지 보존하고, current evidence support를 재검증한 작업이다.
 
 결과:
 
@@ -12068,6 +12068,8 @@ Issue #1066은 Issue #1064 outside-soloing repair objective decision의 source-c
 - model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - outside-soloing repair objective path ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - outside-soloing repair rendered audio file count: `6`
 - outside-soloing repair changed note total: `2`
 - source outside-soloing pitch-role risk count: `5 -> 2`
@@ -12083,7 +12085,7 @@ Issue #1066은 Issue #1064 outside-soloing repair objective decision의 source-c
 
 판단:
 
-- Issue #1064 objective decision의 preserved flag 3개가 current evidence outside-soloing repair objective path와 validation summary까지 유지됨.
+- Issue #1148 objective decision v4의 source schema chain과 preserved context가 current evidence outside-soloing repair objective path와 validation summary까지 유지됨.
 - selected-scale objective path, phrase-bank CLI technical path, model-conditioned pitch-contour path, changed-ratio repair path, outside-soloing repair path 모두 current evidence support에 포함.
 - human/audio preference, MIDI-to-solo musical quality, broad trained model quality claim 제외.
 
