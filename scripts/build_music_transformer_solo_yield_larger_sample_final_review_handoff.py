@@ -130,6 +130,7 @@ def validate_objective_decision(
     report: dict[str, Any],
     *,
     expected_count: int,
+    expected_next_boundary: str,
 ) -> list[dict[str, Any]]:
     if str(report.get("schema_version") or "") != OBJECTIVE_DECISION_SCHEMA_VERSION:
         raise SoloYieldLargerSampleFinalHandoffError("objective decision schema required")
@@ -138,7 +139,7 @@ def validate_objective_decision(
     if _int(summary.get("candidate_count")) != int(expected_count):
         raise SoloYieldLargerSampleFinalHandoffError("objective candidate count mismatch")
     decision = _dict(report.get("decision"))
-    if str(decision.get("next_boundary") or "") != BOUNDARY:
+    if str(decision.get("next_boundary") or "") != expected_next_boundary:
         raise SoloYieldLargerSampleFinalHandoffError("final handoff next boundary required")
     selected = [_dict(row) for row in _list(report.get("selected_objective_candidates"))]
     if not selected:
@@ -203,10 +204,20 @@ def build_handoff_package(
     objective_decision: dict[str, Any],
     *,
     output_dir: Path,
+    schema_version: str = SCHEMA_VERSION,
+    boundary: str = BOUNDARY,
+    next_boundary: str = NEXT_BOUNDARY,
+    output_basename: str = "larger_sample_final_review_handoff",
+    title: str = "Music Transformer Solo Yield Larger Sample Final Review Handoff",
+    decision_reason: str = "larger-sample MIDI/WAV review candidates are packaged; listening preference input remains pending",
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     candidates = validate_listening_package(listening_package)
-    selected = validate_objective_decision(objective_decision, expected_count=len(candidates))
+    selected = validate_objective_decision(
+        objective_decision,
+        expected_count=len(candidates),
+        expected_next_boundary=boundary,
+    )
     handoff_rows = build_candidate_handoff(candidates, selected)
     source_sweep = _dict(listening_package.get("source_sweep"))
     scores = [_float(_dict(row.get("metrics")).get("score")) for row in handoff_rows]
@@ -229,10 +240,11 @@ def build_handoff_package(
         "missing_file_count": 0,
     }
     report = {
-        "schema_version": SCHEMA_VERSION,
+        "schema_version": schema_version,
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "output_dir": str(output_dir),
-        "boundary": BOUNDARY,
+        "boundary": boundary,
+        "title": title,
         "source_reports": {
             "listening_package": {
                 "schema_version": listening_package.get("schema_version"),
@@ -257,11 +269,11 @@ def build_handoff_package(
             "production_ready_claimed": False,
         },
         "decision": {
-            "current_boundary": BOUNDARY,
+            "current_boundary": boundary,
             "selected_next_target": "manual_listening_review_pending",
-            "next_boundary": NEXT_BOUNDARY,
+            "next_boundary": next_boundary,
             "critical_user_input_required": False,
-            "reason": "larger-sample MIDI/WAV review candidates are packaged; listening preference input remains pending",
+            "reason": decision_reason,
         },
         "not_proven": [
             "human_audio_preference",
@@ -270,17 +282,26 @@ def build_handoff_package(
             "production_ready_improviser",
         ],
     }
-    write_json(output_dir / "larger_sample_final_review_handoff.json", report)
+    write_json(output_dir / f"{output_basename}.json", report)
     write_json(
-        output_dir / "larger_sample_final_review_handoff_summary.json",
-        validate_report(report, require_no_quality_claim=True),
+        output_dir / f"{output_basename}_summary.json",
+        validate_report(
+            report,
+            require_no_quality_claim=True,
+            expected_schema_version=schema_version,
+        ),
     )
-    write_text(output_dir / "larger_sample_final_review_handoff.md", markdown_report(report))
+    write_text(output_dir / f"{output_basename}.md", markdown_report(report))
     return report
 
 
-def validate_report(report: dict[str, Any], *, require_no_quality_claim: bool) -> dict[str, Any]:
-    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+def validate_report(
+    report: dict[str, Any],
+    *,
+    require_no_quality_claim: bool,
+    expected_schema_version: str = SCHEMA_VERSION,
+) -> dict[str, Any]:
+    if str(report.get("schema_version") or "") != expected_schema_version:
         raise SoloYieldLargerSampleFinalHandoffError("schema version mismatch")
     if require_no_quality_claim:
         _require_no_quality_claim(report, label="handoff")
@@ -326,7 +347,7 @@ def markdown_report(report: dict[str, Any]) -> str:
     score_range = aggregate["score_range"]
     dead_air_range = aggregate["dead_air_range"]
     lines = [
-        "# Music Transformer Solo Yield Larger Sample Final Review Handoff",
+        f"# {report.get('title') or 'Music Transformer Solo Yield Final Review Handoff'}",
         "",
         "## Summary",
         "",
@@ -395,6 +416,27 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
+    parser.add_argument("--schema_version", type=str, default=SCHEMA_VERSION)
+    parser.add_argument("--boundary", type=str, default=BOUNDARY)
+    parser.add_argument("--next_boundary", type=str, default=NEXT_BOUNDARY)
+    parser.add_argument(
+        "--output_basename",
+        type=str,
+        default="larger_sample_final_review_handoff",
+    )
+    parser.add_argument(
+        "--title",
+        type=str,
+        default="Music Transformer Solo Yield Larger Sample Final Review Handoff",
+    )
+    parser.add_argument(
+        "--decision_reason",
+        type=str,
+        default=(
+            "larger-sample MIDI/WAV review candidates are packaged; "
+            "listening preference input remains pending"
+        ),
+    )
     parser.add_argument("--require_no_quality_claim", action="store_true")
     return parser
 
@@ -407,8 +449,18 @@ def main() -> int:
         read_json(Path(args.listening_package_report)),
         read_json(Path(args.objective_decision_report)),
         output_dir=output_dir,
+        schema_version=str(args.schema_version),
+        boundary=str(args.boundary),
+        next_boundary=str(args.next_boundary),
+        output_basename=str(args.output_basename),
+        title=str(args.title),
+        decision_reason=str(args.decision_reason),
     )
-    summary = validate_report(report, require_no_quality_claim=bool(args.require_no_quality_claim))
+    summary = validate_report(
+        report,
+        require_no_quality_claim=bool(args.require_no_quality_claim),
+        expected_schema_version=str(args.schema_version),
+    )
     if args.doc_path:
         write_text(Path(args.doc_path), markdown_report(report))
     print(json.dumps(summary, ensure_ascii=True, indent=2))
