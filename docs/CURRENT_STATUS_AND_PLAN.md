@@ -17,7 +17,7 @@
 - latest quality gap decision: Issue #1072, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #1074, Stage B MIDI-to-solo listening review quality gap source-context refresh
 - latest MVP delivery package: Issue #1076, Stage B MIDI-to-solo MVP delivery package source-context refresh
-- latest README final evidence refresh: Issue #994, Stage B MIDI-to-solo README final evidence source-context refresh
+- latest README final evidence refresh: Issue #1078, Stage B MIDI-to-solo README final evidence refresh source-context refresh
 - latest final status audit: Issue #996, Stage B MIDI-to-solo final status audit source-context refresh
 - latest post-MVP quality iteration plan: Issue #998, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
 - latest quality rubric baseline: Issue #1000, Stage B MIDI-to-solo quality rubric baseline source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after MVP delivery package source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo README final evidence refresh source-context refresh`
+- open issue queue after README final evidence source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo final status audit source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5317,6 +5317,50 @@ Issue #1076은 Issue #1074 listening review quality gap의 source-context preser
 다음:
 
 - `Stage B MIDI-to-solo README final evidence refresh source-context refresh`
+
+## Stage B MIDI-to-Solo README Final Evidence Refresh Source-Context Refresh Result
+
+Issue #1078은 Issue #1076 MVP delivery package의 source-context preserved flag 3개를 README final evidence와 final status audit README snippet 계약에 반영한 작업이다.
+
+변경:
+
+- README final evidence block source-context preserved flag 3개 반영
+- final status audit README required snippet에 preserved flag 3개 추가
+- current status, core plan, handoff scope 갱신
+
+결과:
+
+- source boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- next boundary: `stage_b_midi_to_solo_final_status_audit`
+- latest evidence boundary reflected: `stage_b_midi_to_solo_mvp_delivery_package`
+- README final evidence source-context reflected: `true`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- raw artifact upload required: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- README final evidence와 final status audit README snippet 계약에 #1076 delivery package preserved flag 반영.
+- final status summary preserved flag 3개 전파는 다음 final status audit refresh 대상.
+- raw artifact upload, human/audio preference, MIDI-to-solo musical quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_final_status_audit`
+- `.venv/bin/python -m py_compile scripts/audit_stage_b_midi_to_solo_final_status.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-final-status-audit`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음:
+
+- `Stage B MIDI-to-solo final status audit source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
