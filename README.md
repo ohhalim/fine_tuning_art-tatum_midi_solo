@@ -17,7 +17,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest quality rubric baseline: `Issue #1084`
 - latest candidate failure labeling: `Issue #1086`
 - latest targeted quality repair sweep: `Issue #1088`
-- latest targeted quality repair audio package: `Issue #1006`
+- latest targeted quality repair audio package: `Issue #1090`
 - latest targeted quality repair listening review package: `Issue #1008`
 - latest targeted quality repair listening review input guard: `Issue #1010`
 - latest targeted quality repair objective-only next decision: `Issue #1012`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1066`
 - latest README evidence refresh: `Issue #1068`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after targeted quality repair sweep source-context refresh merge: `0`
+- open issue queue after targeted quality repair audio package source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -290,6 +290,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - targeted quality repair audio WAV files: `6`
 - targeted quality repair audio WAV technical validation: `true`
 - targeted quality repair audio duration range: `18.422s - 18.984s`
+- targeted quality repair audio follow-up objective source outside-soloing source context preserved: `true`
+- targeted quality repair audio follow-up repair sweep source outside-soloing source context preserved: `true`
+- targeted quality repair audio bridge repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair listening review package ready: `true`
 - targeted quality repair listening review items: `6`
 - targeted quality repair validated review input: `false`
@@ -363,7 +366,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - final status bridge repair sweep source outside-soloing source context preserved: `true`
 - MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
