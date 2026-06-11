@@ -21,7 +21,7 @@ Current handoff scope:
 - Latest final status audit completed: Issue #1164, Stage B MIDI-to-solo final status audit source-context refresh.
 - Latest post-MVP quality iteration plan completed: Issue #1166, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh.
 - Latest quality rubric baseline completed: Issue #1168, Stage B MIDI-to-solo quality rubric baseline source-context refresh.
-- Latest candidate failure labeling completed: Issue #1086, Stage B MIDI-to-solo candidate failure labeling source-context refresh.
+- Latest candidate failure labeling completed: Issue #1170, Stage B MIDI-to-solo candidate failure labeling source-context refresh.
 - Latest targeted quality repair sweep completed: Issue #1088, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh.
 - Latest targeted quality repair audio package completed: Issue #1090, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh.
 - Latest targeted quality repair listening review package completed: Issue #1092, Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh.
@@ -55,8 +55,8 @@ Current handoff scope:
 - Latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision completed: Issue #1148, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh.
 - Latest documentation issue completed: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after Stage B MIDI-to-solo quality rubric baseline source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo candidate failure labeling source-context refresh.
+- Open issue queue after Stage B MIDI-to-solo candidate failure labeling source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo targeted quality repair sweep source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

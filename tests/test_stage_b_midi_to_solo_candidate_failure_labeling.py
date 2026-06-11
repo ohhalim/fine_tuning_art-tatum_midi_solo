@@ -19,6 +19,7 @@ from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import BOUNDARY as 
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
     BOUNDARY as RUBRIC_BOUNDARY,
     NEXT_BOUNDARY as RUBRIC_NEXT_BOUNDARY,
+    SCHEMA_VERSION as RUBRIC_SCHEMA_VERSION,
     SELECTED_TARGET as RUBRIC_SELECTED_TARGET,
     build_quality_rubric_baseline_report,
 )
@@ -158,7 +159,7 @@ def rubric_baseline(root: Path, *, quality_claim: bool = False) -> dict:
     report = build_quality_rubric_baseline_report(
         post_mvp_quality_plan=post_mvp_quality_plan(),
         output_dir=root / "rubric",
-        issue_number=746,
+        issue_number=1168,
     )
     if quality_claim:
         report["readiness"]["midi_to_solo_musical_quality_claimed"] = True
@@ -227,7 +228,7 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
                 rubric_baseline=rubric_baseline(root),
                 mvp_delivery_package=delivery_package(paths),
                 output_dir=root / "labels",
-                issue_number=1086,
+                issue_number=1170,
             )
             summary = validate_candidate_failure_labeling_report(
                 report,
@@ -238,7 +239,15 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
             )
 
             self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-            self.assertEqual(report["issue_number"], 1086)
+            self.assertEqual(report["issue_number"], 1170)
+            self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(summary["source_quality_rubric_schema_version"], RUBRIC_SCHEMA_VERSION)
+            self.assertEqual(summary["source_post_mvp_plan_schema_version"], POST_MVP_SCHEMA_VERSION)
+            self.assertEqual(summary["source_final_status_schema_version"], FINAL_STATUS_SCHEMA_VERSION)
+            self.assertEqual(summary["source_delivery_package_schema_version"], DELIVERY_SCHEMA_VERSION)
+            self.assertEqual(summary["source_listening_gap_schema_version"], LISTENING_GAP_SCHEMA_VERSION)
+            self.assertEqual(summary["source_quality_gap_schema_version"], QUALITY_GAP_DECISION_SCHEMA_VERSION)
+            self.assertEqual(summary["source_current_evidence_schema_version"], CURRENT_EVIDENCE_SCHEMA_VERSION)
             self.assertTrue(summary["candidate_failure_labeling_completed"])
             self.assertEqual(summary["candidate_count"], 3)
             self.assertGreater(summary["failed_candidate_count"], 0)
@@ -246,6 +255,11 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
             self.assertGreaterEqual(summary["not_evaluable_label_type_count"], 2)
             self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
             self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(summary["outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
             self.assertEqual(
                 summary["outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
@@ -281,7 +295,7 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
                     rubric_baseline=rubric_baseline(root),
                     mvp_delivery_package=delivery_package(paths, quality_claim=True),
                     output_dir=root / "labels",
-                    issue_number=1086,
+                    issue_number=1170,
                 )
 
     def test_rejects_rubric_quality_claim(self) -> None:
@@ -295,7 +309,7 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
                     rubric_baseline=rubric_baseline(root, quality_claim=True),
                     mvp_delivery_package=delivery_package(paths),
                     output_dir=root / "labels",
-                    issue_number=1086,
+                    issue_number=1170,
                 )
 
     def test_rejects_missing_candidate_file(self) -> None:
@@ -309,7 +323,7 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
                     rubric_baseline=rubric_baseline(root),
                     mvp_delivery_package=delivery_package(paths),
                     output_dir=root / "labels",
-                    issue_number=1086,
+                    issue_number=1170,
                 )
 
     def test_rejects_wrong_rubric_boundary(self) -> None:
@@ -322,7 +336,7 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
                     rubric_baseline=source,
                     mvp_delivery_package=delivery_package([root / "a.mid"] * 3),
                     output_dir=root / "labels",
-                    issue_number=1086,
+                    issue_number=1170,
                 )
 
     def test_rejects_incomplete_rubric_outside_soloing_context(self) -> None:
@@ -338,7 +352,39 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
                     rubric_baseline=source,
                     mvp_delivery_package=delivery_package(paths),
                     output_dir=root / "labels",
-                    issue_number=1086,
+                    issue_number=1170,
+                )
+
+    def test_rejects_rubric_source_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            paths = [root / f"candidate_{index}.mid" for index in range(3)]
+            for path in paths:
+                write_midi(path, [60, 62, 64, 65] * 4)
+            source = rubric_baseline(root)
+            source["source_schema_versions"]["quality_gap_decision"] = "wrong_schema"
+            with self.assertRaises(StageBMidiToSoloCandidateFailureLabelingError):
+                build_candidate_failure_labeling_report(
+                    rubric_baseline=source,
+                    mvp_delivery_package=delivery_package(paths),
+                    output_dir=root / "labels",
+                    issue_number=1170,
+                )
+
+    def test_rejects_missing_rubric_schema_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            paths = [root / f"candidate_{index}.mid" for index in range(3)]
+            for path in paths:
+                write_midi(path, [60, 62, 64, 65] * 4)
+            source = rubric_baseline(root)
+            source["rubric_baseline"]["outside_soloing_repair_schema_context_preserved"] = False
+            with self.assertRaises(StageBMidiToSoloCandidateFailureLabelingError):
+                build_candidate_failure_labeling_report(
+                    rubric_baseline=source,
+                    mvp_delivery_package=delivery_package(paths),
+                    output_dir=root / "labels",
+                    issue_number=1170,
                 )
 
     def test_rejects_missing_rubric_source_context_field(self) -> None:
@@ -356,7 +402,7 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
                     rubric_baseline=source,
                     mvp_delivery_package=delivery_package(paths),
                     output_dir=root / "labels",
-                    issue_number=1086,
+                    issue_number=1170,
                 )
 
     def test_rejects_false_rubric_source_context_preserved_field(self) -> None:
@@ -374,7 +420,7 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
                     rubric_baseline=source,
                     mvp_delivery_package=delivery_package(paths),
                     output_dir=root / "labels",
-                    issue_number=1086,
+                    issue_number=1170,
                 )
 
     def test_constants_are_stable(self) -> None:
@@ -382,7 +428,7 @@ class StageBMidiToSoloCandidateFailureLabelingTest(unittest.TestCase):
         self.assertEqual(RUBRIC_BOUNDARY, "stage_b_midi_to_solo_quality_rubric_baseline")
         self.assertEqual(RUBRIC_NEXT_BOUNDARY, "stage_b_midi_to_solo_candidate_failure_labeling")
         self.assertEqual(RUBRIC_SELECTED_TARGET, "candidate_failure_labeling")
-        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_candidate_failure_labeling_v3")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_candidate_failure_labeling_v4")
 
 
 if __name__ == "__main__":
