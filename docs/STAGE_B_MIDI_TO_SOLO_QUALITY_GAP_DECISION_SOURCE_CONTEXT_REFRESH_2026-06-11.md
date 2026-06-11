@@ -3,7 +3,10 @@
 ## Summary
 
 - boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
 - next boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- source schema version: `stage_b_midi_to_solo_mvp_completion_audit_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - selected target: `listening_review_quality_gap`
 - fallback path active: `true`
 - pitch-contour changed-ratio review required: `true`
@@ -11,12 +14,15 @@
 
 ## Evidence
 
+- current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - technical model-core MVP completed: `true`
 - phrase-bank CLI technical path completed: `true`
 - model-conditioned pitch-contour objective completed: `true`
 - model-conditioned pitch-contour changed-ratio repair objective completed: `true`
 - outside-soloing repair objective completed: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - musical quality MVP completed: `false`
 - generation source: `context_conditioned_fallback`
 - exported candidates: `3`
