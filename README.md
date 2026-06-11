@@ -16,7 +16,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest post-MVP quality iteration plan: `Issue #1082`
 - latest quality rubric baseline: `Issue #1084`
 - latest candidate failure labeling: `Issue #1086`
-- latest targeted quality repair sweep: `Issue #1004`
+- latest targeted quality repair sweep: `Issue #1088`
 - latest targeted quality repair audio package: `Issue #1006`
 - latest targeted quality repair listening review package: `Issue #1008`
 - latest targeted quality repair listening review input guard: `Issue #1010`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1066`
 - latest README evidence refresh: `Issue #1068`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after candidate failure labeling source-context refresh merge: `0`
+- open issue queue after targeted quality repair sweep source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -284,6 +284,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - targeted quality repair failure label count: `12 -> 8`
 - targeted quality repair improved candidates: `4 / 6`
 - targeted quality repair technical regression count: `0`
+- targeted quality repair follow-up objective source outside-soloing source context preserved: `true`
+- targeted quality repair follow-up repair sweep source outside-soloing source context preserved: `true`
+- targeted quality repair bridge repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair audio WAV files: `6`
 - targeted quality repair audio WAV technical validation: `true`
 - targeted quality repair audio duration range: `18.422s - 18.984s`
@@ -360,7 +363,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - final status bridge repair sweep source outside-soloing source context preserved: `true`
 - MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
