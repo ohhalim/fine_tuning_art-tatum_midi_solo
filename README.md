@@ -10,7 +10,7 @@ MIDI 데이터를 token sequence로 변환하고, Music Transformer 계열 symbo
 - 2마디 후보 생성: strict `24 / 24`, grammar-valid `24 / 24`
 - 4마디 확장 후보 생성: strict `20 / 24`, grammar-valid `24 / 24`
 - 4마디 dead-air repair 이후: strict `22 / 24`, grammar-valid `24 / 24`
-- broader repaired final handoff: MIDI `8`, WAV `8`, checksum mismatch `0`
+- broader repaired handoff audit: reproducible `true`, checksum mismatch `0`
 - final status audit: technical evidence ready `true`
 - 음악적 품질 claim: `false`
 - 사람 기준 청취 선호 입력: `false`
@@ -214,6 +214,9 @@ raw model generation은 note grammar가 자주 깨졌다.
 - broader repaired final review handoff: MIDI `8`, WAV `8`, selected objective candidates `4`
 - broader repaired final handoff validation: missing file `0`, checksum mismatch `0`, musical quality claim `false`
 - next boundary: `music_transformer_solo_yield_broader_repaired_listening_review`
+- broader repaired handoff reproducibility audit: reproducible `true`, missing MIDI/WAV `0 / 0`, checksum mismatch `0 / 0`
+- broader repaired handoff audit claim boundary: musical quality claim `false`, stable jazz solo quality `not_proven`
+- next boundary: `music_transformer_solo_yield_final_readme_evidence_refresh`
 
 ## 결과 파일
 
@@ -274,6 +277,9 @@ raw model generation은 note grammar가 자주 깨졌다.
 - `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_final_handoff/issue_1352_broader_repaired_final_handoff/broader_repaired_final_review_handoff.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_final_handoff/issue_1352_broader_repaired_final_handoff/broader_repaired_final_review_handoff.json`
 - `docs/STAGE_B_MIDI_TO_SOLO_BROADER_REPAIRED_FINAL_REVIEW_HANDOFF_2026-06-11.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_handoff_audit/issue_1354_broader_repaired_handoff_audit/broader_repaired_handoff_reproducibility_audit.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_broader_repaired_handoff_audit/issue_1354_broader_repaired_handoff_audit/broader_repaired_handoff_reproducibility_audit.json`
+- `docs/STAGE_B_MIDI_TO_SOLO_BROADER_REPAIRED_HANDOFF_REPRODUCIBILITY_AUDIT_2026-06-11.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare_listening_review/issue_1308_interval_contour_listening_package/listening_review_package.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare_listening_review/issue_1308_interval_contour_listening_package/listening_review_package.json`
 - `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare_listening_review/issue_1308_interval_contour_listening_package/listening_review_input_template.json`
