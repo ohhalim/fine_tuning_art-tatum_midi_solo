@@ -36,7 +36,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm repair follow-up decision: `Issue #1206`
 - latest songlike melody contour phrase/rhythm chord-context pitch-role bridge: `Issue #1208`
 - latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: `Issue #1210`
-- latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: `Issue #1128`
+- latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: `Issue #1212`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: `Issue #1130`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: `Issue #1132`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: `Issue #1134`
@@ -50,8 +50,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh merge: `0`
-- next recommended issue: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh merge: `0`
+- next recommended issue: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
@@ -97,10 +97,13 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase/rhythm pitch-role secondary risk: `outside_soloing_pitch_role_risk=5`
 - phrase/rhythm pitch-role selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
 - phrase/rhythm chord-tone landing repair completed: `true`
+- phrase/rhythm chord-tone landing repair schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep_v5`
+- phrase/rhythm chord-tone landing repair source objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v5`
+- phrase/rhythm chord-tone landing repair source bridge schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_v5`
 - phrase/rhythm chord-tone landing risk count: `6 -> 0`
 - phrase/rhythm final landing chord-tone count: `1 -> 6`
 - phrase/rhythm chord-tone landing changed note total: `40`
-- phrase/rhythm chord-tone landing next target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
+- phrase/rhythm chord-tone landing next target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package`
 - phrase/rhythm chord-tone landing rendered WAV count: `6`
 - phrase/rhythm chord-tone landing WAV duration range: `18.871s-19.000s`
 - phrase/rhythm chord-tone landing WAV technical validation: `true`

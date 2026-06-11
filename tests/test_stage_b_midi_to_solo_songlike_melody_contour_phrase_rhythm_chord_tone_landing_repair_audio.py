@@ -19,6 +19,7 @@ from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_c
 )
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
     SCHEMA_VERSION as BRIDGE_SCHEMA_VERSION,
 )
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective import (
@@ -26,6 +27,7 @@ from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_c
 )
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep import (
     BOUNDARY as SOURCE_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS as SOURCE_EXPECTED_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
     SCHEMA_VERSION as SOURCE_SCHEMA_VERSION,
     SELECTED_TARGET as SOURCE_SELECTED_TARGET,
@@ -37,6 +39,10 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "followup_objective_source_outside_soloing_source_context_preserved": True,
+    "followup_objective_source_outside_soloing_schema_context_preserved": True,
+    "followup_objective_source_outside_soloing_objective_schema_version": (
+        OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ),
     "followup_objective_source_outside_soloing_source_targeted": False,
     "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -45,6 +51,10 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_schema_context_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_objective_schema_version": (
+        OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ),
     "followup_repair_sweep_source_outside_soloing_source_targeted": False,
     "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -53,6 +63,10 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "repair_sweep_source_outside_soloing_source_context_preserved": True,
+    "repair_sweep_source_outside_soloing_schema_context_preserved": True,
+    "repair_sweep_source_outside_soloing_objective_schema_version": (
+        OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ),
     "repair_sweep_source_outside_soloing_source_targeted": False,
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -130,12 +144,14 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
         "schema_version": SOURCE_SCHEMA_VERSION,
         "boundary": SOURCE_BOUNDARY,
         "source_schema_version": OBJECTIVE_SCHEMA_VERSION,
+        "source_schema_versions": dict(SOURCE_EXPECTED_SOURCE_SCHEMA_VERSIONS),
         "bridge_schema_version": BRIDGE_SCHEMA_VERSION,
         "candidate_repairs": repairs,
         "aggregate": {
             "candidate_count": 6,
             "source_schema_version": OBJECTIVE_SCHEMA_VERSION,
             "bridge_schema_version": BRIDGE_SCHEMA_VERSION,
+            "source_schema_versions": dict(SOURCE_EXPECTED_SOURCE_SCHEMA_VERSIONS),
             "repaired_midi_count": 6,
             "changed_note_total": 42,
             "objective_outside_soloing_pitch_role_risk_count": 5,
@@ -156,6 +172,7 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "boundary": SOURCE_BOUNDARY,
             "source_schema_version": OBJECTIVE_SCHEMA_VERSION,
             "bridge_schema_version": BRIDGE_SCHEMA_VERSION,
+            "source_schema_versions": dict(SOURCE_EXPECTED_SOURCE_SCHEMA_VERSIONS),
             "chord_tone_landing_repair_sweep_completed": True,
             "candidate_count": 6,
             "repaired_midi_count": 6,
