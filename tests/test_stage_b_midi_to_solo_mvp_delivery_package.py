@@ -15,7 +15,11 @@ from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import (
 from scripts.decide_stage_b_midi_to_solo_listening_review_quality_gap import (
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BOUNDARY as LISTENING_GAP_BOUNDARY,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
     NEXT_BOUNDARY as LISTENING_GAP_NEXT_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    QUALITY_GAP_DECISION_SCHEMA_VERSION,
+    SCHEMA_VERSION as LISTENING_GAP_SCHEMA_VERSION,
 )
 from scripts.run_stage_b_midi_to_solo_phrase_bank_cli_mvp_package import (
     BOUNDARY as CLI_PACKAGE_BOUNDARY,
@@ -62,12 +66,24 @@ def listening_gap_report(
     outside_soloing_repair_supported: bool = True,
 ) -> dict:
     return {
+        "schema_version": LISTENING_GAP_SCHEMA_VERSION,
         "boundary": LISTENING_GAP_BOUNDARY,
+        "source_schema_versions": {
+            "quality_gap_decision": QUALITY_GAP_DECISION_SCHEMA_VERSION,
+            "current_evidence": CURRENT_EVIDENCE_SCHEMA_VERSION,
+        },
+        "source_schema_version": QUALITY_GAP_DECISION_SCHEMA_VERSION,
+        "source_current_evidence_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
         "quality_gap_summary": {
+            "current_evidence_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
             "technical_model_core_mvp_completed": True,
             "changed_ratio_repair_objective_completed": True,
             "outside_soloing_repair_objective_completed": outside_soloing_repair_supported,
             "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_schema_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "rendered_audio_file_count": 3,
             "max_repaired_interval": 12,
             "max_interval_threshold": 12,
@@ -94,6 +110,7 @@ def listening_gap_report(
             "listening_review_quality_gap_completed": True,
             "technical_mvp_delivery_package_ready": True,
             "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_schema_context_preserved": outside_soloing_repair_supported,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "broad_trained_model_quality_claimed": False,
@@ -198,7 +215,7 @@ class StageBMidiToSoloMvpDeliveryPackageTest(unittest.TestCase):
                 cli_mvp_package=cli_package_report(tmp_path),
                 changed_ratio_audio_package=changed_ratio_audio_report(tmp_path),
                 output_dir=tmp_path / "delivery",
-                issue_number=1076,
+                issue_number=1160,
             )
             summary = validate_delivery_package_report(
                 report,
@@ -215,6 +232,21 @@ class StageBMidiToSoloMvpDeliveryPackageTest(unittest.TestCase):
         self.assertTrue(summary["changed_ratio_repair_audio_evidence_ready"])
         self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
         self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
+        self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(summary["source_listening_gap_schema_version"], LISTENING_GAP_SCHEMA_VERSION)
+        self.assertEqual(
+            summary["source_quality_gap_schema_version"],
+            QUALITY_GAP_DECISION_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            summary["source_current_evidence_schema_version"],
+            CURRENT_EVIDENCE_SCHEMA_VERSION,
+        )
+        self.assertTrue(summary["outside_soloing_repair_schema_context_preserved"])
+        self.assertEqual(
+            summary["outside_soloing_repair_objective_schema_version"],
+            OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+        )
         self.assertEqual(summary["cli_candidate_count"], 3)
         self.assertEqual(summary["changed_ratio_repair_wav_count"], 3)
         self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
@@ -247,7 +279,43 @@ class StageBMidiToSoloMvpDeliveryPackageTest(unittest.TestCase):
             "Stage B MIDI-to-solo README final evidence refresh source-context refresh",
         )
         self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-        self.assertEqual(report["issue_number"], 1076)
+        self.assertEqual(
+            report["source_schema_versions"]["listening_review_quality_gap"],
+            LISTENING_GAP_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            report["source_schema_versions"]["quality_gap_decision"],
+            QUALITY_GAP_DECISION_SCHEMA_VERSION,
+        )
+        self.assertEqual(report["issue_number"], 1160)
+
+    def test_rejects_listening_gap_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            source = listening_gap_report()
+            source["schema_version"] = "stale_schema"
+            with self.assertRaises(StageBMidiToSoloMvpDeliveryPackageError):
+                build_delivery_package_report(
+                    listening_review_quality_gap=source,
+                    cli_mvp_package=cli_package_report(tmp_path),
+                    changed_ratio_audio_package=changed_ratio_audio_report(tmp_path),
+                    output_dir=tmp_path / "delivery",
+                    issue_number=1160,
+                )
+
+    def test_rejects_listening_gap_source_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            source = listening_gap_report()
+            source["source_schema_version"] = "stale_schema"
+            with self.assertRaises(StageBMidiToSoloMvpDeliveryPackageError):
+                build_delivery_package_report(
+                    listening_review_quality_gap=source,
+                    cli_mvp_package=cli_package_report(tmp_path),
+                    changed_ratio_audio_package=changed_ratio_audio_report(tmp_path),
+                    output_dir=tmp_path / "delivery",
+                    issue_number=1160,
+                )
 
     def test_rejects_listening_gap_quality_claim(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -347,6 +415,40 @@ class StageBMidiToSoloMvpDeliveryPackageTest(unittest.TestCase):
                     issue_number=1076,
                 )
 
+    def test_rejects_false_outside_soloing_schema_context_preserved_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            source = listening_gap_report()
+            source["quality_gap_summary"]["outside_soloing_repair_schema_context_preserved"] = False
+            with self.assertRaises(StageBMidiToSoloMvpDeliveryPackageError):
+                build_delivery_package_report(
+                    listening_review_quality_gap=source,
+                    cli_mvp_package=cli_package_report(tmp_path),
+                    changed_ratio_audio_package=changed_ratio_audio_report(tmp_path),
+                    output_dir=tmp_path / "delivery",
+                    issue_number=1160,
+                )
+
+    def test_rejects_delivery_package_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            report = build_delivery_package_report(
+                listening_review_quality_gap=listening_gap_report(),
+                cli_mvp_package=cli_package_report(tmp_path),
+                changed_ratio_audio_package=changed_ratio_audio_report(tmp_path),
+                output_dir=tmp_path / "delivery",
+                issue_number=1160,
+            )
+            report["schema_version"] = "stale_schema"
+            with self.assertRaises(StageBMidiToSoloMvpDeliveryPackageError):
+                validate_delivery_package_report(
+                    report,
+                    expected_boundary=BOUNDARY,
+                    expected_next_boundary=NEXT_BOUNDARY,
+                    require_delivery_completed=True,
+                    require_no_quality_claim=True,
+                )
+
     def test_rejects_targeted_outside_soloing_source_repair(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -380,7 +482,7 @@ class StageBMidiToSoloMvpDeliveryPackageTest(unittest.TestCase):
     def test_boundary_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_mvp_delivery_package")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_readme_final_evidence_refresh")
-        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_mvp_delivery_package_v3")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_mvp_delivery_package_v4")
 
 
 if __name__ == "__main__":

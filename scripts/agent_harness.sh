@@ -6093,7 +6093,7 @@ run_stage_b_midi_to_solo_mvp_delivery_package() {
     --cli_mvp_package "$cli_package" \
     --changed_ratio_audio_package "$changed_ratio_audio" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_DELIVERY_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 1076 \
+    --issue_number 1160 \
     --expected_boundary stage_b_midi_to_solo_mvp_delivery_package \
     --expected_next_boundary stage_b_midi_to_solo_readme_final_evidence_refresh \
     --require_delivery_completed \

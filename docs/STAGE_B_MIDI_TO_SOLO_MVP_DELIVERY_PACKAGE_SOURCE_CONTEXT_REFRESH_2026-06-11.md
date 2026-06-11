@@ -3,7 +3,11 @@
 ## Summary
 
 - boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
 - next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
+- source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - technical MVP delivery package completed: `true`
 - runnable CLI ready: `true`
 - input to ranked MIDI ready: `true`
@@ -11,6 +15,7 @@
 - changed-ratio repair audio evidence ready: `true`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
 - listening review quality gap open: `true`
 
 ## Run Command
@@ -27,6 +32,7 @@
 - changed-ratio repair max interval / target: `12` / `12`
 - changed-ratio repair WAV duration range: `18.422s` - `18.978s`
 - outside-soloing repair WAV count: `6`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - outside-soloing repair changed note total: `2`
 - outside-soloing source objective pitch-role risk: `5`
 - outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`

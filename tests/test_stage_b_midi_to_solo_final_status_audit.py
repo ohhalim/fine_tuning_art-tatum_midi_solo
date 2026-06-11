@@ -15,7 +15,12 @@ from scripts.audit_stage_b_midi_to_solo_final_status import (
 )
 from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import (
     BOUNDARY as DELIVERY_BOUNDARY,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
+    LISTENING_GAP_SCHEMA_VERSION,
     NEXT_BOUNDARY as DELIVERY_NEXT_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    QUALITY_GAP_DECISION_SCHEMA_VERSION,
+    SCHEMA_VERSION as DELIVERY_SCHEMA_VERSION,
 )
 
 
@@ -54,7 +59,13 @@ def readme_text(*, missing_last: bool = False) -> str:
 
 def delivery_package(*, quality_claim: bool = False, cli_count: int = 3) -> dict:
     return {
+        "schema_version": DELIVERY_SCHEMA_VERSION,
         "boundary": DELIVERY_BOUNDARY,
+        "source_schema_versions": {
+            "listening_review_quality_gap": LISTENING_GAP_SCHEMA_VERSION,
+            "quality_gap_decision": QUALITY_GAP_DECISION_SCHEMA_VERSION,
+            "current_evidence": CURRENT_EVIDENCE_SCHEMA_VERSION,
+        },
         "delivery_package": {
             "runnable_cli_ready": True,
             "input_to_ranked_midi_ready": True,
@@ -62,6 +73,10 @@ def delivery_package(*, quality_claim: bool = False, cli_count: int = 3) -> dict
             "changed_ratio_repair_audio_evidence_ready": True,
             "outside_soloing_repair_evidence_ready": True,
             "outside_soloing_repair_source_context_preserved": True,
+            "outside_soloing_repair_schema_context_preserved": True,
+            "outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "cli_candidate_count": cli_count,
             "changed_ratio_repair_wav_count": 3,
             "outside_soloing_repair_wav_count": 6,
@@ -85,6 +100,7 @@ def delivery_package(*, quality_claim: bool = False, cli_count: int = 3) -> dict
             "mvp_delivery_package_completed": True,
             "raw_artifact_upload_required": False,
             "outside_soloing_repair_source_context_preserved": True,
+            "outside_soloing_repair_schema_context_preserved": True,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "phrase_bank_musical_quality_claimed": False,
