@@ -22,10 +22,12 @@ from scripts.render_stage_b_midi_to_solo_candidate_audio import (  # noqa: E402
 )
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SCHEMA_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
 )
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep import (  # noqa: E402
     BOUNDARY as SOURCE_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS as SOURCE_SWEEP_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
     SCHEMA_VERSION as SOURCE_SCHEMA_VERSION,
     StageBMidiToSoloChordToneLandingRepairSweepError,
@@ -44,8 +46,14 @@ NEXT_BOUNDARY = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package"
 )
 SCHEMA_VERSION = (
-    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v4"
+    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v5"
 )
+EXPECTED_SOURCE_SCHEMA_VERSIONS = {
+    "songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep": (
+        SOURCE_SCHEMA_VERSION
+    ),
+    **SOURCE_SWEEP_SOURCE_SCHEMA_VERSIONS,
+}
 CommandRunner = Callable[[Sequence[str]], subprocess.CompletedProcess[str]]
 
 QUALITY_CLAIM_KEYS = [
@@ -99,18 +107,49 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
         )
 
 
+def _validate_source_schema_versions(
+    source_schema_versions: dict[str, Any],
+    *,
+    label: str,
+) -> dict[str, str]:
+    normalized = {key: str(value) for key, value in source_schema_versions.items()}
+    for key, expected in EXPECTED_SOURCE_SCHEMA_VERSIONS.items():
+        if str(normalized.get(key) or "") != expected:
+            raise StageBMidiToSoloChordToneLandingRepairAudioError(
+                f"{label} source schema version mismatch: {key}"
+            )
+    return normalized
+
+
 def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
     for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in container:
             raise StageBMidiToSoloChordToneLandingRepairAudioError(
                 f"{label} source-context field required: {key}"
             )
+    for key in BRIDGE_SCHEMA_CONTEXT_KEYS:
+        if key not in container:
+            raise StageBMidiToSoloChordToneLandingRepairAudioError(
+                f"{label} schema-context field required: {key}"
+            )
     for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
         if not bool(container.get(key, False)):
             raise StageBMidiToSoloChordToneLandingRepairAudioError(
                 f"{label} source context should be preserved: {key}"
             )
-    return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
+    for key in (
+        "followup_objective_source_outside_soloing_schema_context_preserved",
+        "followup_repair_sweep_source_outside_soloing_schema_context_preserved",
+        "repair_sweep_source_outside_soloing_schema_context_preserved",
+    ):
+        if not bool(container.get(key, False)):
+            raise StageBMidiToSoloChordToneLandingRepairAudioError(
+                f"{label} schema context should be preserved: {key}"
+            )
+    return {
+        **{key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
+        **{key: container[key] for key in BRIDGE_SCHEMA_CONTEXT_KEYS},
+    }
 
 
 def validate_source_report(
@@ -314,6 +353,15 @@ def build_audio_render_report(
     runner: CommandRunner = default_runner,
 ) -> dict[str, Any]:
     candidates = validate_source_report(source_report, expected_count=expected_file_count)
+    source_schema_versions = _validate_source_schema_versions(
+        {
+            "songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep": (
+                str(source_report.get("schema_version") or "")
+            ),
+            **_dict(source_report.get("source_schema_versions")),
+        },
+        label="chord-tone landing repair audio package",
+    )
     resolved_renderer = renderer_path or shutil.which("fluidsynth") or ""
     resolved_soundfont = resolve_soundfont(soundfont_path)
     plan = build_render_plan(
@@ -338,6 +386,7 @@ def build_audio_render_report(
         "issue_number": int(issue_number),
         "source_boundary": SOURCE_BOUNDARY,
         "source_schema_version": SOURCE_SCHEMA_VERSION,
+        "source_schema_versions": source_schema_versions,
         "source_summary": aggregate,
         "renderer": {
             "name": "fluidsynth",
@@ -351,8 +400,17 @@ def build_audio_render_report(
         "summary": {
             "rendered_audio_file_count": int(len(rendered)),
             "source_schema_version": SOURCE_SCHEMA_VERSION,
+            "source_schema_versions": source_schema_versions,
+            "source_repair_sweep_schema_version": source_schema_versions[
+                "songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep"
+            ],
+            "source_objective_decision_schema_version": source_schema_versions[
+                "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision"
+            ],
+            "source_bridge_schema_version": source_schema_versions[
+                "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge"
+            ],
             "source_objective_schema_version": str(source_report.get("source_schema_version") or ""),
-            "source_bridge_schema_version": str(source_report.get("bridge_schema_version") or ""),
             "technical_wav_validation": True,
             "sample_rate": int(sample_rate),
             "duration_min_seconds": min(durations, default=0.0),
@@ -444,6 +502,14 @@ def validate_audio_render_report(
     boundary = _dict(report.get("audio_render_boundary"))
     decision = _dict(report.get("decision"))
     summary = _dict(report.get("summary"))
+    source_schema_versions = _validate_source_schema_versions(
+        _dict(report.get("source_schema_versions")),
+        label="chord-tone landing repair audio package report",
+    )
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingRepairAudioError(
+            "audio package schema version mismatch"
+        )
     if expected_boundary and str(boundary.get("boundary") or "") != expected_boundary:
         raise StageBMidiToSoloChordToneLandingRepairAudioError("unexpected boundary")
     if expected_next_boundary and str(decision.get("next_boundary") or "") != expected_next_boundary:
@@ -512,11 +578,44 @@ def validate_audio_render_report(
             raise StageBMidiToSoloChordToneLandingRepairAudioError(
                 f"audio package source-context preserved field must be true: {key}"
             )
+    for key in BRIDGE_SCHEMA_CONTEXT_KEYS:
+        if key not in summary:
+            raise StageBMidiToSoloChordToneLandingRepairAudioError(
+                f"audio package schema-context field required: {key}"
+            )
     if require_no_quality_claim:
         _require_no_quality_claim(boundary, label="audio render boundary")
     return {
         "boundary": str(boundary.get("boundary") or ""),
+        "schema_version": str(report.get("schema_version") or ""),
         "source_schema_version": str(summary.get("source_schema_version") or ""),
+        "source_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_followup_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_followup_decision"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_objective_next_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_objective_next"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_sweep_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_sweep"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_listening_review_package_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_listening_review_package"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_audio_package_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_audio_package"
+        ],
         "source_objective_schema_version": str(
             summary.get("source_objective_schema_version") or ""
         ),
@@ -568,6 +667,7 @@ def validate_audio_render_report(
         "target_supported": bool(summary.get("target_supported", False)),
         "audio_review_required": bool(summary.get("audio_review_required", False)),
         **{key: summary.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
+        **{key: summary.get(key) for key in BRIDGE_SCHEMA_CONTEXT_KEYS},
         "audio_rendered_quality_claimed": bool(
             boundary.get("audio_rendered_quality_claimed", True)
         ),
@@ -595,7 +695,17 @@ def markdown_report(report: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- boundary: `{boundary['boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
         f"- source schema version: `{report['source_schema_version']}`",
+        f"- source repair sweep schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep']}`",
+        f"- source objective decision schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision']}`",
+        f"- source bridge schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge']}`",
+        f"- source follow-up schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_followup_decision']}`",
+        f"- source objective next schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_objective_next']}`",
+        f"- source repair baseline schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_sweep']}`",
+        f"- source input guard schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard']}`",
+        f"- source listening review package schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_listening_review_package']}`",
+        f"- source audio package schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_audio_package']}`",
         f"- source objective schema version: `{summary['source_objective_schema_version']}`",
         f"- source bridge schema version: `{summary['source_bridge_schema_version']}`",
         f"- next boundary: `{decision['next_boundary']}`",
@@ -667,7 +777,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1130)
+    parser.add_argument("--issue_number", type=int, default=1214)
     parser.add_argument("--renderer", type=str, default=shutil.which("fluidsynth") or "")
     parser.add_argument("--soundfont", type=str, default="")
     parser.add_argument("--sample_rate", type=int, default=44100)
