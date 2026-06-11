@@ -6015,7 +6015,7 @@ run_stage_b_midi_to_solo_mvp_completion_audit() {
     --current_evidence "$current_evidence" \
     --readme_path README.md \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 986 \
+    --issue_number 1070 \
     --expected_boundary stage_b_midi_to_solo_mvp_completion_audit \
     --expected_next_boundary stage_b_midi_to_solo_quality_gap_decision \
     --require_technical_mvp_completion \

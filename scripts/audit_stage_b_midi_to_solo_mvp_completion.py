@@ -27,7 +27,7 @@ class StageBMidiToSoloMvpCompletionAuditError(ValueError):
 
 BOUNDARY = "stage_b_midi_to_solo_mvp_completion_audit"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_quality_gap_decision"
-SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_completion_audit_v2"
+SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_completion_audit_v3"
 
 
 def _dict(value: Any) -> dict[str, Any]:
@@ -674,7 +674,7 @@ def build_mvp_completion_audit_report(
             "brad_style_adaptation",
             "production_ready_improviser",
         ],
-        "next_recommended_issue": "Stage B MIDI-to-solo quality gap decision",
+        "next_recommended_issue": "Stage B MIDI-to-solo quality gap decision source-context refresh",
     }
 
 
