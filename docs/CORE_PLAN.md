@@ -400,7 +400,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo README final evidence refresh: latest evidence boundary `stage_b_midi_to_solo_mvp_delivery_package`, runnable CLI `true`, input ranked MIDI/WAV evidence `true/true`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_final_status_audit`
 - MIDI-to-solo final status audit: technical MVP complete `true`, local review ready `true`, README final evidence reflected `true`, CLI/WAV count `3/3`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
 - MIDI-to-solo post-MVP quality iteration plan: selected target `quality_rubric_baseline`, source risk `5 -> 2`, current repair risk after `0`, source-context preserved flags `3/3`, ordered work `4`, taxonomy seed `7`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_rubric_baseline`
-- MIDI-to-solo quality rubric baseline: rubric items `8`, metric groups `30`, source risk `5 -> 2`, current repair risk after `0`, candidate failure labeling ready `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_candidate_failure_labeling`
+- MIDI-to-solo quality rubric baseline: rubric items `8`, metric groups `30`, source risk `5 -> 2`, current repair risk after `0`, source-context preserved flags `3/3`, candidate failure labeling ready `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_candidate_failure_labeling`
 - MIDI-to-solo candidate failure labeling: candidates `6`, failed `6`, failure label types `4`, not-evaluable types `2`, source risk `5 -> 2`, current repair risk after `0`, targeted repair ready `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_sweep`
 - MIDI-to-solo targeted quality repair sweep: candidates `6`, failure labels `12 -> 8`, improved candidates `4`, technical regression `0`, source risk `5 -> 2`, current repair risk after `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
 - MIDI-to-solo targeted quality repair audio package: rendered WAV `6`, duration `18.422s-18.984s`, source risk `5 -> 2`, current repair risk after `0`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
@@ -12346,6 +12346,52 @@ Issue #1082는 Issue #1080 final status audit 결과를 기준으로 post-MVP qu
 다음 작업:
 
 - `Stage B MIDI-to-solo quality rubric baseline source-context refresh`
+
+## 9.232 Stage B MIDI-to-solo quality rubric baseline source-context refresh
+
+Issue #1084는 Issue #1082 post-MVP quality iteration plan 결과를 기준으로 quality rubric baseline의 source-context validation과 summary에 source-context preserved flag 3개를 보존한 작업이다.
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_QUALITY_RUBRIC_BASELINE_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- source boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- next boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- selected target: `candidate_failure_labeling`
+- quality rubric baseline completed: `true`
+- candidate failure labeling ready: `true`
+- rubric item count: `8`
+- required metric group count: `30`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- outside-soloing source pitch-role risk: `5 -> 2`
+- outside-soloing current repair pitch-role risk after / delta: `0 / 2`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- quality rubric baseline source validation에 post-MVP plan preserved flag 3개 포함.
+- preserved flag false 입력은 validation error로 차단.
+- 다음 검증 대상은 candidate failure labeling 유지.
+- musical quality와 human/audio preference claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_quality_rubric_baseline`
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_candidate_failure_labeling`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_quality_rubric_baseline.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-quality-rubric-baseline`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo candidate failure labeling source-context refresh`
 
 ## 10. 한 문장 요약
 

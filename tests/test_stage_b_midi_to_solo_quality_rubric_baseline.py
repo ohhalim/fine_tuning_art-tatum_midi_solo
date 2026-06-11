@@ -3,11 +3,12 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
     BOUNDARY,
     NEXT_BOUNDARY,
     SELECTED_TARGET,
+    SCHEMA_VERSION,
     StageBMidiToSoloQualityRubricBaselineError,
     build_quality_rubric_baseline_report,
     validate_quality_rubric_baseline_report,
@@ -120,7 +121,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         report = build_quality_rubric_baseline_report(
             post_mvp_quality_plan=post_mvp_quality_plan(),
             output_dir=Path("outputs/quality_rubric"),
-            issue_number=746,
+            issue_number=1084,
         )
         summary = validate_quality_rubric_baseline_report(
             report,
@@ -132,6 +133,8 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             require_no_quality_claim=True,
         )
 
+        self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(report["issue_number"], 1084)
         self.assertTrue(summary["quality_rubric_baseline_completed"])
         self.assertTrue(summary["candidate_failure_labeling_ready"])
         self.assertEqual(summary["selected_target"], SELECTED_TARGET)
@@ -148,7 +151,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
-        for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
             self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertFalse(summary["human_audio_preference_claimed"])
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
@@ -164,7 +167,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=source,
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=746,
+                issue_number=1084,
             )
 
     def test_rejects_wrong_selected_target(self) -> None:
@@ -172,7 +175,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(selected_target="repair_sweep"),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=746,
+                issue_number=1084,
             )
 
     def test_rejects_quality_claim(self) -> None:
@@ -180,7 +183,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(quality_claim=True),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=746,
+                issue_number=1084,
             )
 
     def test_rejects_incomplete_plan_inputs(self) -> None:
@@ -188,13 +191,13 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(ordered_work_count=3),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=746,
+                issue_number=1084,
             )
         with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(taxonomy_count=6),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=746,
+                issue_number=1084,
             )
 
     def test_rejects_incomplete_outside_soloing_repair_context(self) -> None:
@@ -202,19 +205,19 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(outside_ready=False),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=746,
+                issue_number=1084,
             )
         with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(outside_wav_count=5),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=746,
+                issue_number=1084,
             )
         with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=post_mvp_quality_plan(outside_risk_after=1),
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=746,
+                issue_number=1084,
             )
 
     def test_rejects_missing_outside_soloing_source_context_field(self) -> None:
@@ -226,14 +229,26 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
             build_quality_rubric_baseline_report(
                 post_mvp_quality_plan=source,
                 output_dir=Path("outputs/quality_rubric"),
-                issue_number=1000,
+                issue_number=1084,
+            )
+
+    def test_rejects_false_source_context_preserved_field(self) -> None:
+        source = post_mvp_quality_plan()
+        source["post_mvp_status"][
+            "followup_repair_sweep_source_outside_soloing_source_context_preserved"
+        ] = False
+        with self.assertRaises(StageBMidiToSoloQualityRubricBaselineError):
+            build_quality_rubric_baseline_report(
+                post_mvp_quality_plan=source,
+                output_dir=Path("outputs/quality_rubric"),
+                issue_number=1084,
             )
 
     def test_rejects_missing_required_rubric_item(self) -> None:
         report = build_quality_rubric_baseline_report(
             post_mvp_quality_plan=post_mvp_quality_plan(),
             output_dir=Path("outputs/quality_rubric"),
-            issue_number=746,
+            issue_number=1084,
         )
         report["rubric_items"] = [
             item for item in report["rubric_items"] if item["id"] != "weak_chord_tone_landing"
@@ -253,6 +268,7 @@ class StageBMidiToSoloQualityRubricBaselineTest(unittest.TestCase):
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_quality_rubric_baseline")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_candidate_failure_labeling")
         self.assertEqual(SELECTED_TARGET, "candidate_failure_labeling")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_quality_rubric_baseline_v3")
 
 
 if __name__ == "__main__":
