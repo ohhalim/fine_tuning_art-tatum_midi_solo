@@ -16,9 +16,11 @@ from scripts.assess_stage_b_generic_base_readiness import read_json, write_json,
 from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input import (  # noqa: E402
     BOUNDARY as SOURCE_BOUNDARY,
     OBJECTIVE_NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_INPUT_GUARD_SCHEMA_VERSION,
 )
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
 )
 
 
@@ -34,7 +36,7 @@ FOLLOWUP_DECISION_NEXT_BOUNDARY = (
 )
 SELECTED_TARGET = "songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision"
 SCHEMA_VERSION = (
-    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_next_v2"
+    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_next_v3"
 )
 
 QUALITY_CLAIM_KEYS = [
@@ -86,11 +88,7 @@ def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str
             raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
                 f"{label} source-context field required: {key}"
             )
-    for key in (
-        "followup_objective_source_outside_soloing_source_context_preserved",
-        "followup_repair_sweep_source_outside_soloing_source_context_preserved",
-        "repair_sweep_source_outside_soloing_source_context_preserved",
-    ):
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
         if not bool(container.get(key, False)):
             raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
                 f"{label} source context should be preserved: {key}"
@@ -106,6 +104,10 @@ def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
     if str(report.get("boundary") or "") != SOURCE_BOUNDARY:
         raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
             "chord-tone landing repair listening review input guard boundary required"
+        )
+    if str(report.get("schema_version") or "") != SOURCE_INPUT_GUARD_SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
+            "input guard schema version must match current guard report"
         )
     if str(decision.get("next_boundary") or "") != SOURCE_NEXT_BOUNDARY:
         raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
@@ -153,6 +155,9 @@ def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
     _require_no_quality_claim(readiness, label="chord-tone landing input guard readiness")
     return {
         "boundary": SOURCE_BOUNDARY,
+        "schema_version": str(report.get("schema_version") or ""),
+        "source_schema_version": str(report.get("source_schema_version") or ""),
+        "source_audio_schema_version": str(report.get("source_audio_schema_version") or ""),
         "review_item_count": _int(guard.get("review_item_count")),
         "required_input_field_count": _int(guard.get("required_input_field_count")),
         "validated_review_input_present": bool(
@@ -212,7 +217,13 @@ def build_objective_next_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": source["boundary"],
+        "source_schema_version": source["schema_version"],
+        "source_package_schema_version": source["source_schema_version"],
+        "source_audio_schema_version": source["source_audio_schema_version"],
         "objective_summary": {
+            "source_schema_version": source["schema_version"],
+            "source_package_schema_version": source["source_schema_version"],
+            "source_audio_schema_version": source["source_audio_schema_version"],
             "review_item_count": _int(source["review_item_count"]),
             "required_input_field_count": _int(source["required_input_field_count"]),
             "validated_review_input_present": bool(
@@ -375,9 +386,17 @@ def validate_objective_next_report(
             raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
                 f"objective summary source-context field required: {key}"
             )
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
+        if not bool(summary.get(key, False)):
+            raise StageBMidiToSoloChordToneLandingRepairObjectiveNextError(
+                f"objective summary source-context preserved field must be true: {key}"
+            )
     return {
         "boundary": boundary,
         "source_boundary": str(report.get("source_boundary") or ""),
+        "source_schema_version": str(report.get("source_schema_version") or ""),
+        "source_package_schema_version": str(report.get("source_package_schema_version") or ""),
+        "source_audio_schema_version": str(report.get("source_audio_schema_version") or ""),
         "next_boundary": str(decision.get("next_boundary") or ""),
         "selected_target": str(_dict(report.get("selected_next_target")).get("target") or ""),
         "objective_next_decision_completed": bool(
@@ -445,6 +464,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- boundary: `{report['boundary']}`",
         f"- source boundary: `{report['source_boundary']}`",
+        f"- source schema version: `{report['source_schema_version']}`",
+        f"- source package schema version: `{report['source_package_schema_version']}`",
+        f"- source audio schema version: `{report['source_audio_schema_version']}`",
         f"- next boundary: `{decision['next_boundary']}`",
         f"- selected target: `{target['target']}`",
         f"- review item count: `{summary['review_item_count']}`",
@@ -514,7 +536,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1052)
+    parser.add_argument("--issue_number", type=int, default=1136)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_objective_decision", action="store_true")

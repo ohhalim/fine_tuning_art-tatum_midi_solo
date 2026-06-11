@@ -46,7 +46,7 @@
 - latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: Issue #1130, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: Issue #1132, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: Issue #1134, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: Issue #1052, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh
+- latest songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: Issue #1136, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: Issue #1054, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep: Issue #1056, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: Issue #1058, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -4812,20 +4812,23 @@ Issue #1134는 Issue #1132 listening review package v3의 source-context preserv
 
 ## Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Chord-Tone Landing Repair Objective-Only Next Decision Source Context Refresh Result
 
-Issue #1052는 Issue #1050 input guard의 source-context preserved flag를 objective-only next decision까지 보존하고, pending input과 residual outside-soloing risk 기준으로 follow-up decision을 선택한 작업이다.
+Issue #1136은 Issue #1134 input guard v3의 source-context preserved flag를 objective-only next decision까지 보존하고, pending input과 residual outside-soloing risk 기준으로 follow-up decision을 선택한 작업이다.
 
 변경:
 
-- objective-only next decision schema version `v2`
-- input guard required source-context key와 preserved flag 3개 필수 검증
+- objective-only next decision schema version `v3`
+- input guard schema v3, required source-context key, preserved flag 3개 필수 검증
 - objective summary, readiness, validation summary, markdown report source-context preserved field 전파
-- harness issue number와 generated doc path를 #1052 기준으로 갱신
+- harness issue number와 generated doc path를 #1136 기준으로 갱신
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision`
 - source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard`
+- source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard_v3`
+- source package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_v3`
+- source audio schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v4`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
 - selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
 - validated review input present: `false`
