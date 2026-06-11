@@ -104,6 +104,21 @@ def _reject_quality_claim(report: dict[str, Any]) -> None:
         )
 
 
+def candidate_items(report: dict[str, Any]) -> list[Any]:
+    candidates = _list(report.get("candidates"))
+    if candidates:
+        return candidates
+    return _list(report.get("selected_candidates"))
+
+
+def source_candidate_count(report: dict[str, Any], candidates: Sequence[Any]) -> int:
+    direct_count = _int(report.get("candidate_count"))
+    if direct_count:
+        return direct_count
+    repair_count = _int(_dict(report.get("repair_summary")).get("candidate_count"))
+    return repair_count or len(candidates)
+
+
 def label_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
     note_count = _int(candidate.get("note_count"))
     dead_air_ratio = _float(candidate.get("dead_air_ratio"))
@@ -144,9 +159,9 @@ def label_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
         watch_labels.append("tension_high_watch")
 
     return {
-        "review_index": _int(candidate.get("review_index")),
+        "review_index": _int(candidate.get("review_index") or candidate.get("repair_index")),
         "case_label": str(candidate.get("case_label") or ""),
-        "rank": _int(candidate.get("rank")),
+        "rank": _int(candidate.get("rank") or candidate.get("repair_index")),
         "score": _float(candidate.get("score")),
         "note_count": note_count,
         "dead_air_ratio": dead_air_ratio,
@@ -157,8 +172,8 @@ def label_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
         "major_labels": major_labels,
         "watch_labels": watch_labels,
         "quality_proxy_pass": not major_labels,
-        "review_midi_path": str(candidate.get("review_midi_path") or ""),
-        "review_wav_path": str(candidate.get("review_wav_path") or ""),
+        "review_midi_path": str(candidate.get("review_midi_path") or candidate.get("repair_midi_path") or ""),
+        "review_wav_path": str(candidate.get("review_wav_path") or candidate.get("repair_wav_path") or ""),
     }
 
 
@@ -193,7 +208,8 @@ def build_rubric_report(
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     _reject_quality_claim(listening_package)
-    candidates = [label_candidate(_dict(item)) for item in _list(listening_package.get("candidates"))]
+    source_candidates = candidate_items(listening_package)
+    candidates = [label_candidate(_dict(item)) for item in source_candidates]
     major_label_counts = Counter(label for item in candidates for label in item["major_labels"])
     watch_label_counts = Counter(label for item in candidates for label in item["watch_labels"])
     selected_target = select_repair_target(major_label_counts)
@@ -204,7 +220,7 @@ def build_rubric_report(
         "source_package": {
             "schema_version": listening_package.get("schema_version"),
             "output_dir": listening_package.get("output_dir"),
-            "candidate_count": _int(listening_package.get("candidate_count")),
+            "candidate_count": source_candidate_count(listening_package, source_candidates),
         },
         "thresholds": dict(RUBRIC_THRESHOLDS),
         "candidate_labels": candidates,

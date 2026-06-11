@@ -63,6 +63,53 @@ def listening_package(*, quality_claim: bool = False) -> dict:
     }
 
 
+def repair_package() -> dict:
+    return {
+        "schema_version": "music_transformer_solo_yield_dead_air_density_repair_package_v1",
+        "output_dir": "outputs/repair_package",
+        "repair_summary": {
+            "candidate_count": 2,
+        },
+        "selected_candidates": [
+            candidate(
+                review_index=0,
+                case_label="minor_backdoor",
+                rank=0,
+                dead_air_ratio=0.54,
+                direction_change_ratio=0.44,
+                tension_ratio=0.24,
+            )
+            | {
+                "repair_index": 1,
+                "review_midi_path": "",
+                "review_wav_path": "",
+                "repair_midi_path": "midi/repaired_1.mid",
+                "repair_wav_path": "audio/repaired_1.wav",
+            },
+            candidate(
+                review_index=0,
+                case_label="minor_backdoor",
+                rank=0,
+                dead_air_ratio=0.58,
+                direction_change_ratio=0.60,
+                tension_ratio=0.18,
+            )
+            | {
+                "repair_index": 2,
+                "review_midi_path": "",
+                "review_wav_path": "",
+                "repair_midi_path": "midi/repaired_2.mid",
+                "repair_wav_path": "audio/repaired_2.wav",
+            },
+        ],
+        "readiness": {
+            "musical_quality_claimed": False,
+            "artist_style_claimed": False,
+            "production_ready_claimed": False,
+        },
+    }
+
+
 class MusicTransformerSoloYieldObjectiveQualityRubricBaselineTest(unittest.TestCase):
     def test_label_candidate_marks_major_and_watch_labels(self) -> None:
         labeled = label_candidate(
@@ -124,6 +171,26 @@ class MusicTransformerSoloYieldObjectiveQualityRubricBaselineTest(unittest.TestC
                 expected_target="phrase_direction_balance_repair",
                 require_no_quality_claim=True,
             )
+
+    def test_builds_rubric_from_repair_package_selected_candidates(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report = build_rubric_report(
+                listening_package=repair_package(),
+                output_dir=Path(temp_dir) / "rubric",
+            )
+        summary = validate_rubric_report(
+            report,
+            min_candidate_count=2,
+            expected_target="phrase_direction_balance_repair",
+            require_no_quality_claim=True,
+        )
+
+        self.assertEqual(summary["candidate_count"], 2)
+        self.assertEqual(summary["major_label_counts"]["weak_direction_change"], 1)
+        self.assertEqual(summary["major_label_counts"]["low_tension_color"], 1)
+        self.assertEqual(summary["selected_repair_target"], "phrase_direction_balance_repair")
+        self.assertEqual(report["candidate_labels"][0]["review_index"], 1)
+        self.assertEqual(report["candidate_labels"][0]["review_midi_path"], "midi/repaired_1.mid")
 
 
 if __name__ == "__main__":
