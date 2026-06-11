@@ -21,7 +21,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationError(ValueError):
 
 BOUNDARY = "stage_b_midi_to_solo_mvp_current_evidence_consolidation"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_readme_evidence_refresh"
-SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_current_evidence_consolidation_v3"
+SCHEMA_VERSION = "stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4"
 
 CONTRACT_BOUNDARY = "stage_b_midi_to_solo_mvp_input_contract"
 CONTEXT_BOUNDARY = "stage_b_midi_to_solo_context_extraction_mvp"
@@ -48,6 +48,23 @@ MODEL_CONDITIONED_PITCH_CONTOUR_CHANGED_RATIO_REPAIR_OBJECTIVE_BOUNDARY = (
 OUTSIDE_SOLOING_REPAIR_OBJECTIVE_BOUNDARY = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
     "outside_soloing_repair_objective_only_next_decision"
+)
+OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION = (
+    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+    "outside_soloing_repair_objective_next_v4"
+)
+SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS = (
+    "source_schema_version",
+    "source_listening_package_schema_version",
+    "source_audio_package_schema_version",
+    "source_repair_sweep_schema_version",
+    "source_followup_schema_version",
+    "source_objective_input_guard_schema_version",
+    "source_package_schema_version",
+    "source_audio_schema_version",
+    "chord_tone_repair_sweep_schema_version",
+    "chord_tone_repair_sweep_source_schema_version",
+    "chord_tone_repair_sweep_bridge_schema_version",
 )
 BRIDGE_SOURCE_CONTEXT_KEYS = (
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before",
@@ -127,6 +144,35 @@ def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str
             f"{label} source-context preserved field must be true: {missing_preserved}"
         )
     return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
+
+
+def _outside_soloing_schema_context(
+    report: dict[str, Any],
+    summary: dict[str, Any],
+    readiness: dict[str, Any],
+    *,
+    label: str,
+) -> dict[str, str]:
+    if str(report.get("schema_version") or "") != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+            "outside-soloing repair objective schema version must match current report"
+        )
+    context = {
+        "outside_soloing_repair_objective_schema_version": (
+            OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+        )
+    }
+    for key in SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS:
+        if not str(summary.get(key) or ""):
+            raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+                f"{label} schema-context field required: {key}"
+            )
+        if str(readiness.get(key) or "") != str(summary.get(key) or ""):
+            raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+                f"{label} readiness schema-context mismatch: {key}"
+            )
+        context[key] = str(summary.get(key) or "")
+    return context
 
 
 def _duration_range(items: list[dict[str, Any]]) -> dict[str, float]:
@@ -781,8 +827,15 @@ def validate_outside_soloing_repair_objective_next(
         summary,
         label="outside-soloing repair objective summary",
     )
+    schema_context = _outside_soloing_schema_context(
+        report,
+        summary,
+        readiness,
+        label="outside-soloing repair objective summary",
+    )
     return {
         "boundary": OUTSIDE_SOLOING_REPAIR_OBJECTIVE_BOUNDARY,
+        **schema_context,
         "objective_next_completed": bool(readiness.get("objective_next_completed", False)),
         "objective_next_decision_completed": bool(
             readiness.get("objective_next_decision_completed", False)
@@ -996,6 +1049,17 @@ def build_current_evidence_consolidation_report(
                 key in outside_soloing_repair_objective
                 for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
             ),
+            "outside_soloing_repair_schema_context_preserved": bool(
+                outside_soloing_repair_objective
+            )
+            and outside_soloing_repair_objective.get(
+                "outside_soloing_repair_objective_schema_version"
+            )
+            == OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            and all(
+                key in outside_soloing_repair_objective
+                for key in SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS
+            ),
             "current_mvp_technical_execution_evidence_supported": technical_path_supported,
             "current_mvp_objective_repair_evidence_supported": selected_scale_objective_path_complete,
             "midi_to_solo_mvp_current_evidence_supported": current_evidence_supported,
@@ -1146,6 +1210,27 @@ def validate_current_evidence_consolidation_report(
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
             "outside-soloing repair preference fill should remain blocked"
         )
+    if outside_soloing_repair:
+        if str(
+            outside_soloing_repair.get("outside_soloing_repair_objective_schema_version")
+            or ""
+        ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+            raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+                "outside-soloing repair objective schema version mismatch"
+            )
+        missing_schema_context = [
+            key
+            for key in SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS
+            if not str(outside_soloing_repair.get(key) or "")
+        ]
+        if missing_schema_context:
+            raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+                f"outside-soloing repair schema-context missing: {missing_schema_context}"
+            )
+        if not bool(readiness.get("outside_soloing_repair_schema_context_preserved", False)):
+            raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError(
+                "outside-soloing repair schema-context preservation required"
+            )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloMvpCurrentEvidenceConsolidationError("critical user input should not be required")
     for item in _list(generation.get("midi_paths")) + _list(audio.get("wav_paths")):
@@ -1295,6 +1380,17 @@ def validate_current_evidence_consolidation_report(
         "outside_soloing_repair_source_context_preserved": bool(
             readiness.get("outside_soloing_repair_source_context_preserved", False)
         ),
+        "outside_soloing_repair_schema_context_preserved": bool(
+            readiness.get("outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "outside_soloing_repair_objective_schema_version": str(
+            outside_soloing_repair.get("outside_soloing_repair_objective_schema_version")
+            or ""
+        ),
+        **{
+            f"outside_soloing_repair_{key}": outside_soloing_repair.get(key)
+            for key in SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS
+        },
         **{
             key: outside_soloing_repair.get(key)
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
@@ -1363,6 +1459,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- model-conditioned pitch-contour changed-ratio repair objective path ready: `{_bool_token(readiness['model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready'])}`",
         f"- outside-soloing repair objective path ready: `{_bool_token(readiness['outside_soloing_repair_objective_path_ready'])}`",
         f"- outside-soloing repair source context preserved: `{_bool_token(readiness['outside_soloing_repair_source_context_preserved'])}`",
+        f"- outside-soloing repair schema context preserved: `{_bool_token(readiness['outside_soloing_repair_schema_context_preserved'])}`",
         f"- human/audio preference claimed: `{_bool_token(readiness['human_audio_preference_claimed'])}`",
         f"- MIDI-to-solo musical quality claimed: `{_bool_token(readiness['midi_to_solo_musical_quality_claimed'])}`",
         "",
@@ -1453,6 +1550,11 @@ def markdown_report(report: dict[str, Any]) -> str:
                 "## Outside-Soloing Repair Objective Path",
                 "",
                 f"- current evidence consolidation ready: `{_bool_token(outside_soloing_repair['current_evidence_consolidation_ready'])}`",
+                f"- objective schema version: `{outside_soloing_repair['outside_soloing_repair_objective_schema_version']}`",
+                f"- source schema version: `{outside_soloing_repair['source_schema_version']}`",
+                f"- source listening package schema version: `{outside_soloing_repair['source_listening_package_schema_version']}`",
+                f"- source audio package schema version: `{outside_soloing_repair['source_audio_package_schema_version']}`",
+                f"- source repair sweep schema version: `{outside_soloing_repair['source_repair_sweep_schema_version']}`",
                 f"- objective path supported: `{_bool_token(outside_soloing_repair['outside_soloing_repair_objective_path_supported'])}`",
                 f"- rendered WAV files: `{outside_soloing_repair['rendered_audio_file_count']}`",
                 f"- technical WAV validation: `{_bool_token(outside_soloing_repair['technical_wav_validation'])}`",
@@ -1516,7 +1618,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1066)
+    parser.add_argument("--issue_number", type=int, default=1150)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_current_evidence_support", action="store_true")

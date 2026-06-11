@@ -10,6 +10,9 @@ from scripts.consolidate_stage_b_midi_to_solo_mvp_current_evidence import (
     NEXT_BOUNDARY,
     OBJECTIVE_FINAL_BOUNDARY,
     OBJECTIVE_NEXT_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    SCHEMA_VERSION,
+    SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS,
     StageBMidiToSoloMvpCurrentEvidenceConsolidationError,
     build_current_evidence_consolidation_report,
     validate_current_evidence_consolidation_report,
@@ -47,6 +50,54 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_source_context_preserved": True,
+}
+
+
+SOURCE_SCHEMA_CONTEXT = {
+    "source_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "outside_soloing_repair_listening_review_input_guard_v4"
+    ),
+    "source_listening_package_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "outside_soloing_repair_listening_review_package_v4"
+    ),
+    "source_audio_package_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "outside_soloing_repair_audio_package_v4"
+    ),
+    "source_repair_sweep_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "outside_soloing_repair_sweep_v3"
+    ),
+    "source_followup_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "repair_followup_decision_v3"
+    ),
+    "source_objective_input_guard_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "repair_listening_review_input_guard_v3"
+    ),
+    "source_package_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "repair_listening_review_package_v3"
+    ),
+    "source_audio_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "repair_audio_package_v4"
+    ),
+    "chord_tone_repair_sweep_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "repair_sweep_v4"
+    ),
+    "chord_tone_repair_sweep_source_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_"
+        "chord_context_pitch_role_objective_decision_v4"
+    ),
+    "chord_tone_repair_sweep_bridge_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_"
+        "chord_context_pitch_role_bridge_v4"
+    ),
 }
 
 
@@ -328,11 +379,13 @@ def reports(
             },
         },
         "outside_soloing_repair_objective": {
+            "schema_version": OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
             "boundary": (
                 "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_"
                 "chord_tone_landing_outside_soloing_repair_objective_only_next_decision"
             ),
             "objective_summary": {
+                **SOURCE_SCHEMA_CONTEXT,
                 "review_item_count": 6,
                 "validated_review_input_present": False,
                 "preference_fill_allowed": False,
@@ -363,6 +416,7 @@ def reports(
                 **SOURCE_CONTEXT,
             },
             "readiness": {
+                **SOURCE_SCHEMA_CONTEXT,
                 "objective_next_completed": True,
                 "objective_next_decision_completed": True,
                 "human_audio_preference_claimed": False,
@@ -404,7 +458,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
                     "outside_soloing_repair_objective"
                 ],
                 output_dir=Path(tmp) / "out",
-                issue_number=1066,
+                issue_number=1150,
             )
             summary = validate_current_evidence_consolidation_report(
                 report,
@@ -505,6 +559,17 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
             self.assertTrue(summary["outside_soloing_repair_non_chord_run_target_supported"])
             self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
             self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(summary["outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
+            for key in SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS:
+                self.assertIn(key, report["outside_soloing_repair_objective_path"])
+                self.assertEqual(
+                    summary[f"outside_soloing_repair_{key}"],
+                    SOURCE_SCHEMA_CONTEXT[key],
+                )
             for key in BRIDGE_SOURCE_CONTEXT_KEYS:
                 self.assertIn(key, report["outside_soloing_repair_objective_path"])
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
@@ -654,6 +719,58 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
     def test_rejects_missing_outside_soloing_source_context(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data = reports(Path(tmp))
+            data["outside_soloing_repair_objective"]["schema_version"] = "legacy_schema"
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
+                    model_conditioned_pitch_contour_objective_next=data[
+                        "model_conditioned_pitch_contour_objective"
+                    ],
+                    model_conditioned_pitch_contour_changed_ratio_repair_objective_next=data[
+                        "model_conditioned_pitch_contour_changed_ratio_repair_objective"
+                    ],
+                    outside_soloing_repair_objective_next=data[
+                        "outside_soloing_repair_objective"
+                    ],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=1150,
+                )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp))
+            data["outside_soloing_repair_objective"]["readiness"][
+                "source_schema_version"
+            ] = "mismatched_schema"
+            with self.assertRaises(StageBMidiToSoloMvpCurrentEvidenceConsolidationError):
+                build_current_evidence_consolidation_report(
+                    contract_report=data["contract"],
+                    context_report=data["context"],
+                    resource_probe=data["resource"],
+                    generation_probe=data["generation"],
+                    audio_render=data["audio"],
+                    objective_next=data["objective"],
+                    cli_objective_next=data["cli_objective"],
+                    model_conditioned_pitch_contour_objective_next=data[
+                        "model_conditioned_pitch_contour_objective"
+                    ],
+                    model_conditioned_pitch_contour_changed_ratio_repair_objective_next=data[
+                        "model_conditioned_pitch_contour_changed_ratio_repair_objective"
+                    ],
+                    outside_soloing_repair_objective_next=data[
+                        "outside_soloing_repair_objective"
+                    ],
+                    output_dir=Path(tmp) / "out",
+                    issue_number=1150,
+                )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data = reports(Path(tmp))
             data["outside_soloing_repair_objective"]["objective_summary"][
                 "source_outside_soloing_residual_risk_preserved"
             ] = False
@@ -763,6 +880,7 @@ class StageBMidiToSoloMvpCurrentEvidenceConsolidationTest(unittest.TestCase):
     def test_boundary_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_mvp_current_evidence_consolidation")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_readme_evidence_refresh")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4")
 
 
 if __name__ == "__main__":

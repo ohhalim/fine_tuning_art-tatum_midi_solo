@@ -12,7 +12,7 @@
 
 현재 active issue:
 
-- latest functional result: Issue #1076, Stage B MIDI-to-solo MVP delivery package source-context refresh
+- latest functional result: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest MVP completion audit: Issue #1070, Stage B MIDI-to-solo MVP completion audit source-context refresh
 - latest quality gap decision: Issue #1072, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #1074, Stage B MIDI-to-solo listening review quality gap source-context refresh
@@ -53,11 +53,11 @@
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: Issue #1144, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: Issue #1146, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: Issue #1148, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh
-- latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
+- latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh`
+- open issue queue after Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo README evidence refresh source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5266,14 +5266,14 @@ Issue #1148은 Issue #1146 input guard v4의 source schema chain을 objective-on
 
 ## Stage B MIDI-to-Solo MVP Current Evidence Consolidation Source-Context Refresh Result
 
-Issue #1066은 Issue #1064 outside-soloing repair objective decision의 source-context preserved flag를 MVP current evidence consolidation까지 보존하고, current evidence support를 재검증한 작업이다.
+Issue #1150은 Issue #1148 outside-soloing repair objective decision v4의 source schema chain을 MVP current evidence consolidation까지 보존하고, current evidence support를 재검증한 작업이다.
 
 변경:
 
-- current evidence consolidation schema v3 적용
-- outside-soloing repair objective required source-context key와 preserved flag 3개 필수 검증
-- outside-soloing repair objective path, readiness, validation summary source-context preserved field 전파
-- harness issue number를 #1066 기준으로 갱신
+- current evidence consolidation schema v4 적용
+- outside-soloing repair objective schema v4와 source schema-context key 필수 검증
+- outside-soloing repair objective path, readiness, validation summary schema/context field 전파
+- harness issue number를 #1150 기준으로 갱신
 - next recommended issue를 README evidence refresh source-context refresh로 갱신
 
 결과:
@@ -5289,6 +5289,8 @@ Issue #1066은 Issue #1064 outside-soloing repair objective decision의 source-c
 - model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - outside-soloing repair objective path ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - outside-soloing repair rendered audio file count: `6`
 - outside-soloing repair changed note total: `2`
 - source outside-soloing pitch-role risk count: `5 -> 2`
@@ -5304,7 +5306,7 @@ Issue #1066은 Issue #1064 outside-soloing repair objective decision의 source-c
 
 판단:
 
-- Issue #1064 objective decision의 preserved flag 3개가 current evidence outside-soloing repair objective path와 validation summary까지 유지됨.
+- Issue #1148 objective decision v4의 source schema chain과 preserved context가 current evidence outside-soloing repair objective path와 validation summary까지 유지됨.
 - selected-scale objective path, phrase-bank CLI technical path, model-conditioned pitch-contour path, changed-ratio repair path, outside-soloing repair path 모두 current evidence support에 포함.
 - human/audio preference, MIDI-to-solo musical quality, broad trained model quality claim 제외.
 
