@@ -7,14 +7,25 @@ from pathlib import Path
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_next import (
     BOUNDARY,
     FOLLOWUP_DECISION_NEXT_BOUNDARY,
+    SCHEMA_VERSION,
     SELECTED_TARGET,
     StageBMidiToSoloChordToneLandingRepairObjectiveNextError,
     build_objective_next_report,
     validate_objective_next_report,
 )
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package import (
+    SCHEMA_VERSION as SOURCE_PACKAGE_SCHEMA_VERSION,
+)
+from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio import (
+    SCHEMA_VERSION as SOURCE_AUDIO_SCHEMA_VERSION,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+)
 from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input import (
     BOUNDARY as SOURCE_BOUNDARY,
     OBJECTIVE_NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_INPUT_GUARD_SCHEMA_VERSION,
 )
 
 SOURCE_CONTEXT = {
@@ -47,8 +58,11 @@ SOURCE_CONTEXT = {
 
 def input_guard_report(*, quality_claim: bool = False, outside_after: int = 2) -> dict:
     return {
+        "schema_version": SOURCE_INPUT_GUARD_SCHEMA_VERSION,
         "boundary": SOURCE_BOUNDARY,
         "source_boundary": "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package",
+        "source_schema_version": SOURCE_PACKAGE_SCHEMA_VERSION,
+        "source_audio_schema_version": SOURCE_AUDIO_SCHEMA_VERSION,
         "guard_result": {
             "validated_review_input_present": False,
             "preference_fill_allowed": False,
@@ -102,7 +116,7 @@ class StageBMidiToSoloChordToneLandingRepairObjectiveNextTest(unittest.TestCase)
             report = build_objective_next_report(
                 input_guard_report=input_guard_report(),
                 output_dir=root / "objective_next",
-                issue_number=1052,
+                issue_number=1136,
             )
             summary = validate_objective_next_report(
                 report,
@@ -114,6 +128,10 @@ class StageBMidiToSoloChordToneLandingRepairObjectiveNextTest(unittest.TestCase)
             )
 
             self.assertTrue(summary["objective_next_decision_completed"])
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(summary["source_schema_version"], SOURCE_INPUT_GUARD_SCHEMA_VERSION)
+            self.assertEqual(summary["source_package_schema_version"], SOURCE_PACKAGE_SCHEMA_VERSION)
+            self.assertEqual(summary["source_audio_schema_version"], SOURCE_AUDIO_SCHEMA_VERSION)
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
             self.assertFalse(summary["validated_review_input_present"])
             self.assertFalse(summary["preference_fill_allowed"])
@@ -177,7 +195,21 @@ class StageBMidiToSoloChordToneLandingRepairObjectiveNextTest(unittest.TestCase)
                 build_objective_next_report(
                     input_guard_report=input_guard_report(quality_claim=True),
                     output_dir=root / "objective_next",
-                    issue_number=1052,
+                    issue_number=1136,
+                )
+
+    def test_rejects_source_input_guard_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = input_guard_report()
+            source["schema_version"] = (
+                "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard_v2"
+            )
+            with self.assertRaises(StageBMidiToSoloChordToneLandingRepairObjectiveNextError):
+                build_objective_next_report(
+                    input_guard_report=source,
+                    output_dir=root / "objective_next",
+                    issue_number=1136,
                 )
 
     def test_rejects_source_context_preservation_flag(self) -> None:
@@ -190,7 +222,27 @@ class StageBMidiToSoloChordToneLandingRepairObjectiveNextTest(unittest.TestCase)
                 build_objective_next_report(
                     input_guard_report=source,
                     output_dir=root / "objective_next",
-                    issue_number=1052,
+                    issue_number=1136,
+                )
+
+    def test_rejects_report_preserved_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = build_objective_next_report(
+                input_guard_report=input_guard_report(),
+                output_dir=root / "objective_next",
+                issue_number=1136,
+            )
+            report["objective_summary"][BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS[0]] = False
+
+            with self.assertRaises(StageBMidiToSoloChordToneLandingRepairObjectiveNextError):
+                validate_objective_next_report(
+                    report,
+                    expected_boundary=BOUNDARY,
+                    expected_next_boundary=FOLLOWUP_DECISION_NEXT_BOUNDARY,
+                    require_objective_decision=True,
+                    require_followup_required=True,
+                    require_no_quality_claim=True,
                 )
 
     def test_constants_are_stable(self) -> None:
@@ -201,6 +253,10 @@ class StageBMidiToSoloChordToneLandingRepairObjectiveNextTest(unittest.TestCase)
         self.assertEqual(
             FOLLOWUP_DECISION_NEXT_BOUNDARY,
             "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision",
+        )
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_next_v3",
         )
 
 

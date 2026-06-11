@@ -426,7 +426,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package: source schema `v4`, rendered WAV `6`, duration `18.871s-19.000s`, technical validation `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, audio/preference/quality claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package: source schema `v4`, review items `6`, validated input `false`, technical WAV validation `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: source schema `v3`, preference fill `false`, validated input `false`, review items `6`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision`
-- MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: follow-up required `true`, selected target `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
+- MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: source schema `v3`, follow-up required `true`, selected target `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: selected target `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`, primary risk `outside_soloing_pitch_role_risk=2`, weak landing resolved `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep: outside risk `2 -> 0`, changed notes `2`, max non-chord run `4 -> 3`, weak landing after `0`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: rendered WAV `6`, duration `18.871s-19.000s`, technical validation `true`, source risk `5 -> 2`, current repair risk `2 -> 0`, source/current context preserved, audio/preference/quality claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package`
@@ -11656,12 +11656,15 @@ Issue #1134는 Issue #1132 listening review package v3의 source-context preserv
 
 ## 9.216 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh
 
-Issue #1052는 Issue #1050 input guard의 source-context preserved flag를 objective-only next decision까지 보존하고, pending input과 residual outside-soloing risk 기준으로 follow-up decision을 선택한 작업이다.
+Issue #1136은 Issue #1134 input guard v3의 source-context preserved flag를 objective-only next decision까지 보존하고, pending input과 residual outside-soloing risk 기준으로 follow-up decision을 선택한 작업이다.
 
 결과:
 
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision`
 - source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard`
+- source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard_v3`
+- source package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_v3`
+- source audio schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v4`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
 - selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
 - validated review input present: `false`
@@ -11681,7 +11684,7 @@ Issue #1052는 Issue #1050 input guard의 source-context preserved flag를 objec
 
 판단:
 
-- Issue #1050 input guard의 preserved flag 3개가 objective summary와 readiness까지 유지됨.
+- Issue #1134 input guard v3의 preserved flag 3개가 objective summary와 readiness까지 유지됨.
 - validated review input 부재로 preference fill blocked 유지.
 - residual outside-soloing pitch-role risk after `2`로 follow-up decision 필요.
 - current quality claim ready는 `false`.
