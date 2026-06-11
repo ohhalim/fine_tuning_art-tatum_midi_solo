@@ -2,13 +2,24 @@
 
 MIDI 데이터를 token sequence로 변환하고, Music Transformer 계열 symbolic model을 학습해 짧은 재즈 솔로 후보 MIDI를 생성하는 로컬 MVP.
 
-현재 목표는 완성형 재즈 연주 모델이 아니다. 목표는 **학습된 checkpoint를 사용해 2마디 솔로 후보 MIDI/WAV를 만들고, 재즈 솔로 후보로 남길 수 있는 결과의 수율을 높이는 것**이다.
+현재 목표는 완성형 재즈 연주 모델이 아니다. 목표는 **학습된 checkpoint를 사용해 2-4마디 솔로 후보 MIDI/WAV를 만들고, 재즈 솔로 후보로 남길 수 있는 결과의 수율을 높이는 것**이다.
+
+## 현재 완료 범위
+
+- Music Transformer 계열 checkpoint 기반 constrained generation 경로 동작 확인
+- 2마디 후보 생성: strict `24 / 24`, grammar-valid `24 / 24`
+- 4마디 확장 후보 생성: strict `20 / 24`, grammar-valid `24 / 24`
+- 4마디 dead-air repair 이후: strict `22 / 24`, grammar-valid `24 / 24`
+- repaired 4bar review package: MIDI `8`, WAV `8`
+- final status audit: technical evidence ready `true`
+- 음악적 품질 claim: `false`
+- 사람 기준 청취 선호 입력: `false`
 
 ## 무엇을 만들었나
 
 - Stage B tokenized MIDI dataset 기반 Music Transformer 계열 모델 학습
 - 학습 checkpoint 저장
-- chord context 기반 2마디 솔로 후보 생성
+- chord context 기반 2-4마디 솔로 후보 생성
 - model logits 기반 token sampling
 - MIDI 문법 붕괴를 줄이기 위한 constrained decoding
 - 후보별 objective metric 계산
@@ -141,6 +152,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_4BAR_REPAIRED_INPUT_GUARD_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_4BAR_REPAIRED_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_FINAL_STATUS_AUDIT_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_README_FINAL_EVIDENCE_REFRESH_2026-06-11.md`
 
 ## 실행 방법
 
@@ -197,7 +209,7 @@ Report:
 - Coltrane, Art Tatum, Oscar Peterson 수준의 긴 솔로 생성 아님
 - Brad style adaptation 완료 아님
 - 입력 MIDI 전체를 이해해 자유롭게 솔로를 만드는 단계 아님
-- 현재는 chord context와 constrained decoding을 사용한 2마디 후보 생성 MVP
+- 현재는 chord context와 constrained decoding을 사용한 2-4마디 후보 생성 MVP
 
 ## 다음 작업
 
@@ -223,4 +235,5 @@ Report:
 - 4bar repaired objective-only next decision
 - final status audit
 - README final evidence refresh
+- final handoff summary
 - 더 긴 4마디 phrase로 확장 검토
