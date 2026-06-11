@@ -4,10 +4,15 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import (
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+)
 from scripts.build_stage_b_midi_to_solo_targeted_quality_repair_listening_review_package import (
     BOUNDARY as SOURCE_BOUNDARY,
+    EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_PACKAGE_SCHEMA_VERSION,
 )
 from scripts.guard_stage_b_midi_to_solo_targeted_quality_repair_listening_review_input import (
     BOUNDARY,
@@ -67,8 +72,42 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
         for index in range(1, 7)
     ]
     return {
+        "schema_version": SOURCE_PACKAGE_SCHEMA_VERSION,
         "boundary": SOURCE_BOUNDARY,
+        "source_schema_versions": dict(EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS),
         "source_summary": {
+            "source_targeted_quality_repair_audio_package_schema_version": (
+                EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS[
+                    "targeted_quality_repair_audio_package"
+                ]
+            ),
+            "source_targeted_quality_repair_sweep_schema_version": (
+                EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS["targeted_quality_repair_sweep"]
+            ),
+            "source_candidate_failure_labeling_schema_version": (
+                EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS["candidate_failure_labeling"]
+            ),
+            "source_quality_rubric_schema_version": (
+                EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS["quality_rubric_baseline"]
+            ),
+            "source_post_mvp_plan_schema_version": (
+                EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS["post_mvp_quality_iteration_plan"]
+            ),
+            "source_final_status_schema_version": (
+                EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS["final_status_audit"]
+            ),
+            "source_delivery_package_schema_version": (
+                EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS["delivery_package"]
+            ),
+            "source_listening_gap_schema_version": (
+                EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS["listening_review_quality_gap"]
+            ),
+            "source_quality_gap_schema_version": (
+                EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS["quality_gap_decision"]
+            ),
+            "source_current_evidence_schema_version": (
+                EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS["current_evidence"]
+            ),
             "rendered_audio_file_count": 6,
             "technical_wav_validation": True,
             "sample_rate": 44100,
@@ -77,6 +116,10 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "failure_label_delta": 4,
             "source_outside_soloing_repair_evidence_ready": True,
             "source_outside_soloing_repair_source_context_preserved": True,
+            "source_outside_soloing_repair_schema_context_preserved": True,
+            "source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "source_outside_soloing_repair_wav_count": 6,
             "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
             "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
@@ -132,7 +175,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
             report = build_listening_review_input_guard_report(
                 source_package(),
                 output_dir=root / "guard",
-                issue_number=1094,
+                issue_number=1178,
             )
             summary = validate_listening_review_input_guard_report(
                 report,
@@ -145,7 +188,36 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
             )
 
             self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-            self.assertEqual(report["issue_number"], 1094)
+            self.assertEqual(report["issue_number"], 1178)
+            self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(
+                report["source_schema_versions"][
+                    "targeted_quality_repair_listening_review_package"
+                ],
+                SOURCE_PACKAGE_SCHEMA_VERSION,
+            )
+            for key, expected in EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS.items():
+                self.assertEqual(report["source_schema_versions"][key], expected)
+            self.assertEqual(
+                summary["source_targeted_quality_repair_listening_review_package_schema_version"],
+                SOURCE_PACKAGE_SCHEMA_VERSION,
+            )
+            for key, expected in EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS.items():
+                summary_key = "source_" + {
+                    "targeted_quality_repair_audio_package": (
+                        "targeted_quality_repair_audio_package"
+                    ),
+                    "targeted_quality_repair_sweep": "targeted_quality_repair_sweep",
+                    "candidate_failure_labeling": "candidate_failure_labeling",
+                    "quality_rubric_baseline": "quality_rubric",
+                    "post_mvp_quality_iteration_plan": "post_mvp_plan",
+                    "final_status_audit": "final_status",
+                    "delivery_package": "delivery_package",
+                    "listening_review_quality_gap": "listening_gap",
+                    "quality_gap_decision": "quality_gap",
+                    "current_evidence": "current_evidence",
+                }[key] + "_schema_version"
+                self.assertEqual(summary[summary_key], expected)
             self.assertTrue(summary["technical_wav_validation"])
             self.assertFalse(summary["validated_review_input_present"])
             self.assertFalse(summary["preference_fill_allowed"])
@@ -154,6 +226,11 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
             self.assertEqual(summary["failure_label_delta"], 4)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(summary["source_outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
@@ -187,7 +264,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
                 build_listening_review_input_guard_report(
                     source_package(quality_claim=True),
                     output_dir=root / "guard",
-                    issue_number=1094,
+                    issue_number=1178,
                 )
 
     def test_rejects_missing_outside_soloing_context(self) -> None:
@@ -199,7 +276,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
                 build_listening_review_input_guard_report(
                     source,
                     output_dir=root / "guard",
-                    issue_number=1094,
+                    issue_number=1178,
                 )
 
     def test_rejects_source_risk_delta_mismatch(self) -> None:
@@ -211,7 +288,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
                 build_listening_review_input_guard_report(
                     source,
                     output_dir=root / "guard",
-                    issue_number=1094,
+                    issue_number=1178,
                 )
 
     def test_rejects_missing_source_context_field(self) -> None:
@@ -225,7 +302,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
                 build_listening_review_input_guard_report(
                     source,
                     output_dir=root / "guard",
-                    issue_number=1094,
+                    issue_number=1178,
                 )
 
     def test_rejects_false_source_context_preserved_field(self) -> None:
@@ -239,7 +316,35 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
                 build_listening_review_input_guard_report(
                     source,
                     output_dir=root / "guard",
-                    issue_number=1094,
+                    issue_number=1178,
+                )
+
+    def test_rejects_source_schema_version_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = source_package()
+            source["source_schema_versions"]["targeted_quality_repair_audio_package"] = (
+                "wrong_schema"
+            )
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairListeningInputGuardError):
+                build_listening_review_input_guard_report(
+                    source,
+                    output_dir=root / "guard",
+                    issue_number=1178,
+                )
+
+    def test_rejects_missing_schema_context_preserved(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = source_package()
+            source["source_summary"]["source_outside_soloing_repair_schema_context_preserved"] = (
+                False
+            )
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairListeningInputGuardError):
+                build_listening_review_input_guard_report(
+                    source,
+                    output_dir=root / "guard",
+                    issue_number=1178,
                 )
 
     def test_constants_are_stable(self) -> None:
@@ -247,7 +352,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningInputGuardTest(unittest.Test
         self.assertEqual(OBJECTIVE_NEXT_BOUNDARY, "stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision")
         self.assertEqual(
             SCHEMA_VERSION,
-            "stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard_v4",
+            "stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard_v5",
         )
 
 

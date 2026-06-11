@@ -25,7 +25,7 @@ Current handoff scope:
 - Latest targeted quality repair sweep completed: Issue #1172, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh.
 - Latest targeted quality repair audio package completed: Issue #1174, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh.
 - Latest targeted quality repair listening review package completed: Issue #1176, Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh.
-- Latest targeted quality repair listening review input guard completed: Issue #1094, Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh.
+- Latest targeted quality repair listening review input guard completed: Issue #1178, Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh.
 - Latest targeted quality repair objective-only next decision completed: Issue #1096, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh.
 - Latest targeted quality repair follow-up decision completed: Issue #1098, Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh.
 - Latest songlike melody contour repair sweep completed: Issue #1100, Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh.
@@ -55,8 +55,8 @@ Current handoff scope:
 - Latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision completed: Issue #1148, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh.
 - Latest documentation issue completed: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh.
+- Open issue queue after Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
