@@ -18,16 +18,23 @@ from scripts.assess_stage_b_generic_base_readiness import read_json, write_json,
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
     BOUNDARY as BRIDGE_BOUNDARY,
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SCHEMA_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS as BRIDGE_SOURCE_SCHEMA_VERSIONS,
     SCHEMA_VERSION as BRIDGE_SCHEMA_VERSION,
+    StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError,
     bridge_candidate,
     parse_chords,
+    validate_bridge_report,
 )
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective import (  # noqa: E402
     BOUNDARY as OBJECTIVE_DECISION_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS as OBJECTIVE_DECISION_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as OBJECTIVE_DECISION_NEXT_BOUNDARY,
     SCHEMA_VERSION as OBJECTIVE_DECISION_SCHEMA_VERSION,
     SELECTED_TARGET as OBJECTIVE_DECISION_SELECTED_TARGET,
+    StageBMidiToSoloPitchRoleObjectiveDecisionError,
+    validate_objective_decision_report,
 )
 from scripts.run_stage_b_generation_probe import chord_pitch_classes  # noqa: E402
 from scripts.run_stage_b_reference_stats import position_bucket  # noqa: E402
@@ -45,7 +52,13 @@ NEXT_BOUNDARY = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package"
 )
 SELECTED_TARGET = "songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package"
-SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep_v4"
+SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep_v5"
+EXPECTED_SOURCE_SCHEMA_VERSIONS = {
+    "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision": (
+        OBJECTIVE_DECISION_SCHEMA_VERSION
+    ),
+    **OBJECTIVE_DECISION_SOURCE_SCHEMA_VERSIONS,
+}
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
     "midi_to_solo_musical_quality_claimed",
@@ -93,16 +106,64 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
         )
 
 
+def _validate_source_schema_versions(
+    source_schema_versions: dict[str, Any],
+    *,
+    label: str,
+) -> dict[str, str]:
+    normalized = {key: str(value) for key, value in source_schema_versions.items()}
+    for key, expected in EXPECTED_SOURCE_SCHEMA_VERSIONS.items():
+        if str(normalized.get(key) or "") != expected:
+            raise StageBMidiToSoloChordToneLandingRepairSweepError(
+                f"{label} source schema version mismatch: {key}"
+            )
+    return normalized
+
+
+def _validate_bridge_source_schema_versions(
+    source_schema_versions: dict[str, Any],
+    *,
+    label: str,
+) -> dict[str, str]:
+    normalized = {key: str(value) for key, value in source_schema_versions.items()}
+    expected = {
+        "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge": (
+            BRIDGE_SCHEMA_VERSION
+        ),
+        **BRIDGE_SOURCE_SCHEMA_VERSIONS,
+    }
+    for key, expected_version in expected.items():
+        if str(normalized.get(key) or "") != expected_version:
+            raise StageBMidiToSoloChordToneLandingRepairSweepError(
+                f"{label} source schema version mismatch: {key}"
+            )
+    return normalized
+
+
 def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
     for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in container:
             raise StageBMidiToSoloChordToneLandingRepairSweepError(
                 f"{label} source-context field required: {key}"
             )
+    for key in BRIDGE_SCHEMA_CONTEXT_KEYS:
+        if key not in container:
+            raise StageBMidiToSoloChordToneLandingRepairSweepError(
+                f"{label} schema-context field required: {key}"
+            )
     for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
         if not bool(container.get(key, False)):
             raise StageBMidiToSoloChordToneLandingRepairSweepError(
                 f"{label} source context should be preserved: {key}"
+            )
+    for key in (
+        "followup_objective_source_outside_soloing_schema_context_preserved",
+        "followup_repair_sweep_source_outside_soloing_schema_context_preserved",
+        "repair_sweep_source_outside_soloing_schema_context_preserved",
+    ):
+        if not bool(container.get(key, False)):
+            raise StageBMidiToSoloChordToneLandingRepairSweepError(
+                f"{label} schema context should be preserved: {key}"
             )
     for key in (
         "followup_objective_source_outside_soloing_source_targeted",
@@ -131,16 +192,24 @@ def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str
             raise StageBMidiToSoloChordToneLandingRepairSweepError(
                 f"{label} current outside-soloing risk should remain resolved: {key}"
             )
-    return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
+    return {
+        **{key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
+        **{key: container[key] for key in BRIDGE_SCHEMA_CONTEXT_KEYS},
+    }
 
 
 def _validate_source_context_consistency(
     objective: dict[str, Any], bridge: dict[str, Any]
 ) -> None:
-    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
+    for key in [*BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS, *BRIDGE_SCHEMA_CONTEXT_KEYS]:
         if objective.get(key) != bridge.get(key):
             raise StageBMidiToSoloChordToneLandingRepairSweepError(
                 f"objective and bridge source-context mismatch: {key}"
+            )
+    for key, value in bridge["source_schema_versions"].items():
+        if objective["source_schema_versions"].get(key) != value:
+            raise StageBMidiToSoloChordToneLandingRepairSweepError(
+                f"objective and bridge source schema mismatch: {key}"
             )
 
 
@@ -148,6 +217,26 @@ def validate_objective_decision(report: dict[str, Any]) -> dict[str, Any]:
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
     selected = _dict(report.get("selected_next_target"))
+    try:
+        objective_summary = validate_objective_decision_report(
+            report,
+            expected_boundary=OBJECTIVE_DECISION_BOUNDARY,
+            expected_next_boundary=OBJECTIVE_DECISION_NEXT_BOUNDARY,
+            expected_target=OBJECTIVE_DECISION_SELECTED_TARGET,
+            require_objective_decision=True,
+            require_no_quality_claim=True,
+        )
+    except StageBMidiToSoloPitchRoleObjectiveDecisionError as exc:
+        raise StageBMidiToSoloChordToneLandingRepairSweepError(str(exc)) from exc
+    source_schema_versions = _validate_source_schema_versions(
+        {
+            "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision": (
+                objective_summary["schema_version"]
+            ),
+            **_dict(report.get("source_schema_versions")),
+        },
+        label="chord-tone landing repair sweep objective decision",
+    )
     if str(report.get("boundary") or "") != OBJECTIVE_DECISION_BOUNDARY:
         raise StageBMidiToSoloChordToneLandingRepairSweepError(
             "pitch-role objective decision boundary required"
@@ -190,6 +279,7 @@ def validate_objective_decision(report: dict[str, Any]) -> dict[str, Any]:
         "boundary": OBJECTIVE_DECISION_BOUNDARY,
         "schema_version": str(report.get("schema_version") or ""),
         "source_schema_version": str(report.get("source_schema_version") or ""),
+        "source_schema_versions": source_schema_versions,
         "candidate_count": _int(readiness.get("candidate_count")),
         "weak_chord_tone_landing_risk_count": _int(
             readiness.get("weak_chord_tone_landing_risk_count")
@@ -206,6 +296,26 @@ def validate_bridge_source(report: dict[str, Any]) -> dict[str, Any]:
     decision = _dict(report.get("decision"))
     context = _dict(report.get("context"))
     candidates = [_dict(candidate) for candidate in _list(report.get("contextualized_candidates"))]
+    try:
+        bridge_summary = validate_bridge_report(
+            report,
+            expected_boundary=BRIDGE_BOUNDARY,
+            expected_next_boundary=OBJECTIVE_DECISION_BOUNDARY,
+            require_bridge_completed=True,
+            require_context_available=True,
+            require_no_quality_claim=True,
+        )
+    except StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError as exc:
+        raise StageBMidiToSoloChordToneLandingRepairSweepError(str(exc)) from exc
+    source_schema_versions = _validate_bridge_source_schema_versions(
+        {
+            "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge": (
+                bridge_summary["schema_version"]
+            ),
+            **_dict(report.get("source_schema_versions")),
+        },
+        label="chord-tone landing repair sweep bridge",
+    )
     if str(report.get("boundary") or "") != BRIDGE_BOUNDARY:
         raise StageBMidiToSoloChordToneLandingRepairSweepError(
             "chord-context pitch-role bridge boundary required"
@@ -235,6 +345,7 @@ def validate_bridge_source(report: dict[str, Any]) -> dict[str, Any]:
     return {
         "boundary": BRIDGE_BOUNDARY,
         "schema_version": str(report.get("schema_version") or ""),
+        "source_schema_versions": source_schema_versions,
         "candidates": candidates,
         "chord_progression": [str(chord) for chord in _list(context.get("chord_progression"))],
         "bpm": _float(context.get("bpm")) or 124.0,
@@ -407,6 +518,10 @@ def build_repair_sweep_report(
     objective = validate_objective_decision(objective_decision_report)
     bridge = validate_bridge_source(bridge_report)
     _validate_source_context_consistency(objective, bridge)
+    source_schema_versions = _validate_source_schema_versions(
+        objective["source_schema_versions"],
+        label="chord-tone landing repair sweep",
+    )
     chords = bridge["chord_progression"] or parse_chords("")
     bpm = _float(bridge["bpm"]) or 124.0
     manifest_path = ROOT_DIR / "stage_b_midi_to_solo_chord_tone_landing_repair_manifest.json"
@@ -444,6 +559,7 @@ def build_repair_sweep_report(
         "boundary": BOUNDARY,
         "source_boundary": objective["boundary"],
         "source_schema_version": objective["schema_version"],
+        "source_schema_versions": source_schema_versions,
         "bridge_boundary": bridge["boundary"],
         "bridge_schema_version": bridge["schema_version"],
         "context": {
@@ -456,6 +572,7 @@ def build_repair_sweep_report(
             "candidate_count": len(rows),
             "source_schema_version": objective["schema_version"],
             "bridge_schema_version": bridge["schema_version"],
+            "source_schema_versions": source_schema_versions,
             "repaired_midi_count": len(rows),
             "changed_note_total": int(changed_note_total),
             "objective_outside_soloing_pitch_role_risk_count": int(
@@ -470,6 +587,7 @@ def build_repair_sweep_report(
             "outside_soloing_repair_targeted": False,
             "outside_soloing_residual_risk_preserved": bool(outside_context_preserved),
             **{key: objective[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
+            **{key: objective[key] for key in BRIDGE_SCHEMA_CONTEXT_KEYS},
             "final_landing_chord_tone_count_before": int(final_before),
             "final_landing_chord_tone_count_after": int(final_after),
             "target_supported": bool(target_supported),
@@ -478,6 +596,7 @@ def build_repair_sweep_report(
             "boundary": BOUNDARY,
             "source_schema_version": objective["schema_version"],
             "bridge_schema_version": bridge["schema_version"],
+            "source_schema_versions": source_schema_versions,
             "chord_tone_landing_repair_sweep_completed": True,
             "candidate_count": len(rows),
             "repaired_midi_count": len(rows),
@@ -490,6 +609,7 @@ def build_repair_sweep_report(
             "outside_soloing_repair_targeted": False,
             "outside_soloing_residual_risk_preserved": bool(outside_context_preserved),
             **{key: objective[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
+            **{key: objective[key] for key in BRIDGE_SCHEMA_CONTEXT_KEYS},
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -539,6 +659,14 @@ def validate_repair_sweep_report(
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
     aggregate = _dict(report.get("aggregate"))
+    source_schema_versions = _validate_source_schema_versions(
+        _dict(report.get("source_schema_versions")),
+        label="chord-tone landing repair sweep report",
+    )
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingRepairSweepError(
+            "chord-tone landing repair sweep schema version mismatch"
+        )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloChordToneLandingRepairSweepError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -599,10 +727,44 @@ def validate_repair_sweep_report(
             raise StageBMidiToSoloChordToneLandingRepairSweepError(
                 f"repair sweep source-context preserved field must be true: {key}"
             )
+    for key in BRIDGE_SCHEMA_CONTEXT_KEYS:
+        if key not in readiness or key not in aggregate:
+            raise StageBMidiToSoloChordToneLandingRepairSweepError(
+                f"repair sweep schema-context field required: {key}"
+            )
+        if readiness.get(key) != aggregate.get(key):
+            raise StageBMidiToSoloChordToneLandingRepairSweepError(
+                f"repair sweep schema-context readiness/aggregate mismatch: {key}"
+            )
     return {
         "boundary": boundary,
+        "schema_version": str(report.get("schema_version") or ""),
         "source_boundary": str(report.get("source_boundary") or ""),
         "source_schema_version": str(readiness.get("source_schema_version") or ""),
+        "source_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_followup_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_followup_decision"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_objective_next_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_objective_next"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_sweep_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_sweep"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_listening_review_package_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_listening_review_package"
+        ],
+        "source_songlike_melody_contour_phrase_rhythm_repair_audio_package_schema_version": source_schema_versions[
+            "songlike_melody_contour_phrase_rhythm_repair_audio_package"
+        ],
         "bridge_boundary": str(report.get("bridge_boundary") or ""),
         "bridge_schema_version": str(readiness.get("bridge_schema_version") or ""),
         "next_boundary": str(decision.get("next_boundary") or ""),
@@ -648,6 +810,7 @@ def validate_repair_sweep_report(
         ),
         "target_supported": bool(readiness.get("target_supported", False)),
         **{key: readiness.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
+        **{key: readiness.get(key) for key in BRIDGE_SCHEMA_CONTEXT_KEYS},
         "human_audio_preference_claimed": bool(
             readiness.get("human_audio_preference_claimed", True)
         ),
@@ -672,8 +835,17 @@ def markdown_report(report: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- boundary: `{report['boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
         f"- source boundary: `{report['source_boundary']}`",
         f"- source schema version: `{report['source_schema_version']}`",
+        f"- source objective decision schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision']}`",
+        f"- source bridge schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge']}`",
+        f"- source follow-up schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_followup_decision']}`",
+        f"- source objective next schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_objective_next']}`",
+        f"- source repair sweep schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_sweep']}`",
+        f"- source input guard schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard']}`",
+        f"- source listening review package schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_listening_review_package']}`",
+        f"- source audio package schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_audio_package']}`",
         f"- bridge boundary: `{report['bridge_boundary']}`",
         f"- bridge schema version: `{report['bridge_schema_version']}`",
         f"- next boundary: `{decision['next_boundary']}`",
@@ -763,7 +935,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1128)
+    parser.add_argument("--issue_number", type=int, default=1212)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_repair_completed", action="store_true")
