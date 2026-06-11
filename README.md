@@ -33,7 +33,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm repair listening review package: `Issue #1200`
 - latest songlike melody contour phrase/rhythm repair listening review input guard: `Issue #1202`
 - latest songlike melody contour phrase/rhythm repair objective-only next decision: `Issue #1204`
-- latest songlike melody contour phrase/rhythm repair follow-up decision: `Issue #1122`
+- latest songlike melody contour phrase/rhythm repair follow-up decision: `Issue #1206`
 - latest songlike melody contour phrase/rhythm chord-context pitch-role bridge: `Issue #1124`
 - latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: `Issue #1126`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: `Issue #1128`
@@ -50,8 +50,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh merge: `0`
-- next recommended issue: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm repair follow-up decision source-context refresh merge: `0`
+- next recommended issue: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
