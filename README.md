@@ -42,6 +42,7 @@
 - residual-aware final review package: candidate `8`, MIDI/WAV `8 / 8`, proxy pass/fail `6 / 2`
 - residual-aware listening input guard: preference fill `false`, listening review completed `false`
 - residual-aware MVP handoff freeze: local artifacts verified `true`, checksum mismatch `0`
+- residual-aware listening review pending: pending candidate `8`, quality claim `false`
 
 ## 최신 산출물
 
@@ -52,6 +53,7 @@
 - final review doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_FINAL_REVIEW_PACKAGE_2026-06-11.md`
 - listening input guard doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_INPUT_GUARD_2026-06-11.md`
 - MVP handoff freeze doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_MVP_HANDOFF_FREEZE_2026-06-11.md`
+- listening review pending doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_REVIEW_PENDING_2026-06-11.md`
 
 ## 재현 명령
 
@@ -87,6 +89,15 @@
   --require_no_quality_claim
 ```
 
+```bash
+.venv/bin/python scripts/mark_music_transformer_solo_yield_residual_aware_listening_review_pending.py \
+  --run_id issue_1398_residual_aware_listening_review_pending \
+  --handoff_freeze_report outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_mvp_handoff_freeze/issue_1396_residual_aware_mvp_handoff_freeze/residual_aware_mvp_handoff_freeze.json \
+  --expected_next_boundary music_transformer_solo_yield_residual_aware_completion_audit \
+  --require_pending_review \
+  --require_no_quality_claim
+```
+
 ## 아닌 것
 
 - 완성형 jazz solo quality claim 아님
@@ -101,8 +112,10 @@
 - `scripts/build_music_transformer_solo_yield_residual_aware_final_review_package.py`
 - `scripts/guard_music_transformer_solo_yield_residual_aware_listening_input.py`
 - `scripts/freeze_music_transformer_solo_yield_residual_aware_mvp_handoff.py`
+- `scripts/mark_music_transformer_solo_yield_residual_aware_listening_review_pending.py`
 - `scripts/build_music_transformer_solo_yield_objective_quality_rubric_baseline.py`
 - `scripts/decide_music_transformer_solo_yield_residual_tension_target.py`
 - `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_FINAL_REVIEW_PACKAGE_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_INPUT_GUARD_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_MVP_HANDOFF_FREEZE_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_REVIEW_PENDING_2026-06-11.md`
