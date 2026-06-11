@@ -22,7 +22,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest targeted quality repair listening review input guard: `Issue #1094`
 - latest targeted quality repair objective-only next decision: `Issue #1096`
 - latest targeted quality repair follow-up decision: `Issue #1098`
-- latest songlike melody contour repair sweep: `Issue #1016`
+- latest songlike melody contour repair sweep: `Issue #1100`
 - latest songlike melody contour repair audio package: `Issue #1018`
 - latest songlike melody contour repair listening review package: `Issue #1020`
 - latest songlike melody contour repair listening review input guard: `Issue #1022`
@@ -319,6 +319,12 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - songlike melody contour repair sweep completed: `true`
 - songlike failure count: `5 -> 0`
 - songlike contour total failure labels: `8 -> 4`
+- songlike contour objective follow-up objective source outside-soloing source context preserved: `true`
+- songlike contour objective follow-up repair sweep source outside-soloing source context preserved: `true`
+- songlike contour objective bridge repair sweep source outside-soloing source context preserved: `true`
+- songlike contour follow-up objective source outside-soloing source context preserved: `true`
+- songlike contour follow-up repair sweep source outside-soloing source context preserved: `true`
+- songlike contour bridge repair sweep source outside-soloing source context preserved: `true`
 - songlike contour audio package ready: `true`
 - songlike contour rendered audio file count: `6`
 - songlike contour audio duration range: `18.849s - 18.992s`
@@ -378,7 +384,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - final status bridge repair sweep source outside-soloing source context preserved: `true`
 - MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
