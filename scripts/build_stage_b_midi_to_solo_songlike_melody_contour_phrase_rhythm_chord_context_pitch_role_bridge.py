@@ -41,7 +41,7 @@ NEXT_BOUNDARY = (
 SELECTED_TARGET = (
     "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision"
 )
-SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_v3"
+SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_v4"
 DEFAULT_CHORDS = ["Cm7", "Fm7", "Bb7", "Ebmaj7"]
 CONTEXT_LABELS = ["outside_soloing_without_context", "weak_chord_tone_landing"]
 SOURCE_CONTEXT_SUFFIXES = [
@@ -843,6 +843,13 @@ def validate_bridge_report(
             raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
                 f"bridge source-context field required: {key}"
             )
+    missing_preserved = [
+        key for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS if not bool(readiness.get(key))
+    ]
+    if missing_preserved:
+        raise StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError(
+            f"bridge source-context preserved field must be true: {missing_preserved}"
+        )
     return {
         "boundary": boundary,
         "source_boundary": str(report.get("source_boundary") or ""),
@@ -1010,7 +1017,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1040)
+    parser.add_argument("--issue_number", type=int, default=1124)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_bridge_completed", action="store_true")

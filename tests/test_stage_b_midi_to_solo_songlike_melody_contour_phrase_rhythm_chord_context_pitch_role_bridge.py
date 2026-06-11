@@ -11,6 +11,8 @@ from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_ch
     CONTEXT_LABELS,
     DEFAULT_CHORDS,
     NEXT_BOUNDARY,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+    SCHEMA_VERSION,
     SELECTED_TARGET,
     StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError,
     build_bridge_report,
@@ -181,7 +183,7 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                 chords=list(DEFAULT_CHORDS),
                 bpm=124.0,
                 output_dir=root / "bridge",
-                issue_number=1040,
+                issue_number=1124,
             )
             summary = validate_bridge_report(
                 report,
@@ -193,6 +195,7 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
             )
 
             self.assertTrue(summary["chord_context_pitch_role_bridge_completed"])
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
             self.assertEqual(summary["candidate_count"], 6)
             self.assertEqual(summary["chord_context_available_count"], 6)
             self.assertEqual(summary["pitch_role_metrics_defined_count"], 6)
@@ -278,6 +281,8 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
             self.assertTrue(
                 summary["repair_sweep_source_outside_soloing_source_context_preserved"]
             )
+            for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
+                self.assertTrue(summary[key])
             self.assertGreater(summary["min_chord_tone_ratio"], 0.0)
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
             self.assertFalse(summary["human_audio_preference_claimed"])
@@ -299,7 +304,7 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                     chords=list(DEFAULT_CHORDS),
                     bpm=124.0,
                     output_dir=root / "bridge",
-                    issue_number=1040,
+                    issue_number=1124,
                 )
 
     def test_rejects_technical_regression(self) -> None:
@@ -320,7 +325,7 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                     chords=list(DEFAULT_CHORDS),
                     bpm=124.0,
                     output_dir=root / "bridge",
-                    issue_number=1040,
+                    issue_number=1124,
                 )
 
     def test_rejects_missing_followup_outside_soloing_context(self) -> None:
@@ -341,7 +346,7 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                     chords=list(DEFAULT_CHORDS),
                     bpm=124.0,
                     output_dir=root / "bridge",
-                    issue_number=1040,
+                    issue_number=1124,
                 )
 
     def test_rejects_missing_repair_sweep_outside_soloing_context(self) -> None:
@@ -362,7 +367,7 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                     chords=list(DEFAULT_CHORDS),
                     bpm=124.0,
                     output_dir=root / "bridge",
-                    issue_number=1040,
+                    issue_number=1124,
                 )
 
     def test_rejects_followup_source_context_delta_mismatch(self) -> None:
@@ -385,7 +390,7 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                     chords=list(DEFAULT_CHORDS),
                     bpm=124.0,
                     output_dir=root / "bridge",
-                    issue_number=1040,
+                    issue_number=1124,
                 )
 
     def test_rejects_followup_source_context_preservation_missing(self) -> None:
@@ -408,7 +413,7 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                     chords=list(DEFAULT_CHORDS),
                     bpm=124.0,
                     output_dir=root / "bridge",
-                    issue_number=1040,
+                    issue_number=1124,
                 )
 
     def test_rejects_repair_sweep_source_context_mismatch(self) -> None:
@@ -432,7 +437,7 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                     chords=list(DEFAULT_CHORDS),
                     bpm=124.0,
                     output_dir=root / "bridge",
-                    issue_number=1040,
+                    issue_number=1124,
                 )
 
     def test_rejects_repair_sweep_source_context_preservation_missing(self) -> None:
@@ -453,7 +458,36 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
                     chords=list(DEFAULT_CHORDS),
                     bpm=124.0,
                     output_dir=root / "bridge",
-                    issue_number=1040,
+                    issue_number=1124,
+                )
+
+    def test_rejects_report_preserved_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            midi_paths = []
+            for index in range(6):
+                midi_path = root / f"candidate_{index}.mid"
+                write_fixture_midi(midi_path)
+                midi_paths.append(midi_path)
+
+            report = build_bridge_report(
+                followup_report=followup_report(),
+                repair_sweep_report=repair_sweep_report(midi_paths),
+                chords=list(DEFAULT_CHORDS),
+                bpm=124.0,
+                output_dir=root / "bridge",
+                issue_number=1124,
+            )
+            report["readiness"][BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS[0]] = False
+
+            with self.assertRaises(StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeError):
+                validate_bridge_report(
+                    report,
+                    expected_boundary=BOUNDARY,
+                    expected_next_boundary=NEXT_BOUNDARY,
+                    require_bridge_completed=True,
+                    require_context_available=True,
+                    require_no_quality_claim=True,
                 )
 
     def test_constants_are_stable(self) -> None:
@@ -468,6 +502,10 @@ class StageBMidiToSoloPhraseRhythmChordContextPitchRoleBridgeTest(unittest.TestC
         self.assertEqual(
             SELECTED_TARGET,
             "songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision",
+        )
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_v4",
         )
 
 

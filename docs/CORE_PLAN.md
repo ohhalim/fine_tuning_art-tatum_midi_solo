@@ -11366,7 +11366,7 @@ Issue #1122는 Issue #1120 objective-only next decision과 Issue #1112 repair sw
 
 ## 9.210 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh
 
-Issue #1040은 Issue #1038 follow-up decision과 Issue #1028 repair sweep의 source-context preserved flag를 chord-context pitch-role bridge까지 보존한 작업이다.
+Issue #1124는 Issue #1122 follow-up decision과 Issue #1112 repair sweep의 source-context preserved flag를 chord-context pitch-role bridge까지 보존한 작업이다.
 
 결과:
 
@@ -11394,6 +11394,7 @@ Issue #1040은 Issue #1038 follow-up decision과 Issue #1028 repair sweep의 sou
 판단:
 
 - follow-up decision과 repair sweep의 source-context preserved flag 불일치 없음.
+- bridge report preserved flag true 검증 추가.
 - chord context와 pitch-role metrics가 후보 `6/6`개에 정의됨.
 - context 부재로 인한 not-evaluable label은 `12 -> 0`으로 해소.
 - 남은 objective risk는 `outside_soloing_pitch_role_risk=5`, `weak_chord_tone_landing_risk=6`.
