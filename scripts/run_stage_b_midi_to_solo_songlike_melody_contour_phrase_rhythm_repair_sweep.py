@@ -19,11 +19,16 @@ from scripts.assess_stage_b_generic_base_readiness import read_json, write_json,
 from scripts.audit_stage_b_midi_to_solo_final_status import (  # noqa: E402
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
 )
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_repair_followup import (  # noqa: E402
     BOUNDARY as FOLLOWUP_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS as FOLLOWUP_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as FOLLOWUP_NEXT_BOUNDARY,
     SELECTED_TARGET as FOLLOWUP_SELECTED_TARGET,
+    SCHEMA_VERSION as FOLLOWUP_SCHEMA_VERSION,
+    StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError,
+    validate_followup_decision_report,
 )
 from scripts.label_stage_b_midi_to_solo_candidate_failures import (  # noqa: E402
     analyze_candidate_midi,
@@ -32,6 +37,7 @@ from scripts.label_stage_b_midi_to_solo_candidate_failures import (  # noqa: E40
 )
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep import (  # noqa: E402
     BOUNDARY as SOURCE_REPAIR_SWEEP_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_REPAIR_SWEEP_SCHEMA_VERSION,
 )
 
 
@@ -42,11 +48,16 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError(ValueErr
 BOUNDARY = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package"
 SELECTED_TARGET = "songlike_melody_contour_phrase_rhythm_repair_audio_package"
-SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v4"
+SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v5"
 PHRASE_LABEL = "phrase_shape_missing_tension_release"
 RHYTHM_LABEL = "rhythmic_monotony"
 TARGET_LABELS = (PHRASE_LABEL, RHYTHM_LABEL)
 BAR_SECONDS = 2.0
+EXPECTED_SOURCE_SCHEMA_VERSIONS = {
+    "songlike_melody_contour_repair_followup_decision": FOLLOWUP_SCHEMA_VERSION,
+    **FOLLOWUP_SOURCE_SCHEMA_VERSIONS,
+    "songlike_melody_contour_repair_sweep": SOURCE_REPAIR_SWEEP_SCHEMA_VERSION,
+}
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -95,6 +106,20 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
         )
 
 
+def _validate_source_schema_versions(
+    source_schema_versions: dict[str, Any],
+    *,
+    label: str,
+) -> dict[str, str]:
+    normalized = {key: str(value) for key, value in source_schema_versions.items()}
+    for key, expected in EXPECTED_SOURCE_SCHEMA_VERSIONS.items():
+        if str(normalized.get(key) or "") != expected:
+            raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError(
+                f"{label} source schema version mismatch: {key}"
+            )
+    return normalized
+
+
 def _bridge_source_context_fields(
     source: dict[str, Any],
     *,
@@ -134,6 +159,12 @@ def _source_context_fields(
         ),
         "source_outside_soloing_repair_source_context_preserved": bool(
             source.get(f"{prefix}_source_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_schema_context_preserved": bool(
+            source.get(f"{prefix}_schema_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_objective_schema_version": str(
+            source.get(f"{prefix}_objective_schema_version") or ""
         ),
         "source_outside_soloing_repair_source_pitch_role_risk_count_before": _int(
             source.get(f"{prefix}_source_pitch_role_risk_count_before")
@@ -205,6 +236,17 @@ def _validate_source_context(context: dict[str, Any], *, label: str) -> None:
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError(
             f"{label} source context preservation required"
         )
+    if not bool(context.get("source_outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError(
+            f"{label} schema context preservation required"
+        )
+    if (
+        str(context.get("source_outside_soloing_repair_objective_schema_version") or "")
+        != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ):
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError(
+            f"{label} objective schema version mismatch"
+        )
     if not bool(
         context.get("source_outside_soloing_repair_source_residual_risk_preserved", False)
     ):
@@ -260,6 +302,29 @@ def validate_followup_decision(report: dict[str, Any]) -> dict[str, Any]:
     decision = _dict(report.get("decision"))
     selected = _dict(report.get("selected_next_target"))
     sweep = _dict(report.get("repair_sweep_summary"))
+    try:
+        upstream_summary = validate_followup_decision_report(
+            report,
+            expected_boundary=FOLLOWUP_BOUNDARY,
+            expected_next_boundary=FOLLOWUP_NEXT_BOUNDARY,
+            expected_target=FOLLOWUP_SELECTED_TARGET,
+            require_followup_decision=True,
+            require_phrase_rhythm_tie_target=True,
+            require_no_quality_claim=True,
+        )
+    except StageBMidiToSoloSonglikeMelodyContourRepairFollowupDecisionError as exc:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError(
+            str(exc)
+        ) from exc
+    source_schema_versions = _validate_source_schema_versions(
+        {
+            "songlike_melody_contour_repair_followup_decision": (
+                upstream_summary.get("schema_version")
+            ),
+            **_dict(report.get("source_schema_versions")),
+        },
+        label="songlike melody contour phrase/rhythm repair sweep follow-up source",
+    )
     if str(report.get("boundary") or "") != FOLLOWUP_BOUNDARY:
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError(
             "songlike contour follow-up decision boundary required"
@@ -344,6 +409,8 @@ def validate_followup_decision(report: dict[str, Any]) -> dict[str, Any]:
         )
     _require_no_quality_claim(readiness, label="follow-up readiness")
     return {
+        "schema_version": str(upstream_summary.get("schema_version") or ""),
+        "source_schema_versions": source_schema_versions,
         "candidate_count": _int(readiness.get("candidate_count")),
         "source_total_failure_label_count": _int(
             readiness.get("source_total_failure_label_count")
@@ -388,6 +455,10 @@ def validate_source_repair_sweep(report: dict[str, Any]) -> dict[str, Any]:
     readiness = _dict(report.get("readiness"))
     aggregate = _dict(report.get("aggregate"))
     rows = [_dict(item) for item in _list(report.get("candidate_repairs"))]
+    if str(report.get("schema_version") or "") != SOURCE_REPAIR_SWEEP_SCHEMA_VERSION:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError(
+            "songlike contour repair sweep source schema version mismatch"
+        )
     if str(report.get("boundary") or "") != SOURCE_REPAIR_SWEEP_BOUNDARY:
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError(
             "songlike contour repair sweep source required"
@@ -430,7 +501,11 @@ def validate_source_repair_sweep(report: dict[str, Any]) -> dict[str, Any]:
             "source repair row count below 6"
         )
     _require_no_quality_claim(readiness, label="songlike contour repair readiness")
-    return {"rows": rows, **source_context}
+    return {
+        "schema_version": str(report.get("schema_version") or ""),
+        "rows": rows,
+        **source_context,
+    }
 
 
 def density_patterns() -> list[list[int]]:
@@ -627,6 +702,14 @@ def build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
 ) -> dict[str, Any]:
     followup = validate_followup_decision(followup_decision)
     source = validate_source_repair_sweep(source_repair_sweep)
+    source_schema_versions = _validate_source_schema_versions(
+        {
+            "songlike_melody_contour_repair_followup_decision": followup["schema_version"],
+            **_dict(followup.get("source_schema_versions")),
+            "songlike_melody_contour_repair_sweep": source["schema_version"],
+        },
+        label="songlike melody contour phrase/rhythm repair sweep",
+    )
     source_rows = [_dict(item) for item in _list(source.get("rows"))]
     source_context = {
         key: value
@@ -727,6 +810,7 @@ def build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
         "boundary": BOUNDARY,
         "source_boundary": FOLLOWUP_BOUNDARY,
         "source_repair_sweep_boundary": SOURCE_REPAIR_SWEEP_BOUNDARY,
+        "source_schema_versions": source_schema_versions,
         "candidate_repairs": relabeled,
         "aggregate": {
             "candidate_count": len(relabeled),
@@ -845,6 +929,15 @@ def validate_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
     decision = _dict(report.get("decision"))
     aggregate = _dict(report.get("aggregate"))
     repairs = _list(report.get("candidate_repairs"))
+    source_schema_versions = _dict(report.get("source_schema_versions"))
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError(
+            "songlike melody contour phrase/rhythm repair sweep schema version mismatch"
+        )
+    _validate_source_schema_versions(
+        source_schema_versions,
+        label="songlike melody contour phrase/rhythm repair sweep",
+    )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -916,9 +1009,36 @@ def validate_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
         _require_no_quality_claim(readiness, label="songlike contour repair readiness")
     return {
         "boundary": boundary,
+        "schema_version": str(report.get("schema_version") or ""),
         "source_boundary": str(report.get("source_boundary") or ""),
         "source_repair_sweep_boundary": str(
             report.get("source_repair_sweep_boundary") or ""
+        ),
+        "source_songlike_melody_contour_repair_followup_schema_version": str(
+            source_schema_versions.get("songlike_melody_contour_repair_followup_decision")
+            or ""
+        ),
+        "source_songlike_melody_contour_repair_objective_next_schema_version": str(
+            source_schema_versions.get("songlike_melody_contour_repair_objective_next")
+            or ""
+        ),
+        "source_songlike_melody_contour_repair_sweep_schema_version": str(
+            source_schema_versions.get("songlike_melody_contour_repair_sweep") or ""
+        ),
+        "source_songlike_melody_contour_repair_listening_review_input_guard_schema_version": str(
+            source_schema_versions.get(
+                "songlike_melody_contour_repair_listening_review_input_guard"
+            )
+            or ""
+        ),
+        "source_songlike_melody_contour_repair_listening_review_package_schema_version": str(
+            source_schema_versions.get(
+                "songlike_melody_contour_repair_listening_review_package"
+            )
+            or ""
+        ),
+        "source_songlike_melody_contour_repair_audio_package_schema_version": str(
+            source_schema_versions.get("songlike_melody_contour_repair_audio_package") or ""
         ),
         "next_boundary": str(decision.get("next_boundary") or ""),
         "selected_target": str(
@@ -964,12 +1084,24 @@ def validate_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
         "objective_source_outside_soloing_repair_source_context_preserved": bool(
             aggregate.get("objective_source_outside_soloing_repair_source_context_preserved", False)
         ),
+        "objective_source_outside_soloing_repair_schema_context_preserved": bool(
+            aggregate.get("objective_source_outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "objective_source_outside_soloing_repair_objective_schema_version": str(
+            aggregate.get("objective_source_outside_soloing_repair_objective_schema_version") or ""
+        ),
         **{
             f"objective_{key}": aggregate.get(f"objective_{key}")
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
         },
         "source_outside_soloing_repair_source_context_preserved": bool(
             aggregate.get("source_outside_soloing_repair_source_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_schema_context_preserved": bool(
+            aggregate.get("source_outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_objective_schema_version": str(
+            aggregate.get("source_outside_soloing_repair_objective_schema_version") or ""
         ),
         "source_outside_soloing_repair_source_pitch_role_risk_count_before": _int(
             aggregate.get("source_outside_soloing_repair_source_pitch_role_risk_count_before")
@@ -1025,6 +1157,13 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- boundary: `{report['boundary']}`",
         f"- source boundary: `{report['source_boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
+        f"- source follow-up schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_followup_decision']}`",
+        f"- source objective next schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_objective_next']}`",
+        f"- source repair sweep schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_sweep']}`",
+        f"- source input guard schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_listening_review_input_guard']}`",
+        f"- source listening review package schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_listening_review_package']}`",
+        f"- source audio package schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_audio_package']}`",
         f"- next boundary: `{decision['next_boundary']}`",
         f"- selected target: `{selected['selected_target']}`",
         f"- candidate count: `{aggregate['candidate_count']}`",
@@ -1036,7 +1175,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- technical regression count: `{aggregate['technical_regression_count']}`",
         f"- source outside-soloing repair evidence ready: `{_bool_token(aggregate['source_outside_soloing_repair_evidence_ready'])}`",
         f"- objective source outside-soloing source context preserved: `{_bool_token(aggregate['objective_source_outside_soloing_repair_source_context_preserved'])}`",
+        f"- objective source outside-soloing schema context preserved: `{_bool_token(aggregate['objective_source_outside_soloing_repair_schema_context_preserved'])}`",
+        f"- objective source outside-soloing objective schema version: `{aggregate['objective_source_outside_soloing_repair_objective_schema_version']}`",
         f"- source outside-soloing source context preserved: `{_bool_token(aggregate['source_outside_soloing_repair_source_context_preserved'])}`",
+        f"- source outside-soloing schema context preserved: `{_bool_token(aggregate['source_outside_soloing_repair_schema_context_preserved'])}`",
+        f"- source outside-soloing objective schema version: `{aggregate['source_outside_soloing_repair_objective_schema_version']}`",
         f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(aggregate['followup_objective_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(aggregate['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(aggregate['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
@@ -1098,7 +1241,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=944)
+    parser.add_argument("--issue_number", type=int, default=1196)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--min_candidate_count", type=int, default=6)

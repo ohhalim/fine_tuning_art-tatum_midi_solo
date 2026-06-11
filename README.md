@@ -28,7 +28,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour repair listening review input guard: `Issue #1190`
 - latest songlike melody contour repair objective-only next decision: `Issue #1192`
 - latest songlike melody contour repair follow-up decision: `Issue #1194`
-- latest songlike melody contour phrase/rhythm repair sweep: `Issue #1112`
+- latest songlike melody contour phrase/rhythm repair sweep: `Issue #1196`
 - latest songlike melody contour phrase/rhythm repair audio package: `Issue #1114`
 - latest songlike melody contour phrase/rhythm repair listening review package: `Issue #1116`
 - latest songlike melody contour phrase/rhythm repair listening review input guard: `Issue #1118`
@@ -50,7 +50,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after songlike melody contour repair follow-up decision source-context refresh merge: `0`
+- open issue queue after songlike melody contour phrase/rhythm repair sweep source-context refresh merge: `0`
+- next recommended issue: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
@@ -507,11 +508,15 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - songlike contour follow-up repair sweep bridge repair sweep source outside-soloing source context preserved: `true`
 - songlike contour follow-up technical regression count: `0`
 - songlike contour phrase/rhythm repair sweep completed: `true`
+- songlike contour phrase/rhythm repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v5`
+- songlike contour phrase/rhythm source follow-up schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision_v5`
+- songlike contour phrase/rhythm source repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_v5`
 - songlike contour phrase/rhythm failure count: `4 -> 1`
 - songlike contour phrase/rhythm failure delta: `3`
 - songlike contour phrase/rhythm total failure labels: `4 -> 1`
 - songlike contour phrase/rhythm source risk: `5 -> 2`
 - songlike contour phrase/rhythm current risk after / delta: `0 / 2`
+- songlike contour phrase/rhythm source schema-context preserved: `true`
 - songlike contour phrase/rhythm technical regression count: `0`
 - songlike contour phrase/rhythm audio package ready: `true`
 - songlike contour phrase/rhythm rendered audio file count: `6`
