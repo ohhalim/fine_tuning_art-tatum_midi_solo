@@ -18,9 +18,11 @@ from scripts.audit_stage_b_midi_to_solo_final_status import (
 from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import BOUNDARY as DELIVERY_BOUNDARY
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
     build_quality_rubric_baseline_report,
+    SCHEMA_VERSION as RUBRIC_SCHEMA_VERSION,
 )
 from scripts.label_stage_b_midi_to_solo_candidate_failures import (
     build_candidate_failure_labeling_report,
+    SCHEMA_VERSION as LABELING_SCHEMA_VERSION,
 )
 from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
     BOUNDARY as POST_MVP_BOUNDARY,
@@ -157,7 +159,7 @@ def rubric_baseline(root: Path) -> dict:
     return build_quality_rubric_baseline_report(
         post_mvp_quality_plan=post_mvp_quality_plan(),
         output_dir=root / "rubric",
-        issue_number=746,
+        issue_number=1168,
     )
 
 
@@ -214,7 +216,7 @@ def candidate_failure_labeling(root: Path, *, quality_claim: bool = False) -> di
         rubric_baseline=rubric_baseline(root),
         mvp_delivery_package=delivery_package(paths),
         output_dir=root / "labels",
-        issue_number=748,
+        issue_number=1170,
     )
     if quality_claim:
         report["readiness"]["midi_to_solo_musical_quality_claimed"] = True
@@ -229,7 +231,7 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                 candidate_failure_labeling=candidate_failure_labeling(root),
                 rubric_baseline=rubric_baseline(root),
                 output_dir=root / "sweep",
-                issue_number=1088,
+                issue_number=1172,
             )
             summary = validate_targeted_quality_repair_sweep_report(
                 report,
@@ -241,7 +243,19 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
             )
 
             self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-            self.assertEqual(report["issue_number"], 1088)
+            self.assertEqual(report["issue_number"], 1172)
+            self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(
+                summary["source_candidate_failure_labeling_schema_version"],
+                LABELING_SCHEMA_VERSION,
+            )
+            self.assertEqual(summary["source_quality_rubric_schema_version"], RUBRIC_SCHEMA_VERSION)
+            self.assertEqual(summary["source_post_mvp_plan_schema_version"], POST_MVP_SCHEMA_VERSION)
+            self.assertEqual(summary["source_final_status_schema_version"], FINAL_STATUS_SCHEMA_VERSION)
+            self.assertEqual(summary["source_delivery_package_schema_version"], DELIVERY_SCHEMA_VERSION)
+            self.assertEqual(summary["source_listening_gap_schema_version"], LISTENING_GAP_SCHEMA_VERSION)
+            self.assertEqual(summary["source_quality_gap_schema_version"], QUALITY_GAP_DECISION_SCHEMA_VERSION)
+            self.assertEqual(summary["source_current_evidence_schema_version"], CURRENT_EVIDENCE_SCHEMA_VERSION)
             self.assertTrue(summary["targeted_quality_repair_sweep_completed"])
             self.assertTrue(summary["targeted_quality_repair_target_supported"])
             self.assertEqual(summary["candidate_count"], 6)
@@ -249,6 +263,11 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
             self.assertEqual(summary["technical_regression_count"], 0)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(summary["source_outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
             self.assertEqual(
                 summary["source_outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
@@ -288,7 +307,33 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                     ),
                     rubric_baseline=rubric_baseline(root),
                     output_dir=root / "sweep",
-                    issue_number=1088,
+                    issue_number=1172,
+                )
+
+    def test_rejects_labeling_source_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = candidate_failure_labeling(root)
+            source["source_schema_versions"]["quality_rubric_baseline"] = "wrong_schema"
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairSweepError):
+                build_targeted_quality_repair_sweep_report(
+                    candidate_failure_labeling=source,
+                    rubric_baseline=rubric_baseline(root),
+                    output_dir=root / "sweep",
+                    issue_number=1172,
+                )
+
+    def test_rejects_missing_labeling_schema_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = candidate_failure_labeling(root)
+            source["aggregate"]["outside_soloing_repair_schema_context_preserved"] = False
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairSweepError):
+                build_targeted_quality_repair_sweep_report(
+                    candidate_failure_labeling=source,
+                    rubric_baseline=rubric_baseline(root),
+                    output_dir=root / "sweep",
+                    issue_number=1172,
                 )
 
     def test_rejects_missing_outside_soloing_labeling_context(self) -> None:
@@ -301,7 +346,7 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                     candidate_failure_labeling=source,
                     rubric_baseline=rubric_baseline(root),
                     output_dir=root / "sweep",
-                    issue_number=1088,
+                    issue_number=1172,
                 )
 
     def test_rejects_missing_labeling_source_context_field(self) -> None:
@@ -316,7 +361,7 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                     candidate_failure_labeling=source,
                     rubric_baseline=rubric_baseline(root),
                     output_dir=root / "sweep",
-                    issue_number=1088,
+                    issue_number=1172,
                 )
 
     def test_rejects_false_labeling_source_context_preserved_field(self) -> None:
@@ -331,13 +376,13 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                     candidate_failure_labeling=source,
                     rubric_baseline=rubric_baseline(root),
                     output_dir=root / "sweep",
-                    issue_number=1088,
+                    issue_number=1172,
                 )
 
     def test_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_targeted_quality_repair_sweep")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_targeted_quality_repair_audio_package")
-        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_targeted_quality_repair_sweep_v3")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_targeted_quality_repair_sweep_v4")
 
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@
 - latest post-MVP quality iteration plan: Issue #1166, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
 - latest quality rubric baseline: Issue #1168, Stage B MIDI-to-solo quality rubric baseline source-context refresh
 - latest candidate failure labeling: Issue #1170, Stage B MIDI-to-solo candidate failure labeling source-context refresh
-- latest targeted quality repair sweep: Issue #1088, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
+- latest targeted quality repair sweep: Issue #1172, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
 - latest targeted quality repair audio package: Issue #1090, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
 - latest targeted quality repair listening review package: Issue #1092, Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh
 - latest targeted quality repair listening review input guard: Issue #1094, Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh
@@ -5909,13 +5909,22 @@ Issue #1170은 Issue #1168 quality rubric baseline v4 결과를 기준으로 can
 
 ## 9.234 Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
 
-Issue #1088은 Issue #1086 candidate failure labeling 결과를 기준으로 targeted quality repair sweep의 source-context validation과 summary에 source-context preserved flag 3개를 보존한 작업이다.
+Issue #1172는 Issue #1170 candidate failure labeling v4 결과를 기준으로 targeted quality repair sweep의 source schema chain과 outside-soloing schema context를 보존한 작업이다.
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_SWEEP_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
 - source boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
+- schema version: `stage_b_midi_to_solo_targeted_quality_repair_sweep_v4`
+- source candidate failure labeling schema version: `stage_b_midi_to_solo_candidate_failure_labeling_v4`
+- source quality rubric schema version: `stage_b_midi_to_solo_quality_rubric_baseline_v4`
+- source post-MVP plan schema version: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4`
+- source final status schema version: `stage_b_midi_to_solo_final_status_audit_v4`
+- source delivery package schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - next boundary: `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
 - selected target: `targeted_quality_repair_audio_package`
 - targeted quality repair sweep completed: `true`
@@ -5928,6 +5937,8 @@ Issue #1088은 Issue #1086 candidate failure labeling 결과를 기준으로 tar
 - technical regression count: `0`
 - source outside-soloing repair evidence ready: `true`
 - source outside-soloing repair source context preserved: `true`
+- source outside-soloing repair schema context preserved: `true`
+- source outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -5941,8 +5952,8 @@ Issue #1088은 Issue #1086 candidate failure labeling 결과를 기준으로 tar
 
 판단:
 
-- targeted quality repair sweep source validation에 candidate failure labeling preserved flag 3개 포함.
-- preserved flag false 입력은 validation error로 차단.
+- targeted quality repair sweep source validation에 candidate failure labeling v4와 source schema chain 포함.
+- preserved flag false 입력과 objective schema mismatch 입력은 validation error로 차단.
 - failure label은 `12 -> 8`, improved candidate는 `4 / 6`.
 - technical regression count는 `0`.
 - 다음 검증 대상은 targeted quality repair audio package 유지.
@@ -5951,7 +5962,8 @@ Issue #1088은 Issue #1086 candidate failure labeling 결과를 기준으로 tar
 검증:
 
 - `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_sweep`
-- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_targeted_quality_repair_sweep.py`
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_audio`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_targeted_quality_repair_sweep.py scripts/render_stage_b_midi_to_solo_targeted_quality_repair_audio.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-sweep`
 - `bash scripts/agent_harness.sh quick`
