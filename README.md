@@ -36,7 +36,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm repair follow-up decision: `Issue #1122`
 - latest songlike melody contour phrase/rhythm chord-context pitch-role bridge: `Issue #1124`
 - latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: `Issue #1126`
-- latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: `Issue #1044`
+- latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: `Issue #1128`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: `Issue #1046`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: `Issue #1048`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: `Issue #1050`
