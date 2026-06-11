@@ -2,7 +2,90 @@
 
 Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
-현재 목표는 완성형 연주 모델이 아니라, 입력 MIDI를 받아 context 추출, 후보 생성, constrained decoding, ranking, MIDI/WAV export, objective review까지 이어지는 model-core MVP 검증이다.
+현재 목표는 완성형 연주 모델 claim이 아니라, 입력 MIDI를 받아 context 추출, 후보 생성, ranking, MIDI/WAV export, objective review까지 이어지는 model-core MVP 검증이다.
+
+## 한눈에 보는 현재 구현
+
+이 저장소는 `input.mid`를 넣으면 solo 후보 MIDI를 만들고, 검증 가능한 산출물로 정리하는 로컬 파이프라인이다.
+
+구현된 흐름:
+
+1. 입력 MIDI 분석
+   - tempo, bar, note density, pitch range, phrase window 추출
+   - chord/context가 부족한 후보는 별도 risk로 표시
+
+2. 후보 생성
+   - model-conditioned generation path
+   - phrase-bank retrieval fallback path
+   - constrained decoding / ranking / repair 단계 분리
+
+3. 객관 지표 기반 수리
+   - dead-air 감소
+   - wide-interval 감소
+   - chord-tone landing 보강
+   - outside-soloing pitch-role risk 분리
+
+4. 산출물 생성
+   - ranked MIDI 후보 export
+   - WAV render package 생성
+   - listening review package 생성
+   - schema/source-context 보존 검증
+
+현재 확인된 산출물:
+
+- phrase-bank CLI MVP package ready: `true`
+- phrase-bank CLI repaired MIDI candidates: `3`
+- phrase-bank CLI explicit input WAV files: `3`
+- chord-tone landing repair WAV files: `6`
+- chord-tone landing listening review items: `6`
+- technical WAV validation: `true`
+- MIDI-to-solo musical quality claimed: `false`
+
+## 지금까지 해결한 문제
+
+초기 후보는 기술적으로 MIDI가 만들어져도 음악적으로는 빈 구간, 큰 도약, chord context 부재, landing 불안정 문제가 있었다.
+
+현재까지의 조치:
+
+- dead-air max: `0.6522 -> 0.0000`
+- pitch-contour max interval: `62 -> 11`
+- phrase/rhythm chord-context not-evaluable: `12 -> 0`
+- weak chord-tone landing risk: `6 -> 0`
+- final landing chord-tone count: `1 -> 6`
+- outside-soloing pitch-role risk: `5 -> 2`
+
+판단:
+
+- 입력 MIDI에서 후보를 만들고 MIDI/WAV로 확인하는 MVP 경로는 존재
+- objective metric 기준으로 일부 명확한 실패 유형은 줄어듦
+- listening review input은 아직 미검증
+- 음악적으로 좋은 재즈 솔로라고 주장하지 않음
+
+## 최근 확인용 WAV
+
+Chord-tone landing repair 후보 WAV:
+
+- `outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package/harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_source_context_refresh/audio/candidate_01_rank_01_chord_tone_landing_repair.wav`
+- `outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package/harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_source_context_refresh/audio/candidate_02_rank_02_chord_tone_landing_repair.wav`
+- `outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package/harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_source_context_refresh/audio/candidate_03_rank_03_chord_tone_landing_repair.wav`
+- `outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package/harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_source_context_refresh/audio/candidate_04_rank_04_chord_tone_landing_repair.wav`
+- `outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package/harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_source_context_refresh/audio/candidate_05_rank_05_chord_tone_landing_repair.wav`
+- `outputs/stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package/harness_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_source_context_refresh/audio/candidate_06_rank_06_chord_tone_landing_repair.wav`
+
+## 아직 아닌 것
+
+- broad training 완료 아님
+- Brad style adaptation 완료 아님
+- 고품질 jazz solo model claim 아님
+- 사람의 listening preference 검증 완료 아님
+- product/service 배포 아님
+
+## 현재 진행 중
+
+- current issue: `Issue #1216`
+- 작업: chord-tone landing repair listening review package source-context refresh
+- 목적: audio package v5 결과를 listening review package까지 schema/source-context 손실 없이 전달
+- next boundary: listening review input guard source-context refresh
 
 ## 현재 상태
 
@@ -38,7 +121,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: `Issue #1210`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: `Issue #1212`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: `Issue #1214`
-- latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: `Issue #1132`
+- latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: `Issue #1216`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: `Issue #1134`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: `Issue #1136`
 - latest songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: `Issue #1138`
@@ -50,8 +133,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh merge: `0`
-- next recommended issue: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh merge: `0`
+- next recommended issue: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
@@ -110,6 +193,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase/rhythm chord-tone landing rendered WAV count: `6`
 - phrase/rhythm chord-tone landing WAV duration range: `18.871s-19.000s`
 - phrase/rhythm chord-tone landing WAV technical validation: `true`
+- phrase/rhythm chord-tone landing listening review package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_v4`
+- phrase/rhythm chord-tone landing listening review source audio package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v5`
+- phrase/rhythm chord-tone landing listening review source schema context preserved: `true`
 - phrase/rhythm chord-tone landing listening review package ready: `true`
 - phrase/rhythm chord-tone landing listening review item count: `6`
 - phrase/rhythm chord-tone landing validated review input: `false`
