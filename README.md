@@ -110,6 +110,8 @@ raw model generation은 note grammar가 자주 깨졌다.
 - next boundary: `music_transformer_solo_yield_readme_final_evidence_refresh`
 - 4bar repaired top8 objective failure review: final landing not chord-tone `8 / 8`, package low chord-tone ratio `8 / 8`, MIDI low chord-tone ratio `6 / 8`, dead-air still high `3 / 8`
 - next boundary: `music_transformer_solo_yield_chord_tone_landing_repair_sweep`
+- chord-tone landing repair: repaired MIDI `8`, changed note `8`, max pitch shift `2`, final landing not chord-tone `8 / 8 -> 0 / 8`
+- next boundary: `music_transformer_solo_yield_chord_tone_landing_repair_audio_package`
 
 ## 결과 파일
 
@@ -155,6 +157,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_README_FINAL_EVIDENCE_REFRESH_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_FINAL_HANDOFF_SUMMARY_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_REPAIRED_TOP8_OBJECTIVE_FAILURE_REVIEW_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_CHORD_TONE_LANDING_REPAIR_SWEEP_2026-06-11.md`
 
 ## 실행 방법
 
@@ -215,8 +218,9 @@ Report:
 
 ## 다음 작업
 
-- chord-tone landing repair sweep
-- repair 후 strict / grammar / final landing 지표 비교
+- chord-tone landing repair MIDI audio package
+- repaired MIDI WAV render
+- repair 후 strict / grammar / final landing / dead-air 지표 비교
 - repaired candidate listening package 갱신
 - WAV/MIDI 청취 리뷰
 - 청취 결과 기준 keep/reject 후보 기록
