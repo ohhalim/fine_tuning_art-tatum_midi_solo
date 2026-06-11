@@ -15,7 +15,7 @@
 - latest functional result: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest MVP completion audit: Issue #1154, Stage B MIDI-to-solo MVP completion audit source-context refresh
 - latest quality gap decision: Issue #1156, Stage B MIDI-to-solo quality gap decision source-context refresh
-- latest listening review quality gap: Issue #1074, Stage B MIDI-to-solo listening review quality gap source-context refresh
+- latest listening review quality gap: Issue #1158, Stage B MIDI-to-solo listening review quality gap source-context refresh
 - latest MVP delivery package: Issue #1076, Stage B MIDI-to-solo MVP delivery package source-context refresh
 - latest README final evidence refresh: Issue #1078, Stage B MIDI-to-solo README final evidence refresh source-context refresh
 - latest final status audit: Issue #1080, Stage B MIDI-to-solo final status audit source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo quality gap decision source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo listening review quality gap source-context refresh`
+- open issue queue after Stage B MIDI-to-solo listening review quality gap source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP delivery package source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5488,21 +5488,25 @@ Issue #1156은 Issue #1154 MVP completion audit의 schema/source-context preserv
 
 ## Stage B MIDI-to-Solo Listening Review Quality Gap Source-Context Refresh Result
 
-Issue #1074는 Issue #1072 quality gap decision의 source-context preserved flag 3개를 listening review quality gap summary와 validation summary까지 보존하고, 다음 target을 MVP delivery package로 유지한 작업이다.
+Issue #1158은 Issue #1156 quality gap decision의 schema/source-context preserved flag를 listening review quality gap summary와 validation summary까지 보존하고, 다음 target을 MVP delivery package로 유지한 작업이다.
 
 변경:
 
-- listening review quality gap schema v3 적용
-- source-context required key를 preserved flag 3개 포함으로 확장
-- false preserved flag 입력 차단 테스트 추가
-- quality gap summary, generated markdown report, validation summary source-context preserved field 전파
-- harness issue number #1074 반영
+- listening review quality gap schema v4 적용
+- quality gap decision schema v4 입력 검증 추가
+- source MVP completion audit schema v4와 source current evidence schema v4 보존
+- outside-soloing schema-context preserved field와 objective schema version 전파
+- harness issue number #1158 반영
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_LISTENING_REVIEW_QUALITY_GAP_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
 - next boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- source schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source MVP completion audit schema version: `stage_b_midi_to_solo_mvp_completion_audit_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - selected target: `mvp_delivery_package`
 - listening review quality gap open: `true`
 - technical MVP delivery package ready: `true`
@@ -5510,6 +5514,8 @@ Issue #1074는 Issue #1072 quality gap decision의 source-context preserved flag
 - changed-ratio repair objective completed: `true`
 - outside-soloing repair objective completed: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -5519,6 +5525,7 @@ Issue #1074는 Issue #1072 quality gap decision의 source-context preserved flag
 
 판단:
 
+- #1156 quality gap decision schema v4와 source current evidence schema v4가 listening review gap report까지 보존됨.
 - listening review gap은 open 상태.
 - technical delivery package 준비는 quality claim 없이 진행 가능.
 - human/audio preference, MIDI-to-solo musical quality claim 제외.

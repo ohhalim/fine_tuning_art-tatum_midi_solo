@@ -9,7 +9,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest functional result: `Issue #1150`
 - latest MVP completion audit: `Issue #1154`
 - latest quality gap decision: `Issue #1156`
-- latest listening review quality gap: `Issue #1074`
+- latest listening review quality gap: `Issue #1158`
 - latest MVP delivery package: `Issue #1076`
 - latest README final evidence refresh: `Issue #1078`
 - latest final status audit: `Issue #1080`
@@ -50,8 +50,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after quality gap decision source-context refresh merge: `0`
-- latest evidence boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- open issue queue after listening review quality gap source-context refresh merge: `0`
+- latest evidence boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - current MVP evidence support: `true`
@@ -590,6 +590,10 @@ Quality gap decision.
 Listening review quality gap.
 
 - boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- source schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source MVP completion audit schema version: `stage_b_midi_to_solo_mvp_completion_audit_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - next boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - selected target: `mvp_delivery_package`
 - technical model-core MVP completed: `true`
@@ -597,6 +601,8 @@ Listening review quality gap.
 - changed-ratio repair max ratio / target: `0.4348 / 0.5000`
 - changed-ratio repair max interval / target: `12 / 12`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
