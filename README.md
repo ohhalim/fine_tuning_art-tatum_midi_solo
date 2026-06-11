@@ -24,7 +24,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest targeted quality repair follow-up decision: `Issue #1098`
 - latest songlike melody contour repair sweep: `Issue #1100`
 - latest songlike melody contour repair audio package: `Issue #1102`
-- latest songlike melody contour repair listening review package: `Issue #1020`
+- latest songlike melody contour repair listening review package: `Issue #1104`
 - latest songlike melody contour repair listening review input guard: `Issue #1022`
 - latest songlike melody contour repair objective-only next decision: `Issue #1024`
 - latest songlike melody contour repair follow-up decision: `Issue #1026`
@@ -338,6 +338,13 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - songlike contour current risk after / delta: `0 / 2`
 - songlike contour audio technical validation: `true`
 - songlike contour listening review item count: `6`
+- songlike contour listening review validated input: `false`
+- songlike contour listening review objective follow-up objective source outside-soloing source context preserved: `true`
+- songlike contour listening review objective follow-up repair sweep source outside-soloing source context preserved: `true`
+- songlike contour listening review objective bridge repair sweep source outside-soloing source context preserved: `true`
+- songlike contour listening review follow-up objective source outside-soloing source context preserved: `true`
+- songlike contour listening review follow-up repair sweep source outside-soloing source context preserved: `true`
+- songlike contour listening review bridge repair sweep source outside-soloing source context preserved: `true`
 - songlike contour validated review input: `false`
 - songlike contour preference fill allowed: `false`
 - songlike contour follow-up required: `true`
@@ -390,7 +397,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - final status bridge repair sweep source outside-soloing source context preserved: `true`
 - MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`

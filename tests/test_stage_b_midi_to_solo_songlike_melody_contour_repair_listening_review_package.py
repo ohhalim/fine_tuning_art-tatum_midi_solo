@@ -8,10 +8,11 @@ from pathlib import Path
 
 import pretty_midi
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package import (
     BOUNDARY,
     NEXT_BOUNDARY,
+    SCHEMA_VERSION,
     StageBMidiToSoloSonglikeMelodyContourRepairListeningReviewPackageError,
     build_listening_review_package_report,
     validate_listening_review_package_report,
@@ -28,6 +29,7 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "followup_objective_source_outside_soloing_source_targeted": False,
     "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
@@ -35,6 +37,7 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "followup_repair_sweep_source_outside_soloing_source_targeted": False,
     "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
@@ -42,6 +45,7 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "repair_sweep_source_outside_soloing_source_targeted": False,
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
 }
@@ -186,7 +190,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningReviewPackageTest(unit
             report = build_listening_review_package_report(
                 audio_package_report=audio_package_report(root),
                 output_dir=root / "review_package",
-                issue_number=936,
+                issue_number=1104,
                 expected_count=6,
             )
             summary = validate_listening_review_package_report(
@@ -198,6 +202,8 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningReviewPackageTest(unit
                 require_no_quality_claim=True,
             )
 
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(report["issue_number"], 1104)
             self.assertTrue(summary["listening_review_package_ready"])
             self.assertEqual(summary["review_item_count"], 6)
             self.assertFalse(summary["validated_review_input"])
@@ -213,7 +219,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningReviewPackageTest(unit
                 5,
             )
             self.assertTrue(summary["objective_source_outside_soloing_repair_source_context_preserved"])
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
             self.assertEqual(
                 summary[
@@ -245,7 +251,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningReviewPackageTest(unit
                 5,
             )
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(
                 summary["source_outside_soloing_repair_source_pitch_role_risk_count_before"],
@@ -278,7 +284,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningReviewPackageTest(unit
                 build_listening_review_package_report(
                     audio_package_report=audio_package_report(root, quality_claim=True),
                     output_dir=root / "review_package",
-                    issue_number=766,
+                    issue_number=1104,
                     expected_count=6,
                 )
 
@@ -293,7 +299,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningReviewPackageTest(unit
                 build_listening_review_package_report(
                     audio_package_report=source,
                     output_dir=root / "review_package",
-                    issue_number=850,
+                    issue_number=1104,
                     expected_count=6,
                 )
 
@@ -308,7 +314,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningReviewPackageTest(unit
                 build_listening_review_package_report(
                     audio_package_report=source,
                     output_dir=root / "review_package",
-                    issue_number=936,
+                    issue_number=1104,
                     expected_count=6,
                 )
 
@@ -325,13 +331,34 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningReviewPackageTest(unit
                 build_listening_review_package_report(
                     audio_package_report=source,
                     output_dir=root / "review_package",
-                    issue_number=1020,
+                    issue_number=1104,
+                    expected_count=6,
+                )
+
+    def test_rejects_false_source_context_preserved_field(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = audio_package_report(root)
+            source["summary"][
+                "followup_repair_sweep_source_outside_soloing_source_context_preserved"
+            ] = False
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourRepairListeningReviewPackageError
+            ):
+                build_listening_review_package_report(
+                    audio_package_report=source,
+                    output_dir=root / "review_package",
+                    issue_number=1104,
                     expected_count=6,
                 )
 
     def test_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard")
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package_v4",
+        )
 
 
 if __name__ == "__main__":
