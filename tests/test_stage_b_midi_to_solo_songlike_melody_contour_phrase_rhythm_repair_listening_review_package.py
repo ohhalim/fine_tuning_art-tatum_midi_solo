@@ -11,6 +11,7 @@ import pretty_midi
 from scripts.audit_stage_b_midi_to_solo_final_status import (
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
 )
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package import (
     BOUNDARY,
@@ -22,7 +23,9 @@ from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_re
 )
 from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio import (
     BOUNDARY as SOURCE_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_AUDIO_SCHEMA_VERSION,
 )
 
 
@@ -35,6 +38,10 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "followup_objective_source_outside_soloing_source_context_preserved": True,
+    "followup_objective_source_outside_soloing_schema_context_preserved": True,
+    "followup_objective_source_outside_soloing_objective_schema_version": (
+        OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ),
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
@@ -43,6 +50,10 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_schema_context_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_objective_schema_version": (
+        OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ),
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
@@ -51,6 +62,10 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "repair_sweep_source_outside_soloing_source_context_preserved": True,
+    "repair_sweep_source_outside_soloing_schema_context_preserved": True,
+    "repair_sweep_source_outside_soloing_objective_schema_version": (
+        OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ),
 }
 
 
@@ -115,6 +130,8 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
             }
         )
     return {
+        "schema_version": SOURCE_AUDIO_SCHEMA_VERSION,
+        "source_schema_versions": dict(EXPECTED_SOURCE_SCHEMA_VERSIONS),
         "audio_render_boundary": {
             "boundary": SOURCE_BOUNDARY,
             "render_attempted": True,
@@ -154,6 +171,10 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
             "source_outside_soloing_repair_evidence_ready": True,
             "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
             "objective_source_outside_soloing_repair_source_context_preserved": True,
+            "objective_source_outside_soloing_repair_schema_context_preserved": True,
+            "objective_source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -164,6 +185,10 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
             **{f"objective_{key}": value for key, value in SOURCE_CONTEXT.items()},
             "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
             "source_outside_soloing_repair_source_context_preserved": True,
+            "source_outside_soloing_repair_schema_context_preserved": True,
+            "source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -191,7 +216,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
             report = build_listening_review_package_report(
                 audio_package_report=audio_package_report(root),
                 output_dir=root / "review_package",
-                issue_number=1116,
+                issue_number=1200,
                 expected_count=6,
             )
             summary = validate_listening_review_package_report(
@@ -203,6 +228,23 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
                 require_no_quality_claim=True,
             )
 
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(report["issue_number"], 1200)
+            self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(
+                report["source_schema_versions"][
+                    "songlike_melody_contour_phrase_rhythm_repair_audio_package"
+                ],
+                SOURCE_AUDIO_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary[
+                    "source_songlike_melody_contour_phrase_rhythm_repair_audio_package_schema_version"
+                ],
+                SOURCE_AUDIO_SCHEMA_VERSION,
+            )
+            for key, expected in EXPECTED_SOURCE_SCHEMA_VERSIONS.items():
+                self.assertEqual(report["source_schema_versions"][key], expected)
             self.assertTrue(summary["listening_review_package_ready"])
             self.assertEqual(summary["review_item_count"], 6)
             self.assertFalse(summary["validated_review_input"])
@@ -217,7 +259,13 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
                 5,
             )
             self.assertTrue(summary["objective_source_outside_soloing_repair_source_context_preserved"])
-            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertTrue(
+                summary["objective_source_outside_soloing_repair_schema_context_preserved"]
+            )
+            self.assertEqual(
+                summary["objective_source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
             self.assertEqual(
@@ -250,6 +298,11 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
                 5,
             )
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(summary["source_outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
@@ -301,7 +354,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
                 build_listening_review_package_report(
                     audio_package_report=audio_package_report(root, quality_claim=True),
                     output_dir=root / "review_package",
-                    issue_number=1116,
+                    issue_number=1200,
                     expected_count=6,
                 )
 
@@ -317,7 +370,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
                 build_listening_review_package_report(
                     audio_package_report=source,
                     output_dir=root / "review_package",
-                    issue_number=1116,
+                    issue_number=1200,
                     expected_count=6,
                 )
 
@@ -333,7 +386,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
                 build_listening_review_package_report(
                     audio_package_report=source,
                     output_dir=root / "review_package",
-                    issue_number=1116,
+                    issue_number=1200,
                     expected_count=6,
                 )
 
@@ -351,7 +404,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
                 build_listening_review_package_report(
                     audio_package_report=source,
                     output_dir=root / "review_package",
-                    issue_number=1116,
+                    issue_number=1200,
                     expected_count=6,
                 )
 
@@ -367,7 +420,41 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
                 build_listening_review_package_report(
                     audio_package_report=source,
                     output_dir=root / "review_package",
-                    issue_number=1116,
+                    issue_number=1200,
+                    expected_count=6,
+                )
+
+    def test_rejects_source_schema_version_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = audio_package_report(root)
+            source["source_schema_versions"][
+                "songlike_melody_contour_phrase_rhythm_repair_sweep"
+            ] = "old"
+
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError
+            ):
+                build_listening_review_package_report(
+                    audio_package_report=source,
+                    output_dir=root / "review_package",
+                    issue_number=1200,
+                    expected_count=6,
+                )
+
+    def test_rejects_schema_context_preservation_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = audio_package_report(root)
+            source["summary"]["source_outside_soloing_repair_schema_context_preserved"] = False
+
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError
+            ):
+                build_listening_review_package_report(
+                    audio_package_report=source,
+                    output_dir=root / "review_package",
+                    issue_number=1200,
                     expected_count=6,
                 )
 
@@ -376,7 +463,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard")
         self.assertEqual(
             SCHEMA_VERSION,
-            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package_v4",
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package_v5",
         )
 
 

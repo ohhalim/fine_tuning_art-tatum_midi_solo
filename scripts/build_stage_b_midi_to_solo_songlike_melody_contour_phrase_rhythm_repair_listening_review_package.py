@@ -16,10 +16,15 @@ from scripts.assess_stage_b_generic_base_readiness import read_json, write_json,
 from scripts.audit_stage_b_midi_to_solo_final_status import (  # noqa: E402
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
 )
 from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio import (  # noqa: E402
     BOUNDARY as SOURCE_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_AUDIO_SCHEMA_VERSION,
+    StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioError,
+    validate_audio_render_report,
 )
 
 
@@ -29,7 +34,12 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPack
 
 BOUNDARY = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard"
-SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package_v4"
+SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package_v5"
+
+EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS = {
+    "songlike_melody_contour_phrase_rhythm_repair_audio_package": SOURCE_AUDIO_SCHEMA_VERSION,
+    **EXPECTED_SOURCE_SCHEMA_VERSIONS,
+}
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -82,6 +92,20 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
         )
 
 
+def _validate_source_schema_versions(
+    source_schema_versions: dict[str, Any],
+    *,
+    label: str,
+) -> dict[str, str]:
+    normalized = {key: str(value) for key, value in source_schema_versions.items()}
+    for key, expected in EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS.items():
+        if str(normalized.get(key) or "") != expected:
+            raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
+                f"{label} source schema version mismatch: {key}"
+            )
+    return normalized
+
+
 def _source_context_fields(source: dict[str, Any]) -> dict[str, Any]:
     for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         objective_key = f"objective_{key}"
@@ -112,6 +136,12 @@ def _source_context_fields(source: dict[str, Any]) -> dict[str, Any]:
         ),
         "objective_source_outside_soloing_repair_source_context_preserved": bool(
             source.get("objective_source_outside_soloing_repair_source_context_preserved", False)
+        ),
+        "objective_source_outside_soloing_repair_schema_context_preserved": bool(
+            source.get("objective_source_outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "objective_source_outside_soloing_repair_objective_schema_version": str(
+            source.get("objective_source_outside_soloing_repair_objective_schema_version") or ""
         ),
         "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": _int(
             source.get(
@@ -148,6 +178,12 @@ def _source_context_fields(source: dict[str, Any]) -> dict[str, Any]:
         ),
         "source_outside_soloing_repair_source_context_preserved": bool(
             source.get("source_outside_soloing_repair_source_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_schema_context_preserved": bool(
+            source.get("source_outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_objective_schema_version": str(
+            source.get("source_outside_soloing_repair_objective_schema_version") or ""
         ),
         "source_outside_soloing_repair_source_pitch_role_risk_count_before": _int(
             source.get("source_outside_soloing_repair_source_pitch_role_risk_count_before")
@@ -188,6 +224,17 @@ def _validate_source_context_group(context: dict[str, Any], *, base: str, label:
     if not bool(context.get(f"{base}_source_context_preserved", False)):
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
             f"{label} source context preservation required"
+        )
+    if not bool(context.get(f"{base}_schema_context_preserved", False)):
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
+            f"{label} schema context preservation required"
+        )
+    if (
+        str(context.get(f"{base}_objective_schema_version") or "")
+        != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ):
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
+            f"{label} objective schema version mismatch"
         )
     if objective_risk <= 0 or source_before <= 0:
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
@@ -244,6 +291,29 @@ def validate_audio_package_report(
     boundary = _dict(report.get("audio_render_boundary"))
     decision = _dict(report.get("decision"))
     summary = _dict(report.get("summary"))
+    try:
+        audio_validation_summary = validate_audio_render_report(
+            report,
+            expected_boundary=SOURCE_BOUNDARY,
+            expected_next_boundary=SOURCE_NEXT_BOUNDARY,
+            expected_file_count=int(expected_count),
+            expected_sample_rate=_int(summary.get("sample_rate")) or 44100,
+            require_audio_package_completed=True,
+            require_no_quality_claim=True,
+        )
+    except StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioError as exc:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
+            str(exc)
+        ) from exc
+    source_schema_versions = _validate_source_schema_versions(
+        {
+            "songlike_melody_contour_phrase_rhythm_repair_audio_package": (
+                audio_validation_summary.get("schema_version")
+            ),
+            **_dict(report.get("source_schema_versions")),
+        },
+        label="phrase/rhythm repair audio package",
+    )
     if str(boundary.get("boundary") or "") != SOURCE_BOUNDARY:
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
             "songlike melody contour phrase/rhythm repair audio package boundary required"
@@ -328,7 +398,12 @@ def validate_audio_package_report(
                 "review_status": "pending",
             }
         )
-    return {"review_items": review_items, **source_context}
+    return {
+        "review_items": review_items,
+        "audio_validation_summary": audio_validation_summary,
+        "source_schema_versions": source_schema_versions,
+        **source_context,
+    }
 
 
 def build_listening_review_package_report(
@@ -343,6 +418,10 @@ def build_listening_review_package_report(
         expected_count=int(expected_count),
     )
     review_items = [_dict(item) for item in _list(source.get("review_items"))]
+    audio_validation_summary = _dict(source.get("audio_validation_summary"))
+    source_schema_versions = {
+        key: str(value) for key, value in _dict(source.get("source_schema_versions")).items()
+    }
     source_context = {
         key: value
         for key, value in source.items()
@@ -361,7 +440,53 @@ def build_listening_review_package_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": SOURCE_BOUNDARY,
+        "source_schema_versions": source_schema_versions,
         "source_summary": {
+            "source_songlike_melody_contour_phrase_rhythm_repair_audio_package_schema_version": str(
+                audio_validation_summary.get("schema_version") or ""
+            ),
+            "source_songlike_melody_contour_phrase_rhythm_repair_sweep_schema_version": str(
+                audio_validation_summary.get(
+                    "source_songlike_melody_contour_phrase_rhythm_repair_sweep_schema_version"
+                )
+                or ""
+            ),
+            "source_songlike_melody_contour_repair_followup_schema_version": str(
+                audio_validation_summary.get(
+                    "source_songlike_melody_contour_repair_followup_schema_version"
+                )
+                or ""
+            ),
+            "source_songlike_melody_contour_repair_objective_next_schema_version": str(
+                audio_validation_summary.get(
+                    "source_songlike_melody_contour_repair_objective_next_schema_version"
+                )
+                or ""
+            ),
+            "source_songlike_melody_contour_repair_sweep_schema_version": str(
+                audio_validation_summary.get(
+                    "source_songlike_melody_contour_repair_sweep_schema_version"
+                )
+                or ""
+            ),
+            "source_songlike_melody_contour_repair_listening_review_input_guard_schema_version": str(
+                audio_validation_summary.get(
+                    "source_songlike_melody_contour_repair_listening_review_input_guard_schema_version"
+                )
+                or ""
+            ),
+            "source_songlike_melody_contour_repair_listening_review_package_schema_version": str(
+                audio_validation_summary.get(
+                    "source_songlike_melody_contour_repair_listening_review_package_schema_version"
+                )
+                or ""
+            ),
+            "source_songlike_melody_contour_repair_audio_package_schema_version": str(
+                audio_validation_summary.get(
+                    "source_songlike_melody_contour_repair_audio_package_schema_version"
+                )
+                or ""
+            ),
             "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
             "technical_wav_validation": bool(summary.get("technical_wav_validation", False)),
             "sample_rate": _int(summary.get("sample_rate")),
@@ -419,6 +544,18 @@ def build_listening_review_package_report(
             "review_item_count": int(len(review_items)),
             "validated_review_input": False,
             "human_review_required_now": False,
+            "objective_source_outside_soloing_repair_schema_context_preserved": bool(
+                summary.get("objective_source_outside_soloing_repair_schema_context_preserved", False)
+            ),
+            "objective_source_outside_soloing_repair_objective_schema_version": str(
+                summary.get("objective_source_outside_soloing_repair_objective_schema_version") or ""
+            ),
+            "source_outside_soloing_repair_schema_context_preserved": bool(
+                summary.get("source_outside_soloing_repair_schema_context_preserved", False)
+            ),
+            "source_outside_soloing_repair_objective_schema_version": str(
+                summary.get("source_outside_soloing_repair_objective_schema_version") or ""
+            ),
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
             "audio_rendered_quality_claimed": False,
@@ -460,6 +597,15 @@ def validate_listening_review_package_report(
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
     source = _dict(report.get("source_summary"))
+    source_schema_versions = _dict(report.get("source_schema_versions"))
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
+            "phrase/rhythm repair listening review package schema version mismatch"
+        )
+    _validate_source_schema_versions(
+        source_schema_versions,
+        label="phrase/rhythm repair listening review package",
+    )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -484,11 +630,68 @@ def validate_listening_review_package_report(
         raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
             "critical user input should not be required"
         )
+    for label, schema_context_key, objective_schema_key in (
+        (
+            "objective",
+            "objective_source_outside_soloing_repair_schema_context_preserved",
+            "objective_source_outside_soloing_repair_objective_schema_version",
+        ),
+        (
+            "source",
+            "source_outside_soloing_repair_schema_context_preserved",
+            "source_outside_soloing_repair_objective_schema_version",
+        ),
+    ):
+        if not bool(source.get(schema_context_key, False)):
+            raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
+                f"{label} outside-soloing schema context preservation required"
+            )
+        if (
+            str(source.get(objective_schema_key) or "")
+            != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+        ):
+            raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairListeningReviewPackageError(
+                f"{label} outside-soloing objective schema version mismatch"
+            )
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="listening package readiness")
     return {
         "boundary": boundary,
         "next_boundary": str(decision.get("next_boundary") or ""),
+        "schema_version": str(report.get("schema_version") or ""),
+        "source_songlike_melody_contour_phrase_rhythm_repair_audio_package_schema_version": str(
+            source_schema_versions.get("songlike_melody_contour_phrase_rhythm_repair_audio_package")
+            or ""
+        ),
+        "source_songlike_melody_contour_phrase_rhythm_repair_sweep_schema_version": str(
+            source_schema_versions.get("songlike_melody_contour_phrase_rhythm_repair_sweep")
+            or ""
+        ),
+        "source_songlike_melody_contour_repair_followup_schema_version": str(
+            source_schema_versions.get("songlike_melody_contour_repair_followup_decision")
+            or ""
+        ),
+        "source_songlike_melody_contour_repair_objective_next_schema_version": str(
+            source_schema_versions.get("songlike_melody_contour_repair_objective_next") or ""
+        ),
+        "source_songlike_melody_contour_repair_sweep_schema_version": str(
+            source_schema_versions.get("songlike_melody_contour_repair_sweep") or ""
+        ),
+        "source_songlike_melody_contour_repair_listening_review_input_guard_schema_version": str(
+            source_schema_versions.get(
+                "songlike_melody_contour_repair_listening_review_input_guard"
+            )
+            or ""
+        ),
+        "source_songlike_melody_contour_repair_listening_review_package_schema_version": str(
+            source_schema_versions.get(
+                "songlike_melody_contour_repair_listening_review_package"
+            )
+            or ""
+        ),
+        "source_songlike_melody_contour_repair_audio_package_schema_version": str(
+            source_schema_versions.get("songlike_melody_contour_repair_audio_package") or ""
+        ),
         "listening_review_package_ready": bool(readiness.get("listening_review_package_ready", False)),
         "review_item_count": _int(readiness.get("review_item_count")),
         "validated_review_input": bool(readiness.get("validated_review_input", True)),
@@ -509,6 +712,12 @@ def validate_listening_review_package_report(
         ),
         "objective_source_outside_soloing_repair_source_context_preserved": bool(
             source.get("objective_source_outside_soloing_repair_source_context_preserved", False)
+        ),
+        "objective_source_outside_soloing_repair_schema_context_preserved": bool(
+            source.get("objective_source_outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "objective_source_outside_soloing_repair_objective_schema_version": str(
+            source.get("objective_source_outside_soloing_repair_objective_schema_version") or ""
         ),
         "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": _int(
             source.get(
@@ -546,6 +755,12 @@ def validate_listening_review_package_report(
         ),
         "source_outside_soloing_repair_source_context_preserved": bool(
             source.get("source_outside_soloing_repair_source_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_schema_context_preserved": bool(
+            source.get("source_outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_objective_schema_version": str(
+            source.get("source_outside_soloing_repair_objective_schema_version") or ""
         ),
         "source_outside_soloing_repair_source_pitch_role_risk_count_before": _int(
             source.get("source_outside_soloing_repair_source_pitch_role_risk_count_before")
@@ -595,11 +810,20 @@ def markdown_report(report: dict[str, Any]) -> str:
     package = report["review_package"]
     source = report["source_summary"]
     lines = [
-        "# Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Repair Listening Review Package",
+        "# Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Repair Listening Review Package Source Context Refresh",
         "",
         "## Summary",
         "",
         f"- boundary: `{report['boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
+        f"- source audio package schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_audio_package']}`",
+        f"- source phrase/rhythm repair sweep schema version: `{report['source_schema_versions']['songlike_melody_contour_phrase_rhythm_repair_sweep']}`",
+        f"- source follow-up schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_followup_decision']}`",
+        f"- source objective next schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_objective_next']}`",
+        f"- source repair sweep schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_sweep']}`",
+        f"- source repair listening review input guard schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_listening_review_input_guard']}`",
+        f"- source repair listening review package schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_listening_review_package']}`",
+        f"- source repair audio package schema version: `{report['source_schema_versions']['songlike_melody_contour_repair_audio_package']}`",
         f"- next boundary: `{decision['next_boundary']}`",
         f"- package ready: `{_bool_token(package['package_ready'])}`",
         f"- review item count: `{package['review_item_count']}`",
@@ -612,9 +836,13 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- phrase/rhythm failure delta: `{source['phrase_rhythm_failure_delta']}`",
         f"- source outside-soloing repair evidence ready: `{_bool_token(source['source_outside_soloing_repair_evidence_ready'])}`",
         f"- objective source outside-soloing source context preserved: `{_bool_token(source['objective_source_outside_soloing_repair_source_context_preserved'])}`",
+        f"- objective source outside-soloing schema context preserved: `{_bool_token(source['objective_source_outside_soloing_repair_schema_context_preserved'])}`",
+        f"- objective source outside-soloing objective schema version: `{source['objective_source_outside_soloing_repair_objective_schema_version']}`",
         f"- objective source outside-soloing source pitch-role risk before / after / delta: `{source['objective_source_outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{source['objective_source_outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{source['objective_source_outside_soloing_repair_source_pitch_role_risk_delta']}`",
         f"- objective source outside-soloing current repair pitch-role risk after / delta: `{source['objective_source_outside_soloing_repair_pitch_role_risk_count_after']}` / `{source['objective_source_outside_soloing_repair_pitch_role_risk_delta']}`",
         f"- source outside-soloing source context preserved: `{_bool_token(source['source_outside_soloing_repair_source_context_preserved'])}`",
+        f"- source outside-soloing schema context preserved: `{_bool_token(source['source_outside_soloing_repair_schema_context_preserved'])}`",
+        f"- source outside-soloing objective schema version: `{source['source_outside_soloing_repair_objective_schema_version']}`",
         f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(source['followup_objective_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(source['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(source['repair_sweep_source_outside_soloing_source_context_preserved'])}`",

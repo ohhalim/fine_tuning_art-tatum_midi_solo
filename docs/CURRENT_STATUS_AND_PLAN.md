@@ -36,7 +36,7 @@
 - latest songlike melody contour repair follow-up decision: Issue #1194, Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh
 - latest songlike melody contour phrase/rhythm repair sweep: Issue #1196, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm repair audio package: Issue #1198, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh
-- latest songlike melody contour phrase/rhythm repair listening review package: Issue #1116, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh
+- latest songlike melody contour phrase/rhythm repair listening review package: Issue #1200, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm repair listening review input guard: Issue #1118, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh
 - latest songlike melody contour phrase/rhythm repair objective-only next decision: Issue #1120, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh
 - latest songlike melody contour phrase/rhythm repair follow-up decision: Issue #1122, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh`
+- open issue queue after Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh`
 
 현재 범위가 아닌 것:
 
