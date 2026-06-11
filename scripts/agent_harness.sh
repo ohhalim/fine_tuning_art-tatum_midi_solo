@@ -6361,7 +6361,7 @@ run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep() {
     --targeted_repair_sweep "$targeted_sweep_report" \
     --rubric_baseline "$rubric_report" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_SWEEP_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 1100 \
+    --issue_number 1184 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_sweep \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package \
     --min_candidate_count 6 \

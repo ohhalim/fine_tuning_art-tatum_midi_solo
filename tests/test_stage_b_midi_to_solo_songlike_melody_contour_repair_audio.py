@@ -9,7 +9,10 @@ from typing import Sequence
 
 import pretty_midi
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import (
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+)
 from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_repair_audio import (
     BOUNDARY,
     NEXT_BOUNDARY,
@@ -20,7 +23,9 @@ from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_repair_audio im
 )
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep import (
     BOUNDARY as SOURCE_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS as SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_SCHEMA_VERSION,
 )
 
 
@@ -115,7 +120,9 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             }
         )
     return {
+        "schema_version": SOURCE_SCHEMA_VERSION,
         "boundary": SOURCE_BOUNDARY,
+        "source_schema_versions": dict(SOURCE_SCHEMA_VERSIONS),
         "candidate_repairs": repairs,
         "aggregate": {
             "candidate_count": 6,
@@ -131,6 +138,10 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "objective_source_outside_soloing_repair_wav_count": 6,
             "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
             "objective_source_outside_soloing_repair_source_context_preserved": True,
+            "objective_source_outside_soloing_repair_schema_context_preserved": True,
+            "objective_source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -141,6 +152,10 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             **{f"objective_{key}": value for key, value in SOURCE_CONTEXT.items()},
             "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
             "source_outside_soloing_repair_source_context_preserved": True,
+            "source_outside_soloing_repair_schema_context_preserved": True,
+            "source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
