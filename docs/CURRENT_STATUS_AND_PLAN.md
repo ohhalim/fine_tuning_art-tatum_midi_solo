@@ -13,7 +13,7 @@
 현재 active issue:
 
 - latest functional result: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
-- latest MVP completion audit: Issue #1070, Stage B MIDI-to-solo MVP completion audit source-context refresh
+- latest MVP completion audit: Issue #1154, Stage B MIDI-to-solo MVP completion audit source-context refresh
 - latest quality gap decision: Issue #1072, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #1074, Stage B MIDI-to-solo listening review quality gap source-context refresh
 - latest MVP delivery package: Issue #1076, Stage B MIDI-to-solo MVP delivery package source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo README evidence refresh source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit source-context refresh`
+- open issue queue after Stage B MIDI-to-solo MVP completion audit source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo quality gap decision source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5373,12 +5373,14 @@ Issue #1152는 Issue #1150 MVP current evidence consolidation 결과를 README e
 
 ## Stage B MIDI-to-Solo MVP Completion Audit Source-Context Refresh Result
 
-Issue #1070은 Issue #1066 current evidence와 Issue #1068 README evidence refresh를 기준으로 technical model-core MVP completion audit을 #1070 boundary로 갱신한 작업이다.
+Issue #1154는 Issue #1150 current evidence와 Issue #1152 README evidence refresh를 기준으로 technical model-core MVP completion audit을 #1154 boundary로 갱신한 작업이다.
 
 변경:
 
-- MVP completion audit schema v3 적용
-- harness issue number #1070 반영
+- MVP completion audit schema v4 적용
+- current evidence schema version 검증 추가
+- outside-soloing repair objective schema version audit summary 반영
+- harness issue number #1154 반영
 - audit report issue number와 schema assertion 추가
 - generated completion audit doc, README, current status, core plan, handoff scope 갱신
 
@@ -5387,6 +5389,8 @@ Issue #1070은 Issue #1066 current evidence와 Issue #1068 README evidence refre
 - document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 - next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- schema version: `stage_b_midi_to_solo_mvp_completion_audit_v4`
+- source schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - technical model-core MVP completed: `true`
 - input to ranked MIDI completed: `true`
 - input to rendered WAV completed: `true`
@@ -5396,6 +5400,8 @@ Issue #1070은 Issue #1066 current evidence와 Issue #1068 README evidence refre
 - model-conditioned pitch-contour changed-ratio repair objective completed: `true`
 - outside-soloing repair objective completed: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -5405,7 +5411,8 @@ Issue #1070은 Issue #1066 current evidence와 Issue #1068 README evidence refre
 
 판단:
 
-- #1068 README evidence refresh의 preserved flag 3개가 audit report와 validation summary까지 유지됨.
+- #1152 README evidence refresh의 preserved flag 3개와 schema-context reflected snippet이 audit report와 validation summary까지 유지됨.
+- #1150 current evidence schema v4 입력이 audit 필수 조건으로 검증됨.
 - technical model-core MVP completion은 `true`.
 - listening review input, human/audio preference, MIDI-to-solo musical quality claim 제외.
 
