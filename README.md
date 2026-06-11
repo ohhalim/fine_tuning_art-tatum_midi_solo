@@ -6,9 +6,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest functional result: `Issue #1070`
+- latest functional result: `Issue #1072`
 - latest MVP completion audit: `Issue #1070`
-- latest quality gap decision: `Issue #988`
+- latest quality gap decision: `Issue #1072`
 - latest listening review quality gap: `Issue #990`
 - latest MVP delivery package: `Issue #992`
 - latest README final evidence refresh: `Issue #994`
@@ -49,13 +49,13 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: `Issue #1064`
 - latest MVP current evidence consolidation: `Issue #1066`
 - latest README evidence refresh: `Issue #1068`
-- latest functional boundary: `stage_b_midi_to_solo_mvp_completion_audit`
-- open issue queue after MVP completion audit source-context refresh merge: `0`
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- latest functional boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- open issue queue after quality gap decision source-context refresh merge: `0`
+- latest evidence boundary: `stage_b_midi_to_solo_quality_gap_decision`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
-- selected quality gap target: `mvp_delivery_package`
+- selected quality gap target: `listening_review_quality_gap`
 - model-conditioned input path aligned: `false`
 - model-conditioned candidate source available: `true`
 - model-conditioned audio technical path available: `true`
@@ -475,6 +475,9 @@ Quality gap decision.
 - model-conditioned pitch-contour changed-ratio repair max ratio / target: `0.4348 / 0.5000`
 - model-conditioned pitch-contour changed-ratio repair max interval / target: `12 / 12`
 - outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - outside-soloing source pitch-role risk count: `5 -> 2`
 - outside-soloing source repair targeted: `false`
 - outside-soloing source residual risk preserved: `true`
