@@ -22,10 +22,12 @@ from scripts.render_stage_b_midi_to_solo_candidate_audio import (  # noqa: E402
 )
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
 )
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep import (  # noqa: E402
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_SCHEMA_VERSION,
     StageBMidiToSoloChordToneLandingRepairSweepError,
     validate_repair_sweep_report,
 )
@@ -42,7 +44,7 @@ NEXT_BOUNDARY = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package"
 )
 SCHEMA_VERSION = (
-    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v3"
+    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v4"
 )
 CommandRunner = Callable[[Sequence[str]], subprocess.CompletedProcess[str]]
 
@@ -103,11 +105,7 @@ def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str
             raise StageBMidiToSoloChordToneLandingRepairAudioError(
                 f"{label} source-context field required: {key}"
             )
-    for key in (
-        "followup_objective_source_outside_soloing_source_context_preserved",
-        "followup_repair_sweep_source_outside_soloing_source_context_preserved",
-        "repair_sweep_source_outside_soloing_source_context_preserved",
-    ):
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
         if not bool(container.get(key, False)):
             raise StageBMidiToSoloChordToneLandingRepairAudioError(
                 f"{label} source context should be preserved: {key}"
@@ -125,6 +123,10 @@ def validate_source_report(
     if str(report.get("boundary") or readiness.get("boundary") or "") != SOURCE_BOUNDARY:
         raise StageBMidiToSoloChordToneLandingRepairAudioError(
             "chord-tone landing repair sweep boundary required"
+        )
+    if str(report.get("schema_version") or "") != SOURCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingRepairAudioError(
+            "repair sweep schema version must match current repair sweep report"
         )
     if str(decision.get("next_boundary") or "") != SOURCE_NEXT_BOUNDARY:
         raise StageBMidiToSoloChordToneLandingRepairAudioError(
@@ -335,6 +337,7 @@ def build_audio_render_report(
         "output_dir": str(output_dir),
         "issue_number": int(issue_number),
         "source_boundary": SOURCE_BOUNDARY,
+        "source_schema_version": SOURCE_SCHEMA_VERSION,
         "source_summary": aggregate,
         "renderer": {
             "name": "fluidsynth",
@@ -347,6 +350,9 @@ def build_audio_render_report(
         "rendered_audio_files": rendered,
         "summary": {
             "rendered_audio_file_count": int(len(rendered)),
+            "source_schema_version": SOURCE_SCHEMA_VERSION,
+            "source_objective_schema_version": str(source_report.get("source_schema_version") or ""),
+            "source_bridge_schema_version": str(source_report.get("bridge_schema_version") or ""),
             "technical_wav_validation": True,
             "sample_rate": int(sample_rate),
             "duration_min_seconds": min(durations, default=0.0),
@@ -444,6 +450,14 @@ def validate_audio_render_report(
         raise StageBMidiToSoloChordToneLandingRepairAudioError(
             "unexpected next boundary"
         )
+    if str(report.get("source_schema_version") or "") != SOURCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingRepairAudioError(
+            "unexpected source schema version"
+        )
+    if str(summary.get("source_schema_version") or "") != SOURCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingRepairAudioError(
+            "summary source schema version mismatch"
+        )
     files = [_dict(item) for item in _list(report.get("rendered_audio_files"))]
     if len(files) != int(expected_file_count):
         raise StageBMidiToSoloChordToneLandingRepairAudioError(
@@ -493,10 +507,20 @@ def validate_audio_render_report(
             raise StageBMidiToSoloChordToneLandingRepairAudioError(
                 f"audio package source-context field required: {key}"
             )
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
+        if not bool(summary.get(key, False)):
+            raise StageBMidiToSoloChordToneLandingRepairAudioError(
+                f"audio package source-context preserved field must be true: {key}"
+            )
     if require_no_quality_claim:
         _require_no_quality_claim(boundary, label="audio render boundary")
     return {
         "boundary": str(boundary.get("boundary") or ""),
+        "source_schema_version": str(summary.get("source_schema_version") or ""),
+        "source_objective_schema_version": str(
+            summary.get("source_objective_schema_version") or ""
+        ),
+        "source_bridge_schema_version": str(summary.get("source_bridge_schema_version") or ""),
         "next_boundary": str(decision.get("next_boundary") or ""),
         "render_attempted": bool(boundary.get("render_attempted", False)),
         "rendered_audio_file_count": _int(boundary.get("rendered_audio_file_count")),
@@ -571,6 +595,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- boundary: `{boundary['boundary']}`",
+        f"- source schema version: `{report['source_schema_version']}`",
+        f"- source objective schema version: `{summary['source_objective_schema_version']}`",
+        f"- source bridge schema version: `{summary['source_bridge_schema_version']}`",
         f"- next boundary: `{decision['next_boundary']}`",
         f"- render attempted: `{_bool_token(boundary['render_attempted'])}`",
         f"- rendered audio file count: `{boundary['rendered_audio_file_count']}`",
@@ -640,7 +667,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1046)
+    parser.add_argument("--issue_number", type=int, default=1130)
     parser.add_argument("--renderer", type=str, default=shutil.which("fluidsynth") or "")
     parser.add_argument("--soundfont", type=str, default="")
     parser.add_argument("--sample_rate", type=int, default=44100)
