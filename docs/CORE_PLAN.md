@@ -11213,7 +11213,7 @@ Issue #1116은 Issue #1114 phrase/rhythm repair audio package 결과의 WAV/MIDI
 
 ## 9.207 Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh
 
-Issue #1034는 Issue #1032 listening review package의 pending input 상태와 source/current outside-soloing context를 input guard summary까지 보존한 작업이다.
+Issue #1118은 Issue #1116 listening review package의 pending input 상태와 source/current outside-soloing context를 input guard summary까지 보존한 작업이다.
 
 결과:
 
@@ -11230,6 +11230,9 @@ Issue #1034는 Issue #1032 listening review package의 pending input 상태와 s
 - phrase/rhythm failure delta: `3`
 - objective source outside-soloing repair source context preserved: `true`
 - source outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - source outside-soloing source pitch-role risk count: `5 -> 2`
 - source outside-soloing current repair pitch-role risk count after: `0`
 - source outside-soloing current repair pitch-role risk delta: `2`
@@ -11239,8 +11242,8 @@ Issue #1034는 Issue #1032 listening review package의 pending input 상태와 s
 
 판단:
 
-- input guard source validation에 objective/source source-context preserved 조건 추가.
-- bridge source-context 21개 키를 guard/readiness/validation summary까지 보존.
+- input guard source validation에 required source-context key와 preserved flag true 조건 추가.
+- bridge source-context key를 guard/readiness/validation summary까지 보존.
 - validated review input 부재 상태에서 preference fill 차단 유지.
 - 다음 boundary는 phrase/rhythm repair objective-only next decision source-context refresh.
 
@@ -11250,6 +11253,8 @@ Issue #1034는 Issue #1032 listening review package의 pending input 상태와 s
 - `.venv/bin/python -m py_compile scripts/guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-listening-review-input-guard`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
 
 다음 작업:
 
