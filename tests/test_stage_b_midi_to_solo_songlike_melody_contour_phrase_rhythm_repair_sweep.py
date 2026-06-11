@@ -4,7 +4,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import (
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+)
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
     build_quality_rubric_baseline_report,
 )
@@ -22,6 +25,7 @@ from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep import (
     BOUNDARY,
     NEXT_BOUNDARY,
+    SCHEMA_VERSION,
     SELECTED_TARGET,
     StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError,
     build_songlike_melody_contour_phrase_rhythm_repair_sweep_report,
@@ -271,7 +275,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                 source_repair_sweep=source_repair_sweep(),
                 rubric_baseline=rubric_baseline(root),
                 output_dir=root / "phrase_rhythm_repair",
-                issue_number=858,
+                issue_number=1112,
             )
             summary = validate_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
                 report,
@@ -304,7 +308,8 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                 summary["objective_source_outside_soloing_repair_source_context_preserved"]
             )
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(
@@ -349,7 +354,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                     source_repair_sweep=source_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "phrase_rhythm_repair",
-                    issue_number=858,
+                    issue_number=1112,
                 )
 
     def test_rejects_source_technical_regression(self) -> None:
@@ -362,7 +367,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                     source_repair_sweep=source_repair_sweep(technical_regression_count=1),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "phrase_rhythm_repair",
-                    issue_number=858,
+                    issue_number=1112,
                 )
 
     def test_rejects_missing_outside_soloing_context(self) -> None:
@@ -377,7 +382,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                     source_repair_sweep=source,
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "phrase_rhythm_repair",
-                    issue_number=858,
+                    issue_number=1112,
                 )
 
     def test_rejects_source_context_mismatch(self) -> None:
@@ -394,13 +399,13 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                     source_repair_sweep=source,
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "phrase_rhythm_repair",
-                    issue_number=944,
+                    issue_number=1112,
                 )
 
     def test_rejects_missing_bridge_source_context(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             source = source_repair_sweep()
-            source["aggregate"].pop(BRIDGE_SOURCE_CONTEXT_KEYS[0])
+            source["aggregate"].pop(BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS[0])
             with self.assertRaises(
                 StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError
             ):
@@ -409,7 +414,22 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                     source_repair_sweep=source,
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "phrase_rhythm_repair",
-                    issue_number=1028,
+                    issue_number=1112,
+                )
+
+    def test_rejects_bridge_source_context_preservation_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = source_repair_sweep()
+            source["aggregate"][BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS[0]] = False
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError
+            ):
+                build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
+                    followup_decision=followup_decision(),
+                    source_repair_sweep=source,
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "phrase_rhythm_repair",
+                    issue_number=1112,
                 )
 
     def test_rejects_source_context_preservation_flag_false(self) -> None:
@@ -426,7 +446,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                     source_repair_sweep=source_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "phrase_rhythm_repair",
-                    issue_number=1028,
+                    issue_number=1112,
                 )
 
     def test_constants_are_stable(self) -> None:
@@ -441,6 +461,10 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
         self.assertEqual(
             SELECTED_TARGET,
             "songlike_melody_contour_phrase_rhythm_repair_audio_package",
+        )
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v4",
         )
 
 

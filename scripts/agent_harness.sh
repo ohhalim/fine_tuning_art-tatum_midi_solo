@@ -6512,7 +6512,7 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep() {
     --source_repair_sweep "$source_sweep_report" \
     --rubric_baseline "$rubric_report" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_REPAIR_SWEEP_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 1028 \
+    --issue_number 1112 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package \
     --min_candidate_count 6 \
