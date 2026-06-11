@@ -18,8 +18,10 @@ from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
 )
 from scripts.decide_stage_b_midi_to_solo_targeted_quality_repair_followup import (
     BOUNDARY as FOLLOWUP_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS as FOLLOWUP_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as FOLLOWUP_NEXT_BOUNDARY,
     SELECTED_TARGET as FOLLOWUP_SELECTED_TARGET,
+    SCHEMA_VERSION as FOLLOWUP_SCHEMA_VERSION,
 )
 from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
     BOUNDARY as POST_MVP_BOUNDARY,
@@ -39,8 +41,28 @@ from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep impor
 )
 from scripts.run_stage_b_midi_to_solo_targeted_quality_repair_sweep import (
     BOUNDARY as TARGETED_REPAIR_SWEEP_BOUNDARY,
+    SCHEMA_VERSION as TARGETED_REPAIR_SWEEP_SCHEMA_VERSION,
 )
 
+
+TARGETED_REPAIR_SWEEP_SOURCE_SCHEMA_VERSIONS = {
+    "candidate_failure_labeling": FOLLOWUP_SOURCE_SCHEMA_VERSIONS[
+        "candidate_failure_labeling"
+    ],
+    "quality_rubric_baseline": FOLLOWUP_SOURCE_SCHEMA_VERSIONS[
+        "quality_rubric_baseline"
+    ],
+    "post_mvp_quality_iteration_plan": FOLLOWUP_SOURCE_SCHEMA_VERSIONS[
+        "post_mvp_quality_iteration_plan"
+    ],
+    "final_status_audit": FOLLOWUP_SOURCE_SCHEMA_VERSIONS["final_status_audit"],
+    "delivery_package": FOLLOWUP_SOURCE_SCHEMA_VERSIONS["delivery_package"],
+    "listening_review_quality_gap": FOLLOWUP_SOURCE_SCHEMA_VERSIONS[
+        "listening_review_quality_gap"
+    ],
+    "quality_gap_decision": FOLLOWUP_SOURCE_SCHEMA_VERSIONS["quality_gap_decision"],
+    "current_evidence": FOLLOWUP_SOURCE_SCHEMA_VERSIONS["current_evidence"],
+}
 
 SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_count_before": 5,
@@ -154,7 +176,9 @@ def rubric_baseline(root: Path) -> dict:
 
 def followup_decision(*, quality_claim: bool = False) -> dict:
     return {
+        "schema_version": FOLLOWUP_SCHEMA_VERSION,
         "boundary": FOLLOWUP_BOUNDARY,
+        "source_schema_versions": dict(FOLLOWUP_SOURCE_SCHEMA_VERSIONS),
         "repair_sweep_summary": {
             "remaining_failure_counts": {
                 "dead_air_or_density_gap": 1,
@@ -180,6 +204,10 @@ def followup_decision(*, quality_claim: bool = False) -> dict:
             "objective_source_outside_soloing_repair_wav_count": 6,
             "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
             "objective_source_outside_soloing_repair_source_context_preserved": True,
+            "objective_source_outside_soloing_repair_schema_context_preserved": True,
+            "objective_source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "objective_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -193,6 +221,10 @@ def followup_decision(*, quality_claim: bool = False) -> dict:
             "repair_sweep_source_outside_soloing_repair_evidence_ready": True,
             "repair_sweep_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
             "repair_sweep_source_outside_soloing_repair_source_context_preserved": True,
+            "repair_sweep_source_outside_soloing_repair_schema_context_preserved": True,
+            "repair_sweep_source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -229,7 +261,9 @@ def targeted_repair_sweep(*, technical_regression_count: int = 0) -> dict:
         ["dead_air_or_density_gap", "phrase_shape_missing_tension_release", SONGLIKE_LABEL],
     ]
     return {
+        "schema_version": TARGETED_REPAIR_SWEEP_SCHEMA_VERSION,
         "boundary": TARGETED_REPAIR_SWEEP_BOUNDARY,
+        "source_schema_versions": dict(TARGETED_REPAIR_SWEEP_SOURCE_SCHEMA_VERSIONS),
         "candidate_repairs": [
             {
                 "source": "test",
@@ -253,6 +287,10 @@ def targeted_repair_sweep(*, technical_regression_count: int = 0) -> dict:
             "improved_candidate_count": 4,
             "technical_regression_count": technical_regression_count,
             "source_outside_soloing_repair_evidence_ready": True,
+            "source_outside_soloing_repair_schema_context_preserved": True,
+            "source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "source_outside_soloing_repair_pitch_role_risk_count_after": 0,
             "source_outside_soloing_not_evaluable_count": 6,
             "repaired_outside_soloing_not_evaluable_count": 6,
@@ -264,6 +302,7 @@ def targeted_repair_sweep(*, technical_regression_count: int = 0) -> dict:
         },
         "readiness": {
             "targeted_quality_repair_sweep_completed": True,
+            "targeted_quality_repair_target_supported": True,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
             "audio_rendered_quality_claimed": False,
@@ -272,6 +311,9 @@ def targeted_repair_sweep(*, technical_regression_count: int = 0) -> dict:
             "broad_trained_model_quality_claimed": False,
             "brad_style_adaptation_claimed": False,
             "production_ready_claimed": False,
+        },
+        "decision": {
+            "critical_user_input_required": False,
         },
     }
 
@@ -285,7 +327,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                 targeted_repair_sweep=targeted_repair_sweep(),
                 rubric_baseline=rubric_baseline(root),
                 output_dir=root / "songlike_repair",
-                issue_number=1100,
+                issue_number=1184,
             )
             summary = validate_songlike_melody_contour_repair_sweep_report(
                 report,
@@ -299,7 +341,15 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
             )
 
             self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-            self.assertEqual(report["issue_number"], 1100)
+            self.assertEqual(report["issue_number"], 1184)
+            self.assertEqual(
+                summary["source_targeted_quality_repair_followup_schema_version"],
+                FOLLOWUP_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary["source_targeted_quality_repair_sweep_schema_version"],
+                TARGETED_REPAIR_SWEEP_SCHEMA_VERSION,
+            )
             self.assertTrue(summary["songlike_melody_contour_repair_sweep_completed"])
             self.assertTrue(summary["songlike_melody_contour_repair_target_supported"])
             self.assertEqual(summary["candidate_count"], 6)
@@ -316,6 +366,13 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                 5,
             )
             self.assertTrue(summary["objective_source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(
+                summary["objective_source_outside_soloing_repair_schema_context_preserved"]
+            )
+            self.assertEqual(
+                summary["objective_source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
             self.assertEqual(
@@ -348,6 +405,11 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                 5,
             )
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(summary["source_outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(
@@ -383,7 +445,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=targeted_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=1100,
+                    issue_number=1184,
                 )
 
     def test_rejects_source_technical_regression(self) -> None:
@@ -394,7 +456,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=targeted_repair_sweep(technical_regression_count=1),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=1100,
+                    issue_number=1184,
                 )
 
     def test_rejects_missing_followup_outside_soloing_context(self) -> None:
@@ -407,7 +469,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=targeted_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=1100,
+                    issue_number=1184,
                 )
 
     def test_rejects_missing_targeted_sweep_outside_soloing_context(self) -> None:
@@ -420,7 +482,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=source,
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=1100,
+                    issue_number=1184,
                 )
 
     def test_rejects_followup_source_risk_delta_mismatch(self) -> None:
@@ -435,7 +497,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=targeted_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=1100,
+                    issue_number=1184,
                 )
 
     def test_rejects_missing_followup_source_context_field(self) -> None:
@@ -450,7 +512,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=targeted_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=1100,
+                    issue_number=1184,
                 )
 
     def test_rejects_false_followup_source_context_preserved_field(self) -> None:
@@ -465,7 +527,35 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=targeted_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=1100,
+                    issue_number=1184,
+                )
+
+    def test_rejects_followup_source_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = followup_decision()
+            source["source_schema_versions"]["targeted_quality_repair_objective_next"] = "old"
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairSweepError):
+                build_songlike_melody_contour_repair_sweep_report(
+                    followup_decision=source,
+                    targeted_repair_sweep=targeted_repair_sweep(),
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "songlike_repair",
+                    issue_number=1184,
+                )
+
+    def test_rejects_false_schema_context_preserved(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = followup_decision()
+            source["readiness"][
+                "repair_sweep_source_outside_soloing_repair_schema_context_preserved"
+            ] = False
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairSweepError):
+                build_songlike_melody_contour_repair_sweep_report(
+                    followup_decision=source,
+                    targeted_repair_sweep=targeted_repair_sweep(),
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "songlike_repair",
+                    issue_number=1184,
                 )
 
     def test_constants_are_stable(self) -> None:
@@ -474,7 +564,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
         self.assertEqual(SELECTED_TARGET, "songlike_melody_contour_repair_audio_package")
         self.assertEqual(
             SCHEMA_VERSION,
-            "stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_v4",
+            "stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_v5",
         )
 
 
