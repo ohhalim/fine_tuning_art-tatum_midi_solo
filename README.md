@@ -18,7 +18,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest candidate failure labeling: `Issue #1086`
 - latest targeted quality repair sweep: `Issue #1088`
 - latest targeted quality repair audio package: `Issue #1090`
-- latest targeted quality repair listening review package: `Issue #1008`
+- latest targeted quality repair listening review package: `Issue #1092`
 - latest targeted quality repair listening review input guard: `Issue #1010`
 - latest targeted quality repair objective-only next decision: `Issue #1012`
 - latest targeted quality repair follow-up decision: `Issue #1014`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1066`
 - latest README evidence refresh: `Issue #1068`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after targeted quality repair audio package source-context refresh merge: `0`
+- open issue queue after targeted quality repair listening review package source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -295,6 +295,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - targeted quality repair audio bridge repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair listening review package ready: `true`
 - targeted quality repair listening review items: `6`
+- targeted quality repair listening follow-up objective source outside-soloing source context preserved: `true`
+- targeted quality repair listening follow-up repair sweep source outside-soloing source context preserved: `true`
+- targeted quality repair listening bridge repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair validated review input: `false`
 - targeted quality repair listening review input guard completed: `true`
 - targeted quality repair preference fill allowed: `false`
@@ -366,7 +369,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - final status bridge repair sweep source outside-soloing source context preserved: `true`
 - MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`

@@ -13,10 +13,9 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
-from scripts.audit_stage_b_midi_to_solo_final_status import (  # noqa: E402
-    BRIDGE_SOURCE_CONTEXT_KEYS,
-)
 from scripts.render_stage_b_midi_to_solo_targeted_quality_repair_audio import (  # noqa: E402
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
 )
@@ -28,7 +27,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError(ValueErro
 
 BOUNDARY = "stage_b_midi_to_solo_targeted_quality_repair_listening_review_package"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard"
-SCHEMA_VERSION = "stage_b_midi_to_solo_targeted_quality_repair_listening_review_package_v3"
+SCHEMA_VERSION = "stage_b_midi_to_solo_targeted_quality_repair_listening_review_package_v4"
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -82,12 +81,19 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
 
 
 def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
-    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in container or container[key] is None:
             raise StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError(
                 f"{label} source-context field required: {key}"
             )
-    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
+    missing_preserved = [
+        key for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS if not bool(container.get(key))
+    ]
+    if missing_preserved:
+        raise StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError(
+            f"{label} source-context preserved field must be true: {missing_preserved}"
+        )
+    return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
 
 
 def validate_audio_package_report(
@@ -300,7 +306,7 @@ def build_listening_review_package_report(
                 summary.get("repaired_outside_soloing_not_evaluable_count")
             ),
             "audio_review_required": bool(summary.get("audio_review_required", False)),
-            **{key: summary.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
+            **{key: summary.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
         },
         "review_package": {
             "package_ready": True,
@@ -442,7 +448,7 @@ def validate_listening_review_package_report(
         "audio_review_required": bool(source.get("audio_review_required", False)),
         **{
             key: source.get(key)
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
         },
         "human_review_required_now": bool(readiness.get("human_review_required_now", True)),
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
@@ -476,6 +482,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- failure label delta: `{source['failure_label_delta']}`",
         f"- source outside-soloing repair evidence ready: `{_bool_token(source['source_outside_soloing_repair_evidence_ready'])}`",
         f"- source outside-soloing repair source context preserved: `{_bool_token(source['source_outside_soloing_repair_source_context_preserved'])}`",
+        f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(source['followup_objective_source_outside_soloing_source_context_preserved'])}`",
+        f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(source['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
+        f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(source['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- source outside-soloing source objective pitch-role risk: `{source['source_outside_soloing_repair_source_objective_pitch_role_risk_count']}`",
         f"- source outside-soloing source pitch-role risk before / after / delta: `{source['source_outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{source['source_outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{source['source_outside_soloing_repair_source_pitch_role_risk_delta']}`",
         f"- source outside-soloing source repair targeted: `{_bool_token(source['source_outside_soloing_repair_source_targeted'])}`",
@@ -533,7 +542,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=754)
+    parser.add_argument("--issue_number", type=int, default=1092)
     parser.add_argument("--expected_review_item_count", type=int, default=6)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
