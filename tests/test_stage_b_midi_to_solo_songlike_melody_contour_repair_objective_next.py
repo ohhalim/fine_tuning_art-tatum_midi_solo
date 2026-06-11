@@ -4,7 +4,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next import (
     BOUNDARY,
     FOLLOWUP_DECISION_NEXT_BOUNDARY,
@@ -14,8 +13,12 @@ from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_repair_objectiv
     validate_objective_next_report,
 )
 from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input import (
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BOUNDARY as SOURCE_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS,
     OBJECTIVE_NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    SCHEMA_VERSION as SOURCE_GUARD_SCHEMA_VERSION,
 )
 
 
@@ -49,8 +52,10 @@ SOURCE_CONTEXT = {
 
 def input_guard_report(*, quality_claim: bool = False) -> dict:
     return {
+        "schema_version": SOURCE_GUARD_SCHEMA_VERSION,
         "boundary": SOURCE_BOUNDARY,
         "source_boundary": "stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package",
+        "source_schema_versions": dict(EXPECTED_SOURCE_SCHEMA_VERSIONS),
         "guard_result": {
             "validated_review_input_present": False,
             "preference_fill_allowed": False,
@@ -70,6 +75,10 @@ def input_guard_report(*, quality_claim: bool = False) -> dict:
                 "objective_source_outside_soloing_repair_wav_count": 6,
                 "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
                 "objective_source_outside_soloing_repair_source_context_preserved": True,
+                "objective_source_outside_soloing_repair_schema_context_preserved": True,
+                "objective_source_outside_soloing_repair_objective_schema_version": (
+                    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+                ),
                 "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
                 "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
                 "objective_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -80,6 +89,10 @@ def input_guard_report(*, quality_claim: bool = False) -> dict:
                 **{f"objective_{key}": value for key, value in SOURCE_CONTEXT.items()},
                 "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
                 "source_outside_soloing_repair_source_context_preserved": True,
+                "source_outside_soloing_repair_schema_context_preserved": True,
+                "source_outside_soloing_repair_objective_schema_version": (
+                    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+                ),
                 "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
                 "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
                 "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -121,7 +134,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextTest(unittest.Test
             report = build_objective_next_report(
                 input_guard_report=input_guard_report(),
                 output_dir=root / "objective_next",
-                issue_number=1108,
+                issue_number=1192,
             )
             summary = validate_objective_next_report(
                 report,
@@ -133,7 +146,22 @@ class StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextTest(unittest.Test
             )
 
             self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-            self.assertEqual(report["issue_number"], 1108)
+            self.assertEqual(report["issue_number"], 1192)
+            self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(
+                report["source_schema_versions"][
+                    "songlike_melody_contour_repair_listening_review_input_guard"
+                ],
+                SOURCE_GUARD_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary[
+                    "source_songlike_melody_contour_repair_listening_review_input_guard_schema_version"
+                ],
+                SOURCE_GUARD_SCHEMA_VERSION,
+            )
+            for key, expected in EXPECTED_SOURCE_SCHEMA_VERSIONS.items():
+                self.assertEqual(report["source_schema_versions"][key], expected)
             self.assertTrue(summary["objective_next_decision_completed"])
             self.assertFalse(summary["validated_review_input_present"])
             self.assertFalse(summary["preference_fill_allowed"])
@@ -150,6 +178,13 @@ class StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextTest(unittest.Test
                 5,
             )
             self.assertTrue(summary["objective_source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(
+                summary["objective_source_outside_soloing_repair_schema_context_preserved"]
+            )
+            self.assertEqual(
+                summary["objective_source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
             self.assertEqual(
@@ -182,6 +217,11 @@ class StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextTest(unittest.Test
                 5,
             )
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(summary["source_outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(
@@ -211,7 +251,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextTest(unittest.Test
                 build_objective_next_report(
                     input_guard_report=input_guard_report(quality_claim=True),
                     output_dir=root / "objective_next",
-                    issue_number=1108,
+                    issue_number=1192,
                 )
 
     def test_rejects_missing_outside_soloing_context(self) -> None:
@@ -223,7 +263,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextTest(unittest.Test
                 build_objective_next_report(
                     input_guard_report=source,
                     output_dir=root / "objective_next",
-                    issue_number=1108,
+                    issue_number=1192,
                 )
 
     def test_rejects_source_context_delta_mismatch(self) -> None:
@@ -237,7 +277,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextTest(unittest.Test
                 build_objective_next_report(
                     input_guard_report=source,
                     output_dir=root / "objective_next",
-                    issue_number=1108,
+                    issue_number=1192,
                 )
 
     def test_rejects_missing_source_context_field(self) -> None:
@@ -251,7 +291,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextTest(unittest.Test
                 build_objective_next_report(
                     input_guard_report=source,
                     output_dir=root / "objective_next",
-                    issue_number=1108,
+                    issue_number=1192,
                 )
 
     def test_rejects_false_source_context_preserved_field(self) -> None:
@@ -265,7 +305,35 @@ class StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextTest(unittest.Test
                 build_objective_next_report(
                     input_guard_report=source,
                     output_dir=root / "objective_next",
-                    issue_number=1108,
+                    issue_number=1192,
+                )
+
+    def test_rejects_source_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = input_guard_report()
+            source["source_schema_versions"][
+                "songlike_melody_contour_repair_listening_review_package"
+            ] = "stale"
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextError):
+                build_objective_next_report(
+                    input_guard_report=source,
+                    output_dir=root / "objective_next",
+                    issue_number=1192,
+                )
+
+    def test_rejects_false_outside_soloing_schema_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = input_guard_report()
+            source["guard_result"]["source_summary"][
+                "source_outside_soloing_repair_schema_context_preserved"
+            ] = False
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextError):
+                build_objective_next_report(
+                    input_guard_report=source,
+                    output_dir=root / "objective_next",
+                    issue_number=1192,
                 )
 
     def test_constants_are_stable(self) -> None:
@@ -273,7 +341,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairObjectiveNextTest(unittest.Test
         self.assertEqual(FOLLOWUP_DECISION_NEXT_BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision")
         self.assertEqual(
             SCHEMA_VERSION,
-            "stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next_v4",
+            "stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next_v5",
         )
 
 
