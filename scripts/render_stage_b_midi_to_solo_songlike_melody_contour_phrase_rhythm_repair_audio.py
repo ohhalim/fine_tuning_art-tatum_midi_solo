@@ -17,7 +17,8 @@ sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
 from scripts.audit_stage_b_midi_to_solo_final_status import (  # noqa: E402
-    BRIDGE_SOURCE_CONTEXT_KEYS,
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
 )
 from scripts.render_stage_b_midi_to_solo_candidate_audio import (  # noqa: E402
     resolve_soundfont,
@@ -38,7 +39,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioError(ValueErr
 
 BOUNDARY = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package"
-SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package_v3"
+SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package_v4"
 CommandRunner = Callable[[Sequence[str]], subprocess.CompletedProcess[str]]
 
 QUALITY_CLAIM_KEYS = [
@@ -93,7 +94,7 @@ def _require_no_quality_claim(container: dict[str, Any], *, label: str) -> None:
 
 
 def _source_context_fields(source: dict[str, Any]) -> dict[str, Any]:
-    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         objective_key = f"objective_{key}"
         if objective_key not in source or source[objective_key] is None:
             raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioError(
@@ -103,6 +104,17 @@ def _source_context_fields(source: dict[str, Any]) -> dict[str, Any]:
             raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioError(
                 f"source-context field required: {key}"
             )
+    missing_preserved = []
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
+        objective_key = f"objective_{key}"
+        if not bool(source.get(objective_key)):
+            missing_preserved.append(objective_key)
+        if not bool(source.get(key)):
+            missing_preserved.append(key)
+    if missing_preserved:
+        raise StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioError(
+            f"source-context preserved field must be true: {missing_preserved}"
+        )
     return {
         "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count": _int(
             source.get(
@@ -169,8 +181,11 @@ def _source_context_fields(source: dict[str, Any]) -> dict[str, Any]:
         "source_outside_soloing_repair_pitch_role_risk_delta": _int(
             source.get("source_outside_soloing_repair_pitch_role_risk_delta")
         ),
-        **{f"objective_{key}": source.get(f"objective_{key}") for key in BRIDGE_SOURCE_CONTEXT_KEYS},
-        **{key: source.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
+        **{
+            f"objective_{key}": source.get(f"objective_{key}")
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
+        },
+        **{key: source.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
     }
 
 
@@ -437,8 +452,8 @@ def build_audio_render_report(
         for key, value in source.items()
         if key.startswith("objective_source_outside_soloing_repair_")
         or key.startswith("source_outside_soloing_repair_")
-        or key in BRIDGE_SOURCE_CONTEXT_KEYS
-        or key in {f"objective_{source_key}" for source_key in BRIDGE_SOURCE_CONTEXT_KEYS}
+        or key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
+        or key in {f"objective_{source_key}" for source_key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
     }
     resolved_renderer = renderer_path or shutil.which("fluidsynth") or ""
     resolved_soundfont = resolve_soundfont(soundfont_path)
@@ -705,8 +720,11 @@ def validate_audio_render_report(
         "source_outside_soloing_repair_pitch_role_risk_delta": _int(
             summary.get("source_outside_soloing_repair_pitch_role_risk_delta")
         ),
-        **{f"objective_{key}": summary.get(f"objective_{key}") for key in BRIDGE_SOURCE_CONTEXT_KEYS},
-        **{key: summary.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
+        **{
+            f"objective_{key}": summary.get(f"objective_{key}")
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
+        },
+        **{key: summary.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
         "source_outside_soloing_not_evaluable_count": _int(
             summary.get("source_outside_soloing_not_evaluable_count")
         ),
@@ -759,6 +777,9 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- objective source outside-soloing source pitch-role risk before / after / delta: `{summary['objective_source_outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{summary['objective_source_outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{summary['objective_source_outside_soloing_repair_source_pitch_role_risk_delta']}`",
         f"- objective source outside-soloing current repair pitch-role risk after / delta: `{summary['objective_source_outside_soloing_repair_pitch_role_risk_count_after']}` / `{summary['objective_source_outside_soloing_repair_pitch_role_risk_delta']}`",
         f"- source outside-soloing source context preserved: `{_bool_token(summary['source_outside_soloing_repair_source_context_preserved'])}`",
+        f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(summary['followup_objective_source_outside_soloing_source_context_preserved'])}`",
+        f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(summary['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
+        f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(summary['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- source outside-soloing source pitch-role risk before / after / delta: `{summary['source_outside_soloing_repair_source_pitch_role_risk_count_before']}` / `{summary['source_outside_soloing_repair_source_pitch_role_risk_count_after']}` / `{summary['source_outside_soloing_repair_source_pitch_role_risk_delta']}`",
         f"- source outside-soloing source repair targeted: `{_bool_token(summary['source_outside_soloing_repair_source_targeted'])}`",
         f"- source outside-soloing source residual risk preserved: `{_bool_token(summary['source_outside_soloing_repair_source_residual_risk_preserved'])}`",

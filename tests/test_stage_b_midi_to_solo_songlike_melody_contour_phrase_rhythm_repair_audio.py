@@ -9,10 +9,14 @@ from typing import Sequence
 
 import pretty_midi
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import (
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+)
 from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio import (
     BOUNDARY,
     NEXT_BOUNDARY,
+    SCHEMA_VERSION,
     StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioError,
     build_audio_render_report,
     validate_audio_render_report,
@@ -233,7 +237,8 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioTest(unittest.
                 5,
             )
             self.assertTrue(summary["objective_source_outside_soloing_repair_source_context_preserved"])
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
             self.assertEqual(
                 summary[
@@ -265,8 +270,11 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioTest(unittest.
                 5,
             )
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
+            for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
+                self.assertTrue(summary[f"objective_{key}"])
+                self.assertTrue(summary[key])
             self.assertEqual(
                 summary[
                     "source_outside_soloing_repair_source_pitch_role_risk_count_before"
@@ -379,9 +387,33 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioTest(unittest.
                     runner=fake_runner,
                 )
 
+    def test_rejects_source_context_preservation_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            source = source_report(root)
+            source["aggregate"][BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS[0]] = False
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioError):
+                build_audio_render_report(
+                    source,
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    runner=fake_runner,
+                )
+
     def test_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package")
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package_v4",
+        )
 
 
 if __name__ == "__main__":
