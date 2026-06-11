@@ -16,9 +16,11 @@ from scripts.assess_stage_b_generic_base_readiness import read_json, write_json,
 from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio import (  # noqa: E402
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_SCHEMA_VERSION,
 )
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
 )
 
 
@@ -33,7 +35,7 @@ NEXT_BOUNDARY = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard"
 )
 SCHEMA_VERSION = (
-    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_v2"
+    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_v3"
 )
 
 QUALITY_CLAIM_KEYS = [
@@ -93,11 +95,7 @@ def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str
             raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
                 f"{label} source-context field required: {key}"
             )
-    for key in (
-        "followup_objective_source_outside_soloing_source_context_preserved",
-        "followup_repair_sweep_source_outside_soloing_source_context_preserved",
-        "repair_sweep_source_outside_soloing_source_context_preserved",
-    ):
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
         if not bool(container.get(key, False)):
             raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
                 f"{label} source context should be preserved: {key}"
@@ -116,6 +114,10 @@ def validate_audio_package_report(
     if str(boundary.get("boundary") or "") != SOURCE_BOUNDARY:
         raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
             "chord-tone landing repair audio package boundary required"
+        )
+    if str(report.get("schema_version") or "") != SOURCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
+            "audio package schema version must match current audio package report"
         )
     if str(decision.get("next_boundary") or "") != SOURCE_NEXT_BOUNDARY:
         raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
@@ -229,7 +231,16 @@ def build_listening_review_package_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": SOURCE_BOUNDARY,
+        "source_schema_version": SOURCE_SCHEMA_VERSION,
         "source_summary": {
+            "source_schema_version": SOURCE_SCHEMA_VERSION,
+            "source_repair_sweep_schema_version": str(
+                summary.get("source_schema_version") or ""
+            ),
+            "source_objective_schema_version": str(
+                summary.get("source_objective_schema_version") or ""
+            ),
+            "source_bridge_schema_version": str(summary.get("source_bridge_schema_version") or ""),
             "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
             "technical_wav_validation": bool(summary.get("technical_wav_validation", False)),
             "sample_rate": _int(summary.get("sample_rate")),
@@ -376,10 +387,23 @@ def validate_listening_review_package_report(
             raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
                 f"listening package source-context field required: {key}"
             )
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
+        if not bool(source.get(key, False)):
+            raise StageBMidiToSoloChordToneLandingRepairListeningReviewPackageError(
+                f"listening package source-context preserved field must be true: {key}"
+            )
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="listening package readiness")
     return {
         "boundary": boundary,
+        "source_schema_version": str(source.get("source_schema_version") or ""),
+        "source_repair_sweep_schema_version": str(
+            source.get("source_repair_sweep_schema_version") or ""
+        ),
+        "source_objective_schema_version": str(
+            source.get("source_objective_schema_version") or ""
+        ),
+        "source_bridge_schema_version": str(source.get("source_bridge_schema_version") or ""),
         "next_boundary": str(decision.get("next_boundary") or ""),
         "listening_review_package_ready": bool(
             readiness.get("listening_review_package_ready", False)
@@ -443,6 +467,10 @@ def markdown_report(report: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- boundary: `{report['boundary']}`",
+        f"- source schema version: `{report['source_schema_version']}`",
+        f"- source repair sweep schema version: `{source['source_repair_sweep_schema_version']}`",
+        f"- source objective schema version: `{source['source_objective_schema_version']}`",
+        f"- source bridge schema version: `{source['source_bridge_schema_version']}`",
         f"- next boundary: `{decision['next_boundary']}`",
         f"- package ready: `{_bool_token(package['package_ready'])}`",
         f"- review item count: `{package['review_item_count']}`",
@@ -523,7 +551,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1048)
+    parser.add_argument("--issue_number", type=int, default=1132)
     parser.add_argument("--expected_review_item_count", type=int, default=6)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
