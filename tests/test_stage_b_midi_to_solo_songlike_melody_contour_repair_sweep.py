@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
     build_quality_rubric_baseline_report,
 )
@@ -21,6 +21,7 @@ from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep import (
     BOUNDARY,
     NEXT_BOUNDARY,
+    SCHEMA_VERSION,
     SELECTED_TARGET,
     SONGLIKE_LABEL,
     StageBMidiToSoloSonglikeMelodyContourRepairSweepError,
@@ -257,7 +258,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                 targeted_repair_sweep=targeted_repair_sweep(),
                 rubric_baseline=rubric_baseline(root),
                 output_dir=root / "songlike_repair",
-                issue_number=762,
+                issue_number=1100,
             )
             summary = validate_songlike_melody_contour_repair_sweep_report(
                 report,
@@ -270,6 +271,8 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                 require_no_quality_claim=True,
             )
 
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(report["issue_number"], 1100)
             self.assertTrue(summary["songlike_melody_contour_repair_sweep_completed"])
             self.assertTrue(summary["songlike_melody_contour_repair_target_supported"])
             self.assertEqual(summary["candidate_count"], 6)
@@ -286,7 +289,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                 5,
             )
             self.assertTrue(summary["objective_source_outside_soloing_repair_source_context_preserved"])
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
             self.assertEqual(
                 summary[
@@ -318,7 +321,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                 5,
             )
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(
                 summary["source_outside_soloing_repair_source_pitch_role_risk_count_before"], 5
@@ -353,7 +356,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=targeted_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=762,
+                    issue_number=1100,
                 )
 
     def test_rejects_source_technical_regression(self) -> None:
@@ -364,7 +367,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=targeted_repair_sweep(technical_regression_count=1),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=762,
+                    issue_number=1100,
                 )
 
     def test_rejects_missing_followup_outside_soloing_context(self) -> None:
@@ -377,7 +380,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=targeted_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=846,
+                    issue_number=1100,
                 )
 
     def test_rejects_missing_targeted_sweep_outside_soloing_context(self) -> None:
@@ -390,7 +393,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=source,
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=846,
+                    issue_number=1100,
                 )
 
     def test_rejects_followup_source_risk_delta_mismatch(self) -> None:
@@ -405,7 +408,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=targeted_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=932,
+                    issue_number=1100,
                 )
 
     def test_rejects_missing_followup_source_context_field(self) -> None:
@@ -420,13 +423,32 @@ class StageBMidiToSoloSonglikeMelodyContourRepairSweepTest(unittest.TestCase):
                     targeted_repair_sweep=targeted_repair_sweep(),
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "songlike_repair",
-                    issue_number=1016,
+                    issue_number=1100,
+                )
+
+    def test_rejects_false_followup_source_context_preserved_field(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = followup_decision()
+            source["readiness"][
+                "repair_sweep_followup_repair_sweep_source_outside_soloing_source_context_preserved"
+            ] = False
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourRepairSweepError):
+                build_songlike_melody_contour_repair_sweep_report(
+                    followup_decision=source,
+                    targeted_repair_sweep=targeted_repair_sweep(),
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "songlike_repair",
+                    issue_number=1100,
                 )
 
     def test_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_repair_sweep")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package")
         self.assertEqual(SELECTED_TARGET, "songlike_melody_contour_repair_audio_package")
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_v4",
+        )
 
 
 if __name__ == "__main__":

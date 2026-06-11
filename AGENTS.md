@@ -28,7 +28,7 @@ Current handoff scope:
 - Latest targeted quality repair listening review input guard completed: Issue #1094, Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh.
 - Latest targeted quality repair objective-only next decision completed: Issue #1096, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh.
 - Latest targeted quality repair follow-up decision completed: Issue #1098, Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh.
-- Latest songlike melody contour repair sweep completed: Issue #1016, Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh.
+- Latest songlike melody contour repair sweep completed: Issue #1100, Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh.
 - Latest songlike melody contour repair audio package completed: Issue #1018, Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh.
 - Latest songlike melody contour repair listening review package completed: Issue #1020, Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh.
 - Latest songlike melody contour repair listening review input guard completed: Issue #1022, Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh.
@@ -55,8 +55,8 @@ Current handoff scope:
 - Latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision completed: Issue #1064, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh.
 - Latest documentation issue completed: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after targeted quality repair follow-up decision source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh.
+- Open issue queue after songlike melody contour repair sweep source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 
