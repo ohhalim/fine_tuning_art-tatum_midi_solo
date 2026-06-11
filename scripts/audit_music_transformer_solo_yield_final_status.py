@@ -67,10 +67,21 @@ def build_audit_report(
     repaired_package: dict[str, Any],
     repaired_guard: dict[str, Any],
     repaired_objective: dict[str, Any],
+    final_handoff: dict[str, Any] | None = None,
+    handoff_audit: dict[str, Any] | None = None,
     output_dir: Path,
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    _require_no_quality_claim(repair_sweep, repaired_package, repaired_guard, repaired_objective)
+    final_handoff = final_handoff or {}
+    handoff_audit = handoff_audit or {}
+    _require_no_quality_claim(
+        repair_sweep,
+        repaired_package,
+        repaired_guard,
+        repaired_objective,
+        final_handoff,
+        handoff_audit,
+    )
 
     sweep_aggregate = _dict(repair_sweep.get("aggregate"))
     sweep_readiness = _dict(repair_sweep.get("readiness"))
@@ -79,6 +90,10 @@ def build_audit_report(
     guard_validation = _dict(repaired_guard.get("input_validation"))
     objective_readiness = _dict(repaired_objective.get("readiness"))
     objective_summary = _dict(repaired_objective.get("objective_summary"))
+    final_handoff_readiness = _dict(final_handoff.get("readiness"))
+    final_handoff_aggregate = _dict(final_handoff.get("aggregate"))
+    handoff_audit_readiness = _dict(handoff_audit.get("readiness"))
+    handoff_audit_aggregate = _dict(handoff_audit.get("aggregate"))
 
     repaired_candidate_count = _int(repaired_package.get("candidate_count"))
     midi_count = _int(package_readiness.get("candidate_midi_files_copied"))
@@ -87,6 +102,49 @@ def build_audit_report(
     strict_count = _int(sweep_aggregate.get("strict_valid_sample_count"))
     sample_count = _int(sweep_aggregate.get("sample_count"))
     grammar_count = _int(sweep_aggregate.get("grammar_gate_sample_count"))
+    final_handoff_present = bool(final_handoff)
+    final_handoff_candidate_count = _int(final_handoff_aggregate.get("candidate_count"))
+    final_handoff_midi_count = _int(final_handoff_aggregate.get("midi_count"))
+    final_handoff_wav_count = _int(final_handoff_aggregate.get("wav_count"))
+    final_handoff_missing_count = _int(final_handoff_aggregate.get("missing_file_count"))
+    final_handoff_checksum_mismatch_count = _int(
+        final_handoff_aggregate.get("checksum_mismatch_count")
+    )
+    final_handoff_ready = bool(final_handoff_readiness.get("final_review_handoff_ready", False))
+    final_handoff_verified = (not final_handoff_present) or (
+        final_handoff_ready
+        and final_handoff_candidate_count >= 1
+        and final_handoff_midi_count == final_handoff_candidate_count
+        and final_handoff_wav_count == final_handoff_candidate_count
+        and final_handoff_missing_count == 0
+        and final_handoff_checksum_mismatch_count == 0
+    )
+    handoff_audit_present = bool(handoff_audit)
+    handoff_reproducibility_completed = bool(
+        handoff_audit_readiness.get("reproducibility_audit_completed", False)
+    )
+    reproducible_handoff = bool(
+        handoff_audit_readiness.get(
+            "reproducible_handoff",
+            handoff_audit_aggregate.get("reproducible_handoff", False),
+        )
+    )
+    handoff_missing_midi_count = _int(handoff_audit_aggregate.get("missing_midi_count"))
+    handoff_missing_wav_count = _int(handoff_audit_aggregate.get("missing_wav_count"))
+    handoff_midi_checksum_mismatch_count = _int(
+        handoff_audit_aggregate.get("midi_checksum_mismatch_count")
+    )
+    handoff_wav_checksum_mismatch_count = _int(
+        handoff_audit_aggregate.get("wav_checksum_mismatch_count")
+    )
+    handoff_audit_verified = (not handoff_audit_present) or (
+        handoff_reproducibility_completed
+        and reproducible_handoff
+        and handoff_missing_midi_count == 0
+        and handoff_missing_wav_count == 0
+        and handoff_midi_checksum_mismatch_count == 0
+        and handoff_wav_checksum_mismatch_count == 0
+    )
 
     technical_ready = bool(
         strict_count > 0
@@ -96,6 +154,8 @@ def build_audit_report(
         and wav_count == repaired_candidate_count
         and selected_objective_count >= 1
         and not bool(guard_readiness.get("preference_fill_allowed", True))
+        and final_handoff_verified
+        and handoff_audit_verified
     )
 
     report = {
@@ -107,6 +167,8 @@ def build_audit_report(
             "repaired_package": repaired_package.get("output_dir"),
             "repaired_guard": repaired_guard.get("output_dir"),
             "repaired_objective": repaired_objective.get("output_dir"),
+            "final_handoff": final_handoff.get("output_dir"),
+            "handoff_audit": handoff_audit.get("output_dir"),
         },
         "final_status": {
             "technical_mvp_evidence_ready": technical_ready,
@@ -131,6 +193,20 @@ def build_audit_report(
                 guard_validation.get("validated_listening_input_present", False)
             ),
             "preference_fill_allowed": bool(guard_readiness.get("preference_fill_allowed", True)),
+            "final_review_handoff_present": final_handoff_present,
+            "final_review_handoff_ready": final_handoff_ready,
+            "final_handoff_candidate_count": final_handoff_candidate_count,
+            "final_handoff_midi_count": final_handoff_midi_count,
+            "final_handoff_wav_count": final_handoff_wav_count,
+            "final_handoff_missing_file_count": final_handoff_missing_count,
+            "final_handoff_checksum_mismatch_count": final_handoff_checksum_mismatch_count,
+            "handoff_reproducibility_audit_present": handoff_audit_present,
+            "handoff_reproducibility_audit_completed": handoff_reproducibility_completed,
+            "reproducible_handoff": reproducible_handoff,
+            "handoff_missing_midi_count": handoff_missing_midi_count,
+            "handoff_missing_wav_count": handoff_missing_wav_count,
+            "handoff_midi_checksum_mismatch_count": handoff_midi_checksum_mismatch_count,
+            "handoff_wav_checksum_mismatch_count": handoff_wav_checksum_mismatch_count,
             "musical_quality_claimed": False,
             "artist_style_claimed": False,
             "production_ready_claimed": False,
@@ -193,6 +269,30 @@ def validate_audit_report(report: dict[str, Any]) -> dict[str, Any]:
         "selected_objective_candidate_count": _int(final_status.get("selected_objective_candidate_count")),
         "validated_listening_input_present": bool(final_status.get("validated_listening_input_present", True)),
         "preference_fill_allowed": bool(final_status.get("preference_fill_allowed", True)),
+        "final_review_handoff_present": bool(final_status.get("final_review_handoff_present", False)),
+        "final_review_handoff_ready": bool(final_status.get("final_review_handoff_ready", False)),
+        "final_handoff_candidate_count": _int(final_status.get("final_handoff_candidate_count")),
+        "final_handoff_midi_count": _int(final_status.get("final_handoff_midi_count")),
+        "final_handoff_wav_count": _int(final_status.get("final_handoff_wav_count")),
+        "final_handoff_missing_file_count": _int(final_status.get("final_handoff_missing_file_count")),
+        "final_handoff_checksum_mismatch_count": _int(
+            final_status.get("final_handoff_checksum_mismatch_count")
+        ),
+        "handoff_reproducibility_audit_present": bool(
+            final_status.get("handoff_reproducibility_audit_present", False)
+        ),
+        "handoff_reproducibility_audit_completed": bool(
+            final_status.get("handoff_reproducibility_audit_completed", False)
+        ),
+        "reproducible_handoff": bool(final_status.get("reproducible_handoff", False)),
+        "handoff_missing_midi_count": _int(final_status.get("handoff_missing_midi_count")),
+        "handoff_missing_wav_count": _int(final_status.get("handoff_missing_wav_count")),
+        "handoff_midi_checksum_mismatch_count": _int(
+            final_status.get("handoff_midi_checksum_mismatch_count")
+        ),
+        "handoff_wav_checksum_mismatch_count": _int(
+            final_status.get("handoff_wav_checksum_mismatch_count")
+        ),
         "musical_quality_claimed": bool(final_status.get("musical_quality_claimed", True)),
         "next_boundary": str(_dict(report.get("decision")).get("next_boundary") or ""),
     }
@@ -221,6 +321,16 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- objective dead-air range: `{float(status['objective_dead_air_min']):.4f}` - `{float(status['objective_dead_air_max']):.4f}`",
         f"- validated listening input present: `{_bool_token(status['validated_listening_input_present'])}`",
         f"- preference fill allowed: `{_bool_token(status['preference_fill_allowed'])}`",
+        f"- final review handoff present: `{_bool_token(status['final_review_handoff_present'])}`",
+        f"- final review handoff ready: `{_bool_token(status['final_review_handoff_ready'])}`",
+        f"- final handoff MIDI/WAV: `{status['final_handoff_midi_count']}` / `{status['final_handoff_wav_count']}`",
+        f"- final handoff missing files: `{status['final_handoff_missing_file_count']}`",
+        f"- final handoff checksum mismatch: `{status['final_handoff_checksum_mismatch_count']}`",
+        f"- handoff reproducibility audit present: `{_bool_token(status['handoff_reproducibility_audit_present'])}`",
+        f"- handoff reproducibility audit completed: `{_bool_token(status['handoff_reproducibility_audit_completed'])}`",
+        f"- reproducible handoff: `{_bool_token(status['reproducible_handoff'])}`",
+        f"- handoff missing MIDI/WAV: `{status['handoff_missing_midi_count']}` / `{status['handoff_missing_wav_count']}`",
+        f"- handoff checksum mismatch MIDI/WAV: `{status['handoff_midi_checksum_mismatch_count']}` / `{status['handoff_wav_checksum_mismatch_count']}`",
         f"- musical quality claimed: `{_bool_token(status['musical_quality_claimed'])}`",
         f"- raw artifact upload required: `{_bool_token(status['raw_artifact_upload_required'])}`",
         f"- next boundary: `{decision['next_boundary']}`",
@@ -267,6 +377,8 @@ def build_parser() -> argparse.ArgumentParser:
             "issue_1254_4bar_repaired_objective_next_decision/objective_next_decision.json"
         ),
     )
+    parser.add_argument("--final_handoff_report", type=str, default="")
+    parser.add_argument("--handoff_audit_report", type=str, default="")
     parser.add_argument(
         "--output_root",
         type=str,
@@ -286,6 +398,8 @@ def main() -> int:
         repaired_package=read_json(Path(args.repaired_package_report)),
         repaired_guard=read_json(Path(args.repaired_guard_report)),
         repaired_objective=read_json(Path(args.repaired_objective_report)),
+        final_handoff=read_json(Path(args.final_handoff_report)) if args.final_handoff_report else None,
+        handoff_audit=read_json(Path(args.handoff_audit_report)) if args.handoff_audit_report else None,
         output_dir=output_dir,
     )
     summary = validate_audit_report(report)

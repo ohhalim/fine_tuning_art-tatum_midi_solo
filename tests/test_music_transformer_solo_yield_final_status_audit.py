@@ -83,6 +83,54 @@ def repaired_objective() -> dict:
     }
 
 
+def final_handoff(*, missing_file_count: int = 0) -> dict:
+    return {
+        "schema_version": "music_transformer_solo_yield_broader_repaired_final_review_handoff_v1",
+        "output_dir": "outputs/final_handoff",
+        "aggregate": {
+            "candidate_count": 8,
+            "midi_count": 8,
+            "wav_count": 8,
+            "selected_objective_candidate_count": 4,
+            "missing_file_count": missing_file_count,
+            "checksum_mismatch_count": 0,
+        },
+        "readiness": {
+            "final_review_handoff_ready": True,
+            "validated_listening_input_present": False,
+            "preference_fill_allowed": False,
+            "musical_quality_claimed": False,
+            "artist_style_claimed": False,
+            "production_ready_claimed": False,
+        },
+    }
+
+
+def handoff_audit(*, reproducible: bool = True) -> dict:
+    return {
+        "schema_version": "music_transformer_solo_yield_broader_repaired_handoff_reproducibility_audit_v1",
+        "output_dir": "outputs/handoff_audit",
+        "aggregate": {
+            "candidate_count": 8,
+            "selected_objective_candidate_count": 4,
+            "missing_midi_count": 0,
+            "missing_wav_count": 0,
+            "midi_checksum_mismatch_count": 0,
+            "wav_checksum_mismatch_count": 0,
+            "reproducible_handoff": reproducible,
+        },
+        "readiness": {
+            "reproducibility_audit_completed": True,
+            "reproducible_handoff": reproducible,
+            "validated_listening_input_present": False,
+            "preference_fill_allowed": False,
+            "musical_quality_claimed": False,
+            "artist_style_claimed": False,
+            "production_ready_claimed": False,
+        },
+    }
+
+
 class MusicTransformerSoloYieldFinalStatusAuditTest(unittest.TestCase):
     def test_builds_final_status_audit_without_quality_claim(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -105,6 +153,67 @@ class MusicTransformerSoloYieldFinalStatusAuditTest(unittest.TestCase):
         self.assertFalse(summary["preference_fill_allowed"])
         self.assertFalse(summary["musical_quality_claimed"])
         self.assertEqual(summary["next_boundary"], "music_transformer_solo_yield_readme_final_evidence_refresh")
+
+    def test_includes_final_handoff_reproducibility_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report = build_audit_report(
+                repair_sweep=repair_sweep(),
+                repaired_package=repaired_package(),
+                repaired_guard=repaired_guard(),
+                repaired_objective=repaired_objective(),
+                final_handoff=final_handoff(),
+                handoff_audit=handoff_audit(),
+                output_dir=Path(temp_dir) / "audit",
+            )
+        summary = validate_audit_report(report)
+
+        self.assertTrue(summary["technical_mvp_evidence_ready"])
+        self.assertTrue(summary["final_review_handoff_present"])
+        self.assertTrue(summary["final_review_handoff_ready"])
+        self.assertEqual(summary["final_handoff_candidate_count"], 8)
+        self.assertEqual(summary["final_handoff_midi_count"], 8)
+        self.assertEqual(summary["final_handoff_wav_count"], 8)
+        self.assertEqual(summary["final_handoff_missing_file_count"], 0)
+        self.assertEqual(summary["final_handoff_checksum_mismatch_count"], 0)
+        self.assertTrue(summary["handoff_reproducibility_audit_present"])
+        self.assertTrue(summary["handoff_reproducibility_audit_completed"])
+        self.assertTrue(summary["reproducible_handoff"])
+        self.assertEqual(summary["handoff_missing_midi_count"], 0)
+        self.assertEqual(summary["handoff_missing_wav_count"], 0)
+        self.assertEqual(summary["handoff_midi_checksum_mismatch_count"], 0)
+        self.assertEqual(summary["handoff_wav_checksum_mismatch_count"], 0)
+
+    def test_handoff_mismatch_keeps_technical_ready_false(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report = build_audit_report(
+                repair_sweep=repair_sweep(),
+                repaired_package=repaired_package(),
+                repaired_guard=repaired_guard(),
+                repaired_objective=repaired_objective(),
+                final_handoff=final_handoff(missing_file_count=1),
+                handoff_audit=handoff_audit(),
+                output_dir=Path(temp_dir) / "audit",
+            )
+        summary = validate_audit_report(report)
+
+        self.assertFalse(summary["technical_mvp_evidence_ready"])
+        self.assertEqual(summary["final_handoff_missing_file_count"], 1)
+
+    def test_non_reproducible_handoff_keeps_technical_ready_false(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report = build_audit_report(
+                repair_sweep=repair_sweep(),
+                repaired_package=repaired_package(),
+                repaired_guard=repaired_guard(),
+                repaired_objective=repaired_objective(),
+                final_handoff=final_handoff(),
+                handoff_audit=handoff_audit(reproducible=False),
+                output_dir=Path(temp_dir) / "audit",
+            )
+        summary = validate_audit_report(report)
+
+        self.assertFalse(summary["technical_mvp_evidence_ready"])
+        self.assertFalse(summary["reproducible_handoff"])
 
     def test_rejects_quality_claim_in_source_report(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
