@@ -1,0 +1,102 @@
+# Music Transformer Solo Yield Interval Contour Aftercare Sweep
+
+## Summary
+
+- candidate count: `8`
+- repaired MIDI count: `8`
+- wide interval review: `1 -> 0`
+- adjusted note total: `1`
+- max pitch shift: `1`
+- chord-tone ratio decrease count: `0`
+- MIDI low chord-tone ratio after: `0`
+- low note count after: `0`
+- dead-air aftercare after: `0`
+- weak direction-change after: `0`
+- final landing not chord-tone after: `0`
+- chord-tone ratio min/avg: `0.5000` / `0.5331`
+- target supported: `true`
+- selected next target: `interval_contour_aftercare_audio_package`
+- next boundary: `music_transformer_solo_yield_interval_contour_aftercare_audio_package`
+- musical quality claimed: `false`
+
+## Candidate Repairs
+
+- candidate `1` / `minor_backdoor`
+  - max interval: `7` -> `7`
+  - note count: `33` -> `33`
+  - chord-tone ratio: `0.5152` -> `0.5152`
+  - direction-change ratio: `0.5806` -> `0.5806`
+  - adjusted notes: `0`
+  - max pitch shift: `0`
+  - final landing preserved: `true`
+  - repaired MIDI: `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare/issue_1304_interval_contour_aftercare_sweep/midi/candidate_01_minor_backdoor_interval_contour_aftercare.mid`
+- candidate `2` / `minor_backdoor`
+  - max interval: `8` -> `7`
+  - note count: `34` -> `34`
+  - chord-tone ratio: `0.5000` -> `0.5000`
+  - direction-change ratio: `0.5862` -> `0.5862`
+  - adjusted notes: `1`
+  - max pitch shift: `1`
+  - final landing preserved: `true`
+  - repaired MIDI: `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare/issue_1304_interval_contour_aftercare_sweep/midi/candidate_02_minor_backdoor_interval_contour_aftercare.mid`
+- candidate `3` / `major_ii_v_turnaround`
+  - max interval: `7` -> `7`
+  - note count: `32` -> `32`
+  - chord-tone ratio: `0.5000` -> `0.5000`
+  - direction-change ratio: `0.6071` -> `0.6071`
+  - adjusted notes: `0`
+  - max pitch shift: `0`
+  - final landing preserved: `true`
+  - repaired MIDI: `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare/issue_1304_interval_contour_aftercare_sweep/midi/candidate_03_major_ii_v_turnaround_interval_contour_aftercare.mid`
+- candidate `4` / `major_ii_v_turnaround`
+  - max interval: `7` -> `7`
+  - note count: `32` -> `32`
+  - chord-tone ratio: `0.5000` -> `0.5000`
+  - direction-change ratio: `0.5333` -> `0.5333`
+  - adjusted notes: `0`
+  - max pitch shift: `0`
+  - final landing preserved: `true`
+  - repaired MIDI: `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare/issue_1304_interval_contour_aftercare_sweep/midi/candidate_04_major_ii_v_turnaround_interval_contour_aftercare.mid`
+- candidate `5` / `dominant_cycle`
+  - max interval: `7` -> `7`
+  - note count: `30` -> `30`
+  - chord-tone ratio: `0.5667` -> `0.5667`
+  - direction-change ratio: `0.5556` -> `0.5556`
+  - adjusted notes: `0`
+  - max pitch shift: `0`
+  - final landing preserved: `true`
+  - repaired MIDI: `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare/issue_1304_interval_contour_aftercare_sweep/midi/candidate_05_dominant_cycle_interval_contour_aftercare.mid`
+- candidate `6` / `dominant_cycle`
+  - max interval: `7` -> `7`
+  - note count: `30` -> `30`
+  - chord-tone ratio: `0.6333` -> `0.6333`
+  - direction-change ratio: `0.5556` -> `0.5556`
+  - adjusted notes: `0`
+  - max pitch shift: `0`
+  - final landing preserved: `true`
+  - repaired MIDI: `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare/issue_1304_interval_contour_aftercare_sweep/midi/candidate_06_dominant_cycle_interval_contour_aftercare.mid`
+- candidate `7` / `rhythm_turnaround`
+  - max interval: `7` -> `7`
+  - note count: `30` -> `30`
+  - chord-tone ratio: `0.5333` -> `0.5333`
+  - direction-change ratio: `0.6154` -> `0.6154`
+  - adjusted notes: `0`
+  - max pitch shift: `0`
+  - final landing preserved: `true`
+  - repaired MIDI: `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare/issue_1304_interval_contour_aftercare_sweep/midi/candidate_07_rhythm_turnaround_interval_contour_aftercare.mid`
+- candidate `8` / `rhythm_turnaround`
+  - max interval: `7` -> `7`
+  - note count: `31` -> `31`
+  - chord-tone ratio: `0.5161` -> `0.5161`
+  - direction-change ratio: `0.5000` -> `0.5000`
+  - adjusted notes: `0`
+  - max pitch shift: `0`
+  - final landing preserved: `true`
+  - repaired MIDI: `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare/issue_1304_interval_contour_aftercare_sweep/midi/candidate_08_rhythm_turnaround_interval_contour_aftercare.mid`
+
+## Not Proven
+
+- `human_audio_preference`
+- `stable_jazz_solo_quality`
+- `artist_level_long_solo_generation`
+- `production_ready_improviser`
