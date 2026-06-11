@@ -6679,7 +6679,7 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pit
     --run_id "$run_id" \
     --bridge_report "$bridge_report" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_CONTEXT_PITCH_ROLE_OBJECTIVE_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 1042 \
+    --issue_number 1126 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep \
     --expected_target songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep \

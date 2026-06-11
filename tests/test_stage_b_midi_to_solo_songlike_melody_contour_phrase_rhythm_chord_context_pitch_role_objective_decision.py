@@ -6,12 +6,15 @@ from pathlib import Path
 
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
     BOUNDARY as BRIDGE_BOUNDARY,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     NEXT_BOUNDARY as BRIDGE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as BRIDGE_SCHEMA_VERSION,
 )
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective import (
     BOUNDARY,
     NEXT_BOUNDARY,
     PRIMARY_RISK_LABEL,
+    SCHEMA_VERSION,
     SELECTED_TARGET,
     StageBMidiToSoloPitchRoleObjectiveDecisionError,
     build_objective_decision_report,
@@ -19,8 +22,11 @@ from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_c
 )
 
 
-def bridge_report(*, quality_claim: bool = False, weak_count: int = 6, outside_count: int = 5) -> dict:
+def bridge_report(
+    *, quality_claim: bool = False, weak_count: int = 6, outside_count: int = 5
+) -> dict:
     return {
+        "schema_version": BRIDGE_SCHEMA_VERSION,
         "boundary": BRIDGE_BOUNDARY,
         "summary": {
             "candidate_count": 6,
@@ -95,7 +101,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             report = build_objective_decision_report(
                 bridge_report=bridge_report(),
                 output_dir=Path(tmp) / "decision",
-                issue_number=1042,
+                issue_number=1126,
             )
             summary = validate_objective_decision_report(
                 report,
@@ -106,6 +112,9 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 require_no_quality_claim=True,
             )
 
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(report["source_schema_version"], BRIDGE_SCHEMA_VERSION)
+            self.assertEqual(summary["source_schema_version"], BRIDGE_SCHEMA_VERSION)
             self.assertTrue(summary["pitch_role_objective_decision_completed"])
             self.assertEqual(summary["primary_risk_label"], PRIMARY_RISK_LABEL)
             self.assertEqual(summary["weak_chord_tone_landing_risk_count"], 6)
@@ -195,7 +204,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=bridge_report(quality_claim=True),
                     output_dir=Path(tmp) / "decision",
-                    issue_number=1042,
+                    issue_number=1126,
                 )
 
     def test_routes_outside_soloing_when_it_dominates(self) -> None:
@@ -203,7 +212,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             report = build_objective_decision_report(
                 bridge_report=bridge_report(weak_count=2, outside_count=5),
                 output_dir=Path(tmp) / "decision",
-                issue_number=1042,
+                issue_number=1126,
             )
             summary = validate_objective_decision_report(
                 report,
@@ -229,7 +238,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=1042,
+                    issue_number=1126,
                 )
 
     def test_rejects_missing_bridge_source_context_field(self) -> None:
@@ -243,7 +252,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=1042,
+                    issue_number=1126,
                 )
 
     def test_rejects_source_context_targeted_flag(self) -> None:
@@ -257,7 +266,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=1042,
+                    issue_number=1126,
                 )
 
     def test_rejects_source_context_preservation_flag(self) -> None:
@@ -271,7 +280,40 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=1042,
+                    issue_number=1126,
+                )
+
+    def test_rejects_bridge_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = bridge_report()
+            source["schema_version"] = (
+                "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_v3"
+            )
+
+            with self.assertRaises(StageBMidiToSoloPitchRoleObjectiveDecisionError):
+                build_objective_decision_report(
+                    bridge_report=source,
+                    output_dir=Path(tmp) / "decision",
+                    issue_number=1126,
+                )
+
+    def test_rejects_report_preserved_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            report = build_objective_decision_report(
+                bridge_report=bridge_report(),
+                output_dir=Path(tmp) / "decision",
+                issue_number=1126,
+            )
+            report["readiness"][BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS[0]] = False
+
+            with self.assertRaises(StageBMidiToSoloPitchRoleObjectiveDecisionError):
+                validate_objective_decision_report(
+                    report,
+                    expected_boundary=BOUNDARY,
+                    expected_next_boundary=NEXT_BOUNDARY,
+                    expected_target=SELECTED_TARGET,
+                    require_objective_decision=True,
+                    require_no_quality_claim=True,
                 )
 
     def test_constants_are_stable(self) -> None:
@@ -286,6 +328,10 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
         self.assertEqual(
             SELECTED_TARGET,
             "songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep",
+        )
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v4",
         )
 
 
