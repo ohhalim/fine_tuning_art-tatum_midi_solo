@@ -3,8 +3,15 @@
 ## Summary
 
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge`
+- schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_v5`
 - source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
 - repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- source follow-up schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision_v5`
+- source objective next schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_next_v5`
+- source repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v5`
+- source input guard schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard_v5`
+- source listening review package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package_v5`
+- source audio package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package_v5`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
 - selected target: `songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision`
 - chord progression: `Cm7,Fm7,Bb7,Ebmaj7`
@@ -19,18 +26,24 @@
 - follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
 - follow-up objective source outside-soloing source pitch-role risk delta: `3`
 - follow-up objective source outside-soloing source context preserved: `true`
+- follow-up objective source outside-soloing schema context preserved: `true`
+- follow-up objective source outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source targeted: `false`
 - follow-up objective source outside-soloing source residual risk preserved: `true`
 - follow-up objective source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
 - follow-up repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
 - follow-up repair sweep source outside-soloing source pitch-role risk delta: `3`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing schema context preserved: `true`
+- follow-up repair sweep source outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up repair sweep source outside-soloing source targeted: `false`
 - follow-up repair sweep source outside-soloing source residual risk preserved: `true`
 - follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
 - bridge repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
 - bridge repair sweep source outside-soloing source pitch-role risk delta: `3`
 - bridge repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing schema context preserved: `true`
+- bridge repair sweep source outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - bridge repair sweep source outside-soloing source targeted: `false`
 - bridge repair sweep source outside-soloing source residual risk preserved: `true`
 - bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
