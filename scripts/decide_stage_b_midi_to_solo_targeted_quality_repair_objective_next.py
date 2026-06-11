@@ -17,7 +17,12 @@ from scripts.guard_stage_b_midi_to_solo_targeted_quality_repair_listening_review
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as SOURCE_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS as INPUT_GUARD_SOURCE_SCHEMA_VERSIONS,
     OBJECTIVE_NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    SCHEMA_VERSION as SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+    StageBMidiToSoloTargetedQualityRepairListeningInputGuardError,
+    validate_listening_review_input_guard_report,
 )
 
 
@@ -29,7 +34,12 @@ BOUNDARY = "stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_dec
 FOLLOWUP_DECISION_NEXT_BOUNDARY = (
     "stage_b_midi_to_solo_targeted_quality_repair_followup_decision"
 )
-SCHEMA_VERSION = "stage_b_midi_to_solo_targeted_quality_repair_objective_next_v4"
+SCHEMA_VERSION = "stage_b_midi_to_solo_targeted_quality_repair_objective_next_v5"
+
+EXPECTED_SOURCE_SCHEMA_VERSIONS = {
+    "targeted_quality_repair_listening_review_input_guard": SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+    **INPUT_GUARD_SOURCE_SCHEMA_VERSIONS,
+}
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -90,11 +100,46 @@ def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str
     return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
 
 
+def _validate_source_schema_versions(
+    source_schema_versions: dict[str, Any],
+    *,
+    label: str,
+) -> dict[str, str]:
+    normalized = {key: str(value) for key, value in source_schema_versions.items()}
+    for key, expected in EXPECTED_SOURCE_SCHEMA_VERSIONS.items():
+        if str(normalized.get(key) or "") != expected:
+            raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
+                f"{label} source schema version mismatch: {key}"
+            )
+    return normalized
+
+
 def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
     guard = _dict(report.get("guard_result"))
     source = _dict(guard.get("source_summary"))
+    try:
+        input_guard_summary = validate_listening_review_input_guard_report(
+            report,
+            expected_boundary=SOURCE_BOUNDARY,
+            expected_next_boundary=SOURCE_NEXT_BOUNDARY,
+            require_guard_completed=True,
+            require_preference_blocked=True,
+            require_pending_input=True,
+            require_no_quality_claim=True,
+        )
+    except StageBMidiToSoloTargetedQualityRepairListeningInputGuardError as exc:
+        raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(str(exc)) from exc
+    source_schema_versions = _validate_source_schema_versions(
+        {
+            "targeted_quality_repair_listening_review_input_guard": (
+                input_guard_summary.get("schema_version")
+            ),
+            **_dict(report.get("source_schema_versions")),
+        },
+        label="targeted quality repair listening review input guard",
+    )
     if str(report.get("boundary") or "") != SOURCE_BOUNDARY:
         raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
             "targeted quality repair listening review input guard boundary required"
@@ -132,6 +177,17 @@ def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
     ):
         raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
             "outside-soloing repair source context preservation required"
+        )
+    if not bool(source.get("source_outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
+            "outside-soloing repair schema context preservation required"
+        )
+    if (
+        str(source.get("source_outside_soloing_repair_objective_schema_version") or "")
+        != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ):
+        raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
+            "outside-soloing repair objective schema version mismatch"
         )
     source_context = _source_context_fields(source, label="input guard")
     source_wav_count = _int(source.get("source_outside_soloing_repair_wav_count"))
@@ -196,6 +252,8 @@ def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
     _require_no_quality_claim(readiness, label="targeted repair input guard readiness")
     return {
         "boundary": SOURCE_BOUNDARY,
+        "source_schema_versions": source_schema_versions,
+        "input_guard_summary": input_guard_summary,
         "review_item_count": _int(guard.get("review_item_count")),
         "required_input_field_count": _int(guard.get("required_input_field_count")),
         "validated_review_input_present": bool(
@@ -208,11 +266,57 @@ def validate_input_guard_report(report: dict[str, Any]) -> dict[str, Any]:
         "duration_min_seconds": _float(source.get("duration_min_seconds")),
         "duration_max_seconds": _float(source.get("duration_max_seconds")),
         "failure_label_delta": _int(source.get("failure_label_delta")),
+        "source_targeted_quality_repair_listening_review_input_guard_schema_version": str(
+            input_guard_summary.get("schema_version") or ""
+        ),
+        "source_targeted_quality_repair_listening_review_package_schema_version": str(
+            input_guard_summary.get(
+                "source_targeted_quality_repair_listening_review_package_schema_version"
+            )
+            or ""
+        ),
+        "source_targeted_quality_repair_audio_package_schema_version": str(
+            input_guard_summary.get("source_targeted_quality_repair_audio_package_schema_version")
+            or ""
+        ),
+        "source_targeted_quality_repair_sweep_schema_version": str(
+            input_guard_summary.get("source_targeted_quality_repair_sweep_schema_version") or ""
+        ),
+        "source_candidate_failure_labeling_schema_version": str(
+            input_guard_summary.get("source_candidate_failure_labeling_schema_version") or ""
+        ),
+        "source_quality_rubric_schema_version": str(
+            input_guard_summary.get("source_quality_rubric_schema_version") or ""
+        ),
+        "source_post_mvp_plan_schema_version": str(
+            input_guard_summary.get("source_post_mvp_plan_schema_version") or ""
+        ),
+        "source_final_status_schema_version": str(
+            input_guard_summary.get("source_final_status_schema_version") or ""
+        ),
+        "source_delivery_package_schema_version": str(
+            input_guard_summary.get("source_delivery_package_schema_version") or ""
+        ),
+        "source_listening_gap_schema_version": str(
+            input_guard_summary.get("source_listening_gap_schema_version") or ""
+        ),
+        "source_quality_gap_schema_version": str(
+            input_guard_summary.get("source_quality_gap_schema_version") or ""
+        ),
+        "source_current_evidence_schema_version": str(
+            input_guard_summary.get("source_current_evidence_schema_version") or ""
+        ),
         "source_outside_soloing_repair_evidence_ready": bool(
             source.get("source_outside_soloing_repair_evidence_ready", False)
         ),
         "source_outside_soloing_repair_source_context_preserved": bool(
             source.get("source_outside_soloing_repair_source_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_schema_context_preserved": bool(
+            source.get("source_outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_objective_schema_version": str(
+            source.get("source_outside_soloing_repair_objective_schema_version") or ""
         ),
         "source_outside_soloing_repair_wav_count": source_wav_count,
         "source_outside_soloing_repair_source_objective_pitch_role_risk_count": source_objective_risk,
@@ -259,7 +363,42 @@ def build_objective_next_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": source["boundary"],
+        "source_schema_versions": source["source_schema_versions"],
         "objective_summary": {
+            "source_targeted_quality_repair_listening_review_input_guard_schema_version": str(
+                source[
+                    "source_targeted_quality_repair_listening_review_input_guard_schema_version"
+                ]
+            ),
+            "source_targeted_quality_repair_listening_review_package_schema_version": str(
+                source[
+                    "source_targeted_quality_repair_listening_review_package_schema_version"
+                ]
+            ),
+            "source_targeted_quality_repair_audio_package_schema_version": str(
+                source["source_targeted_quality_repair_audio_package_schema_version"]
+            ),
+            "source_targeted_quality_repair_sweep_schema_version": str(
+                source["source_targeted_quality_repair_sweep_schema_version"]
+            ),
+            "source_candidate_failure_labeling_schema_version": str(
+                source["source_candidate_failure_labeling_schema_version"]
+            ),
+            "source_quality_rubric_schema_version": str(
+                source["source_quality_rubric_schema_version"]
+            ),
+            "source_post_mvp_plan_schema_version": str(
+                source["source_post_mvp_plan_schema_version"]
+            ),
+            "source_final_status_schema_version": str(source["source_final_status_schema_version"]),
+            "source_delivery_package_schema_version": str(
+                source["source_delivery_package_schema_version"]
+            ),
+            "source_listening_gap_schema_version": str(source["source_listening_gap_schema_version"]),
+            "source_quality_gap_schema_version": str(source["source_quality_gap_schema_version"]),
+            "source_current_evidence_schema_version": str(
+                source["source_current_evidence_schema_version"]
+            ),
             "review_item_count": _int(source["review_item_count"]),
             "required_input_field_count": _int(source["required_input_field_count"]),
             "validated_review_input_present": bool(
@@ -277,6 +416,12 @@ def build_objective_next_report(
             ),
             "source_outside_soloing_repair_source_context_preserved": bool(
                 source["source_outside_soloing_repair_source_context_preserved"]
+            ),
+            "source_outside_soloing_repair_schema_context_preserved": bool(
+                source["source_outside_soloing_repair_schema_context_preserved"]
+            ),
+            "source_outside_soloing_repair_objective_schema_version": str(
+                source["source_outside_soloing_repair_objective_schema_version"]
             ),
             "source_outside_soloing_repair_wav_count": _int(
                 source["source_outside_soloing_repair_wav_count"]
@@ -332,6 +477,12 @@ def build_objective_next_report(
             ),
             "source_outside_soloing_repair_source_context_preserved": bool(
                 source["source_outside_soloing_repair_source_context_preserved"]
+            ),
+            "source_outside_soloing_repair_schema_context_preserved": bool(
+                source["source_outside_soloing_repair_schema_context_preserved"]
+            ),
+            "source_outside_soloing_repair_objective_schema_version": str(
+                source["source_outside_soloing_repair_objective_schema_version"]
             ),
             "source_outside_soloing_repair_wav_count": _int(
                 source["source_outside_soloing_repair_wav_count"]
@@ -412,6 +563,15 @@ def validate_objective_next_report(
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
     summary = _dict(report.get("objective_summary"))
+    source_schema_versions = _dict(report.get("source_schema_versions"))
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
+            "targeted quality repair objective next schema version mismatch"
+        )
+    _validate_source_schema_versions(
+        source_schema_versions,
+        label="targeted quality repair objective next",
+    )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -444,12 +604,60 @@ def validate_objective_next_report(
         raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
             "critical user input should not be required"
         )
+    if not bool(summary.get("source_outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
+            "source outside-soloing repair schema context preservation required"
+        )
+    if (
+        str(summary.get("source_outside_soloing_repair_objective_schema_version") or "")
+        != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ):
+        raise StageBMidiToSoloTargetedQualityRepairObjectiveNextError(
+            "source outside-soloing repair objective schema version mismatch"
+        )
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="targeted repair objective next readiness")
     return {
         "boundary": boundary,
         "source_boundary": str(report.get("source_boundary") or ""),
         "next_boundary": str(decision.get("next_boundary") or ""),
+        "schema_version": str(report.get("schema_version") or ""),
+        "source_targeted_quality_repair_listening_review_input_guard_schema_version": str(
+            source_schema_versions.get("targeted_quality_repair_listening_review_input_guard") or ""
+        ),
+        "source_targeted_quality_repair_listening_review_package_schema_version": str(
+            source_schema_versions.get("targeted_quality_repair_listening_review_package") or ""
+        ),
+        "source_targeted_quality_repair_audio_package_schema_version": str(
+            source_schema_versions.get("targeted_quality_repair_audio_package") or ""
+        ),
+        "source_targeted_quality_repair_sweep_schema_version": str(
+            source_schema_versions.get("targeted_quality_repair_sweep") or ""
+        ),
+        "source_candidate_failure_labeling_schema_version": str(
+            source_schema_versions.get("candidate_failure_labeling") or ""
+        ),
+        "source_quality_rubric_schema_version": str(
+            source_schema_versions.get("quality_rubric_baseline") or ""
+        ),
+        "source_post_mvp_plan_schema_version": str(
+            source_schema_versions.get("post_mvp_quality_iteration_plan") or ""
+        ),
+        "source_final_status_schema_version": str(
+            source_schema_versions.get("final_status_audit") or ""
+        ),
+        "source_delivery_package_schema_version": str(
+            source_schema_versions.get("delivery_package") or ""
+        ),
+        "source_listening_gap_schema_version": str(
+            source_schema_versions.get("listening_review_quality_gap") or ""
+        ),
+        "source_quality_gap_schema_version": str(
+            source_schema_versions.get("quality_gap_decision") or ""
+        ),
+        "source_current_evidence_schema_version": str(
+            source_schema_versions.get("current_evidence") or ""
+        ),
         "objective_next_decision_completed": bool(
             readiness.get("objective_next_decision_completed", False)
         ),
@@ -467,6 +675,12 @@ def validate_objective_next_report(
         ),
         "source_outside_soloing_repair_source_context_preserved": bool(
             summary.get("source_outside_soloing_repair_source_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_schema_context_preserved": bool(
+            summary.get("source_outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_objective_schema_version": str(
+            summary.get("source_outside_soloing_repair_objective_schema_version") or ""
         ),
         "source_outside_soloing_repair_wav_count": _int(
             summary.get("source_outside_soloing_repair_wav_count")
@@ -531,6 +745,19 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- boundary: `{report['boundary']}`",
         f"- source boundary: `{report['source_boundary']}`",
         f"- next boundary: `{decision['next_boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
+        f"- source targeted quality repair listening review input guard schema version: `{report['source_schema_versions']['targeted_quality_repair_listening_review_input_guard']}`",
+        f"- source targeted quality repair listening review package schema version: `{report['source_schema_versions']['targeted_quality_repair_listening_review_package']}`",
+        f"- source targeted quality repair audio package schema version: `{report['source_schema_versions']['targeted_quality_repair_audio_package']}`",
+        f"- source targeted quality repair sweep schema version: `{report['source_schema_versions']['targeted_quality_repair_sweep']}`",
+        f"- source candidate failure labeling schema version: `{report['source_schema_versions']['candidate_failure_labeling']}`",
+        f"- source quality rubric schema version: `{report['source_schema_versions']['quality_rubric_baseline']}`",
+        f"- source post-MVP plan schema version: `{report['source_schema_versions']['post_mvp_quality_iteration_plan']}`",
+        f"- source final status schema version: `{report['source_schema_versions']['final_status_audit']}`",
+        f"- source delivery package schema version: `{report['source_schema_versions']['delivery_package']}`",
+        f"- source listening gap schema version: `{report['source_schema_versions']['listening_review_quality_gap']}`",
+        f"- source quality gap schema version: `{report['source_schema_versions']['quality_gap_decision']}`",
+        f"- source current evidence schema version: `{report['source_schema_versions']['current_evidence']}`",
         f"- selected target: `{target['target']}`",
         f"- review item count: `{summary['review_item_count']}`",
         f"- required input field count: `{summary['required_input_field_count']}`",
@@ -541,6 +768,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- failure label delta: `{summary['failure_label_delta']}`",
         f"- source outside-soloing repair evidence ready: `{_bool_token(summary['source_outside_soloing_repair_evidence_ready'])}`",
         f"- source outside-soloing repair source context preserved: `{_bool_token(summary['source_outside_soloing_repair_source_context_preserved'])}`",
+        f"- source outside-soloing repair schema context preserved: `{_bool_token(summary['source_outside_soloing_repair_schema_context_preserved'])}`",
+        f"- source outside-soloing repair objective schema version: `{summary['source_outside_soloing_repair_objective_schema_version']}`",
         f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(summary['followup_objective_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(summary['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(summary['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
@@ -591,7 +820,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1096)
+    parser.add_argument("--issue_number", type=int, default=1180)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_objective_decision", action="store_true")
