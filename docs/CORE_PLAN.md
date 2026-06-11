@@ -428,7 +428,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: source schema `v3`, preference fill `false`, validated input `false`, review items `6`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: source schema `v3`, follow-up required `true`, selected target `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: source schema `v3`, repair sweep schema `v4`, selected target `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`, primary risk `outside_soloing_pitch_role_risk=2`, weak landing resolved `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
-- MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep: outside risk `2 -> 0`, changed notes `2`, max non-chord run `4 -> 3`, weak landing after `0`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package`
+- MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep: source schema `v3`, chord-tone repair sweep schema `v4`, outside risk `2 -> 0`, changed notes `2`, max non-chord run `4 -> 3`, weak landing after `0`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: rendered WAV `6`, duration `18.871s-19.000s`, technical validation `true`, source risk `5 -> 2`, current repair risk `2 -> 0`, source/current context preserved, audio/preference/quality claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: review items `6`, validated input `false`, technical WAV validation `true`, source risk `5 -> 2`, current repair risk after `0`, source/current context preserved, preference/quality claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input_guard`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: validated input `false`, preference fill `false`, review items `6`, source risk `5 -> 2`, current repair risk after `0`, source/current context preserved, preference/quality claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision`
@@ -11762,14 +11762,21 @@ Issue #1138은 Issue #1136 objective-only next decision v3와 Issue #1128 repair
 
 ## 9.218 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep source-context refresh
 
-Issue #1056은 Issue #1054 follow-up decision과 Issue #1044 chord-tone landing repair sweep의 source-context preserved flag를 outside-soloing repair sweep에서 대조하고, residual outside-soloing pitch-role risk를 objective MIDI evidence 기준으로 수리한 작업이다.
+Issue #1140은 Issue #1138 follow-up decision v3와 Issue #1128 chord-tone landing repair sweep v4의 source-context preserved flag를 outside-soloing repair sweep에서 대조하고, residual outside-soloing pitch-role risk를 objective MIDI evidence 기준으로 수리한 작업이다.
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_OUTSIDE_SOLOING_REPAIR_SWEEP_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
 - source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
+- source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision_v3`
+- source objective input guard schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard_v3`
+- source package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_v3`
+- source audio schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v4`
 - chord-tone repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- chord-tone repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep_v4`
+- chord-tone repair sweep source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v4`
+- chord-tone repair sweep bridge schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_v4`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package`
 - selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package`
 - candidate count: `6`
@@ -11791,7 +11798,7 @@ Issue #1056은 Issue #1054 follow-up decision과 Issue #1044 chord-tone landing 
 
 판단:
 
-- Issue #1054 follow-up decision과 Issue #1044 repair sweep의 preserved flag 3개 불일치 없음.
+- Issue #1138 follow-up decision v3와 Issue #1128 repair sweep v4의 preserved flag 3개 불일치 없음.
 - residual outside-soloing pitch-role risk는 `2 -> 0`으로 감소.
 - weak chord-tone landing risk after `0` 유지.
 - final landing chord-tone count after `6` 유지.

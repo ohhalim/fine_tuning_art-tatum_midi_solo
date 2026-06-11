@@ -17,16 +17,19 @@ sys.path.insert(0, str(ROOT_DIR))
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     bridge_candidate,
     parse_chords,
 )
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup import (  # noqa: E402
     BOUNDARY as FOLLOWUP_BOUNDARY,
     NEXT_BOUNDARY as FOLLOWUP_NEXT_BOUNDARY,
+    SCHEMA_VERSION as FOLLOWUP_SCHEMA_VERSION,
     SELECTED_TARGET as FOLLOWUP_SELECTED_TARGET,
 )
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep import (  # noqa: E402
     BOUNDARY as CHORD_TONE_REPAIR_SWEEP_BOUNDARY,
+    SCHEMA_VERSION as CHORD_TONE_REPAIR_SWEEP_SCHEMA_VERSION,
     all_notes,
     nearest_chord_tone_pitch,
 )
@@ -48,7 +51,7 @@ SELECTED_TARGET = (
     "songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package"
 )
 SCHEMA_VERSION = (
-    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep_v2"
+    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep_v3"
 )
 OUTSIDE_RISK_FLAG = "outside_soloing_pitch_role_risk"
 WEAK_LANDING_FLAG = "weak_chord_tone_landing_risk"
@@ -106,11 +109,7 @@ def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str
             raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
                 f"{label} source-context field required: {key}"
             )
-    for key in (
-        "followup_objective_source_outside_soloing_source_context_preserved",
-        "followup_repair_sweep_source_outside_soloing_source_context_preserved",
-        "repair_sweep_source_outside_soloing_source_context_preserved",
-    ):
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
         if not bool(container.get(key, False)):
             raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
                 f"{label} source context should be preserved: {key}"
@@ -130,6 +129,10 @@ def validate_followup_source(report: dict[str, Any]) -> dict[str, Any]:
     if str(report.get("boundary") or "") != FOLLOWUP_BOUNDARY:
         raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
             "chord-tone landing repair follow-up decision boundary required"
+        )
+    if str(report.get("schema_version") or "") != FOLLOWUP_SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
+            "follow-up decision schema version must match current report"
         )
     if str(decision.get("next_boundary") or "") != FOLLOWUP_NEXT_BOUNDARY:
         raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
@@ -177,6 +180,11 @@ def validate_followup_source(report: dict[str, Any]) -> dict[str, Any]:
     source_context = _source_context_fields(readiness, label="follow-up readiness")
     return {
         "boundary": FOLLOWUP_BOUNDARY,
+        "schema_version": str(report.get("schema_version") or ""),
+        "source_schema_version": str(report.get("source_schema_version") or ""),
+        "source_input_guard_schema_version": str(report.get("source_input_guard_schema_version") or ""),
+        "source_package_schema_version": str(report.get("source_package_schema_version") or ""),
+        "source_audio_schema_version": str(report.get("source_audio_schema_version") or ""),
         "primary_remaining_risk_label": str(
             readiness.get("primary_remaining_risk_label") or OUTSIDE_RISK_FLAG
         ),
@@ -220,6 +228,10 @@ def validate_chord_tone_repair_sweep_source(report: dict[str, Any]) -> dict[str,
         raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
             "chord-tone landing repair sweep boundary required"
         )
+    if str(report.get("schema_version") or "") != CHORD_TONE_REPAIR_SWEEP_SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
+            "chord-tone repair sweep schema version must match current report"
+        )
     if not bool(readiness.get("chord_tone_landing_repair_sweep_completed", False)):
         raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
             "chord-tone landing repair sweep completion required"
@@ -262,6 +274,9 @@ def validate_chord_tone_repair_sweep_source(report: dict[str, Any]) -> dict[str,
     source_context = _source_context_fields(aggregate, label="chord-tone repair sweep aggregate")
     return {
         "boundary": CHORD_TONE_REPAIR_SWEEP_BOUNDARY,
+        "schema_version": str(report.get("schema_version") or ""),
+        "source_schema_version": str(report.get("source_schema_version") or ""),
+        "bridge_schema_version": str(report.get("bridge_schema_version") or ""),
         "rows": rows,
         "chord_progression": [
             str(chord) for chord in _list(context.get("chord_progression"))
@@ -517,7 +532,14 @@ def build_outside_soloing_repair_sweep_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": followup["boundary"],
+        "source_schema_version": followup["schema_version"],
+        "source_objective_input_guard_schema_version": followup["source_input_guard_schema_version"],
+        "source_package_schema_version": followup["source_package_schema_version"],
+        "source_audio_schema_version": followup["source_audio_schema_version"],
         "chord_tone_repair_sweep_boundary": source["boundary"],
+        "chord_tone_repair_sweep_schema_version": source["schema_version"],
+        "chord_tone_repair_sweep_source_schema_version": source["source_schema_version"],
+        "chord_tone_repair_sweep_bridge_schema_version": source["bridge_schema_version"],
         "context": {
             "chord_progression": chords,
             "bpm": bpm,
@@ -561,6 +583,13 @@ def build_outside_soloing_repair_sweep_report(
             "source_primary_remaining_risk_count": int(
                 followup["primary_remaining_risk_count"]
             ),
+            "source_schema_version": followup["schema_version"],
+            "source_objective_input_guard_schema_version": followup["source_input_guard_schema_version"],
+            "source_package_schema_version": followup["source_package_schema_version"],
+            "source_audio_schema_version": followup["source_audio_schema_version"],
+            "chord_tone_repair_sweep_schema_version": source["schema_version"],
+            "chord_tone_repair_sweep_source_schema_version": source["source_schema_version"],
+            "chord_tone_repair_sweep_bridge_schema_version": source["bridge_schema_version"],
             **{key: followup.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
         },
         "readiness": {
@@ -590,6 +619,13 @@ def build_outside_soloing_repair_sweep_report(
             "outside_soloing_repair_targeted": True,
             "outside_soloing_pitch_role_risk_delta": int(outside_before - outside_after),
             "weak_chord_tone_landing_risk_count_after": int(weak_after),
+            "source_schema_version": followup["schema_version"],
+            "source_objective_input_guard_schema_version": followup["source_input_guard_schema_version"],
+            "source_package_schema_version": followup["source_package_schema_version"],
+            "source_audio_schema_version": followup["source_audio_schema_version"],
+            "chord_tone_repair_sweep_schema_version": source["schema_version"],
+            "chord_tone_repair_sweep_source_schema_version": source["source_schema_version"],
+            "chord_tone_repair_sweep_bridge_schema_version": source["bridge_schema_version"],
             **{key: followup.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
@@ -695,11 +731,31 @@ def validate_outside_soloing_repair_sweep_report(
             raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
                 f"outside-soloing repair aggregate source-context field required: {key}"
             )
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
+        if not bool(aggregate.get(key, False)):
+            raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError(
+                f"outside-soloing repair aggregate source-context preserved field must be true: {key}"
+            )
     return {
         "boundary": boundary,
         "source_boundary": str(report.get("source_boundary") or ""),
+        "source_schema_version": str(report.get("source_schema_version") or ""),
+        "source_objective_input_guard_schema_version": str(
+            report.get("source_objective_input_guard_schema_version") or ""
+        ),
+        "source_package_schema_version": str(report.get("source_package_schema_version") or ""),
+        "source_audio_schema_version": str(report.get("source_audio_schema_version") or ""),
         "chord_tone_repair_sweep_boundary": str(
             report.get("chord_tone_repair_sweep_boundary") or ""
+        ),
+        "chord_tone_repair_sweep_schema_version": str(
+            report.get("chord_tone_repair_sweep_schema_version") or ""
+        ),
+        "chord_tone_repair_sweep_source_schema_version": str(
+            report.get("chord_tone_repair_sweep_source_schema_version") or ""
+        ),
+        "chord_tone_repair_sweep_bridge_schema_version": str(
+            report.get("chord_tone_repair_sweep_bridge_schema_version") or ""
         ),
         "next_boundary": str(decision.get("next_boundary") or ""),
         "selected_target": str(decision.get("selected_target") or ""),
@@ -778,7 +834,14 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- boundary: `{report['boundary']}`",
         f"- source boundary: `{report['source_boundary']}`",
+        f"- source schema version: `{report['source_schema_version']}`",
+        f"- source objective input guard schema version: `{report['source_objective_input_guard_schema_version']}`",
+        f"- source package schema version: `{report['source_package_schema_version']}`",
+        f"- source audio schema version: `{report['source_audio_schema_version']}`",
         f"- chord-tone repair sweep boundary: `{report['chord_tone_repair_sweep_boundary']}`",
+        f"- chord-tone repair sweep schema version: `{report['chord_tone_repair_sweep_schema_version']}`",
+        f"- chord-tone repair sweep source schema version: `{report['chord_tone_repair_sweep_source_schema_version']}`",
+        f"- chord-tone repair sweep bridge schema version: `{report['chord_tone_repair_sweep_bridge_schema_version']}`",
         f"- next boundary: `{decision['next_boundary']}`",
         f"- selected target: `{decision['selected_target']}`",
         f"- repair policy: `{context['repair_policy']}`",
@@ -871,7 +934,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1056)
+    parser.add_argument("--issue_number", type=int, default=1140)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_repair_completed", action="store_true")

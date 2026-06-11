@@ -6849,7 +6849,7 @@ run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landin
     --followup_report "$followup_report" \
     --chord_tone_repair_sweep_report "$sweep_report" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_OUTSIDE_SOLOING_REPAIR_SWEEP_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 1056 \
+    --issue_number 1140 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package \
     --require_repair_completed \
