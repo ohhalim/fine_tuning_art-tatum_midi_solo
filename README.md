@@ -6,11 +6,11 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest functional result: `Issue #1074`
+- latest functional result: `Issue #1076`
 - latest MVP completion audit: `Issue #1070`
 - latest quality gap decision: `Issue #1072`
 - latest listening review quality gap: `Issue #1074`
-- latest MVP delivery package: `Issue #992`
+- latest MVP delivery package: `Issue #1076`
 - latest README final evidence refresh: `Issue #994`
 - latest final status audit: `Issue #996`
 - latest post-MVP quality iteration plan: `Issue #998`
@@ -49,9 +49,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: `Issue #1064`
 - latest MVP current evidence consolidation: `Issue #1066`
 - latest README evidence refresh: `Issue #1068`
-- latest functional boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
-- open issue queue after listening review quality gap source-context refresh merge: `0`
-- latest evidence boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- open issue queue after MVP delivery package source-context refresh merge: `0`
+- latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -519,6 +519,9 @@ MVP delivery package.
 - changed-ratio repair audio evidence ready: `true`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - CLI candidate count: `3`
 - changed-ratio repair WAV count: `3`
 - outside-soloing repair WAV count: `6`

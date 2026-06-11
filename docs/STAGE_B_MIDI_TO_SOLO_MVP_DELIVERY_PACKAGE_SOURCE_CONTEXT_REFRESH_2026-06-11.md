@@ -35,10 +35,13 @@
 - outside-soloing current repair pitch-role risk after / delta: `0` / `2`
 - follow-up objective source outside-soloing source pitch-role risk: `5 -> 2`
 - follow-up objective source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
 - follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source pitch-role risk: `5 -> 2`
 - bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `0 / 2`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 
 ## Claim Boundary
 
@@ -50,4 +53,4 @@
 
 ## Next
 
-- `Stage B MIDI-to-solo README final evidence refresh`
+- `Stage B MIDI-to-solo README final evidence refresh source-context refresh`
