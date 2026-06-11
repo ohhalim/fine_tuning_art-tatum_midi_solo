@@ -17,7 +17,12 @@ from scripts.build_stage_b_midi_to_solo_targeted_quality_repair_listening_review
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as SOURCE_BOUNDARY,
+    EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    SCHEMA_VERSION as SOURCE_PACKAGE_SCHEMA_VERSION,
+    StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError,
+    validate_listening_review_package_report,
 )
 
 
@@ -30,7 +35,12 @@ FILL_BOUNDARY = "stage_b_midi_to_solo_targeted_quality_repair_listening_review_f
 OBJECTIVE_NEXT_BOUNDARY = (
     "stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision"
 )
-SCHEMA_VERSION = "stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard_v4"
+SCHEMA_VERSION = "stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard_v5"
+
+EXPECTED_SOURCE_SCHEMA_VERSIONS = {
+    "targeted_quality_repair_listening_review_package": SOURCE_PACKAGE_SCHEMA_VERSION,
+    **EXPECTED_AUDIO_SOURCE_SCHEMA_VERSIONS,
+}
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -95,6 +105,20 @@ def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str
     return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
 
 
+def _validate_source_schema_versions(
+    source_schema_versions: dict[str, Any],
+    *,
+    label: str,
+) -> dict[str, str]:
+    normalized = {key: str(value) for key, value in source_schema_versions.items()}
+    for key, expected in EXPECTED_SOURCE_SCHEMA_VERSIONS.items():
+        if str(normalized.get(key) or "") != expected:
+            raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+                f"{label} source schema version mismatch: {key}"
+            )
+    return normalized
+
+
 def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
@@ -102,6 +126,29 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
     source = _dict(report.get("source_summary"))
     review_items = [_dict(item) for item in _list(report.get("review_items"))]
     boundary = str(report.get("boundary") or readiness.get("boundary") or "")
+    review_item_count = _int(readiness.get("review_item_count") or package.get("review_item_count"))
+    try:
+        package_validation_summary = validate_listening_review_package_report(
+            report,
+            expected_boundary=SOURCE_BOUNDARY,
+            expected_next_boundary=SOURCE_NEXT_BOUNDARY,
+            expected_review_item_count=review_item_count,
+            require_package_ready=True,
+            require_no_quality_claim=True,
+        )
+    except StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError as exc:
+        raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+            str(exc)
+        ) from exc
+    source_schema_versions = _validate_source_schema_versions(
+        {
+            "targeted_quality_repair_listening_review_package": (
+                package_validation_summary.get("schema_version")
+            ),
+            **_dict(report.get("source_schema_versions")),
+        },
+        label="targeted quality repair listening review package",
+    )
     if boundary != SOURCE_BOUNDARY:
         raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
             "targeted quality repair listening review package boundary required"
@@ -118,7 +165,6 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
             "review package ready flag required"
         )
-    review_item_count = _int(readiness.get("review_item_count") or package.get("review_item_count"))
     if review_item_count <= 0 or len(review_items) < review_item_count:
         raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
             "review items required"
@@ -144,6 +190,17 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
     ):
         raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
             "outside-soloing repair source context preservation required"
+        )
+    if not bool(source.get("source_outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+            "outside-soloing repair schema context preservation required"
+        )
+    if (
+        str(source.get("source_outside_soloing_repair_objective_schema_version") or "")
+        != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ):
+        raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+            "outside-soloing repair objective schema version mismatch"
         )
     source_context = _source_context_fields(source, label="listening review package")
     source_wav_count = _int(source.get("source_outside_soloing_repair_wav_count"))
@@ -209,6 +266,8 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
     return {
         "boundary": SOURCE_BOUNDARY,
         "review_item_count": review_item_count,
+        "source_schema_versions": source_schema_versions,
+        "package_validation_summary": package_validation_summary,
         "validated_review_input": bool(readiness.get("validated_review_input", False)),
         "human_review_required_now": bool(readiness.get("human_review_required_now", False)),
         "required_input_fields": [
@@ -216,6 +275,44 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
         ],
         "wav_paths": [str(item.get("wav_path") or "") for item in review_items],
         "source_summary": {
+            "source_targeted_quality_repair_listening_review_package_schema_version": str(
+                package_validation_summary.get("schema_version") or ""
+            ),
+            "source_targeted_quality_repair_audio_package_schema_version": str(
+                package_validation_summary.get(
+                    "source_targeted_quality_repair_audio_package_schema_version"
+                )
+                or ""
+            ),
+            "source_targeted_quality_repair_sweep_schema_version": str(
+                package_validation_summary.get("source_targeted_quality_repair_sweep_schema_version")
+                or ""
+            ),
+            "source_candidate_failure_labeling_schema_version": str(
+                package_validation_summary.get("source_candidate_failure_labeling_schema_version")
+                or ""
+            ),
+            "source_quality_rubric_schema_version": str(
+                package_validation_summary.get("source_quality_rubric_schema_version") or ""
+            ),
+            "source_post_mvp_plan_schema_version": str(
+                package_validation_summary.get("source_post_mvp_plan_schema_version") or ""
+            ),
+            "source_final_status_schema_version": str(
+                package_validation_summary.get("source_final_status_schema_version") or ""
+            ),
+            "source_delivery_package_schema_version": str(
+                package_validation_summary.get("source_delivery_package_schema_version") or ""
+            ),
+            "source_listening_gap_schema_version": str(
+                package_validation_summary.get("source_listening_gap_schema_version") or ""
+            ),
+            "source_quality_gap_schema_version": str(
+                package_validation_summary.get("source_quality_gap_schema_version") or ""
+            ),
+            "source_current_evidence_schema_version": str(
+                package_validation_summary.get("source_current_evidence_schema_version") or ""
+            ),
             "technical_wav_validation": bool(source.get("technical_wav_validation", False)),
             "rendered_audio_file_count": _int(source.get("rendered_audio_file_count")),
             "sample_rate": _int(source.get("sample_rate")),
@@ -227,6 +324,12 @@ def validate_source_package(report: dict[str, Any]) -> dict[str, Any]:
             ),
             "source_outside_soloing_repair_source_context_preserved": bool(
                 source.get("source_outside_soloing_repair_source_context_preserved", False)
+            ),
+            "source_outside_soloing_repair_schema_context_preserved": bool(
+                source.get("source_outside_soloing_repair_schema_context_preserved", False)
+            ),
+            "source_outside_soloing_repair_objective_schema_version": str(
+                source.get("source_outside_soloing_repair_objective_schema_version") or ""
             ),
             "source_outside_soloing_repair_wav_count": source_wav_count,
             "source_outside_soloing_repair_source_objective_pitch_role_risk_count": source_objective_risk,
@@ -280,6 +383,7 @@ def build_listening_review_input_guard_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": source["boundary"],
+        "source_schema_versions": source["source_schema_versions"],
         "source_package_summary": source,
         "guard_result": {
             "validated_review_input_present": bool(validated_input),
@@ -346,6 +450,15 @@ def validate_listening_review_input_guard_report(
     decision = _dict(report.get("decision"))
     guard = _dict(report.get("guard_result"))
     source = _dict(guard.get("source_summary"))
+    source_schema_versions = _dict(report.get("source_schema_versions"))
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+            "targeted quality repair listening input guard schema version mismatch"
+        )
+    _validate_source_schema_versions(
+        source_schema_versions,
+        label="targeted quality repair listening input guard",
+    )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -372,11 +485,56 @@ def validate_listening_review_input_guard_report(
         raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
             "critical user input should not be required"
         )
+    if not bool(source.get("source_outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+            "source outside-soloing repair schema context preservation required"
+        )
+    if (
+        str(source.get("source_outside_soloing_repair_objective_schema_version") or "")
+        != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ):
+        raise StageBMidiToSoloTargetedQualityRepairListeningInputGuardError(
+            "source outside-soloing repair objective schema version mismatch"
+        )
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="targeted repair input guard readiness")
     return {
         "boundary": boundary,
         "source_boundary": str(report.get("source_boundary") or ""),
+        "schema_version": str(report.get("schema_version") or ""),
+        "source_targeted_quality_repair_listening_review_package_schema_version": str(
+            source_schema_versions.get("targeted_quality_repair_listening_review_package") or ""
+        ),
+        "source_targeted_quality_repair_audio_package_schema_version": str(
+            source_schema_versions.get("targeted_quality_repair_audio_package") or ""
+        ),
+        "source_targeted_quality_repair_sweep_schema_version": str(
+            source_schema_versions.get("targeted_quality_repair_sweep") or ""
+        ),
+        "source_candidate_failure_labeling_schema_version": str(
+            source_schema_versions.get("candidate_failure_labeling") or ""
+        ),
+        "source_quality_rubric_schema_version": str(
+            source_schema_versions.get("quality_rubric_baseline") or ""
+        ),
+        "source_post_mvp_plan_schema_version": str(
+            source_schema_versions.get("post_mvp_quality_iteration_plan") or ""
+        ),
+        "source_final_status_schema_version": str(
+            source_schema_versions.get("final_status_audit") or ""
+        ),
+        "source_delivery_package_schema_version": str(
+            source_schema_versions.get("delivery_package") or ""
+        ),
+        "source_listening_gap_schema_version": str(
+            source_schema_versions.get("listening_review_quality_gap") or ""
+        ),
+        "source_quality_gap_schema_version": str(
+            source_schema_versions.get("quality_gap_decision") or ""
+        ),
+        "source_current_evidence_schema_version": str(
+            source_schema_versions.get("current_evidence") or ""
+        ),
         "validated_review_input_present": bool(
             guard.get("validated_review_input_present", True)
         ),
@@ -394,6 +552,12 @@ def validate_listening_review_input_guard_report(
         ),
         "source_outside_soloing_repair_source_context_preserved": bool(
             source.get("source_outside_soloing_repair_source_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_schema_context_preserved": bool(
+            source.get("source_outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_objective_schema_version": str(
+            source.get("source_outside_soloing_repair_objective_schema_version") or ""
         ),
         "source_outside_soloing_repair_wav_count": _int(
             source.get("source_outside_soloing_repair_wav_count")
@@ -456,6 +620,18 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- boundary: `{report['boundary']}`",
         f"- source boundary: `{report['source_boundary']}`",
         f"- next boundary: `{decision['next_boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
+        f"- source targeted quality repair listening review package schema version: `{report['source_schema_versions']['targeted_quality_repair_listening_review_package']}`",
+        f"- source targeted quality repair audio package schema version: `{report['source_schema_versions']['targeted_quality_repair_audio_package']}`",
+        f"- source targeted quality repair sweep schema version: `{report['source_schema_versions']['targeted_quality_repair_sweep']}`",
+        f"- source candidate failure labeling schema version: `{report['source_schema_versions']['candidate_failure_labeling']}`",
+        f"- source quality rubric schema version: `{report['source_schema_versions']['quality_rubric_baseline']}`",
+        f"- source post-MVP plan schema version: `{report['source_schema_versions']['post_mvp_quality_iteration_plan']}`",
+        f"- source final status schema version: `{report['source_schema_versions']['final_status_audit']}`",
+        f"- source delivery package schema version: `{report['source_schema_versions']['delivery_package']}`",
+        f"- source listening gap schema version: `{report['source_schema_versions']['listening_review_quality_gap']}`",
+        f"- source quality gap schema version: `{report['source_schema_versions']['quality_gap_decision']}`",
+        f"- source current evidence schema version: `{report['source_schema_versions']['current_evidence']}`",
         f"- review item count: `{guard['review_item_count']}`",
         f"- required input field count: `{guard['required_input_field_count']}`",
         f"- validated review input present: `{_bool_token(guard['validated_review_input_present'])}`",
@@ -466,6 +642,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- failure label delta: `{source['failure_label_delta']}`",
         f"- source outside-soloing repair evidence ready: `{_bool_token(source['source_outside_soloing_repair_evidence_ready'])}`",
         f"- source outside-soloing repair source context preserved: `{_bool_token(source['source_outside_soloing_repair_source_context_preserved'])}`",
+        f"- source outside-soloing repair schema context preserved: `{_bool_token(source['source_outside_soloing_repair_schema_context_preserved'])}`",
+        f"- source outside-soloing repair objective schema version: `{source['source_outside_soloing_repair_objective_schema_version']}`",
         f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(source['followup_objective_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(source['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(source['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
@@ -521,7 +699,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1094)
+    parser.add_argument("--issue_number", type=int, default=1178)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--require_guard_completed", action="store_true")

@@ -19,7 +19,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest targeted quality repair sweep: `Issue #1172`
 - latest targeted quality repair audio package: `Issue #1174`
 - latest targeted quality repair listening review package: `Issue #1176`
-- latest targeted quality repair listening review input guard: `Issue #1094`
+- latest targeted quality repair listening review input guard: `Issue #1178`
 - latest targeted quality repair objective-only next decision: `Issue #1096`
 - latest targeted quality repair follow-up decision: `Issue #1098`
 - latest songlike melody contour repair sweep: `Issue #1100`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after targeted quality repair listening review package source-context refresh merge: `0`
+- open issue queue after targeted quality repair listening review input guard source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
@@ -365,7 +365,15 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - targeted quality repair listening follow-up repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair listening bridge repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair validated review input: `false`
+- targeted quality repair listening input guard schema version: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard_v5`
+- targeted quality repair input guard source listening review package schema version: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package_v5`
+- targeted quality repair input guard source audio package schema version: `stage_b_midi_to_solo_targeted_quality_repair_audio_package_v5`
+- targeted quality repair input guard source sweep schema version: `stage_b_midi_to_solo_targeted_quality_repair_sweep_v4`
 - targeted quality repair listening review input guard completed: `true`
+- targeted quality repair input guard validated review input present: `false`
+- targeted quality repair input guard preference fill allowed: `false`
+- targeted quality repair input guard outside-soloing schema context preserved: `true`
+- targeted quality repair input guard outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - targeted quality repair input guard follow-up objective source outside-soloing source context preserved: `true`
 - targeted quality repair input guard follow-up repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair input guard bridge repair sweep source outside-soloing source context preserved: `true`
