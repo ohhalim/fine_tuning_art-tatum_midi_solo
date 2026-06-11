@@ -15,8 +15,12 @@ from scripts.decide_stage_b_midi_to_solo_listening_review_quality_gap import (
 from scripts.decide_stage_b_midi_to_solo_quality_gap import (
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BOUNDARY as QUALITY_GAP_BOUNDARY,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
     LISTENING_REVIEW_NEXT_BOUNDARY,
     LISTENING_REVIEW_TARGET,
+    MVP_COMPLETION_AUDIT_SCHEMA_VERSION,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    SCHEMA_VERSION as QUALITY_GAP_DECISION_SCHEMA_VERSION,
 )
 
 
@@ -57,7 +61,10 @@ def quality_gap_decision(
     outside_soloing_repair_supported: bool = True,
 ) -> dict:
     return {
+        "schema_version": QUALITY_GAP_DECISION_SCHEMA_VERSION,
         "boundary": QUALITY_GAP_BOUNDARY,
+        "source_schema_version": MVP_COMPLETION_AUDIT_SCHEMA_VERSION,
+        "source_current_evidence_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
         "quality_gap": {
             "technical_model_core_mvp_completed": True,
             "phrase_bank_cli_technical_path_completed": True,
@@ -67,6 +74,10 @@ def quality_gap_decision(
             ),
             "outside_soloing_repair_objective_completed": outside_soloing_repair_supported,
             "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_schema_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "musical_quality_mvp_completed": False,
             "human_audio_preference_completed": False,
             "product_mvp_completed": False,
@@ -90,6 +101,7 @@ def quality_gap_decision(
             **SOURCE_CONTEXT,
         },
         "mvp_completion_summary": {
+            "current_evidence_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
             "model_conditioned_pitch_contour_changed_ratio_repair_rendered_audio_file_count": 3,
             "model_conditioned_pitch_contour_changed_ratio_repair_max_interval": (
                 12 if changed_ratio_supported else 13
@@ -106,6 +118,10 @@ def quality_gap_decision(
             ),
             "outside_soloing_repair_pitch_role_risk_delta": 2,
             "outside_soloing_repair_objective_path_supported": outside_soloing_repair_supported,
+            "outside_soloing_repair_schema_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "outside_soloing_repair_weak_landing_target_supported": True,
             "outside_soloing_repair_final_landing_target_supported": True,
             "outside_soloing_repair_non_chord_run_target_supported": True,
@@ -121,6 +137,7 @@ def quality_gap_decision(
             "selected_target": selected_target,
             "next_boundary_selected": next_boundary,
             "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_schema_context_preserved": outside_soloing_repair_supported,
             "human_review_required_now": False,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
@@ -140,7 +157,7 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
         report = build_listening_review_quality_gap_report(
             quality_gap_decision=quality_gap_decision(),
             output_dir=Path("outputs/listening_review_quality_gap"),
-            issue_number=1074,
+            issue_number=1158,
         )
         summary = validate_listening_review_quality_gap_report(
             report,
@@ -153,10 +170,32 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
 
         self.assertEqual(summary["selected_target"], SELECTED_TARGET)
         self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
+        self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(
+            summary["source_schema_version"],
+            QUALITY_GAP_DECISION_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            summary["source_mvp_completion_audit_schema_version"],
+            MVP_COMPLETION_AUDIT_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            summary["source_current_evidence_schema_version"],
+            CURRENT_EVIDENCE_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            summary["current_evidence_schema_version"],
+            CURRENT_EVIDENCE_SCHEMA_VERSION,
+        )
         self.assertTrue(summary["technical_model_core_mvp_completed"])
         self.assertTrue(summary["changed_ratio_repair_objective_completed"])
         self.assertTrue(summary["outside_soloing_repair_objective_completed"])
         self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
+        self.assertTrue(summary["outside_soloing_repair_schema_context_preserved"])
+        self.assertEqual(
+            summary["outside_soloing_repair_objective_schema_version"],
+            OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+        )
         self.assertEqual(summary["rendered_audio_file_count"], 3)
         self.assertEqual(summary["max_repaired_interval"], 12)
         self.assertEqual(summary["max_interval_threshold"], 12)
@@ -200,7 +239,36 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
             "Stage B MIDI-to-solo MVP delivery package source-context refresh",
         )
         self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-        self.assertEqual(report["issue_number"], 1074)
+        self.assertEqual(report["source_schema_version"], QUALITY_GAP_DECISION_SCHEMA_VERSION)
+        self.assertEqual(
+            report["source_mvp_completion_audit_schema_version"],
+            MVP_COMPLETION_AUDIT_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            report["source_current_evidence_schema_version"],
+            CURRENT_EVIDENCE_SCHEMA_VERSION,
+        )
+        self.assertEqual(report["issue_number"], 1158)
+
+    def test_rejects_quality_gap_decision_schema_mismatch(self) -> None:
+        source = quality_gap_decision()
+        source["schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloListeningReviewQualityGapError):
+            build_listening_review_quality_gap_report(
+                quality_gap_decision=source,
+                output_dir=Path("outputs/listening_review_quality_gap"),
+                issue_number=1158,
+            )
+
+    def test_rejects_quality_gap_decision_source_schema_mismatch(self) -> None:
+        source = quality_gap_decision()
+        source["source_schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloListeningReviewQualityGapError):
+            build_listening_review_quality_gap_report(
+                quality_gap_decision=source,
+                output_dir=Path("outputs/listening_review_quality_gap"),
+                issue_number=1158,
+            )
 
     def test_rejects_wrong_selected_target(self) -> None:
         with self.assertRaises(StageBMidiToSoloListeningReviewQualityGapError):
@@ -273,6 +341,34 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
                 issue_number=1074,
             )
 
+    def test_rejects_false_outside_soloing_schema_context_preserved_flag(self) -> None:
+        source = quality_gap_decision()
+        source["quality_gap"]["outside_soloing_repair_schema_context_preserved"] = False
+
+        with self.assertRaises(StageBMidiToSoloListeningReviewQualityGapError):
+            build_listening_review_quality_gap_report(
+                quality_gap_decision=source,
+                output_dir=Path("outputs/listening_review_quality_gap"),
+                issue_number=1158,
+            )
+
+    def test_rejects_listening_review_quality_gap_schema_mismatch(self) -> None:
+        report = build_listening_review_quality_gap_report(
+            quality_gap_decision=quality_gap_decision(),
+            output_dir=Path("outputs/listening_review_quality_gap"),
+            issue_number=1158,
+        )
+        report["schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloListeningReviewQualityGapError):
+            validate_listening_review_quality_gap_report(
+                report,
+                expected_boundary=BOUNDARY,
+                expected_next_boundary=NEXT_BOUNDARY,
+                expected_target=SELECTED_TARGET,
+                require_delivery_package_ready=True,
+                require_no_quality_claim=True,
+            )
+
     def test_rejects_targeted_outside_soloing_source_repair(self) -> None:
         source = quality_gap_decision()
         source["quality_gap"]["outside_soloing_repair_source_targeted"] = True
@@ -311,7 +407,7 @@ class StageBMidiToSoloListeningReviewQualityGapTest(unittest.TestCase):
         self.assertEqual(SELECTED_TARGET, "mvp_delivery_package")
         self.assertEqual(
             SCHEMA_VERSION,
-            "stage_b_midi_to_solo_listening_review_quality_gap_v3",
+            "stage_b_midi_to_solo_listening_review_quality_gap_v4",
         )
 
 

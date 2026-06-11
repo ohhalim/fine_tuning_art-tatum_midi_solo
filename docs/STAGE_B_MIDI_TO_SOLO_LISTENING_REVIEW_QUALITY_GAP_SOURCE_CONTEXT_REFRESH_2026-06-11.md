@@ -3,7 +3,11 @@
 ## Summary
 
 - boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
 - source boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- source schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source MVP completion audit schema version: `stage_b_midi_to_solo_mvp_completion_audit_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - next boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - selected target: `mvp_delivery_package`
 - listening review quality gap open: `true`
@@ -12,12 +16,15 @@
 
 ## Evidence
 
+- current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - technical model-core MVP completed: `true`
 - phrase-bank CLI technical path completed: `true`
 - model-conditioned pitch-contour objective completed: `true`
 - changed-ratio repair objective completed: `true`
 - outside-soloing repair objective completed: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - rendered WAV files: `3`
 - changed-ratio repair max interval / threshold: `12` / `12`
 - changed-ratio repair max ratio / target: `0.4348` / `0.5000`

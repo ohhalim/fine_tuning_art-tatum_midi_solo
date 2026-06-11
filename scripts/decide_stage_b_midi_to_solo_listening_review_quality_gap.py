@@ -18,8 +18,12 @@ from scripts.decide_stage_b_midi_to_solo_quality_gap import (  # noqa: E402
     BRIDGE_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as SOURCE_BOUNDARY,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
     LISTENING_REVIEW_NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
     LISTENING_REVIEW_TARGET,
+    MVP_COMPLETION_AUDIT_SCHEMA_VERSION,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    SCHEMA_VERSION as QUALITY_GAP_DECISION_SCHEMA_VERSION,
 )
 
 
@@ -30,7 +34,7 @@ class StageBMidiToSoloListeningReviewQualityGapError(ValueError):
 BOUNDARY = "stage_b_midi_to_solo_listening_review_quality_gap"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_mvp_delivery_package"
 SELECTED_TARGET = "mvp_delivery_package"
-SCHEMA_VERSION = "stage_b_midi_to_solo_listening_review_quality_gap_v3"
+SCHEMA_VERSION = "stage_b_midi_to_solo_listening_review_quality_gap_v4"
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -98,6 +102,18 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
     selected = _dict(report.get("selected_target"))
     summary = _dict(report.get("mvp_completion_summary"))
 
+    if str(report.get("schema_version") or "") != QUALITY_GAP_DECISION_SCHEMA_VERSION:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "quality gap decision schema version mismatch"
+        )
+    if str(report.get("source_schema_version") or "") != MVP_COMPLETION_AUDIT_SCHEMA_VERSION:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "quality gap source audit schema version mismatch"
+        )
+    if str(report.get("source_current_evidence_schema_version") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "quality gap source current evidence schema version mismatch"
+        )
     if str(report.get("boundary") or "") != SOURCE_BOUNDARY:
         raise StageBMidiToSoloListeningReviewQualityGapError("quality gap decision boundary required")
     if str(decision.get("next_boundary") or "") != SOURCE_NEXT_BOUNDARY:
@@ -141,9 +157,23 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloListeningReviewQualityGapError(
             "outside-soloing repair source context readiness required"
         )
+    if not bool(readiness.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "outside-soloing repair schema context readiness required"
+        )
     if not bool(quality_gap.get("outside_soloing_repair_source_context_preserved", False)):
         raise StageBMidiToSoloListeningReviewQualityGapError(
             "outside-soloing repair source context preservation required"
+        )
+    if not bool(quality_gap.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "outside-soloing repair schema context preservation required"
+        )
+    if str(
+        quality_gap.get("outside_soloing_repair_objective_schema_version") or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "outside-soloing repair objective schema version mismatch"
         )
     source_context = _source_context_fields(
         quality_gap,
@@ -171,6 +201,20 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
         summary.get("model_conditioned_pitch_contour_changed_ratio_repair_rendered_audio_file_count")
     ) < 3:
         raise StageBMidiToSoloListeningReviewQualityGapError("changed-ratio repair rendered WAV count below 3")
+    if str(summary.get("current_evidence_schema_version") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "quality gap summary current evidence schema version mismatch"
+        )
+    if not bool(summary.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "quality gap summary schema context preservation required"
+        )
+    if str(
+        summary.get("outside_soloing_repair_objective_schema_version") or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "quality gap summary outside-soloing objective schema version mismatch"
+        )
     if _int(summary.get("model_conditioned_pitch_contour_changed_ratio_repair_max_interval")) > _int(
         summary.get("model_conditioned_pitch_contour_changed_ratio_repair_max_interval_threshold")
     ):
@@ -237,6 +281,12 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
     _require_no_quality_claim(readiness, label="quality gap decision readiness")
 
     return {
+        "quality_gap_decision_schema_version": QUALITY_GAP_DECISION_SCHEMA_VERSION,
+        "source_mvp_completion_audit_schema_version": MVP_COMPLETION_AUDIT_SCHEMA_VERSION,
+        "source_current_evidence_schema_version": CURRENT_EVIDENCE_SCHEMA_VERSION,
+        "current_evidence_schema_version": str(
+            summary.get("current_evidence_schema_version") or ""
+        ),
         "boundary": SOURCE_BOUNDARY,
         "technical_model_core_mvp_completed": True,
         "phrase_bank_cli_technical_path_completed": True,
@@ -245,6 +295,12 @@ def validate_quality_gap_decision(report: dict[str, Any]) -> dict[str, Any]:
         "outside_soloing_repair_objective_completed": True,
         "outside_soloing_repair_source_context_preserved": bool(
             quality_gap.get("outside_soloing_repair_source_context_preserved", False)
+        ),
+        "outside_soloing_repair_schema_context_preserved": bool(
+            quality_gap.get("outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "outside_soloing_repair_objective_schema_version": str(
+            quality_gap.get("outside_soloing_repair_objective_schema_version") or ""
         ),
         "fallback_path_active": bool(quality_gap.get("fallback_path_active", False)),
         "model_conditioned_input_path_alignment_required": bool(
@@ -327,6 +383,13 @@ def build_listening_review_quality_gap_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": source["boundary"],
+        "source_schema_version": source["quality_gap_decision_schema_version"],
+        "source_mvp_completion_audit_schema_version": source[
+            "source_mvp_completion_audit_schema_version"
+        ],
+        "source_current_evidence_schema_version": source[
+            "source_current_evidence_schema_version"
+        ],
         "quality_gap_summary": {
             **source,
             "listening_review_quality_gap_open": True,
@@ -350,6 +413,9 @@ def build_listening_review_quality_gap_report(
             "human_review_required_now": False,
             "outside_soloing_repair_source_context_preserved": bool(
                 source["outside_soloing_repair_source_context_preserved"]
+            ),
+            "outside_soloing_repair_schema_context_preserved": bool(
+                source["outside_soloing_repair_schema_context_preserved"]
             ),
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -394,6 +460,24 @@ def validate_listening_review_quality_gap_report(
     decision = _dict(report.get("decision"))
     selected = _dict(report.get("selected_next_target"))
     summary = _dict(report.get("quality_gap_summary"))
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "listening review quality gap schema version mismatch"
+        )
+    if str(report.get("source_schema_version") or "") != QUALITY_GAP_DECISION_SCHEMA_VERSION:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "listening review source quality gap schema version mismatch"
+        )
+    if str(
+        report.get("source_mvp_completion_audit_schema_version") or ""
+    ) != MVP_COMPLETION_AUDIT_SCHEMA_VERSION:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "listening review source MVP completion audit schema version mismatch"
+        )
+    if str(report.get("source_current_evidence_schema_version") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "listening review source current evidence schema version mismatch"
+        )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloListeningReviewQualityGapError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -416,9 +500,23 @@ def validate_listening_review_quality_gap_report(
         raise StageBMidiToSoloListeningReviewQualityGapError(
             "outside-soloing repair source context readiness required"
         )
+    if not bool(readiness.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "outside-soloing repair schema context readiness required"
+        )
     if not bool(summary.get("outside_soloing_repair_source_context_preserved", False)):
         raise StageBMidiToSoloListeningReviewQualityGapError(
             "outside-soloing repair source context preservation required"
+        )
+    if not bool(summary.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "outside-soloing repair schema context preservation required"
+        )
+    if str(
+        summary.get("outside_soloing_repair_objective_schema_version") or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloListeningReviewQualityGapError(
+            "outside-soloing repair objective schema version mismatch"
         )
     source_context = _source_context_fields(
         summary,
@@ -457,7 +555,18 @@ def validate_listening_review_quality_gap_report(
             "outside-soloing source residual risk preservation required"
         )
     return {
+        "schema_version": str(report.get("schema_version") or ""),
         "boundary": boundary,
+        "source_schema_version": str(report.get("source_schema_version") or ""),
+        "source_mvp_completion_audit_schema_version": str(
+            report.get("source_mvp_completion_audit_schema_version") or ""
+        ),
+        "source_current_evidence_schema_version": str(
+            report.get("source_current_evidence_schema_version") or ""
+        ),
+        "current_evidence_schema_version": str(
+            summary.get("current_evidence_schema_version") or ""
+        ),
         "next_boundary": str(decision.get("next_boundary") or ""),
         "selected_target": str(selected.get("selected_target") or ""),
         "technical_model_core_mvp_completed": bool(
@@ -471,6 +580,12 @@ def validate_listening_review_quality_gap_report(
         ),
         "outside_soloing_repair_source_context_preserved": bool(
             summary.get("outside_soloing_repair_source_context_preserved", False)
+        ),
+        "outside_soloing_repair_schema_context_preserved": bool(
+            summary.get("outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "outside_soloing_repair_objective_schema_version": str(
+            summary.get("outside_soloing_repair_objective_schema_version") or ""
         ),
         "rendered_audio_file_count": _int(summary.get("rendered_audio_file_count")),
         "max_repaired_interval": _int(summary.get("max_repaired_interval")),
@@ -545,7 +660,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         "## Summary",
         "",
         f"- boundary: `{report['boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
         f"- source boundary: `{report['source_boundary']}`",
+        f"- source schema version: `{report['source_schema_version']}`",
+        f"- source MVP completion audit schema version: `{report['source_mvp_completion_audit_schema_version']}`",
+        f"- source current evidence schema version: `{report['source_current_evidence_schema_version']}`",
         f"- next boundary: `{decision['next_boundary']}`",
         f"- selected target: `{selected['selected_target']}`",
         f"- listening review quality gap open: `{_bool_token(summary['listening_review_quality_gap_open'])}`",
@@ -554,12 +673,15 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         "## Evidence",
         "",
+        f"- current evidence schema version: `{summary['current_evidence_schema_version']}`",
         f"- technical model-core MVP completed: `{_bool_token(summary['technical_model_core_mvp_completed'])}`",
         f"- phrase-bank CLI technical path completed: `{_bool_token(summary['phrase_bank_cli_technical_path_completed'])}`",
         f"- model-conditioned pitch-contour objective completed: `{_bool_token(summary['model_conditioned_pitch_contour_objective_completed'])}`",
         f"- changed-ratio repair objective completed: `{_bool_token(summary['changed_ratio_repair_objective_completed'])}`",
         f"- outside-soloing repair objective completed: `{_bool_token(summary['outside_soloing_repair_objective_completed'])}`",
         f"- outside-soloing repair source context preserved: `{_bool_token(summary['outside_soloing_repair_source_context_preserved'])}`",
+        f"- outside-soloing repair schema context preserved: `{_bool_token(summary['outside_soloing_repair_schema_context_preserved'])}`",
+        f"- outside-soloing repair objective schema version: `{summary['outside_soloing_repair_objective_schema_version']}`",
         f"- rendered WAV files: `{summary['rendered_audio_file_count']}`",
         f"- changed-ratio repair max interval / threshold: `{summary['max_repaired_interval']}` / `{summary['max_interval_threshold']}`",
         f"- changed-ratio repair max ratio / target: `{summary['max_repaired_pitch_changed_ratio']:.4f}` / `{summary['target_max_pitch_changed_ratio']:.4f}`",
@@ -613,7 +735,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=736)
+    parser.add_argument("--issue_number", type=int, default=1158)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--expected_target", type=str, default="")
