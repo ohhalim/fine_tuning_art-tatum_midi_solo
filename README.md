@@ -111,27 +111,25 @@ raw model generation은 note grammar가 자주 깨졌다.
 
 ## 결과 파일
 
-MIDI:
+최신 리뷰 패키지:
 
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/generated/candidate_01_sample_20.mid`
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/generated/candidate_02_sample_16.mid`
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/generated/candidate_03_sample_12.mid`
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/generated/candidate_04_sample_06.mid`
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/generated/candidate_05_sample_04.mid`
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1250_4bar_repaired_top8_listening_package/listening_review_package.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1250_4bar_repaired_top8_listening_package/listening_review_package.json`
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1250_4bar_repaired_top8_listening_package/listening_review_input_template.json`
 
-WAV:
+MIDI 후보:
 
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/audio/candidate_01_sample_20.wav`
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/audio/candidate_02_sample_16.wav`
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/audio/candidate_03_sample_12.wav`
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/audio/candidate_04_sample_06.wav`
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/audio/candidate_05_sample_04.wav`
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1250_4bar_repaired_top8_listening_package/midi/`
+
+WAV 후보:
+
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1250_4bar_repaired_top8_listening_package/audio/`
 
 Report:
 
-- `outputs/music_transformer_finetune_mvp/stage_b_solo_yield_probe/constrained_chord_swing_20/report.json`
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/solo_yield_package.json`
-- `outputs/music_transformer_finetune_mvp/solo_yield_mvp/constrained_chord_swing_top5/solo_yield_package.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_final_status_audit/issue_1256_final_status_audit/final_status_audit.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_final_status_audit/issue_1256_final_status_audit/final_status_audit_summary.json`
+- `outputs/music_transformer_finetune_mvp/solo_yield_objective_next_decision/issue_1254_4bar_repaired_objective_next_decision/objective_next_decision.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_CHORD_PROGRESSION_YIELD_SWEEP_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_YIELD_FAILURE_CASE_REVIEW_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_DEAD_AIR_REPAIR_SWEEP_2026-06-11.md`
@@ -153,6 +151,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_4BAR_REPAIRED_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_FINAL_STATUS_AUDIT_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_README_FINAL_EVIDENCE_REFRESH_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_FINAL_HANDOFF_SUMMARY_2026-06-11.md`
 
 ## 실행 방법
 
@@ -213,27 +212,8 @@ Report:
 
 ## 다음 작업
 
-- top 5 WAV 청취 리뷰
-- 사람이 rejected로 판단한 후보의 공통 실패 원인 기록
-- `Dm7, G7, Cmaj7, A7` progression 실패 원인 분석
-- dead-air repair sweep
-- `fill_n10` repair variant 기준 full progression retry sweep
-- retry top candidates listening review
-- listening review input guard
-- objective-only next decision
-- larger sample repeatability sweep
-- larger sample candidate listening review package
-- larger sample listening input guard
-- larger sample objective-only next decision
-- 4bar phrase expansion probe
-- 4bar candidate listening review package
-- 4bar listening input guard
-- 4bar objective-only next decision
-- 4bar dead-air repair sweep
-- 4bar repaired candidate listening review package
-- 4bar repaired input guard
-- 4bar repaired objective-only next decision
-- final status audit
-- README final evidence refresh
-- final handoff summary
-- 더 긴 4마디 phrase로 확장 검토
+- repaired 4bar top8 WAV/MIDI 청취 리뷰
+- 청취 결과 기준 keep/reject 후보 기록
+- rejected 후보 공통 실패 원인 라벨링
+- 음악적 품질 claim 여부는 청취 리뷰 이후 재판단
+- 다음 품질 개선 후보: dead-air 추가 완화, phrase tension/release, chord-tone landing, outside-soloing pitch-role
