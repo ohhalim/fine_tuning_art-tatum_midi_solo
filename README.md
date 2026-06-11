@@ -76,6 +76,8 @@ raw model generation은 note grammar가 자주 깨졌다.
 - larger sample repeatability: total candidates `48`, strict `47 / 48`, grammar-valid `48 / 48`
 - larger sample min case strict rate: `0.9167`, rendered WAV files `12`, musical quality claim `false`
 - larger sample listening package: MIDI `12`, WAV `12`, review input template ready
+- larger sample input guard: validated input `false`, preference fill `false`, pending candidate fields `36`
+- next boundary: `music_transformer_solo_yield_objective_only_next_decision`
 
 ## 결과 파일
 
@@ -109,6 +111,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_LARGER_SAMPLE_REPEATABILITY_SWEEP_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_LARGER_SAMPLE_LISTENING_PACKAGE_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_LARGER_SAMPLE_LISTENING_INPUT_GUARD_2026-06-11.md`
 
 ## 실행 방법
 
@@ -180,4 +183,5 @@ Report:
 - larger sample repeatability sweep
 - larger sample candidate listening review package
 - larger sample listening input guard
+- larger sample objective-only next decision
 - 더 긴 4마디 phrase로 확장 검토
