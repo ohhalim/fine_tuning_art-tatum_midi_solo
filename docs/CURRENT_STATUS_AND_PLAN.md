@@ -26,7 +26,7 @@
 - latest targeted quality repair audio package: Issue #1174, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
 - latest targeted quality repair listening review package: Issue #1176, Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh
 - latest targeted quality repair listening review input guard: Issue #1178, Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh
-- latest targeted quality repair objective-only next decision: Issue #1096, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh
+- latest targeted quality repair objective-only next decision: Issue #1180, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh
 - latest targeted quality repair follow-up decision: Issue #1098, Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh
 - latest songlike melody contour repair sweep: Issue #1100, Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh
 - latest songlike melody contour repair audio package: Issue #1102, Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh`
+- open issue queue after Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -6175,7 +6175,7 @@ Issue #1178은 Issue #1176 targeted quality repair listening review package v5 �
 
 ## 9.238 Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh
 
-Issue #1096은 Issue #1094 targeted quality repair listening review input guard 결과를 기준으로 objective-only next decision의 source-context validation과 summary에 source-context preserved flag 3개를 보존한 작업이다.
+Issue #1180은 Issue #1178 targeted quality repair listening review input guard v5 결과를 기준으로 objective-only next decision의 source schema chain, outside-soloing schema context, source-context preserved flag 3개를 보존한 작업이다.
 
 결과:
 
@@ -6183,6 +6183,19 @@ Issue #1096은 Issue #1094 targeted quality repair listening review input guard 
 - boundary: `stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision`
 - source boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard`
 - next boundary: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision`
+- schema version: `stage_b_midi_to_solo_targeted_quality_repair_objective_next_v5`
+- source targeted quality repair listening review input guard schema version: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard_v5`
+- source targeted quality repair listening review package schema version: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package_v5`
+- source targeted quality repair audio package schema version: `stage_b_midi_to_solo_targeted_quality_repair_audio_package_v5`
+- source targeted quality repair sweep schema version: `stage_b_midi_to_solo_targeted_quality_repair_sweep_v4`
+- source candidate failure labeling schema version: `stage_b_midi_to_solo_candidate_failure_labeling_v4`
+- source quality rubric schema version: `stage_b_midi_to_solo_quality_rubric_baseline_v4`
+- source post-MVP plan schema version: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4`
+- source final status schema version: `stage_b_midi_to_solo_final_status_audit_v4`
+- source delivery package schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - selected target: `targeted_quality_repair_followup_decision`
 - objective next decision completed: `true`
 - review item count: `6`
@@ -6194,6 +6207,8 @@ Issue #1096은 Issue #1094 targeted quality repair listening review input guard 
 - failure label delta: `4`
 - source outside-soloing repair evidence ready: `true`
 - source outside-soloing repair source context preserved: `true`
+- source outside-soloing repair schema context preserved: `true`
+- source outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -6208,8 +6223,8 @@ Issue #1096은 Issue #1094 targeted quality repair listening review input guard 
 
 판단:
 
-- objective-only next decision source validation에 input guard preserved flag 3개 포함.
-- preserved flag false 입력은 validation error로 차단.
+- objective-only next decision source validation에 input guard v5와 upstream schema chain 포함.
+- schema version mismatch, schema-context false, preserved flag false 입력은 validation error로 차단.
 - review input pending과 quality claim unavailable 기준 follow-up decision 선택.
 - 다음 검증 대상은 targeted quality repair follow-up decision 유지.
 - human/audio preference와 musical quality claim 제외 유지.
@@ -6217,7 +6232,7 @@ Issue #1096은 Issue #1094 targeted quality repair listening review input guard 
 검증:
 
 - `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_objective_next`
-- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_targeted_quality_repair_objective_next.py`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_targeted_quality_repair_objective_next.py tests/test_stage_b_midi_to_solo_targeted_quality_repair_objective_next.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-objective-only-next-decision`
 - `bash scripts/agent_harness.sh quick`
