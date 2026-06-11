@@ -29,7 +29,7 @@
 - latest targeted quality repair objective-only next decision: Issue #1180, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh
 - latest targeted quality repair follow-up decision: Issue #1182, Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh
 - latest songlike melody contour repair sweep: Issue #1184, Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh
-- latest songlike melody contour repair audio package: Issue #1102, Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh
+- latest songlike melody contour repair audio package: Issue #1186, Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh
 - latest songlike melody contour repair listening review package: Issue #1104, Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh
 - latest songlike melody contour repair listening review input guard: Issue #1106, Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh
 - latest songlike melody contour repair objective-only next decision: Issue #1108, Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh`
+- open issue queue after Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -3619,7 +3619,7 @@ Issue #1012는 Issue #1010 input guard 이후 listening input 없이 objective e
 
 다음:
 
-- `Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh`
+- `Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh`
 
 ## Stage B MIDI-to-Solo Targeted Quality Repair Follow-Up Decision Source Context Refresh Result
 
@@ -6389,12 +6389,28 @@ Issue #1184는 Issue #1182 targeted quality repair follow-up decision v5의 sele
 
 ## 9.241 Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh
 
-Issue #1102는 Issue #1184 songlike melody contour repair sweep의 MIDI 후보 6개를 WAV로 렌더링하고 source-context preserved flag를 audio summary/validation summary까지 보존한 작업이다.
+Issue #1186은 Issue #1184 songlike melody contour repair sweep v5의 MIDI 후보 6개를 WAV로 렌더링하고 source schema chain, outside-soloing schema context, source-context preserved flag를 audio summary/validation summary까지 보존한 작업이다.
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_AUDIO_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package`
+- schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package_v5`
+- source songlike melody contour repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_v5`
+- source targeted quality repair follow-up schema version: `stage_b_midi_to_solo_targeted_quality_repair_followup_decision_v5`
+- source targeted quality repair objective next schema version: `stage_b_midi_to_solo_targeted_quality_repair_objective_next_v5`
+- source targeted quality repair listening review input guard schema version: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard_v5`
+- source targeted quality repair listening review package schema version: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package_v5`
+- source targeted quality repair audio package schema version: `stage_b_midi_to_solo_targeted_quality_repair_audio_package_v5`
+- source targeted quality repair sweep schema version: `stage_b_midi_to_solo_targeted_quality_repair_sweep_v4`
+- source candidate failure labeling schema version: `stage_b_midi_to_solo_candidate_failure_labeling_v4`
+- source quality rubric schema version: `stage_b_midi_to_solo_quality_rubric_baseline_v4`
+- source post-MVP plan schema version: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4`
+- source final status schema version: `stage_b_midi_to_solo_final_status_audit_v4`
+- source delivery package schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package`
 - render attempted: `true`
 - rendered audio file count: `6`
@@ -6409,8 +6425,12 @@ Issue #1102는 Issue #1184 songlike melody contour repair sweep의 MIDI 후보 6
 - source outside-soloing repair evidence ready: `true`
 - objective source outside-soloing repair WAV count: `6`
 - objective source outside-soloing source context preserved: `true`
+- objective source outside-soloing schema context preserved: `true`
+- objective source outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - objective preserved source-context flags: `3 / 3`
 - source outside-soloing source context preserved: `true`
+- source outside-soloing schema context preserved: `true`
+- source outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - source preserved source-context flags: `3 / 3`
 - source outside-soloing source pitch-role risk: `5 -> 2`
 - source outside-soloing current repair pitch-role risk after / delta: `0 / 2`
@@ -6424,16 +6444,16 @@ Issue #1102는 Issue #1184 songlike melody contour repair sweep의 MIDI 후보 6
 
 판단:
 
-- audio package source validation에 #1100 preserved flag 3개 포함.
-- audio summary와 validation summary에 objective/source preserved flag 보존.
-- preserved flag false 입력은 validation error로 차단.
+- audio package source validation에 sweep v5와 upstream schema chain 포함.
+- audio summary와 validation summary에 objective/source schema context 및 preserved flag 보존.
+- schema version mismatch, schema-context false, preserved flag false 입력은 validation error로 차단.
 - WAV 파일 6개 렌더링과 기술 메타데이터 검증 완료.
 - human/audio preference와 audio rendered quality claim 제외 유지.
 
 검증:
 
-- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_audio`
-- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_songlike_melody_contour_repair_audio.py`
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_audio tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package`
+- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_songlike_melody_contour_repair_audio.py tests/test_stage_b_midi_to_solo_songlike_melody_contour_repair_audio.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-repair-audio-package`
 - `bash scripts/agent_harness.sh quick`
@@ -6445,7 +6465,7 @@ Issue #1102는 Issue #1184 songlike melody contour repair sweep의 MIDI 후보 6
 
 ## 9.242 Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh
 
-Issue #1104는 Issue #1102 songlike melody contour repair audio package의 WAV/MIDI 후보 6개를 listening review package로 묶고 source-context preserved flag를 review package source summary/validation summary까지 보존한 작업이다.
+Issue #1104는 Issue #1186 songlike melody contour repair audio package의 WAV/MIDI 후보 6개를 listening review package로 묶고 source-context preserved flag를 review package source summary/validation summary까지 보존한 작업이다.
 
 결과:
 
