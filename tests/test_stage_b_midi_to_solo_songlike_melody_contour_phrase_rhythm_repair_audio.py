@@ -255,6 +255,13 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioTest(unittest.
             self.assertEqual(summary["phrase_rhythm_failure_delta"], 3)
             self.assertEqual(summary["technical_regression_count"], 0)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(
+                summary[
+                    "source_songlike_melody_contour_phrase_rhythm_repair_sweep_schema_version"
+                ],
+                SOURCE_SCHEMA_VERSION,
+            )
             self.assertEqual(
                 summary[
                     "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count"
@@ -262,7 +269,11 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioTest(unittest.
                 5,
             )
             self.assertTrue(summary["objective_source_outside_soloing_repair_source_context_preserved"])
-            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertTrue(summary["objective_source_outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["objective_source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
             self.assertEqual(
@@ -295,6 +306,11 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioTest(unittest.
                 5,
             )
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(summary["source_outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
@@ -342,6 +358,28 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioTest(unittest.
             with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioError):
                 build_audio_render_report(
                     source_report(root, quality_claim=True),
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    runner=fake_runner,
+                )
+
+    def test_rejects_source_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            source = source_report(root)
+            source["source_schema_versions"][
+                "songlike_melody_contour_repair_followup_decision"
+            ] = "stale"
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioError):
+                build_audio_render_report(
+                    source,
                     output_dir=root / "audio_package",
                     renderer_path=str(renderer),
                     soundfont_path=str(soundfont),
@@ -432,12 +470,34 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioTest(unittest.
                     runner=fake_runner,
                 )
 
+    def test_rejects_schema_context_preservation_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            source = source_report(root)
+            source["aggregate"][
+                "source_outside_soloing_repair_schema_context_preserved"
+            ] = False
+            with self.assertRaises(StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairAudioError):
+                build_audio_render_report(
+                    source,
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    runner=fake_runner,
+                )
+
     def test_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package")
         self.assertEqual(
             SCHEMA_VERSION,
-            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package_v4",
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package_v5",
         )
 
 

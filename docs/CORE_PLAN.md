@@ -415,7 +415,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo songlike melody contour repair objective-only next decision: follow-up required `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source-context preserved flags `3/3`, source/repaired outside-soloing not evaluable `6/6`, current quality claim ready `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
 - MIDI-to-solo songlike melody contour repair follow-up decision: selected target `songlike_melody_contour_phrase_rhythm_repair_sweep`, primary labels `phrase_shape_missing_tension_release,rhythmic_monotony`, objective and repair sweep source risk `5 -> 2`, current repair risk after/delta `0/2`, source-context preserved flags `3/3`, objective/sweep outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair sweep: schema `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v5`, source follow-up schema `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision_v5`, source repair sweep schema `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_v5`, phrase/rhythm failure `4 -> 1`, total failure labels `4 -> 1`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/schema-context preserved flags `true`, source/repaired outside-soloing not evaluable `6/6`, technical regression `0`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package`
-- MIDI-to-solo songlike melody contour phrase/rhythm repair audio package: rendered WAV `6`, duration `18.871s-19.000s`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source-context preserved flags `3/3`, source/repaired outside-soloing not evaluable `6/6`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package`
+- MIDI-to-solo songlike melody contour phrase/rhythm repair audio package: schema `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package_v5`, source sweep schema `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v5`, rendered WAV `6`, duration `18.871s-19.000s`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/schema-context preserved flags `true`, source/repaired outside-soloing not evaluable `6/6`, technical validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package: review items `6`, validated input `false`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source-context preserved flags `3/3`, source/repaired outside-soloing not evaluable `6/6`, technical WAV validation `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_input_guard`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard: preference fill `false`, validated input `false`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_objective_only_next_decision`
 - MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision: follow-up required `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, source/repaired outside-soloing not evaluable `6/6`, current quality claim ready `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_followup_decision`
@@ -11125,12 +11125,17 @@ Issue #1196은 Issue #1194 follow-up decision v5와 songlike contour repair swee
 
 ## 9.205 Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh
 
-Issue #1114는 Issue #1112 phrase/rhythm repair sweep MIDI 후보 6개를 WAV로 렌더링하고 source/current outside-soloing context를 audio package까지 보존한 작업이다.
+Issue #1198은 Issue #1196 phrase/rhythm repair sweep v5 MIDI 후보 6개를 WAV로 렌더링하고 source schema chain, source-context, schema-context를 audio package까지 보존한 작업이다.
 
 결과:
 
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package`
 - source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
+- schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package_v5`
+- source phrase/rhythm repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v5`
+- source follow-up schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision_v5`
+- source objective next schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next_v5`
+- source repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_v5`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_listening_review_package`
 - rendered audio file count: `6`
 - technical WAV validation: `true`
@@ -11142,7 +11147,9 @@ Issue #1114는 Issue #1112 phrase/rhythm repair sweep MIDI 후보 6개를 WAV로
 - improved candidate count: `2`
 - technical regression count: `0`
 - objective source outside-soloing repair source context preserved: `true`
+- objective source outside-soloing repair schema context preserved: `true`
 - source outside-soloing repair source context preserved: `true`
+- source outside-soloing repair schema context preserved: `true`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -11155,7 +11162,8 @@ Issue #1114는 Issue #1112 phrase/rhythm repair sweep MIDI 후보 6개를 WAV로
 
 판단:
 
-- audio package source validation에 objective/source source-context preserved 조건 유지.
+- audio package source validation에 phrase/rhythm repair sweep v5 schema chain 포함.
+- source schema mismatch, schema-context false 입력은 validation error로 차단.
 - required source-context key와 preserved flag true 조건을 audio package summary와 validation summary까지 보존.
 - WAV 6개 렌더링 및 sample-rate/duration/file metadata 기술 검증 완료.
 - 다음 boundary는 phrase/rhythm repair listening review package source-context refresh.
@@ -11163,7 +11171,7 @@ Issue #1114는 Issue #1112 phrase/rhythm repair sweep MIDI 후보 6개를 WAV로
 검증:
 
 - `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio`
-- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio.py`
+- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio.py tests/test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-audio-package`
 
