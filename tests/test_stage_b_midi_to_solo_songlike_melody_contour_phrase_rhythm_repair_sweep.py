@@ -19,8 +19,10 @@ from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
 )
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_repair_followup import (
     BOUNDARY as FOLLOWUP_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS as FOLLOWUP_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as FOLLOWUP_NEXT_BOUNDARY,
     SELECTED_TARGET as FOLLOWUP_SELECTED_TARGET,
+    SCHEMA_VERSION as FOLLOWUP_SCHEMA_VERSION,
     TIE_TARGET_LABELS,
 )
 from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
@@ -40,6 +42,7 @@ from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repa
 )
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_repair_sweep import (
     BOUNDARY as SOURCE_SWEEP_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_SWEEP_SCHEMA_VERSION,
 )
 
 
@@ -52,6 +55,10 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "followup_objective_source_outside_soloing_source_context_preserved": True,
+    "followup_objective_source_outside_soloing_schema_context_preserved": True,
+    "followup_objective_source_outside_soloing_objective_schema_version": (
+        OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ),
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
@@ -60,6 +67,10 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_schema_context_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_objective_schema_version": (
+        OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ),
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
@@ -68,6 +79,10 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "repair_sweep_source_outside_soloing_source_context_preserved": True,
+    "repair_sweep_source_outside_soloing_schema_context_preserved": True,
+    "repair_sweep_source_outside_soloing_objective_schema_version": (
+        OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ),
 }
 
 
@@ -154,19 +169,79 @@ def rubric_baseline(root: Path) -> dict:
 
 
 def followup_decision(*, quality_claim: bool = False) -> dict:
+    objective_context = {
+        "objective_source_outside_soloing_repair_evidence_ready": True,
+        "objective_source_outside_soloing_repair_wav_count": 6,
+        "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+        "objective_source_outside_soloing_repair_source_context_preserved": True,
+        "objective_source_outside_soloing_repair_schema_context_preserved": True,
+        "objective_source_outside_soloing_repair_objective_schema_version": (
+            OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+        ),
+        "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+        "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+        "objective_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
+        "objective_source_outside_soloing_repair_source_targeted": False,
+        "objective_source_outside_soloing_repair_source_residual_risk_preserved": True,
+        "objective_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+        "objective_source_outside_soloing_repair_pitch_role_risk_delta": 2,
+        "objective_source_outside_soloing_not_evaluable_count": 6,
+        "objective_repaired_outside_soloing_not_evaluable_count": 6,
+        **{f"objective_{key}": value for key, value in SOURCE_CONTEXT.items()},
+    }
+    repair_sweep_context = {
+        "repair_sweep_source_outside_soloing_repair_evidence_ready": True,
+        "repair_sweep_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
+        "repair_sweep_source_outside_soloing_repair_source_context_preserved": True,
+        "repair_sweep_source_outside_soloing_repair_schema_context_preserved": True,
+        "repair_sweep_source_outside_soloing_repair_objective_schema_version": (
+            OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+        ),
+        "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
+        "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
+        "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
+        "repair_sweep_source_outside_soloing_repair_source_targeted": False,
+        "repair_sweep_source_outside_soloing_repair_source_residual_risk_preserved": True,
+        "repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
+        "repair_sweep_source_outside_soloing_repair_pitch_role_risk_delta": 2,
+        "repair_sweep_source_outside_soloing_not_evaluable_count": 6,
+        "repair_sweep_repaired_outside_soloing_not_evaluable_count": 6,
+        **{f"repair_sweep_{key}": value for key, value in SOURCE_CONTEXT.items()},
+    }
     return {
+        "schema_version": FOLLOWUP_SCHEMA_VERSION,
         "boundary": FOLLOWUP_BOUNDARY,
+        "source_boundary": "stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision",
+        "repair_sweep_boundary": SOURCE_SWEEP_BOUNDARY,
+        "source_schema_versions": dict(FOLLOWUP_SOURCE_SCHEMA_VERSIONS),
         "repair_sweep_summary": {
             "remaining_failure_counts": {
                 "phrase_shape_missing_tension_release": 2,
                 "rhythmic_monotony": 2,
-            }
+            },
+            "not_evaluable_counts": {
+                "outside_soloing_without_context": 6,
+                "weak_chord_tone_landing": 6,
+            },
         },
         "selected_next_target": {
             "selected_target": FOLLOWUP_SELECTED_TARGET,
             "selected_next_boundary": FOLLOWUP_NEXT_BOUNDARY,
             "primary_remaining_failure_labels": list(TIE_TARGET_LABELS),
             "primary_remaining_failure_count": 2,
+        },
+        "followup_targets": {
+            "primary_labels": list(TIE_TARGET_LABELS),
+            "secondary_failure_counts": {
+                "phrase_shape_missing_tension_release": 2,
+                "rhythmic_monotony": 2,
+            },
+            "not_evaluable_counts": {
+                "outside_soloing_without_context": 6,
+                "weak_chord_tone_landing": 6,
+            },
+            **objective_context,
+            **repair_sweep_context,
         },
         "readiness": {
             "followup_decision_completed": True,
@@ -176,33 +251,8 @@ def followup_decision(*, quality_claim: bool = False) -> dict:
             "repaired_total_failure_label_count": 4,
             "failure_label_delta": 4,
             "technical_regression_count": 0,
-            "objective_source_outside_soloing_repair_evidence_ready": True,
-            "objective_source_outside_soloing_repair_wav_count": 6,
-            "objective_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
-            "objective_source_outside_soloing_repair_source_context_preserved": True,
-            "objective_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
-            "objective_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
-            "objective_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
-            "objective_source_outside_soloing_repair_source_targeted": False,
-            "objective_source_outside_soloing_repair_source_residual_risk_preserved": True,
-            "objective_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
-            "objective_source_outside_soloing_repair_pitch_role_risk_delta": 2,
-            "objective_source_outside_soloing_not_evaluable_count": 6,
-            "objective_repaired_outside_soloing_not_evaluable_count": 6,
-            **{f"objective_{key}": value for key, value in SOURCE_CONTEXT.items()},
-            "repair_sweep_source_outside_soloing_repair_evidence_ready": True,
-            "repair_sweep_source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
-            "repair_sweep_source_outside_soloing_repair_source_context_preserved": True,
-            "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
-            "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
-            "repair_sweep_source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
-            "repair_sweep_source_outside_soloing_repair_source_targeted": False,
-            "repair_sweep_source_outside_soloing_repair_source_residual_risk_preserved": True,
-            "repair_sweep_source_outside_soloing_repair_pitch_role_risk_count_after": 0,
-            "repair_sweep_source_outside_soloing_repair_pitch_role_risk_delta": 2,
-            "repair_sweep_source_outside_soloing_not_evaluable_count": 6,
-            "repair_sweep_repaired_outside_soloing_not_evaluable_count": 6,
-            **{f"repair_sweep_{key}": value for key, value in SOURCE_CONTEXT.items()},
+            **objective_context,
+            **repair_sweep_context,
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
@@ -229,6 +279,7 @@ def source_repair_sweep(*, technical_regression_count: int = 0) -> dict:
         ["phrase_shape_missing_tension_release"],
     ]
     return {
+        "schema_version": SOURCE_SWEEP_SCHEMA_VERSION,
         "boundary": SOURCE_SWEEP_BOUNDARY,
         "candidate_repairs": [
             {
@@ -262,6 +313,10 @@ def source_repair_sweep(*, technical_regression_count: int = 0) -> dict:
             "source_outside_soloing_repair_evidence_ready": True,
             "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
             "source_outside_soloing_repair_source_context_preserved": True,
+            "source_outside_soloing_repair_schema_context_preserved": True,
+            "source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
             "source_outside_soloing_repair_source_pitch_role_risk_count_after": 2,
             "source_outside_soloing_repair_source_pitch_role_risk_delta": 3,
@@ -329,11 +384,31 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
             self.assertGreater(summary["phrase_rhythm_failure_delta"], 0)
             self.assertEqual(summary["technical_regression_count"], 0)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(
+                summary["source_songlike_melody_contour_repair_followup_schema_version"],
+                FOLLOWUP_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary["source_songlike_melody_contour_repair_sweep_schema_version"],
+                SOURCE_SWEEP_SCHEMA_VERSION,
+            )
             self.assertTrue(
                 summary["objective_source_outside_soloing_repair_source_context_preserved"]
             )
+            self.assertTrue(
+                summary["objective_source_outside_soloing_repair_schema_context_preserved"]
+            )
+            self.assertEqual(
+                summary["objective_source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
-            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertTrue(summary["source_outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
@@ -390,6 +465,38 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                 build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
                     followup_decision=followup_decision(),
                     source_repair_sweep=source_repair_sweep(technical_regression_count=1),
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "phrase_rhythm_repair",
+                    issue_number=1112,
+                )
+
+    def test_rejects_followup_source_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = followup_decision()
+            source["source_schema_versions"][
+                "songlike_melody_contour_repair_objective_next"
+            ] = "stale"
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError
+            ):
+                build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
+                    followup_decision=source,
+                    source_repair_sweep=source_repair_sweep(),
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "phrase_rhythm_repair",
+                    issue_number=1112,
+                )
+
+    def test_rejects_source_sweep_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = source_repair_sweep()
+            source["schema_version"] = "stale"
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError
+            ):
+                build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
+                    followup_decision=followup_decision(),
+                    source_repair_sweep=source,
                     rubric_baseline=rubric_baseline(Path(tmp)),
                     output_dir=Path(tmp) / "phrase_rhythm_repair",
                     issue_number=1112,
@@ -474,6 +581,23 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
                     issue_number=1112,
                 )
 
+    def test_rejects_schema_context_preservation_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = followup_decision()
+            source["readiness"][
+                "repair_sweep_source_outside_soloing_repair_schema_context_preserved"
+            ] = False
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepError
+            ):
+                build_songlike_melody_contour_phrase_rhythm_repair_sweep_report(
+                    followup_decision=source,
+                    source_repair_sweep=source_repair_sweep(),
+                    rubric_baseline=rubric_baseline(Path(tmp)),
+                    output_dir=Path(tmp) / "phrase_rhythm_repair",
+                    issue_number=1112,
+                )
+
     def test_constants_are_stable(self) -> None:
         self.assertEqual(
             BOUNDARY,
@@ -489,7 +613,7 @@ class StageBMidiToSoloSonglikeMelodyContourPhraseRhythmRepairSweepTest(
         )
         self.assertEqual(
             SCHEMA_VERSION,
-            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v4",
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v5",
         )
 
 

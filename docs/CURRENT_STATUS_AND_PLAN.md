@@ -34,7 +34,7 @@
 - latest songlike melody contour repair listening review input guard: Issue #1190, Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh
 - latest songlike melody contour repair objective-only next decision: Issue #1192, Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh
 - latest songlike melody contour repair follow-up decision: Issue #1194, Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh
-- latest songlike melody contour phrase/rhythm repair sweep: Issue #1112, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh
+- latest songlike melody contour phrase/rhythm repair sweep: Issue #1196, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm repair audio package: Issue #1114, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm repair listening review package: Issue #1116, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm repair listening review input guard: Issue #1118, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh`
+- open issue queue after Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -203,6 +203,12 @@
 - MIDI-to-solo musical quality claim: `false`
 - 다음 repair target: `songlike_melody_contour_phrase_rhythm_repair_sweep`
 - songlike melody contour phrase/rhythm repair sweep source-context refresh 완료
+- source follow-up schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision_v5`
+- source objective next schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next_v5`
+- source repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_v5`
+- source input guard schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard_v5`
+- source listening review package schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package_v5`
+- source audio package schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package_v5`
 - candidate count: `6`
 - total failure labels: `4 -> 1`
 - failure label delta: `3`
@@ -214,6 +220,8 @@
 - source outside-soloing source pitch-role risk delta: `3`
 - source outside-soloing source repair targeted: `false`
 - source outside-soloing source residual risk preserved: `true`
+- objective source outside-soloing schema context preserved: `true`
+- source outside-soloing schema context preserved: `true`
 - source outside-soloing current repair pitch-role risk count after / delta: `0 / 2`
 - source/repaired outside-soloing not evaluable count: `6/6`
 - repaired not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
@@ -4149,14 +4157,15 @@ Issue #1026은 Issue #1024 objective-only next decision과 songlike melody conto
 
 ## Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Repair Sweep Source Context Refresh Result
 
-Issue #1112는 Issue #1110 follow-up decision에서 선택된 phrase/rhythm repair sweep에 source/current outside-soloing context를 보존한 작업이다.
+Issue #1196은 Issue #1194 follow-up decision v5와 songlike contour repair sweep v5의 source schema chain, source-context, schema-context를 phrase/rhythm repair sweep까지 보존한 작업이다.
 
 변경:
 
-- phrase/rhythm repair sweep input validation에 source-context preserved flag 필수화
-- follow-up decision과 source repair sweep의 required source-context key 일치 검증 추가
+- phrase/rhythm repair sweep input validation에 follow-up decision v5 schema chain 필수화
+- source repair sweep v5 schema version mismatch 차단
+- source-context preserved flag와 schema-context preserved flag 필수화
+- follow-up decision과 source repair sweep의 required source-context key 일치 검증
 - objective/source context를 aggregate/readiness/validation summary까지 전파
-- stale quality rubric baseline run_id를 source-context refresh 기준으로 교체
 
 결과:
 
@@ -4164,6 +4173,13 @@ Issue #1112는 Issue #1110 follow-up decision에서 선택된 phrase/rhythm repa
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
 - source boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
 - source repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep`
+- schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v5`
+- source follow-up schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision_v5`
+- source objective next schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_objective_next_v5`
+- source repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_sweep_v5`
+- source input guard schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard_v5`
+- source listening review package schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package_v5`
+- source audio package schema version: `stage_b_midi_to_solo_songlike_melody_contour_repair_audio_package_v5`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_audio_package`
 - selected target: `songlike_melody_contour_phrase_rhythm_repair_audio_package`
 - candidate count: `6`
@@ -4174,7 +4190,9 @@ Issue #1112는 Issue #1110 follow-up decision에서 선택된 phrase/rhythm repa
 - improved candidate count: `2`
 - technical regression count: `0`
 - objective source outside-soloing source context preserved: `true`
+- objective source outside-soloing schema context preserved: `true`
 - source outside-soloing source context preserved: `true`
+- source outside-soloing schema context preserved: `true`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -4186,15 +4204,16 @@ Issue #1112는 Issue #1110 follow-up decision에서 선택된 phrase/rhythm repa
 
 판단:
 
-- phrase/rhythm repair sweep에서 target label 감소 확인.
-- source-context preserved flag `3/3` 보존 확인.
+- phrase/rhythm repair sweep에서 target label `4 -> 1` 감소 확인.
+- source schema mismatch, repair sweep schema mismatch, schema-context false 입력은 validation error로 차단.
+- source-context preserved flag와 schema-context preserved flag 보존 확인.
 - outside-soloing과 weak chord-tone landing은 context 부재로 quality claim 제외 유지.
 - 다음 boundary는 audio package source-context refresh.
 
 검증:
 
 - `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
-- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep.py`
+- `.venv/bin/python -m py_compile scripts/run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep.py tests/test_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-phrase-rhythm-repair-sweep`
 - `bash scripts/agent_harness.sh quick`
