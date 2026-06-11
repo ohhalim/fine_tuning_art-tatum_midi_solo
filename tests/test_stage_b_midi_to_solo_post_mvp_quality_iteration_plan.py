@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from scripts.audit_stage_b_midi_to_solo_final_status import (
-    BRIDGE_SOURCE_CONTEXT_KEYS,
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BOUNDARY as FINAL_STATUS_BOUNDARY,
     NEXT_BOUNDARY as FINAL_STATUS_NEXT_BOUNDARY,
 )
@@ -12,6 +12,7 @@ from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
     BOUNDARY,
     NEXT_BOUNDARY,
     SELECTED_TARGET,
+    SCHEMA_VERSION,
     StageBMidiToSoloPostMvpQualityIterationPlanError,
     build_post_mvp_quality_iteration_plan_report,
     validate_post_mvp_quality_iteration_plan_report,
@@ -114,7 +115,7 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
         report = build_post_mvp_quality_iteration_plan_report(
             final_status_audit=final_status_audit(),
             output_dir=Path("outputs/post_mvp_quality"),
-            issue_number=744,
+            issue_number=1082,
         )
         summary = validate_post_mvp_quality_iteration_plan_report(
             report,
@@ -125,6 +126,8 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
             require_no_quality_claim=True,
         )
 
+        self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(report["issue_number"], 1082)
         self.assertTrue(summary["post_mvp_quality_iteration_plan_completed"])
         self.assertTrue(summary["technical_mvp_complete"])
         self.assertTrue(summary["local_review_ready"])
@@ -142,7 +145,7 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
-        for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
             self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertTrue(summary["candidate_failure_labeling_required"])
         self.assertTrue(summary["targeted_quality_repair_sweep_required"])
@@ -163,7 +166,7 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
             build_post_mvp_quality_iteration_plan_report(
                 final_status_audit=source,
                 output_dir=Path("outputs/post_mvp_quality"),
-                issue_number=744,
+                issue_number=1082,
             )
 
     def test_rejects_quality_claim(self) -> None:
@@ -171,7 +174,7 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
             build_post_mvp_quality_iteration_plan_report(
                 final_status_audit=final_status_audit(quality_claim=True),
                 output_dir=Path("outputs/post_mvp_quality"),
-                issue_number=744,
+                issue_number=1082,
             )
 
     def test_rejects_closed_listening_gap(self) -> None:
@@ -179,7 +182,7 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
             build_post_mvp_quality_iteration_plan_report(
                 final_status_audit=final_status_audit(listening_gap_open=False),
                 output_dir=Path("outputs/post_mvp_quality"),
-                issue_number=744,
+                issue_number=1082,
             )
 
     def test_rejects_low_candidate_or_wav_count(self) -> None:
@@ -187,13 +190,13 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
             build_post_mvp_quality_iteration_plan_report(
                 final_status_audit=final_status_audit(cli_count=2),
                 output_dir=Path("outputs/post_mvp_quality"),
-                issue_number=744,
+                issue_number=1082,
             )
         with self.assertRaises(StageBMidiToSoloPostMvpQualityIterationPlanError):
             build_post_mvp_quality_iteration_plan_report(
                 final_status_audit=final_status_audit(wav_count=2),
                 output_dir=Path("outputs/post_mvp_quality"),
-                issue_number=744,
+                issue_number=1082,
             )
 
     def test_rejects_incomplete_outside_soloing_repair_evidence(self) -> None:
@@ -201,19 +204,19 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
             build_post_mvp_quality_iteration_plan_report(
                 final_status_audit=final_status_audit(outside_ready=False),
                 output_dir=Path("outputs/post_mvp_quality"),
-                issue_number=744,
+                issue_number=1082,
             )
         with self.assertRaises(StageBMidiToSoloPostMvpQualityIterationPlanError):
             build_post_mvp_quality_iteration_plan_report(
                 final_status_audit=final_status_audit(outside_wav_count=5),
                 output_dir=Path("outputs/post_mvp_quality"),
-                issue_number=744,
+                issue_number=1082,
             )
         with self.assertRaises(StageBMidiToSoloPostMvpQualityIterationPlanError):
             build_post_mvp_quality_iteration_plan_report(
                 final_status_audit=final_status_audit(outside_risk_after=1),
                 output_dir=Path("outputs/post_mvp_quality"),
-                issue_number=744,
+                issue_number=1082,
             )
 
     def test_rejects_missing_outside_soloing_source_context_field(self) -> None:
@@ -225,13 +228,26 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
             build_post_mvp_quality_iteration_plan_report(
                 final_status_audit=source,
                 output_dir=Path("outputs/post_mvp_quality"),
-                issue_number=998,
+                issue_number=1082,
+            )
+
+    def test_rejects_false_source_context_preserved_field(self) -> None:
+        source = final_status_audit()
+        source["final_status"][
+            "repair_sweep_source_outside_soloing_source_context_preserved"
+        ] = False
+        with self.assertRaises(StageBMidiToSoloPostMvpQualityIterationPlanError):
+            build_post_mvp_quality_iteration_plan_report(
+                final_status_audit=source,
+                output_dir=Path("outputs/post_mvp_quality"),
+                issue_number=1082,
             )
 
     def test_boundary_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_post_mvp_quality_iteration_plan")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_quality_rubric_baseline")
         self.assertEqual(SELECTED_TARGET, "quality_rubric_baseline")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v3")
 
 
 if __name__ == "__main__":

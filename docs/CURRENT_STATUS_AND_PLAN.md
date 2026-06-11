@@ -19,7 +19,7 @@
 - latest MVP delivery package: Issue #1076, Stage B MIDI-to-solo MVP delivery package source-context refresh
 - latest README final evidence refresh: Issue #1078, Stage B MIDI-to-solo README final evidence refresh source-context refresh
 - latest final status audit: Issue #1080, Stage B MIDI-to-solo final status audit source-context refresh
-- latest post-MVP quality iteration plan: Issue #998, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
+- latest post-MVP quality iteration plan: Issue #1082, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
 - latest quality rubric baseline: Issue #1000, Stage B MIDI-to-solo quality rubric baseline source-context refresh
 - latest candidate failure labeling: Issue #1002, Stage B MIDI-to-solo candidate failure labeling source-context refresh
 - latest targeted quality repair sweep: Issue #1004, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after final status audit source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo post-MVP musical quality iteration plan source-context refresh`
+- open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo quality rubric baseline source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -997,6 +997,9 @@
 - changed-ratio repair audio evidence ready: `true`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - outside-soloing repair WAV count: `6`
 - outside-soloing source objective pitch-role risk count: `5`
 - outside-soloing source pitch-role risk count: `5 -> 2`
@@ -5409,6 +5412,61 @@ Issue #1080은 Issue #1078 README final evidence와 Issue #1076 MVP delivery pac
 다음:
 
 - `Stage B MIDI-to-solo post-MVP musical quality iteration plan source-context refresh`
+
+## Stage B MIDI-to-Solo Post-MVP Quality Iteration Plan Source-Context Refresh Result
+
+Issue #1082는 Issue #1080 final status audit 결과를 기준으로 post-MVP quality iteration plan의 source-context validation과 summary에 source-context preserved flag 3개를 보존한 작업이다.
+
+변경:
+
+- post-MVP quality iteration plan source validation을 required source-context key 기준으로 갱신
+- source-context preserved flag 3개 false 입력 차단
+- post-MVP status, generated markdown report, validation summary preserved flag 전파
+- harness issue number #1082 반영
+- quality rubric baseline fixture 입력 계약 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_POST_MVP_QUALITY_ITERATION_PLAN_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- source boundary: `stage_b_midi_to_solo_final_status_audit`
+- next boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
+- selected target: `quality_rubric_baseline`
+- post-MVP quality iteration plan completed: `true`
+- technical MVP complete: `true`
+- local review ready: `true`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- outside-soloing source pitch-role risk: `5 -> 2`
+- outside-soloing current repair pitch-role risk after / delta: `0 / 2`
+- ordered work count: `4`
+- quality failure taxonomy seed count: `7`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- post-MVP plan source validation에 final status audit preserved flag 3개 포함.
+- preserved flag false 입력은 validation error로 차단.
+- 다음 검증 대상은 quality rubric baseline 유지.
+- musical quality와 human/audio preference claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_quality_rubric_baseline`
+- `.venv/bin/python -m py_compile scripts/plan_stage_b_midi_to_solo_post_mvp_quality_iteration.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-post-mvp-quality-iteration-plan`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음:
+
+- `Stage B MIDI-to-solo quality rubric baseline source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
