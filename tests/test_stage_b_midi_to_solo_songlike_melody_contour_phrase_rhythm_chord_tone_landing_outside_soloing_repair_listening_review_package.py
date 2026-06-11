@@ -11,6 +11,8 @@ import pretty_midi
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package import (
     BOUNDARY,
     NEXT_BOUNDARY,
+    SCHEMA_VERSION as REVIEW_SCHEMA_VERSION,
+    SOURCE_PACKAGE_SCHEMA_CONTEXT_KEYS,
     StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackageError,
     build_listening_review_package_report,
     validate_listening_review_package_report,
@@ -18,6 +20,30 @@ from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_ch
 from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio import (
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_SCHEMA_VERSION,
+    SOURCE_SCHEMA_CONTEXT_KEYS as SOURCE_AUDIO_SCHEMA_CONTEXT_KEYS,
+    SOURCE_SWEEP_SCHEMA_VERSION,
+)
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup import (
+    SCHEMA_VERSION as SOURCE_FOLLOWUP_SCHEMA_VERSION,
+)
+from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input import (
+    SCHEMA_VERSION as SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package import (
+    SCHEMA_VERSION as SOURCE_PACKAGE_SCHEMA_VERSION,
+)
+from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio import (
+    SCHEMA_VERSION as SOURCE_AUDIO_SCHEMA_VERSION,
+)
+from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep import (
+    SCHEMA_VERSION as CHORD_TONE_REPAIR_SWEEP_SCHEMA_VERSION,
+)
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective import (
+    SCHEMA_VERSION as CHORD_CONTEXT_OBJECTIVE_SCHEMA_VERSION,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
+    SCHEMA_VERSION as BRIDGE_SCHEMA_VERSION,
 )
 
 
@@ -46,6 +72,16 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_source_context_preserved": True,
+}
+AUDIO_SOURCE_SCHEMA_CONTEXT = {
+    "source_schema_version": SOURCE_SWEEP_SCHEMA_VERSION,
+    "source_followup_schema_version": SOURCE_FOLLOWUP_SCHEMA_VERSION,
+    "source_objective_input_guard_schema_version": SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+    "source_package_schema_version": SOURCE_PACKAGE_SCHEMA_VERSION,
+    "source_audio_schema_version": SOURCE_AUDIO_SCHEMA_VERSION,
+    "chord_tone_repair_sweep_schema_version": CHORD_TONE_REPAIR_SWEEP_SCHEMA_VERSION,
+    "chord_tone_repair_sweep_source_schema_version": CHORD_CONTEXT_OBJECTIVE_SCHEMA_VERSION,
+    "chord_tone_repair_sweep_bridge_schema_version": BRIDGE_SCHEMA_VERSION,
 }
 
 
@@ -105,6 +141,9 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
             }
         )
     return {
+        "schema_version": SOURCE_SCHEMA_VERSION,
+        "source_boundary": SOURCE_BOUNDARY,
+        **AUDIO_SOURCE_SCHEMA_CONTEXT,
         "audio_render_boundary": {
             "boundary": SOURCE_BOUNDARY,
             "render_attempted": True,
@@ -119,6 +158,7 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
             "broad_trained_model_quality_claimed": False,
             "brad_style_adaptation_claimed": False,
             "production_ready_claimed": False,
+            **AUDIO_SOURCE_SCHEMA_CONTEXT,
         },
         "decision": {
             "current_boundary": SOURCE_BOUNDARY,
@@ -148,6 +188,7 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
             "max_non_chord_tone_run_after": 3,
             "target_supported": True,
             "audio_review_required": True,
+            **AUDIO_SOURCE_SCHEMA_CONTEXT,
             **SOURCE_CONTEXT,
         },
         "rendered_audio_files": rendered,
@@ -163,7 +204,7 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackage
             report = build_listening_review_package_report(
                 audio_package_report=audio_package_report(root),
                 output_dir=root / "review_package",
-                issue_number=1060,
+                issue_number=1144,
                 expected_count=6,
             )
             summary = validate_listening_review_package_report(
@@ -193,6 +234,19 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackage
             self.assertEqual(summary["weak_chord_tone_landing_risk_count_after"], 0)
             self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
             self.assertEqual(summary["max_non_chord_tone_run_after"], 3)
+            self.assertEqual(report["schema_version"], REVIEW_SCHEMA_VERSION)
+            self.assertEqual(report["issue_number"], 1144)
+            self.assertEqual(report["source_schema_version"], SOURCE_SCHEMA_VERSION)
+            self.assertEqual(summary["source_schema_version"], SOURCE_SCHEMA_VERSION)
+            self.assertEqual(
+                summary["source_repair_sweep_schema_version"], SOURCE_SWEEP_SCHEMA_VERSION
+            )
+            self.assertEqual(
+                summary["source_followup_schema_version"], SOURCE_FOLLOWUP_SCHEMA_VERSION
+            )
+            for key in SOURCE_PACKAGE_SCHEMA_CONTEXT_KEYS:
+                self.assertEqual(report["source_summary"][key], summary[key])
+                self.assertEqual(report["readiness"][key], summary[key])
             for key, value in SOURCE_CONTEXT.items():
                 self.assertEqual(report["source_summary"][key], value)
                 self.assertEqual(report["readiness"][key], value)
@@ -209,7 +263,39 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackage
                 build_listening_review_package_report(
                     audio_package_report=audio_package_report(root, quality_claim=True),
                     output_dir=root / "review_package",
-                    issue_number=1060,
+                    issue_number=1144,
+                    expected_count=6,
+                )
+
+    def test_rejects_audio_package_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = audio_package_report(root)
+            source["schema_version"] = "stale_schema"
+            with self.assertRaises(
+                StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackageError
+            ):
+                build_listening_review_package_report(
+                    audio_package_report=source,
+                    output_dir=root / "review_package",
+                    issue_number=1144,
+                    expected_count=6,
+                )
+
+    def test_rejects_audio_package_schema_context_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = audio_package_report(root)
+            source["audio_render_boundary"][
+                SOURCE_AUDIO_SCHEMA_CONTEXT_KEYS[1]
+            ] = "stale_schema"
+            with self.assertRaises(
+                StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackageError
+            ):
+                build_listening_review_package_report(
+                    audio_package_report=source,
+                    output_dir=root / "review_package",
+                    issue_number=1144,
                     expected_count=6,
                 )
 
@@ -226,7 +312,7 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackage
                 build_listening_review_package_report(
                     audio_package_report=source,
                     output_dir=root / "review_package",
-                    issue_number=1060,
+                    issue_number=1144,
                     expected_count=6,
                 )
 
@@ -238,6 +324,10 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairListeningReviewPackage
         self.assertEqual(
             NEXT_BOUNDARY,
             "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input_guard",
+        )
+        self.assertEqual(
+            REVIEW_SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package_v4",
         )
 
 
