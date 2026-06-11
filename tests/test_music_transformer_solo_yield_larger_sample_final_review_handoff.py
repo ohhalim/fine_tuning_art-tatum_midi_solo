@@ -179,6 +179,37 @@ class MusicTransformerSoloYieldLargerSampleFinalReviewHandoffTest(unittest.TestC
                     output_dir=root / "out",
                 )
 
+    def test_supports_custom_boundary_schema_and_output_basename(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            custom_schema = "custom_final_review_handoff_v1"
+            custom_boundary = "custom_final_review_handoff"
+            custom_next = "custom_listening_review"
+            objective = objective_decision()
+            objective["decision"]["next_boundary"] = custom_boundary
+            report = build_handoff_package(
+                listening_package(root),
+                objective,
+                output_dir=root / "out",
+                schema_version=custom_schema,
+                boundary=custom_boundary,
+                next_boundary=custom_next,
+                output_basename="custom_handoff",
+                title="Custom Final Review Handoff",
+            )
+            summary = validate_report(
+                report,
+                require_no_quality_claim=True,
+                expected_schema_version=custom_schema,
+            )
+
+            self.assertEqual(summary["schema_version"], custom_schema)
+            self.assertEqual(summary["boundary"], custom_boundary)
+            self.assertEqual(summary["next_boundary"], custom_next)
+            self.assertTrue((root / "out" / "custom_handoff.json").exists())
+            self.assertTrue((root / "out" / "custom_handoff_summary.json").exists())
+            self.assertTrue((root / "out" / "custom_handoff.md").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
