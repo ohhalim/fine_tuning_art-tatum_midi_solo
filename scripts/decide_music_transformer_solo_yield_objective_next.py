@@ -93,6 +93,8 @@ def build_decision(
     *,
     output_dir: Path,
     top_n: int,
+    pending_next_boundary: str = "music_transformer_solo_yield_larger_sample_repeatability_sweep",
+    pending_reason: str = "listening input pending; objective yield is clean, so increase sample count before quality claim",
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     guard_readiness = _dict(guard_report.get("readiness"))
@@ -100,8 +102,8 @@ def build_decision(
         next_boundary = "music_transformer_solo_yield_listening_review_fill"
         reason = "validated listening input present"
     else:
-        next_boundary = "music_transformer_solo_yield_larger_sample_repeatability_sweep"
-        reason = "listening input pending; objective yield is clean, so increase sample count before quality claim"
+        next_boundary = pending_next_boundary
+        reason = pending_reason
     candidates = [_dict(row) for row in _list(package_report.get("candidates"))]
     ranked = rank_candidates(candidates)
     selected = ranked[: int(top_n)]
@@ -121,6 +123,11 @@ def build_decision(
                 _dict(guard_report.get("input_validation")).get("validated_listening_input_present", False)
             ),
             "preference_fill_allowed": bool(guard_readiness.get("preference_fill_allowed", False)),
+        },
+        "request": {
+            "top_n": int(top_n),
+            "pending_next_boundary": pending_next_boundary,
+            "pending_reason": pending_reason,
         },
         "objective_summary": objective_summary(candidates),
         "selected_objective_candidates": selected,
@@ -233,6 +240,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--top_n", type=int, default=4)
+    parser.add_argument(
+        "--pending_next_boundary",
+        type=str,
+        default="music_transformer_solo_yield_larger_sample_repeatability_sweep",
+    )
+    parser.add_argument(
+        "--pending_reason",
+        type=str,
+        default="listening input pending; objective yield is clean, so increase sample count before quality claim",
+    )
     parser.add_argument("--doc_path", type=str, default="")
     parser.add_argument("--require_no_quality_claim", action="store_true")
     return parser
@@ -247,6 +264,8 @@ def main() -> int:
         read_json(Path(args.guard_report)),
         output_dir=output_dir,
         top_n=int(args.top_n),
+        pending_next_boundary=str(args.pending_next_boundary),
+        pending_reason=str(args.pending_reason),
     )
     summary = validate_report(report, require_no_quality_claim=bool(args.require_no_quality_claim))
     if args.doc_path:
