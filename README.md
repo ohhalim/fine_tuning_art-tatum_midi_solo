@@ -10,7 +10,7 @@ MIDI 데이터를 token sequence로 변환하고, Music Transformer 계열 symbo
 - 2마디 후보 생성: strict `24 / 24`, grammar-valid `24 / 24`
 - 4마디 확장 후보 생성: strict `20 / 24`, grammar-valid `24 / 24`
 - 4마디 dead-air repair 이후: strict `22 / 24`, grammar-valid `24 / 24`
-- repaired retry listening package: MIDI `8`, WAV `8`, review input template ready
+- repaired retry input guard: pending candidate fields `24`, next `objective_only_next_decision`
 - final status audit: technical evidence ready `true`
 - 음악적 품질 claim: `false`
 - 사람 기준 청취 선호 입력: `false`
@@ -176,6 +176,8 @@ raw model generation은 note grammar가 자주 깨졌다.
 - next boundary: `music_transformer_solo_yield_candidate_listening_review`
 - repaired retry listening package: candidate MIDI `8`, candidate WAV `8`, validated listening input `false`
 - next boundary: `music_transformer_solo_yield_listening_input_guard`
+- repaired retry listening input guard: validated input `false`, preference fill `false`, pending candidate fields `24`
+- next boundary: `music_transformer_solo_yield_objective_only_next_decision`
 
 ## 결과 파일
 
@@ -196,6 +198,8 @@ raw model generation은 note grammar가 자주 깨졌다.
 - `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1326_repaired_retry_listening_package/listening_review_package.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1326_repaired_retry_listening_package/listening_review_package.json`
 - `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1326_repaired_retry_listening_package/listening_review_input_template.json`
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_input_guard/issue_1328_repaired_listening_input_guard/listening_input_guard.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_input_guard/issue_1328_repaired_listening_input_guard/listening_input_guard.json`
 - `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare_listening_review/issue_1308_interval_contour_listening_package/listening_review_package.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare_listening_review/issue_1308_interval_contour_listening_package/listening_review_package.json`
 - `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare_listening_review/issue_1308_interval_contour_listening_package/listening_review_input_template.json`
@@ -221,6 +225,7 @@ Report:
 - `outputs/music_transformer_finetune_mvp/solo_yield_dead_air_repair_sweep/issue_1322_sampling_dead_air_repair/solo_yield_dead_air_repair_sweep.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_sweep/issue_1324_sampling_repaired_retry/solo_yield_sweep_report.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1326_repaired_retry_listening_package/listening_review_package.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_input_guard/issue_1328_repaired_listening_input_guard/listening_input_guard.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_CHORD_PROGRESSION_YIELD_SWEEP_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_YIELD_FAILURE_CASE_REVIEW_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_DEAD_AIR_REPAIR_SWEEP_2026-06-11.md`
@@ -272,6 +277,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_SAMPLING_DEAD_AIR_REPAIR_SWEEP_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_SAMPLING_REPAIRED_PROGRESSION_RETRY_SWEEP_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_REPAIRED_RETRY_LISTENING_PACKAGE_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_REPAIRED_RETRY_LISTENING_INPUT_GUARD_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_DIRECTION_REPAIR_SWEEP_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_DIRECTION_REPAIR_AUDIO_PACKAGE_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_PHRASE_DIRECTION_REPAIR_LISTENING_PACKAGE_2026-06-11.md`
