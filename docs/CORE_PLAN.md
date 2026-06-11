@@ -429,7 +429,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: source schema `v3`, follow-up required `true`, selected target `songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: source schema `v3`, repair sweep schema `v4`, selected target `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`, primary risk `outside_soloing_pitch_role_risk=2`, weak landing resolved `true`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep: source schema `v3`, chord-tone repair sweep schema `v4`, outside risk `2 -> 0`, changed notes `2`, max non-chord run `4 -> 3`, weak landing after `0`, source risk `5 -> 2`, current repair risk after/delta `0/2`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package`
-- MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: rendered WAV `6`, duration `18.871s-19.000s`, technical validation `true`, source risk `5 -> 2`, current repair risk `2 -> 0`, source/current context preserved, audio/preference/quality claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package`
+- MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: source schema `v3`, audio schema `v4`, rendered WAV `6`, duration `18.871s-19.000s`, technical validation `true`, source risk `5 -> 2`, current repair risk `2 -> 0`, source/current context preserved, audio/preference/quality claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: review items `6`, validated input `false`, technical WAV validation `true`, source risk `5 -> 2`, current repair risk after `0`, source/current context preserved, preference/quality claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input_guard`
 - MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: validated input `false`, preference fill `false`, review items `6`, source risk `5 -> 2`, current repair risk after `0`, source/current context preserved, preference/quality claim `false`, next boundary `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision`
 - MIDI-to-solo pitch-contour changed-ratio review decision: selected target `lower_pitch_change_ratio_repair_probe`, repair probe required `true`, max interval/threshold `11/12`, changed-ratio review threshold `0.5`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_model_conditioned_pitch_contour_changed_ratio_repair_probe`
@@ -11819,13 +11819,21 @@ Issue #1140은 Issue #1138 follow-up decision v3와 Issue #1128 chord-tone landi
 
 ## 9.219 Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package source-context refresh
 
-Issue #1058은 Issue #1056 outside-soloing repair sweep의 source-context preserved flag를 audio package summary와 validation summary까지 보존하고, rendered WAV technical metadata를 검증한 작업이다.
+Issue #1142는 Issue #1140 outside-soloing repair sweep의 source schema와 source-context preserved flag를 audio package summary, audio render boundary, validation summary까지 보존하고, rendered WAV technical metadata를 검증한 작업이다.
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_OUTSIDE_SOLOING_REPAIR_AUDIO_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package`
+- source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep_v3`
+- source follow-up schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision_v3`
+- source objective input guard schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard_v3`
+- source package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_v3`
+- source audio schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v4`
+- chord-tone repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep_v4`
+- chord-tone repair sweep source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision_v4`
+- chord-tone repair sweep bridge schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_v4`
 - rendered audio file count: `6`
 - technical WAV validation: `true`
 - sample rate: `44100`
@@ -11847,7 +11855,7 @@ Issue #1058은 Issue #1056 outside-soloing repair sweep의 source-context preser
 
 판단:
 
-- Issue #1056 sweep의 preserved flag 3개가 audio package summary와 validation summary까지 유지됨.
+- Issue #1140 sweep schema v3와 preserved flag 3개가 audio package summary, audio render boundary, validation summary까지 유지됨.
 - WAV 6개 technical metadata 검증 완료.
 - outside-soloing repair evidence는 audio review package로 전달 가능.
 - audio rendered quality, human/audio preference, MIDI-to-solo musical quality claim 제외.

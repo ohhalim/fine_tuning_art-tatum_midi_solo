@@ -12,6 +12,7 @@ import pretty_midi
 from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio import (
     BOUNDARY,
     NEXT_BOUNDARY,
+    SCHEMA_VERSION as AUDIO_SCHEMA_VERSION,
     StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError,
     build_audio_render_report,
     validate_audio_render_report,
@@ -19,7 +20,30 @@ from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_c
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep import (
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_SWEEP_SCHEMA_VERSION,
     SELECTED_TARGET as SOURCE_SELECTED_TARGET,
+)
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup import (
+    SCHEMA_VERSION as SOURCE_FOLLOWUP_SCHEMA_VERSION,
+)
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective import (
+    SCHEMA_VERSION as CHORD_CONTEXT_OBJECTIVE_SCHEMA_VERSION,
+)
+from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input import (
+    SCHEMA_VERSION as SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package import (
+    SCHEMA_VERSION as SOURCE_PACKAGE_SCHEMA_VERSION,
+)
+from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio import (
+    SCHEMA_VERSION as SOURCE_AUDIO_SCHEMA_VERSION,
+)
+from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep import (
+    SCHEMA_VERSION as CHORD_TONE_REPAIR_SWEEP_SCHEMA_VERSION,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+    SCHEMA_VERSION as BRIDGE_SCHEMA_VERSION,
 )
 
 
@@ -110,7 +134,15 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             }
         )
     return {
+        "schema_version": SOURCE_SWEEP_SCHEMA_VERSION,
         "boundary": SOURCE_BOUNDARY,
+        "source_schema_version": SOURCE_FOLLOWUP_SCHEMA_VERSION,
+        "source_objective_input_guard_schema_version": SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+        "source_package_schema_version": SOURCE_PACKAGE_SCHEMA_VERSION,
+        "source_audio_schema_version": SOURCE_AUDIO_SCHEMA_VERSION,
+        "chord_tone_repair_sweep_schema_version": CHORD_TONE_REPAIR_SWEEP_SCHEMA_VERSION,
+        "chord_tone_repair_sweep_source_schema_version": CHORD_CONTEXT_OBJECTIVE_SCHEMA_VERSION,
+        "chord_tone_repair_sweep_bridge_schema_version": BRIDGE_SCHEMA_VERSION,
         "candidate_repairs": repairs,
         "aggregate": {
             "candidate_count": 6,
@@ -211,6 +243,21 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioTest(unittest.Tes
             self.assertTrue(summary["outside_soloing_repair_targeted"])
             self.assertEqual(summary["weak_chord_tone_landing_risk_count_after"], 0)
             self.assertEqual(summary["max_non_chord_tone_run_after"], 3)
+            self.assertEqual(report["schema_version"], AUDIO_SCHEMA_VERSION)
+            self.assertEqual(report["issue_number"], 1142)
+            self.assertEqual(report["source_schema_version"], SOURCE_SWEEP_SCHEMA_VERSION)
+            self.assertEqual(
+                report["source_followup_schema_version"], SOURCE_FOLLOWUP_SCHEMA_VERSION
+            )
+            self.assertEqual(
+                report["source_objective_input_guard_schema_version"],
+                SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                report["chord_tone_repair_sweep_schema_version"],
+                CHORD_TONE_REPAIR_SWEEP_SCHEMA_VERSION,
+            )
+            self.assertEqual(summary["source_schema_version"], SOURCE_SWEEP_SCHEMA_VERSION)
             for key, value in SOURCE_CONTEXT.items():
                 self.assertEqual(report["summary"][key], value)
                 self.assertEqual(report["audio_render_boundary"][key], value)
@@ -231,6 +278,28 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioTest(unittest.Tes
             ):
                 build_audio_render_report(
                     source_report(root, quality_claim=True),
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    runner=fake_runner,
+                )
+
+    def test_rejects_source_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            report = source_report(root)
+            report["schema_version"] = "stale_schema"
+            with self.assertRaises(
+                StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError
+            ):
+                build_audio_render_report(
+                    report,
                     output_dir=root / "audio_package",
                     renderer_path=str(renderer),
                     soundfont_path=str(soundfont),
@@ -263,6 +332,36 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioTest(unittest.Tes
                     runner=fake_runner,
                 )
 
+    def test_rejects_audio_summary_source_context_preservation_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            report = build_audio_render_report(
+                source_report(root),
+                output_dir=root / "audio_package",
+                renderer_path=str(renderer),
+                soundfont_path=str(soundfont),
+                sample_rate=44100,
+                expected_file_count=6,
+                runner=fake_runner,
+            )
+            report["summary"][BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS[0]] = False
+            with self.assertRaises(
+                StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError
+            ):
+                validate_audio_render_report(
+                    report,
+                    expected_boundary=BOUNDARY,
+                    expected_next_boundary=NEXT_BOUNDARY,
+                    expected_file_count=6,
+                    expected_sample_rate=44100,
+                    require_audio_package_completed=True,
+                    require_no_quality_claim=True,
+                )
+
     def test_constants_are_stable(self) -> None:
         self.assertEqual(
             BOUNDARY,
@@ -271,6 +370,10 @@ class StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioTest(unittest.Tes
         self.assertEqual(
             NEXT_BOUNDARY,
             "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package",
+        )
+        self.assertEqual(
+            AUDIO_SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package_v4",
         )
 
 

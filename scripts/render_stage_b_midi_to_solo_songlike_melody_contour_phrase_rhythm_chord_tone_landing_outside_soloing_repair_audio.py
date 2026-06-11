@@ -22,10 +22,12 @@ from scripts.render_stage_b_midi_to_solo_candidate_audio import (  # noqa: E402
 )
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
 )
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep import (  # noqa: E402
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_SWEEP_SCHEMA_VERSION,
     StageBMidiToSoloChordToneLandingOutsideSoloingRepairSweepError,
     validate_outside_soloing_repair_sweep_report,
 )
@@ -42,9 +44,19 @@ NEXT_BOUNDARY = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package"
 )
 SCHEMA_VERSION = (
-    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package_v3"
+    "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package_v4"
 )
 CommandRunner = Callable[[Sequence[str]], subprocess.CompletedProcess[str]]
+SOURCE_SCHEMA_CONTEXT_KEYS = [
+    "source_schema_version",
+    "source_followup_schema_version",
+    "source_objective_input_guard_schema_version",
+    "source_package_schema_version",
+    "source_audio_schema_version",
+    "chord_tone_repair_sweep_schema_version",
+    "chord_tone_repair_sweep_source_schema_version",
+    "chord_tone_repair_sweep_bridge_schema_version",
+]
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -103,16 +115,39 @@ def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str
             raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
                 f"{label} source-context field required: {key}"
             )
-    for key in (
-        "followup_objective_source_outside_soloing_source_context_preserved",
-        "followup_repair_sweep_source_outside_soloing_source_context_preserved",
-        "repair_sweep_source_outside_soloing_source_context_preserved",
-    ):
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
         if not bool(container.get(key, False)):
             raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
                 f"{label} source context should be preserved: {key}"
             )
     return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
+
+
+def _source_schema_context(report: dict[str, Any], *, label: str) -> dict[str, str]:
+    fields = {
+        "source_schema_version": str(report.get("schema_version") or ""),
+        "source_followup_schema_version": str(report.get("source_schema_version") or ""),
+        "source_objective_input_guard_schema_version": str(
+            report.get("source_objective_input_guard_schema_version") or ""
+        ),
+        "source_package_schema_version": str(report.get("source_package_schema_version") or ""),
+        "source_audio_schema_version": str(report.get("source_audio_schema_version") or ""),
+        "chord_tone_repair_sweep_schema_version": str(
+            report.get("chord_tone_repair_sweep_schema_version") or ""
+        ),
+        "chord_tone_repair_sweep_source_schema_version": str(
+            report.get("chord_tone_repair_sweep_source_schema_version") or ""
+        ),
+        "chord_tone_repair_sweep_bridge_schema_version": str(
+            report.get("chord_tone_repair_sweep_bridge_schema_version") or ""
+        ),
+    }
+    missing = [key for key, value in fields.items() if not value]
+    if missing:
+        raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
+            f"{label} schema context required: {missing}"
+        )
+    return fields
 
 
 def validate_source_report(
@@ -126,6 +161,11 @@ def validate_source_report(
         raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
             "outside-soloing repair sweep boundary required"
         )
+    if str(report.get("schema_version") or "") != SOURCE_SWEEP_SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
+            "outside-soloing repair sweep schema version must match current report"
+        )
+    _source_schema_context(report, label="outside-soloing repair sweep report")
     if str(decision.get("next_boundary") or "") != SOURCE_NEXT_BOUNDARY:
         raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
             "outside-soloing repair sweep must route to audio package"
@@ -288,10 +328,13 @@ def build_audio_render_report(
     soundfont_path: str,
     sample_rate: int,
     expected_file_count: int,
-    issue_number: int = 1058,
+    issue_number: int = 1142,
     runner: CommandRunner = default_runner,
 ) -> dict[str, Any]:
     candidates = validate_source_report(source_report, expected_count=expected_file_count)
+    source_schema_context = _source_schema_context(
+        source_report, label="outside-soloing repair sweep report"
+    )
     resolved_renderer = renderer_path or shutil.which("fluidsynth") or ""
     resolved_soundfont = resolve_soundfont(soundfont_path)
     plan = build_render_plan(
@@ -315,6 +358,7 @@ def build_audio_render_report(
         "output_dir": str(output_dir),
         "issue_number": int(issue_number),
         "source_boundary": SOURCE_BOUNDARY,
+        **source_schema_context,
         "source_summary": aggregate,
         "renderer": {
             "name": "fluidsynth",
@@ -375,6 +419,7 @@ def build_audio_render_report(
                 aggregate.get("max_non_chord_tone_run_after")
             ),
             "target_supported": bool(aggregate.get("target_supported", False)),
+            **source_schema_context,
             **source_context,
             "audio_review_required": True,
         },
@@ -405,6 +450,7 @@ def build_audio_render_report(
             "outside_soloing_repair_targeted": bool(
                 aggregate.get("outside_soloing_repair_targeted", False)
             ),
+            **source_schema_context,
             **source_context,
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
@@ -448,6 +494,10 @@ def validate_audio_render_report(
     boundary = _dict(report.get("audio_render_boundary"))
     decision = _dict(report.get("decision"))
     summary = _dict(report.get("summary"))
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
+            "audio package schema version must match current report"
+        )
     if expected_boundary and str(boundary.get("boundary") or "") != expected_boundary:
         raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
             "unexpected boundary"
@@ -503,10 +553,32 @@ def validate_audio_render_report(
         raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
             "outside-soloing repair must be targeted before audio package"
         )
+    if str(summary.get("source_schema_version") or "") != SOURCE_SWEEP_SCHEMA_VERSION:
+        raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
+            "source schema version must match outside-soloing repair sweep"
+        )
+    for key in SOURCE_SCHEMA_CONTEXT_KEYS:
+        if not str(summary.get(key) or ""):
+            raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
+                f"audio package schema-context field required: {key}"
+            )
+        if str(boundary.get(key) or "") != str(summary.get(key) or ""):
+            raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
+                f"audio boundary schema-context mismatch: {key}"
+            )
     for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in summary:
             raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
                 f"audio package source-context field required: {key}"
+            )
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
+        if not bool(summary.get(key, False)):
+            raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
+                f"audio package source context should be preserved: {key}"
+            )
+        if not bool(boundary.get(key, False)):
+            raise StageBMidiToSoloChordToneLandingOutsideSoloingRepairAudioError(
+                f"audio boundary source context should be preserved: {key}"
             )
     if require_no_quality_claim:
         _require_no_quality_claim(boundary, label="audio render boundary")
@@ -567,6 +639,7 @@ def validate_audio_render_report(
         ),
         "target_supported": bool(summary.get("target_supported", False)),
         "audio_review_required": bool(summary.get("audio_review_required", False)),
+        **{key: str(summary.get(key) or "") for key in SOURCE_SCHEMA_CONTEXT_KEYS},
         **{key: summary.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
         "audio_rendered_quality_claimed": bool(
             boundary.get("audio_rendered_quality_claimed", True)
@@ -596,6 +669,14 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- boundary: `{boundary['boundary']}`",
         f"- next boundary: `{decision['next_boundary']}`",
+        f"- source schema version: `{summary['source_schema_version']}`",
+        f"- source follow-up schema version: `{summary['source_followup_schema_version']}`",
+        f"- source objective input guard schema version: `{summary['source_objective_input_guard_schema_version']}`",
+        f"- source package schema version: `{summary['source_package_schema_version']}`",
+        f"- source audio schema version: `{summary['source_audio_schema_version']}`",
+        f"- chord-tone repair sweep schema version: `{summary['chord_tone_repair_sweep_schema_version']}`",
+        f"- chord-tone repair sweep source schema version: `{summary['chord_tone_repair_sweep_source_schema_version']}`",
+        f"- chord-tone repair sweep bridge schema version: `{summary['chord_tone_repair_sweep_bridge_schema_version']}`",
         f"- render attempted: `{_bool_token(boundary['render_attempted'])}`",
         f"- rendered audio file count: `{boundary['rendered_audio_file_count']}`",
         f"- technical WAV validation: `{_bool_token(boundary['technical_wav_validation'])}`",
@@ -661,7 +742,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1058)
+    parser.add_argument("--issue_number", type=int, default=1142)
     parser.add_argument("--renderer", type=str, default=shutil.which("fluidsynth") or "")
     parser.add_argument("--soundfont", type=str, default="")
     parser.add_argument("--sample_rate", type=int, default=44100)
