@@ -10,7 +10,7 @@ MIDI 데이터를 token sequence로 변환하고, Music Transformer 계열 symbo
 - 2마디 후보 생성: strict `24 / 24`, grammar-valid `24 / 24`
 - 4마디 확장 후보 생성: strict `20 / 24`, grammar-valid `24 / 24`
 - 4마디 dead-air repair 이후: strict `22 / 24`, grammar-valid `24 / 24`
-- larger sample listening package: MIDI `8`, WAV `8`, next `listening_input_guard`
+- larger sample input guard: pending candidate fields `24`, next `objective_only_next_decision`
 - final status audit: technical evidence ready `true`
 - 음악적 품질 claim: `false`
 - 사람 기준 청취 선호 입력: `false`
@@ -187,6 +187,9 @@ raw model generation은 note grammar가 자주 깨졌다.
 - larger sample listening package: MIDI `8`, WAV `8`, review input template ready `true`
 - larger sample listening package claim boundary: validated listening input `false`, musical quality claim `false`
 - next boundary: `music_transformer_solo_yield_listening_input_guard`
+- larger sample input guard: validated input `false`, preference fill `false`, pending candidate fields `24`
+- larger sample input guard decision: objective-only next decision required `true`, musical quality claim `false`
+- next boundary: `music_transformer_solo_yield_objective_only_next_decision`
 
 ## 결과 파일
 
@@ -219,6 +222,9 @@ raw model generation은 note grammar가 자주 깨졌다.
 - `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1334_larger_sample_listening_package/listening_review_package.json`
 - `outputs/music_transformer_finetune_mvp/solo_yield_listening_review/issue_1334_larger_sample_listening_package/listening_review_input_template.json`
 - `docs/STAGE_B_MIDI_TO_SOLO_LARGER_SAMPLE_LISTENING_PACKAGE_2026-06-11.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_input_guard/issue_1336_larger_sample_input_guard/listening_input_guard.md`
+- `outputs/music_transformer_finetune_mvp/solo_yield_listening_input_guard/issue_1336_larger_sample_input_guard/listening_input_guard.json`
+- `docs/STAGE_B_MIDI_TO_SOLO_LARGER_SAMPLE_LISTENING_INPUT_GUARD_2026-06-11.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare_listening_review/issue_1308_interval_contour_listening_package/listening_review_package.md`
 - `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare_listening_review/issue_1308_interval_contour_listening_package/listening_review_package.json`
 - `outputs/music_transformer_finetune_mvp/solo_yield_interval_contour_aftercare_listening_review/issue_1308_interval_contour_listening_package/listening_review_input_template.json`
