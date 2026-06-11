@@ -130,6 +130,7 @@ def probe_command(
     bpm: int,
     bars: int,
     density: str,
+    duration_mode: str,
     temperature: float,
     top_k: int,
     note_groups_per_bar: int,
@@ -138,7 +139,7 @@ def probe_command(
     max_adjacent_interval: int,
     max_sequence: int,
 ) -> list[str]:
-    return [
+    command = [
         sys.executable,
         "scripts/run_stage_b_generation_probe.py",
         "--output_root",
@@ -189,12 +190,16 @@ def probe_command(
         "--jazz_duration_tokens",
         "--jazz_rhythm_profile",
         "swing_motif",
-        "--cap_duration_to_next_position",
         "--avoid_reused_positions",
         "--postprocess_overlap",
         "--max_simultaneous_notes",
         "1",
     ]
+    if duration_mode == "fill":
+        command.append("--fill_duration_to_next_position")
+    else:
+        command.append("--cap_duration_to_next_position")
+    return command
 
 
 def package_command(
@@ -336,6 +341,7 @@ def build_sweep_report(
     bpm: int,
     bars: int,
     density: str,
+    duration_mode: str,
     temperature: float,
     top_k: int,
     note_groups_per_bar: int,
@@ -374,6 +380,7 @@ def build_sweep_report(
                         bpm=bpm,
                         bars=bars,
                         density=density,
+                        duration_mode=duration_mode,
                         temperature=temperature,
                         top_k=top_k,
                         note_groups_per_bar=note_groups_per_bar,
@@ -428,6 +435,7 @@ def build_sweep_report(
             "bpm": int(bpm),
             "bars": int(bars),
             "density": density,
+            "duration_mode": duration_mode,
             "temperature": float(temperature),
             "top_k": int(top_k),
             "note_groups_per_bar": int(note_groups_per_bar),
@@ -536,6 +544,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- constrained decoding used: `{_bool_token(readiness['constrained_decoding_used'])}`",
         f"- case count: `{aggregate['case_count']}`",
         f"- sample count: `{aggregate['sample_count']}`",
+        f"- duration mode: `{report['request']['duration_mode']}`",
         f"- valid yield: `{aggregate['valid_sample_count']}` / `{aggregate['sample_count']}`",
         f"- strict yield: `{aggregate['strict_valid_sample_count']}` / `{aggregate['sample_count']}`",
         f"- grammar yield: `{aggregate['grammar_gate_sample_count']}` / `{aggregate['sample_count']}`",
@@ -612,6 +621,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--bpm", type=int, default=124)
     parser.add_argument("--bars", type=int, default=2)
     parser.add_argument("--density", type=str, default="medium")
+    parser.add_argument("--duration_mode", choices=("cap", "fill"), default="cap")
     parser.add_argument("--temperature", type=float, default=0.85)
     parser.add_argument("--top_k", type=int, default=8)
     parser.add_argument("--note_groups_per_bar", type=int, default=8)
@@ -647,6 +657,7 @@ def main() -> int:
         bpm=int(args.bpm),
         bars=int(args.bars),
         density=str(args.density),
+        duration_mode=str(args.duration_mode),
         temperature=float(args.temperature),
         top_k=int(args.top_k),
         note_groups_per_bar=int(args.note_groups_per_bar),

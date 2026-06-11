@@ -68,6 +68,7 @@ raw model generation은 note grammar가 자주 깨졌다.
 - lowest case: `Dm7, G7, Cmaj7, A7` strict `2 / 6`
 - lowest case review: invalid `4 / 4` dead-air threshold miss, next target `duration_fill_or_overlap_aftercare`
 - dead-air repair: `fill_n10` 기준 strict `2 / 6 -> 6 / 6`, dead-air fail `4 -> 0`
+- repaired full sweep: `fill_n10` 기준 strict `24 / 24`, grammar-valid `24 / 24`, rendered WAV `8`
 
 ## 결과 파일
 
@@ -95,6 +96,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_CHORD_PROGRESSION_YIELD_SWEEP_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_YIELD_FAILURE_CASE_REVIEW_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_DEAD_AIR_REPAIR_SWEEP_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_REPAIRED_PROGRESSION_RETRY_SWEEP_2026-06-11.md`
 
 ## 실행 방법
 
@@ -160,6 +162,6 @@ Report:
 - `Dm7, G7, Cmaj7, A7` progression 실패 원인 분석
 - dead-air repair sweep
 - `fill_n10` repair variant 기준 full progression retry sweep
-- 실패 원인별 생성 설정 조정
-- 20개 후보 기준 valid 수율 유지 여부 재측정
+- retry top candidates listening review
+- 20개 후보 이상 기준 수율 재측정
 - 더 긴 4마디 phrase로 확장 검토
