@@ -4,10 +4,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
 from scripts.decide_stage_b_midi_to_solo_targeted_quality_repair_objective_next import (
     BOUNDARY,
     FOLLOWUP_DECISION_NEXT_BOUNDARY,
+    SCHEMA_VERSION,
     StageBMidiToSoloTargetedQualityRepairObjectiveNextError,
     build_objective_next_report,
     validate_objective_next_report,
@@ -24,6 +25,7 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "followup_objective_source_outside_soloing_source_targeted": False,
     "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
@@ -31,6 +33,7 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "followup_repair_sweep_source_outside_soloing_source_targeted": False,
     "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
@@ -38,6 +41,7 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "repair_sweep_source_outside_soloing_source_targeted": False,
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
 }
@@ -104,7 +108,7 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
             report = build_objective_next_report(
                 input_guard_report=input_guard_report(),
                 output_dir=root / "objective_next",
-                issue_number=758,
+                issue_number=1096,
             )
             summary = validate_objective_next_report(
                 report,
@@ -115,6 +119,8 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
                 require_no_quality_claim=True,
             )
 
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(report["issue_number"], 1096)
             self.assertTrue(summary["objective_next_decision_completed"])
             self.assertFalse(summary["validated_review_input_present"])
             self.assertFalse(summary["preference_fill_allowed"])
@@ -123,7 +129,7 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
             self.assertEqual(summary["failure_label_delta"], 4)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
             self.assertEqual(
@@ -158,7 +164,7 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
                 build_objective_next_report(
                     input_guard_report=input_guard_report(quality_claim=True),
                     output_dir=root / "objective_next",
-                    issue_number=758,
+                    issue_number=1096,
                 )
 
     def test_rejects_missing_outside_soloing_context(self) -> None:
@@ -172,7 +178,7 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
                 build_objective_next_report(
                     input_guard_report=source,
                     output_dir=root / "objective_next",
-                    issue_number=842,
+                    issue_number=1096,
                 )
 
     def test_rejects_source_risk_delta_mismatch(self) -> None:
@@ -186,7 +192,7 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
                 build_objective_next_report(
                     input_guard_report=source,
                     output_dir=root / "objective_next",
-                    issue_number=928,
+                    issue_number=1096,
                 )
 
     def test_rejects_missing_source_context_field(self) -> None:
@@ -200,12 +206,30 @@ class StageBMidiToSoloTargetedQualityRepairObjectiveNextTest(unittest.TestCase):
                 build_objective_next_report(
                     input_guard_report=source,
                     output_dir=root / "objective_next",
-                    issue_number=1012,
+                    issue_number=1096,
+                )
+
+    def test_rejects_false_source_context_preserved_field(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = input_guard_report()
+            source["guard_result"]["source_summary"][
+                "followup_repair_sweep_source_outside_soloing_source_context_preserved"
+            ] = False
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairObjectiveNextError):
+                build_objective_next_report(
+                    input_guard_report=source,
+                    output_dir=root / "objective_next",
+                    issue_number=1096,
                 )
 
     def test_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_targeted_quality_repair_objective_only_next_decision")
         self.assertEqual(FOLLOWUP_DECISION_NEXT_BOUNDARY, "stage_b_midi_to_solo_targeted_quality_repair_followup_decision")
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_targeted_quality_repair_objective_next_v4",
+        )
 
 
 if __name__ == "__main__":
