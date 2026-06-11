@@ -18,6 +18,8 @@ from scripts.consolidate_stage_b_midi_to_solo_mvp_current_evidence import (  # n
     BRIDGE_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as CURRENT_EVIDENCE_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS,
 )
 
 
@@ -101,6 +103,7 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         "model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready",
         "outside_soloing_repair_objective_path_ready",
         "outside_soloing_repair_source_context_preserved",
+        "outside_soloing_repair_schema_context_preserved",
         "current_mvp_technical_execution_evidence_supported",
         "current_mvp_objective_repair_evidence_supported",
         "midi_to_solo_mvp_current_evidence_supported",
@@ -321,6 +324,22 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         outside_soloing_repair,
         label="outside-soloing repair current evidence",
     )
+    if str(
+        outside_soloing_repair.get("outside_soloing_repair_objective_schema_version")
+        or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            "outside-soloing repair objective schema version mismatch"
+        )
+    missing_schema_context = [
+        key
+        for key in SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS
+        if not str(outside_soloing_repair.get(key) or "")
+    ]
+    if missing_schema_context:
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            f"outside-soloing repair schema-context missing: {missing_schema_context}"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloMvpCompletionAuditError("critical user input should not be required")
     return {
@@ -452,6 +471,17 @@ def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
         "outside_soloing_repair_source_context_preserved": bool(
             readiness.get("outside_soloing_repair_source_context_preserved", False)
         ),
+        "outside_soloing_repair_schema_context_preserved": bool(
+            readiness.get("outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "outside_soloing_repair_objective_schema_version": str(
+            outside_soloing_repair.get("outside_soloing_repair_objective_schema_version")
+            or ""
+        ),
+        **{
+            f"outside_soloing_repair_{key}": outside_soloing_repair.get(key)
+            for key in SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS
+        },
         "outside_soloing_repair_current_evidence_ready": bool(
             outside_soloing_repair.get("current_evidence_consolidation_ready", False)
         ),
@@ -547,6 +577,13 @@ def validate_readme_refresh(readme_text: str) -> dict[str, Any]:
         "outside_soloing_source_context_reflected": (
             "outside-soloing source-context evidence reflected: `true`"
         ),
+        "outside_soloing_schema_context_reflected": (
+            "outside-soloing schema-context evidence reflected: `true`"
+        ),
+        "outside_soloing_objective_schema": (
+            "outside-soloing repair objective schema version: "
+            f"`{OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION}`"
+        ),
         "outside_soloing_source_risk": (
             "outside-soloing source pitch-role risk count: `5 -> 2`"
         ),
@@ -614,6 +651,9 @@ def build_mvp_completion_audit_report(
             "outside_soloing_repair_source_context_preserved": bool(
                 evidence["outside_soloing_repair_source_context_preserved"]
             ),
+            "outside_soloing_repair_schema_context_preserved": bool(
+                evidence["outside_soloing_repair_schema_context_preserved"]
+            ),
             "readme_evidence_boundary_refreshed": True,
             "musical_quality_mvp_completed": False,
             "human_audio_preference_completed": False,
@@ -638,6 +678,9 @@ def build_mvp_completion_audit_report(
             ),
             "outside_soloing_repair_source_context_preserved": bool(
                 evidence["outside_soloing_repair_source_context_preserved"]
+            ),
+            "outside_soloing_repair_schema_context_preserved": bool(
+                evidence["outside_soloing_repair_schema_context_preserved"]
             ),
             "quality_gap_decision_required": True,
             "human_audio_preference_claimed": False,
@@ -767,6 +810,9 @@ def validate_mvp_completion_audit_report(
         "outside_soloing_repair_source_context_preserved": bool(
             audit.get("outside_soloing_repair_source_context_preserved", False)
         ),
+        "outside_soloing_repair_schema_context_preserved": bool(
+            audit.get("outside_soloing_repair_schema_context_preserved", False)
+        ),
         "musical_quality_mvp_completed": bool(audit.get("musical_quality_mvp_completed", True)),
         "human_audio_preference_completed": bool(audit.get("human_audio_preference_completed", True)),
         "product_mvp_completed": bool(audit.get("product_mvp_completed", True)),
@@ -852,6 +898,18 @@ def validate_mvp_completion_audit_report(
         "outside_soloing_repair_source_context_preserved": bool(
             evidence.get("outside_soloing_repair_source_context_preserved", False)
         ),
+        "outside_soloing_repair_schema_context_preserved": bool(
+            evidence.get("outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "outside_soloing_repair_objective_schema_version": str(
+            evidence.get("outside_soloing_repair_objective_schema_version") or ""
+        ),
+        **{
+            f"outside_soloing_repair_{key}": evidence.get(
+                f"outside_soloing_repair_{key}"
+            )
+            for key in SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS
+        },
         "outside_soloing_repair_current_evidence_ready": bool(
             evidence.get("outside_soloing_repair_current_evidence_ready", False)
         ),
