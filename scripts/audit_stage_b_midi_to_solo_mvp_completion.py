@@ -14,7 +14,9 @@ sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
 from scripts.consolidate_stage_b_midi_to_solo_mvp_current_evidence import (  # noqa: E402
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as CURRENT_EVIDENCE_BOUNDARY,
 )
 
@@ -55,12 +57,19 @@ def _bool_token(value: Any) -> str:
 
 
 def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
-    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in container:
             raise StageBMidiToSoloMvpCompletionAuditError(
                 f"{label} source-context field required: {key}"
             )
-    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
+    missing_preserved = [
+        key for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS if not bool(container.get(key))
+    ]
+    if missing_preserved:
+        raise StageBMidiToSoloMvpCompletionAuditError(
+            f"{label} source-context preserved field must be true: {missing_preserved}"
+        )
+    return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
 
 
 def validate_current_evidence(report: dict[str, Any]) -> dict[str, Any]:
@@ -894,7 +903,7 @@ def validate_mvp_completion_audit_report(
         "outside_soloing_repair_preference_fill_allowed": bool(
             evidence.get("outside_soloing_repair_preference_fill_allowed", True)
         ),
-        **{key: evidence.get(key) for key in BRIDGE_SOURCE_CONTEXT_KEYS},
+        **{key: evidence.get(key) for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
         "human_audio_preference_claimed": bool(readiness.get("human_audio_preference_claimed", True)),
         "midi_to_solo_musical_quality_claimed": bool(
             readiness.get("midi_to_solo_musical_quality_claimed", True)
@@ -970,10 +979,13 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- outside-soloing pitch-role risk after / delta: `{evidence['outside_soloing_repair_pitch_role_risk_count_after']}` / `{evidence['outside_soloing_repair_pitch_role_risk_delta']}`",
         f"- follow-up objective source outside-soloing source pitch-role risk: `{evidence['followup_objective_source_outside_soloing_source_pitch_role_risk_count_before']} -> {evidence['followup_objective_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `{evidence['followup_objective_source_outside_soloing_current_pitch_role_risk_count_after']} / {evidence['followup_objective_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(evidence['followup_objective_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing source pitch-role risk: `{evidence['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {evidence['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `{evidence['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {evidence['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(evidence['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- bridge repair sweep source outside-soloing source pitch-role risk: `{evidence['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {evidence['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `{evidence['repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {evidence['repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(evidence['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- outside-soloing repair objective path supported: `{_bool_token(evidence['outside_soloing_repair_objective_path_supported'])}`",
         f"- outside-soloing repair target supported: `{_bool_token(evidence['outside_soloing_repair_target_supported'])}`",
         f"- outside-soloing repair weak landing target supported: `{_bool_token(evidence['outside_soloing_repair_weak_landing_target_supported'])}`",
