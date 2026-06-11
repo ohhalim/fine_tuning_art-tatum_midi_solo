@@ -6,6 +6,7 @@ from pathlib import Path
 from scripts.audit_stage_b_midi_to_solo_mvp_completion import (
     BOUNDARY,
     NEXT_BOUNDARY,
+    SCHEMA_VERSION,
     StageBMidiToSoloMvpCompletionAuditError,
     build_mvp_completion_audit_report,
     validate_mvp_completion_audit_report,
@@ -226,7 +227,7 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
             current_evidence=current_evidence(),
             readme_text=readme_text(),
             output_dir=Path("outputs/audit"),
-            issue_number=616,
+            issue_number=1070,
         )
         summary = validate_mvp_completion_audit_report(
             report,
@@ -335,6 +336,8 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
         for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
             self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
+        self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(report["issue_number"], 1070)
 
     def test_rejects_missing_outside_soloing_source_context_field(self) -> None:
         evidence = current_evidence()
@@ -346,7 +349,7 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
                 current_evidence=evidence,
                 readme_text=readme_text(),
                 output_dir=Path("outputs/audit"),
-                issue_number=986,
+                issue_number=1070,
             )
 
     def test_rejects_false_outside_soloing_source_context_preserved_flag(self) -> None:
@@ -359,7 +362,7 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
                 current_evidence=evidence,
                 readme_text=readme_text(),
                 output_dir=Path("outputs/audit"),
-                issue_number=1068,
+                issue_number=1070,
             )
 
     def test_rejects_missing_readme_evidence_boundary(self) -> None:
@@ -419,6 +422,7 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
     def test_boundary_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_mvp_completion_audit")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_quality_gap_decision")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_mvp_completion_audit_v3")
 
 
 if __name__ == "__main__":

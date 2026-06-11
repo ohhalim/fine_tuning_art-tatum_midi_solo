@@ -6,8 +6,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 
 ## 현재 상태
 
-- latest functional result: `Issue #1066`
-- latest MVP completion audit: `Issue #986`
+- latest functional result: `Issue #1070`
+- latest MVP completion audit: `Issue #1070`
 - latest quality gap decision: `Issue #988`
 - latest listening review quality gap: `Issue #990`
 - latest MVP delivery package: `Issue #992`
@@ -49,9 +49,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: `Issue #1064`
 - latest MVP current evidence consolidation: `Issue #1066`
 - latest README evidence refresh: `Issue #1068`
-- latest functional boundary: `stage_b_midi_to_solo_readme_evidence_refresh`
-- open issue queue after README evidence refresh source-context refresh merge: `0`
-- latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- latest functional boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- open issue queue after MVP completion audit source-context refresh merge: `0`
+- latest evidence boundary: `stage_b_midi_to_solo_mvp_completion_audit`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
 - technical model-core MVP completed: `true`
@@ -1154,6 +1154,12 @@ MVP completion audit.
 - selected-scale objective repair completed: `true`
 - phrase-bank CLI technical path completed: `true`
 - model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour changed-ratio repair objective completed: `true`
+- outside-soloing repair objective completed: `true`
+- outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - model-conditioned pitch-contour max interval / threshold: `11 / 12`
 - model-conditioned pitch-contour changed-ratio review required: `true`
 - musical quality MVP completed: `false`

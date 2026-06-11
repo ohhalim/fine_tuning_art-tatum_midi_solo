@@ -12,8 +12,8 @@
 
 현재 active issue:
 
-- latest functional result: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
-- latest MVP completion audit: Issue #986, Stage B MIDI-to-solo MVP completion audit source-context refresh
+- latest functional result: Issue #1070, Stage B MIDI-to-solo MVP completion audit source-context refresh
+- latest MVP completion audit: Issue #1070, Stage B MIDI-to-solo MVP completion audit source-context refresh
 - latest quality gap decision: Issue #988, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #990, Stage B MIDI-to-solo listening review quality gap source-context refresh
 - latest MVP delivery package: Issue #992, Stage B MIDI-to-solo MVP delivery package source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after README evidence refresh source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP completion audit source-context refresh`
+- open issue queue after MVP completion audit source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo quality gap decision source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5114,6 +5114,57 @@ Issue #1068은 Issue #1066 MVP current evidence consolidation 결과를 README e
 다음:
 
 - `Stage B MIDI-to-solo MVP completion audit source-context refresh`
+
+## Stage B MIDI-to-Solo MVP Completion Audit Source-Context Refresh Result
+
+Issue #1070은 Issue #1066 current evidence와 Issue #1068 README evidence refresh를 기준으로 technical model-core MVP completion audit을 #1070 boundary로 갱신한 작업이다.
+
+변경:
+
+- MVP completion audit schema v3 적용
+- harness issue number #1070 반영
+- audit report issue number와 schema assertion 추가
+- generated completion audit doc, README, current status, core plan, handoff scope 갱신
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_COMPLETION_AUDIT_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_mvp_completion_audit`
+- next boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- technical model-core MVP completed: `true`
+- input to ranked MIDI completed: `true`
+- input to rendered WAV completed: `true`
+- selected-scale objective repair completed: `true`
+- phrase-bank CLI technical path completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour changed-ratio repair objective completed: `true`
+- outside-soloing repair objective completed: `true`
+- outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- musical quality MVP completed: `false`
+- human/audio preference completed: `false`
+- product MVP completed: `false`
+
+판단:
+
+- #1068 README evidence refresh의 preserved flag 3개가 audit report와 validation summary까지 유지됨.
+- technical model-core MVP completion은 `true`.
+- listening review input, human/audio preference, MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_completion_audit`
+- `.venv/bin/python -m py_compile scripts/audit_stage_b_midi_to_solo_mvp_completion.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음:
+
+- `Stage B MIDI-to-solo quality gap decision source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

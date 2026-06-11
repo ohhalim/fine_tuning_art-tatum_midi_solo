@@ -90,4 +90,4 @@
 
 ## Next
 
-- `Stage B MIDI-to-solo quality gap decision`
+- `Stage B MIDI-to-solo quality gap decision source-context refresh`
