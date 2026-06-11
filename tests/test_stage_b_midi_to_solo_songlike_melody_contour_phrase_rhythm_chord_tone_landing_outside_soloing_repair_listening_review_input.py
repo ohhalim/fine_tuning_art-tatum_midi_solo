@@ -5,13 +5,42 @@ import unittest
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package import (
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_SCHEMA_VERSION,
+    SOURCE_PACKAGE_SCHEMA_CONTEXT_KEYS,
 )
 from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input import (
     BOUNDARY,
     OBJECTIVE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as GUARD_SCHEMA_VERSION,
+    SOURCE_GUARD_SCHEMA_CONTEXT_KEYS,
     StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError,
     build_listening_review_input_guard_report,
     validate_listening_review_input_guard_report,
+)
+from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio import (
+    SCHEMA_VERSION as SOURCE_AUDIO_PACKAGE_SCHEMA_VERSION,
+    SOURCE_SWEEP_SCHEMA_VERSION,
+)
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup import (
+    SCHEMA_VERSION as SOURCE_FOLLOWUP_SCHEMA_VERSION,
+)
+from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input import (
+    SCHEMA_VERSION as SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package import (
+    SCHEMA_VERSION as SOURCE_PACKAGE_SCHEMA_VERSION,
+)
+from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio import (
+    SCHEMA_VERSION as SOURCE_AUDIO_SCHEMA_VERSION,
+)
+from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep import (
+    SCHEMA_VERSION as CHORD_TONE_REPAIR_SWEEP_SCHEMA_VERSION,
+)
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective import (
+    SCHEMA_VERSION as CHORD_CONTEXT_OBJECTIVE_SCHEMA_VERSION,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
+    SCHEMA_VERSION as BRIDGE_SCHEMA_VERSION,
 )
 
 
@@ -41,6 +70,17 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_source_context_preserved": True,
 }
+SOURCE_PACKAGE_SCHEMA_CONTEXT = {
+    "source_schema_version": SOURCE_AUDIO_PACKAGE_SCHEMA_VERSION,
+    "source_repair_sweep_schema_version": SOURCE_SWEEP_SCHEMA_VERSION,
+    "source_followup_schema_version": SOURCE_FOLLOWUP_SCHEMA_VERSION,
+    "source_objective_input_guard_schema_version": SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+    "source_package_schema_version": SOURCE_PACKAGE_SCHEMA_VERSION,
+    "source_audio_schema_version": SOURCE_AUDIO_SCHEMA_VERSION,
+    "chord_tone_repair_sweep_schema_version": CHORD_TONE_REPAIR_SWEEP_SCHEMA_VERSION,
+    "chord_tone_repair_sweep_source_schema_version": CHORD_CONTEXT_OBJECTIVE_SCHEMA_VERSION,
+    "chord_tone_repair_sweep_bridge_schema_version": BRIDGE_SCHEMA_VERSION,
+}
 
 
 def source_package(*, quality_claim: bool = False, validated_input: bool = False) -> dict:
@@ -55,8 +95,11 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
         for index in range(1, 7)
     ]
     return {
+        "schema_version": SOURCE_SCHEMA_VERSION,
         "boundary": SOURCE_BOUNDARY,
+        "source_schema_version": SOURCE_AUDIO_PACKAGE_SCHEMA_VERSION,
         "source_summary": {
+            **SOURCE_PACKAGE_SCHEMA_CONTEXT,
             "technical_wav_validation": True,
             "rendered_audio_file_count": 6,
             "sample_rate": 44100,
@@ -104,6 +147,7 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
             "broad_trained_model_quality_claimed": False,
             "brad_style_adaptation_claimed": False,
             "production_ready_claimed": False,
+            **SOURCE_PACKAGE_SCHEMA_CONTEXT,
             **SOURCE_CONTEXT,
         },
         "decision": {
@@ -119,7 +163,7 @@ class StageBMidiToSoloOutsideSoloingRepairListeningInputGuardTest(unittest.TestC
         report = build_listening_review_input_guard_report(
             source_package(),
             output_dir="unused",
-            issue_number=1062,
+            issue_number=1146,
         )
         summary = validate_listening_review_input_guard_report(
             report,
@@ -152,6 +196,20 @@ class StageBMidiToSoloOutsideSoloingRepairListeningInputGuardTest(unittest.TestC
         self.assertEqual(summary["weak_chord_tone_landing_risk_count_after"], 0)
         self.assertEqual(summary["final_landing_chord_tone_count_after"], 6)
         self.assertEqual(summary["max_non_chord_tone_run_after"], 3)
+        self.assertEqual(report["schema_version"], GUARD_SCHEMA_VERSION)
+        self.assertEqual(report["issue_number"], 1146)
+        self.assertEqual(report["source_schema_version"], SOURCE_SCHEMA_VERSION)
+        self.assertEqual(summary["source_schema_version"], SOURCE_SCHEMA_VERSION)
+        self.assertEqual(
+            summary["source_audio_package_schema_version"],
+            SOURCE_AUDIO_PACKAGE_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            summary["source_repair_sweep_schema_version"], SOURCE_SWEEP_SCHEMA_VERSION
+        )
+        for key in SOURCE_GUARD_SCHEMA_CONTEXT_KEYS:
+            self.assertEqual(report["guard_result"]["source_summary"][key], summary[key])
+            self.assertEqual(report["readiness"][key], summary[key])
         for key, value in SOURCE_CONTEXT.items():
             self.assertEqual(report["guard_result"]["source_summary"][key], value)
             self.assertEqual(report["readiness"][key], value)
@@ -164,14 +222,34 @@ class StageBMidiToSoloOutsideSoloingRepairListeningInputGuardTest(unittest.TestC
             build_listening_review_input_guard_report(
                 source_package(quality_claim=True),
                 output_dir="unused",
-                issue_number=1062,
+                issue_number=1146,
+            )
+
+    def test_rejects_source_package_schema_mismatch(self) -> None:
+        source = source_package()
+        source["schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError):
+            build_listening_review_input_guard_report(
+                source,
+                output_dir="unused",
+                issue_number=1146,
+            )
+
+    def test_rejects_source_package_schema_context_mismatch(self) -> None:
+        source = source_package()
+        source["readiness"][SOURCE_PACKAGE_SCHEMA_CONTEXT_KEYS[1]] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloOutsideSoloingRepairListeningInputGuardError):
+            build_listening_review_input_guard_report(
+                source,
+                output_dir="unused",
+                issue_number=1146,
             )
 
     def test_routes_to_fill_when_validated_input_exists(self) -> None:
         report = build_listening_review_input_guard_report(
             source_package(validated_input=True),
             output_dir="unused",
-            issue_number=1062,
+            issue_number=1146,
         )
         self.assertTrue(report["guard_result"]["preference_fill_allowed"])
         self.assertTrue(report["guard_result"]["validated_review_input_present"])
@@ -185,7 +263,7 @@ class StageBMidiToSoloOutsideSoloingRepairListeningInputGuardTest(unittest.TestC
             build_listening_review_input_guard_report(
                 source,
                 output_dir="unused",
-                issue_number=1062,
+                issue_number=1146,
             )
 
     def test_constants_are_stable(self) -> None:
@@ -196,6 +274,10 @@ class StageBMidiToSoloOutsideSoloingRepairListeningInputGuardTest(unittest.TestC
         self.assertEqual(
             OBJECTIVE_NEXT_BOUNDARY,
             "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision",
+        )
+        self.assertEqual(
+            GUARD_SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input_guard_v4",
         )
 
 
