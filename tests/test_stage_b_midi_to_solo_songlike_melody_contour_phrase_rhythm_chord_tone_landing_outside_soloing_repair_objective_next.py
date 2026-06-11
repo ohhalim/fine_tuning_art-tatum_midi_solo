@@ -6,6 +6,8 @@ from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_c
     BOUNDARY,
     CURRENT_EVIDENCE_NEXT_BOUNDARY,
     REPAIR_RETRY_NEXT_BOUNDARY,
+    SCHEMA_VERSION as OBJECTIVE_SCHEMA_VERSION,
+    SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS,
     StageBMidiToSoloOutsideSoloingRepairObjectiveNextError,
     build_objective_next_report,
     validate_objective_next_report,
@@ -13,9 +15,37 @@ from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_c
 from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input import (
     BOUNDARY as SOURCE_BOUNDARY,
     OBJECTIVE_NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_SCHEMA_VERSION,
+    SOURCE_GUARD_SCHEMA_CONTEXT_KEYS,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package import (
+    SCHEMA_VERSION as SOURCE_LISTENING_PACKAGE_SCHEMA_VERSION,
+)
+from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio import (
+    SCHEMA_VERSION as SOURCE_AUDIO_PACKAGE_SCHEMA_VERSION,
+    SOURCE_SWEEP_SCHEMA_VERSION,
+)
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup import (
+    SCHEMA_VERSION as SOURCE_FOLLOWUP_SCHEMA_VERSION,
+)
+from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input import (
+    SCHEMA_VERSION as SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package import (
+    SCHEMA_VERSION as SOURCE_PACKAGE_SCHEMA_VERSION,
+)
+from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio import (
+    SCHEMA_VERSION as SOURCE_AUDIO_SCHEMA_VERSION,
+)
+from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep import (
+    SCHEMA_VERSION as CHORD_TONE_REPAIR_SWEEP_SCHEMA_VERSION,
+)
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective import (
+    SCHEMA_VERSION as CHORD_CONTEXT_OBJECTIVE_SCHEMA_VERSION,
 )
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    SCHEMA_VERSION as BRIDGE_SCHEMA_VERSION,
 )
 
 
@@ -48,6 +78,16 @@ SOURCE_CONTEXT = {
 
 
 SOURCE_SUMMARY = {
+    "source_schema_version": SOURCE_LISTENING_PACKAGE_SCHEMA_VERSION,
+    "source_audio_package_schema_version": SOURCE_AUDIO_PACKAGE_SCHEMA_VERSION,
+    "source_repair_sweep_schema_version": SOURCE_SWEEP_SCHEMA_VERSION,
+    "source_followup_schema_version": SOURCE_FOLLOWUP_SCHEMA_VERSION,
+    "source_objective_input_guard_schema_version": SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+    "source_package_schema_version": SOURCE_PACKAGE_SCHEMA_VERSION,
+    "source_audio_schema_version": SOURCE_AUDIO_SCHEMA_VERSION,
+    "chord_tone_repair_sweep_schema_version": CHORD_TONE_REPAIR_SWEEP_SCHEMA_VERSION,
+    "chord_tone_repair_sweep_source_schema_version": CHORD_CONTEXT_OBJECTIVE_SCHEMA_VERSION,
+    "chord_tone_repair_sweep_bridge_schema_version": BRIDGE_SCHEMA_VERSION,
     "technical_wav_validation": True,
     "rendered_audio_file_count": 6,
     "sample_rate": 44100,
@@ -79,7 +119,9 @@ def input_guard(
 ) -> dict:
     summary = source_summary if source_summary is not None else dict(SOURCE_SUMMARY)
     return {
+        "schema_version": SOURCE_SCHEMA_VERSION,
         "boundary": SOURCE_BOUNDARY,
+        "source_schema_version": SOURCE_LISTENING_PACKAGE_SCHEMA_VERSION,
         "guard_result": {
             "validated_review_input_present": False,
             "preference_fill_allowed": preference_fill_allowed,
@@ -97,6 +139,7 @@ def input_guard(
             "broad_trained_model_quality_claimed": False,
             "brad_style_adaptation_claimed": False,
             "production_ready_claimed": False,
+            **{key: summary.get(key) for key in SOURCE_GUARD_SCHEMA_CONTEXT_KEYS},
         },
         "decision": {
             "next_boundary": SOURCE_NEXT_BOUNDARY,
@@ -110,7 +153,7 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
         report = build_objective_next_report(
             input_guard_report=input_guard(),
             output_dir="out",
-            issue_number=1064,
+            issue_number=1148,
             max_non_chord_tone_run_threshold=3,
             min_final_landing_chord_tone_count=6,
         )
@@ -150,6 +193,21 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
         self.assertTrue(summary["non_chord_run_target_supported"])
         self.assertTrue(summary["outside_soloing_repair_objective_path_supported"])
         self.assertTrue(summary["current_evidence_consolidation_ready"])
+        self.assertEqual(report["schema_version"], OBJECTIVE_SCHEMA_VERSION)
+        self.assertEqual(report["issue_number"], 1148)
+        self.assertEqual(report["source_schema_version"], SOURCE_SCHEMA_VERSION)
+        self.assertEqual(summary["source_schema_version"], SOURCE_SCHEMA_VERSION)
+        self.assertEqual(
+            summary["source_listening_package_schema_version"],
+            SOURCE_LISTENING_PACKAGE_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            summary["source_audio_package_schema_version"],
+            SOURCE_AUDIO_PACKAGE_SCHEMA_VERSION,
+        )
+        for key in SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS:
+            self.assertEqual(report["objective_summary"][key], summary[key])
+            self.assertEqual(report["readiness"][key], summary[key])
         for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
             self.assertIn(key, report["objective_summary"])
             self.assertIn(key, report["readiness"])
@@ -163,7 +221,7 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
         report = build_objective_next_report(
             input_guard_report=input_guard(source_summary=broken_summary),
             output_dir="out",
-            issue_number=1064,
+            issue_number=1148,
             max_non_chord_tone_run_threshold=3,
             min_final_landing_chord_tone_count=6,
         )
@@ -185,7 +243,7 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
             build_objective_next_report(
                 input_guard_report=input_guard(preference_fill_allowed=True),
                 output_dir="out",
-                issue_number=1064,
+                issue_number=1148,
                 max_non_chord_tone_run_threshold=3,
                 min_final_landing_chord_tone_count=6,
             )
@@ -195,7 +253,7 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
             build_objective_next_report(
                 input_guard_report=input_guard(quality_claim=True),
                 output_dir="out",
-                issue_number=1064,
+                issue_number=1148,
                 max_non_chord_tone_run_threshold=3,
                 min_final_landing_chord_tone_count=6,
             )
@@ -209,7 +267,31 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
             build_objective_next_report(
                 input_guard_report=input_guard(source_summary=broken_summary),
                 output_dir="out",
-                issue_number=1064,
+                issue_number=1148,
+                max_non_chord_tone_run_threshold=3,
+                min_final_landing_chord_tone_count=6,
+            )
+
+    def test_rejects_input_guard_schema_mismatch(self) -> None:
+        source = input_guard()
+        source["schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloOutsideSoloingRepairObjectiveNextError):
+            build_objective_next_report(
+                input_guard_report=source,
+                output_dir="out",
+                issue_number=1148,
+                max_non_chord_tone_run_threshold=3,
+                min_final_landing_chord_tone_count=6,
+            )
+
+    def test_rejects_input_guard_schema_context_mismatch(self) -> None:
+        source = input_guard()
+        source["readiness"][SOURCE_GUARD_SCHEMA_CONTEXT_KEYS[1]] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloOutsideSoloingRepairObjectiveNextError):
+            build_objective_next_report(
+                input_guard_report=source,
+                output_dir="out",
+                issue_number=1148,
                 max_non_chord_tone_run_threshold=3,
                 min_final_landing_chord_tone_count=6,
             )
@@ -222,6 +304,10 @@ class StageBMidiToSoloOutsideSoloingRepairObjectiveNextTest(unittest.TestCase):
         self.assertEqual(
             CURRENT_EVIDENCE_NEXT_BOUNDARY,
             "stage_b_midi_to_solo_mvp_current_evidence_consolidation",
+        )
+        self.assertEqual(
+            OBJECTIVE_SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4",
         )
 
 

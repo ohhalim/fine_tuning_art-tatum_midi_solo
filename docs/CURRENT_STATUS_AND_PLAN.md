@@ -52,12 +52,12 @@
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: Issue #1142, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: Issue #1144, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: Issue #1146, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: Issue #1064, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh
+- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: Issue #1148, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5200,14 +5200,14 @@ Issue #1146은 Issue #1144 listening review package의 source schema chain과 so
 
 ## Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Chord-Tone Landing Outside-Soloing Repair Objective-Only Next Decision Source-Context Refresh Result
 
-Issue #1064는 Issue #1062 input guard의 source-context preserved flag를 objective-only next decision summary와 readiness까지 보존하고, objective evidence 기준 current evidence consolidation 경로를 유지한 작업이다.
+Issue #1148은 Issue #1146 input guard v4의 source schema chain을 objective-only next decision summary와 readiness까지 보존하고, objective evidence 기준 current evidence consolidation 경로를 유지한 작업이다.
 
 변경:
 
-- objective-only next decision schema v3 적용
-- input guard required source-context key와 preserved flag 3개 필수 검증
-- objective summary, readiness, validation summary source-context preserved field 전파
-- harness issue number와 generated doc path를 #1064 기준으로 갱신
+- objective-only next decision schema v4 적용
+- input guard schema v4와 source schema-context key 일치 검증
+- objective summary, readiness, validation summary schema/context field 전파
+- harness issue number와 generated doc path를 #1148 기준으로 갱신
 - next recommended issue를 MVP current evidence consolidation source-context refresh로 갱신
 
 결과:
@@ -5216,6 +5216,10 @@ Issue #1064는 Issue #1062 input guard의 source-context preserved flag를 objec
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_only_next_decision`
 - source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input_guard`
 - next boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
+- source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_input_guard_v4`
+- source listening package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_listening_review_package_v4`
+- source audio package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_audio_package_v4`
+- source repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep_v3`
 - selected target: `current_evidence_consolidation`
 - review item count: `6`
 - validated review input present: `false`
@@ -5243,7 +5247,7 @@ Issue #1064는 Issue #1062 input guard의 source-context preserved flag를 objec
 
 판단:
 
-- Issue #1062 input guard의 preserved flag 3개가 objective summary와 readiness까지 유지됨.
+- Issue #1146 input guard v4의 source schema chain과 preserved context가 objective summary와 readiness까지 유지됨.
 - outside-soloing, weak landing, final landing, non-chord run objective target 통과.
 - current evidence consolidation 준비 완료. 단, listening review input과 musical quality claim은 계속 제외.
 
