@@ -108,6 +108,8 @@ raw model generation은 note grammar가 자주 깨졌다.
 - final status audit: technical evidence ready `true`, strict `22 / 24`, grammar-valid `24 / 24`, rendered WAV `8`
 - final status audit claim boundary: musical quality claim `false`, raw artifact upload required `false`
 - next boundary: `music_transformer_solo_yield_readme_final_evidence_refresh`
+- 4bar repaired top8 objective failure review: final landing not chord-tone `8 / 8`, package low chord-tone ratio `8 / 8`, MIDI low chord-tone ratio `6 / 8`, dead-air still high `3 / 8`
+- next boundary: `music_transformer_solo_yield_chord_tone_landing_repair_sweep`
 
 ## 결과 파일
 
@@ -152,6 +154,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_FINAL_STATUS_AUDIT_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_README_FINAL_EVIDENCE_REFRESH_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_FINAL_HANDOFF_SUMMARY_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_REPAIRED_TOP8_OBJECTIVE_FAILURE_REVIEW_2026-06-11.md`
 
 ## 실행 방법
 
@@ -212,8 +215,10 @@ Report:
 
 ## 다음 작업
 
-- repaired 4bar top8 WAV/MIDI 청취 리뷰
+- chord-tone landing repair sweep
+- repair 후 strict / grammar / final landing 지표 비교
+- repaired candidate listening package 갱신
+- WAV/MIDI 청취 리뷰
 - 청취 결과 기준 keep/reject 후보 기록
-- rejected 후보 공통 실패 원인 라벨링
 - 음악적 품질 claim 여부는 청취 리뷰 이후 재판단
-- 다음 품질 개선 후보: dead-air 추가 완화, phrase tension/release, chord-tone landing, outside-soloing pitch-role
+- 다음 품질 개선 후보: dead-air 추가 완화, phrase tension/release, outside-soloing pitch-role
