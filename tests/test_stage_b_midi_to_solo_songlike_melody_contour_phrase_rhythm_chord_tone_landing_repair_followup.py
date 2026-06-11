@@ -8,6 +8,7 @@ from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_c
     BOUNDARY,
     NEXT_BOUNDARY,
     PRIMARY_RISK_LABEL,
+    SCHEMA_VERSION,
     SELECTED_TARGET,
     StageBMidiToSoloChordToneLandingRepairFollowupDecisionError,
     build_followup_decision_report,
@@ -16,10 +17,28 @@ from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_c
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_next import (
     BOUNDARY as OBJECTIVE_NEXT_BOUNDARY,
     FOLLOWUP_DECISION_NEXT_BOUNDARY,
+    SCHEMA_VERSION as OBJECTIVE_NEXT_SCHEMA_VERSION,
     SELECTED_TARGET as OBJECTIVE_NEXT_SELECTED_TARGET,
+)
+from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input import (
+    SCHEMA_VERSION as SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package import (
+    SCHEMA_VERSION as SOURCE_PACKAGE_SCHEMA_VERSION,
+)
+from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio import (
+    SCHEMA_VERSION as SOURCE_AUDIO_SCHEMA_VERSION,
+)
+from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective import (
+    SCHEMA_VERSION as SWEEP_SOURCE_SCHEMA_VERSION,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+    SCHEMA_VERSION as SWEEP_BRIDGE_SCHEMA_VERSION,
 )
 from scripts.run_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep import (
     BOUNDARY as SWEEP_BOUNDARY,
+    SCHEMA_VERSION as SWEEP_SCHEMA_VERSION,
 )
 
 SOURCE_CONTEXT = {
@@ -52,8 +71,12 @@ SOURCE_CONTEXT = {
 
 def objective_next_report(*, quality_claim: bool = False, outside_after: int = 2) -> dict:
     return {
+        "schema_version": OBJECTIVE_NEXT_SCHEMA_VERSION,
         "boundary": OBJECTIVE_NEXT_BOUNDARY,
         "source_boundary": "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard",
+        "source_schema_version": SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+        "source_package_schema_version": SOURCE_PACKAGE_SCHEMA_VERSION,
+        "source_audio_schema_version": SOURCE_AUDIO_SCHEMA_VERSION,
         "objective_summary": {
             "review_item_count": 6,
             "required_input_field_count": 4,
@@ -105,7 +128,10 @@ def objective_next_report(*, quality_claim: bool = False, outside_after: int = 2
 
 def repair_sweep_report(*, target_supported: bool = True) -> dict:
     return {
+        "schema_version": SWEEP_SCHEMA_VERSION,
         "boundary": SWEEP_BOUNDARY,
+        "source_schema_version": SWEEP_SOURCE_SCHEMA_VERSION,
+        "bridge_schema_version": SWEEP_BRIDGE_SCHEMA_VERSION,
         "aggregate": {
             "candidate_count": 6,
             "repaired_midi_count": 6,
@@ -156,7 +182,7 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                 objective_next_report=objective_next_report(),
                 repair_sweep_report=repair_sweep_report(),
                 output_dir=Path(tmp) / "followup",
-                issue_number=1054,
+                issue_number=1138,
             )
             summary = validate_followup_decision_report(
                 report,
@@ -169,6 +195,17 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
             )
 
             self.assertTrue(summary["followup_decision_completed"])
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(summary["source_schema_version"], OBJECTIVE_NEXT_SCHEMA_VERSION)
+            self.assertEqual(
+                summary["source_input_guard_schema_version"],
+                SOURCE_INPUT_GUARD_SCHEMA_VERSION,
+            )
+            self.assertEqual(summary["source_package_schema_version"], SOURCE_PACKAGE_SCHEMA_VERSION)
+            self.assertEqual(summary["source_audio_schema_version"], SOURCE_AUDIO_SCHEMA_VERSION)
+            self.assertEqual(summary["repair_sweep_schema_version"], SWEEP_SCHEMA_VERSION)
+            self.assertEqual(summary["repair_sweep_source_schema_version"], SWEEP_SOURCE_SCHEMA_VERSION)
+            self.assertEqual(summary["repair_sweep_bridge_schema_version"], SWEEP_BRIDGE_SCHEMA_VERSION)
             self.assertTrue(summary["outside_soloing_repair_selected"])
             self.assertEqual(summary["primary_remaining_risk_label"], PRIMARY_RISK_LABEL)
             self.assertEqual(summary["primary_remaining_risk_count"], 2)
@@ -238,7 +275,39 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                     objective_next_report=objective_next_report(quality_claim=True),
                     repair_sweep_report=repair_sweep_report(),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=1054,
+                    issue_number=1138,
+                )
+
+    def test_rejects_objective_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            report = objective_next_report()
+            report["schema_version"] = (
+                "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_next_v2"
+            )
+            with self.assertRaises(
+                StageBMidiToSoloChordToneLandingRepairFollowupDecisionError
+            ):
+                build_followup_decision_report(
+                    objective_next_report=report,
+                    repair_sweep_report=repair_sweep_report(),
+                    output_dir=Path(tmp) / "followup",
+                    issue_number=1138,
+                )
+
+    def test_rejects_repair_sweep_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            sweep = repair_sweep_report()
+            sweep["schema_version"] = (
+                "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep_v3"
+            )
+            with self.assertRaises(
+                StageBMidiToSoloChordToneLandingRepairFollowupDecisionError
+            ):
+                build_followup_decision_report(
+                    objective_next_report=objective_next_report(),
+                    repair_sweep_report=sweep,
+                    output_dir=Path(tmp) / "followup",
+                    issue_number=1138,
                 )
 
     def test_rejects_missing_repair_support(self) -> None:
@@ -250,7 +319,7 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                     objective_next_report=objective_next_report(),
                     repair_sweep_report=repair_sweep_report(target_supported=False),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=1054,
+                    issue_number=1138,
                 )
 
     def test_rejects_missing_outside_soloing_risk(self) -> None:
@@ -262,7 +331,7 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                     objective_next_report=objective_next_report(outside_after=0),
                     repair_sweep_report=repair_sweep_report(),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=1054,
+                    issue_number=1138,
                 )
 
     def test_rejects_source_context_preservation_flag(self) -> None:
@@ -278,7 +347,30 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
                     objective_next_report=report,
                     repair_sweep_report=repair_sweep_report(),
                     output_dir=Path(tmp) / "followup",
-                    issue_number=1054,
+                    issue_number=1138,
+                )
+
+    def test_rejects_report_preserved_flag_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            report = build_followup_decision_report(
+                objective_next_report=objective_next_report(),
+                repair_sweep_report=repair_sweep_report(),
+                output_dir=Path(tmp) / "followup",
+                issue_number=1138,
+            )
+            report["readiness"][BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS[0]] = False
+
+            with self.assertRaises(
+                StageBMidiToSoloChordToneLandingRepairFollowupDecisionError
+            ):
+                validate_followup_decision_report(
+                    report,
+                    expected_boundary=BOUNDARY,
+                    expected_next_boundary=NEXT_BOUNDARY,
+                    expected_target=SELECTED_TARGET,
+                    require_followup_decision=True,
+                    require_outside_soloing_repair=True,
+                    require_no_quality_claim=True,
                 )
 
     def test_constants_are_stable(self) -> None:
@@ -293,6 +385,10 @@ class StageBMidiToSoloChordToneLandingRepairFollowupDecisionTest(unittest.TestCa
         self.assertEqual(
             SELECTED_TARGET,
             "songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep",
+        )
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision_v3",
         )
 
 

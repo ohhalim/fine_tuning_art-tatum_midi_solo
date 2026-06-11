@@ -47,7 +47,7 @@
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: Issue #1132, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: Issue #1134, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: Issue #1136, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: Issue #1054, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh
+- latest songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: Issue #1138, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep: Issue #1056, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: Issue #1058, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package source-context refresh
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: Issue #1060, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh`
+- open issue queue after songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -4869,12 +4869,12 @@ Issue #1136은 Issue #1134 input guard v3의 source-context preserved flag를 ob
 
 ## Stage B MIDI-to-Solo Songlike Melody Contour Phrase/Rhythm Chord-Tone Landing Repair Follow-Up Decision Source-Context Refresh Result
 
-Issue #1054는 Issue #1052 objective-only next decision과 Issue #1044 repair sweep의 source-context preserved flag를 follow-up decision에서 대조하고, 잔여 outside-soloing pitch-role risk를 다음 repair target으로 분리한 작업이다.
+Issue #1138은 Issue #1136 objective-only next decision v3와 Issue #1128 repair sweep v4의 source-context preserved flag를 follow-up decision에서 대조하고, 잔여 outside-soloing pitch-role risk를 다음 repair target으로 분리한 작업이다.
 
 변경:
 
-- follow-up decision schema v2 적용
-- objective-only next decision과 repair sweep의 source-context required key 비교
+- follow-up decision schema v3 적용
+- objective-only next decision v3와 repair sweep v4의 source-context required key 비교
 - preserved flag 3개 필수 검증 추가
 - next recommended issue를 outside-soloing repair sweep source-context refresh로 갱신
 
@@ -4883,7 +4883,14 @@ Issue #1054는 Issue #1052 objective-only next decision과 Issue #1044 repair sw
 - document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_PHRASE_RHYTHM_CHORD_TONE_LANDING_REPAIR_FOLLOWUP_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_followup_decision`
 - source boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision`
+- source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_next_v3`
+- source input guard schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard_v3`
+- source package schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_v3`
+- source audio schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio_package_v4`
 - repair sweep boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep`
+- repair sweep schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep_v4`
+- repair sweep source schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v4`
+- repair sweep bridge schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_v4`
 - next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
 - selected target: `songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_sweep`
 - primary remaining risk label: `outside_soloing_pitch_role_risk`
@@ -4905,7 +4912,7 @@ Issue #1054는 Issue #1052 objective-only next decision과 Issue #1044 repair sw
 
 판단:
 
-- Issue #1052 objective-only next decision과 Issue #1044 repair sweep의 preserved flag 3개 불일치 없음.
+- Issue #1136 objective-only next decision v3와 Issue #1128 repair sweep v4의 preserved flag 3개 불일치 없음.
 - weak chord-tone landing risk는 `6 -> 0`으로 해소.
 - 잔여 outside-soloing pitch-role risk after `2`가 다음 objective repair 대상.
 - outside-soloing repair는 현재 단계에서 아직 targeted `false`.
