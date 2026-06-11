@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package import (
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
@@ -12,6 +12,7 @@ from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_repair_listening
 from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input import (
     BOUNDARY,
     OBJECTIVE_NEXT_BOUNDARY,
+    SCHEMA_VERSION,
     StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardError,
     build_listening_review_input_guard_report,
     validate_listening_review_input_guard_report,
@@ -24,6 +25,7 @@ SOURCE_CONTEXT = {
     "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "followup_objective_source_outside_soloing_source_targeted": False,
     "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_objective_source_outside_soloing_source_context_preserved": True,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_objective_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
@@ -31,6 +33,7 @@ SOURCE_CONTEXT = {
     "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "followup_repair_sweep_source_outside_soloing_source_targeted": False,
     "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before": 5,
@@ -38,6 +41,7 @@ SOURCE_CONTEXT = {
     "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
     "repair_sweep_source_outside_soloing_source_targeted": False,
     "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
+    "repair_sweep_source_outside_soloing_source_context_preserved": True,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
     "repair_sweep_source_outside_soloing_current_pitch_role_risk_delta": 2,
 }
@@ -145,7 +149,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
             report = build_listening_review_input_guard_report(
                 source_package(),
                 output_dir=root / "guard",
-                issue_number=938,
+                issue_number=1106,
             )
             summary = validate_listening_review_input_guard_report(
                 report,
@@ -157,6 +161,8 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                 require_no_quality_claim=True,
             )
 
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(report["issue_number"], 1106)
             self.assertTrue(summary["technical_wav_validation"])
             self.assertFalse(summary["validated_review_input_present"])
             self.assertFalse(summary["preference_fill_allowed"])
@@ -173,7 +179,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                 5,
             )
             self.assertTrue(summary["objective_source_outside_soloing_repair_source_context_preserved"])
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[f"objective_{key}"], SOURCE_CONTEXT[key])
             self.assertEqual(
                 summary[
@@ -205,7 +211,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                 5,
             )
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(
                 summary["source_outside_soloing_repair_source_pitch_role_risk_count_before"],
@@ -232,7 +238,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                 build_listening_review_input_guard_report(
                     source_package(quality_claim=True),
                     output_dir=root / "guard",
-                    issue_number=852,
+                    issue_number=1106,
                 )
 
     def test_rejects_missing_outside_soloing_context(self) -> None:
@@ -244,7 +250,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                 build_listening_review_input_guard_report(
                     source,
                     output_dir=root / "guard",
-                    issue_number=852,
+                    issue_number=1106,
                 )
 
     def test_rejects_source_context_delta_mismatch(self) -> None:
@@ -256,7 +262,7 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                 build_listening_review_input_guard_report(
                     source,
                     output_dir=root / "guard",
-                    issue_number=938,
+                    issue_number=1106,
                 )
 
     def test_rejects_missing_source_context_field(self) -> None:
@@ -272,12 +278,32 @@ class StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardTest(unittes
                 build_listening_review_input_guard_report(
                     source,
                     output_dir=root / "guard",
-                    issue_number=1022,
+                    issue_number=1106,
+                )
+
+    def test_rejects_false_source_context_preserved_field(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = source_package()
+            source["source_summary"][
+                "followup_repair_sweep_source_outside_soloing_source_context_preserved"
+            ] = False
+            with self.assertRaises(
+                StageBMidiToSoloSonglikeMelodyContourRepairListeningInputGuardError
+            ):
+                build_listening_review_input_guard_report(
+                    source,
+                    output_dir=root / "guard",
+                    issue_number=1106,
                 )
 
     def test_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard")
         self.assertEqual(OBJECTIVE_NEXT_BOUNDARY, "stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision")
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard_v4",
+        )
 
 
 if __name__ == "__main__":
