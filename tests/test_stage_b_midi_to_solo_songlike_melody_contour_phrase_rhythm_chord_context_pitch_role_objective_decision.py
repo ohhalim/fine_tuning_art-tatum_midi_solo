@@ -6,12 +6,16 @@ from pathlib import Path
 
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
     BOUNDARY as BRIDGE_BOUNDARY,
+    BRIDGE_SCHEMA_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS as BRIDGE_EXPECTED_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as BRIDGE_NEXT_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
     SCHEMA_VERSION as BRIDGE_SCHEMA_VERSION,
 )
 from scripts.decide_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective import (
     BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY,
     PRIMARY_RISK_LABEL,
     SCHEMA_VERSION,
@@ -28,6 +32,7 @@ def bridge_report(
     return {
         "schema_version": BRIDGE_SCHEMA_VERSION,
         "boundary": BRIDGE_BOUNDARY,
+        "source_schema_versions": dict(BRIDGE_EXPECTED_SOURCE_SCHEMA_VERSIONS),
         "summary": {
             "candidate_count": 6,
             "chord_context_available_count": 6,
@@ -59,6 +64,10 @@ def bridge_report(
             "followup_objective_source_outside_soloing_source_pitch_role_risk_count_after": 2,
             "followup_objective_source_outside_soloing_source_pitch_role_risk_delta": 3,
             "followup_objective_source_outside_soloing_source_context_preserved": True,
+            "followup_objective_source_outside_soloing_schema_context_preserved": True,
+            "followup_objective_source_outside_soloing_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "followup_objective_source_outside_soloing_source_targeted": False,
             "followup_objective_source_outside_soloing_source_residual_risk_preserved": True,
             "followup_objective_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -67,6 +76,10 @@ def bridge_report(
             "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
             "followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
             "followup_repair_sweep_source_outside_soloing_source_context_preserved": True,
+            "followup_repair_sweep_source_outside_soloing_schema_context_preserved": True,
+            "followup_repair_sweep_source_outside_soloing_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "followup_repair_sweep_source_outside_soloing_source_targeted": False,
             "followup_repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
             "followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -75,6 +88,10 @@ def bridge_report(
             "repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after": 2,
             "repair_sweep_source_outside_soloing_source_pitch_role_risk_delta": 3,
             "repair_sweep_source_outside_soloing_source_context_preserved": True,
+            "repair_sweep_source_outside_soloing_schema_context_preserved": True,
+            "repair_sweep_source_outside_soloing_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "repair_sweep_source_outside_soloing_source_targeted": False,
             "repair_sweep_source_outside_soloing_source_residual_risk_preserved": True,
             "repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after": 0,
@@ -101,7 +118,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             report = build_objective_decision_report(
                 bridge_report=bridge_report(),
                 output_dir=Path(tmp) / "decision",
-                issue_number=1126,
+                issue_number=1210,
             )
             summary = validate_objective_decision_report(
                 report,
@@ -114,7 +131,14 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
 
             self.assertEqual(report["schema_version"], SCHEMA_VERSION)
             self.assertEqual(report["source_schema_version"], BRIDGE_SCHEMA_VERSION)
+            self.assertEqual(report["source_schema_versions"], EXPECTED_SOURCE_SCHEMA_VERSIONS)
             self.assertEqual(summary["source_schema_version"], BRIDGE_SCHEMA_VERSION)
+            self.assertEqual(
+                summary[
+                    "source_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge_schema_version"
+                ],
+                BRIDGE_SCHEMA_VERSION,
+            )
             self.assertTrue(summary["pitch_role_objective_decision_completed"])
             self.assertEqual(summary["primary_risk_label"], PRIMARY_RISK_LABEL)
             self.assertEqual(summary["weak_chord_tone_landing_risk_count"], 6)
@@ -197,6 +221,8 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             self.assertEqual(summary["selected_target"], SELECTED_TARGET)
             self.assertFalse(summary["human_audio_preference_claimed"])
             self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
+            for key in BRIDGE_SCHEMA_CONTEXT_KEYS:
+                self.assertIn(key, summary)
 
     def test_rejects_bridge_quality_claim(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -204,7 +230,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=bridge_report(quality_claim=True),
                     output_dir=Path(tmp) / "decision",
-                    issue_number=1126,
+                    issue_number=1210,
                 )
 
     def test_routes_outside_soloing_when_it_dominates(self) -> None:
@@ -212,7 +238,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             report = build_objective_decision_report(
                 bridge_report=bridge_report(weak_count=2, outside_count=5),
                 output_dir=Path(tmp) / "decision",
-                issue_number=1126,
+                issue_number=1210,
             )
             summary = validate_objective_decision_report(
                 report,
@@ -238,7 +264,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=1126,
+                    issue_number=1210,
                 )
 
     def test_rejects_missing_bridge_source_context_field(self) -> None:
@@ -252,7 +278,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=1126,
+                    issue_number=1210,
                 )
 
     def test_rejects_source_context_targeted_flag(self) -> None:
@@ -266,7 +292,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=1126,
+                    issue_number=1210,
                 )
 
     def test_rejects_source_context_preservation_flag(self) -> None:
@@ -280,7 +306,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=1126,
+                    issue_number=1210,
                 )
 
     def test_rejects_bridge_schema_mismatch(self) -> None:
@@ -294,7 +320,35 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
                 build_objective_decision_report(
                     bridge_report=source,
                     output_dir=Path(tmp) / "decision",
-                    issue_number=1126,
+                    issue_number=1210,
+                )
+
+    def test_rejects_bridge_source_schema_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = bridge_report()
+            source["source_schema_versions"][
+                "songlike_melody_contour_phrase_rhythm_repair_sweep"
+            ] = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep_v4"
+
+            with self.assertRaises(StageBMidiToSoloPitchRoleObjectiveDecisionError):
+                build_objective_decision_report(
+                    bridge_report=source,
+                    output_dir=Path(tmp) / "decision",
+                    issue_number=1210,
+                )
+
+    def test_rejects_bridge_schema_context_false(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = bridge_report()
+            source["readiness"][
+                "followup_objective_source_outside_soloing_schema_context_preserved"
+            ] = False
+
+            with self.assertRaises(StageBMidiToSoloPitchRoleObjectiveDecisionError):
+                build_objective_decision_report(
+                    bridge_report=source,
+                    output_dir=Path(tmp) / "decision",
+                    issue_number=1210,
                 )
 
     def test_rejects_report_preserved_flag_false(self) -> None:
@@ -302,7 +356,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
             report = build_objective_decision_report(
                 bridge_report=bridge_report(),
                 output_dir=Path(tmp) / "decision",
-                issue_number=1126,
+                issue_number=1210,
             )
             report["readiness"][BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS[0]] = False
 
@@ -331,7 +385,7 @@ class StageBMidiToSoloPitchRoleObjectiveDecisionTest(unittest.TestCase):
         )
         self.assertEqual(
             SCHEMA_VERSION,
-            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v4",
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v5",
         )
 
 
