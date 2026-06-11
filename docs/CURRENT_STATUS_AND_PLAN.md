@@ -12,52 +12,16 @@
 
 현재 active issue:
 
-- latest functional result: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
-- latest MVP completion audit: Issue #1154, Stage B MIDI-to-solo MVP completion audit source-context refresh
-- latest quality gap decision: Issue #1156, Stage B MIDI-to-solo quality gap decision source-context refresh
-- latest listening review quality gap: Issue #1158, Stage B MIDI-to-solo listening review quality gap source-context refresh
-- latest MVP delivery package: Issue #1160, Stage B MIDI-to-solo MVP delivery package source-context refresh
-- latest README final evidence refresh: Issue #1162, Stage B MIDI-to-solo README final evidence refresh source-context refresh
-- latest final status audit: Issue #1164, Stage B MIDI-to-solo final status audit source-context refresh
-- latest post-MVP quality iteration plan: Issue #1166, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
-- latest quality rubric baseline: Issue #1168, Stage B MIDI-to-solo quality rubric baseline source-context refresh
-- latest candidate failure labeling: Issue #1170, Stage B MIDI-to-solo candidate failure labeling source-context refresh
-- latest targeted quality repair sweep: Issue #1172, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
-- latest targeted quality repair audio package: Issue #1174, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
-- latest targeted quality repair listening review package: Issue #1176, Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh
-- latest targeted quality repair listening review input guard: Issue #1178, Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh
-- latest targeted quality repair objective-only next decision: Issue #1180, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh
-- latest targeted quality repair follow-up decision: Issue #1182, Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh
-- latest songlike melody contour repair sweep: Issue #1184, Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh
-- latest songlike melody contour repair audio package: Issue #1186, Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh
-- latest songlike melody contour repair listening review package: Issue #1188, Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh
-- latest songlike melody contour repair listening review input guard: Issue #1190, Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh
-- latest songlike melody contour repair objective-only next decision: Issue #1192, Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh
-- latest songlike melody contour repair follow-up decision: Issue #1194, Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh
-- latest songlike melody contour phrase/rhythm repair sweep: Issue #1196, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair sweep source-context refresh
-- latest songlike melody contour phrase/rhythm repair audio package: Issue #1198, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair audio package source-context refresh
-- latest songlike melody contour phrase/rhythm repair listening review package: Issue #1200, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review package source-context refresh
-- latest songlike melody contour phrase/rhythm repair listening review input guard: Issue #1202, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair listening review input guard source-context refresh
-- latest songlike melody contour phrase/rhythm repair objective-only next decision: Issue #1204, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh
-- latest songlike melody contour phrase/rhythm repair follow-up decision: Issue #1206, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh
-- latest songlike melody contour phrase/rhythm chord-context pitch-role bridge: Issue #1208, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh
-- latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision: Issue #1210, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair sweep: Issue #1212, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair audio package: Issue #1214, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package: Issue #1216, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard: Issue #1134, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision: Issue #1136, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair objective-only next decision source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision: Issue #1138, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair follow-up decision source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep: Issue #1140, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair sweep source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package: Issue #1142, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair audio package source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package: Issue #1144, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review package source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: Issue #1146, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard source-context refresh
-- latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: Issue #1148, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh
-- latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
-- latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
-- latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review input guard source-context refresh`
+- latest broader sampling audit: Issue #1344, Stage B MIDI-to-solo broader repaired sampling repeatability audit
+- latest broader listening package: Issue #1346, Stage B MIDI-to-solo broader repaired listening package
+- latest broader listening input guard: Issue #1348, Stage B MIDI-to-solo broader repaired listening input guard
+- latest broader objective-only next decision: Issue #1350, Stage B MIDI-to-solo broader repaired objective-only next decision
+- latest broader final review handoff: Issue #1352, Stage B MIDI-to-solo broader repaired final review handoff
+- latest broader handoff reproducibility audit: Issue #1354, Stage B MIDI-to-solo broader repaired handoff reproducibility audit
+- latest README final evidence refresh: Issue #1356, Stage B MIDI-to-solo final README evidence refresh
+- current issue: Issue #1358, Stage B MIDI-to-solo current status evidence refresh
+- open issue queue after README final evidence refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo final status audit evidence refresh`
 
 현재 범위가 아닌 것:
 
@@ -75,6 +39,16 @@
 
 현재 품질 경계:
 
+- broader repaired sampling audit strict/grammar: `40 / 40` / `40 / 40`
+- broader repaired review package MIDI/WAV: `8 / 8`
+- broader repaired final handoff selected objective candidates: `4`
+- broader repaired handoff audit reproducible: `true`
+- broader repaired handoff audit missing MIDI/WAV: `0 / 0`
+- broader repaired handoff audit checksum mismatch MIDI/WAV: `0 / 0`
+- README final evidence refresh 완료
+- stable jazz solo quality: `not_proven`
+- human listening preference input: `false`
+- artist style claim: `false`
 - checkpoint 직접 생성 품질 claim 제외
 - phrase-bank retrieval baseline을 품질 하한 후보 경로로 사용
 - phrase-bank audio render technical validation 완료
