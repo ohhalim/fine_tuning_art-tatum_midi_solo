@@ -5,10 +5,18 @@ import unittest
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package import (
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_PACKAGE_SCHEMA_VERSION,
+)
+from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
+)
+from scripts.render_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_audio import (
+    SCHEMA_VERSION as SOURCE_AUDIO_SCHEMA_VERSION,
 )
 from scripts.guard_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input import (
     BOUNDARY,
     OBJECTIVE_NEXT_BOUNDARY,
+    SCHEMA_VERSION,
     StageBMidiToSoloChordToneLandingRepairListeningInputGuardError,
     build_listening_review_input_guard_report,
     validate_listening_review_input_guard_report,
@@ -54,7 +62,9 @@ def source_package(*, quality_claim: bool = False, validated_input: bool = False
         for index in range(1, 7)
     ]
     return {
+        "schema_version": SOURCE_PACKAGE_SCHEMA_VERSION,
         "boundary": SOURCE_BOUNDARY,
+        "source_schema_version": SOURCE_AUDIO_SCHEMA_VERSION,
         "source_summary": {
             "technical_wav_validation": True,
             "rendered_audio_file_count": 6,
@@ -113,7 +123,7 @@ class StageBMidiToSoloChordToneLandingRepairListeningInputGuardTest(unittest.Tes
         report = build_listening_review_input_guard_report(
             source_package(),
             output_dir="unused",
-            issue_number=1050,
+            issue_number=1134,
         )
         summary = validate_listening_review_input_guard_report(
             report,
@@ -125,6 +135,11 @@ class StageBMidiToSoloChordToneLandingRepairListeningInputGuardTest(unittest.Tes
             require_no_quality_claim=True,
         )
 
+        self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(report["source_schema_version"], SOURCE_PACKAGE_SCHEMA_VERSION)
+        self.assertEqual(report["source_audio_schema_version"], SOURCE_AUDIO_SCHEMA_VERSION)
+        self.assertEqual(summary["source_schema_version"], SOURCE_PACKAGE_SCHEMA_VERSION)
+        self.assertEqual(summary["source_audio_schema_version"], SOURCE_AUDIO_SCHEMA_VERSION)
         self.assertFalse(summary["validated_review_input_present"])
         self.assertFalse(summary["preference_fill_allowed"])
         self.assertEqual(summary["review_item_count"], 6)
@@ -184,7 +199,20 @@ class StageBMidiToSoloChordToneLandingRepairListeningInputGuardTest(unittest.Tes
             build_listening_review_input_guard_report(
                 source_package(quality_claim=True),
                 output_dir="unused",
-                issue_number=1050,
+                issue_number=1134,
+            )
+
+    def test_rejects_source_package_schema_mismatch(self) -> None:
+        source = source_package()
+        source["schema_version"] = (
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_package_v2"
+        )
+
+        with self.assertRaises(StageBMidiToSoloChordToneLandingRepairListeningInputGuardError):
+            build_listening_review_input_guard_report(
+                source,
+                output_dir="unused",
+                issue_number=1134,
             )
 
     def test_rejects_source_context_preservation_flag(self) -> None:
@@ -196,14 +224,35 @@ class StageBMidiToSoloChordToneLandingRepairListeningInputGuardTest(unittest.Tes
             build_listening_review_input_guard_report(
                 source,
                 output_dir="unused",
-                issue_number=1050,
+                issue_number=1134,
+            )
+
+    def test_rejects_report_preserved_flag_false(self) -> None:
+        report = build_listening_review_input_guard_report(
+            source_package(),
+            output_dir="unused",
+            issue_number=1134,
+        )
+        report["guard_result"]["source_summary"][
+            BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS[0]
+        ] = False
+
+        with self.assertRaises(StageBMidiToSoloChordToneLandingRepairListeningInputGuardError):
+            validate_listening_review_input_guard_report(
+                report,
+                expected_boundary=BOUNDARY,
+                expected_next_boundary=OBJECTIVE_NEXT_BOUNDARY,
+                require_guard_completed=True,
+                require_preference_blocked=True,
+                require_pending_input=True,
+                require_no_quality_claim=True,
             )
 
     def test_routes_to_fill_when_validated_input_exists(self) -> None:
         report = build_listening_review_input_guard_report(
             source_package(validated_input=True),
             output_dir="unused",
-            issue_number=1050,
+            issue_number=1134,
         )
         self.assertTrue(report["guard_result"]["preference_fill_allowed"])
         self.assertTrue(report["guard_result"]["validated_review_input_present"])
@@ -216,6 +265,10 @@ class StageBMidiToSoloChordToneLandingRepairListeningInputGuardTest(unittest.Tes
         self.assertEqual(
             OBJECTIVE_NEXT_BOUNDARY,
             "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_objective_only_next_decision",
+        )
+        self.assertEqual(
+            SCHEMA_VERSION,
+            "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_listening_review_input_guard_v3",
         )
 
 
