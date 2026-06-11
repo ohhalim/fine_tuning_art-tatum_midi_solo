@@ -90,6 +90,8 @@ raw model generation은 note grammar가 자주 깨졌다.
 - 4bar dead-air repair: strict `20 / 24 -> 22 / 24`, case avg dead-air range `0.7171 - 0.7571 -> 0.6340 - 0.6545`
 - rejected repair variant: `note_groups_per_bar=10`, `max_sequence=192`, reason checkpoint `model_max_sequence=160`
 - 4bar repaired listening package: MIDI `8`, WAV `8`, review input template ready
+- 4bar repaired input guard: validated input `false`, preference fill `false`, pending candidate fields `24`
+- next boundary: `music_transformer_solo_yield_objective_only_next_decision`
 
 ## 결과 파일
 
@@ -131,6 +133,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_4BAR_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_4BAR_DEAD_AIR_REPAIR_SWEEP_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_4BAR_REPAIRED_LISTENING_PACKAGE_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_4BAR_REPAIRED_INPUT_GUARD_2026-06-11.md`
 
 ## 실행 방법
 
@@ -210,4 +213,5 @@ Report:
 - 4bar dead-air repair sweep
 - 4bar repaired candidate listening review package
 - 4bar repaired input guard
+- 4bar repaired objective-only next decision
 - 더 긴 4마디 phrase로 확장 검토
