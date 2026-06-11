@@ -18,6 +18,9 @@
 - objective source outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`
 - objective source outside-soloing current repair pitch-role risk after / delta: `0` / `2`
 - source outside-soloing source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - source outside-soloing source pitch-role risk before / after / delta: `5` / `2` / `3`
 - source outside-soloing source repair targeted: `false`
 - source outside-soloing source residual risk preserved: `true`
