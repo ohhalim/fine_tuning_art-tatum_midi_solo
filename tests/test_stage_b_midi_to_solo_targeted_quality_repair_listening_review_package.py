@@ -8,7 +8,10 @@ from pathlib import Path
 
 import pretty_midi
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import (
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+)
 from scripts.build_stage_b_midi_to_solo_targeted_quality_repair_listening_review_package import (
     BOUNDARY,
     NEXT_BOUNDARY,
@@ -19,7 +22,9 @@ from scripts.build_stage_b_midi_to_solo_targeted_quality_repair_listening_review
 )
 from scripts.render_stage_b_midi_to_solo_targeted_quality_repair_audio import (
     BOUNDARY as SOURCE_BOUNDARY,
+    EXPECTED_SOURCE_SCHEMA_VERSIONS,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_AUDIO_SCHEMA_VERSION,
 )
 
 
@@ -112,12 +117,18 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
             }
         )
     return {
+        "schema_version": SOURCE_AUDIO_SCHEMA_VERSION,
+        "source_schema_versions": dict(EXPECTED_SOURCE_SCHEMA_VERSIONS),
         "audio_render_boundary": {
             "boundary": SOURCE_BOUNDARY,
             "render_attempted": True,
             "rendered_audio_file_count": 6,
             "technical_wav_validation": True,
             "targeted_quality_repair_audio_package_completed": True,
+            "source_outside_soloing_repair_schema_context_preserved": True,
+            "source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
@@ -132,6 +143,33 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
             "critical_user_input_required": False,
         },
         "summary": {
+            "source_targeted_quality_repair_sweep_schema_version": (
+                EXPECTED_SOURCE_SCHEMA_VERSIONS["targeted_quality_repair_sweep"]
+            ),
+            "source_candidate_failure_labeling_schema_version": (
+                EXPECTED_SOURCE_SCHEMA_VERSIONS["candidate_failure_labeling"]
+            ),
+            "source_quality_rubric_schema_version": (
+                EXPECTED_SOURCE_SCHEMA_VERSIONS["quality_rubric_baseline"]
+            ),
+            "source_post_mvp_plan_schema_version": (
+                EXPECTED_SOURCE_SCHEMA_VERSIONS["post_mvp_quality_iteration_plan"]
+            ),
+            "source_final_status_schema_version": (
+                EXPECTED_SOURCE_SCHEMA_VERSIONS["final_status_audit"]
+            ),
+            "source_delivery_package_schema_version": (
+                EXPECTED_SOURCE_SCHEMA_VERSIONS["delivery_package"]
+            ),
+            "source_listening_gap_schema_version": (
+                EXPECTED_SOURCE_SCHEMA_VERSIONS["listening_review_quality_gap"]
+            ),
+            "source_quality_gap_schema_version": (
+                EXPECTED_SOURCE_SCHEMA_VERSIONS["quality_gap_decision"]
+            ),
+            "source_current_evidence_schema_version": (
+                EXPECTED_SOURCE_SCHEMA_VERSIONS["current_evidence"]
+            ),
             "rendered_audio_file_count": 6,
             "technical_wav_validation": True,
             "sample_rate": 44100,
@@ -144,6 +182,10 @@ def audio_package_report(root: Path, *, quality_claim: bool = False) -> dict:
             "technical_regression_count": 0,
             "source_outside_soloing_repair_evidence_ready": True,
             "source_outside_soloing_repair_source_context_preserved": True,
+            "source_outside_soloing_repair_schema_context_preserved": True,
+            "source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "source_outside_soloing_repair_wav_count": 6,
             "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
             "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
@@ -169,7 +211,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningReviewPackageTest(unittest.T
             report = build_listening_review_package_report(
                 audio_package_report=audio_package_report(root),
                 output_dir=root / "review_package",
-                issue_number=1092,
+                issue_number=1176,
                 expected_count=6,
             )
             summary = validate_listening_review_package_report(
@@ -182,7 +224,31 @@ class StageBMidiToSoloTargetedQualityRepairListeningReviewPackageTest(unittest.T
             )
 
             self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-            self.assertEqual(report["issue_number"], 1092)
+            self.assertEqual(report["issue_number"], 1176)
+            self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(
+                report["source_schema_versions"]["targeted_quality_repair_audio_package"],
+                SOURCE_AUDIO_SCHEMA_VERSION,
+            )
+            for key, expected in EXPECTED_SOURCE_SCHEMA_VERSIONS.items():
+                self.assertEqual(report["source_schema_versions"][key], expected)
+            self.assertEqual(
+                summary["source_targeted_quality_repair_audio_package_schema_version"],
+                SOURCE_AUDIO_SCHEMA_VERSION,
+            )
+            for key, expected in EXPECTED_SOURCE_SCHEMA_VERSIONS.items():
+                summary_key = "source_" + {
+                    "targeted_quality_repair_sweep": "targeted_quality_repair_sweep",
+                    "candidate_failure_labeling": "candidate_failure_labeling",
+                    "quality_rubric_baseline": "quality_rubric",
+                    "post_mvp_quality_iteration_plan": "post_mvp_plan",
+                    "final_status_audit": "final_status",
+                    "delivery_package": "delivery_package",
+                    "listening_review_quality_gap": "listening_gap",
+                    "quality_gap_decision": "quality_gap",
+                    "current_evidence": "current_evidence",
+                }[key] + "_schema_version"
+                self.assertEqual(summary[summary_key], expected)
             self.assertTrue(summary["listening_review_package_ready"])
             self.assertEqual(summary["review_item_count"], 6)
             self.assertFalse(summary["validated_review_input"])
@@ -190,6 +256,11 @@ class StageBMidiToSoloTargetedQualityRepairListeningReviewPackageTest(unittest.T
             self.assertEqual(summary["failure_label_delta"], 7)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(summary["source_outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
             self.assertEqual(
                 summary["source_outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
@@ -225,7 +296,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningReviewPackageTest(unittest.T
                 build_listening_review_package_report(
                     audio_package_report=audio_package_report(root, quality_claim=True),
                     output_dir=root / "review_package",
-                    issue_number=1092,
+                    issue_number=1176,
                     expected_count=6,
                 )
 
@@ -240,7 +311,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningReviewPackageTest(unittest.T
                 build_listening_review_package_report(
                     audio_package_report=source,
                     output_dir=root / "review_package",
-                    issue_number=1092,
+                    issue_number=1176,
                     expected_count=6,
                 )
 
@@ -257,7 +328,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningReviewPackageTest(unittest.T
                 build_listening_review_package_report(
                     audio_package_report=source,
                     output_dir=root / "review_package",
-                    issue_number=1092,
+                    issue_number=1176,
                     expected_count=6,
                 )
 
@@ -274,7 +345,37 @@ class StageBMidiToSoloTargetedQualityRepairListeningReviewPackageTest(unittest.T
                 build_listening_review_package_report(
                     audio_package_report=source,
                     output_dir=root / "review_package",
-                    issue_number=1092,
+                    issue_number=1176,
+                    expected_count=6,
+                )
+
+    def test_rejects_source_schema_version_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = audio_package_report(root)
+            source["source_schema_versions"]["targeted_quality_repair_sweep"] = "wrong_schema"
+            with self.assertRaises(
+                StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError
+            ):
+                build_listening_review_package_report(
+                    audio_package_report=source,
+                    output_dir=root / "review_package",
+                    issue_number=1176,
+                    expected_count=6,
+                )
+
+    def test_rejects_missing_schema_context_preserved(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = audio_package_report(root)
+            source["summary"]["source_outside_soloing_repair_schema_context_preserved"] = False
+            with self.assertRaises(
+                StageBMidiToSoloTargetedQualityRepairListeningReviewPackageError
+            ):
+                build_listening_review_package_report(
+                    audio_package_report=source,
+                    output_dir=root / "review_package",
+                    issue_number=1176,
                     expected_count=6,
                 )
 
@@ -283,7 +384,7 @@ class StageBMidiToSoloTargetedQualityRepairListeningReviewPackageTest(unittest.T
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_targeted_quality_repair_listening_review_input_guard")
         self.assertEqual(
             SCHEMA_VERSION,
-            "stage_b_midi_to_solo_targeted_quality_repair_listening_review_package_v4",
+            "stage_b_midi_to_solo_targeted_quality_repair_listening_review_package_v5",
         )
 
 
