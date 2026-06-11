@@ -6156,7 +6156,7 @@ run_stage_b_midi_to_solo_quality_rubric_baseline() {
     --run_id "$run_id" \
     --post_mvp_quality_plan "$post_mvp_plan" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_QUALITY_RUBRIC_BASELINE_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 1000 \
+    --issue_number 1084 \
     --expected_boundary stage_b_midi_to_solo_quality_rubric_baseline \
     --expected_next_boundary stage_b_midi_to_solo_candidate_failure_labeling \
     --expected_target candidate_failure_labeling \
