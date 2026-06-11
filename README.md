@@ -10,7 +10,7 @@ MIDI 데이터를 token sequence로 변환하고, Music Transformer 계열 symbo
 - 2마디 후보 생성: strict `24 / 24`, grammar-valid `24 / 24`
 - 4마디 확장 후보 생성: strict `20 / 24`, grammar-valid `24 / 24`
 - 4마디 dead-air repair 이후: strict `22 / 24`, grammar-valid `24 / 24`
-- chord-tone landing repair listening input guard: pending fields `24`, preference fill `false`
+- chord-tone landing repair objective-only decision: weak direction-change `4 / 8`, next `phrase_direction_repair`
 - final status audit: technical evidence ready `true`
 - 음악적 품질 claim: `false`
 - 사람 기준 청취 선호 입력: `false`
@@ -118,6 +118,8 @@ raw model generation은 note grammar가 자주 깨졌다.
 - next boundary: `music_transformer_solo_yield_chord_tone_landing_repair_listening_input_guard`
 - chord-tone landing repair listening input guard: schema matched `true`, pending candidate fields `24`, objective-only next decision required `true`
 - next boundary: `music_transformer_solo_yield_chord_tone_landing_repair_objective_only_next_decision`
+- chord-tone landing repair objective-only decision: final landing residual `0 / 8`, weak direction-change `4 / 8`, MIDI low chord-tone ratio `3 / 8`, dead-air aftercare `0 / 8`
+- next boundary: `music_transformer_solo_yield_phrase_direction_repair_sweep`
 
 ## 결과 파일
 
@@ -167,6 +169,7 @@ Report:
 - `docs/STAGE_B_MIDI_TO_SOLO_CHORD_TONE_LANDING_REPAIR_AUDIO_PACKAGE_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_CHORD_TONE_LANDING_REPAIR_LISTENING_PACKAGE_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_CHORD_TONE_LANDING_REPAIR_LISTENING_INPUT_GUARD_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_CHORD_TONE_LANDING_REPAIR_OBJECTIVE_ONLY_NEXT_DECISION_2026-06-11.md`
 
 ## 실행 방법
 
@@ -227,9 +230,9 @@ Report:
 
 ## 다음 작업
 
-- chord-tone landing repair objective-only next decision 기록
-- pending input 기준 다음 repair target 분리
+- phrase direction repair sweep
+- weak direction-change 후보 `4 / 8` 감소 여부 검증
 - WAV/MIDI 청취 리뷰
 - 청취 결과 기준 keep/reject 후보 기록
 - 음악적 품질 claim 여부는 청취 리뷰 이후 재판단
-- 다음 품질 개선 후보: dead-air 추가 완화, phrase tension/release, outside-soloing pitch-role
+- 다음 품질 개선 후보: phrase tension/release, chord-role balance, outside-soloing pitch-role

@@ -1,0 +1,149 @@
+from __future__ import annotations
+
+import tempfile
+import unittest
+from pathlib import Path
+
+from scripts.decide_music_transformer_solo_yield_chord_tone_landing_objective_next import (
+    BOUNDARY,
+    NEXT_BOUNDARY_CHORD_ROLE_BALANCE,
+    NEXT_BOUNDARY_LISTENING_REVIEW_FILL,
+    NEXT_BOUNDARY_PHRASE_DIRECTION,
+    SCHEMA_VERSION,
+    build_decision,
+    validate_report,
+)
+from scripts.guard_music_transformer_solo_yield_chord_tone_landing_listening_input import (
+    SCHEMA_VERSION as INPUT_GUARD_SCHEMA_VERSION,
+)
+from scripts.run_music_transformer_solo_yield_chord_tone_landing_repair_sweep import (
+    SCHEMA_VERSION as REPAIR_SWEEP_SCHEMA_VERSION,
+)
+
+
+def after_profile(
+    *,
+    chord_tone_ratio: float,
+    direction_change_ratio: float,
+    note_count: int = 32,
+    max_gap: float = 0.55,
+    max_interval: int = 7,
+) -> dict:
+    return {
+        "midi_note_count": note_count,
+        "midi_unique_pitch_count": 12,
+        "midi_pitch_span": 14,
+        "midi_max_abs_interval": max_interval,
+        "midi_direction_change_ratio": direction_change_ratio,
+        "midi_max_gap_seconds": max_gap,
+        "midi_avg_gap_seconds": 0.25,
+        "midi_chord_tone_ratio": chord_tone_ratio,
+        "midi_tension_ratio": 1.0 - chord_tone_ratio,
+        "final_landing_chord": "Ebmaj7",
+        "final_landing_pitch": 63,
+        "final_landing_is_chord_tone": True,
+    }
+
+
+def repair_sweep(rows: list[dict]) -> dict:
+    return {
+        "schema_version": REPAIR_SWEEP_SCHEMA_VERSION,
+        "output_dir": "outputs/repair",
+        "candidate_repairs": [
+            {
+                "review_index": index + 1,
+                "case_label": f"case_{index + 1}",
+                "repaired_midi_path": f"outputs/repair/candidate_{index + 1}.mid",
+                "source_wav_path": f"outputs/repair/candidate_{index + 1}.wav",
+                "after_profile": row,
+            }
+            for index, row in enumerate(rows)
+        ],
+        "aggregate": {
+            "candidate_count": len(rows),
+            "target_supported": True,
+            "final_landing_not_chord_tone_count_after": 0,
+        },
+        "readiness": {
+            "musical_quality_claimed": False,
+            "artist_style_claimed": False,
+            "production_ready_claimed": False,
+        },
+    }
+
+
+def guard_report(*, preference_fill_allowed: bool = False) -> dict:
+    return {
+        "schema_version": INPUT_GUARD_SCHEMA_VERSION,
+        "output_dir": "outputs/guard",
+        "input_validation": {
+            "validated_listening_input_present": preference_fill_allowed,
+            "pending_candidate_field_count": 0 if preference_fill_allowed else 12,
+        },
+        "readiness": {
+            "preference_fill_allowed": preference_fill_allowed,
+            "objective_only_next_decision_required": not preference_fill_allowed,
+            "audio_rendered_quality_claimed": False,
+            "musical_quality_claimed": False,
+            "artist_style_claimed": False,
+            "production_ready_claimed": False,
+        },
+    }
+
+
+class MusicTransformerSoloYieldChordToneLandingObjectiveNextTest(unittest.TestCase):
+    def test_selects_phrase_direction_when_weak_direction_is_half_or_more(self) -> None:
+        rows = [
+            after_profile(chord_tone_ratio=0.52, direction_change_ratio=0.42),
+            after_profile(chord_tone_ratio=0.51, direction_change_ratio=0.48),
+            after_profile(chord_tone_ratio=0.53, direction_change_ratio=0.61),
+            after_profile(chord_tone_ratio=0.54, direction_change_ratio=0.58),
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report = build_decision(repair_sweep(rows), guard_report(), output_dir=Path(temp_dir))
+        summary = validate_report(report, require_no_quality_claim=True)
+
+        self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(summary["boundary"], BOUNDARY)
+        self.assertEqual(summary["candidate_count"], 4)
+        self.assertEqual(summary["weak_direction_change_count"], 2)
+        self.assertEqual(summary["selected_next_target"], "phrase_direction_repair")
+        self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY_PHRASE_DIRECTION)
+        self.assertFalse(summary["musical_quality_claimed"])
+
+    def test_selects_chord_role_balance_when_low_chord_tone_is_half_or_more(self) -> None:
+        rows = [
+            after_profile(chord_tone_ratio=0.45, direction_change_ratio=0.52),
+            after_profile(chord_tone_ratio=0.49, direction_change_ratio=0.55),
+            after_profile(chord_tone_ratio=0.56, direction_change_ratio=0.60),
+            after_profile(chord_tone_ratio=0.57, direction_change_ratio=0.58),
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report = build_decision(repair_sweep(rows), guard_report(), output_dir=Path(temp_dir))
+        summary = validate_report(report, require_no_quality_claim=True)
+
+        self.assertEqual(summary["midi_low_chord_tone_ratio_count"], 2)
+        self.assertEqual(summary["selected_next_target"], "chord_role_balance_repair")
+        self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY_CHORD_ROLE_BALANCE)
+
+    def test_validated_input_routes_to_listening_review_fill(self) -> None:
+        rows = [
+            after_profile(chord_tone_ratio=0.45, direction_change_ratio=0.42),
+            after_profile(chord_tone_ratio=0.49, direction_change_ratio=0.44),
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report = build_decision(
+                repair_sweep(rows),
+                guard_report(preference_fill_allowed=True),
+                output_dir=Path(temp_dir),
+            )
+        summary = validate_report(report, require_no_quality_claim=True)
+
+        self.assertTrue(summary["validated_listening_input_present"])
+        self.assertTrue(summary["preference_fill_allowed"])
+        self.assertEqual(summary["selected_next_target"], "listening_review_fill")
+        self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY_LISTENING_REVIEW_FILL)
+
+
+if __name__ == "__main__":
+    unittest.main()
