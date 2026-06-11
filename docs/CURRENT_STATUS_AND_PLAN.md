@@ -19,9 +19,12 @@
 - latest broader final review handoff: Issue #1352, Stage B MIDI-to-solo broader repaired final review handoff
 - latest broader handoff reproducibility audit: Issue #1354, Stage B MIDI-to-solo broader repaired handoff reproducibility audit
 - latest README final evidence refresh: Issue #1356, Stage B MIDI-to-solo final README evidence refresh
-- current issue: Issue #1358, Stage B MIDI-to-solo current status evidence refresh
-- open issue queue after README final evidence refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo final status audit evidence refresh`
+- latest current status evidence refresh: Issue #1358, Stage B MIDI-to-solo current status evidence refresh
+- latest final status audit evidence refresh: Issue #1360, Stage B MIDI-to-solo final status audit evidence refresh
+- latest README final status audit refresh: Issue #1362, Stage B MIDI-to-solo README final status audit refresh
+- current issue: Issue #1364, Stage B MIDI-to-solo current status final audit refresh
+- open issue queue after README final status audit refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo post-final quality iteration decision refresh`
 
 현재 범위가 아닌 것:
 
@@ -45,7 +48,11 @@
 - broader repaired handoff audit reproducible: `true`
 - broader repaired handoff audit missing MIDI/WAV: `0 / 0`
 - broader repaired handoff audit checksum mismatch MIDI/WAV: `0 / 0`
-- README final evidence refresh 완료
+- final status audit evidence refresh: technical ready `true`, strict/grammar `40 / 40` / `40 / 40`
+- final status audit handoff evidence: MIDI/WAV `8 / 8`, reproducible `true`
+- final status audit handoff missing MIDI/WAV: `0 / 0`
+- final status audit handoff checksum mismatch MIDI/WAV: `0 / 0`
+- README final status audit refresh 완료
 - stable jazz solo quality: `not_proven`
 - human listening preference input: `false`
 - artist style claim: `false`
