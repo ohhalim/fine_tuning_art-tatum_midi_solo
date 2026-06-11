@@ -18,7 +18,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest candidate failure labeling: `Issue #1170`
 - latest targeted quality repair sweep: `Issue #1172`
 - latest targeted quality repair audio package: `Issue #1174`
-- latest targeted quality repair listening review package: `Issue #1092`
+- latest targeted quality repair listening review package: `Issue #1176`
 - latest targeted quality repair listening review input guard: `Issue #1094`
 - latest targeted quality repair objective-only next decision: `Issue #1096`
 - latest targeted quality repair follow-up decision: `Issue #1098`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after targeted quality repair audio package source-context refresh merge: `0`
+- open issue queue after targeted quality repair listening review package source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
@@ -346,8 +346,21 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - targeted quality repair audio follow-up objective source outside-soloing source context preserved: `true`
 - targeted quality repair audio follow-up repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair audio bridge repair sweep source outside-soloing source context preserved: `true`
+- targeted quality repair listening review package schema version: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package_v5`
+- targeted quality repair listening source audio package schema version: `stage_b_midi_to_solo_targeted_quality_repair_audio_package_v5`
+- targeted quality repair listening source sweep schema version: `stage_b_midi_to_solo_targeted_quality_repair_sweep_v4`
+- targeted quality repair listening source candidate failure labeling schema version: `stage_b_midi_to_solo_candidate_failure_labeling_v4`
+- targeted quality repair listening source quality rubric schema version: `stage_b_midi_to_solo_quality_rubric_baseline_v4`
+- targeted quality repair listening source post-MVP plan schema version: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4`
+- targeted quality repair listening source final status schema version: `stage_b_midi_to_solo_final_status_audit_v4`
+- targeted quality repair listening source delivery package schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- targeted quality repair listening source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- targeted quality repair listening source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- targeted quality repair listening source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - targeted quality repair listening review package ready: `true`
 - targeted quality repair listening review items: `6`
+- targeted quality repair listening outside-soloing schema context preserved: `true`
+- targeted quality repair listening outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - targeted quality repair listening follow-up objective source outside-soloing source context preserved: `true`
 - targeted quality repair listening follow-up repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair listening bridge repair sweep source outside-soloing source context preserved: `true`
