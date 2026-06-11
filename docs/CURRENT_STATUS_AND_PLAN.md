@@ -23,7 +23,7 @@
 - latest quality rubric baseline: Issue #1168, Stage B MIDI-to-solo quality rubric baseline source-context refresh
 - latest candidate failure labeling: Issue #1170, Stage B MIDI-to-solo candidate failure labeling source-context refresh
 - latest targeted quality repair sweep: Issue #1172, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
-- latest targeted quality repair audio package: Issue #1090, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
+- latest targeted quality repair audio package: Issue #1174, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
 - latest targeted quality repair listening review package: Issue #1092, Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh
 - latest targeted quality repair listening review input guard: Issue #1094, Stage B MIDI-to-solo targeted quality repair listening review input guard source-context refresh
 - latest targeted quality repair objective-only next decision: Issue #1096, Stage B MIDI-to-solo targeted quality repair objective-only next decision source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1150, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1152, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo quality rubric baseline source-context refresh`
+- open issue queue after Stage B MIDI-to-solo targeted quality repair audio package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted quality repair listening review package source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5975,7 +5975,7 @@ Issue #1172는 Issue #1170 candidate failure labeling v4 결과를 기준으로 
 
 ## 9.235 Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
 
-Issue #1090은 Issue #1088 targeted quality repair sweep 결과를 기준으로 targeted quality repair audio package의 source-context validation과 summary에 source-context preserved flag 3개를 보존한 작업이다.
+Issue #1174는 Issue #1172 targeted quality repair sweep v4 결과를 기준으로 targeted quality repair audio package의 source schema chain, outside-soloing schema context, source-context preserved flag 3개를 보존한 작업이다.
 
 결과:
 
@@ -5983,6 +5983,16 @@ Issue #1090은 Issue #1088 targeted quality repair sweep 결과를 기준으로 
 - boundary: `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
 - source boundary: `stage_b_midi_to_solo_targeted_quality_repair_sweep`
 - next boundary: `stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
+- schema version: `stage_b_midi_to_solo_targeted_quality_repair_audio_package_v5`
+- source targeted quality repair sweep schema version: `stage_b_midi_to_solo_targeted_quality_repair_sweep_v4`
+- source candidate failure labeling schema version: `stage_b_midi_to_solo_candidate_failure_labeling_v4`
+- source quality rubric schema version: `stage_b_midi_to_solo_quality_rubric_baseline_v4`
+- source post-MVP plan schema version: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4`
+- source final status schema version: `stage_b_midi_to_solo_final_status_audit_v4`
+- source delivery package schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - targeted quality repair audio package completed: `true`
 - render attempted: `true`
 - rendered audio file count: `6`
@@ -5996,6 +6006,8 @@ Issue #1090은 Issue #1088 targeted quality repair sweep 결과를 기준으로 
 - technical regression count: `0`
 - source outside-soloing repair evidence ready: `true`
 - source outside-soloing repair source context preserved: `true`
+- source outside-soloing repair schema context preserved: `true`
+- source outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -6010,8 +6022,8 @@ Issue #1090은 Issue #1088 targeted quality repair sweep 결과를 기준으로 
 
 판단:
 
-- audio package source validation에 targeted repair sweep preserved flag 3개 포함.
-- preserved flag false 입력은 validation error로 차단.
+- audio package source validation에 targeted repair sweep v4와 upstream schema chain 포함.
+- schema version mismatch, schema-context false, preserved flag false 입력은 validation error로 차단.
 - rendered WAV 6개 technical metadata 검증 완료.
 - 청음 preference와 rendered audio quality claim 제외 유지.
 - 다음 검증 대상은 targeted quality repair listening review package 유지.
@@ -6019,7 +6031,8 @@ Issue #1090은 Issue #1088 targeted quality repair sweep 결과를 기준으로 
 검증:
 
 - `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_audio`
-- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_targeted_quality_repair_audio.py`
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_targeted_quality_repair_listening_review_package`
+- `.venv/bin/python -m py_compile scripts/render_stage_b_midi_to_solo_targeted_quality_repair_audio.py tests/test_stage_b_midi_to_solo_targeted_quality_repair_audio.py`
 - `bash -n scripts/agent_harness.sh`
 - `bash scripts/agent_harness.sh stage-b-midi-to-solo-targeted-quality-repair-audio-package`
 - `bash scripts/agent_harness.sh quick`

@@ -213,7 +213,7 @@ class StageBMidiToSoloTargetedQualityRepairAudioTest(unittest.TestCase):
                 soundfont_path=str(soundfont),
                 sample_rate=44100,
                 expected_file_count=6,
-                issue_number=1090,
+                issue_number=1174,
                 runner=fake_runner,
             )
             summary = validate_audio_render_report(
@@ -227,7 +227,80 @@ class StageBMidiToSoloTargetedQualityRepairAudioTest(unittest.TestCase):
             )
 
             self.assertEqual(report["schema_version"], SCHEMA_VERSION)
-            self.assertEqual(report["issue_number"], 1090)
+            self.assertEqual(report["issue_number"], 1174)
+            self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(
+                report["source_schema_versions"]["targeted_quality_repair_sweep"],
+                SOURCE_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                report["source_schema_versions"]["candidate_failure_labeling"],
+                LABELING_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                report["source_schema_versions"]["quality_rubric_baseline"],
+                RUBRIC_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                report["source_schema_versions"]["post_mvp_quality_iteration_plan"],
+                POST_MVP_PLAN_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                report["source_schema_versions"]["final_status_audit"],
+                FINAL_STATUS_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                report["source_schema_versions"]["delivery_package"],
+                DELIVERY_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                report["source_schema_versions"]["listening_review_quality_gap"],
+                LISTENING_GAP_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                report["source_schema_versions"]["quality_gap_decision"],
+                QUALITY_GAP_DECISION_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                report["source_schema_versions"]["current_evidence"],
+                CURRENT_EVIDENCE_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary["source_targeted_quality_repair_sweep_schema_version"],
+                SOURCE_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary["source_candidate_failure_labeling_schema_version"],
+                LABELING_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary["source_quality_rubric_schema_version"],
+                RUBRIC_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary["source_post_mvp_plan_schema_version"],
+                POST_MVP_PLAN_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary["source_final_status_schema_version"],
+                FINAL_STATUS_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary["source_delivery_package_schema_version"],
+                DELIVERY_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary["source_listening_gap_schema_version"],
+                LISTENING_GAP_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary["source_quality_gap_schema_version"],
+                QUALITY_GAP_DECISION_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                summary["source_current_evidence_schema_version"],
+                CURRENT_EVIDENCE_SCHEMA_VERSION,
+            )
             self.assertTrue(summary["targeted_quality_repair_audio_package_completed"])
             self.assertEqual(summary["rendered_audio_file_count"], 6)
             self.assertTrue(summary["technical_wav_validation"])
@@ -235,6 +308,11 @@ class StageBMidiToSoloTargetedQualityRepairAudioTest(unittest.TestCase):
             self.assertEqual(summary["technical_regression_count"], 0)
             self.assertTrue(summary["source_outside_soloing_repair_evidence_ready"])
             self.assertTrue(summary["source_outside_soloing_repair_source_context_preserved"])
+            self.assertTrue(summary["source_outside_soloing_repair_schema_context_preserved"])
+            self.assertEqual(
+                summary["source_outside_soloing_repair_objective_schema_version"],
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+            )
             self.assertEqual(summary["source_outside_soloing_repair_wav_count"], 6)
             self.assertEqual(
                 summary["source_outside_soloing_repair_source_objective_pitch_role_risk_count"], 5
@@ -341,7 +419,47 @@ class StageBMidiToSoloTargetedQualityRepairAudioTest(unittest.TestCase):
                     soundfont_path=str(soundfont),
                     sample_rate=44100,
                     expected_file_count=6,
-                    issue_number=1090,
+                    issue_number=1174,
+                    runner=fake_runner,
+                )
+
+    def test_rejects_source_schema_version_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            source = source_report(root)
+            source["source_schema_versions"]["candidate_failure_labeling"] = "wrong_schema"
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairAudioError):
+                build_audio_render_report(
+                    source,
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
+                    runner=fake_runner,
+                )
+
+    def test_rejects_missing_schema_context_preserved(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            renderer = root / "fluidsynth"
+            soundfont = root / "soundfont.sf2"
+            renderer.write_text("#!/bin/sh\n", encoding="utf-8")
+            soundfont.write_bytes(b"sf2")
+            source = source_report(root)
+            source["aggregate"]["source_outside_soloing_repair_schema_context_preserved"] = False
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairAudioError):
+                build_audio_render_report(
+                    source,
+                    output_dir=root / "audio_package",
+                    renderer_path=str(renderer),
+                    soundfont_path=str(soundfont),
+                    sample_rate=44100,
+                    expected_file_count=6,
                     runner=fake_runner,
                 )
 
@@ -350,7 +468,7 @@ class StageBMidiToSoloTargetedQualityRepairAudioTest(unittest.TestCase):
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_targeted_quality_repair_listening_review_package")
         self.assertEqual(
             SCHEMA_VERSION,
-            "stage_b_midi_to_solo_targeted_quality_repair_audio_package_v4",
+            "stage_b_midi_to_solo_targeted_quality_repair_audio_package_v5",
         )
 
 

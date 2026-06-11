@@ -25,7 +25,17 @@ from scripts.run_stage_b_midi_to_solo_targeted_quality_repair_sweep import (  # 
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as SOURCE_BOUNDARY,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
+    DELIVERY_SCHEMA_VERSION,
+    FINAL_STATUS_SCHEMA_VERSION,
+    LABELING_SCHEMA_VERSION,
+    LISTENING_GAP_SCHEMA_VERSION,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    POST_MVP_PLAN_SCHEMA_VERSION,
+    QUALITY_GAP_DECISION_SCHEMA_VERSION,
+    RUBRIC_SCHEMA_VERSION,
+    SCHEMA_VERSION as SOURCE_SCHEMA_VERSION,
     StageBMidiToSoloTargetedQualityRepairSweepError,
     validate_targeted_quality_repair_sweep_report,
 )
@@ -37,8 +47,20 @@ class StageBMidiToSoloTargetedQualityRepairAudioError(ValueError):
 
 BOUNDARY = "stage_b_midi_to_solo_targeted_quality_repair_audio_package"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_targeted_quality_repair_listening_review_package"
-SCHEMA_VERSION = "stage_b_midi_to_solo_targeted_quality_repair_audio_package_v4"
+SCHEMA_VERSION = "stage_b_midi_to_solo_targeted_quality_repair_audio_package_v5"
 CommandRunner = Callable[[Sequence[str]], subprocess.CompletedProcess[str]]
+
+EXPECTED_SOURCE_SCHEMA_VERSIONS = {
+    "targeted_quality_repair_sweep": SOURCE_SCHEMA_VERSION,
+    "candidate_failure_labeling": LABELING_SCHEMA_VERSION,
+    "quality_rubric_baseline": RUBRIC_SCHEMA_VERSION,
+    "post_mvp_quality_iteration_plan": POST_MVP_PLAN_SCHEMA_VERSION,
+    "final_status_audit": FINAL_STATUS_SCHEMA_VERSION,
+    "delivery_package": DELIVERY_SCHEMA_VERSION,
+    "listening_review_quality_gap": LISTENING_GAP_SCHEMA_VERSION,
+    "quality_gap_decision": QUALITY_GAP_DECISION_SCHEMA_VERSION,
+    "current_evidence": CURRENT_EVIDENCE_SCHEMA_VERSION,
+}
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -107,11 +129,45 @@ def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str
     return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
 
 
+def _source_schema_versions_from_summary(summary: dict[str, Any]) -> dict[str, str]:
+    return {
+        "targeted_quality_repair_sweep": str(summary.get("schema_version") or ""),
+        "candidate_failure_labeling": str(
+            summary.get("source_candidate_failure_labeling_schema_version") or ""
+        ),
+        "quality_rubric_baseline": str(
+            summary.get("source_quality_rubric_schema_version") or ""
+        ),
+        "post_mvp_quality_iteration_plan": str(
+            summary.get("source_post_mvp_plan_schema_version") or ""
+        ),
+        "final_status_audit": str(summary.get("source_final_status_schema_version") or ""),
+        "delivery_package": str(summary.get("source_delivery_package_schema_version") or ""),
+        "listening_review_quality_gap": str(
+            summary.get("source_listening_gap_schema_version") or ""
+        ),
+        "quality_gap_decision": str(summary.get("source_quality_gap_schema_version") or ""),
+        "current_evidence": str(summary.get("source_current_evidence_schema_version") or ""),
+    }
+
+
+def _validate_source_schema_versions(
+    source_schema_versions: dict[str, str],
+    *,
+    label: str,
+) -> None:
+    for key, expected in EXPECTED_SOURCE_SCHEMA_VERSIONS.items():
+        if str(source_schema_versions.get(key) or "") != expected:
+            raise StageBMidiToSoloTargetedQualityRepairAudioError(
+                f"{label} source schema version mismatch: {key}"
+            )
+
+
 def validate_source_report(
     report: dict[str, Any],
     *,
     expected_count: int,
-) -> list[dict[str, Any]]:
+) -> dict[str, Any]:
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
     aggregate = _dict(report.get("aggregate"))
@@ -124,7 +180,7 @@ def validate_source_report(
             "targeted repair sweep must route to audio package"
         )
     try:
-        validate_targeted_quality_repair_sweep_report(
+        source_validation_summary = validate_targeted_quality_repair_sweep_report(
             report,
             expected_boundary=SOURCE_BOUNDARY,
             min_candidate_count=int(expected_count),
@@ -134,6 +190,24 @@ def validate_source_report(
         )
     except StageBMidiToSoloTargetedQualityRepairSweepError as exc:
         raise StageBMidiToSoloTargetedQualityRepairAudioError(str(exc)) from exc
+    source_schema_versions = _source_schema_versions_from_summary(source_validation_summary)
+    _validate_source_schema_versions(source_schema_versions, label="targeted quality repair sweep")
+    if not bool(
+        source_validation_summary.get("source_outside_soloing_repair_schema_context_preserved")
+    ):
+        raise StageBMidiToSoloTargetedQualityRepairAudioError(
+            "outside-soloing repair schema context preservation required"
+        )
+    if (
+        str(
+            source_validation_summary.get("source_outside_soloing_repair_objective_schema_version")
+            or ""
+        )
+        != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ):
+        raise StageBMidiToSoloTargetedQualityRepairAudioError(
+            "outside-soloing repair objective schema version mismatch"
+        )
     if not bool(readiness.get("targeted_quality_repair_target_supported", False)):
         raise StageBMidiToSoloTargetedQualityRepairAudioError(
             "targeted quality repair target support required"
@@ -245,7 +319,11 @@ def validate_source_report(
                 ),
             }
         )
-    return compacted
+    return {
+        "candidates": compacted,
+        "source_validation_summary": source_validation_summary,
+        "source_schema_versions": source_schema_versions,
+    }
 
 
 def _safe_name(value: str) -> str:
@@ -349,10 +427,15 @@ def build_audio_render_report(
     soundfont_path: str,
     sample_rate: int,
     expected_file_count: int,
-    issue_number: int = 1090,
+    issue_number: int = 1174,
     runner: CommandRunner = default_runner,
 ) -> dict[str, Any]:
-    candidates = validate_source_report(source_report, expected_count=expected_file_count)
+    source = validate_source_report(source_report, expected_count=expected_file_count)
+    candidates = [_dict(item) for item in _list(source.get("candidates"))]
+    source_validation_summary = _dict(source.get("source_validation_summary"))
+    source_schema_versions = {
+        key: str(value) for key, value in _dict(source.get("source_schema_versions")).items()
+    }
     resolved_renderer = renderer_path or shutil.which("fluidsynth") or ""
     resolved_soundfont = resolve_soundfont(soundfont_path)
     plan = build_render_plan(
@@ -378,6 +461,7 @@ def build_audio_render_report(
         "output_dir": str(output_dir),
         "issue_number": int(issue_number),
         "source_boundary": SOURCE_BOUNDARY,
+        "source_schema_versions": source_schema_versions,
         "source_summary": aggregate,
         "renderer": {
             "name": "fluidsynth",
@@ -403,11 +487,45 @@ def build_audio_render_report(
             "failure_label_delta": _int(aggregate.get("failure_label_delta")),
             "improved_candidate_count": _int(aggregate.get("improved_candidate_count")),
             "technical_regression_count": _int(aggregate.get("technical_regression_count")),
+            "source_targeted_quality_repair_sweep_schema_version": str(
+                source_validation_summary.get("schema_version") or ""
+            ),
+            "source_candidate_failure_labeling_schema_version": str(
+                source_validation_summary.get("source_candidate_failure_labeling_schema_version")
+                or ""
+            ),
+            "source_quality_rubric_schema_version": str(
+                source_validation_summary.get("source_quality_rubric_schema_version") or ""
+            ),
+            "source_post_mvp_plan_schema_version": str(
+                source_validation_summary.get("source_post_mvp_plan_schema_version") or ""
+            ),
+            "source_final_status_schema_version": str(
+                source_validation_summary.get("source_final_status_schema_version") or ""
+            ),
+            "source_delivery_package_schema_version": str(
+                source_validation_summary.get("source_delivery_package_schema_version") or ""
+            ),
+            "source_listening_gap_schema_version": str(
+                source_validation_summary.get("source_listening_gap_schema_version") or ""
+            ),
+            "source_quality_gap_schema_version": str(
+                source_validation_summary.get("source_quality_gap_schema_version") or ""
+            ),
+            "source_current_evidence_schema_version": str(
+                source_validation_summary.get("source_current_evidence_schema_version") or ""
+            ),
             "source_outside_soloing_repair_evidence_ready": bool(
                 aggregate.get("source_outside_soloing_repair_evidence_ready", False)
             ),
             "source_outside_soloing_repair_source_context_preserved": bool(
                 aggregate.get("source_outside_soloing_repair_source_context_preserved", False)
+            ),
+            "source_outside_soloing_repair_schema_context_preserved": bool(
+                aggregate.get("source_outside_soloing_repair_schema_context_preserved", False)
+            ),
+            "source_outside_soloing_repair_objective_schema_version": str(
+                aggregate.get("source_outside_soloing_repair_objective_schema_version") or ""
             ),
             "source_outside_soloing_repair_wav_count": _int(
                 aggregate.get("source_outside_soloing_repair_wav_count")
@@ -452,6 +570,12 @@ def build_audio_render_report(
             "rendered_audio_file_count": int(len(rendered)),
             "technical_wav_validation": True,
             "targeted_quality_repair_audio_package_completed": True,
+            "source_outside_soloing_repair_schema_context_preserved": bool(
+                aggregate.get("source_outside_soloing_repair_schema_context_preserved", False)
+            ),
+            "source_outside_soloing_repair_objective_schema_version": str(
+                aggregate.get("source_outside_soloing_repair_objective_schema_version") or ""
+            ),
             "human_audio_preference_claimed": False,
             "audio_rendered_quality_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -494,6 +618,15 @@ def validate_audio_render_report(
     boundary = _dict(report.get("audio_render_boundary"))
     decision = _dict(report.get("decision"))
     summary = _dict(report.get("summary"))
+    source_schema_versions = _dict(report.get("source_schema_versions"))
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairAudioError(
+            "targeted quality repair audio package schema version mismatch"
+        )
+    _validate_source_schema_versions(
+        {key: str(value) for key, value in source_schema_versions.items()},
+        label="targeted quality repair audio package",
+    )
     if expected_boundary and str(boundary.get("boundary") or "") != expected_boundary:
         raise StageBMidiToSoloTargetedQualityRepairAudioError("unexpected boundary")
     if expected_next_boundary and str(decision.get("next_boundary") or "") != expected_next_boundary:
@@ -523,6 +656,17 @@ def validate_audio_render_report(
         raise StageBMidiToSoloTargetedQualityRepairAudioError(
             "technical regression count should be zero"
         )
+    if not bool(summary.get("source_outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloTargetedQualityRepairAudioError(
+            "source outside-soloing repair schema context preservation required"
+        )
+    if (
+        str(summary.get("source_outside_soloing_repair_objective_schema_version") or "")
+        != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+    ):
+        raise StageBMidiToSoloTargetedQualityRepairAudioError(
+            "source outside-soloing repair objective schema version mismatch"
+        )
     if bool(decision.get("critical_user_input_required", True)):
         raise StageBMidiToSoloTargetedQualityRepairAudioError(
             "critical user input should not be required"
@@ -533,6 +677,34 @@ def validate_audio_render_report(
         "boundary": str(boundary.get("boundary") or ""),
         "next_boundary": str(decision.get("next_boundary") or ""),
         "render_attempted": bool(boundary.get("render_attempted", False)),
+        "schema_version": str(report.get("schema_version") or ""),
+        "source_targeted_quality_repair_sweep_schema_version": str(
+            source_schema_versions.get("targeted_quality_repair_sweep") or ""
+        ),
+        "source_candidate_failure_labeling_schema_version": str(
+            source_schema_versions.get("candidate_failure_labeling") or ""
+        ),
+        "source_quality_rubric_schema_version": str(
+            source_schema_versions.get("quality_rubric_baseline") or ""
+        ),
+        "source_post_mvp_plan_schema_version": str(
+            source_schema_versions.get("post_mvp_quality_iteration_plan") or ""
+        ),
+        "source_final_status_schema_version": str(
+            source_schema_versions.get("final_status_audit") or ""
+        ),
+        "source_delivery_package_schema_version": str(
+            source_schema_versions.get("delivery_package") or ""
+        ),
+        "source_listening_gap_schema_version": str(
+            source_schema_versions.get("listening_review_quality_gap") or ""
+        ),
+        "source_quality_gap_schema_version": str(
+            source_schema_versions.get("quality_gap_decision") or ""
+        ),
+        "source_current_evidence_schema_version": str(
+            source_schema_versions.get("current_evidence") or ""
+        ),
         "rendered_audio_file_count": _int(boundary.get("rendered_audio_file_count")),
         "technical_wav_validation": bool(boundary.get("technical_wav_validation", False)),
         "targeted_quality_repair_audio_package_completed": bool(
@@ -555,6 +727,12 @@ def validate_audio_render_report(
         ),
         "source_outside_soloing_repair_source_context_preserved": bool(
             summary.get("source_outside_soloing_repair_source_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_schema_context_preserved": bool(
+            summary.get("source_outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_objective_schema_version": str(
+            summary.get("source_outside_soloing_repair_objective_schema_version") or ""
         ),
         "source_outside_soloing_repair_wav_count": _int(
             summary.get("source_outside_soloing_repair_wav_count")
@@ -616,6 +794,16 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- boundary: `{boundary['boundary']}`",
         f"- next boundary: `{decision['next_boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
+        f"- source targeted quality repair sweep schema version: `{report['source_schema_versions']['targeted_quality_repair_sweep']}`",
+        f"- source candidate failure labeling schema version: `{report['source_schema_versions']['candidate_failure_labeling']}`",
+        f"- source quality rubric schema version: `{report['source_schema_versions']['quality_rubric_baseline']}`",
+        f"- source post-MVP plan schema version: `{report['source_schema_versions']['post_mvp_quality_iteration_plan']}`",
+        f"- source final status schema version: `{report['source_schema_versions']['final_status_audit']}`",
+        f"- source delivery package schema version: `{report['source_schema_versions']['delivery_package']}`",
+        f"- source listening gap schema version: `{report['source_schema_versions']['listening_review_quality_gap']}`",
+        f"- source quality gap schema version: `{report['source_schema_versions']['quality_gap_decision']}`",
+        f"- source current evidence schema version: `{report['source_schema_versions']['current_evidence']}`",
         f"- render attempted: `{_bool_token(boundary['render_attempted'])}`",
         f"- rendered audio file count: `{boundary['rendered_audio_file_count']}`",
         f"- technical WAV validation: `{_bool_token(boundary['technical_wav_validation'])}`",
@@ -626,6 +814,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- technical regression count: `{summary['technical_regression_count']}`",
         f"- source outside-soloing repair evidence ready: `{_bool_token(summary['source_outside_soloing_repair_evidence_ready'])}`",
         f"- source outside-soloing repair source context preserved: `{_bool_token(summary['source_outside_soloing_repair_source_context_preserved'])}`",
+        f"- source outside-soloing repair schema context preserved: `{_bool_token(summary['source_outside_soloing_repair_schema_context_preserved'])}`",
+        f"- source outside-soloing repair objective schema version: `{summary['source_outside_soloing_repair_objective_schema_version']}`",
         f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(summary['followup_objective_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(summary['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(summary['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
@@ -677,7 +867,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1090)
+    parser.add_argument("--issue_number", type=int, default=1174)
     parser.add_argument("--renderer", type=str, default=shutil.which("fluidsynth") or "")
     parser.add_argument("--soundfont", type=str, default="")
     parser.add_argument("--sample_rate", type=int, default=44100)
