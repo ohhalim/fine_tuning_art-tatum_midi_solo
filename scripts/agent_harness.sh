@@ -6233,7 +6233,7 @@ run_stage_b_midi_to_solo_targeted_quality_repair_audio_package() {
     --run_id "$run_id" \
     --targeted_quality_repair_sweep_report "$repair_sweep_report" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_TARGETED_QUALITY_REPAIR_AUDIO_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 1090 \
+    --issue_number 1174 \
     --expected_boundary stage_b_midi_to_solo_targeted_quality_repair_audio_package \
     --expected_next_boundary stage_b_midi_to_solo_targeted_quality_repair_listening_review_package \
     --expected_file_count 6 \
