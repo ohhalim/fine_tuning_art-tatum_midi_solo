@@ -16,7 +16,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest post-MVP quality iteration plan: `Issue #1166`
 - latest quality rubric baseline: `Issue #1168`
 - latest candidate failure labeling: `Issue #1170`
-- latest targeted quality repair sweep: `Issue #1088`
+- latest targeted quality repair sweep: `Issue #1172`
 - latest targeted quality repair audio package: `Issue #1090`
 - latest targeted quality repair listening review package: `Issue #1092`
 - latest targeted quality repair listening review input guard: `Issue #1094`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after candidate failure labeling source-context refresh merge: `0`
+- open issue queue after targeted quality repair sweep source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
@@ -311,9 +311,20 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - candidate failure follow-up repair sweep source outside-soloing source context preserved: `true`
 - candidate failure bridge repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair sweep completed: `true`
+- targeted quality repair sweep schema version: `stage_b_midi_to_solo_targeted_quality_repair_sweep_v4`
+- targeted quality repair source candidate failure labeling schema version: `stage_b_midi_to_solo_candidate_failure_labeling_v4`
+- targeted quality repair source quality rubric schema version: `stage_b_midi_to_solo_quality_rubric_baseline_v4`
+- targeted quality repair source post-MVP plan schema version: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4`
+- targeted quality repair source final status schema version: `stage_b_midi_to_solo_final_status_audit_v4`
+- targeted quality repair source delivery package schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- targeted quality repair source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- targeted quality repair source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- targeted quality repair source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - targeted quality repair failure label count: `12 -> 8`
 - targeted quality repair improved candidates: `4 / 6`
 - targeted quality repair technical regression count: `0`
+- targeted quality repair outside-soloing schema context preserved: `true`
+- targeted quality repair outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - targeted quality repair follow-up objective source outside-soloing source context preserved: `true`
 - targeted quality repair follow-up repair sweep source outside-soloing source context preserved: `true`
 - targeted quality repair bridge repair sweep source outside-soloing source context preserved: `true`

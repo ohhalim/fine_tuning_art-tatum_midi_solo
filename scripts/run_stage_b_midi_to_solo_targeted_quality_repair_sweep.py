@@ -22,8 +22,17 @@ from scripts.label_stage_b_midi_to_solo_candidate_failures import (  # noqa: E40
     BRIDGE_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as LABELING_BOUNDARY,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
+    DELIVERY_SCHEMA_VERSION,
+    FINAL_STATUS_SCHEMA_VERSION,
+    LISTENING_GAP_SCHEMA_VERSION,
     REPAIR_NEXT_BOUNDARY as LABELING_NEXT_BOUNDARY,
     REPAIR_TARGET as LABELING_TARGET,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    POST_MVP_PLAN_SCHEMA_VERSION,
+    QUALITY_GAP_DECISION_SCHEMA_VERSION,
+    RUBRIC_SCHEMA_VERSION,
+    SCHEMA_VERSION as LABELING_SCHEMA_VERSION,
     StageBMidiToSoloCandidateFailureLabelingError,
     analyze_candidate_midi,
     label_candidate,
@@ -39,7 +48,7 @@ class StageBMidiToSoloTargetedQualityRepairSweepError(ValueError):
 BOUNDARY = "stage_b_midi_to_solo_targeted_quality_repair_sweep"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_targeted_quality_repair_audio_package"
 FOLLOWUP_BOUNDARY = "stage_b_midi_to_solo_targeted_quality_repair_followup_decision"
-SCHEMA_VERSION = "stage_b_midi_to_solo_targeted_quality_repair_sweep_v3"
+SCHEMA_VERSION = "stage_b_midi_to_solo_targeted_quality_repair_sweep_v4"
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -135,6 +144,52 @@ def validate_labeling_source(report: dict[str, Any]) -> dict[str, Any]:
     if not bool(summary.get("outside_soloing_repair_source_context_preserved", False)):
         raise StageBMidiToSoloTargetedQualityRepairSweepError(
             "outside-soloing repair source context preservation required"
+        )
+    if str(summary.get("schema_version") or "") != LABELING_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "candidate failure labeling schema version mismatch"
+        )
+    if str(summary.get("source_quality_rubric_schema_version") or "") != RUBRIC_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "labeling source quality rubric schema version mismatch"
+        )
+    if str(
+        summary.get("source_post_mvp_plan_schema_version") or ""
+    ) != POST_MVP_PLAN_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "labeling source post-MVP plan schema version mismatch"
+        )
+    if str(
+        summary.get("source_final_status_schema_version") or ""
+    ) != FINAL_STATUS_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "labeling source final status schema version mismatch"
+        )
+    if str(summary.get("source_delivery_package_schema_version") or "") != DELIVERY_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "labeling source delivery package schema version mismatch"
+        )
+    if str(summary.get("source_listening_gap_schema_version") or "") != LISTENING_GAP_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "labeling source listening gap schema version mismatch"
+        )
+    if str(summary.get("source_quality_gap_schema_version") or "") != QUALITY_GAP_DECISION_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "labeling source quality gap schema version mismatch"
+        )
+    if str(summary.get("source_current_evidence_schema_version") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "labeling source current evidence schema version mismatch"
+        )
+    if not bool(summary.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "outside-soloing repair schema context preservation required"
+        )
+    if str(
+        summary.get("outside_soloing_repair_objective_schema_version") or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "outside-soloing repair objective schema version mismatch"
         )
     _source_context_fields(summary, label="candidate failure labeling")
     if _int(summary.get("outside_soloing_repair_wav_count")) < 6:
@@ -373,6 +428,20 @@ def build_targeted_quality_repair_sweep_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": LABELING_BOUNDARY,
+        "source_schema_versions": {
+            "candidate_failure_labeling": str(source_summary["schema_version"]),
+            "quality_rubric_baseline": str(source_summary["source_quality_rubric_schema_version"]),
+            "post_mvp_quality_iteration_plan": str(
+                source_summary["source_post_mvp_plan_schema_version"]
+            ),
+            "final_status_audit": str(source_summary["source_final_status_schema_version"]),
+            "delivery_package": str(source_summary["source_delivery_package_schema_version"]),
+            "listening_review_quality_gap": str(
+                source_summary["source_listening_gap_schema_version"]
+            ),
+            "quality_gap_decision": str(source_summary["source_quality_gap_schema_version"]),
+            "current_evidence": str(source_summary["source_current_evidence_schema_version"]),
+        },
         "candidate_repairs": relabeled,
         "aggregate": {
             "candidate_count": len(relabeled),
@@ -387,6 +456,12 @@ def build_targeted_quality_repair_sweep_report(
             ),
             "source_outside_soloing_repair_source_context_preserved": bool(
                 source_summary["outside_soloing_repair_source_context_preserved"]
+            ),
+            "source_outside_soloing_repair_schema_context_preserved": bool(
+                source_summary["outside_soloing_repair_schema_context_preserved"]
+            ),
+            "source_outside_soloing_repair_objective_schema_version": str(
+                source_summary["outside_soloing_repair_objective_schema_version"]
             ),
             "source_outside_soloing_repair_wav_count": _int(
                 source_summary["outside_soloing_repair_wav_count"]
@@ -444,6 +519,12 @@ def build_targeted_quality_repair_sweep_report(
             "source_outside_soloing_repair_source_context_preserved": bool(
                 source_summary["outside_soloing_repair_source_context_preserved"]
             ),
+            "source_outside_soloing_repair_schema_context_preserved": bool(
+                source_summary["outside_soloing_repair_schema_context_preserved"]
+            ),
+            "source_outside_soloing_repair_objective_schema_version": str(
+                source_summary["outside_soloing_repair_objective_schema_version"]
+            ),
             "followup_objective_source_outside_soloing_source_context_preserved": bool(
                 source_summary["followup_objective_source_outside_soloing_source_context_preserved"]
             ),
@@ -495,7 +576,50 @@ def validate_targeted_quality_repair_sweep_report(
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
     aggregate = _dict(report.get("aggregate"))
+    source_schema_versions = _dict(report.get("source_schema_versions"))
     repairs = _list(report.get("candidate_repairs"))
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "targeted quality repair sweep schema version mismatch"
+        )
+    if str(
+        source_schema_versions.get("candidate_failure_labeling") or ""
+    ) != LABELING_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "repair sweep source candidate failure labeling schema version mismatch"
+        )
+    if str(source_schema_versions.get("quality_rubric_baseline") or "") != RUBRIC_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "repair sweep source quality rubric schema version mismatch"
+        )
+    if str(
+        source_schema_versions.get("post_mvp_quality_iteration_plan") or ""
+    ) != POST_MVP_PLAN_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "repair sweep source post-MVP plan schema version mismatch"
+        )
+    if str(source_schema_versions.get("final_status_audit") or "") != FINAL_STATUS_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "repair sweep source final status schema version mismatch"
+        )
+    if str(source_schema_versions.get("delivery_package") or "") != DELIVERY_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "repair sweep source delivery package schema version mismatch"
+        )
+    if str(
+        source_schema_versions.get("listening_review_quality_gap") or ""
+    ) != LISTENING_GAP_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "repair sweep source listening gap schema version mismatch"
+        )
+    if str(source_schema_versions.get("quality_gap_decision") or "") != QUALITY_GAP_DECISION_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "repair sweep source quality gap schema version mismatch"
+        )
+    if str(source_schema_versions.get("current_evidence") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "repair sweep source current evidence schema version mismatch"
+        )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloTargetedQualityRepairSweepError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -518,7 +642,42 @@ def validate_targeted_quality_repair_sweep_report(
         )
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="targeted repair readiness")
+    if not bool(aggregate.get("source_outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "source outside-soloing repair schema context preservation required"
+        )
+    if str(
+        aggregate.get("source_outside_soloing_repair_objective_schema_version") or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloTargetedQualityRepairSweepError(
+            "source outside-soloing repair objective schema version mismatch"
+        )
     return {
+        "schema_version": str(report.get("schema_version") or ""),
+        "source_candidate_failure_labeling_schema_version": str(
+            source_schema_versions.get("candidate_failure_labeling") or ""
+        ),
+        "source_quality_rubric_schema_version": str(
+            source_schema_versions.get("quality_rubric_baseline") or ""
+        ),
+        "source_post_mvp_plan_schema_version": str(
+            source_schema_versions.get("post_mvp_quality_iteration_plan") or ""
+        ),
+        "source_final_status_schema_version": str(
+            source_schema_versions.get("final_status_audit") or ""
+        ),
+        "source_delivery_package_schema_version": str(
+            source_schema_versions.get("delivery_package") or ""
+        ),
+        "source_listening_gap_schema_version": str(
+            source_schema_versions.get("listening_review_quality_gap") or ""
+        ),
+        "source_quality_gap_schema_version": str(
+            source_schema_versions.get("quality_gap_decision") or ""
+        ),
+        "source_current_evidence_schema_version": str(
+            source_schema_versions.get("current_evidence") or ""
+        ),
         "boundary": boundary,
         "next_boundary": str(decision.get("next_boundary") or ""),
         "targeted_quality_repair_sweep_completed": bool(
@@ -542,6 +701,12 @@ def validate_targeted_quality_repair_sweep_report(
         ),
         "source_outside_soloing_repair_source_context_preserved": bool(
             aggregate.get("source_outside_soloing_repair_source_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_schema_context_preserved": bool(
+            aggregate.get("source_outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "source_outside_soloing_repair_objective_schema_version": str(
+            aggregate.get("source_outside_soloing_repair_objective_schema_version") or ""
         ),
         "source_outside_soloing_repair_wav_count": _int(
             aggregate.get("source_outside_soloing_repair_wav_count")
@@ -603,6 +768,15 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- boundary: `{report['boundary']}`",
         f"- source boundary: `{report['source_boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
+        f"- source candidate failure labeling schema version: `{report['source_schema_versions']['candidate_failure_labeling']}`",
+        f"- source quality rubric schema version: `{report['source_schema_versions']['quality_rubric_baseline']}`",
+        f"- source post-MVP plan schema version: `{report['source_schema_versions']['post_mvp_quality_iteration_plan']}`",
+        f"- source final status schema version: `{report['source_schema_versions']['final_status_audit']}`",
+        f"- source delivery package schema version: `{report['source_schema_versions']['delivery_package']}`",
+        f"- source listening gap schema version: `{report['source_schema_versions']['listening_review_quality_gap']}`",
+        f"- source quality gap schema version: `{report['source_schema_versions']['quality_gap_decision']}`",
+        f"- source current evidence schema version: `{report['source_schema_versions']['current_evidence']}`",
         f"- next boundary: `{selected['selected_next_boundary']}`",
         f"- selected target: `{selected['selected_target']}`",
         f"- candidate count: `{aggregate['candidate_count']}`",
@@ -613,6 +787,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- technical regression count: `{aggregate['technical_regression_count']}`",
         f"- source outside-soloing repair evidence ready: `{_bool_token(aggregate['source_outside_soloing_repair_evidence_ready'])}`",
         f"- source outside-soloing repair source context preserved: `{_bool_token(aggregate['source_outside_soloing_repair_source_context_preserved'])}`",
+        f"- source outside-soloing repair schema context preserved: `{_bool_token(aggregate['source_outside_soloing_repair_schema_context_preserved'])}`",
+        f"- source outside-soloing repair objective schema version: `{aggregate['source_outside_soloing_repair_objective_schema_version']}`",
         f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(aggregate['followup_objective_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(aggregate['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(aggregate['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
@@ -665,7 +841,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=750)
+    parser.add_argument("--issue_number", type=int, default=1172)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--min_candidate_count", type=int, default=6)
     parser.add_argument("--require_sweep_completed", action="store_true")

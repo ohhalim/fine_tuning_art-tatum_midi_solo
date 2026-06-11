@@ -9,7 +9,20 @@ from typing import Sequence
 
 import pretty_midi
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import (
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
+    DELIVERY_SCHEMA_VERSION,
+    LISTENING_GAP_SCHEMA_VERSION,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    QUALITY_GAP_DECISION_SCHEMA_VERSION,
+    SCHEMA_VERSION as FINAL_STATUS_SCHEMA_VERSION,
+)
+from scripts.label_stage_b_midi_to_solo_candidate_failures import (
+    POST_MVP_PLAN_SCHEMA_VERSION,
+    RUBRIC_SCHEMA_VERSION,
+    SCHEMA_VERSION as LABELING_SCHEMA_VERSION,
+)
 from scripts.render_stage_b_midi_to_solo_targeted_quality_repair_audio import (
     BOUNDARY,
     NEXT_BOUNDARY,
@@ -21,6 +34,7 @@ from scripts.render_stage_b_midi_to_solo_targeted_quality_repair_audio import (
 from scripts.run_stage_b_midi_to_solo_targeted_quality_repair_sweep import (
     BOUNDARY as SOURCE_BOUNDARY,
     NEXT_BOUNDARY as SOURCE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as SOURCE_SCHEMA_VERSION,
 )
 
 
@@ -110,7 +124,18 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             }
         )
     return {
+        "schema_version": SOURCE_SCHEMA_VERSION,
         "boundary": SOURCE_BOUNDARY,
+        "source_schema_versions": {
+            "candidate_failure_labeling": LABELING_SCHEMA_VERSION,
+            "quality_rubric_baseline": RUBRIC_SCHEMA_VERSION,
+            "post_mvp_quality_iteration_plan": POST_MVP_PLAN_SCHEMA_VERSION,
+            "final_status_audit": FINAL_STATUS_SCHEMA_VERSION,
+            "delivery_package": DELIVERY_SCHEMA_VERSION,
+            "listening_review_quality_gap": LISTENING_GAP_SCHEMA_VERSION,
+            "quality_gap_decision": QUALITY_GAP_DECISION_SCHEMA_VERSION,
+            "current_evidence": CURRENT_EVIDENCE_SCHEMA_VERSION,
+        },
         "candidate_repairs": repairs,
         "aggregate": {
             "candidate_count": 6,
@@ -122,6 +147,10 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "repaired_failure_counts": {"songlike_melody_not_soloing": 5},
             "source_outside_soloing_repair_evidence_ready": True,
             "source_outside_soloing_repair_source_context_preserved": True,
+            "source_outside_soloing_repair_schema_context_preserved": True,
+            "source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "source_outside_soloing_repair_wav_count": 6,
             "source_outside_soloing_repair_source_objective_pitch_role_risk_count": 5,
             "source_outside_soloing_repair_source_pitch_role_risk_count_before": 5,
@@ -148,6 +177,10 @@ def source_report(root: Path, *, quality_claim: bool = False) -> dict:
             "failure_label_delta": 7,
             "technical_regression_count": 0,
             "audio_package_ready": True,
+            "source_outside_soloing_repair_schema_context_preserved": True,
+            "source_outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": quality_claim,
             "audio_rendered_quality_claimed": False,
