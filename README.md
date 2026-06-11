@@ -48,9 +48,9 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair listening review input guard: `Issue #1146`
 - latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision: `Issue #1148`
 - latest MVP current evidence consolidation: `Issue #1150`
-- latest README evidence refresh: `Issue #1068`
+- latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after MVP current evidence consolidation source-context refresh merge: `0`
+- open issue queue after README evidence refresh source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -135,6 +135,8 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - phrase/rhythm chord-tone landing outside-soloing repair objective path supported: `true`
 - phrase/rhythm chord-tone landing outside-soloing repair current evidence consolidation ready: `true`
 - phrase/rhythm chord-tone landing outside-soloing repair source context preserved: `true`
+- phrase/rhythm chord-tone landing outside-soloing repair schema context preserved: `true`
+- phrase/rhythm chord-tone landing outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - phrase/rhythm repair rendered WAV count: `6`
 - phrase/rhythm repair technical WAV validation: `true`
 - phrase/rhythm repair source context preserved: `true`
@@ -253,6 +255,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - current evidence changed-ratio repair objective path included: `true`
 - outside-soloing repair objective path included in current evidence: `true`
 - outside-soloing repair source context preserved in current evidence: `true`
+- outside-soloing repair schema context preserved in current evidence: `true`
 - outside-soloing repair WAV files: `6`
 - outside-soloing repair changed note total: `2`
 - outside-soloing source pitch-role risk: `5 -> 2`
@@ -530,6 +533,8 @@ MVP current evidence refresh.
 - model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - outside-soloing repair objective path ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -1229,6 +1234,8 @@ README evidence refresh.
 - model-conditioned pitch-contour changed-ratio repair objective path ready: `true`
 - model-conditioned pitch-contour changed-ratio repair max ratio / target: `0.4348 / 0.5000`
 - outside-soloing source-context evidence reflected: `true`
+- outside-soloing schema-context evidence reflected: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - outside-soloing source pitch-role risk count: `5 -> 2`
 - outside-soloing source residual risk preserved: `true`
 - outside-soloing current repair pitch-role risk count after: `0`

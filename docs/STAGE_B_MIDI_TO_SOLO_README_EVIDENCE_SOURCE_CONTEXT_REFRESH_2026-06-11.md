@@ -12,6 +12,8 @@
 - current MVP evidence supported: `true`
 - outside-soloing repair objective path ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - outside-soloing repair rendered audio file count: `6`
 - outside-soloing repair changed note total: `2`
 - source objective outside-soloing pitch-role risk count: `5`
@@ -35,8 +37,8 @@
 ## Decision
 
 - README current evidence block에 source/current repair context 분리 기록
-- README evidence block에 source-context preserved flag 3개 반영
-- MVP completion audit README snippet guard에 preserved flag 3개 필수화
+- README evidence block에 source-context preserved flag와 schema-context reflected field 반영
+- MVP completion audit README snippet guard에 schema-context reflected snippet 필수화
 - source repair residual risk boundary 보존
 - current repair objective support만 반영
 - 다음 boundary: `stage_b_midi_to_solo_mvp_completion_audit`
@@ -45,6 +47,5 @@
 
 - `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_completion_audit`
 - `.venv/bin/python -m py_compile scripts/audit_stage_b_midi_to_solo_mvp_completion.py`
-- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-completion-audit`
 - `bash scripts/agent_harness.sh quick`
 - `git diff --check`

@@ -14,6 +14,8 @@ from scripts.audit_stage_b_midi_to_solo_mvp_completion import (
 from scripts.consolidate_stage_b_midi_to_solo_mvp_current_evidence import (
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BOUNDARY as CURRENT_EVIDENCE_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS,
 )
 
 
@@ -45,6 +47,54 @@ SOURCE_CONTEXT = {
 }
 
 
+SOURCE_SCHEMA_CONTEXT = {
+    "source_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "outside_soloing_repair_listening_review_input_guard_v4"
+    ),
+    "source_listening_package_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "outside_soloing_repair_listening_review_package_v4"
+    ),
+    "source_audio_package_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "outside_soloing_repair_audio_package_v4"
+    ),
+    "source_repair_sweep_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "outside_soloing_repair_sweep_v3"
+    ),
+    "source_followup_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "repair_followup_decision_v3"
+    ),
+    "source_objective_input_guard_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "repair_listening_review_input_guard_v3"
+    ),
+    "source_package_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "repair_listening_review_package_v3"
+    ),
+    "source_audio_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "repair_audio_package_v4"
+    ),
+    "chord_tone_repair_sweep_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_"
+        "repair_sweep_v4"
+    ),
+    "chord_tone_repair_sweep_source_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_"
+        "chord_context_pitch_role_objective_decision_v4"
+    ),
+    "chord_tone_repair_sweep_bridge_schema_version": (
+        "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_"
+        "chord_context_pitch_role_bridge_v4"
+    ),
+}
+
+
 def current_evidence(
     *,
     quality_claim: bool = False,
@@ -73,6 +123,7 @@ def current_evidence(
             "model_conditioned_pitch_contour_changed_ratio_repair_objective_path_ready": changed_ratio_repair_supported,
             "outside_soloing_repair_objective_path_ready": outside_soloing_repair_supported,
             "outside_soloing_repair_source_context_preserved": outside_soloing_repair_supported,
+            "outside_soloing_repair_schema_context_preserved": outside_soloing_repair_supported,
             "current_mvp_technical_execution_evidence_supported": True,
             "current_mvp_objective_repair_evidence_supported": True,
             "midi_to_solo_mvp_current_evidence_supported": current_evidence_supported,
@@ -154,6 +205,10 @@ def current_evidence(
                 "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_"
                 "chord_tone_landing_outside_soloing_repair_objective_only_next_decision"
             ),
+            "outside_soloing_repair_objective_schema_version": (
+                OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION
+            ),
+            **SOURCE_SCHEMA_CONTEXT,
             "objective_next_completed": True,
             "objective_next_decision_completed": True,
             "current_evidence_consolidation_ready": outside_soloing_repair_supported,
@@ -206,6 +261,9 @@ def readme_text(*, missing_boundary: bool = False) -> str:
             "- outside-soloing repair objective path included in current evidence: `true`",
             "- current evidence outside-soloing repair objective path included: `true`",
             "- outside-soloing source-context evidence reflected: `true`",
+            "- outside-soloing schema-context evidence reflected: `true`",
+            "- outside-soloing repair objective schema version: "
+            f"`{OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION}`",
             "- outside-soloing source pitch-role risk count: `5 -> 2`",
             "- outside-soloing source residual risk preserved: `true`",
             "- outside-soloing current repair pitch-role risk count after: `0`",
@@ -304,6 +362,16 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_objective_completed"])
         self.assertTrue(summary["outside_soloing_repair_objective_path_ready"])
         self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
+        self.assertTrue(summary["outside_soloing_repair_schema_context_preserved"])
+        self.assertEqual(
+            summary["outside_soloing_repair_objective_schema_version"],
+            OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+        )
+        for key in SOURCE_OBJECTIVE_SCHEMA_CONTEXT_KEYS:
+            self.assertEqual(
+                summary[f"outside_soloing_repair_{key}"],
+                SOURCE_SCHEMA_CONTEXT[key],
+            )
         self.assertTrue(summary["outside_soloing_repair_current_evidence_ready"])
         self.assertEqual(summary["outside_soloing_repair_rendered_audio_file_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
@@ -363,6 +431,27 @@ class StageBMidiToSoloMvpCompletionAuditTest(unittest.TestCase):
                 readme_text=readme_text(),
                 output_dir=Path("outputs/audit"),
                 issue_number=1070,
+            )
+
+    def test_rejects_missing_outside_soloing_schema_context(self) -> None:
+        evidence = current_evidence()
+        evidence["readiness"]["outside_soloing_repair_schema_context_preserved"] = False
+        with self.assertRaises(StageBMidiToSoloMvpCompletionAuditError):
+            build_mvp_completion_audit_report(
+                current_evidence=evidence,
+                readme_text=readme_text(),
+                output_dir=Path("outputs/audit"),
+                issue_number=1152,
+            )
+
+        evidence = current_evidence()
+        del evidence["outside_soloing_repair_objective_path"]["source_schema_version"]
+        with self.assertRaises(StageBMidiToSoloMvpCompletionAuditError):
+            build_mvp_completion_audit_report(
+                current_evidence=evidence,
+                readme_text=readme_text(),
+                output_dir=Path("outputs/audit"),
+                issue_number=1152,
             )
 
     def test_rejects_missing_readme_evidence_boundary(self) -> None:
