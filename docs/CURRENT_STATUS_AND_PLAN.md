@@ -12,19 +12,11 @@
 
 현재 active issue:
 
-- latest broader sampling audit: Issue #1344, Stage B MIDI-to-solo broader repaired sampling repeatability audit
-- latest broader listening package: Issue #1346, Stage B MIDI-to-solo broader repaired listening package
-- latest broader listening input guard: Issue #1348, Stage B MIDI-to-solo broader repaired listening input guard
-- latest broader objective-only next decision: Issue #1350, Stage B MIDI-to-solo broader repaired objective-only next decision
-- latest broader final review handoff: Issue #1352, Stage B MIDI-to-solo broader repaired final review handoff
-- latest broader handoff reproducibility audit: Issue #1354, Stage B MIDI-to-solo broader repaired handoff reproducibility audit
-- latest README final evidence refresh: Issue #1356, Stage B MIDI-to-solo final README evidence refresh
-- latest current status evidence refresh: Issue #1358, Stage B MIDI-to-solo current status evidence refresh
-- latest final status audit evidence refresh: Issue #1360, Stage B MIDI-to-solo final status audit evidence refresh
-- latest README final status audit refresh: Issue #1362, Stage B MIDI-to-solo README final status audit refresh
-- current issue: Issue #1364, Stage B MIDI-to-solo current status final audit refresh
-- open issue queue after README final status audit refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo post-final quality iteration decision refresh`
+- latest residual-aware final review package: Issue #1388, Stage B MIDI-to-solo residual-aware final review package
+- latest residual-aware listening input guard: Issue #1390, Stage B MIDI-to-solo residual-aware listening input guard
+- current issue: Issue #1392, Stage B MIDI-to-solo residual-aware README and status sync
+- open issue queue after residual-aware listening input guard merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware status audit`
 
 현재 범위가 아닌 것:
 
@@ -42,6 +34,15 @@
 
 현재 품질 경계:
 
+- residual-aware final review package candidate count: `8`
+- residual-aware final review MIDI/WAV: `8 / 8`
+- residual-aware objective rubric pass/fail: `6 / 2`
+- residual-aware residual major label: `low_tension_color=2`
+- residual-aware residual watch label: `dead_air_watch=3`
+- residual tension repeat feasible under current guard: `false`
+- residual-aware listening input guard validated input: `false`
+- residual-aware listening input guard preference fill: `false`
+- residual-aware next boundary: `music_transformer_solo_yield_residual_aware_status_sync`
 - broader repaired sampling audit strict/grammar: `40 / 40` / `40 / 40`
 - broader repaired review package MIDI/WAV: `8 / 8`
 - broader repaired final handoff selected objective candidates: `4`
