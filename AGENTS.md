@@ -41,7 +41,7 @@ Current handoff scope:
 - Latest songlike melody contour phrase/rhythm repair objective-only next decision completed: Issue #1120, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair objective-only next decision source-context refresh.
 - Latest songlike melody contour phrase/rhythm repair follow-up decision completed: Issue #1122, Stage B MIDI-to-solo songlike melody contour phrase/rhythm repair follow-up decision source-context refresh.
 - Latest songlike melody contour phrase/rhythm chord-context pitch-role bridge completed: Issue #1124, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh.
-- Latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision completed: Issue #1042, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh.
+- Latest songlike melody contour phrase/rhythm chord-context pitch-role objective decision completed: Issue #1126, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh.
 - Latest songlike melody contour phrase/rhythm chord-tone landing repair sweep completed: Issue #1044, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh.
 - Latest songlike melody contour phrase/rhythm chord-tone landing repair audio package completed: Issue #1046, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair audio package source-context refresh.
 - Latest songlike melody contour phrase/rhythm chord-tone landing repair listening review package completed: Issue #1048, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair listening review package source-context refresh.
@@ -55,8 +55,8 @@ Current handoff scope:
 - Latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision completed: Issue #1064, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh.
 - Latest documentation issue completed: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after songlike melody contour phrase/rhythm chord-context pitch-role bridge source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh.
+- Open issue queue after songlike melody contour phrase/rhythm chord-context pitch-role objective decision source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing repair sweep source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

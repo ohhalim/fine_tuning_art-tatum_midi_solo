@@ -16,7 +16,9 @@ from scripts.assess_stage_b_generic_base_readiness import read_json, write_json,
 from scripts.build_stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_bridge import (  # noqa: E402
     BOUNDARY as BRIDGE_BOUNDARY,
     BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     NEXT_BOUNDARY as BRIDGE_NEXT_BOUNDARY,
+    SCHEMA_VERSION as BRIDGE_SCHEMA_VERSION,
 )
 
 
@@ -31,7 +33,7 @@ NEXT_BOUNDARY = (
     "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep"
 )
 SELECTED_TARGET = "songlike_melody_contour_phrase_rhythm_chord_tone_landing_repair_sweep"
-SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v3"
+SCHEMA_VERSION = "stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_context_pitch_role_objective_decision_v4"
 PRIMARY_RISK_LABEL = "weak_chord_tone_landing_risk"
 SECONDARY_RISK_LABEL = "outside_soloing_pitch_role_risk"
 QUALITY_CLAIM_KEYS = [
@@ -86,6 +88,10 @@ def validate_bridge_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
             "chord-context pitch-role bridge boundary required"
         )
+    if str(report.get("schema_version") or "") != BRIDGE_SCHEMA_VERSION:
+        raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
+            "bridge schema version must match current bridge report"
+        )
     if str(decision.get("next_boundary") or "") != BRIDGE_NEXT_BOUNDARY:
         raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
             "bridge must route to pitch-role objective decision"
@@ -133,11 +139,7 @@ def validate_bridge_source(report: dict[str, Any]) -> dict[str, Any]:
             raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
                 f"bridge source-context field required: {key}"
             )
-    for key in (
-        "followup_objective_source_outside_soloing_source_context_preserved",
-        "followup_repair_sweep_source_outside_soloing_source_context_preserved",
-        "repair_sweep_source_outside_soloing_source_context_preserved",
-    ):
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
         if not bool(readiness.get(key, False)):
             raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
                 f"source outside-soloing context should be preserved: {key}"
@@ -171,6 +173,7 @@ def validate_bridge_source(report: dict[str, Any]) -> dict[str, Any]:
             )
     return {
         "boundary": BRIDGE_BOUNDARY,
+        "schema_version": str(report.get("schema_version") or ""),
         "candidate_count": candidate_count,
         "not_evaluable_before_count": _int(readiness.get("not_evaluable_before_count")),
         "not_evaluable_after_count": _int(readiness.get("not_evaluable_after_count")),
@@ -235,6 +238,7 @@ def build_objective_decision_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": bridge["boundary"],
+        "source_schema_version": bridge["schema_version"],
         "objective_summary": bridge,
         "selected_next_target": {
             "selected_target": selected_target,
@@ -246,6 +250,7 @@ def build_objective_decision_report(
         },
         "readiness": {
             "boundary": BOUNDARY,
+            "source_schema_version": bridge["schema_version"],
             "pitch_role_objective_decision_completed": True,
             "candidate_count": _int(bridge["candidate_count"]),
             "primary_risk_label": primary_label,
@@ -353,9 +358,15 @@ def validate_objective_decision_report(
             raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
                 f"objective source-context field required: {key}"
             )
+    for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS:
+        if not bool(readiness.get(key, False)):
+            raise StageBMidiToSoloPitchRoleObjectiveDecisionError(
+                f"objective source-context preserved field must be true: {key}"
+            )
     return {
         "boundary": boundary,
         "source_boundary": str(report.get("source_boundary") or ""),
+        "source_schema_version": str(readiness.get("source_schema_version") or ""),
         "next_boundary": str(decision.get("next_boundary") or ""),
         "selected_target": str(decision.get("selected_target") or ""),
         "pitch_role_objective_decision_completed": bool(
@@ -414,6 +425,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- boundary: `{report['boundary']}`",
         f"- source boundary: `{report['source_boundary']}`",
+        f"- source schema version: `{report['source_schema_version']}`",
         f"- next boundary: `{decision['next_boundary']}`",
         f"- selected target: `{decision['selected_target']}`",
         f"- primary risk label: `{selected['primary_risk_label']}`",
@@ -476,7 +488,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--run_id", type=str, default=None)
     parser.add_argument("--doc_path", type=str, default="")
-    parser.add_argument("--issue_number", type=int, default=1042)
+    parser.add_argument("--issue_number", type=int, default=1126)
     parser.add_argument("--expected_boundary", type=str, default="")
     parser.add_argument("--expected_next_boundary", type=str, default="")
     parser.add_argument("--expected_target", type=str, default="")
