@@ -150,6 +150,18 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
 
         self.assertEqual(report["schema_version"], SCHEMA_VERSION)
         self.assertEqual(report["issue_number"], 1082)
+        self.assertEqual(summary["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(summary["source_final_status_schema_version"], FINAL_STATUS_SCHEMA_VERSION)
+        self.assertEqual(summary["source_delivery_package_schema_version"], DELIVERY_SCHEMA_VERSION)
+        self.assertEqual(summary["source_listening_gap_schema_version"], LISTENING_GAP_SCHEMA_VERSION)
+        self.assertEqual(
+            summary["source_quality_gap_schema_version"],
+            QUALITY_GAP_DECISION_SCHEMA_VERSION,
+        )
+        self.assertEqual(
+            summary["source_current_evidence_schema_version"],
+            CURRENT_EVIDENCE_SCHEMA_VERSION,
+        )
         self.assertTrue(summary["post_mvp_quality_iteration_plan_completed"])
         self.assertTrue(summary["technical_mvp_complete"])
         self.assertTrue(summary["local_review_ready"])
@@ -157,6 +169,11 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
         self.assertTrue(summary["quality_rubric_required"])
         self.assertTrue(summary["outside_soloing_repair_evidence_ready"])
         self.assertTrue(summary["outside_soloing_repair_source_context_preserved"])
+        self.assertTrue(summary["outside_soloing_repair_schema_context_preserved"])
+        self.assertEqual(
+            summary["outside_soloing_repair_objective_schema_version"],
+            OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+        )
         self.assertEqual(summary["outside_soloing_repair_wav_count"], 6)
         self.assertEqual(summary["outside_soloing_repair_changed_note_total"], 2)
         self.assertEqual(summary["outside_soloing_repair_source_objective_pitch_role_risk_count"], 5)
@@ -180,6 +197,37 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
             summary["next_recommended_issue"],
             "Stage B MIDI-to-solo quality rubric baseline source-context refresh",
         )
+        self.assertEqual(
+            report["source_schema_versions"]["final_status_audit"],
+            FINAL_STATUS_SCHEMA_VERSION,
+        )
+
+    def test_rejects_post_mvp_schema_mismatch(self) -> None:
+        report = build_post_mvp_quality_iteration_plan_report(
+            final_status_audit=final_status_audit(),
+            output_dir=Path("outputs/post_mvp_quality"),
+            issue_number=1166,
+        )
+        report["schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloPostMvpQualityIterationPlanError):
+            validate_post_mvp_quality_iteration_plan_report(
+                report,
+                expected_boundary=BOUNDARY,
+                expected_next_boundary=NEXT_BOUNDARY,
+                expected_target=SELECTED_TARGET,
+                require_quality_rubric=True,
+                require_no_quality_claim=True,
+            )
+
+    def test_rejects_final_status_schema_mismatch(self) -> None:
+        source = final_status_audit()
+        source["schema_version"] = "stale_schema"
+        with self.assertRaises(StageBMidiToSoloPostMvpQualityIterationPlanError):
+            build_post_mvp_quality_iteration_plan_report(
+                final_status_audit=source,
+                output_dir=Path("outputs/post_mvp_quality"),
+                issue_number=1166,
+            )
 
     def test_rejects_wrong_source_boundary(self) -> None:
         source = final_status_audit()
@@ -269,7 +317,7 @@ class StageBMidiToSoloPostMvpQualityIterationPlanTest(unittest.TestCase):
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_post_mvp_quality_iteration_plan")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_quality_rubric_baseline")
         self.assertEqual(SELECTED_TARGET, "quality_rubric_baseline")
-        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v3")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4")
 
 
 if __name__ == "__main__":

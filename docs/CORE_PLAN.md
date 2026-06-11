@@ -399,7 +399,7 @@ MVP가 끝났다고 볼 수 있는 조건:
 - MIDI-to-solo MVP delivery package: schema `stage_b_midi_to_solo_mvp_delivery_package_v4`, source listening gap schema `stage_b_midi_to_solo_listening_review_quality_gap_v4`, current evidence schema `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`, runnable CLI `true`, input ranked MIDI `true`, rendered WAV evidence `true`, CLI/changed-ratio audio candidate count `3/3`, outside-soloing schema-context preserved `true`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_readme_final_evidence_refresh`
 - MIDI-to-solo README final evidence refresh: latest evidence boundary `stage_b_midi_to_solo_mvp_delivery_package`, delivery schema `stage_b_midi_to_solo_mvp_delivery_package_v4`, source listening gap schema `stage_b_midi_to_solo_listening_review_quality_gap_v4`, current evidence schema `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`, outside-soloing schema-context preserved `true`, runnable CLI `true`, input ranked MIDI/WAV evidence `true/true`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_final_status_audit`
 - MIDI-to-solo final status audit: schema `stage_b_midi_to_solo_final_status_audit_v4`, source delivery schema `stage_b_midi_to_solo_mvp_delivery_package_v4`, source current evidence schema `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`, technical MVP complete `true`, local review ready `true`, README final evidence reflected `true`, outside-soloing schema-context preserved `true`, CLI/WAV count `3/3`, raw artifact upload `false`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
-- MIDI-to-solo post-MVP quality iteration plan: selected target `quality_rubric_baseline`, source risk `5 -> 2`, current repair risk after `0`, source-context preserved flags `3/3`, ordered work `4`, taxonomy seed `7`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_rubric_baseline`
+- MIDI-to-solo post-MVP quality iteration plan: schema `stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4`, source final status schema `stage_b_midi_to_solo_final_status_audit_v4`, source current evidence schema `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`, selected target `quality_rubric_baseline`, source risk `5 -> 2`, current repair risk after `0`, outside-soloing schema-context preserved `true`, ordered work `4`, taxonomy seed `7`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_quality_rubric_baseline`
 - MIDI-to-solo quality rubric baseline: rubric items `8`, metric groups `30`, source risk `5 -> 2`, current repair risk after `0`, source-context preserved flags `3/3`, candidate failure labeling ready `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_candidate_failure_labeling`
 - MIDI-to-solo candidate failure labeling: candidates `6`, failed `6`, failure label types `4`, not-evaluable types `2`, source risk `5 -> 2`, current repair risk after `0`, source-context preserved flags `3/3`, targeted repair ready `true`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_sweep`
 - MIDI-to-solo targeted quality repair sweep: candidates `6`, failure labels `12 -> 8`, improved candidates `4`, technical regression `0`, source risk `5 -> 2`, current repair risk after `0`, source-context preserved flags `3/3`, quality/preference claim `false`, next boundary `stage_b_midi_to_solo_targeted_quality_repair_audio_package`
@@ -12434,13 +12434,19 @@ Issue #1164는 Issue #1162 README final evidence와 Issue #1160 MVP delivery pac
 
 ## 9.231 Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
 
-Issue #1082는 Issue #1080 final status audit 결과를 기준으로 post-MVP quality iteration plan의 source-context validation과 summary에 source-context preserved flag 3개를 보존한 작업이다.
+Issue #1166은 Issue #1164 final status audit 결과를 기준으로 post-MVP quality iteration plan의 schema/source-context validation과 summary에 final status schema chain을 보존한 작업이다.
 
 결과:
 
 - document: `docs/STAGE_B_MIDI_TO_SOLO_POST_MVP_QUALITY_ITERATION_PLAN_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- schema version: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4`
 - source boundary: `stage_b_midi_to_solo_final_status_audit`
+- source final status schema version: `stage_b_midi_to_solo_final_status_audit_v4`
+- source delivery package schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - next boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
 - selected target: `quality_rubric_baseline`
 - post-MVP quality iteration plan completed: `true`
@@ -12448,6 +12454,8 @@ Issue #1082는 Issue #1080 final status audit 결과를 기준으로 post-MVP qu
 - local review ready: `true`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -12460,8 +12468,8 @@ Issue #1082는 Issue #1080 final status audit 결과를 기준으로 post-MVP qu
 
 판단:
 
-- post-MVP plan source validation에 final status audit preserved flag 3개 포함.
-- preserved flag false 입력은 validation error로 차단.
+- post-MVP plan source validation에 final status audit schema/source-context 결과 포함.
+- stale schema와 preserved flag false 입력은 validation error로 차단.
 - 다음 검증 대상은 quality rubric baseline 유지.
 - musical quality와 human/audio preference claim 제외 유지.
 

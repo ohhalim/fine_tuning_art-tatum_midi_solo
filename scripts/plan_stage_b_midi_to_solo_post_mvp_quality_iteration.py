@@ -18,7 +18,13 @@ from scripts.audit_stage_b_midi_to_solo_final_status import (  # noqa: E402
     BRIDGE_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as FINAL_STATUS_BOUNDARY,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
+    DELIVERY_SCHEMA_VERSION,
+    LISTENING_GAP_SCHEMA_VERSION,
     NEXT_BOUNDARY as FINAL_STATUS_NEXT_BOUNDARY,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    QUALITY_GAP_DECISION_SCHEMA_VERSION,
+    SCHEMA_VERSION as FINAL_STATUS_SCHEMA_VERSION,
     StageBMidiToSoloFinalStatusAuditError,
     validate_final_status_audit_report,
 )
@@ -31,7 +37,7 @@ class StageBMidiToSoloPostMvpQualityIterationPlanError(ValueError):
 BOUNDARY = "stage_b_midi_to_solo_post_mvp_quality_iteration_plan"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_quality_rubric_baseline"
 SELECTED_TARGET = "quality_rubric_baseline"
-SCHEMA_VERSION = "stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v3"
+SCHEMA_VERSION = "stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4"
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -134,6 +140,16 @@ def validate_final_status_source(report: dict[str, Any]) -> dict[str, Any]:
         raise StageBMidiToSoloPostMvpQualityIterationPlanError(
             "outside-soloing repair source context preservation required"
         )
+    if not bool(summary.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing repair schema context preservation required"
+        )
+    if str(
+        summary.get("outside_soloing_repair_objective_schema_version") or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing repair objective schema version mismatch"
+        )
     _source_context_fields(summary, label="final status audit")
     if _int(summary.get("outside_soloing_repair_wav_count")) < 6:
         raise StageBMidiToSoloPostMvpQualityIterationPlanError(
@@ -234,8 +250,28 @@ def build_post_mvp_quality_iteration_plan_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": FINAL_STATUS_BOUNDARY,
+        "source_schema_versions": {
+            "final_status_audit": str(source["schema_version"]),
+            "delivery_package": str(source["source_delivery_package_schema_version"]),
+            "listening_review_quality_gap": str(source["source_listening_gap_schema_version"]),
+            "quality_gap_decision": str(source["source_quality_gap_schema_version"]),
+            "current_evidence": str(source["source_current_evidence_schema_version"]),
+        },
         "source_summary": source,
         "post_mvp_status": {
+            "source_final_status_schema_version": str(source["schema_version"]),
+            "source_delivery_package_schema_version": str(
+                source["source_delivery_package_schema_version"]
+            ),
+            "source_listening_gap_schema_version": str(
+                source["source_listening_gap_schema_version"]
+            ),
+            "source_quality_gap_schema_version": str(
+                source["source_quality_gap_schema_version"]
+            ),
+            "source_current_evidence_schema_version": str(
+                source["source_current_evidence_schema_version"]
+            ),
             "technical_mvp_complete": bool(source["technical_mvp_complete"]),
             "local_review_ready": bool(source["technical_mvp_ready_for_local_review"]),
             "readme_final_evidence_reflected": bool(source["readme_final_evidence_reflected"]),
@@ -246,6 +282,12 @@ def build_post_mvp_quality_iteration_plan_report(
             ),
             "outside_soloing_repair_source_context_preserved": bool(
                 source["outside_soloing_repair_source_context_preserved"]
+            ),
+            "outside_soloing_repair_schema_context_preserved": bool(
+                source["outside_soloing_repair_schema_context_preserved"]
+            ),
+            "outside_soloing_repair_objective_schema_version": str(
+                source["outside_soloing_repair_objective_schema_version"]
             ),
             "outside_soloing_repair_wav_count": _int(
                 source["outside_soloing_repair_wav_count"]
@@ -308,6 +350,9 @@ def build_post_mvp_quality_iteration_plan_report(
             "outside_soloing_repair_source_context_preserved": bool(
                 source["outside_soloing_repair_source_context_preserved"]
             ),
+            "outside_soloing_repair_schema_context_preserved": bool(
+                source["outside_soloing_repair_schema_context_preserved"]
+            ),
             "followup_objective_source_outside_soloing_source_context_preserved": bool(
                 source["followup_objective_source_outside_soloing_source_context_preserved"]
             ),
@@ -364,7 +409,34 @@ def validate_post_mvp_quality_iteration_plan_report(
     readiness = _dict(report.get("readiness"))
     selected = _dict(report.get("selected_next_target"))
     post_mvp_status = _dict(report.get("post_mvp_status"))
+    source_schema_versions = _dict(report.get("source_schema_versions"))
     ordered_work = report.get("ordered_work")
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "post-MVP quality iteration plan schema version mismatch"
+        )
+    if str(source_schema_versions.get("final_status_audit") or "") != FINAL_STATUS_SCHEMA_VERSION:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "post-MVP source final status schema version mismatch"
+        )
+    if str(source_schema_versions.get("delivery_package") or "") != DELIVERY_SCHEMA_VERSION:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "post-MVP source delivery package schema version mismatch"
+        )
+    if str(
+        source_schema_versions.get("listening_review_quality_gap") or ""
+    ) != LISTENING_GAP_SCHEMA_VERSION:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "post-MVP source listening gap schema version mismatch"
+        )
+    if str(source_schema_versions.get("quality_gap_decision") or "") != QUALITY_GAP_DECISION_SCHEMA_VERSION:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "post-MVP source quality gap schema version mismatch"
+        )
+    if str(source_schema_versions.get("current_evidence") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "post-MVP source current evidence schema version mismatch"
+        )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloPostMvpQualityIterationPlanError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -392,7 +464,33 @@ def validate_post_mvp_quality_iteration_plan_report(
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="post-MVP quality iteration readiness")
         _require_no_quality_claim(post_mvp_status, label="post-MVP status")
+    if not bool(post_mvp_status.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing repair schema context preservation required"
+        )
+    if str(
+        post_mvp_status.get("outside_soloing_repair_objective_schema_version") or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloPostMvpQualityIterationPlanError(
+            "outside-soloing repair objective schema version mismatch"
+        )
     return {
+        "schema_version": str(report.get("schema_version") or ""),
+        "source_final_status_schema_version": str(
+            source_schema_versions.get("final_status_audit") or ""
+        ),
+        "source_delivery_package_schema_version": str(
+            source_schema_versions.get("delivery_package") or ""
+        ),
+        "source_listening_gap_schema_version": str(
+            source_schema_versions.get("listening_review_quality_gap") or ""
+        ),
+        "source_quality_gap_schema_version": str(
+            source_schema_versions.get("quality_gap_decision") or ""
+        ),
+        "source_current_evidence_schema_version": str(
+            source_schema_versions.get("current_evidence") or ""
+        ),
         "boundary": boundary,
         "next_boundary": str(decision.get("next_boundary") or ""),
         "selected_target": str(selected.get("selected_target") or ""),
@@ -407,6 +505,12 @@ def validate_post_mvp_quality_iteration_plan_report(
         ),
         "outside_soloing_repair_source_context_preserved": bool(
             post_mvp_status.get("outside_soloing_repair_source_context_preserved", False)
+        ),
+        "outside_soloing_repair_schema_context_preserved": bool(
+            post_mvp_status.get("outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "outside_soloing_repair_objective_schema_version": str(
+            post_mvp_status.get("outside_soloing_repair_objective_schema_version") or ""
         ),
         "outside_soloing_repair_wav_count": _int(
             post_mvp_status.get("outside_soloing_repair_wav_count")
@@ -479,12 +583,20 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- boundary: `{report['boundary']}`",
         f"- source boundary: `{report['source_boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
+        f"- source final status schema version: `{report['source_schema_versions']['final_status_audit']}`",
+        f"- source delivery package schema version: `{report['source_schema_versions']['delivery_package']}`",
+        f"- source listening gap schema version: `{report['source_schema_versions']['listening_review_quality_gap']}`",
+        f"- source quality gap schema version: `{report['source_schema_versions']['quality_gap_decision']}`",
+        f"- source current evidence schema version: `{report['source_schema_versions']['current_evidence']}`",
         f"- next boundary: `{selected['selected_next_boundary']}`",
         f"- selected target: `{selected['selected_target']}`",
         f"- technical MVP complete: `{_bool_token(status['technical_mvp_complete'])}`",
         f"- local review ready: `{_bool_token(status['local_review_ready'])}`",
         f"- outside-soloing repair evidence ready: `{_bool_token(status['outside_soloing_repair_evidence_ready'])}`",
         f"- outside-soloing repair source context preserved: `{_bool_token(status['outside_soloing_repair_source_context_preserved'])}`",
+        f"- outside-soloing repair schema context preserved: `{_bool_token(status['outside_soloing_repair_schema_context_preserved'])}`",
+        f"- outside-soloing repair objective schema version: `{status['outside_soloing_repair_objective_schema_version']}`",
         f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(status['followup_objective_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(status['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(status['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
