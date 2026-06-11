@@ -6114,7 +6114,7 @@ run_stage_b_midi_to_solo_final_status_audit() {
     --delivery_package "$delivery_package" \
     --readme_path README.md \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_FINAL_STATUS_AUDIT_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 996 \
+    --issue_number 1080 \
     --expected_boundary stage_b_midi_to_solo_final_status_audit \
     --expected_next_boundary stage_b_midi_to_solo_post_mvp_quality_iteration_plan \
     --require_technical_mvp_complete \

@@ -4,15 +4,16 @@ import unittest
 from pathlib import Path
 
 from scripts.audit_stage_b_midi_to_solo_final_status import (
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BOUNDARY,
     NEXT_BOUNDARY,
     REQUIRED_README_SNIPPETS,
+    SCHEMA_VERSION,
     StageBMidiToSoloFinalStatusAuditError,
     build_final_status_audit_report,
     validate_final_status_audit_report,
 )
 from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import (
-    BRIDGE_SOURCE_CONTEXT_KEYS,
     BOUNDARY as DELIVERY_BOUNDARY,
     NEXT_BOUNDARY as DELIVERY_NEXT_BOUNDARY,
 )
@@ -105,7 +106,7 @@ class StageBMidiToSoloFinalStatusAuditTest(unittest.TestCase):
             delivery_package=delivery_package(),
             readme_text=readme_text(),
             output_dir=Path("outputs/final_status"),
-            issue_number=742,
+            issue_number=1080,
         )
         summary = validate_final_status_audit_report(
             report,
@@ -143,7 +144,7 @@ class StageBMidiToSoloFinalStatusAuditTest(unittest.TestCase):
         self.assertTrue(summary["outside_soloing_repair_source_residual_risk_preserved"])
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_count_after"], 0)
         self.assertEqual(summary["outside_soloing_repair_pitch_role_risk_delta"], 2)
-        for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+        for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
             self.assertEqual(summary[key], SOURCE_CONTEXT[key])
         self.assertTrue(summary["listening_review_quality_gap_open"])
         self.assertFalse(summary["raw_artifact_upload_required"])
@@ -151,8 +152,10 @@ class StageBMidiToSoloFinalStatusAuditTest(unittest.TestCase):
         self.assertFalse(summary["midi_to_solo_musical_quality_claimed"])
         self.assertEqual(
             summary["next_recommended_issue"],
-            "Stage B MIDI-to-solo post-MVP musical quality iteration plan",
+            "Stage B MIDI-to-solo post-MVP musical quality iteration plan source-context refresh",
         )
+        self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+        self.assertEqual(report["issue_number"], 1080)
 
     def test_rejects_missing_readme_snippet(self) -> None:
         with self.assertRaises(StageBMidiToSoloFinalStatusAuditError):
@@ -181,9 +184,24 @@ class StageBMidiToSoloFinalStatusAuditTest(unittest.TestCase):
                 issue_number=742,
             )
 
+    def test_rejects_false_source_context_preserved_flag(self) -> None:
+        source = delivery_package()
+        source["delivery_package"][
+            "repair_sweep_source_outside_soloing_source_context_preserved"
+        ] = False
+
+        with self.assertRaises(StageBMidiToSoloFinalStatusAuditError):
+            build_final_status_audit_report(
+                delivery_package=source,
+                readme_text=readme_text(),
+                output_dir=Path("outputs/final_status"),
+                issue_number=1080,
+            )
+
     def test_boundary_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_final_status_audit")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_post_mvp_quality_iteration_plan")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_final_status_audit_v3")
 
 
 if __name__ == "__main__":
