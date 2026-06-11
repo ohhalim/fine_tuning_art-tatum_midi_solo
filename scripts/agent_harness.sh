@@ -6427,7 +6427,7 @@ run_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_g
     --run_id "$guard_run_id" \
     --source_package "$source_package" \
     --doc_path docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_LISTENING_REVIEW_INPUT_GUARD_SOURCE_CONTEXT_REFRESH_2026-06-11.md \
-    --issue_number 1022 \
+    --issue_number 1106 \
     --expected_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard \
     --expected_next_boundary stage_b_midi_to_solo_songlike_melody_contour_repair_objective_only_next_decision \
     --require_guard_completed \
