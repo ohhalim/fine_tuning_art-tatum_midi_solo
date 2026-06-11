@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pretty_midi
 
-from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_SOURCE_CONTEXT_KEYS
+from scripts.audit_stage_b_midi_to_solo_final_status import BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS
 from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import BOUNDARY as DELIVERY_BOUNDARY
 from scripts.build_stage_b_midi_to_solo_quality_rubric_baseline import (
     build_quality_rubric_baseline_report,
@@ -22,6 +22,7 @@ from scripts.plan_stage_b_midi_to_solo_post_mvp_quality_iteration import (
 from scripts.run_stage_b_midi_to_solo_targeted_quality_repair_sweep import (
     BOUNDARY,
     NEXT_BOUNDARY,
+    SCHEMA_VERSION,
     StageBMidiToSoloTargetedQualityRepairSweepError,
     build_targeted_quality_repair_sweep_report,
     validate_targeted_quality_repair_sweep_report,
@@ -201,7 +202,7 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                 candidate_failure_labeling=candidate_failure_labeling(root),
                 rubric_baseline=rubric_baseline(root),
                 output_dir=root / "sweep",
-                issue_number=750,
+                issue_number=1088,
             )
             summary = validate_targeted_quality_repair_sweep_report(
                 report,
@@ -212,6 +213,8 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                 require_no_quality_claim=True,
             )
 
+            self.assertEqual(report["schema_version"], SCHEMA_VERSION)
+            self.assertEqual(report["issue_number"], 1088)
             self.assertTrue(summary["targeted_quality_repair_sweep_completed"])
             self.assertTrue(summary["targeted_quality_repair_target_supported"])
             self.assertEqual(summary["candidate_count"], 6)
@@ -236,7 +239,7 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
             self.assertEqual(summary["source_outside_soloing_repair_pitch_role_risk_delta"], 2)
             self.assertEqual(summary["source_outside_soloing_not_evaluable_count"], 6)
             self.assertEqual(summary["repaired_outside_soloing_not_evaluable_count"], 6)
-            for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+            for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
                 self.assertEqual(summary[key], SOURCE_CONTEXT[key])
             self.assertEqual(summary["next_boundary"], NEXT_BOUNDARY)
             self.assertTrue(summary["audio_package_ready"])
@@ -258,7 +261,7 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                     ),
                     rubric_baseline=rubric_baseline(root),
                     output_dir=root / "sweep",
-                    issue_number=750,
+                    issue_number=1088,
                 )
 
     def test_rejects_missing_outside_soloing_labeling_context(self) -> None:
@@ -271,7 +274,7 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                     candidate_failure_labeling=source,
                     rubric_baseline=rubric_baseline(root),
                     output_dir=root / "sweep",
-                    issue_number=750,
+                    issue_number=1088,
                 )
 
     def test_rejects_missing_labeling_source_context_field(self) -> None:
@@ -286,12 +289,28 @@ class StageBMidiToSoloTargetedQualityRepairSweepTest(unittest.TestCase):
                     candidate_failure_labeling=source,
                     rubric_baseline=rubric_baseline(root),
                     output_dir=root / "sweep",
-                    issue_number=1004,
+                    issue_number=1088,
+                )
+
+    def test_rejects_false_labeling_source_context_preserved_field(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = candidate_failure_labeling(root)
+            source["aggregate"][
+                "followup_objective_source_outside_soloing_source_context_preserved"
+            ] = False
+            with self.assertRaises(StageBMidiToSoloTargetedQualityRepairSweepError):
+                build_targeted_quality_repair_sweep_report(
+                    candidate_failure_labeling=source,
+                    rubric_baseline=rubric_baseline(root),
+                    output_dir=root / "sweep",
+                    issue_number=1088,
                 )
 
     def test_constants_are_stable(self) -> None:
         self.assertEqual(BOUNDARY, "stage_b_midi_to_solo_targeted_quality_repair_sweep")
         self.assertEqual(NEXT_BOUNDARY, "stage_b_midi_to_solo_targeted_quality_repair_audio_package")
+        self.assertEqual(SCHEMA_VERSION, "stage_b_midi_to_solo_targeted_quality_repair_sweep_v3")
 
 
 if __name__ == "__main__":
