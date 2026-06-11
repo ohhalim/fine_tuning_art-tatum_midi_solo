@@ -12,9 +12,9 @@
 
 현재 active issue:
 
-- latest functional result: Issue #1070, Stage B MIDI-to-solo MVP completion audit source-context refresh
+- latest functional result: Issue #1072, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest MVP completion audit: Issue #1070, Stage B MIDI-to-solo MVP completion audit source-context refresh
-- latest quality gap decision: Issue #988, Stage B MIDI-to-solo quality gap decision source-context refresh
+- latest quality gap decision: Issue #1072, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #990, Stage B MIDI-to-solo listening review quality gap source-context refresh
 - latest MVP delivery package: Issue #992, Stage B MIDI-to-solo MVP delivery package source-context refresh
 - latest README final evidence refresh: Issue #994, Stage B MIDI-to-solo README final evidence source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after MVP completion audit source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo quality gap decision source-context refresh`
+- open issue queue after quality gap decision source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo listening review quality gap source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5165,6 +5165,57 @@ Issue #1070은 Issue #1066 current evidence와 Issue #1068 README evidence refre
 다음:
 
 - `Stage B MIDI-to-solo quality gap decision source-context refresh`
+
+## Stage B MIDI-to-Solo Quality Gap Decision Source-Context Refresh Result
+
+Issue #1072는 Issue #1070 MVP completion audit의 source-context preserved flag 3개를 quality gap decision summary와 validation summary까지 보존하고, 다음 target을 listening review quality gap으로 유지한 작업이다.
+
+변경:
+
+- quality gap decision schema v3 적용
+- source-context required key를 preserved flag 3개 포함으로 확장
+- false preserved flag 입력 차단 테스트 추가
+- quality gap summary, generated markdown report, validation summary source-context preserved field 전파
+- harness issue number #1072 반영
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_QUALITY_GAP_DECISION_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_quality_gap_decision`
+- next boundary: `stage_b_midi_to_solo_listening_review_quality_gap`
+- selected target: `listening_review_quality_gap`
+- fallback path active: `true`
+- model-conditioned input path alignment required: `false`
+- technical model-core MVP completed: `true`
+- model-conditioned pitch-contour objective completed: `true`
+- model-conditioned pitch-contour changed-ratio repair objective completed: `true`
+- outside-soloing repair objective completed: `true`
+- outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- human review required now: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- changed-ratio repair와 outside-soloing repair objective path는 현재 target 통과.
+- 다음 gap은 추가 objective repair가 아니라 listening review evidence.
+- human/audio preference, MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_quality_gap_decision`
+- `.venv/bin/python -m py_compile scripts/decide_stage_b_midi_to_solo_quality_gap.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-quality-gap-decision`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음:
+
+- `Stage B MIDI-to-solo listening review quality gap source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 

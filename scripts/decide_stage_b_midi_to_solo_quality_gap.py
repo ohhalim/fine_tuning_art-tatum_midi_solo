@@ -14,7 +14,9 @@ sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.assess_stage_b_generic_base_readiness import read_json, write_json, write_text  # noqa: E402
 from scripts.audit_stage_b_midi_to_solo_mvp_completion import (  # noqa: E402
+    BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_KEYS,
+    BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as MVP_COMPLETION_AUDIT_BOUNDARY,
 )
 
@@ -32,7 +34,7 @@ PITCH_CONTOUR_CHANGED_RATIO_NEXT_BOUNDARY = (
 )
 LISTENING_REVIEW_TARGET = "listening_review_quality_gap"
 LISTENING_REVIEW_NEXT_BOUNDARY = "stage_b_midi_to_solo_listening_review_quality_gap"
-SCHEMA_VERSION = "stage_b_midi_to_solo_quality_gap_decision_v2"
+SCHEMA_VERSION = "stage_b_midi_to_solo_quality_gap_decision_v3"
 
 
 def _dict(value: Any) -> dict[str, Any]:
@@ -58,12 +60,19 @@ def _bool_token(value: Any) -> str:
 
 
 def _source_context_fields(container: dict[str, Any], *, label: str) -> dict[str, Any]:
-    for key in BRIDGE_SOURCE_CONTEXT_KEYS:
+    for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS:
         if key not in container:
             raise StageBMidiToSoloQualityGapDecisionError(
                 f"{label} source-context field required: {key}"
             )
-    return {key: container[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS}
+    missing_preserved = [
+        key for key in BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS if not bool(container.get(key))
+    ]
+    if missing_preserved:
+        raise StageBMidiToSoloQualityGapDecisionError(
+            f"{label} source-context preserved field must be true: {missing_preserved}"
+        )
+    return {key: container[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS}
 
 
 def validate_mvp_completion_audit(report: dict[str, Any]) -> dict[str, Any]:
@@ -545,7 +554,7 @@ def build_quality_gap_decision_report(
             "outside_soloing_repair_source_residual_risk_preserved": bool(
                 audit_summary["outside_soloing_repair_source_residual_risk_preserved"]
             ),
-            **{key: audit_summary[key] for key in BRIDGE_SOURCE_CONTEXT_KEYS},
+            **{key: audit_summary[key] for key in BRIDGE_REQUIRED_SOURCE_CONTEXT_KEYS},
             "human_review_required_now": False,
         },
         "selected_target": target,
@@ -582,7 +591,7 @@ def build_quality_gap_decision_report(
             "Stage B MIDI-to-solo model-conditioned pitch-contour changed-ratio review decision"
             if str(target["selected_target"]) == PITCH_CONTOUR_CHANGED_RATIO_TARGET
             else (
-                "Stage B MIDI-to-solo listening review quality gap"
+                "Stage B MIDI-to-solo listening review quality gap source-context refresh"
                 if str(target["selected_target"]) == LISTENING_REVIEW_TARGET
                 else "Stage B MIDI-to-solo model-conditioned input path quality alignment"
             )
@@ -905,10 +914,13 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- outside-soloing current repair pitch-role risk after / delta: `{summary['outside_soloing_repair_pitch_role_risk_count_after']}` / `{summary['outside_soloing_repair_pitch_role_risk_delta']}`",
         f"- follow-up objective source outside-soloing source pitch-role risk: `{summary['followup_objective_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['followup_objective_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- follow-up objective source outside-soloing current repair pitch-role risk after/delta: `{summary['followup_objective_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['followup_objective_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- follow-up objective source outside-soloing source context preserved: `{_bool_token(summary['followup_objective_source_outside_soloing_source_context_preserved'])}`",
         f"- follow-up repair sweep source outside-soloing source pitch-role risk: `{summary['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['followup_repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- follow-up repair sweep source outside-soloing current repair pitch-role risk after/delta: `{summary['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['followup_repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- follow-up repair sweep source outside-soloing source context preserved: `{_bool_token(summary['followup_repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- bridge repair sweep source outside-soloing source pitch-role risk: `{summary['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_before']} -> {summary['repair_sweep_source_outside_soloing_source_pitch_role_risk_count_after']}`",
         f"- bridge repair sweep source outside-soloing current repair pitch-role risk after/delta: `{summary['repair_sweep_source_outside_soloing_current_pitch_role_risk_count_after']} / {summary['repair_sweep_source_outside_soloing_current_pitch_role_risk_delta']}`",
+        f"- bridge repair sweep source outside-soloing source context preserved: `{_bool_token(summary['repair_sweep_source_outside_soloing_source_context_preserved'])}`",
         f"- outside-soloing repair objective path supported: `{_bool_token(summary['outside_soloing_repair_objective_path_supported'])}`",
         f"- outside-soloing repair target supported: `{_bool_token(summary['outside_soloing_repair_target_supported'])}`",
         f"- outside-soloing repair weak landing target supported: `{_bool_token(summary['outside_soloing_repair_weak_landing_target_supported'])}`",
