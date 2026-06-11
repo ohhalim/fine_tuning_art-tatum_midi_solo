@@ -30,7 +30,7 @@
 - latest targeted quality repair follow-up decision: Issue #1098, Stage B MIDI-to-solo targeted quality repair follow-up decision source-context refresh
 - latest songlike melody contour repair sweep: Issue #1100, Stage B MIDI-to-solo songlike melody contour repair sweep source-context refresh
 - latest songlike melody contour repair audio package: Issue #1102, Stage B MIDI-to-solo songlike melody contour repair audio package source-context refresh
-- latest songlike melody contour repair listening review package: Issue #1020, Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh
+- latest songlike melody contour repair listening review package: Issue #1104, Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh
 - latest songlike melody contour repair listening review input guard: Issue #1022, Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh
 - latest songlike melody contour repair objective-only next decision: Issue #1024, Stage B MIDI-to-solo songlike melody contour repair objective-only next decision source-context refresh
 - latest songlike melody contour repair follow-up decision: Issue #1026, Stage B MIDI-to-solo songlike melody contour repair follow-up decision source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after songlike melody contour repair audio package source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh`
+- open issue queue after songlike melody contour repair listening review package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -1360,6 +1360,12 @@
 - failure label delta: `4`
 - songlike failure count: `5 -> 0`
 - songlike failure delta: `5`
+- objective follow-up objective source outside-soloing source context preserved: `true`
+- objective follow-up repair sweep source outside-soloing source context preserved: `true`
+- objective bridge repair sweep source outside-soloing source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
 - source outside-soloing repair pitch-role risk count after: `0`
 - source outside-soloing not evaluable count: `6`
 - repaired outside-soloing not evaluable count: `6`
@@ -6049,6 +6055,61 @@ Issue #1102는 Issue #1100 songlike melody contour repair sweep의 MIDI 후보 6
 다음:
 
 - `Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh`
+
+## 9.242 Stage B MIDI-to-solo songlike melody contour repair listening review package source-context refresh
+
+Issue #1104는 Issue #1102 songlike melody contour repair audio package의 WAV/MIDI 후보 6개를 listening review package로 묶고 source-context preserved flag를 review package source summary/validation summary까지 보존한 작업이다.
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_SONGLIKE_MELODY_CONTOUR_REPAIR_LISTENING_REVIEW_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_input_guard`
+- package ready: `true`
+- review item count: `6`
+- validated review input: `false`
+- technical WAV validation: `true`
+- rendered audio file count: `6`
+- WAV sample rate: `44100`
+- WAV duration range: `18.849s-18.992s`
+- failure label delta: `4`
+- songlike failure count: `5 -> 0`
+- songlike failure delta: `5`
+- source outside-soloing repair evidence ready: `true`
+- objective source outside-soloing repair WAV count: `6`
+- objective source outside-soloing source context preserved: `true`
+- objective preserved source-context flags: `3 / 3`
+- source outside-soloing source context preserved: `true`
+- source preserved source-context flags: `3 / 3`
+- source outside-soloing source pitch-role risk: `5 -> 2`
+- source outside-soloing current repair pitch-role risk after / delta: `0 / 2`
+- source outside-soloing not evaluable count: `6`
+- repaired outside-soloing not evaluable count: `6`
+- repaired not evaluable counts: `outside_soloing_without_context=6`, `weak_chord_tone_landing=6`
+- human review required now: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- listening review package source validation에 #1102 preserved flag 3개 포함.
+- review package source summary와 validation summary에 objective/source preserved flag 보존.
+- preserved flag false 입력은 validation error로 차단.
+- review item 6개 생성, review input은 pending 상태 유지.
+- human/audio preference와 musical quality claim 제외 유지.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_songlike_melody_contour_repair_listening_review_package.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-songlike-melody-contour-repair-listening-review-package`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음:
+
+- `Stage B MIDI-to-solo songlike melody contour repair listening review input guard source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
