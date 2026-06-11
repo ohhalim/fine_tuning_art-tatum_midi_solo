@@ -12178,6 +12178,49 @@ Issue #1074는 Issue #1072 quality gap decision의 source-context preserved flag
 
 - `Stage B MIDI-to-solo MVP delivery package source-context refresh`
 
+## 9.228 Stage B MIDI-to-solo MVP delivery package source-context refresh
+
+Issue #1076은 Issue #1074 listening review quality gap의 source-context preserved flag 3개를 MVP delivery package manifest와 validation summary까지 보존하고, 다음 boundary를 README final evidence refresh로 유지한 작업이다.
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_DELIVERY_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
+- technical MVP delivery package completed: `true`
+- runnable CLI ready: `true`
+- input to ranked MIDI ready: `true`
+- input to rendered WAV evidence ready: `true`
+- changed-ratio repair audio evidence ready: `true`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- listening review quality gap open: `true`
+- raw artifact upload required: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- technical MVP delivery package는 quality claim 없이 기록 가능.
+- raw artifact upload 필요 없음.
+- human/audio preference, MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_delivery_package`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_mvp_delivery_package.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-delivery-package`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo README final evidence refresh source-context refresh`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

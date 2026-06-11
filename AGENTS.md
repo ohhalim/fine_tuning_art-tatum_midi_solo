@@ -16,7 +16,7 @@ Current handoff scope:
 - Latest audit issue completed: Issue #1070, Stage B MIDI-to-solo MVP completion audit source-context refresh.
 - Latest quality gap decision completed: Issue #1072, Stage B MIDI-to-solo quality gap decision source-context refresh.
 - Latest listening review quality gap completed: Issue #1074, Stage B MIDI-to-solo listening review quality gap source-context refresh.
-- Latest MVP delivery package completed: Issue #992, Stage B MIDI-to-solo MVP delivery package source-context refresh.
+- Latest MVP delivery package completed: Issue #1076, Stage B MIDI-to-solo MVP delivery package source-context refresh.
 - Latest README final evidence refresh completed: Issue #994, Stage B MIDI-to-solo README final evidence source-context refresh.
 - Latest final status audit completed: Issue #996, Stage B MIDI-to-solo final status audit source-context refresh.
 - Latest post-MVP quality iteration plan completed: Issue #998, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh.
@@ -55,8 +55,8 @@ Current handoff scope:
 - Latest songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision completed: Issue #1064, Stage B MIDI-to-solo songlike melody contour phrase/rhythm chord-tone landing outside-soloing repair objective-only next decision source-context refresh.
 - Latest documentation issue completed: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh.
 - Current branch should be `main` before starting new work.
-- Open issue queue after listening review quality gap source-context refresh merge: `0`.
-- Recommended next issue: Stage B MIDI-to-solo MVP delivery package source-context refresh.
+- Open issue queue after MVP delivery package source-context refresh merge: `0`.
+- Recommended next issue: Stage B MIDI-to-solo README final evidence refresh source-context refresh.
 
 Do not expand into Spring Boot, realtime DAW/plugin work, SaaS, UI, or deployment unless the user explicitly asks for that new scope.
 

@@ -12,11 +12,11 @@
 
 현재 active issue:
 
-- latest functional result: Issue #1074, Stage B MIDI-to-solo listening review quality gap source-context refresh
+- latest functional result: Issue #1076, Stage B MIDI-to-solo MVP delivery package source-context refresh
 - latest MVP completion audit: Issue #1070, Stage B MIDI-to-solo MVP completion audit source-context refresh
 - latest quality gap decision: Issue #1072, Stage B MIDI-to-solo quality gap decision source-context refresh
 - latest listening review quality gap: Issue #1074, Stage B MIDI-to-solo listening review quality gap source-context refresh
-- latest MVP delivery package: Issue #992, Stage B MIDI-to-solo MVP delivery package source-context refresh
+- latest MVP delivery package: Issue #1076, Stage B MIDI-to-solo MVP delivery package source-context refresh
 - latest README final evidence refresh: Issue #994, Stage B MIDI-to-solo README final evidence source-context refresh
 - latest final status audit: Issue #996, Stage B MIDI-to-solo final status audit source-context refresh
 - latest post-MVP quality iteration plan: Issue #998, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
@@ -56,8 +56,8 @@
 - latest MVP current evidence consolidation: Issue #1066, Stage B MIDI-to-solo MVP current evidence consolidation source-context refresh
 - latest README evidence refresh: Issue #1068, Stage B MIDI-to-solo README evidence source-context refresh
 - latest handoff sync: Issue #896, Stage B MIDI-to-solo handoff status sync
-- open issue queue after listening review quality gap source-context refresh merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo MVP delivery package source-context refresh`
+- open issue queue after MVP delivery package source-context refresh merge: `0`
+- 다음 권장 이슈: `Stage B MIDI-to-solo README final evidence refresh source-context refresh`
 
 현재 범위가 아닌 것:
 
@@ -5266,6 +5266,57 @@ Issue #1074는 Issue #1072 quality gap decision의 source-context preserved flag
 다음:
 
 - `Stage B MIDI-to-solo MVP delivery package source-context refresh`
+
+## Stage B MIDI-to-Solo MVP Delivery Package Source-Context Refresh Result
+
+Issue #1076은 Issue #1074 listening review quality gap의 source-context preserved flag 3개를 MVP delivery package manifest와 validation summary까지 보존하고, 다음 boundary를 README final evidence refresh로 유지한 작업이다.
+
+변경:
+
+- MVP delivery package schema v3 적용
+- source-context required key를 preserved flag 3개 포함으로 확장
+- false preserved flag 입력 차단 테스트 추가
+- delivery package manifest, generated markdown report, validation summary source-context preserved field 전파
+- harness issue number #1076 반영
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_MVP_DELIVERY_PACKAGE_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
+- boundary: `stage_b_midi_to_solo_mvp_delivery_package`
+- next boundary: `stage_b_midi_to_solo_readme_final_evidence_refresh`
+- technical MVP delivery package completed: `true`
+- runnable CLI ready: `true`
+- input to ranked MIDI ready: `true`
+- input to rendered WAV evidence ready: `true`
+- changed-ratio repair audio evidence ready: `true`
+- outside-soloing repair evidence ready: `true`
+- outside-soloing repair source context preserved: `true`
+- follow-up objective source outside-soloing source context preserved: `true`
+- follow-up repair sweep source outside-soloing source context preserved: `true`
+- bridge repair sweep source outside-soloing source context preserved: `true`
+- listening review quality gap open: `true`
+- raw artifact upload required: `false`
+- human/audio preference claimed: `false`
+- MIDI-to-solo musical quality claimed: `false`
+
+판단:
+
+- technical MVP delivery package는 quality claim 없이 기록 가능.
+- raw artifact upload 필요 없음.
+- human/audio preference, MIDI-to-solo musical quality claim 제외.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_stage_b_midi_to_solo_mvp_delivery_package`
+- `.venv/bin/python -m py_compile scripts/build_stage_b_midi_to_solo_mvp_delivery_package.py`
+- `bash -n scripts/agent_harness.sh`
+- `bash scripts/agent_harness.sh stage-b-midi-to-solo-mvp-delivery-package`
+- `bash scripts/agent_harness.sh quick`
+- `git diff --check`
+
+다음:
+
+- `Stage B MIDI-to-solo README final evidence refresh source-context refresh`
 
 ## Stage B MIDI-to-Solo README Evidence Refresh Result
 
