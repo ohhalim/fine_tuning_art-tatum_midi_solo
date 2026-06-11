@@ -27,7 +27,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest songlike melody contour repair listening review package: `Issue #1104`
 - latest songlike melody contour repair listening review input guard: `Issue #1106`
 - latest songlike melody contour repair objective-only next decision: `Issue #1108`
-- latest songlike melody contour repair follow-up decision: `Issue #1026`
+- latest songlike melody contour repair follow-up decision: `Issue #1110`
 - latest songlike melody contour phrase/rhythm repair sweep: `Issue #1028`
 - latest songlike melody contour phrase/rhythm repair audio package: `Issue #1030`
 - latest songlike melody contour phrase/rhythm repair listening review package: `Issue #1032`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1066`
 - latest README evidence refresh: `Issue #1068`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after songlike melody contour repair objective-only next decision source-context refresh merge: `0`
+- open issue queue after songlike melody contour repair follow-up decision source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current MVP evidence support: `true`
@@ -365,6 +365,12 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - songlike contour follow-up primary remaining failure labels: `phrase_shape_missing_tension_release`, `rhythmic_monotony`
 - songlike contour follow-up source risk: `5 -> 2`
 - songlike contour follow-up current risk after / delta: `0 / 2`
+- songlike contour follow-up objective follow-up objective source outside-soloing source context preserved: `true`
+- songlike contour follow-up objective follow-up repair sweep source outside-soloing source context preserved: `true`
+- songlike contour follow-up objective bridge repair sweep source outside-soloing source context preserved: `true`
+- songlike contour follow-up repair sweep follow-up objective source outside-soloing source context preserved: `true`
+- songlike contour follow-up repair sweep follow-up repair sweep source outside-soloing source context preserved: `true`
+- songlike contour follow-up repair sweep bridge repair sweep source outside-soloing source context preserved: `true`
 - songlike contour follow-up technical regression count: `0`
 - songlike contour phrase/rhythm repair sweep completed: `true`
 - songlike contour phrase/rhythm failure count: `4 -> 1`
@@ -409,7 +415,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - final status bridge repair sweep source outside-soloing source context preserved: `true`
 - MVP delivery raw artifact upload required: `false`
 - model-conditioned input path quality alignment decision completed: `true`
-- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_repair_followup_decision`
+- next boundary: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_repair_sweep`
 - validated review input: `false`
 - input MIDI -> context -> ranked MIDI -> WAV technical path: `true`
 - selected-scale objective repair path complete: `true`
