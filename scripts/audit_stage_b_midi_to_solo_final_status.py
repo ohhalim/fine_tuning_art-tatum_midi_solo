@@ -18,6 +18,11 @@ from scripts.build_stage_b_midi_to_solo_mvp_delivery_package import (  # noqa: E
     BRIDGE_SOURCE_CONTEXT_KEYS,
     BRIDGE_SOURCE_CONTEXT_PRESERVED_KEYS,
     BOUNDARY as DELIVERY_BOUNDARY,
+    CURRENT_EVIDENCE_SCHEMA_VERSION,
+    LISTENING_GAP_SCHEMA_VERSION,
+    OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION,
+    QUALITY_GAP_DECISION_SCHEMA_VERSION,
+    SCHEMA_VERSION as DELIVERY_SCHEMA_VERSION,
     StageBMidiToSoloMvpDeliveryPackageError,
     validate_delivery_package_report,
 )
@@ -29,7 +34,7 @@ class StageBMidiToSoloFinalStatusAuditError(ValueError):
 
 BOUNDARY = "stage_b_midi_to_solo_final_status_audit"
 NEXT_BOUNDARY = "stage_b_midi_to_solo_post_mvp_quality_iteration_plan"
-SCHEMA_VERSION = "stage_b_midi_to_solo_final_status_audit_v3"
+SCHEMA_VERSION = "stage_b_midi_to_solo_final_status_audit_v4"
 
 QUALITY_CLAIM_KEYS = [
     "human_audio_preference_claimed",
@@ -156,6 +161,16 @@ def build_final_status_audit_report(
         "technical_mvp_complete": bool(delivery["mvp_delivery_package_completed"]),
         "technical_mvp_ready_for_local_review": bool(delivery["runnable_cli_ready"]),
         "readme_final_evidence_reflected": bool(readme["readme_final_evidence_reflected"]),
+        "delivery_package_schema_version": str(delivery["schema_version"]),
+        "delivery_source_listening_gap_schema_version": str(
+            delivery["source_listening_gap_schema_version"]
+        ),
+        "delivery_source_quality_gap_schema_version": str(
+            delivery["source_quality_gap_schema_version"]
+        ),
+        "delivery_source_current_evidence_schema_version": str(
+            delivery["source_current_evidence_schema_version"]
+        ),
         "input_to_ranked_midi_ready": bool(delivery["input_to_ranked_midi_ready"]),
         "input_to_rendered_wav_evidence_ready": bool(delivery["input_to_rendered_wav_evidence_ready"]),
         "changed_ratio_repair_audio_evidence_ready": bool(
@@ -166,6 +181,12 @@ def build_final_status_audit_report(
         ),
         "outside_soloing_repair_source_context_preserved": bool(
             delivery["outside_soloing_repair_source_context_preserved"]
+        ),
+        "outside_soloing_repair_schema_context_preserved": bool(
+            delivery["outside_soloing_repair_schema_context_preserved"]
+        ),
+        "outside_soloing_repair_objective_schema_version": str(
+            delivery["outside_soloing_repair_objective_schema_version"]
         ),
         "cli_candidate_count": _int(delivery["cli_candidate_count"]),
         "changed_ratio_repair_wav_count": _int(delivery["changed_ratio_repair_wav_count"]),
@@ -215,6 +236,14 @@ def build_final_status_audit_report(
         "issue_number": int(issue_number),
         "boundary": BOUNDARY,
         "source_boundary": DELIVERY_BOUNDARY,
+        "source_schema_versions": {
+            "delivery_package": final_status["delivery_package_schema_version"],
+            "listening_review_quality_gap": final_status[
+                "delivery_source_listening_gap_schema_version"
+            ],
+            "quality_gap_decision": final_status["delivery_source_quality_gap_schema_version"],
+            "current_evidence": final_status["delivery_source_current_evidence_schema_version"],
+        },
         "final_status": final_status,
         "readme_audit": readme,
         "readiness": {
@@ -229,6 +258,9 @@ def build_final_status_audit_report(
             ),
             "outside_soloing_repair_source_context_preserved": bool(
                 final_status["outside_soloing_repair_source_context_preserved"]
+            ),
+            "outside_soloing_repair_schema_context_preserved": bool(
+                final_status["outside_soloing_repair_schema_context_preserved"]
             ),
             "human_audio_preference_claimed": False,
             "midi_to_solo_musical_quality_claimed": False,
@@ -272,6 +304,27 @@ def validate_final_status_audit_report(
     readiness = _dict(report.get("readiness"))
     decision = _dict(report.get("decision"))
     final_status = _dict(report.get("final_status"))
+    source_schema_versions = _dict(report.get("source_schema_versions"))
+    if str(report.get("schema_version") or "") != SCHEMA_VERSION:
+        raise StageBMidiToSoloFinalStatusAuditError("final status audit schema version mismatch")
+    if str(source_schema_versions.get("delivery_package") or "") != DELIVERY_SCHEMA_VERSION:
+        raise StageBMidiToSoloFinalStatusAuditError(
+            "final status source delivery package schema version mismatch"
+        )
+    if str(
+        source_schema_versions.get("listening_review_quality_gap") or ""
+    ) != LISTENING_GAP_SCHEMA_VERSION:
+        raise StageBMidiToSoloFinalStatusAuditError(
+            "final status source listening gap schema version mismatch"
+        )
+    if str(source_schema_versions.get("quality_gap_decision") or "") != QUALITY_GAP_DECISION_SCHEMA_VERSION:
+        raise StageBMidiToSoloFinalStatusAuditError(
+            "final status source quality gap schema version mismatch"
+        )
+    if str(source_schema_versions.get("current_evidence") or "") != CURRENT_EVIDENCE_SCHEMA_VERSION:
+        raise StageBMidiToSoloFinalStatusAuditError(
+            "final status source current evidence schema version mismatch"
+        )
     if expected_boundary and boundary != expected_boundary:
         raise StageBMidiToSoloFinalStatusAuditError(
             f"expected boundary {expected_boundary}, got {boundary}"
@@ -288,8 +341,31 @@ def validate_final_status_audit_report(
         raise StageBMidiToSoloFinalStatusAuditError("critical user input should not be required")
     if require_no_quality_claim:
         _require_no_quality_claim(readiness, label="final status readiness")
+    if not bool(final_status.get("outside_soloing_repair_schema_context_preserved", False)):
+        raise StageBMidiToSoloFinalStatusAuditError(
+            "outside-soloing repair schema context preservation required"
+        )
+    if str(
+        final_status.get("outside_soloing_repair_objective_schema_version") or ""
+    ) != OUTSIDE_SOLOING_REPAIR_OBJECTIVE_SCHEMA_VERSION:
+        raise StageBMidiToSoloFinalStatusAuditError(
+            "outside-soloing repair objective schema version mismatch"
+        )
     source_context = _source_context_fields(final_status, label="final status")
     return {
+        "schema_version": str(report.get("schema_version") or ""),
+        "source_delivery_package_schema_version": str(
+            source_schema_versions.get("delivery_package") or ""
+        ),
+        "source_listening_gap_schema_version": str(
+            source_schema_versions.get("listening_review_quality_gap") or ""
+        ),
+        "source_quality_gap_schema_version": str(
+            source_schema_versions.get("quality_gap_decision") or ""
+        ),
+        "source_current_evidence_schema_version": str(
+            source_schema_versions.get("current_evidence") or ""
+        ),
         "boundary": boundary,
         "next_boundary": str(decision.get("next_boundary") or ""),
         "final_status_audit_completed": bool(
@@ -311,6 +387,12 @@ def validate_final_status_audit_report(
         ),
         "outside_soloing_repair_source_context_preserved": bool(
             final_status.get("outside_soloing_repair_source_context_preserved", False)
+        ),
+        "outside_soloing_repair_schema_context_preserved": bool(
+            final_status.get("outside_soloing_repair_schema_context_preserved", False)
+        ),
+        "outside_soloing_repair_objective_schema_version": str(
+            final_status.get("outside_soloing_repair_objective_schema_version") or ""
         ),
         "outside_soloing_repair_wav_count": _int(
             final_status.get("outside_soloing_repair_wav_count")
@@ -369,6 +451,11 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- boundary: `{report['boundary']}`",
         f"- source boundary: `{report['source_boundary']}`",
+        f"- schema version: `{report['schema_version']}`",
+        f"- source delivery package schema version: `{report['source_schema_versions']['delivery_package']}`",
+        f"- source listening gap schema version: `{report['source_schema_versions']['listening_review_quality_gap']}`",
+        f"- source quality gap schema version: `{report['source_schema_versions']['quality_gap_decision']}`",
+        f"- source current evidence schema version: `{report['source_schema_versions']['current_evidence']}`",
         f"- next boundary: `{decision['next_boundary']}`",
         f"- technical MVP complete: `{_bool_token(final_status['technical_mvp_complete'])}`",
         f"- technical MVP ready for local review: `{_bool_token(final_status['technical_mvp_ready_for_local_review'])}`",
@@ -381,6 +468,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- changed-ratio repair audio evidence ready: `{_bool_token(final_status['changed_ratio_repair_audio_evidence_ready'])}`",
         f"- outside-soloing repair evidence ready: `{_bool_token(final_status['outside_soloing_repair_evidence_ready'])}`",
         f"- outside-soloing repair source context preserved: `{_bool_token(final_status['outside_soloing_repair_source_context_preserved'])}`",
+        f"- outside-soloing repair schema context preserved: `{_bool_token(final_status['outside_soloing_repair_schema_context_preserved'])}`",
+        f"- outside-soloing repair objective schema version: `{final_status['outside_soloing_repair_objective_schema_version']}`",
         f"- CLI candidate count: `{final_status['cli_candidate_count']}`",
         f"- changed-ratio repair WAV count: `{final_status['changed_ratio_repair_wav_count']}`",
         f"- outside-soloing repair WAV count: `{final_status['outside_soloing_repair_wav_count']}`",
