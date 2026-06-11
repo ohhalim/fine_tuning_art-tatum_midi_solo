@@ -13711,6 +13711,46 @@ Issue #1402는 #1400 completion audit 결과를 README와 CURRENT_STATUS_AND_PLA
 
 - `Stage B MIDI-to-solo residual-aware listening review input wait`
 
+## 9.251 Stage B MIDI-to-solo residual-aware listening review input wait
+
+Issue #1404는 #1402 final status sync 이후 user listening review 입력 대기 상태를 고정한 작업이다.
+
+결과:
+
+- document: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_REVIEW_INPUT_WAIT_2026-06-11.md`
+- output: `outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_listening_review_input_wait/issue_1404_residual_aware_listening_review_input_wait/`
+- boundary: `music_transformer_solo_yield_residual_aware_listening_review_input_wait`
+- source final status schema: `music_transformer_solo_yield_residual_aware_final_status_sync_v1`
+- technical MVP complete: `true`
+- final status synced: `true`
+- local review ready: `true`
+- candidate count: `8`
+- MIDI/WAV: `8 / 8`
+- pending candidate count: `8`
+- quality proxy pass/fail: `6 / 2`
+- residual major label: `low_tension_color=2`
+- residual watch label: `dead_air_watch=3`
+- user listening input required for quality claim: `true`
+- automated quality claim blocked: `true`
+- MIDI-to-solo musical quality claimed: `false`
+- next boundary: `music_transformer_solo_yield_residual_aware_user_listening_review_fill`
+
+판단:
+
+- technical MVP는 완료됐지만, quality claim은 user listening review 입력 전까지 차단.
+- user listening input이 들어오면 review fill 경계로 진행 가능.
+- 현재 자동화 범위에서 preference fill 임의 생성 없음.
+
+검증:
+
+- `.venv/bin/python -m unittest tests.test_music_transformer_solo_yield_residual_aware_listening_review_input_wait`
+- `.venv/bin/python -m py_compile scripts/mark_music_transformer_solo_yield_residual_aware_listening_review_input_wait.py tests/test_music_transformer_solo_yield_residual_aware_listening_review_input_wait.py`
+- `.venv/bin/python scripts/mark_music_transformer_solo_yield_residual_aware_listening_review_input_wait.py --run_id issue_1404_residual_aware_listening_review_input_wait --issue_number 1404 --final_status_sync outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_final_status_sync/issue_1402_residual_aware_final_status_sync/residual_aware_final_status_sync.json --doc_path docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_REVIEW_INPUT_WAIT_2026-06-11.md --expected_next_boundary music_transformer_solo_yield_residual_aware_user_listening_review_fill --require_wait_recorded --require_no_quality_claim`
+
+다음 작업:
+
+- `Stage B MIDI-to-solo residual-aware user listening review fill`
+
 ## 10. 한 문장 요약
 
 이 프로젝트의 현재 핵심은 다음이다.

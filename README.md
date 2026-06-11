@@ -45,6 +45,7 @@
 - residual-aware listening review pending: pending candidate `8`, quality claim `false`
 - residual-aware completion audit: technical MVP complete `true`, local review ready `true`
 - residual-aware final status sync: synced `true`, next `listening_review_input_wait`
+- residual-aware listening review input wait: quality claim blocked `true`
 
 ## 최신 산출물
 
@@ -58,6 +59,7 @@
 - listening review pending doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_REVIEW_PENDING_2026-06-11.md`
 - completion audit doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_COMPLETION_AUDIT_2026-06-11.md`
 - final status sync doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_FINAL_STATUS_SYNC_2026-06-11.md`
+- listening review input wait doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_REVIEW_INPUT_WAIT_2026-06-11.md`
 
 ## 재현 명령
 
@@ -121,6 +123,15 @@
   --require_no_quality_claim
 ```
 
+```bash
+.venv/bin/python scripts/mark_music_transformer_solo_yield_residual_aware_listening_review_input_wait.py \
+  --run_id issue_1404_residual_aware_listening_review_input_wait \
+  --final_status_sync outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_final_status_sync/issue_1402_residual_aware_final_status_sync/residual_aware_final_status_sync.json \
+  --expected_next_boundary music_transformer_solo_yield_residual_aware_user_listening_review_fill \
+  --require_wait_recorded \
+  --require_no_quality_claim
+```
+
 ## 아닌 것
 
 - 완성형 jazz solo quality claim 아님
@@ -138,6 +149,7 @@
 - `scripts/mark_music_transformer_solo_yield_residual_aware_listening_review_pending.py`
 - `scripts/audit_music_transformer_solo_yield_residual_aware_completion.py`
 - `scripts/sync_music_transformer_solo_yield_residual_aware_final_status.py`
+- `scripts/mark_music_transformer_solo_yield_residual_aware_listening_review_input_wait.py`
 - `scripts/build_music_transformer_solo_yield_objective_quality_rubric_baseline.py`
 - `scripts/decide_music_transformer_solo_yield_residual_tension_target.py`
 - `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_FINAL_REVIEW_PACKAGE_2026-06-11.md`
@@ -146,3 +158,4 @@
 - `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_REVIEW_PENDING_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_COMPLETION_AUDIT_2026-06-11.md`
 - `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_FINAL_STATUS_SYNC_2026-06-11.md`
+- `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_REVIEW_INPUT_WAIT_2026-06-11.md`
