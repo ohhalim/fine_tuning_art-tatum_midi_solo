@@ -14,7 +14,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest README final evidence refresh: `Issue #1162`
 - latest final status audit: `Issue #1164`
 - latest post-MVP quality iteration plan: `Issue #1166`
-- latest quality rubric baseline: `Issue #1084`
+- latest quality rubric baseline: `Issue #1168`
 - latest candidate failure labeling: `Issue #1086`
 - latest targeted quality repair sweep: `Issue #1088`
 - latest targeted quality repair audio package: `Issue #1090`
@@ -50,7 +50,7 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - latest MVP current evidence consolidation: `Issue #1150`
 - latest README evidence refresh: `Issue #1152`
 - latest functional boundary: `stage_b_midi_to_solo_mvp_delivery_package`
-- open issue queue after post-MVP quality iteration plan source-context refresh merge: `0`
+- open issue queue after quality rubric baseline source-context refresh merge: `0`
 - latest evidence boundary: `stage_b_midi_to_solo_mvp_delivery_package`
 - current evidence boundary: `stage_b_midi_to_solo_mvp_current_evidence_consolidation`
 - current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
@@ -279,8 +279,17 @@ Symbolic MIDI 기반 jazz piano solo-line 생성 파이프라인.
 - post-MVP follow-up repair sweep source outside-soloing source context preserved: `true`
 - post-MVP bridge repair sweep source outside-soloing source context preserved: `true`
 - quality rubric baseline completed: `true`
+- quality rubric baseline schema version: `stage_b_midi_to_solo_quality_rubric_baseline_v4`
+- quality rubric source post-MVP plan schema version: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4`
+- quality rubric source final status schema version: `stage_b_midi_to_solo_final_status_audit_v4`
+- quality rubric source delivery package schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- quality rubric source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- quality rubric source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- quality rubric source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - quality rubric item / metric group count: `8 / 30`
 - quality rubric candidate failure labeling ready: `true`
+- quality rubric outside-soloing schema context preserved: `true`
+- quality rubric outside-soloing objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - quality rubric follow-up objective source outside-soloing source context preserved: `true`
 - quality rubric follow-up repair sweep source outside-soloing source context preserved: `true`
 - quality rubric bridge repair sweep source outside-soloing source context preserved: `true`

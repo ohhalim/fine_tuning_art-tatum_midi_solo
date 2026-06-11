@@ -20,7 +20,7 @@
 - latest README final evidence refresh: Issue #1162, Stage B MIDI-to-solo README final evidence refresh source-context refresh
 - latest final status audit: Issue #1164, Stage B MIDI-to-solo final status audit source-context refresh
 - latest post-MVP quality iteration plan: Issue #1166, Stage B MIDI-to-solo post-MVP quality iteration plan source-context refresh
-- latest quality rubric baseline: Issue #1084, Stage B MIDI-to-solo quality rubric baseline source-context refresh
+- latest quality rubric baseline: Issue #1168, Stage B MIDI-to-solo quality rubric baseline source-context refresh
 - latest candidate failure labeling: Issue #1086, Stage B MIDI-to-solo candidate failure labeling source-context refresh
 - latest targeted quality repair sweep: Issue #1088, Stage B MIDI-to-solo targeted quality repair sweep source-context refresh
 - latest targeted quality repair audio package: Issue #1090, Stage B MIDI-to-solo targeted quality repair audio package source-context refresh
@@ -5777,14 +5777,15 @@ Issue #1166은 Issue #1164 final status audit 결과를 기준으로 post-MVP qu
 
 ## Stage B MIDI-to-Solo Quality Rubric Baseline Source-Context Refresh Result
 
-Issue #1084는 Issue #1082 post-MVP quality iteration plan 결과를 기준으로 quality rubric baseline의 source-context validation과 summary에 source-context preserved flag 3개를 보존한 작업이다.
+Issue #1168은 Issue #1166 post-MVP quality iteration plan v4 결과를 기준으로 quality rubric baseline의 source schema chain과 outside-soloing schema context를 보존한 작업이다.
 
 변경:
 
-- quality rubric baseline source validation을 required source-context key 기준으로 갱신
-- source-context preserved flag 3개 false 입력 차단
-- source quality context, rubric baseline, generated markdown report, validation summary preserved flag 전파
-- harness issue number #1084 반영
+- quality rubric baseline schema v4 적용
+- post-MVP plan, final status, delivery package, listening gap, quality gap, current evidence schema version 검증
+- outside-soloing schema-context flag와 objective schema version 검증
+- source quality context, rubric baseline, generated markdown report, validation summary schema/source-context 전파
+- harness issue number #1168 반영
 - candidate failure labeling fixture 입력 계약 갱신
 
 결과:
@@ -5792,6 +5793,13 @@ Issue #1084는 Issue #1082 post-MVP quality iteration plan 결과를 기준으�
 - document: `docs/STAGE_B_MIDI_TO_SOLO_QUALITY_RUBRIC_BASELINE_SOURCE_CONTEXT_REFRESH_2026-06-11.md`
 - boundary: `stage_b_midi_to_solo_quality_rubric_baseline`
 - source boundary: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan`
+- schema version: `stage_b_midi_to_solo_quality_rubric_baseline_v4`
+- source post-MVP plan schema version: `stage_b_midi_to_solo_post_mvp_quality_iteration_plan_v4`
+- source final status schema version: `stage_b_midi_to_solo_final_status_audit_v4`
+- source delivery package schema version: `stage_b_midi_to_solo_mvp_delivery_package_v4`
+- source listening gap schema version: `stage_b_midi_to_solo_listening_review_quality_gap_v4`
+- source quality gap schema version: `stage_b_midi_to_solo_quality_gap_decision_v4`
+- source current evidence schema version: `stage_b_midi_to_solo_mvp_current_evidence_consolidation_v4`
 - next boundary: `stage_b_midi_to_solo_candidate_failure_labeling`
 - selected target: `candidate_failure_labeling`
 - quality rubric baseline completed: `true`
@@ -5800,6 +5808,8 @@ Issue #1084는 Issue #1082 post-MVP quality iteration plan 결과를 기준으�
 - required metric group count: `30`
 - outside-soloing repair evidence ready: `true`
 - outside-soloing repair source context preserved: `true`
+- outside-soloing repair schema context preserved: `true`
+- outside-soloing repair objective schema version: `stage_b_midi_to_solo_songlike_melody_contour_phrase_rhythm_chord_tone_landing_outside_soloing_repair_objective_next_v4`
 - follow-up objective source outside-soloing source context preserved: `true`
 - follow-up repair sweep source outside-soloing source context preserved: `true`
 - bridge repair sweep source outside-soloing source context preserved: `true`
@@ -5810,8 +5820,8 @@ Issue #1084는 Issue #1082 post-MVP quality iteration plan 결과를 기준으�
 
 판단:
 
-- quality rubric baseline source validation에 post-MVP plan preserved flag 3개 포함.
-- preserved flag false 입력은 validation error로 차단.
+- quality rubric baseline source validation에 post-MVP plan v4와 source schema chain 포함.
+- preserved flag false 입력과 objective schema mismatch 입력은 validation error로 차단.
 - 다음 검증 대상은 candidate failure labeling 유지.
 - musical quality와 human/audio preference claim 제외 유지.
 
