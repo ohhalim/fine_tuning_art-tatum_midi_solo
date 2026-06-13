@@ -54,6 +54,9 @@
 - representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v8_interval_repeat_tight/listen_first_by_progression/`
 - note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_v8_listen_first_note_review/bebop_language_note_review.md`
 - first 32 notes outside count by listen-first candidate: `2 / 3 / 2 / 2`
+- strict-listen top4 package: `manual_2026_06_13_bebop_language_best_of_top4_strict_listen`
+- strict-listen top4 offbeat / unresolved / interval repeat: `0.4063 / 0.0313 / 0.0164`
+- strict-listen top4 representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_strict_listen/listen_first_by_progression/`
 - quality claim: `false`
 - model direct claim: `false`
 - rejected follow-up package: `manual_2026_06_13_bebop_language_best_of_v9_with_v10_interval_sweep`
