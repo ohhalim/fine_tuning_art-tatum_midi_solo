@@ -2,6 +2,7 @@ import unittest
 
 from scripts.build_stage_b_midi_to_solo_bebop_language_best_of_package import (
     apply_rhythm_articulation_variation,
+    bebop_stepwise_chromatic_selection_score,
     rhythm_articulation_metrics,
 )
 from scripts.build_stage_b_midi_to_solo_bebop_language_package import (
@@ -48,6 +49,48 @@ class BebopLanguageRhythmArticulationTest(unittest.TestCase):
         self.assertLessEqual(after_gate, before_gate)
         self.assertEqual(after_objective["note_count"], before_objective["note_count"])
         self.assertEqual(after_objective["adjacent_repeat_ratio"], before_objective["adjacent_repeat_ratio"])
+
+    def test_stepwise_chromatic_profile_prefers_stepwise_candidate(self) -> None:
+        base_metrics = {
+            "gate_penalty": 0.0,
+            "offbeat_unresolved_non_chord_ratio": 0.0,
+            "offbeat_non_chord_resolution_ratio": 1.0,
+            "large_leap_ratio": 0.05,
+            "max_abs_interval": 7,
+            "enclosure_proxy_ratio": 0.34,
+            "max_bar_pitch_class_jaccard": 0.58,
+            "adjacent_repeat_ratio": 0.0,
+            "two_note_cycle_ratio": 0.0,
+            "interval_trigram_repeat_ratio": 0.0,
+            "bar_half_repeat_ratio": 0.0,
+            "offbeat_non_chord_ratio": 0.390625,
+            "chord_tone_ratio": 0.8046875,
+            "dominant_altered_offbeat_ratio": 0.125,
+            "unique_pitch_count": 14,
+            "step_motion_ratio": 0.34,
+            "chromatic_step_ratio": 0.16,
+            "third_fourth_motion_ratio": 0.60,
+        }
+        arpeggio_like = {
+            "objective_metrics": base_metrics,
+            "score": 0.10,
+            "gate_penalty": 0.0,
+        }
+        stepwise_like = {
+            "objective_metrics": {
+                **base_metrics,
+                "step_motion_ratio": 0.42,
+                "chromatic_step_ratio": 0.24,
+                "third_fourth_motion_ratio": 0.52,
+            },
+            "score": 0.10,
+            "gate_penalty": 0.0,
+        }
+
+        self.assertLess(
+            bebop_stepwise_chromatic_selection_score(stepwise_like),
+            bebop_stepwise_chromatic_selection_score(arpeggio_like),
+        )
 
 
 if __name__ == "__main__":

@@ -268,11 +268,26 @@ def bebop_language_selection_score(item: dict[str, Any]) -> float:
     )
 
 
+def bebop_stepwise_chromatic_selection_score(item: dict[str, Any]) -> float:
+    metrics = item["objective_metrics"]
+    return (
+        bebop_language_selection_score(item)
+        + max(0.0, 0.40 - float(metrics["step_motion_ratio"])) * 2.5
+        + max(0.0, 0.22 - float(metrics["chromatic_step_ratio"])) * 3.0
+        + max(0.0, float(metrics["third_fourth_motion_ratio"]) - 0.56) * 1.0
+        + max(0.0, float(metrics["large_leap_ratio"]) - 0.09) * 2.0
+        + max(0.0, float(metrics["max_bar_pitch_class_jaccard"]) - 0.70) * 1.0
+        + max(0.0, 0.28 - float(metrics["enclosure_proxy_ratio"])) * 0.7
+    )
+
+
 def selection_sort_key(row: dict[str, Any], *, selection_profile: str) -> tuple[float, float, str, str, int]:
     if selection_profile == "score":
         primary_score = float(row["score"])
     elif selection_profile == "bebop_language":
         primary_score = bebop_language_selection_score(row)
+    elif selection_profile == "bebop_stepwise_chromatic":
+        primary_score = bebop_stepwise_chromatic_selection_score(row)
     else:
         raise BebopLanguagePackageError(f"unknown selection profile: {selection_profile}")
     return (
@@ -1629,7 +1644,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--context_bass_velocity_boost", type=int, default=0)
     parser.add_argument("--context_comp_velocity_boost", type=int, default=0)
     parser.add_argument("--select_after_repair", action="store_true")
-    parser.add_argument("--selection_profile", choices=["score", "bebop_language"], default="score")
+    parser.add_argument(
+        "--selection_profile",
+        choices=["score", "bebop_language", "bebop_stepwise_chromatic"],
+        default="score",
+    )
     return parser
 
 

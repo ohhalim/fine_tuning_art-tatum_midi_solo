@@ -6,9 +6,10 @@
 
 - 생성 방식: Music Transformer 계열 symbolic checkpoint + constrained decoding
 - 출력 단위: 2-8마디 solo-line MIDI 후보
-- 최신 대표 review package: strict-listen top4 rhythm-articulation-repair, MIDI `4`, WAV `4`
+- 최신 대표 review package: strict-listen top4 stepwise-chromatic-selection, MIDI `4`, WAV `4`
 - 최신 objective gate: max gate penalty `0.0000`
-- 최신 chord/rhythm 지표: strong-beat chord-tone `1.0000`, offbeat non-chord `0.3906`, offbeat resolution `1.0000`, unresolved offbeat `0.0000`, large leap `0.0516`, adjacent repeat `0.0000`, enclosure proxy `0.3516`, bar pitch-class similarity `0.5774`
+- 최신 chord/rhythm 지표: strong-beat chord-tone `1.0000`, offbeat non-chord `0.3828`, offbeat resolution `1.0000`, unresolved offbeat `0.0000`, large leap `0.0556`, adjacent repeat `0.0000`, enclosure proxy `0.3359`, bar pitch-class similarity `0.6369`
+- 최신 contour 지표: step motion `0.3849 -> 0.4048`, chromatic step `0.1905 -> 0.2183`, third/fourth motion `0.5635 -> 0.5397`
 - 최신 articulation 지표: duration template repeat `0.8750 -> 0.3750`, most common duration `0.5000 -> 0.2031`, duration bucket `3 -> 16`, velocity count `4 -> 17`
 - 기준 best-of review package: MIDI `16`, WAV `16`
 - residual-aware objective rubric: pass/fail `6 / 2`
@@ -58,6 +59,7 @@
 - bebop language strict-listen top4 adjacent-repeat-final-repair package: source package `125`, pool `1807`, selection pool `18`, selected `4`, select-after-repair `true`, selection profile `bebop_language`, adjacent repeat `0.0119 -> 0.0040`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.3906`, offbeat resolution `1.0000`, unresolved offbeat non-chord `0.0000`, large leap `0.0476`, enclosure proxy `0.3438`, two-note cycle `0.0000`, interval trigram repeat `0.0123`, bar pitch-class similarity `0.5774`, max gate penalty `0.0000`
 - bebop language strict-listen top4 residual-adjacent-search-repair package: source package `125`, pool `1807`, selection pool `18`, selected `4`, select-after-repair `true`, selection profile `bebop_language`, adjacent repeat `0.0040 -> 0.0000`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.3906`, offbeat resolution `1.0000`, unresolved offbeat non-chord `0.0000`, large leap `0.0516`, enclosure proxy `0.3516`, two-note cycle `0.0000`, interval trigram repeat `0.0123`, bar pitch-class similarity `0.5774`, max gate penalty `0.0000`
 - bebop language strict-listen top4 rhythm-articulation-repair package: source package `125`, pool `1807`, selection pool `18`, selected `4`, articulation accepted `4 / 4`, duration template repeat `0.8750 -> 0.3750`, most common duration `0.5000 -> 0.2031`, duration bucket `3 -> 16`, velocity count `4 -> 17`, strong-beat chord-tone `1.0000`, offbeat resolution `1.0000`, unresolved offbeat non-chord `0.0000`, adjacent repeat `0.0000`, max gate penalty `0.0000`
+- bebop language strict-listen top4 stepwise-chromatic-selection package: source package `125`, pool `1807`, selection pool `18`, selected `4`, selection profile `bebop_stepwise_chromatic`, step motion `0.3849 -> 0.4048`, chromatic step `0.1905 -> 0.2183`, third/fourth motion `0.5635 -> 0.5397`, large leap `0.0516 -> 0.0556`, bar pitch-class similarity `0.5774 -> 0.6369`, max gate penalty `0.0000`, offbeat resolution `1.0000`, unresolved offbeat non-chord `0.0000`, adjacent repeat `0.0000`
 - bebop language best-of with-sweeps package: source package `91`, pool `1263`, selected `16`, score `0.2143`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4277`, offbeat resolution `0.9177`, unresolved offbeat non-chord `0.0352`, altered offbeat `0.1836`, two-note cycle `0.0082`, max gate penalty `0.0639`
 - bebop language best-of balanced package: source package `33`, pool `335`, selected `16`, score `0.2728`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4414`, offbeat resolution `0.8983`, unresolved offbeat non-chord `0.0449`, altered offbeat `0.1602`, two-note cycle `0.0092`, max-per-case `4`
 - bebop language altered-color balanced package: generated `4000`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4512`, offbeat resolution `0.8914`, unresolved offbeat non-chord `0.0488`, unique pitch avg `14.8125`, 3rd/4th motion `0.4831`, large leap `0.0863`, altered offbeat `0.1445`, bar pitch-class similarity `0.7027`, half-repeat `0.0000`
@@ -94,6 +96,8 @@
 - strict-listen top4 residual-adjacent-search-repair note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_residual_adjacent_search_repair_note_review/bebop_language_note_review.md`
 - strict-listen top4 rhythm-articulation-repair 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_rhythm_articulation_repair_probe/listen_first_by_progression/`
 - strict-listen top4 rhythm-articulation-repair note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_rhythm_articulation_repair_note_review/bebop_language_note_review.md`
+- strict-listen top4 stepwise-chromatic-selection 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_stepwise_chromatic_selection_probe/listen_first_by_progression/`
+- strict-listen top4 stepwise-chromatic-selection note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_stepwise_chromatic_selection_note_review/bebop_language_note_review.md`
 - altered-color balanced 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/listen_first_by_progression/`
 - altered-color balanced 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/audio_with_context/`
 - altered-color balanced package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/bebop_language_package.md`
@@ -116,7 +120,7 @@
 
 ```bash
 .venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_best_of_package.py \
-  --run_id manual_2026_06_13_bebop_language_best_of_top4_rhythm_articulation_repair_probe \
+  --run_id manual_2026_06_13_bebop_language_best_of_top4_stepwise_chromatic_selection_probe \
   --package_globs 'manual_2026_06_13_bebop_language_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v6_data_contour_resolution/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v7_altered_balanced/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v8_v22_micro/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v9_strict_consonance/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v10_interval_repeat_rank/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v11_large_leap_pool/config_*/bebop_language_package.json' \
   --selected_count 4 \
   --max_per_case 1 \
@@ -145,13 +149,13 @@
   --context_bass_velocity_boost 6 \
   --context_comp_velocity_boost 10 \
   --select_after_repair \
-  --selection_profile bebop_language
+  --selection_profile bebop_stepwise_chromatic
 ```
 
 ```bash
 .venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_note_review.py \
-  --run_id manual_2026_06_13_bebop_language_top4_rhythm_articulation_repair_note_review \
-  --package outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_rhythm_articulation_repair_probe/bebop_language_best_of_package.json \
+  --run_id manual_2026_06_13_bebop_language_top4_stepwise_chromatic_selection_note_review \
+  --package outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_stepwise_chromatic_selection_probe/bebop_language_best_of_package.json \
   --max_notes 32
 ```
 
