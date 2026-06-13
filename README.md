@@ -47,9 +47,12 @@
 - residual-aware final status sync: synced `true`, next `listening_review_input_wait`
 - residual-aware listening review input wait: quality claim blocked `true`
 - bebop language package: generated `320`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4609`, offbeat resolution `0.8512`, unresolved offbeat non-chord `0.0684`
+- bebop language parameter sweep: config `36`, best `config_28`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4707`, offbeat resolution `0.8598`, unresolved offbeat non-chord `0.0664`
 
 ## 최신 산출물
 
+- parameter sweep 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v2_wide/best_listen_first_by_progression/`
+- parameter sweep report: `outputs/stage_b_midi_to_solo_bebop_language_package/parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v2_wide/bebop_language_parameter_sweep.md`
 - bebop language 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v7_auto_listen_first/listen_first_by_progression/`
 - bebop language 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v7_auto_listen_first/audio_with_context/`
 - bebop language package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v7_auto_listen_first/bebop_language_package.md`
@@ -66,6 +69,20 @@
 - listening review input wait doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_REVIEW_INPUT_WAIT_2026-06-11.md`
 
 ## 재현 명령
+
+```bash
+.venv/bin/python scripts/run_stage_b_midi_to_solo_bebop_language_parameter_sweep.py \
+  --run_id manual_2026_06_13_bebop_language_param_sweep_v2_wide \
+  --variants_per_progression 48 \
+  --selected_count 16 \
+  --bars 8 \
+  --bpm 124 \
+  --seed_base 300000 \
+  --non_chord_probabilities 0.26,0.30,0.34 \
+  --target_chord_tone_ratios 0.74,0.76,0.80 \
+  --target_offbeat_non_chord_ratios 0.34,0.38,0.42,0.44 \
+  --max_configs 36
+```
 
 ```bash
 .venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_package.py \
@@ -157,9 +174,11 @@
 - human listening preference 검증 완료 아님
 - raw audio generation 프로젝트 아님
 - bebop language package는 직접 모델 품질 claim이 아니라 청감 수율 개선용 chord-guided comparison package
+- parameter sweep는 생성 후보의 음악적 완성도 판정이 아니라 offbeat 해소율과 미해소 비율 기준의 로컬 비교
 
 ## 주요 파일
 
+- `scripts/run_stage_b_midi_to_solo_bebop_language_parameter_sweep.py`
 - `scripts/build_stage_b_midi_to_solo_bebop_language_package.py`
 - `scripts/build_music_transformer_solo_yield_rhythm_syncopation_balance_repair_package.py`
 - `scripts/build_music_transformer_solo_yield_residual_aware_final_review_package.py`
