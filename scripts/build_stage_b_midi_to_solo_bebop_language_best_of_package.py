@@ -125,6 +125,8 @@ def filter_candidate_rows(
     max_offbeat_non_chord_ratio: float | None,
     max_unresolved_offbeat_non_chord_ratio: float | None,
     max_dominant_altered_offbeat_ratio: float | None,
+    max_adjacent_repeat_ratio: float | None,
+    max_bar_pitch_class_jaccard: float | None,
 ) -> list[dict[str, Any]]:
     filtered: list[dict[str, Any]] = []
     for row in rows:
@@ -144,6 +146,16 @@ def filter_candidate_rows(
         if (
             max_dominant_altered_offbeat_ratio is not None
             and float(metrics["dominant_altered_offbeat_ratio"]) > float(max_dominant_altered_offbeat_ratio)
+        ):
+            continue
+        if (
+            max_adjacent_repeat_ratio is not None
+            and float(metrics["adjacent_repeat_ratio"]) > float(max_adjacent_repeat_ratio)
+        ):
+            continue
+        if (
+            max_bar_pitch_class_jaccard is not None
+            and float(metrics["max_bar_pitch_class_jaccard"]) > float(max_bar_pitch_class_jaccard)
         ):
             continue
         filtered.append(row)
@@ -1318,6 +1330,8 @@ def build_best_of_package(
     max_offbeat_non_chord_ratio: float | None = None,
     max_unresolved_offbeat_non_chord_ratio: float | None = None,
     max_dominant_altered_offbeat_ratio: float | None = None,
+    max_adjacent_repeat_ratio: float | None = None,
+    max_bar_pitch_class_jaccard: float | None = None,
     listen_first_mode: str = "rank",
     repair_bar_similarity_enabled: bool = False,
     repair_bar_similarity_iterations: int = 4,
@@ -1349,6 +1363,8 @@ def build_best_of_package(
         max_offbeat_non_chord_ratio=max_offbeat_non_chord_ratio,
         max_unresolved_offbeat_non_chord_ratio=max_unresolved_offbeat_non_chord_ratio,
         max_dominant_altered_offbeat_ratio=max_dominant_altered_offbeat_ratio,
+        max_adjacent_repeat_ratio=None if select_after_repair else max_adjacent_repeat_ratio,
+        max_bar_pitch_class_jaccard=None if select_after_repair else max_bar_pitch_class_jaccard,
     )
     if not selection_rows:
         raise BebopLanguagePackageError("no candidate rows after best-of selection filters")
@@ -1400,9 +1416,19 @@ def build_best_of_package(
                 }
             )
         selection_rows = sorted(
-            repaired_selection_rows,
+            filter_candidate_rows(
+                repaired_selection_rows,
+                max_gate_penalty=max_gate_penalty,
+                max_offbeat_non_chord_ratio=max_offbeat_non_chord_ratio,
+                max_unresolved_offbeat_non_chord_ratio=max_unresolved_offbeat_non_chord_ratio,
+                max_dominant_altered_offbeat_ratio=max_dominant_altered_offbeat_ratio,
+                max_adjacent_repeat_ratio=max_adjacent_repeat_ratio,
+                max_bar_pitch_class_jaccard=max_bar_pitch_class_jaccard,
+            ),
             key=lambda row: selection_sort_key(row, selection_profile=selection_profile),
         )
+        if not selection_rows:
+            raise BebopLanguagePackageError("no candidate rows after repaired best-of selection filters")
     elif selection_profile != "score":
         selection_rows = sorted(selection_rows, key=lambda row: selection_sort_key(row, selection_profile=selection_profile))
     selected = select_candidates(selection_rows, selected_count=selected_count, max_per_case=max_per_case)
@@ -1565,6 +1591,8 @@ def build_best_of_package(
             "max_offbeat_non_chord_ratio": max_offbeat_non_chord_ratio,
             "max_unresolved_offbeat_non_chord_ratio": max_unresolved_offbeat_non_chord_ratio,
             "max_dominant_altered_offbeat_ratio": max_dominant_altered_offbeat_ratio,
+            "max_adjacent_repeat_ratio": max_adjacent_repeat_ratio,
+            "max_bar_pitch_class_jaccard": max_bar_pitch_class_jaccard,
             "listen_first_mode": listen_first_mode,
             "repair_bar_similarity": bool(repair_bar_similarity_enabled),
             "repair_bar_similarity_iterations": int(repair_bar_similarity_iterations),
@@ -1627,6 +1655,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max_offbeat_non_chord_ratio", type=float, default=None)
     parser.add_argument("--max_unresolved_offbeat_non_chord_ratio", type=float, default=None)
     parser.add_argument("--max_dominant_altered_offbeat_ratio", type=float, default=None)
+    parser.add_argument("--max_adjacent_repeat_ratio", type=float, default=None)
+    parser.add_argument("--max_bar_pitch_class_jaccard", type=float, default=None)
     parser.add_argument("--listen_first_mode", choices=["rank", "consonance"], default="rank")
     parser.add_argument("--repair_bar_similarity", action="store_true")
     parser.add_argument("--repair_bar_similarity_iterations", type=int, default=4)
@@ -1678,6 +1708,8 @@ def main() -> int:
         max_offbeat_non_chord_ratio=args.max_offbeat_non_chord_ratio,
         max_unresolved_offbeat_non_chord_ratio=args.max_unresolved_offbeat_non_chord_ratio,
         max_dominant_altered_offbeat_ratio=args.max_dominant_altered_offbeat_ratio,
+        max_adjacent_repeat_ratio=args.max_adjacent_repeat_ratio,
+        max_bar_pitch_class_jaccard=args.max_bar_pitch_class_jaccard,
         listen_first_mode=str(args.listen_first_mode),
         repair_bar_similarity_enabled=bool(args.repair_bar_similarity),
         repair_bar_similarity_iterations=int(args.repair_bar_similarity_iterations),

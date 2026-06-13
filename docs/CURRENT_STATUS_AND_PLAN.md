@@ -22,7 +22,7 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1416, Stage B MIDI-to-solo bebop language top8 frontier review package
+- current issue: Issue #1418, Stage B MIDI-to-solo bebop language top8 safety gate package
 - open issue queue after residual-aware listening input guard merge: `0`
 - 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware user listening review fill`
 
@@ -92,6 +92,37 @@
 - model direct claim: `false`
 - recorded tradeoff against strict top4 representative: bar pitch-class similarity `0.6131 -> 0.6458`, adjacent repeat `0.0000 -> 0.0020`
 - preserved metrics against strict top4 representative: gate `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`
+
+2026-06-13 top8 safety gate package 기준:
+
+- latest safety gate package: `manual_2026_06_13_bebop_language_best_of_top8_safety_gate_probe`
+- safety gate role: frontier regression guard, representative replacement `false`
+- source package count: `125`
+- candidate pool / selection pool / selected: `1807 / 11 / 8`
+- max-per-case: `3`
+- selection profile: `bebop_stepwise_chromatic`
+- final safety gate: max adjacent repeat `0.0000`, max bar pitch-class similarity `0.7000`
+- strong-beat chord-tone: `1.0000`
+- offbeat non-chord / resolution / unresolved: `0.3867 / 1.0000 / 0.0000`
+- large leap / adjacent repeat / enclosure proxy / bar pitch-class similarity: `0.0595 / 0.0000 / 0.2969 / 0.6131`
+- step motion / chromatic step / third-fourth motion: `0.3790 / 0.2044 / 0.5615`
+- altered offbeat / two-note cycle / interval trigram repeat: `0.1016 / 0.0020 / 0.0082`
+- max gate penalty: `0.0000`
+- duration template repeat / most common duration: `0.3750 / 0.2031`
+- duration bucket / velocity count: `16 / 17`
+- MIDI / solo WAV / context WAV: `8 / 8 / 8`
+- listen-first case count: `4`
+- representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_safety_gate_probe/listen_first_by_progression/`
+- all context WAV path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_safety_gate_probe/audio_with_context/`
+- package report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_safety_gate_probe/bebop_language_best_of_package.md`
+- all-selected note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_safety_gate_all_selected_note_review/bebop_language_note_review.md`
+- all-selected note review candidate count: `8`
+- quality claim: `false`
+- model direct claim: `false`
+- recorded improvement against top8 frontier: adjacent repeat `0.0020 -> 0.0000`, bar pitch-class similarity `0.6458 -> 0.6131`
+- recorded tradeoff against top8 frontier: max-per-case `2 -> 3`, step motion `0.3968 -> 0.3790`, chromatic step `0.2202 -> 0.2044`, large leap `0.0456 -> 0.0595`, enclosure proxy `0.3125 -> 0.2969`
+- rejected stricter case-balanced gate: max-per-case `2`, max adjacent repeat `0.0000`, max bar pitch-class similarity `0.7000-0.7200`, selectable count `7`
+- preserved metrics against top8 frontier: gate `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`
 
 2026-06-13 previous best-of strict consonance 기준:
 
