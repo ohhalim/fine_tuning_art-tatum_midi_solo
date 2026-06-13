@@ -111,6 +111,38 @@ def candidate_rows(
     )
 
 
+def filter_candidate_rows(
+    rows: list[dict[str, Any]],
+    *,
+    max_gate_penalty: float | None,
+    max_offbeat_non_chord_ratio: float | None,
+    max_unresolved_offbeat_non_chord_ratio: float | None,
+    max_dominant_altered_offbeat_ratio: float | None,
+) -> list[dict[str, Any]]:
+    filtered: list[dict[str, Any]] = []
+    for row in rows:
+        metrics = row["objective_metrics"]
+        if max_gate_penalty is not None and float(row["gate_penalty"]) > float(max_gate_penalty):
+            continue
+        if (
+            max_offbeat_non_chord_ratio is not None
+            and float(metrics["offbeat_non_chord_ratio"]) > float(max_offbeat_non_chord_ratio)
+        ):
+            continue
+        if (
+            max_unresolved_offbeat_non_chord_ratio is not None
+            and float(metrics["offbeat_unresolved_non_chord_ratio"]) > float(max_unresolved_offbeat_non_chord_ratio)
+        ):
+            continue
+        if (
+            max_dominant_altered_offbeat_ratio is not None
+            and float(metrics["dominant_altered_offbeat_ratio"]) > float(max_dominant_altered_offbeat_ratio)
+        ):
+            continue
+        filtered.append(row)
+    return filtered
+
+
 def select_candidates(rows: list[dict[str, Any]], *, selected_count: int, max_per_case: int) -> list[dict[str, Any]]:
     if not rows:
         raise BebopLanguagePackageError("no candidate rows for best-of package")
@@ -187,6 +219,10 @@ def build_best_of_package(
     max_per_case: int,
     target_chord_tone_ratio: float,
     target_offbeat_non_chord_ratio: float,
+    max_gate_penalty: float | None = None,
+    max_offbeat_non_chord_ratio: float | None = None,
+    max_unresolved_offbeat_non_chord_ratio: float | None = None,
+    max_dominant_altered_offbeat_ratio: float | None = None,
 ) -> dict[str, Any]:
     paths = package_paths(source_root, package_globs)
     rows = candidate_rows(
@@ -194,7 +230,16 @@ def build_best_of_package(
         target_chord_tone_ratio=target_chord_tone_ratio,
         target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
     )
-    selected = select_candidates(rows, selected_count=selected_count, max_per_case=max_per_case)
+    selection_rows = filter_candidate_rows(
+        rows,
+        max_gate_penalty=max_gate_penalty,
+        max_offbeat_non_chord_ratio=max_offbeat_non_chord_ratio,
+        max_unresolved_offbeat_non_chord_ratio=max_unresolved_offbeat_non_chord_ratio,
+        max_dominant_altered_offbeat_ratio=max_dominant_altered_offbeat_ratio,
+    )
+    if not selection_rows:
+        raise BebopLanguagePackageError("no candidate rows after best-of selection filters")
+    selected = select_candidates(selection_rows, selected_count=selected_count, max_per_case=max_per_case)
     solo_dir = output_dir / "midi"
     mix_midi_dir = output_dir / "midi_with_context"
     solo_audio_dir = output_dir / "audio"
@@ -241,6 +286,11 @@ def build_best_of_package(
             "candidate_pool_count": len(rows),
             "target_chord_tone_ratio": float(target_chord_tone_ratio),
             "target_offbeat_non_chord_ratio": float(target_offbeat_non_chord_ratio),
+            "selection_pool_count": len(selection_rows),
+            "max_gate_penalty": max_gate_penalty,
+            "max_offbeat_non_chord_ratio": max_offbeat_non_chord_ratio,
+            "max_unresolved_offbeat_non_chord_ratio": max_unresolved_offbeat_non_chord_ratio,
+            "max_dominant_altered_offbeat_ratio": max_dominant_altered_offbeat_ratio,
         },
         "renderer": render_config.renderer,
         "soundfont": render_config.soundfont,
@@ -281,6 +331,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max_per_case", type=int, default=4)
     parser.add_argument("--target_chord_tone_ratio", type=float, default=0.78)
     parser.add_argument("--target_offbeat_non_chord_ratio", type=float, default=0.38)
+    parser.add_argument("--max_gate_penalty", type=float, default=None)
+    parser.add_argument("--max_offbeat_non_chord_ratio", type=float, default=None)
+    parser.add_argument("--max_unresolved_offbeat_non_chord_ratio", type=float, default=None)
+    parser.add_argument("--max_dominant_altered_offbeat_ratio", type=float, default=None)
     return parser
 
 
@@ -306,6 +360,10 @@ def main() -> int:
         max_per_case=int(args.max_per_case),
         target_chord_tone_ratio=float(args.target_chord_tone_ratio),
         target_offbeat_non_chord_ratio=float(args.target_offbeat_non_chord_ratio),
+        max_gate_penalty=args.max_gate_penalty,
+        max_offbeat_non_chord_ratio=args.max_offbeat_non_chord_ratio,
+        max_unresolved_offbeat_non_chord_ratio=args.max_unresolved_offbeat_non_chord_ratio,
+        max_dominant_altered_offbeat_ratio=args.max_dominant_altered_offbeat_ratio,
     )
     print(json.dumps(validate_report(report, int(args.sample_rate)), ensure_ascii=False, indent=2))
     return 0
