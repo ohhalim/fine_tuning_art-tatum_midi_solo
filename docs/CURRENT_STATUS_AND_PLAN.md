@@ -22,9 +22,9 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1434, Stage B MIDI-to-solo bebop language case-balanced motion guard tightening
+- current issue: Issue #1436, Stage B MIDI-to-solo bebop language interval repeat guard audit
 - open issue queue after residual-aware listening input guard merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo case-balanced motion-tight listening review input or interval-repeat guard audit`
+- 다음 권장 이슈: `Stage B MIDI-to-solo interval-repeat source expansion or listening review input`
 
 현재 범위가 아닌 것:
 
@@ -330,6 +330,36 @@
 - review handoff path: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_case_balanced_motion_tight_review_handoff/bebop_language_review_handoff.md`
 - review ready: `true`
 - next boundary: `listening_review_input_or_motion_balance_guard_tightening`
+- representative replacement: `false`
+- quality claim: `false`
+- model direct claim: `false`
+
+2026-06-13 interval-repeat guard audit 기준:
+
+- package: `manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_interval_guard_feasible_probe`
+- baseline package: `manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_tight_probe`
+- source pool unchanged: `true`
+- new filter option: `--max_interval_trigram_repeat_ratio`
+- strict interval cap attempt: `0.0125`
+- strict interval cap result: selected count shortage under max-per-case `2`
+- feasible interval cap: `0.0164`
+- best-of candidate pool / selected: `1999 / 8`
+- max-per-case: `2`
+- selected case counts: dominant_cycle `2`, major_ii_v_turnaround `2`, minor_backdoor `2`, rhythm_turnaround `2`
+- selected interval trigram repeat values: `0.0164, 0.0164, 0.0164, 0.0000, 0.0000, 0.0164, 0.0164, 0.0164`
+- interval trigram repeat avg / max selected: `0.0123 / 0.0164`
+- offbeat non-chord / resolution / unresolved: `0.3672 / 1.0000 / 0.0000`
+- max gate penalty / adjacent repeat: `0.0000 / 0.0000`
+- step motion / chromatic step / large leap: `0.4583 / 0.2599 / 0.0337`
+- enclosure proxy / bar pitch-class similarity: `0.3242 / 0.6345`
+- compared against motion-tight baseline: objective metrics unchanged
+- preserved metrics against motion-tight baseline: selected case counts `2/2/2/2`, max gate penalty `0.0000`, adjacent repeat `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`
+- MIDI / solo WAV / context WAV: `8 / 8 / 8`
+- all-selected note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_case_balanced_motion_interval_guard_all_selected_note_review/bebop_language_note_review.md`
+- package report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_interval_guard_feasible_probe/bebop_language_best_of_package.md`
+- review handoff path: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_case_balanced_motion_interval_guard_review_handoff/bebop_language_review_handoff.md`
+- review ready: `true`
+- next boundary: `interval_repeat_source_expansion_or_listening_review_input`
 - representative replacement: `false`
 - quality claim: `false`
 - model direct claim: `false`

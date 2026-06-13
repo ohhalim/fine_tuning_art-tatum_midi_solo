@@ -126,7 +126,8 @@ def filter_candidate_rows(
     max_unresolved_offbeat_non_chord_ratio: float | None,
     max_dominant_altered_offbeat_ratio: float | None,
     max_adjacent_repeat_ratio: float | None,
-    max_bar_pitch_class_jaccard: float | None,
+    max_interval_trigram_repeat_ratio: float | None = None,
+    max_bar_pitch_class_jaccard: float | None = None,
 ) -> list[dict[str, Any]]:
     filtered: list[dict[str, Any]] = []
     for row in rows:
@@ -151,6 +152,11 @@ def filter_candidate_rows(
         if (
             max_adjacent_repeat_ratio is not None
             and float(metrics["adjacent_repeat_ratio"]) > float(max_adjacent_repeat_ratio)
+        ):
+            continue
+        if (
+            max_interval_trigram_repeat_ratio is not None
+            and float(metrics["interval_trigram_repeat_ratio"]) > float(max_interval_trigram_repeat_ratio)
         ):
             continue
         if (
@@ -1570,6 +1576,7 @@ def build_best_of_package(
     max_unresolved_offbeat_non_chord_ratio: float | None = None,
     max_dominant_altered_offbeat_ratio: float | None = None,
     max_adjacent_repeat_ratio: float | None = None,
+    max_interval_trigram_repeat_ratio: float | None = None,
     max_bar_pitch_class_jaccard: float | None = None,
     listen_first_mode: str = "rank",
     repair_bar_similarity_enabled: bool = False,
@@ -1609,6 +1616,7 @@ def build_best_of_package(
         max_unresolved_offbeat_non_chord_ratio=max_unresolved_offbeat_non_chord_ratio,
         max_dominant_altered_offbeat_ratio=max_dominant_altered_offbeat_ratio,
         max_adjacent_repeat_ratio=None if select_after_repair else max_adjacent_repeat_ratio,
+        max_interval_trigram_repeat_ratio=None if select_after_repair else max_interval_trigram_repeat_ratio,
         max_bar_pitch_class_jaccard=None if select_after_repair else max_bar_pitch_class_jaccard,
     )
     if not selection_rows:
@@ -1676,6 +1684,7 @@ def build_best_of_package(
                 max_unresolved_offbeat_non_chord_ratio=max_unresolved_offbeat_non_chord_ratio,
                 max_dominant_altered_offbeat_ratio=max_dominant_altered_offbeat_ratio,
                 max_adjacent_repeat_ratio=max_adjacent_repeat_ratio,
+                max_interval_trigram_repeat_ratio=max_interval_trigram_repeat_ratio,
                 max_bar_pitch_class_jaccard=max_bar_pitch_class_jaccard,
             ),
             key=lambda row: selection_sort_key(row, selection_profile=selection_profile),
@@ -1854,6 +1863,7 @@ def build_best_of_package(
             "max_unresolved_offbeat_non_chord_ratio": max_unresolved_offbeat_non_chord_ratio,
             "max_dominant_altered_offbeat_ratio": max_dominant_altered_offbeat_ratio,
             "max_adjacent_repeat_ratio": max_adjacent_repeat_ratio,
+            "max_interval_trigram_repeat_ratio": max_interval_trigram_repeat_ratio,
             "max_bar_pitch_class_jaccard": max_bar_pitch_class_jaccard,
             "listen_first_mode": listen_first_mode,
             "repair_bar_similarity": bool(repair_bar_similarity_enabled),
@@ -1924,6 +1934,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max_unresolved_offbeat_non_chord_ratio", type=float, default=None)
     parser.add_argument("--max_dominant_altered_offbeat_ratio", type=float, default=None)
     parser.add_argument("--max_adjacent_repeat_ratio", type=float, default=None)
+    parser.add_argument("--max_interval_trigram_repeat_ratio", type=float, default=None)
     parser.add_argument("--max_bar_pitch_class_jaccard", type=float, default=None)
     parser.add_argument("--listen_first_mode", choices=["rank", "consonance"], default="rank")
     parser.add_argument("--repair_bar_similarity", action="store_true")
@@ -1983,6 +1994,7 @@ def main() -> int:
         max_unresolved_offbeat_non_chord_ratio=args.max_unresolved_offbeat_non_chord_ratio,
         max_dominant_altered_offbeat_ratio=args.max_dominant_altered_offbeat_ratio,
         max_adjacent_repeat_ratio=args.max_adjacent_repeat_ratio,
+        max_interval_trigram_repeat_ratio=args.max_interval_trigram_repeat_ratio,
         max_bar_pitch_class_jaccard=args.max_bar_pitch_class_jaccard,
         listen_first_mode=str(args.listen_first_mode),
         repair_bar_similarity_enabled=bool(args.repair_bar_similarity),
