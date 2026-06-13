@@ -46,16 +46,18 @@
 - residual-aware completion audit: technical MVP complete `true`, local review ready `true`
 - residual-aware final status sync: synced `true`, next `listening_review_input_wait`
 - residual-aware listening review input wait: quality claim blocked `true`
+- bebop language data-contour package: generated `4000`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4629`, offbeat resolution `0.8808`, unresolved offbeat non-chord `0.0547`, unique pitch avg `14.3125`, 3rd/4th motion `0.4742`, large leap `0.0913`, bar pitch-class similarity `0.6875`, half-repeat `0.0000`
 - bebop language bar-similarity package: generated `1440`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4746`, offbeat resolution `0.8891`, unresolved offbeat non-chord `0.0527`, bar pitch-class similarity `0.7280`, half-repeat `0.0000`
-- bebop language bar-similarity focused sweep: config `18`, best `config_07`, strong-beat chord-tone `1.0000`, offbeat resolution `0.8726`, unresolved offbeat non-chord `0.0645`, bar pitch-class similarity `0.6860`, half-repeat `0.0000`
+- bebop language data-contour sweep: config `18`, best `config_01`, strong-beat chord-tone `1.0000`, offbeat resolution `0.8598`, unresolved offbeat non-chord `0.0625`, unique pitch avg `13.9375`, 3rd/4th motion `0.4931`, bar pitch-class similarity `0.7449`, half-repeat `0.0000`
 
 ## 최신 산출물
 
-- bar-similarity 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v14_bar_similarity_rank/listen_first_by_progression/`
-- bar-similarity 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v14_bar_similarity_rank/audio_with_context/`
-- bar-similarity package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v14_bar_similarity_rank/bebop_language_package.md`
-- bar-similarity focused sweep 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v5_bar_similarity/best_listen_first_by_progression/`
-- bar-similarity focused sweep report: `outputs/stage_b_midi_to_solo_bebop_language_package/parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v5_bar_similarity/bebop_language_parameter_sweep.md`
+- data-contour 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v20_data_contour_large_pool/listen_first_by_progression/`
+- data-contour 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v20_data_contour_large_pool/audio_with_context/`
+- data-contour package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v20_data_contour_large_pool/bebop_language_package.md`
+- data-contour focused sweep 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v6_data_contour_resolution/best_listen_first_by_progression/`
+- data-contour focused sweep report: `outputs/stage_b_midi_to_solo_bebop_language_package/parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v6_data_contour_resolution/bebop_language_parameter_sweep.md`
+- previous bar-similarity 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v14_bar_similarity_rank/listen_first_by_progression/`
 - final review package: `outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_final_review/issue_1388_residual_aware_final_review_package/residual_aware_final_review_package.md`
 - review input template: `outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_final_review/issue_1388_residual_aware_final_review_package/residual_aware_review_input_template.json`
 - MIDI 후보: `outputs/music_transformer_finetune_mvp/solo_yield_rhythm_syncopation_balance_repair/issue_1384_rhythm_syncopation_balance_repair_package/midi/`
@@ -72,29 +74,29 @@
 
 ```bash
 .venv/bin/python scripts/run_stage_b_midi_to_solo_bebop_language_parameter_sweep.py \
-  --run_id manual_2026_06_13_bebop_language_param_sweep_v5_bar_similarity \
-  --variants_per_progression 120 \
+  --run_id manual_2026_06_13_bebop_language_param_sweep_v6_data_contour_resolution \
+  --variants_per_progression 160 \
   --selected_count 16 \
   --bars 8 \
   --bpm 124 \
-  --seed_base 1500000 \
-  --non_chord_probabilities 0.30,0.34,0.38 \
-  --target_chord_tone_ratios 0.72,0.74 \
-  --target_offbeat_non_chord_ratios 0.42,0.44,0.48 \
+  --seed_base 1010000 \
+  --non_chord_probabilities 0.28,0.32,0.34 \
+  --target_chord_tone_ratios 0.76,0.78 \
+  --target_offbeat_non_chord_ratios 0.38,0.40,0.44 \
   --max_configs 18
 ```
 
 ```bash
 .venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_package.py \
-  --run_id manual_2026_06_13_bebop_language_v14_bar_similarity_rank \
-  --variants_per_progression 360 \
+  --run_id manual_2026_06_13_bebop_language_v20_data_contour_large_pool \
+  --variants_per_progression 1000 \
   --selected_count 16 \
   --bars 8 \
   --bpm 124 \
-  --seed_base 710000 \
-  --non_chord_probability 0.34 \
-  --target_chord_tone_ratio 0.74 \
-  --target_offbeat_non_chord_ratio 0.44
+  --seed_base 910000 \
+  --non_chord_probability 0.32 \
+  --target_chord_tone_ratio 0.76 \
+  --target_offbeat_non_chord_ratio 0.40
 ```
 
 ```bash

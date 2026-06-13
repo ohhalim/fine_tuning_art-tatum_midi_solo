@@ -53,6 +53,11 @@ def sweep_score(summary: dict[str, Any]) -> float:
     half_repeat = float(summary.get("avg_bar_half_repeat_ratio") or 0.0)
     bar_similarity = float(summary.get("avg_max_bar_pitch_class_jaccard") or 0.0)
     shape_repeat = float(summary.get("avg_bar_pitch_shape_repeat_ratio") or 0.0)
+    gate = float(summary.get("avg_gate_penalty", 0.0) or 0.0)
+    unique_pitch = float(summary.get("avg_unique_pitch_count", 14.0) or 14.0)
+    step_motion = float(summary.get("avg_step_motion_ratio", 0.44) or 0.44)
+    third_fourth_motion = float(summary.get("avg_third_fourth_motion_ratio", 0.50) or 0.50)
+    large_leap = float(summary.get("avg_large_leap_ratio", 0.08) or 0.08)
     min_bar_unique = int(summary.get("min_bar_unique_pitch_count_min") or 0)
     final_ok = bool(summary.get("all_final_landings_chord_tone", False))
     return (
@@ -68,6 +73,11 @@ def sweep_score(summary: dict[str, Any]) -> float:
         + half_repeat * 1.2
         + max(0.0, bar_similarity - 0.72) * 1.4
         + shape_repeat * 1.4
+        + gate * 0.8
+        + max(0.0, 14.0 - unique_pitch) * 0.04
+        + max(0.0, step_motion - 0.48) * 0.6
+        + max(0.0, 0.48 - third_fourth_motion) * 0.8
+        + max(0.0, large_leap - 0.10) * 0.6
         + max(0, 4 - min_bar_unique) * 0.3
         + (0.0 if final_ok else 3.0)
     )
@@ -112,6 +122,11 @@ def build_markdown(report: dict[str, Any]) -> str:
         f"- best offbeat non-chord: `{float(report['best_config']['summary']['avg_offbeat_non_chord_ratio']):.4f}`",
         f"- best offbeat resolution: `{float(report['best_config']['summary']['avg_offbeat_non_chord_resolution_ratio']):.4f}`",
         f"- best unresolved offbeat non-chord: `{float(report['best_config']['summary']['avg_offbeat_unresolved_non_chord_ratio']):.4f}`",
+        f"- best gate penalty: `{float(report['best_config']['summary'].get('avg_gate_penalty') or 0.0):.4f}`",
+        f"- best unique pitch count: `{float(report['best_config']['summary'].get('avg_unique_pitch_count') or 0.0):.4f}`",
+        f"- best step motion: `{float(report['best_config']['summary'].get('avg_step_motion_ratio') or 0.0):.4f}`",
+        f"- best 3rd/4th motion: `{float(report['best_config']['summary'].get('avg_third_fourth_motion_ratio') or 0.0):.4f}`",
+        f"- best large leap: `{float(report['best_config']['summary'].get('avg_large_leap_ratio') or 0.0):.4f}`",
         f"- best chromatic step: `{float(report['best_config']['summary']['avg_chromatic_step_ratio']):.4f}`",
         f"- best enclosure proxy: `{float(report['best_config']['summary']['avg_enclosure_proxy_ratio']):.4f}`",
         f"- best dominant altered offbeat: `{float(report['best_config']['summary']['avg_dominant_altered_offbeat_ratio']):.4f}`",
@@ -124,8 +139,8 @@ def build_markdown(report: dict[str, Any]) -> str:
         "",
         "## Configs",
         "",
-        "| rank | config | score | chord-tone | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | half repeat | bar sim | shape repeat | min bar unique | package |",
-        "|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        "| rank | config | score | gate | unique pitch | step | 3rd/4th | leap | chord-tone | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | half repeat | bar sim | shape repeat | min bar unique | package |",
+        "|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for rank, row in enumerate(report["ranked_configs"], start=1):
         summary = row["summary"]
@@ -136,6 +151,11 @@ def build_markdown(report: dict[str, Any]) -> str:
                     str(rank),
                     str(row["config_label"]),
                     f"{float(row['sweep_score']):.4f}",
+                    f"{float(summary.get('avg_gate_penalty') or 0.0):.4f}",
+                    f"{float(summary.get('avg_unique_pitch_count') or 0.0):.4f}",
+                    f"{float(summary.get('avg_step_motion_ratio') or 0.0):.4f}",
+                    f"{float(summary.get('avg_third_fourth_motion_ratio') or 0.0):.4f}",
+                    f"{float(summary.get('avg_large_leap_ratio') or 0.0):.4f}",
                     f"{float(summary['avg_chord_tone_ratio']):.4f}",
                     f"{float(summary['avg_offbeat_non_chord_ratio']):.4f}",
                     f"{float(summary['avg_offbeat_non_chord_resolution_ratio']):.4f}",

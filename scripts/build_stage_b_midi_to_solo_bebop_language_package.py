@@ -45,6 +45,13 @@ HIGH_PITCH = 86
 DEFAULT_NON_CHORD_PROBABILITY = 0.38
 DEFAULT_TARGET_CHORD_TONE_RATIO = 0.72
 DEFAULT_TARGET_OFFBEAT_NON_CHORD_RATIO = 0.46
+DATA_CONTOUR_INTERVAL_CELLS: tuple[tuple[int, ...], ...] = (
+    (2, -4, 1, 3, 3, 4, -2),
+    (4, -3, -4, -3, 1, -2, 4),
+    (4, -3, 4, 4, -3, -4, 3),
+    (3, 3, -6, -1, 4, -4, 7),
+    (-3, 4, 1, 4, -2, 3, -1),
+)
 
 
 class BebopLanguagePackageError(ValueError):
@@ -311,6 +318,51 @@ def scalar_fragment(chord: str, start: int, direction: int) -> list[int]:
     return [int(scale[(start_index + offset) % len(scale)]) for offset in range(4)] if scale else [start] * 4
 
 
+def contour_cell_line(
+    chord: str,
+    next_chord: str,
+    start_target: int,
+    next_target: int,
+    *,
+    seed: int,
+    bar_index: int,
+    rng: random.Random,
+    non_chord_probability: float,
+) -> list[int]:
+    cell = DATA_CONTOUR_INTERVAL_CELLS[(seed + bar_index) % len(DATA_CONTOUR_INTERVAL_CELLS)]
+    desired = [nearest_chord_tone(chord, start_target)]
+    for interval in cell:
+        desired.append(max(LOW_PITCH, min(HIGH_PITCH, int(desired[-1] + interval))))
+
+    line: list[int] = []
+    for index, reference in enumerate(desired[:8]):
+        active_chord = chord if index < 7 else next_chord
+        if index % 2 == 0:
+            pitch = nearest_chord_tone(active_chord, int(reference), avoid=line[-1] if line else None)
+        else:
+            target_chord = next_chord if index == 7 else chord
+            target_reference = desired[index + 1] if index + 1 < len(desired) else next_target
+            target = nearest_chord_tone(target_chord, int(target_reference))
+            if rng.random() < non_chord_probability:
+                pitch = chromatic_approach(target, line[-1], active_chord, rng)
+            else:
+                pitch = nearest_scale_tone(active_chord, int(reference), avoid_chord=False)
+        if line:
+            pitch = avoid_large_leap(int(pitch), line[-1], active_chord)
+        line.append(max(LOW_PITCH, min(HIGH_PITCH, int(pitch))))
+
+    line[6] = nearest_chord_tone(chord, int(line[6]), avoid=line[5])
+    line[7] = offbeat_note(
+        next_chord,
+        next_target,
+        line[6],
+        rng,
+        next_chord=next_chord,
+        non_chord_probability=max(0.20, non_chord_probability - 0.04),
+    )
+    return line
+
+
 def build_bar_line(
     chord: str,
     next_chord: str,
@@ -323,7 +375,7 @@ def build_bar_line(
 ) -> list[int]:
     rng = random.Random(seed + bar_index * 7919)
     direction = 1 if (bar_index + seed) % 2 == 0 else -1
-    pattern = (seed + bar_index) % 5
+    pattern = (seed + bar_index) % 7
 
     beat1 = nearest_chord_tone(chord, start_target)
     beat2 = nearest_chord_tone(chord, beat1 + direction * rng.choice([3, 4, 5, 7]), avoid=beat1)
@@ -418,7 +470,7 @@ def build_bar_line(
                 non_chord_probability=non_chord_probability,
             ),
         ]
-    else:
+    elif pattern == 4:
         line = [
             beat1,
             offbeat_note(chord, beat2, beat1, rng, non_chord_probability=non_chord_probability),
@@ -436,6 +488,17 @@ def build_bar_line(
                 non_chord_probability=non_chord_probability,
             ),
         ]
+    else:
+        line = contour_cell_line(
+            chord,
+            next_chord,
+            beat1,
+            next_target,
+            seed=seed,
+            bar_index=bar_index,
+            rng=rng,
+            non_chord_probability=non_chord_probability,
+        )
 
     repaired: list[int] = []
     for index, pitch in enumerate(line):
@@ -776,6 +839,9 @@ def objective_metrics(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: in
     final_chord = chord_for_time(chords, float(final_note.start), bars=bars, bpm=bpm)
     final_ok = int(final_note.pitch) % 12 in chord_pitch_classes(final_chord)
     intervals = [abs(right - left) for left, right in zip(pitches, pitches[1:])]
+    step_motion_ratio = sum(1 for interval in intervals if interval <= 2) / max(1, len(intervals))
+    third_fourth_motion_ratio = sum(1 for interval in intervals if 3 <= interval <= 5) / max(1, len(intervals))
+    large_leap_ratio = sum(1 for interval in intervals if interval >= 6) / max(1, len(intervals))
     return {
         "note_count": len(notes),
         "duration_seconds": max(float(note.end) for note in notes) - min(float(note.start) for note in notes),
@@ -789,6 +855,9 @@ def objective_metrics(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: in
         "avg_gap_seconds": mean(gaps) if gaps else 0.0,
         "max_abs_interval": max(intervals or [0]),
         "avg_abs_interval": mean(intervals) if intervals else 0.0,
+        "step_motion_ratio": step_motion_ratio,
+        "third_fourth_motion_ratio": third_fourth_motion_ratio,
+        "large_leap_ratio": large_leap_ratio,
         "direction_change_ratio": direction_change_ratio(pitches),
         "adjacent_repeat_ratio": adjacent_repeat_ratio(pitches),
         "chromatic_step_ratio": chromatic_step_ratio(pitches),
@@ -838,8 +907,12 @@ def candidate_score(
     shape_repeat = float(metrics.get("bar_pitch_shape_repeat_ratio") or 0.0)
     min_bar_unique = int(metrics.get("min_bar_unique_pitch_count") or 0)
     max_interval = int(metrics.get("max_abs_interval") or 0)
+    unique_pitch = int(metrics.get("unique_pitch_count") or 0)
     unique_pc = int(metrics.get("unique_pitch_class_count") or 0)
     max_gap = float(metrics.get("max_gap_seconds") or 0.0)
+    step_motion = float(metrics.get("step_motion_ratio") or 0.0)
+    third_fourth_motion = float(metrics.get("third_fourth_motion_ratio") or 0.0)
+    large_leap = float(metrics.get("large_leap_ratio") or 0.0)
     final_ok = bool(metrics.get("final_landing_is_chord_tone", False))
     return (
         abs(chord_tone - float(target_chord_tone_ratio)) * 2.2
@@ -847,8 +920,8 @@ def candidate_score(
         + max(0.0, 1.0 - strong) * 4.0
         + max(0.0, 0.36 - direction) * 1.2
         + repeat * 1.6
-        + max(0.0, 0.72 - resolution) * 1.0
-        + unresolved * 1.8
+        + max(0.0, 0.86 - resolution) * 2.4
+        + unresolved * 4.5
         + max(0.0, 0.18 - chromatic) * 0.9
         + max(0.0, 0.04 - enclosure) * 0.6
         + max(0.0, 0.05 - dominant_altered) * 0.4
@@ -858,9 +931,39 @@ def candidate_score(
         + shape_repeat * 1.4
         + max(0, 4 - min_bar_unique) * 0.3
         + max(0, max_interval - 12) * 0.1
+        + max(0, 14 - unique_pitch) * 0.04
         + max(0, 7 - unique_pc) * 0.2
         + max(0.0, max_gap - 0.4) * 0.8
+        + max(0.0, step_motion - 0.48) * 0.8
+        + max(0.0, 0.48 - third_fourth_motion) * 0.8
+        + max(0.0, large_leap - 0.10) * 0.8
         + (0.0 if final_ok else 3.0)
+    )
+
+
+def candidate_gate_penalty(metrics: dict[str, Any]) -> float:
+    """Penalty for objective defects that should sort before fine-grained score."""
+
+    penalty = 0.0
+    if not bool(metrics.get("final_landing_is_chord_tone", False)):
+        penalty += 10.0
+    penalty += max(0.0, 0.99 - float(metrics.get("strong_beat_chord_tone_ratio") or 0.0)) * 8.0
+    penalty += max(0.0, 0.84 - float(metrics.get("offbeat_non_chord_resolution_ratio") or 0.0)) * 4.0
+    penalty += max(0.0, float(metrics.get("offbeat_unresolved_non_chord_ratio") or 0.0) - 0.07) * 6.0
+    penalty += max(0.0, float(metrics.get("two_note_cycle_ratio") or 0.0) - 0.02) * 5.0
+    penalty += float(metrics.get("bar_half_repeat_ratio") or 0.0) * 6.0
+    penalty += max(0.0, float(metrics.get("max_bar_pitch_class_jaccard") or 0.0) - 0.86) * 2.0
+    penalty += float(metrics.get("bar_pitch_shape_repeat_ratio") or 0.0) * 4.0
+    penalty += max(0, 4 - int(metrics.get("min_bar_unique_pitch_count") or 0)) * 2.0
+    return float(penalty)
+
+
+def generated_sort_key(item: dict[str, Any]) -> tuple[float, float, str, int]:
+    return (
+        float(item["score"]),
+        float(item.get("gate_penalty") or 0.0),
+        str(item["case_label"]),
+        int(item["variant_index"]),
     )
 
 
@@ -1025,6 +1128,7 @@ def build_package(
                 target_chord_tone_ratio=target_chord_tone_ratio,
                 target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
             )
+            gate_penalty = candidate_gate_penalty(metrics)
             raw_path = raw_dir / f"{progression['case_label']}_variant_{variant_index + 1:02d}_seed_{seed}.mid"
             raw_path.parent.mkdir(parents=True, exist_ok=True)
             pm.write(str(raw_path))
@@ -1039,10 +1143,11 @@ def build_package(
                     "generation_meta": generation_meta,
                     "objective_metrics": metrics,
                     "score": float(score),
+                    "gate_penalty": float(gate_penalty),
                 }
             )
 
-    generated.sort(key=lambda item: (float(item["score"]), str(item["case_label"]), int(item["variant_index"])))
+    generated.sort(key=generated_sort_key)
     selected: list[dict[str, Any]] = []
     selected_paths: set[str] = set()
     for progression in progressions:
@@ -1095,6 +1200,22 @@ def build_package(
         "selected_candidate_count": len(rendered),
         "listen_first_case_count": int(listen_first["case_count"]),
         "avg_score": mean([float(item["score"]) for item in rendered]) if rendered else 0.0,
+        "avg_gate_penalty": mean([float(item.get("gate_penalty") or 0.0) for item in rendered]) if rendered else 0.0,
+        "max_gate_penalty": max((float(item.get("gate_penalty") or 0.0) for item in rendered), default=0.0),
+        "avg_unique_pitch_count": mean([float(item["objective_metrics"]["unique_pitch_count"]) for item in rendered])
+        if rendered
+        else 0.0,
+        "avg_step_motion_ratio": mean([float(item["objective_metrics"]["step_motion_ratio"]) for item in rendered])
+        if rendered
+        else 0.0,
+        "avg_third_fourth_motion_ratio": mean(
+            [float(item["objective_metrics"]["third_fourth_motion_ratio"]) for item in rendered]
+        )
+        if rendered
+        else 0.0,
+        "avg_large_leap_ratio": mean([float(item["objective_metrics"]["large_leap_ratio"]) for item in rendered])
+        if rendered
+        else 0.0,
         "avg_chord_tone_ratio": mean([float(item["objective_metrics"]["chord_tone_ratio"]) for item in rendered])
         if rendered
         else 0.0,
@@ -1240,6 +1361,12 @@ def validate_report(report: dict[str, Any], expected_sample_rate: int) -> dict[s
         "schema_version": report["schema_version"],
         "candidate_count": len(selected),
         "generated_candidate_count": int(aggregate["generated_candidate_count"]),
+        "avg_gate_penalty": float(aggregate["avg_gate_penalty"]),
+        "max_gate_penalty": float(aggregate["max_gate_penalty"]),
+        "avg_unique_pitch_count": float(aggregate["avg_unique_pitch_count"]),
+        "avg_step_motion_ratio": float(aggregate["avg_step_motion_ratio"]),
+        "avg_third_fourth_motion_ratio": float(aggregate["avg_third_fourth_motion_ratio"]),
+        "avg_large_leap_ratio": float(aggregate["avg_large_leap_ratio"]),
         "avg_chord_tone_ratio": float(aggregate["avg_chord_tone_ratio"]),
         "avg_tension_ratio": float(aggregate["avg_tension_ratio"]),
         "avg_strong_beat_chord_tone_ratio": float(aggregate["avg_strong_beat_chord_tone_ratio"]),
@@ -1274,6 +1401,12 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- selected candidate count: `{aggregate['selected_candidate_count']}`",
         f"- bars: `{generation['bars']}`",
         f"- bpm: `{generation['bpm']}`",
+        f"- avg gate penalty: `{float(aggregate['avg_gate_penalty']):.4f}`",
+        f"- max gate penalty: `{float(aggregate['max_gate_penalty']):.4f}`",
+        f"- avg unique pitch count: `{float(aggregate['avg_unique_pitch_count']):.4f}`",
+        f"- avg step motion: `{float(aggregate['avg_step_motion_ratio']):.4f}`",
+        f"- avg 3rd/4th motion: `{float(aggregate['avg_third_fourth_motion_ratio']):.4f}`",
+        f"- avg large leap: `{float(aggregate['avg_large_leap_ratio']):.4f}`",
         f"- avg chord-tone ratio: `{float(aggregate['avg_chord_tone_ratio']):.4f}`",
         f"- avg tension ratio: `{float(aggregate['avg_tension_ratio']):.4f}`",
         f"- avg strong-beat chord-tone ratio: `{float(aggregate['avg_strong_beat_chord_tone_ratio']):.4f}`",
@@ -1294,8 +1427,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         "## Selected Files",
         "",
-        "| rank | case | chords | score | chord-tone | strong beat | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | half repeat | bar sim | shape repeat | min bar unique | solo WAV | context WAV |",
-        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
+        "| rank | case | chords | gate | score | unique pitch | step | 3rd/4th | leap | chord-tone | strong beat | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | half repeat | bar sim | shape repeat | min bar unique | solo WAV | context WAV |",
+        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
     ]
     for item in report["selected_candidates"]:
         metrics = item["objective_metrics"]
@@ -1306,7 +1439,12 @@ def markdown_report(report: dict[str, Any]) -> str:
                     str(item["rank"]),
                     str(item["case_label"]),
                     ",".join(item["chords"]),
+                    f"{float(item.get('gate_penalty') or 0.0):.4f}",
                     f"{float(item['score']):.4f}",
+                    str(int(metrics["unique_pitch_count"])),
+                    f"{float(metrics['step_motion_ratio']):.4f}",
+                    f"{float(metrics['third_fourth_motion_ratio']):.4f}",
+                    f"{float(metrics['large_leap_ratio']):.4f}",
                     f"{float(metrics['chord_tone_ratio']):.4f}",
                     f"{float(metrics['strong_beat_chord_tone_ratio']):.4f}",
                     f"{float(metrics['offbeat_non_chord_ratio']):.4f}",
