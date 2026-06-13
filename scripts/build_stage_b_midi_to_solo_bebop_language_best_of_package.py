@@ -355,6 +355,166 @@ def repair_bar_similarity(
     return current, current_metrics, repair_report
 
 
+def is_strong_beat_note(note: pretty_midi.Note, *, bpm: float) -> bool:
+    seconds_per_beat = 60.0 / float(bpm)
+    beat_position = float(note.start) / seconds_per_beat
+    in_bar_beat = beat_position % 4
+    return abs(in_bar_beat - round(in_bar_beat)) < 0.05
+
+
+def notes_bracket_target(notes: list[pretty_midi.Note], target_index: int) -> bool:
+    if target_index < 2:
+        return False
+    left = int(notes[target_index - 2].pitch)
+    right = int(notes[target_index - 1].pitch)
+    target = int(notes[target_index].pitch)
+    return (left - target) * (right - target) < 0 and abs(left - target) <= 4 and abs(right - target) <= 4
+
+
+def enclosure_replacement_pitches(chord: str, *, left_pitch: int, target_pitch: int) -> list[int]:
+    left_distance = int(left_pitch) - int(target_pitch)
+    if left_distance == 0 or abs(left_distance) > 4:
+        return []
+    replacement_side = -1 if left_distance > 0 else 1
+    chord_root, _intervals = parse_chord(chord)
+    root_pitch_class = chord_root % 12
+    scale_pcs = {(root_pitch_class + interval) % 12 for interval in scale_intervals(chord)}
+    allowed_pcs = scale_pcs | chord_pitch_classes(chord)
+    candidates: list[int] = []
+    for offset in (replacement_side, replacement_side * 2, replacement_side * 3, replacement_side * 4):
+        pitch = int(target_pitch) + int(offset)
+        if 56 <= pitch <= 86 and pitch % 12 in allowed_pcs:
+            candidates.append(pitch)
+    return candidates
+
+
+def repair_enclosure_density(
+    pm: pretty_midi.PrettyMIDI,
+    chords: list[str],
+    *,
+    bars: int,
+    bpm: float,
+    target_chord_tone_ratio: float,
+    target_offbeat_non_chord_ratio: float,
+    max_offbeat_non_chord_ratio: float,
+    max_iterations: int = 8,
+) -> tuple[pretty_midi.PrettyMIDI, dict[str, Any], dict[str, Any]]:
+    current = copy.deepcopy(pm)
+    current_metrics = objective_metrics(current, chords, bars=bars, bpm=bpm)
+    current_score = candidate_score(
+        current_metrics,
+        target_chord_tone_ratio=target_chord_tone_ratio,
+        target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
+    )
+    current_gate = candidate_gate_penalty(current_metrics)
+    original_enclosure = float(current_metrics["enclosure_proxy_ratio"])
+    repair_steps: list[dict[str, Any]] = []
+
+    for _ in range(int(max_iterations)):
+        best_candidate: tuple[tuple[float, float, float, float, float], pretty_midi.PrettyMIDI, dict[str, Any], dict[str, Any]] | None = None
+        notes = solo_notes(current)
+        for note_index in range(2, len(notes)):
+            target_note = notes[note_index]
+            if not is_strong_beat_note(target_note, bpm=bpm):
+                continue
+            chord = chord_for_time(chords, float(target_note.start), bars=bars, bpm=bpm)
+            if int(target_note.pitch) % 12 not in chord_pitch_classes(chord):
+                continue
+            if notes_bracket_target(notes, note_index):
+                continue
+            replacement_pitches = enclosure_replacement_pitches(
+                chord,
+                left_pitch=int(notes[note_index - 2].pitch),
+                target_pitch=int(target_note.pitch),
+            )
+            for replacement in replacement_pitches:
+                trial = copy.deepcopy(current)
+                trial_notes = solo_notes(trial)
+                old_pitch = int(trial_notes[note_index - 1].pitch)
+                if old_pitch == int(replacement):
+                    continue
+                trial_notes[note_index - 1].pitch = int(replacement)
+                metrics = objective_metrics(trial, chords, bars=bars, bpm=bpm)
+                gate = candidate_gate_penalty(metrics)
+                if gate > current_gate:
+                    continue
+                if float(metrics["offbeat_unresolved_non_chord_ratio"]) > float(current_metrics["offbeat_unresolved_non_chord_ratio"]):
+                    continue
+                if float(metrics["offbeat_non_chord_ratio"]) > float(max_offbeat_non_chord_ratio):
+                    continue
+                if float(metrics["dominant_altered_offbeat_ratio"]) > 0.25:
+                    continue
+                if float(metrics["two_note_cycle_ratio"]) > float(current_metrics["two_note_cycle_ratio"]):
+                    continue
+                if float(metrics["interval_trigram_repeat_ratio"]) > max(
+                    0.02,
+                    float(current_metrics["interval_trigram_repeat_ratio"]),
+                ):
+                    continue
+                if float(metrics["max_bar_pitch_class_jaccard"]) > max(
+                    0.72,
+                    float(current_metrics["max_bar_pitch_class_jaccard"]) + 0.05,
+                ):
+                    continue
+                score = candidate_score(
+                    metrics,
+                    target_chord_tone_ratio=target_chord_tone_ratio,
+                    target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
+                )
+                if score > current_score + 0.08:
+                    continue
+                improvement_key = (
+                    -float(metrics["enclosure_proxy_ratio"]),
+                    float(metrics["offbeat_non_chord_ratio"]),
+                    float(metrics["offbeat_unresolved_non_chord_ratio"]),
+                    float(metrics["interval_trigram_repeat_ratio"]),
+                    float(metrics["max_bar_pitch_class_jaccard"]),
+                    float(score),
+                )
+                current_key = (
+                    -float(current_metrics["enclosure_proxy_ratio"]),
+                    float(current_metrics["offbeat_non_chord_ratio"]),
+                    float(current_metrics["offbeat_unresolved_non_chord_ratio"]),
+                    float(current_metrics["interval_trigram_repeat_ratio"]),
+                    float(current_metrics["max_bar_pitch_class_jaccard"]),
+                    float(current_score),
+                )
+                if improvement_key >= current_key:
+                    continue
+                step = {
+                    "note_index": int(note_index),
+                    "target_note_index": int(note_index + 1),
+                    "old_pitch": old_pitch,
+                    "new_pitch": int(replacement),
+                    "target_pitch": int(target_note.pitch),
+                    "old_enclosure_proxy_ratio": float(current_metrics["enclosure_proxy_ratio"]),
+                    "new_enclosure_proxy_ratio": float(metrics["enclosure_proxy_ratio"]),
+                    "old_offbeat_non_chord_ratio": float(current_metrics["offbeat_non_chord_ratio"]),
+                    "new_offbeat_non_chord_ratio": float(metrics["offbeat_non_chord_ratio"]),
+                    "old_score": float(current_score),
+                    "new_score": float(score),
+                }
+                if best_candidate is None or improvement_key < best_candidate[0]:
+                    best_candidate = (improvement_key, trial, metrics, step)
+        if best_candidate is None:
+            break
+        _key, current, current_metrics, step = best_candidate
+        current_score = float(step["new_score"])
+        current_gate = candidate_gate_penalty(current_metrics)
+        repair_steps.append(step)
+
+    repair_report = {
+        "attempted": True,
+        "changed": bool(repair_steps),
+        "step_count": len(repair_steps),
+        "original_enclosure_proxy_ratio": original_enclosure,
+        "final_enclosure_proxy_ratio": float(current_metrics["enclosure_proxy_ratio"]),
+        "max_offbeat_non_chord_ratio": float(max_offbeat_non_chord_ratio),
+        "steps": repair_steps,
+    }
+    return current, current_metrics, repair_report
+
+
 def build_best_of_package(
     *,
     output_dir: Path,
@@ -374,6 +534,9 @@ def build_best_of_package(
     listen_first_mode: str = "rank",
     repair_bar_similarity_enabled: bool = False,
     repair_bar_similarity_iterations: int = 4,
+    repair_enclosure_density_enabled: bool = False,
+    repair_enclosure_density_iterations: int = 8,
+    max_enclosure_repair_offbeat_non_chord_ratio: float = 0.421875,
 ) -> dict[str, Any]:
     paths = package_paths(source_root, package_globs)
     rows = candidate_rows(
@@ -400,6 +563,7 @@ def build_best_of_package(
         source_midi = Path(str(item["source_midi_path"]))
         pm = pretty_midi.PrettyMIDI(str(source_midi))
         bar_similarity_repair = {"attempted": False, "changed": False, "step_count": 0}
+        enclosure_density_repair = {"attempted": False, "changed": False, "step_count": 0}
         item_metrics = dict(item["objective_metrics"])
         item_score = float(item["score"])
         item_gate_penalty = float(item["gate_penalty"])
@@ -419,6 +583,23 @@ def build_best_of_package(
                 target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
             )
             item_gate_penalty = candidate_gate_penalty(item_metrics)
+        if repair_enclosure_density_enabled:
+            pm, item_metrics, enclosure_density_repair = repair_enclosure_density(
+                pm,
+                item["chords"],
+                bars=bars,
+                bpm=bpm,
+                target_chord_tone_ratio=target_chord_tone_ratio,
+                target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
+                max_iterations=repair_enclosure_density_iterations,
+                max_offbeat_non_chord_ratio=max_enclosure_repair_offbeat_non_chord_ratio,
+            )
+            item_score = candidate_score(
+                item_metrics,
+                target_chord_tone_ratio=target_chord_tone_ratio,
+                target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
+            )
+            item_gate_penalty = candidate_gate_penalty(item_metrics)
         context_pm = add_context(pm, item["chords"], bars=bars, bpm=bpm)
         safe_case = str(item["case_label"]).replace("/", "_").replace(" ", "_")
         stem = f"candidate_{rank:02d}_{safe_case}_variant_{int(item['variant_index']):02d}_best_of"
@@ -426,7 +607,10 @@ def build_best_of_package(
         mix_midi_path = mix_midi_dir / f"{stem}_with_context.mid"
         solo_midi_path.parent.mkdir(parents=True, exist_ok=True)
         mix_midi_path.parent.mkdir(parents=True, exist_ok=True)
-        if repair_bar_similarity_enabled and bool(bar_similarity_repair.get("changed")):
+        if (
+            (repair_bar_similarity_enabled and bool(bar_similarity_repair.get("changed")))
+            or (repair_enclosure_density_enabled and bool(enclosure_density_repair.get("changed")))
+        ):
             pm.write(str(solo_midi_path))
         else:
             shutil.copy2(source_midi, solo_midi_path)
@@ -438,6 +622,7 @@ def build_best_of_package(
                 "score": float(item_score),
                 "gate_penalty": float(item_gate_penalty),
                 "bar_similarity_repair": bar_similarity_repair,
+                "enclosure_density_repair": enclosure_density_repair,
                 "rank": int(rank),
                 "midi_path": str(solo_midi_path),
                 "midi_sha256": sha256_file(solo_midi_path),
@@ -473,6 +658,9 @@ def build_best_of_package(
             "listen_first_mode": listen_first_mode,
             "repair_bar_similarity": bool(repair_bar_similarity_enabled),
             "repair_bar_similarity_iterations": int(repair_bar_similarity_iterations),
+            "repair_enclosure_density": bool(repair_enclosure_density_enabled),
+            "repair_enclosure_density_iterations": int(repair_enclosure_density_iterations),
+            "max_enclosure_repair_offbeat_non_chord_ratio": float(max_enclosure_repair_offbeat_non_chord_ratio),
         },
         "renderer": render_config.renderer,
         "soundfont": render_config.soundfont,
@@ -520,6 +708,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--listen_first_mode", choices=["rank", "consonance"], default="rank")
     parser.add_argument("--repair_bar_similarity", action="store_true")
     parser.add_argument("--repair_bar_similarity_iterations", type=int, default=4)
+    parser.add_argument("--repair_enclosure_density", action="store_true")
+    parser.add_argument("--repair_enclosure_density_iterations", type=int, default=8)
+    parser.add_argument("--max_enclosure_repair_offbeat_non_chord_ratio", type=float, default=0.421875)
     return parser
 
 
@@ -552,6 +743,9 @@ def main() -> int:
         listen_first_mode=str(args.listen_first_mode),
         repair_bar_similarity_enabled=bool(args.repair_bar_similarity),
         repair_bar_similarity_iterations=int(args.repair_bar_similarity_iterations),
+        repair_enclosure_density_enabled=bool(args.repair_enclosure_density),
+        repair_enclosure_density_iterations=int(args.repair_enclosure_density_iterations),
+        max_enclosure_repair_offbeat_non_chord_ratio=float(args.max_enclosure_repair_offbeat_non_chord_ratio),
     )
     print(json.dumps(validate_report(report, int(args.sample_rate)), ensure_ascii=False, indent=2))
     return 0
