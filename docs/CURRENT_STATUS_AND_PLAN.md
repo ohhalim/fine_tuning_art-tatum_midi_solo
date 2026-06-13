@@ -22,9 +22,9 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1430, Stage B MIDI-to-solo bebop language targeted offbeat pool expansion
+- current issue: Issue #1432, Stage B MIDI-to-solo bebop language targeted low-offbeat case balance repair
 - open issue queue after residual-aware listening input guard merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo targeted-low-offbeat listening review or case-balance repair`
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted-low-offbeat listening review input or motion-balance guard tightening`
 
 현재 범위가 아닌 것:
 
@@ -265,6 +265,37 @@
 - all-selected note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_targeted_low_offbeat_dedup_all_selected_note_review/bebop_language_note_review.md`
 - package report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_targeted_low_offbeat_dedup_probe/bebop_language_best_of_package.md`
 - review handoff path: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_targeted_low_offbeat_review_handoff/bebop_language_review_handoff.md`
+- review ready: `true`
+- next boundary: `listening_review_input_or_motion_balance_guard_tightening`
+- representative replacement: `false`
+- quality claim: `false`
+- model direct claim: `false`
+
+2026-06-13 targeted low-offbeat case-balanced package 기준:
+
+- package: `manual_2026_06_13_bebop_language_best_of_top8_targeted_low_offbeat_case_balanced_probe`
+- baseline package: `manual_2026_06_13_bebop_language_best_of_top8_targeted_low_offbeat_dedup_probe`
+- source pool unchanged: `true`
+- best-of candidate pool / selected: `1999 / 8`
+- max-per-case: `2`
+- selected case counts before: dominant_cycle `3`, rhythm_turnaround `3`, major_ii_v_turnaround `1`, minor_backdoor `1`
+- selected case counts after: dominant_cycle `2`, major_ii_v_turnaround `2`, minor_backdoor `2`, rhythm_turnaround `2`
+- final strict offbeat cap: `0.390625`
+- final strict bar pitch-class similarity cap: `0.6750`
+- strong-beat chord-tone: `1.0000`
+- offbeat non-chord / resolution / unresolved: `0.3711 / 1.0000 / 0.0000`
+- max gate penalty / adjacent repeat: `0.0000 / 0.0000`
+- step motion / chromatic step / large leap: `0.4325 / 0.2321 / 0.0456`
+- enclosure proxy / bar pitch-class similarity: `0.3164 / 0.6429`
+- altered offbeat / interval trigram repeat: `0.1719 / 0.0082`
+- motion balance pitch repair steps: `29`
+- compared against targeted-low-offbeat: case counts `3/3/1/1 -> 2/2/2/2`, offbeat `0.3711 -> 0.3711`, bar pitch-class similarity `0.6429 -> 0.6429`
+- recorded tradeoff against targeted-low-offbeat: step motion `0.4345 -> 0.4325`, chromatic step `0.2401 -> 0.2321`, large leap `0.0437 -> 0.0456`, enclosure `0.3242 -> 0.3164`
+- preserved metrics against targeted-low-offbeat: max gate penalty `0.0000`, adjacent repeat `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`
+- MIDI / solo WAV / context WAV: `8 / 8 / 8`
+- all-selected note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_targeted_low_offbeat_case_balanced_all_selected_note_review/bebop_language_note_review.md`
+- package report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_targeted_low_offbeat_case_balanced_probe/bebop_language_best_of_package.md`
+- review handoff path: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_targeted_low_offbeat_case_balanced_review_handoff/bebop_language_review_handoff.md`
 - review ready: `true`
 - next boundary: `listening_review_input_or_motion_balance_guard_tightening`
 - representative replacement: `false`
