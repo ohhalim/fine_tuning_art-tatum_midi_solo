@@ -439,8 +439,8 @@ def build_bar_line(
 
     repaired: list[int] = []
     for index, pitch in enumerate(line):
+        active_chord = chord if index < 7 else next_chord
         if repaired:
-            active_chord = chord if index < 7 else next_chord
             pitch = avoid_large_leap(int(pitch), repaired[-1], active_chord)
             if int(pitch) == repaired[-1]:
                 direction_hint = direction if direction != 0 else 1
@@ -455,7 +455,54 @@ def build_bar_line(
                         rng,
                         non_chord_probability=max(0.20, non_chord_probability - 0.08),
                     )
+        if len(repaired) >= 3:
+            would_repeat_two_note_cycle = (
+                repaired[-3] == repaired[-1]
+                and repaired[-2] == int(pitch)
+                and repaired[-3] != repaired[-2]
+            )
+            if would_repeat_two_note_cycle:
+                direction_hint = direction if direction != 0 else 1
+                if index % 2 == 0:
+                    pitch = nearest_chord_tone(active_chord, int(pitch) + direction_hint * 3, avoid=repaired[-1])
+                    if int(pitch) == repaired[-2]:
+                        pitch = nearest_chord_tone(active_chord, int(pitch) + direction_hint * 4, avoid=repaired[-1])
+                else:
+                    target = line[index + 1] if index + 1 < len(line) else next_target
+                    pitch = offbeat_note(
+                        active_chord,
+                        int(target),
+                        repaired[-1],
+                        rng,
+                        non_chord_probability=max(0.20, non_chord_probability - 0.06),
+                    )
+                    if int(pitch) == repaired[-2]:
+                        pitch = nearest_scale_tone(
+                            active_chord,
+                            int(pitch) + direction_hint * 2,
+                            avoid_chord=True,
+                        )
         repaired.append(max(LOW_PITCH, min(HIGH_PITCH, int(pitch))))
+    if len(repaired) == 8 and repaired[:4] == repaired[4:]:
+        repaired[5] = offbeat_note(
+            chord,
+            repaired[6],
+            repaired[4],
+            rng,
+            non_chord_probability=max(0.20, non_chord_probability - 0.06),
+        )
+        if repaired[5] == repaired[1]:
+            repaired[5] = nearest_scale_tone(chord, repaired[5] + direction * 2, avoid_chord=True)
+        repaired[7] = offbeat_note(
+            next_chord,
+            next_target,
+            repaired[6],
+            rng,
+            next_chord=next_chord,
+            non_chord_probability=max(0.20, non_chord_probability - 0.06),
+        )
+        if repaired[7] == repaired[3]:
+            repaired[7] = nearest_scale_tone(next_chord, repaired[7] - direction * 2, avoid_chord=True)
     return repaired
 
 
@@ -569,6 +616,40 @@ def chromatic_step_ratio(pitches: list[int]) -> float:
     return sum(1 for interval in intervals if interval == 1) / max(1, len(intervals))
 
 
+def two_note_cycle_ratio(pitches: list[int]) -> float:
+    if len(pitches) < 4:
+        return 0.0
+    cycle_count = 0
+    window_count = 0
+    for index in range(len(pitches) - 3):
+        left_a, left_b, right_a, right_b = pitches[index : index + 4]
+        window_count += 1
+        if left_a == right_a and left_b == right_b and left_a != left_b:
+            cycle_count += 1
+    return cycle_count / max(1, window_count)
+
+
+def bar_unique_pitch_counts(pitches: list[int], *, slots_per_bar: int = 8) -> list[int]:
+    return [
+        len(set(pitches[index : index + slots_per_bar]))
+        for index in range(0, len(pitches), slots_per_bar)
+        if pitches[index : index + slots_per_bar]
+    ]
+
+
+def bar_half_repeat_ratio(pitches: list[int], *, slots_per_bar: int = 8) -> float:
+    bars = [
+        pitches[index : index + slots_per_bar]
+        for index in range(0, len(pitches), slots_per_bar)
+        if len(pitches[index : index + slots_per_bar]) == slots_per_bar
+    ]
+    if not bars:
+        return 0.0
+    half = slots_per_bar // 2
+    repeat_count = sum(1 for bar in bars if bar[:half] == bar[half:])
+    return repeat_count / len(bars)
+
+
 def solo_notes(pm: pretty_midi.PrettyMIDI) -> list[pretty_midi.Note]:
     notes: list[pretty_midi.Note] = []
     for instrument in pm.instruments:
@@ -606,6 +687,7 @@ def objective_metrics(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: in
     pitches = [int(note.pitch) for note in notes]
     durations = [max(0.0, float(note.end) - float(note.start)) for note in notes]
     gaps = [max(0.0, float(notes[index].start) - float(notes[index - 1].start)) for index in range(1, len(notes))]
+    bar_uniques = bar_unique_pitch_counts(pitches)
 
     for note_index, note in enumerate(notes):
         chord = chord_for_time(chords, float(note.start), bars=bars, bpm=bpm)
@@ -677,6 +759,10 @@ def objective_metrics(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: in
         "direction_change_ratio": direction_change_ratio(pitches),
         "adjacent_repeat_ratio": adjacent_repeat_ratio(pitches),
         "chromatic_step_ratio": chromatic_step_ratio(pitches),
+        "two_note_cycle_ratio": two_note_cycle_ratio(pitches),
+        "bar_half_repeat_ratio": bar_half_repeat_ratio(pitches),
+        "min_bar_unique_pitch_count": min(bar_uniques or [0]),
+        "avg_bar_unique_pitch_count": mean(bar_uniques) if bar_uniques else 0.0,
         "chord_tone_ratio": chord_tone_count / max(1, len(notes)),
         "tension_ratio": 1.0 - (chord_tone_count / max(1, len(notes))),
         "strong_beat_chord_tone_ratio": strong_chord_count / max(1, strong_total),
@@ -710,6 +796,9 @@ def candidate_score(
     chromatic = float(metrics.get("chromatic_step_ratio") or 0.0)
     enclosure = float(metrics.get("enclosure_proxy_ratio") or 0.0)
     dominant_altered = float(metrics.get("dominant_altered_offbeat_ratio") or 0.0)
+    cycle = float(metrics.get("two_note_cycle_ratio") or 0.0)
+    half_repeat = float(metrics.get("bar_half_repeat_ratio") or 0.0)
+    min_bar_unique = int(metrics.get("min_bar_unique_pitch_count") or 0)
     max_interval = int(metrics.get("max_abs_interval") or 0)
     unique_pc = int(metrics.get("unique_pitch_class_count") or 0)
     max_gap = float(metrics.get("max_gap_seconds") or 0.0)
@@ -725,6 +814,9 @@ def candidate_score(
         + max(0.0, 0.18 - chromatic) * 0.9
         + max(0.0, 0.04 - enclosure) * 0.6
         + max(0.0, 0.05 - dominant_altered) * 0.4
+        + cycle * 1.5
+        + half_repeat * 1.2
+        + max(0, 4 - min_bar_unique) * 0.3
         + max(0, max_interval - 12) * 0.1
         + max(0, 7 - unique_pc) * 0.2
         + max(0.0, max_gap - 0.4) * 0.8
@@ -1004,6 +1096,20 @@ def build_package(
         )
         if rendered
         else 0.0,
+        "avg_two_note_cycle_ratio": mean(
+            [float(item["objective_metrics"]["two_note_cycle_ratio"]) for item in rendered]
+        )
+        if rendered
+        else 0.0,
+        "avg_bar_half_repeat_ratio": mean(
+            [float(item["objective_metrics"]["bar_half_repeat_ratio"]) for item in rendered]
+        )
+        if rendered
+        else 0.0,
+        "min_bar_unique_pitch_count_min": min(
+            (int(item["objective_metrics"]["min_bar_unique_pitch_count"]) for item in rendered),
+            default=0,
+        ),
         "all_final_landings_chord_tone": all(
             bool(item["objective_metrics"]["final_landing_is_chord_tone"]) for item in rendered
         ),
@@ -1093,6 +1199,9 @@ def validate_report(report: dict[str, Any], expected_sample_rate: int) -> dict[s
         "avg_chromatic_step_ratio": float(aggregate["avg_chromatic_step_ratio"]),
         "avg_enclosure_proxy_ratio": float(aggregate["avg_enclosure_proxy_ratio"]),
         "avg_dominant_altered_offbeat_ratio": float(aggregate["avg_dominant_altered_offbeat_ratio"]),
+        "avg_two_note_cycle_ratio": float(aggregate["avg_two_note_cycle_ratio"]),
+        "avg_bar_half_repeat_ratio": float(aggregate["avg_bar_half_repeat_ratio"]),
+        "min_bar_unique_pitch_count_min": int(aggregate["min_bar_unique_pitch_count_min"]),
         "all_final_landings_chord_tone": bool(aggregate["all_final_landings_chord_tone"]),
         "solo_wav_count": len([item for item in selected if Path(item["solo_audio"]["wav_file"]["path"]).exists()]),
         "context_wav_count": len([item for item in selected if Path(item["context_audio"]["wav_file"]["path"]).exists()]),
@@ -1122,14 +1231,17 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- avg chromatic step ratio: `{float(aggregate['avg_chromatic_step_ratio']):.4f}`",
         f"- avg enclosure proxy ratio: `{float(aggregate['avg_enclosure_proxy_ratio']):.4f}`",
         f"- avg dominant altered offbeat ratio: `{float(aggregate['avg_dominant_altered_offbeat_ratio']):.4f}`",
+        f"- avg two-note cycle ratio: `{float(aggregate['avg_two_note_cycle_ratio']):.4f}`",
+        f"- avg bar half-repeat ratio: `{float(aggregate['avg_bar_half_repeat_ratio']):.4f}`",
+        f"- min bar unique pitch count: `{int(aggregate['min_bar_unique_pitch_count_min'])}`",
         f"- all final landings chord tone: `{str(bool(aggregate['all_final_landings_chord_tone'])).lower()}`",
         f"- quality claimed: `{str(bool(report['quality_claimed'])).lower()}`",
         f"- model direct claimed: `{str(bool(report['model_direct_claimed'])).lower()}`",
         "",
         "## Selected Files",
         "",
-        "| rank | case | chords | score | chord-tone | strong beat | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | solo WAV | context WAV |",
-        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
+        "| rank | case | chords | score | chord-tone | strong beat | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | half repeat | min bar unique | solo WAV | context WAV |",
+        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
     ]
     for item in report["selected_candidates"]:
         metrics = item["objective_metrics"]
@@ -1149,6 +1261,9 @@ def markdown_report(report: dict[str, Any]) -> str:
                     f"{float(metrics['chromatic_step_ratio']):.4f}",
                     f"{float(metrics['enclosure_proxy_ratio']):.4f}",
                     f"{float(metrics['dominant_altered_offbeat_ratio']):.4f}",
+                    f"{float(metrics['two_note_cycle_ratio']):.4f}",
+                    f"{float(metrics['bar_half_repeat_ratio']):.4f}",
+                    str(int(metrics["min_bar_unique_pitch_count"])),
                     str(item["solo_audio"]["wav_file"]["path"]),
                     str(item["context_audio"]["wav_file"]["path"]),
                 ]

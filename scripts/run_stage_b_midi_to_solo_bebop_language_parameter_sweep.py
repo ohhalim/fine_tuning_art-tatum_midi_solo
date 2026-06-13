@@ -49,6 +49,9 @@ def sweep_score(summary: dict[str, Any]) -> float:
     chromatic = float(summary.get("avg_chromatic_step_ratio") or 0.0)
     enclosure = float(summary.get("avg_enclosure_proxy_ratio") or 0.0)
     altered = float(summary.get("avg_dominant_altered_offbeat_ratio") or 0.0)
+    cycle = float(summary.get("avg_two_note_cycle_ratio") or 0.0)
+    half_repeat = float(summary.get("avg_bar_half_repeat_ratio") or 0.0)
+    min_bar_unique = int(summary.get("min_bar_unique_pitch_count_min") or 0)
     final_ok = bool(summary.get("all_final_landings_chord_tone", False))
     return (
         abs(chord_tone - 0.78) * 2.0
@@ -59,6 +62,9 @@ def sweep_score(summary: dict[str, Any]) -> float:
         + max(0.0, 0.18 - chromatic) * 1.0
         + max(0.0, 0.04 - enclosure) * 0.8
         + max(0.0, 0.05 - altered) * 0.5
+        + cycle * 1.5
+        + half_repeat * 1.2
+        + max(0, 4 - min_bar_unique) * 0.3
         + (0.0 if final_ok else 3.0)
     )
 
@@ -105,12 +111,15 @@ def build_markdown(report: dict[str, Any]) -> str:
         f"- best chromatic step: `{float(report['best_config']['summary']['avg_chromatic_step_ratio']):.4f}`",
         f"- best enclosure proxy: `{float(report['best_config']['summary']['avg_enclosure_proxy_ratio']):.4f}`",
         f"- best dominant altered offbeat: `{float(report['best_config']['summary']['avg_dominant_altered_offbeat_ratio']):.4f}`",
+        f"- best two-note cycle: `{float(report['best_config']['summary']['avg_two_note_cycle_ratio']):.4f}`",
+        f"- best bar half-repeat: `{float(report['best_config']['summary']['avg_bar_half_repeat_ratio']):.4f}`",
+        f"- best min bar unique pitch: `{int(report['best_config']['summary']['min_bar_unique_pitch_count_min'])}`",
         f"- best listen-first dir: `{report['best_listen_first']['target_dir']}`",
         "",
         "## Configs",
         "",
-        "| rank | config | score | chord-tone | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | package |",
-        "|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        "| rank | config | score | chord-tone | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | half repeat | min bar unique | package |",
+        "|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for rank, row in enumerate(report["ranked_configs"], start=1):
         summary = row["summary"]
@@ -128,6 +137,9 @@ def build_markdown(report: dict[str, Any]) -> str:
                     f"{float(summary['avg_chromatic_step_ratio']):.4f}",
                     f"{float(summary['avg_enclosure_proxy_ratio']):.4f}",
                     f"{float(summary['avg_dominant_altered_offbeat_ratio']):.4f}",
+                    f"{float(summary['avg_two_note_cycle_ratio']):.4f}",
+                    f"{float(summary['avg_bar_half_repeat_ratio']):.4f}",
+                    str(int(summary["min_bar_unique_pitch_count_min"])),
                     str(row["package_dir"]),
                 ]
             )
