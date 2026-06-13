@@ -729,8 +729,8 @@ def adjacent_repeat_replacement_pitches(
     reference = int(next_note.pitch) if next_note is not None else int(previous.pitch) + 3
     candidates = pitches_for_pcs(
         allowed_pcs,
-        low=max(56, int(previous.pitch) - 5),
-        high=min(86, int(previous.pitch) + 5),
+        low=max(56, int(previous.pitch) - 8),
+        high=min(86, int(previous.pitch) + 8),
     )
     return sorted(
         [
@@ -738,7 +738,7 @@ def adjacent_repeat_replacement_pitches(
             for pitch in candidates
             if int(pitch) != int(note.pitch)
             and (next_note is None or int(pitch) != int(next_note.pitch))
-            and abs(int(pitch) - int(previous.pitch)) <= 5
+            and abs(int(pitch) - int(previous.pitch)) <= 8
             and (next_note is None or abs(int(next_note.pitch) - int(pitch)) <= 7)
         ],
         key=lambda pitch: (abs(int(pitch) - reference), abs(int(pitch) - int(note.pitch)), int(pitch)),
@@ -802,7 +802,7 @@ def repair_adjacent_repeats(
                     float(current_metrics["max_bar_pitch_class_jaccard"]) + 0.05,
                 ):
                     continue
-                if float(metrics["large_leap_ratio"]) > max(0.0625, float(current_metrics["large_leap_ratio"])):
+                if float(metrics["large_leap_ratio"]) > max(0.065, float(current_metrics["large_leap_ratio"])):
                     continue
                 score = candidate_score(
                     metrics,
