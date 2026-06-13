@@ -22,7 +22,7 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1426, Stage B MIDI-to-solo bebop language motion balance review handoff
+- current issue: Issue #1428, Stage B MIDI-to-solo bebop language motion-balance guard feasibility sweep
 - open issue queue after residual-aware listening input guard merge: `0`
 - 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware user listening review fill`
 
@@ -210,6 +210,28 @@
 - unchanged guard metrics: `max_gate_penalty`, `avg_adjacent_repeat_ratio`, `avg_offbeat_non_chord_resolution_ratio`, `avg_offbeat_unresolved_non_chord_ratio`
 - handoff path: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_motion_balance_review_handoff/bebop_language_review_handoff.md`
 - next boundary: `listening_review_input_or_motion_balance_guard_tightening`
+- quality claim: `false`
+- model direct claim: `false`
+
+2026-06-13 motion balance guard feasibility sweep 기준:
+
+- latest guard feasibility sweep: `manual_2026_06_13_bebop_language_motion_balance_guard_feasibility_sweep`
+- motion balance repair included: `true`
+- repaired pool count: `21`
+- safety baseline candidate count: `19`
+- safety baseline case counts: dominant_cycle `4`, major_ii_v_turnaround `4`, minor_backdoor `2`, rhythm_turnaround `9`
+- safety baseline selectable max-per-case `2 / 3`: `8 / 11`
+- selected count target: `8`
+- feasible guard/motion config count: `20`
+- feasible by max-per-case `2 / 3`: `8 / 20`
+- min feasible max offbeat non-chord: `0.40625`
+- min feasible max bar pitch-class similarity: `0.675`
+- stricter offbeat feasible: `false`
+- stricter bar similarity feasible: `true`
+- report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of_feasibility/manual_2026_06_13_bebop_language_motion_balance_guard_feasibility_sweep/bebop_language_safety_gate_feasibility_sweep.md`
+- judgment: 현 repaired pool 기준 offbeat cap 하향은 top8 유지 불가, bar similarity cap `0.675` 하향은 top8 유지 가능
+- next boundary: `motion_balance_guard_tightening_candidate_package`
+- representative replacement: `false`
 - quality claim: `false`
 - model direct claim: `false`
 
