@@ -46,12 +46,16 @@
 - residual-aware completion audit: technical MVP complete `true`, local review ready `true`
 - residual-aware final status sync: synced `true`, next `listening_review_input_wait`
 - residual-aware listening review input wait: quality claim blocked `true`
+- bebop language best-of balanced package: source package `33`, pool `335`, selected `16`, score `0.2728`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4414`, offbeat resolution `0.8983`, unresolved offbeat non-chord `0.0449`, altered offbeat `0.1602`, two-note cycle `0.0092`, max-per-case `4`
 - bebop language altered-color balanced package: generated `4000`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4512`, offbeat resolution `0.8914`, unresolved offbeat non-chord `0.0488`, unique pitch avg `14.8125`, 3rd/4th motion `0.4831`, large leap `0.0863`, altered offbeat `0.1445`, bar pitch-class similarity `0.7027`, half-repeat `0.0000`
 - bebop language bar-similarity package: generated `1440`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4746`, offbeat resolution `0.8891`, unresolved offbeat non-chord `0.0527`, bar pitch-class similarity `0.7280`, half-repeat `0.0000`
 - bebop language data-contour sweep: config `18`, best `config_01`, strong-beat chord-tone `1.0000`, offbeat resolution `0.8598`, unresolved offbeat non-chord `0.0625`, unique pitch avg `13.9375`, 3rd/4th motion `0.4931`, bar pitch-class similarity `0.7449`, half-repeat `0.0000`
 
 ## 최신 산출물
 
+- best-of balanced 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v1_balanced/listen_first_by_progression/`
+- best-of balanced 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v1_balanced/audio_with_context/`
+- best-of balanced package report: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v1_balanced/bebop_language_best_of_package.md`
 - altered-color balanced 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/listen_first_by_progression/`
 - altered-color balanced 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/audio_with_context/`
 - altered-color balanced package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/bebop_language_package.md`
@@ -71,6 +75,17 @@
 - listening review input wait doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_REVIEW_INPUT_WAIT_2026-06-11.md`
 
 ## 재현 명령
+
+```bash
+.venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_best_of_package.py \
+  --run_id manual_2026_06_13_bebop_language_best_of_v1_balanced \
+  --selected_count 16 \
+  --max_per_case 4 \
+  --bars 8 \
+  --bpm 124 \
+  --target_chord_tone_ratio 0.78 \
+  --target_offbeat_non_chord_ratio 0.38
+```
 
 ```bash
 .venv/bin/python scripts/run_stage_b_midi_to_solo_bebop_language_parameter_sweep.py \
@@ -180,9 +195,11 @@
 - chromatic/enclosure/altered 지표는 비밥 장치 proxy이며 human listening preference 대체 아님
 - half-repeat 지표는 단순 패턴 반복 proxy이며 실제 청감 반복감 판정 아님
 - bar pitch-class similarity 지표는 마디 간 pitch-class 중복 proxy이며 실제 motif 반복감 판정 아님
+- best-of package는 기존 후보 재랭킹/재렌더 산출물이며 새 모델 학습 결과 claim 아님
 
 ## 주요 파일
 
+- `scripts/build_stage_b_midi_to_solo_bebop_language_best_of_package.py`
 - `scripts/run_stage_b_midi_to_solo_bebop_language_parameter_sweep.py`
 - `scripts/build_stage_b_midi_to_solo_bebop_language_package.py`
 - `scripts/build_music_transformer_solo_yield_rhythm_syncopation_balance_repair_package.py`
