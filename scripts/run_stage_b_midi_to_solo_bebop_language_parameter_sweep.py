@@ -68,7 +68,7 @@ def sweep_score(summary: dict[str, Any]) -> float:
         + max(0.0, 1.0 - strong) * 4.0
         + max(0.0, 0.18 - chromatic) * 1.0
         + max(0.0, 0.04 - enclosure) * 0.8
-        + max(0.0, 0.05 - altered) * 0.5
+        + max(0.0, 0.14 - altered) * 0.7
         + cycle * 1.5
         + half_repeat * 1.2
         + max(0.0, bar_similarity - 0.72) * 1.4

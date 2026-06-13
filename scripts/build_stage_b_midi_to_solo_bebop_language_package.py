@@ -233,6 +233,18 @@ def enclosure_note(target: int, previous: int, chord: str, rng: random.Random) -
     return int(pool[rng.randrange(len(pool))])
 
 
+def altered_approach_note(target: int, previous: int, chord: str, rng: random.Random) -> int:
+    root, _ = parse_chord(chord)
+    altered_pcs = {(root + interval) % 12 for interval in (1, 3, 6, 8)}
+    choices = pitches_for_pcs(altered_pcs)
+    valid = [pitch for pitch in choices if LOW_PITCH <= pitch <= HIGH_PITCH and pitch != previous]
+    close = [pitch for pitch in valid if abs(pitch - target) <= 4]
+    pool = close or valid
+    if not pool:
+        return chromatic_approach(target, previous, chord, rng)
+    return int(min(pool, key=lambda pitch: (abs(pitch - target), abs(pitch - previous), rng.random())))
+
+
 def offbeat_note(
     chord: str,
     target: int,
@@ -252,6 +264,8 @@ def offbeat_note(
     active_chord = next_chord or chord
     roll = rng.random()
     if roll < non_chord_probability:
+        if chord_kind(active_chord) == "7" and rng.random() < 0.42:
+            return altered_approach_note(target, previous, active_chord, rng)
         return chromatic_approach(target, previous, active_chord, rng)
     if roll < non_chord_probability + 0.30:
         return nearest_chord_tone(chord, previous + (1 if target >= previous else -1) * rng.choice([2, 3, 4]))
@@ -924,7 +938,7 @@ def candidate_score(
         + unresolved * 4.5
         + max(0.0, 0.18 - chromatic) * 0.9
         + max(0.0, 0.04 - enclosure) * 0.6
-        + max(0.0, 0.05 - dominant_altered) * 0.4
+        + max(0.0, 0.14 - dominant_altered) * 0.7
         + cycle * 1.5
         + half_repeat * 1.2
         + max(0.0, max_bar_similarity - 0.72) * 1.4
