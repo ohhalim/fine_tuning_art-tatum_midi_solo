@@ -90,6 +90,13 @@
 - strict-listen top4 post-repair-select average bar pitch-class similarity: `0.6429`
 - strict-listen top4 post-repair-select representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_post_repair_select_probe/listen_first_by_progression/`
 - strict-listen top4 post-repair-select note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_post_repair_select_note_review/bebop_language_note_review.md`
+- strict-listen top4 unresolved-repair package: `manual_2026_06_13_bebop_language_best_of_top4_unresolved_repair_probe`
+- strict-listen top4 unresolved-repair candidate count: `4`
+- strict-listen top4 unresolved-repair offbeat / resolution / unresolved: `0.3750 / 1.0000 / 0.0000`
+- strict-listen top4 unresolved-repair enclosure / altered / interval repeat: `0.3281 / 0.1563 / 0.0082`
+- strict-listen top4 unresolved-repair max gate penalty: `0.0000`
+- strict-listen top4 unresolved-repair representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_unresolved_repair_probe/listen_first_by_progression/`
+- strict-listen top4 unresolved-repair note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_unresolved_repair_note_review/bebop_language_note_review.md`
 - quality claim: `false`
 - model direct claim: `false`
 - rejected follow-up package: `manual_2026_06_13_bebop_language_best_of_v9_with_v10_interval_sweep`
