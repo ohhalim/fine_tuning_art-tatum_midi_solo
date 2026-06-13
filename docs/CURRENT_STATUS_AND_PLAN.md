@@ -42,19 +42,22 @@
 
 2026-06-13 best-of strict consonance 기준:
 
-- latest local package: `manual_2026_06_13_bebop_language_best_of_top4_bebop_selection_profile_probe`
+- latest local package: `manual_2026_06_13_bebop_language_best_of_top4_adjacent_repeat_final_repair_probe`
 - source package count: `125`
 - candidate pool / selection pool / selected: `1807 / 18 / 4`
 - selection profile: `bebop_language`
 - strong-beat chord-tone: `1.0000`
 - offbeat non-chord / resolution / unresolved: `0.3906 / 1.0000 / 0.0000`
-- large leap / enclosure proxy / bar pitch-class similarity: `0.0476 / 0.3516 / 0.5774`
+- large leap / adjacent repeat / enclosure proxy / bar pitch-class similarity: `0.0476 / 0.0040 / 0.3438 / 0.5774`
 - altered offbeat / two-note cycle / interval trigram repeat: `0.1250 / 0.0000 / 0.0123`
 - max gate penalty: `0.0000`
-- representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_bebop_selection_profile_probe/listen_first_by_progression/`
-- note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_bebop_selection_profile_note_review/bebop_language_note_review.md`
+- representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_adjacent_repeat_final_repair_probe/listen_first_by_progression/`
+- note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_adjacent_repeat_final_repair_note_review/bebop_language_note_review.md`
 - quality claim: `false`
 - model direct claim: `false`
+- previous top4 selection-profile package: `manual_2026_06_13_bebop_language_best_of_top4_bebop_selection_profile_probe`
+- adjacent-repeat final repair delta: `0.0119 -> 0.0040`
+- preserved metrics after adjacent-repeat repair: gate `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`, large leap `0.0476`, bar pitch-class similarity `0.5774`
 
 2026-06-13 previous best-of strict consonance 기준:
 
