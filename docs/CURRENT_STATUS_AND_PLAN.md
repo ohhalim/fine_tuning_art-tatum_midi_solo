@@ -22,7 +22,7 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1422, Stage B MIDI-to-solo bebop language safety motion pool expansion package
+- current issue: Issue #1424, Stage B MIDI-to-solo bebop language motion balance repair package
 - open issue queue after residual-aware listening input guard merge: `0`
 - 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware user listening review fill`
 
@@ -165,6 +165,31 @@
 - preserved metrics against top8 safety gate: gate `0.0000`, adjacent repeat `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`
 - representative replacement: `false`
 - next boundary: `selection_score_reweight_with_expanded_pool_or_targeted_generation`
+- quality claim: `false`
+- model direct claim: `false`
+
+2026-06-13 motion balance repair package 기준:
+
+- latest motion balance package: `manual_2026_06_13_bebop_language_best_of_top8_motion_balance_probe`
+- source pool / selection pool / selected: `1871 / 19 / 8`
+- max-per-case: `3`
+- repair motion balance iterations: `12`
+- target min step / chromatic / max large leap: `0.4000 / 0.2200 / 0.0550`
+- changed candidates / total: `7 / 8`
+- pitch repair steps: `26`
+- strong-beat chord-tone: `1.0000`
+- offbeat non-chord / resolution / unresolved: `0.4063 / 1.0000 / 0.0000`
+- large leap / adjacent repeat / enclosure proxy / bar pitch-class similarity: `0.0437 / 0.0000 / 0.3125 / 0.6339`
+- step motion / chromatic step / third-fourth motion: `0.4226 / 0.2440 / 0.5337`
+- altered offbeat / two-note cycle / interval trigram repeat: `0.1250 / 0.0000 / 0.0082`
+- MIDI / solo WAV / context WAV: `8 / 8 / 8`
+- all-selected note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_motion_balance_all_selected_note_review/bebop_language_note_review.md`
+- package report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_motion_balance_probe/bebop_language_best_of_package.md`
+- recorded improvement against safety pool expansion: step motion `0.3770 -> 0.4226`, chromatic step `0.2004 -> 0.2440`, large leap `0.0516 -> 0.0437`, enclosure proxy `0.3086 -> 0.3125`
+- recorded tradeoff against safety pool expansion: offbeat non-chord `0.3828 -> 0.4063`, bar pitch-class similarity `0.6256 -> 0.6339`
+- preserved metrics against safety pool expansion: gate `0.0000`, adjacent repeat `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`
+- representative replacement: `false`
+- next boundary: `listening_review_or_motion_balance_guard_tightening`
 - quality claim: `false`
 - model direct claim: `false`
 
