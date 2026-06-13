@@ -22,7 +22,7 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1424, Stage B MIDI-to-solo bebop language motion balance repair package
+- current issue: Issue #1426, Stage B MIDI-to-solo bebop language motion balance review handoff
 - open issue queue after residual-aware listening input guard merge: `0`
 - 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware user listening review fill`
 
@@ -190,6 +190,26 @@
 - preserved metrics against safety pool expansion: gate `0.0000`, adjacent repeat `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`
 - representative replacement: `false`
 - next boundary: `listening_review_or_motion_balance_guard_tightening`
+- quality claim: `false`
+- model direct claim: `false`
+
+2026-06-13 motion balance review handoff 기준:
+
+- latest review handoff: `manual_2026_06_13_bebop_language_motion_balance_review_handoff`
+- source package: `manual_2026_06_13_bebop_language_best_of_top8_motion_balance_probe`
+- baseline package: `manual_2026_06_13_bebop_language_best_of_top8_safety_pool_expansion_probe`
+- selected candidates: `8`
+- solo WAV / context WAV: `8 / 8`
+- listen-first audio pairs: `4`
+- note review validated: `true`
+- review ready: `true`
+- motion balance changed candidates / pitch repair steps: `7 / 26`
+- rhythm articulation accepted candidates: `8`
+- baseline improved metrics: `avg_step_motion_ratio`, `avg_chromatic_step_ratio`, `avg_large_leap_ratio`, `avg_enclosure_proxy_ratio`
+- baseline tradeoff watch metrics: `avg_offbeat_non_chord_ratio`, `avg_max_bar_pitch_class_jaccard`
+- unchanged guard metrics: `max_gate_penalty`, `avg_adjacent_repeat_ratio`, `avg_offbeat_non_chord_resolution_ratio`, `avg_offbeat_unresolved_non_chord_ratio`
+- handoff path: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_motion_balance_review_handoff/bebop_language_review_handoff.md`
+- next boundary: `listening_review_input_or_motion_balance_guard_tightening`
 - quality claim: `false`
 - model direct claim: `false`
 
