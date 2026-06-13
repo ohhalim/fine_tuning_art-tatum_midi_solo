@@ -22,9 +22,9 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1436, Stage B MIDI-to-solo bebop language interval repeat guard audit
+- current issue: Issue #1438, Stage B MIDI-to-solo bebop language interval repeat source expansion
 - open issue queue after residual-aware listening input guard merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo interval-repeat source expansion or listening review input`
+- 다음 권장 이슈: `Stage B MIDI-to-solo interval-repeat retargeting decision or listening review input`
 
 현재 범위가 아닌 것:
 
@@ -360,6 +360,27 @@
 - review handoff path: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_case_balanced_motion_interval_guard_review_handoff/bebop_language_review_handoff.md`
 - review ready: `true`
 - next boundary: `interval_repeat_source_expansion_or_listening_review_input`
+- representative replacement: `false`
+- quality claim: `false`
+- model direct claim: `false`
+
+2026-06-13 interval-repeat source expansion 기준:
+
+- source package: `manual_2026_06_13_bebop_language_v25_interval_repeat_source_expansion`
+- source generated / selected: `4800 / 128`
+- source generation: variants-per-progression `1200`, seed-base `7200000`, non-chord probability `0.2200`
+- source aggregate gate max / avg: `2.0000 / 0.2155`
+- source aggregate interval trigram repeat avg: `0.0310`
+- source strict interval `<=0.0125` rows: `21`
+- source strict interval `<=0.0125` + gate `0` rows: `4`
+- source strict interval `<=0.0125` + offbeat `<=0.390625` rows: `2`
+- source strict interval `<=0.0125` + resolution `1.0000` + unresolved `<=0.1000` rows: `0`
+- source strict interval case counts: minor_backdoor `11`, dominant_cycle `4`, rhythm_turnaround `3`, major_ii_v_turnaround `3`
+- strict interval best-of attempt max-per-case `2`: selected count shortage
+- strict interval best-of attempt max-per-case `3`: selected count shortage
+- judgment: v25 source expansion은 strict interval 후보를 생성했으나 offbeat/resolution guard 동시 만족 후보 부족
+- accepted frontier unchanged: `manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_interval_guard_feasible_probe`
+- next boundary: `interval_repeat_retargeting_decision_or_listening_review_input`
 - representative replacement: `false`
 - quality claim: `false`
 - model direct claim: `false`

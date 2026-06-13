@@ -78,6 +78,7 @@
 - bebop language targeted-low-offbeat case-balanced package: candidate pool `1999`, selected `8`, max-per-case `2`, selected case counts `3/3/1/1 -> 2/2/2/2`, offbeat non-chord `0.3711 -> 0.3711`, offbeat resolution `1.0000`, unresolved `0.0000`, max gate penalty `0.0000`, adjacent repeat `0.0000`, step motion `0.4345 -> 0.4325`, chromatic step `0.2401 -> 0.2321`, large leap `0.0437 -> 0.0456`, enclosure proxy `0.3242 -> 0.3164`, bar pitch-class similarity `0.6429 -> 0.6429`, quality claim `false`
 - bebop language case-balanced motion-tight package: candidate pool `1999`, selected `8`, selected case counts `2/2/2/2`, offbeat non-chord `0.3711 -> 0.3672`, offbeat resolution `1.0000`, unresolved `0.0000`, max gate penalty `0.0000`, adjacent repeat `0.0000`, step motion `0.4325 -> 0.4583`, chromatic step `0.2321 -> 0.2599`, large leap `0.0456 -> 0.0337`, enclosure proxy `0.3164 -> 0.3242`, bar pitch-class similarity `0.6429 -> 0.6345`, dominant altered offbeat `0.1719 -> 0.0703`, motion-balance pitch repair steps `60`, quality claim `false`
 - bebop language interval-repeat guard audit: strict cap `0.0125` failed with selected count shortage under max-per-case `2`, feasible cap `0.0164`, selected `8`, selected case counts `2/2/2/2`, interval trigram repeat avg `0.0123`, max selected interval trigram repeat `0.0164`, gate/resolution/unresolved/motion metrics preserved, quality claim `false`
+- bebop language interval-repeat source expansion: source generated/selected `4800 / 128`, strict interval `<=0.0125` rows `21`, strict interval + offbeat `<=0.390625` rows `2`, strict interval + resolution `1.0000` + unresolved `<=0.1000` rows `0`, strict interval best-of selected `8` failed under max-per-case `2` and `3`, accepted frontier unchanged
 - bebop language best-of with-sweeps package: source package `91`, pool `1263`, selected `16`, score `0.2143`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4277`, offbeat resolution `0.9177`, unresolved offbeat non-chord `0.0352`, altered offbeat `0.1836`, two-note cycle `0.0082`, max gate penalty `0.0639`
 - bebop language best-of balanced package: source package `33`, pool `335`, selected `16`, score `0.2728`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4414`, offbeat resolution `0.8983`, unresolved offbeat non-chord `0.0449`, altered offbeat `0.1602`, two-note cycle `0.0092`, max-per-case `4`
 - bebop language altered-color balanced package: generated `4000`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4512`, offbeat resolution `0.8914`, unresolved offbeat non-chord `0.0488`, unique pitch avg `14.8125`, 3rd/4th motion `0.4831`, large leap `0.0863`, altered offbeat `0.1445`, bar pitch-class similarity `0.7027`, half-repeat `0.0000`
@@ -155,6 +156,7 @@
 - case-balanced motion interval-guard top8 package report: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_interval_guard_feasible_probe/bebop_language_best_of_package.md`
 - case-balanced motion interval-guard top8 all-selected note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_case_balanced_motion_interval_guard_all_selected_note_review/bebop_language_note_review.md`
 - case-balanced motion interval-guard review handoff: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_case_balanced_motion_interval_guard_review_handoff/bebop_language_review_handoff.md`
+- interval-repeat source expansion package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v25_interval_repeat_source_expansion/bebop_language_package.md`
 - altered-color balanced 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/listen_first_by_progression/`
 - altered-color balanced 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/audio_with_context/`
 - altered-color balanced package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/bebop_language_package.md`
@@ -605,6 +607,19 @@
   --baseline_package outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_tight_probe/bebop_language_best_of_package.json \
   --note_review outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_case_balanced_motion_interval_guard_all_selected_note_review/bebop_language_note_review.json \
   --expected_candidate_count 8
+```
+
+```bash
+.venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_package.py \
+  --run_id manual_2026_06_13_bebop_language_v25_interval_repeat_source_expansion \
+  --variants_per_progression 1200 \
+  --selected_count 128 \
+  --seed_base 7200000 \
+  --non_chord_probability 0.22 \
+  --target_chord_tone_ratio 0.82 \
+  --target_offbeat_non_chord_ratio 0.34 \
+  --bars 8 \
+  --bpm 124
 ```
 
 ```bash
