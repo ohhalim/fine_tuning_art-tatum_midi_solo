@@ -46,6 +46,9 @@ def sweep_score(summary: dict[str, Any]) -> float:
     resolution = float(summary.get("avg_offbeat_non_chord_resolution_ratio") or 0.0)
     unresolved = float(summary.get("avg_offbeat_unresolved_non_chord_ratio") or 0.0)
     strong = float(summary.get("avg_strong_beat_chord_tone_ratio") or 0.0)
+    chromatic = float(summary.get("avg_chromatic_step_ratio") or 0.0)
+    enclosure = float(summary.get("avg_enclosure_proxy_ratio") or 0.0)
+    altered = float(summary.get("avg_dominant_altered_offbeat_ratio") or 0.0)
     final_ok = bool(summary.get("all_final_landings_chord_tone", False))
     return (
         abs(chord_tone - 0.78) * 2.0
@@ -53,6 +56,9 @@ def sweep_score(summary: dict[str, Any]) -> float:
         + max(0.0, 0.86 - resolution) * 2.4
         + unresolved * 5.0
         + max(0.0, 1.0 - strong) * 4.0
+        + max(0.0, 0.18 - chromatic) * 1.0
+        + max(0.0, 0.04 - enclosure) * 0.8
+        + max(0.0, 0.05 - altered) * 0.5
         + (0.0 if final_ok else 3.0)
     )
 
@@ -96,12 +102,15 @@ def build_markdown(report: dict[str, Any]) -> str:
         f"- best offbeat non-chord: `{float(report['best_config']['summary']['avg_offbeat_non_chord_ratio']):.4f}`",
         f"- best offbeat resolution: `{float(report['best_config']['summary']['avg_offbeat_non_chord_resolution_ratio']):.4f}`",
         f"- best unresolved offbeat non-chord: `{float(report['best_config']['summary']['avg_offbeat_unresolved_non_chord_ratio']):.4f}`",
+        f"- best chromatic step: `{float(report['best_config']['summary']['avg_chromatic_step_ratio']):.4f}`",
+        f"- best enclosure proxy: `{float(report['best_config']['summary']['avg_enclosure_proxy_ratio']):.4f}`",
+        f"- best dominant altered offbeat: `{float(report['best_config']['summary']['avg_dominant_altered_offbeat_ratio']):.4f}`",
         f"- best listen-first dir: `{report['best_listen_first']['target_dir']}`",
         "",
         "## Configs",
         "",
-        "| rank | config | score | chord-tone | offbeat non-chord | resolved | unresolved | package |",
-        "|---:|---|---:|---:|---:|---:|---:|---|",
+        "| rank | config | score | chord-tone | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | package |",
+        "|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for rank, row in enumerate(report["ranked_configs"], start=1):
         summary = row["summary"]
@@ -116,6 +125,9 @@ def build_markdown(report: dict[str, Any]) -> str:
                     f"{float(summary['avg_offbeat_non_chord_ratio']):.4f}",
                     f"{float(summary['avg_offbeat_non_chord_resolution_ratio']):.4f}",
                     f"{float(summary['avg_offbeat_unresolved_non_chord_ratio']):.4f}",
+                    f"{float(summary['avg_chromatic_step_ratio']):.4f}",
+                    f"{float(summary['avg_enclosure_proxy_ratio']):.4f}",
+                    f"{float(summary['avg_dominant_altered_offbeat_ratio']):.4f}",
                     str(row["package_dir"]),
                 ]
             )

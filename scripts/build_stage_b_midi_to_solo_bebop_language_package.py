@@ -562,6 +562,13 @@ def adjacent_repeat_ratio(pitches: list[int]) -> float:
     return sum(1 for left, right in zip(pitches, pitches[1:]) if left == right) / (len(pitches) - 1)
 
 
+def chromatic_step_ratio(pitches: list[int]) -> float:
+    if len(pitches) < 2:
+        return 0.0
+    intervals = [abs(right - left) for left, right in zip(pitches, pitches[1:])]
+    return sum(1 for interval in intervals if interval == 1) / max(1, len(intervals))
+
+
 def solo_notes(pm: pretty_midi.PrettyMIDI) -> list[pretty_midi.Note]:
     notes: list[pretty_midi.Note] = []
     for instrument in pm.instruments:
@@ -591,6 +598,10 @@ def objective_metrics(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: in
     offbeat_non_chord_count = 0
     offbeat_non_chord_resolved_count = 0
     offbeat_non_chord_unresolved_count = 0
+    enclosure_proxy_count = 0
+    strong_chord_tone_count_for_enclosure = 0
+    dominant_offbeat_total = 0
+    dominant_altered_offbeat_count = 0
     non_chord_examples: list[dict[str, Any]] = []
     pitches = [int(note.pitch) for note in notes]
     durations = [max(0.0, float(note.end) - float(note.start)) for note in notes]
@@ -606,9 +617,24 @@ def objective_metrics(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: in
         if is_strong:
             strong_total += 1
             strong_chord_count += int(is_chord_tone)
+            if is_chord_tone:
+                strong_chord_tone_count_for_enclosure += 1
+                if note_index >= 2:
+                    left = int(notes[note_index - 2].pitch)
+                    right = int(notes[note_index - 1].pitch)
+                    target = int(note.pitch)
+                    brackets_target = (left - target) * (right - target) < 0
+                    close_enough = abs(left - target) <= 4 and abs(right - target) <= 4
+                    if brackets_target and close_enough:
+                        enclosure_proxy_count += 1
         else:
             offbeat_total += 1
             offbeat_non_chord_count += int(not is_chord_tone)
+            if chord_kind(chord) == "7":
+                dominant_offbeat_total += 1
+                root, _ = parse_chord(chord)
+                altered_pcs = {(root + interval) % 12 for interval in (1, 3, 6, 8)}
+                dominant_altered_offbeat_count += int(int(note.pitch) % 12 in altered_pcs)
             if not is_chord_tone:
                 next_note = notes[note_index + 1] if note_index + 1 < len(notes) else None
                 if next_note is not None:
@@ -650,12 +676,17 @@ def objective_metrics(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: in
         "avg_abs_interval": mean(intervals) if intervals else 0.0,
         "direction_change_ratio": direction_change_ratio(pitches),
         "adjacent_repeat_ratio": adjacent_repeat_ratio(pitches),
+        "chromatic_step_ratio": chromatic_step_ratio(pitches),
         "chord_tone_ratio": chord_tone_count / max(1, len(notes)),
         "tension_ratio": 1.0 - (chord_tone_count / max(1, len(notes))),
         "strong_beat_chord_tone_ratio": strong_chord_count / max(1, strong_total),
         "offbeat_non_chord_ratio": offbeat_non_chord_count / max(1, offbeat_total),
         "offbeat_non_chord_resolution_ratio": offbeat_non_chord_resolved_count / max(1, offbeat_non_chord_count),
         "offbeat_unresolved_non_chord_ratio": offbeat_non_chord_unresolved_count / max(1, offbeat_total),
+        "enclosure_proxy_ratio": enclosure_proxy_count / max(1, strong_chord_tone_count_for_enclosure),
+        "enclosure_proxy_count": int(enclosure_proxy_count),
+        "dominant_altered_offbeat_ratio": dominant_altered_offbeat_count / max(1, dominant_offbeat_total),
+        "dominant_altered_offbeat_count": int(dominant_altered_offbeat_count),
         "final_landing_chord": final_chord,
         "final_landing_pitch": int(final_note.pitch),
         "final_landing_is_chord_tone": final_ok,
@@ -676,6 +707,9 @@ def candidate_score(
     repeat = float(metrics.get("adjacent_repeat_ratio") or 0.0)
     resolution = float(metrics.get("offbeat_non_chord_resolution_ratio") or 0.0)
     unresolved = float(metrics.get("offbeat_unresolved_non_chord_ratio") or 0.0)
+    chromatic = float(metrics.get("chromatic_step_ratio") or 0.0)
+    enclosure = float(metrics.get("enclosure_proxy_ratio") or 0.0)
+    dominant_altered = float(metrics.get("dominant_altered_offbeat_ratio") or 0.0)
     max_interval = int(metrics.get("max_abs_interval") or 0)
     unique_pc = int(metrics.get("unique_pitch_class_count") or 0)
     max_gap = float(metrics.get("max_gap_seconds") or 0.0)
@@ -688,6 +722,9 @@ def candidate_score(
         + repeat * 1.6
         + max(0.0, 0.72 - resolution) * 1.0
         + unresolved * 1.8
+        + max(0.0, 0.18 - chromatic) * 0.9
+        + max(0.0, 0.04 - enclosure) * 0.6
+        + max(0.0, 0.05 - dominant_altered) * 0.4
         + max(0, max_interval - 12) * 0.1
         + max(0, 7 - unique_pc) * 0.2
         + max(0.0, max_gap - 0.4) * 0.8
@@ -952,6 +989,21 @@ def build_package(
         )
         if rendered
         else 0.0,
+        "avg_chromatic_step_ratio": mean(
+            [float(item["objective_metrics"]["chromatic_step_ratio"]) for item in rendered]
+        )
+        if rendered
+        else 0.0,
+        "avg_enclosure_proxy_ratio": mean(
+            [float(item["objective_metrics"]["enclosure_proxy_ratio"]) for item in rendered]
+        )
+        if rendered
+        else 0.0,
+        "avg_dominant_altered_offbeat_ratio": mean(
+            [float(item["objective_metrics"]["dominant_altered_offbeat_ratio"]) for item in rendered]
+        )
+        if rendered
+        else 0.0,
         "all_final_landings_chord_tone": all(
             bool(item["objective_metrics"]["final_landing_is_chord_tone"]) for item in rendered
         ),
@@ -1038,6 +1090,9 @@ def validate_report(report: dict[str, Any], expected_sample_rate: int) -> dict[s
         "avg_offbeat_non_chord_ratio": float(aggregate["avg_offbeat_non_chord_ratio"]),
         "avg_offbeat_non_chord_resolution_ratio": float(aggregate["avg_offbeat_non_chord_resolution_ratio"]),
         "avg_offbeat_unresolved_non_chord_ratio": float(aggregate["avg_offbeat_unresolved_non_chord_ratio"]),
+        "avg_chromatic_step_ratio": float(aggregate["avg_chromatic_step_ratio"]),
+        "avg_enclosure_proxy_ratio": float(aggregate["avg_enclosure_proxy_ratio"]),
+        "avg_dominant_altered_offbeat_ratio": float(aggregate["avg_dominant_altered_offbeat_ratio"]),
         "all_final_landings_chord_tone": bool(aggregate["all_final_landings_chord_tone"]),
         "solo_wav_count": len([item for item in selected if Path(item["solo_audio"]["wav_file"]["path"]).exists()]),
         "context_wav_count": len([item for item in selected if Path(item["context_audio"]["wav_file"]["path"]).exists()]),
@@ -1064,14 +1119,17 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- avg offbeat non-chord ratio: `{float(aggregate['avg_offbeat_non_chord_ratio']):.4f}`",
         f"- avg offbeat non-chord resolution ratio: `{float(aggregate['avg_offbeat_non_chord_resolution_ratio']):.4f}`",
         f"- avg offbeat unresolved non-chord ratio: `{float(aggregate['avg_offbeat_unresolved_non_chord_ratio']):.4f}`",
+        f"- avg chromatic step ratio: `{float(aggregate['avg_chromatic_step_ratio']):.4f}`",
+        f"- avg enclosure proxy ratio: `{float(aggregate['avg_enclosure_proxy_ratio']):.4f}`",
+        f"- avg dominant altered offbeat ratio: `{float(aggregate['avg_dominant_altered_offbeat_ratio']):.4f}`",
         f"- all final landings chord tone: `{str(bool(aggregate['all_final_landings_chord_tone'])).lower()}`",
         f"- quality claimed: `{str(bool(report['quality_claimed'])).lower()}`",
         f"- model direct claimed: `{str(bool(report['model_direct_claimed'])).lower()}`",
         "",
         "## Selected Files",
         "",
-        "| rank | case | chords | score | chord-tone | strong beat | offbeat non-chord | resolved | unresolved | solo WAV | context WAV |",
-        "|---:|---|---|---:|---:|---:|---:|---:|---:|---|---|",
+        "| rank | case | chords | score | chord-tone | strong beat | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | solo WAV | context WAV |",
+        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
     ]
     for item in report["selected_candidates"]:
         metrics = item["objective_metrics"]
@@ -1088,6 +1146,9 @@ def markdown_report(report: dict[str, Any]) -> str:
                     f"{float(metrics['offbeat_non_chord_ratio']):.4f}",
                     f"{float(metrics['offbeat_non_chord_resolution_ratio']):.4f}",
                     f"{float(metrics['offbeat_unresolved_non_chord_ratio']):.4f}",
+                    f"{float(metrics['chromatic_step_ratio']):.4f}",
+                    f"{float(metrics['enclosure_proxy_ratio']):.4f}",
+                    f"{float(metrics['dominant_altered_offbeat_ratio']):.4f}",
                     str(item["solo_audio"]["wav_file"]["path"]),
                     str(item["context_audio"]["wav_file"]["path"]),
                 ]
