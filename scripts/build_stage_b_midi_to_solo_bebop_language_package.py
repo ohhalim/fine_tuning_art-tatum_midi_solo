@@ -650,6 +650,38 @@ def bar_half_repeat_ratio(pitches: list[int], *, slots_per_bar: int = 8) -> floa
     return repeat_count / len(bars)
 
 
+def bar_pitch_class_similarity_metrics(pitches: list[int], *, slots_per_bar: int = 8) -> dict[str, float]:
+    bars = [
+        pitches[index : index + slots_per_bar]
+        for index in range(0, len(pitches), slots_per_bar)
+        if len(pitches[index : index + slots_per_bar]) == slots_per_bar
+    ]
+    if len(bars) < 2:
+        return {
+            "max_bar_pitch_class_jaccard": 0.0,
+            "avg_bar_pitch_class_jaccard": 0.0,
+            "bar_pitch_shape_repeat_ratio": 0.0,
+        }
+    similarities: list[float] = []
+    repeated_shapes = 0
+    comparisons = 0
+    for left_index, left in enumerate(bars):
+        left_pc = {pitch % 12 for pitch in left}
+        left_shape = tuple((pitch - left[0]) for pitch in left)
+        for right in bars[left_index + 1 :]:
+            right_pc = {pitch % 12 for pitch in right}
+            union = left_pc | right_pc
+            similarities.append(len(left_pc & right_pc) / max(1, len(union)))
+            right_shape = tuple((pitch - right[0]) for pitch in right)
+            comparisons += 1
+            repeated_shapes += int(left_shape == right_shape)
+    return {
+        "max_bar_pitch_class_jaccard": max(similarities or [0.0]),
+        "avg_bar_pitch_class_jaccard": mean(similarities) if similarities else 0.0,
+        "bar_pitch_shape_repeat_ratio": repeated_shapes / max(1, comparisons),
+    }
+
+
 def solo_notes(pm: pretty_midi.PrettyMIDI) -> list[pretty_midi.Note]:
     notes: list[pretty_midi.Note] = []
     for instrument in pm.instruments:
@@ -688,6 +720,7 @@ def objective_metrics(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: in
     durations = [max(0.0, float(note.end) - float(note.start)) for note in notes]
     gaps = [max(0.0, float(notes[index].start) - float(notes[index - 1].start)) for index in range(1, len(notes))]
     bar_uniques = bar_unique_pitch_counts(pitches)
+    bar_similarity = bar_pitch_class_similarity_metrics(pitches)
 
     for note_index, note in enumerate(notes):
         chord = chord_for_time(chords, float(note.start), bars=bars, bpm=bpm)
@@ -761,6 +794,9 @@ def objective_metrics(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: in
         "chromatic_step_ratio": chromatic_step_ratio(pitches),
         "two_note_cycle_ratio": two_note_cycle_ratio(pitches),
         "bar_half_repeat_ratio": bar_half_repeat_ratio(pitches),
+        "max_bar_pitch_class_jaccard": bar_similarity["max_bar_pitch_class_jaccard"],
+        "avg_bar_pitch_class_jaccard": bar_similarity["avg_bar_pitch_class_jaccard"],
+        "bar_pitch_shape_repeat_ratio": bar_similarity["bar_pitch_shape_repeat_ratio"],
         "min_bar_unique_pitch_count": min(bar_uniques or [0]),
         "avg_bar_unique_pitch_count": mean(bar_uniques) if bar_uniques else 0.0,
         "chord_tone_ratio": chord_tone_count / max(1, len(notes)),
@@ -798,6 +834,8 @@ def candidate_score(
     dominant_altered = float(metrics.get("dominant_altered_offbeat_ratio") or 0.0)
     cycle = float(metrics.get("two_note_cycle_ratio") or 0.0)
     half_repeat = float(metrics.get("bar_half_repeat_ratio") or 0.0)
+    max_bar_similarity = float(metrics.get("max_bar_pitch_class_jaccard") or 0.0)
+    shape_repeat = float(metrics.get("bar_pitch_shape_repeat_ratio") or 0.0)
     min_bar_unique = int(metrics.get("min_bar_unique_pitch_count") or 0)
     max_interval = int(metrics.get("max_abs_interval") or 0)
     unique_pc = int(metrics.get("unique_pitch_class_count") or 0)
@@ -816,6 +854,8 @@ def candidate_score(
         + max(0.0, 0.05 - dominant_altered) * 0.4
         + cycle * 1.5
         + half_repeat * 1.2
+        + max(0.0, max_bar_similarity - 0.72) * 1.4
+        + shape_repeat * 1.4
         + max(0, 4 - min_bar_unique) * 0.3
         + max(0, max_interval - 12) * 0.1
         + max(0, 7 - unique_pc) * 0.2
@@ -1106,6 +1146,16 @@ def build_package(
         )
         if rendered
         else 0.0,
+        "avg_max_bar_pitch_class_jaccard": mean(
+            [float(item["objective_metrics"]["max_bar_pitch_class_jaccard"]) for item in rendered]
+        )
+        if rendered
+        else 0.0,
+        "avg_bar_pitch_shape_repeat_ratio": mean(
+            [float(item["objective_metrics"]["bar_pitch_shape_repeat_ratio"]) for item in rendered]
+        )
+        if rendered
+        else 0.0,
         "min_bar_unique_pitch_count_min": min(
             (int(item["objective_metrics"]["min_bar_unique_pitch_count"]) for item in rendered),
             default=0,
@@ -1201,6 +1251,8 @@ def validate_report(report: dict[str, Any], expected_sample_rate: int) -> dict[s
         "avg_dominant_altered_offbeat_ratio": float(aggregate["avg_dominant_altered_offbeat_ratio"]),
         "avg_two_note_cycle_ratio": float(aggregate["avg_two_note_cycle_ratio"]),
         "avg_bar_half_repeat_ratio": float(aggregate["avg_bar_half_repeat_ratio"]),
+        "avg_max_bar_pitch_class_jaccard": float(aggregate["avg_max_bar_pitch_class_jaccard"]),
+        "avg_bar_pitch_shape_repeat_ratio": float(aggregate["avg_bar_pitch_shape_repeat_ratio"]),
         "min_bar_unique_pitch_count_min": int(aggregate["min_bar_unique_pitch_count_min"]),
         "all_final_landings_chord_tone": bool(aggregate["all_final_landings_chord_tone"]),
         "solo_wav_count": len([item for item in selected if Path(item["solo_audio"]["wav_file"]["path"]).exists()]),
@@ -1233,6 +1285,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- avg dominant altered offbeat ratio: `{float(aggregate['avg_dominant_altered_offbeat_ratio']):.4f}`",
         f"- avg two-note cycle ratio: `{float(aggregate['avg_two_note_cycle_ratio']):.4f}`",
         f"- avg bar half-repeat ratio: `{float(aggregate['avg_bar_half_repeat_ratio']):.4f}`",
+        f"- avg max bar pitch-class similarity: `{float(aggregate['avg_max_bar_pitch_class_jaccard']):.4f}`",
+        f"- avg bar pitch-shape repeat ratio: `{float(aggregate['avg_bar_pitch_shape_repeat_ratio']):.4f}`",
         f"- min bar unique pitch count: `{int(aggregate['min_bar_unique_pitch_count_min'])}`",
         f"- all final landings chord tone: `{str(bool(aggregate['all_final_landings_chord_tone'])).lower()}`",
         f"- quality claimed: `{str(bool(report['quality_claimed'])).lower()}`",
@@ -1240,8 +1294,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         "## Selected Files",
         "",
-        "| rank | case | chords | score | chord-tone | strong beat | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | half repeat | min bar unique | solo WAV | context WAV |",
-        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
+        "| rank | case | chords | score | chord-tone | strong beat | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | half repeat | bar sim | shape repeat | min bar unique | solo WAV | context WAV |",
+        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
     ]
     for item in report["selected_candidates"]:
         metrics = item["objective_metrics"]
@@ -1263,6 +1317,8 @@ def markdown_report(report: dict[str, Any]) -> str:
                     f"{float(metrics['dominant_altered_offbeat_ratio']):.4f}",
                     f"{float(metrics['two_note_cycle_ratio']):.4f}",
                     f"{float(metrics['bar_half_repeat_ratio']):.4f}",
+                    f"{float(metrics['max_bar_pitch_class_jaccard']):.4f}",
+                    f"{float(metrics['bar_pitch_shape_repeat_ratio']):.4f}",
                     str(int(metrics["min_bar_unique_pitch_count"])),
                     str(item["solo_audio"]["wav_file"]["path"]),
                     str(item["context_audio"]["wav_file"]["path"]),
