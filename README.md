@@ -9,6 +9,7 @@
 - 최신 대표 review package: strict-listen top4 stepwise-large-leap-guard, MIDI `4`, WAV `4`
 - 최신 frontier review package: strict-listen top8 motion-balance, MIDI `8`, solo/context WAV `8 / 8`, all-selected note review `8`
 - 최신 review handoff: motion-balance, review ready `true`, solo/context WAV `8 / 8`, listen-first audio pair `4`, note review validated `true`
+- 최신 guard feasibility: motion-balance guard/motion feasible config `20`, stricter offbeat feasible `false`, stricter bar similarity feasible `true`
 - 최신 pool expansion review package: strict-listen top8 safety-pool-expansion, representative replacement `false`
 - 최신 feasibility sweep: safety-gate motion/leap strict filter feasible config `0`
 - 최신 objective gate: max gate penalty `0.0000`
@@ -71,6 +72,7 @@
 - bebop language safety motion pool expansion package: source generated `4800`, source selected `64`, best-of pool `1871`, selection pool `12`, selected `8`, max gate penalty `0.0000`, adjacent repeat `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`, large leap `0.0595 -> 0.0516`, enclosure proxy `0.2969 -> 0.3086`, step motion `0.3790 -> 0.3770`, chromatic step `0.2044 -> 0.2004`, bar pitch-class similarity `0.6131 -> 0.6256`, representative replacement `false`
 - bebop language strict-listen top8 motion-balance repair package: pool `1871`, selection pool `19`, selected `8`, changed candidates `7 / 8`, pitch repair steps `26`, step motion `0.3770 -> 0.4226`, chromatic step `0.2004 -> 0.2440`, large leap `0.0516 -> 0.0437`, enclosure proxy `0.3086 -> 0.3125`, max gate penalty `0.0000`, adjacent repeat `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`, bar pitch-class similarity `0.6256 -> 0.6339`, quality claim `false`
 - bebop language motion-balance review handoff: review ready `true`, selected `8`, solo/context WAV `8 / 8`, listen-first audio pair `4`, note review validated `true`, baseline improved `4`, tradeoff watch `2`, unchanged guard `4`, quality claim `false`
+- bebop language motion-balance guard feasibility sweep: repaired pool `21`, safety baseline `19`, selectable max-per-case `2 / 3` = `8 / 11`, feasible guard/motion config `20`, min feasible offbeat max `0.40625`, min feasible bar similarity max `0.675`, stricter offbeat feasible `false`, stricter bar similarity feasible `true`, next `motion_balance_guard_tightening_candidate_package`
 - bebop language best-of with-sweeps package: source package `91`, pool `1263`, selected `16`, score `0.2143`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4277`, offbeat resolution `0.9177`, unresolved offbeat non-chord `0.0352`, altered offbeat `0.1836`, two-note cycle `0.0082`, max gate penalty `0.0639`
 - bebop language best-of balanced package: source package `33`, pool `335`, selected `16`, score `0.2728`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4414`, offbeat resolution `0.8983`, unresolved offbeat non-chord `0.0449`, altered offbeat `0.1602`, two-note cycle `0.0092`, max-per-case `4`
 - bebop language altered-color balanced package: generated `4000`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4512`, offbeat resolution `0.8914`, unresolved offbeat non-chord `0.0488`, unique pitch avg `14.8125`, 3rd/4th motion `0.4831`, large leap `0.0863`, altered offbeat `0.1445`, bar pitch-class similarity `0.7027`, half-repeat `0.0000`
@@ -129,6 +131,7 @@
 - strict-listen top8 motion-balance package report: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_motion_balance_probe/bebop_language_best_of_package.md`
 - strict-listen top8 motion-balance all-selected note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_motion_balance_all_selected_note_review/bebop_language_note_review.md`
 - strict-listen top8 motion-balance review handoff: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_motion_balance_review_handoff/bebop_language_review_handoff.md`
+- motion-balance guard feasibility sweep report: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of_feasibility/manual_2026_06_13_bebop_language_motion_balance_guard_feasibility_sweep/bebop_language_safety_gate_feasibility_sweep.md`
 - altered-color balanced 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/listen_first_by_progression/`
 - altered-color balanced 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/audio_with_context/`
 - altered-color balanced package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/bebop_language_package.md`
@@ -309,6 +312,26 @@
   --baseline_package outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_safety_pool_expansion_probe/bebop_language_best_of_package.json \
   --note_review outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_motion_balance_all_selected_note_review/bebop_language_note_review.json \
   --expected_candidate_count 8
+```
+
+```bash
+.venv/bin/python scripts/run_stage_b_midi_to_solo_bebop_language_safety_gate_feasibility_sweep.py \
+  --run_id manual_2026_06_13_bebop_language_motion_balance_guard_feasibility_sweep \
+  --selected_count 8 \
+  --max_per_case_values 2,3 \
+  --max_offbeat_non_chord_ratio 0.40625 \
+  --max_offbeat_non_chord_ratios 0.3828125,0.390625,0.3984375,0.40625 \
+  --max_bar_pitch_class_jaccard 0.70 \
+  --max_bar_pitch_class_jaccards 0.625,0.65,0.675,0.70 \
+  --min_step_motion_ratios 0.38,0.40,0.42 \
+  --min_chromatic_step_ratios 0.20,0.22,0.24 \
+  --max_large_leap_ratios 0.045,0.055,0.065 \
+  --repair_motion_balance \
+  --repair_motion_balance_iterations 12 \
+  --target_min_step_motion_ratio 0.40 \
+  --target_min_chromatic_step_ratio 0.22 \
+  --target_max_large_leap_ratio 0.055 \
+  --max_motion_balance_bar_pitch_class_jaccard 0.70
 ```
 
 ```bash
