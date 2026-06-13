@@ -7,9 +7,9 @@
 - 생성 방식: Music Transformer 계열 symbolic checkpoint + constrained decoding
 - 출력 단위: 2-8마디 solo-line MIDI 후보
 - 최신 대표 review package: strict-listen top4 stepwise-large-leap-guard, MIDI `4`, WAV `4`
-- 최신 frontier review package: strict-listen top8 case-balanced motion-tight, MIDI `8`, solo/context WAV `8 / 8`, all-selected note review `8`
-- 최신 motion guard: selected case counts `2/2/2/2`, step `0.4325 -> 0.4583`, chromatic `0.2321 -> 0.2599`, large leap `0.0456 -> 0.0337`
-- 최신 review handoff: case-balanced motion-tight, review ready `true`, solo/context WAV `8 / 8`, listen-first audio pair `4`, note review validated `true`
+- 최신 frontier review package: strict-listen top8 case-balanced motion interval-guard, MIDI `8`, solo/context WAV `8 / 8`, all-selected note review `8`
+- 최신 interval guard: cap `0.0125` selected `8` 불가, cap `0.0164` selected `8`, case counts `2/2/2/2`, interval repeat avg `0.0123`
+- 최신 review handoff: case-balanced motion interval-guard, review ready `true`, solo/context WAV `8 / 8`, listen-first audio pair `4`, note review validated `true`
 - 최신 guard feasibility: motion-balance guard/motion feasible config `20`, stricter offbeat feasible `false`, stricter bar similarity feasible `true`
 - 최신 pool expansion review package: strict-listen top8 safety-pool-expansion, representative replacement `false`
 - 최신 feasibility sweep: safety-gate motion/leap strict filter feasible config `0`
@@ -77,6 +77,7 @@
 - bebop language targeted-low-offbeat package: generated candidate pool `1999`, selected `8`, max gate penalty `0.0000`, offbeat non-chord `0.4063 -> 0.3711`, offbeat resolution `1.0000`, unresolved `0.0000`, step motion `0.4226 -> 0.4345`, chromatic step `0.2440 -> 0.2401`, large leap `0.0437 -> 0.0437`, enclosure proxy `0.3125 -> 0.3242`, bar pitch-class similarity `0.6339 -> 0.6429`, motion-balance changed candidates `8 / 8`, pitch repair steps `36`, quality claim `false`
 - bebop language targeted-low-offbeat case-balanced package: candidate pool `1999`, selected `8`, max-per-case `2`, selected case counts `3/3/1/1 -> 2/2/2/2`, offbeat non-chord `0.3711 -> 0.3711`, offbeat resolution `1.0000`, unresolved `0.0000`, max gate penalty `0.0000`, adjacent repeat `0.0000`, step motion `0.4345 -> 0.4325`, chromatic step `0.2401 -> 0.2321`, large leap `0.0437 -> 0.0456`, enclosure proxy `0.3242 -> 0.3164`, bar pitch-class similarity `0.6429 -> 0.6429`, quality claim `false`
 - bebop language case-balanced motion-tight package: candidate pool `1999`, selected `8`, selected case counts `2/2/2/2`, offbeat non-chord `0.3711 -> 0.3672`, offbeat resolution `1.0000`, unresolved `0.0000`, max gate penalty `0.0000`, adjacent repeat `0.0000`, step motion `0.4325 -> 0.4583`, chromatic step `0.2321 -> 0.2599`, large leap `0.0456 -> 0.0337`, enclosure proxy `0.3164 -> 0.3242`, bar pitch-class similarity `0.6429 -> 0.6345`, dominant altered offbeat `0.1719 -> 0.0703`, motion-balance pitch repair steps `60`, quality claim `false`
+- bebop language interval-repeat guard audit: strict cap `0.0125` failed with selected count shortage under max-per-case `2`, feasible cap `0.0164`, selected `8`, selected case counts `2/2/2/2`, interval trigram repeat avg `0.0123`, max selected interval trigram repeat `0.0164`, gate/resolution/unresolved/motion metrics preserved, quality claim `false`
 - bebop language best-of with-sweeps package: source package `91`, pool `1263`, selected `16`, score `0.2143`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4277`, offbeat resolution `0.9177`, unresolved offbeat non-chord `0.0352`, altered offbeat `0.1836`, two-note cycle `0.0082`, max gate penalty `0.0639`
 - bebop language best-of balanced package: source package `33`, pool `335`, selected `16`, score `0.2728`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4414`, offbeat resolution `0.8983`, unresolved offbeat non-chord `0.0449`, altered offbeat `0.1602`, two-note cycle `0.0092`, max-per-case `4`
 - bebop language altered-color balanced package: generated `4000`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4512`, offbeat resolution `0.8914`, unresolved offbeat non-chord `0.0488`, unique pitch avg `14.8125`, 3rd/4th motion `0.4831`, large leap `0.0863`, altered offbeat `0.1445`, bar pitch-class similarity `0.7027`, half-repeat `0.0000`
@@ -150,6 +151,10 @@
 - case-balanced motion-tight top8 package report: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_tight_probe/bebop_language_best_of_package.md`
 - case-balanced motion-tight top8 all-selected note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_case_balanced_motion_tight_all_selected_note_review/bebop_language_note_review.md`
 - case-balanced motion-tight review handoff: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_case_balanced_motion_tight_review_handoff/bebop_language_review_handoff.md`
+- case-balanced motion interval-guard top8 전체 context WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_interval_guard_feasible_probe/audio_with_context/`
+- case-balanced motion interval-guard top8 package report: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_interval_guard_feasible_probe/bebop_language_best_of_package.md`
+- case-balanced motion interval-guard top8 all-selected note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_case_balanced_motion_interval_guard_all_selected_note_review/bebop_language_note_review.md`
+- case-balanced motion interval-guard review handoff: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_case_balanced_motion_interval_guard_review_handoff/bebop_language_review_handoff.md`
 - altered-color balanced 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/listen_first_by_progression/`
 - altered-color balanced 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/audio_with_context/`
 - altered-color balanced package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/bebop_language_package.md`
@@ -539,6 +544,66 @@
   --package outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_tight_probe/bebop_language_best_of_package.json \
   --baseline_package outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_targeted_low_offbeat_case_balanced_probe/bebop_language_best_of_package.json \
   --note_review outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_case_balanced_motion_tight_all_selected_note_review/bebop_language_note_review.json \
+  --expected_candidate_count 8
+```
+
+```bash
+.venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_best_of_package.py \
+  --run_id manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_interval_guard_feasible_probe \
+  --package_globs 'manual_2026_06_13_bebop_language_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v6_data_contour_resolution/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v7_altered_balanced/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v8_v22_micro/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v9_strict_consonance/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v10_interval_repeat_rank/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v11_large_leap_pool/config_*/bebop_language_package.json' \
+  --selected_count 8 \
+  --max_per_case 2 \
+  --bars 8 \
+  --bpm 124 \
+  --target_chord_tone_ratio 0.82 \
+  --target_offbeat_non_chord_ratio 0.34 \
+  --max_gate_penalty 1.0 \
+  --max_offbeat_non_chord_ratio 0.390625 \
+  --max_unresolved_offbeat_non_chord_ratio 0.10 \
+  --max_dominant_altered_offbeat_ratio 0.25 \
+  --max_adjacent_repeat_ratio 0 \
+  --max_interval_trigram_repeat_ratio 0.0164 \
+  --max_bar_pitch_class_jaccard 0.675 \
+  --listen_first_mode consonance \
+  --repair_bar_similarity \
+  --repair_bar_similarity_iterations 4 \
+  --repair_enclosure_density \
+  --repair_enclosure_density_iterations 8 \
+  --repair_unresolved_offbeat \
+  --repair_unresolved_offbeat_iterations 8 \
+  --repair_adjacent_repeats \
+  --repair_adjacent_repeats_iterations 4 \
+  --repair_large_leaps \
+  --repair_large_leaps_iterations 12 \
+  --repair_motion_balance \
+  --repair_motion_balance_iterations 24 \
+  --target_min_step_motion_ratio 0.43 \
+  --target_min_chromatic_step_ratio 0.24 \
+  --target_max_large_leap_ratio 0.045 \
+  --max_motion_balance_bar_pitch_class_jaccard 0.675 \
+  --repair_rhythm_articulation \
+  --min_large_leap_repair_enclosure_proxy_ratio 0.28125 \
+  --max_enclosure_repair_offbeat_non_chord_ratio 0.421875 \
+  --context_bass_velocity_boost 6 \
+  --context_comp_velocity_boost 10 \
+  --select_after_repair \
+  --selection_profile bebop_stepwise_chromatic
+```
+
+```bash
+.venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_note_review.py \
+  --run_id manual_2026_06_13_bebop_language_top8_case_balanced_motion_interval_guard_all_selected_note_review \
+  --package outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_interval_guard_feasible_probe/bebop_language_best_of_package.json \
+  --all_candidates \
+  --max_notes 32
+```
+
+```bash
+.venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_review_handoff.py \
+  --run_id manual_2026_06_13_bebop_language_case_balanced_motion_interval_guard_review_handoff \
+  --package outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_interval_guard_feasible_probe/bebop_language_best_of_package.json \
+  --baseline_package outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_tight_probe/bebop_language_best_of_package.json \
+  --note_review outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_case_balanced_motion_interval_guard_all_selected_note_review/bebop_language_note_review.json \
   --expected_candidate_count 8
 ```
 

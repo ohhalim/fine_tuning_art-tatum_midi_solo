@@ -133,6 +133,40 @@ class BebopLanguageRhythmArticulationTest(unittest.TestCase):
 
         self.assertEqual(filtered, [safe])
 
+    def test_safety_filter_excludes_interval_trigram_repeat_regression(self) -> None:
+        base_metrics = {
+            "offbeat_non_chord_ratio": 0.390625,
+            "offbeat_unresolved_non_chord_ratio": 0.0,
+            "dominant_altered_offbeat_ratio": 0.125,
+            "adjacent_repeat_ratio": 0.0,
+            "interval_trigram_repeat_ratio": 0.0082,
+            "max_bar_pitch_class_jaccard": 0.62,
+        }
+        safe = {
+            "gate_penalty": 0.0,
+            "objective_metrics": base_metrics,
+        }
+        interval_repeat_regression = {
+            "gate_penalty": 0.0,
+            "objective_metrics": {
+                **base_metrics,
+                "interval_trigram_repeat_ratio": 0.0164,
+            },
+        }
+
+        filtered = filter_candidate_rows(
+            [safe, interval_repeat_regression],
+            max_gate_penalty=0.0,
+            max_offbeat_non_chord_ratio=0.40625,
+            max_unresolved_offbeat_non_chord_ratio=0.0,
+            max_dominant_altered_offbeat_ratio=0.25,
+            max_adjacent_repeat_ratio=0.0,
+            max_interval_trigram_repeat_ratio=0.0125,
+            max_bar_pitch_class_jaccard=0.625,
+        )
+
+        self.assertEqual(filtered, [safe])
+
     def test_motion_balance_score_prefers_stepwise_chromatic_lower_leap_candidate(self) -> None:
         base_metrics = {
             "step_motion_ratio": 0.34,
