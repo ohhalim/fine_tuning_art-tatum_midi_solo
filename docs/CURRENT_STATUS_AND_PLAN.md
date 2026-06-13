@@ -2,6 +2,8 @@
 
 작성일: 2026-06-11
 
+최신 로컬 갱신: 2026-06-13
+
 ## Current Focus
 
 현재 이 저장소의 우선순위는 입력 MIDI를 받아 jazz solo MIDI 후보를 출력하는 Stage B MIDI-to-solo MVP를 완성하는 것이다.
@@ -20,7 +22,7 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1404, Stage B MIDI-to-solo residual-aware listening review input wait
+- current issue: Issue #1406, Stage B MIDI-to-solo bebop language listen-first quality iteration
 - open issue queue after residual-aware listening input guard merge: `0`
 - 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware user listening review fill`
 
@@ -37,6 +39,97 @@
 ## Current Decision
 
 현재 목표는 완성형 jazz model claim이 아니라, `input.mid -> ranked solo MIDI candidates` 실행 경로를 만드는 것이다.
+
+2026-06-13 best-of strict consonance 기준:
+
+- latest local package: `manual_2026_06_13_bebop_language_best_of_top4_adjacent_repeat_final_repair_probe`
+- source package count: `125`
+- candidate pool / selection pool / selected: `1807 / 18 / 4`
+- selection profile: `bebop_language`
+- strong-beat chord-tone: `1.0000`
+- offbeat non-chord / resolution / unresolved: `0.3906 / 1.0000 / 0.0000`
+- large leap / adjacent repeat / enclosure proxy / bar pitch-class similarity: `0.0476 / 0.0040 / 0.3438 / 0.5774`
+- altered offbeat / two-note cycle / interval trigram repeat: `0.1250 / 0.0000 / 0.0123`
+- max gate penalty: `0.0000`
+- representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_adjacent_repeat_final_repair_probe/listen_first_by_progression/`
+- note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_adjacent_repeat_final_repair_note_review/bebop_language_note_review.md`
+- quality claim: `false`
+- model direct claim: `false`
+- previous top4 selection-profile package: `manual_2026_06_13_bebop_language_best_of_top4_bebop_selection_profile_probe`
+- adjacent-repeat final repair delta: `0.0119 -> 0.0040`
+- preserved metrics after adjacent-repeat repair: gate `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`, large leap `0.0476`, bar pitch-class similarity `0.5774`
+
+2026-06-13 previous best-of strict consonance 기준:
+
+- latest local package: `manual_2026_06_13_bebop_language_best_of_v8_interval_repeat_tight`
+- source package count: `107`
+- candidate pool / selection pool / selected: `1519 / 64 / 16`
+- score: `0.1905`
+- strong-beat chord-tone: `1.0000`
+- offbeat non-chord / resolution / unresolved: `0.4219 / 0.9256 / 0.0313`
+- altered offbeat / two-note cycle / interval trigram repeat: `0.1797 / 0.0092 / 0.0369`
+- max gate penalty: `0.0000`
+- listen-first mode: `consonance`
+- representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v8_interval_repeat_tight/listen_first_by_progression/`
+- note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_v8_listen_first_note_review/bebop_language_note_review.md`
+- first 32 notes outside count by listen-first candidate: `2 / 3 / 2 / 2`
+- strict-listen top4 package: `manual_2026_06_13_bebop_language_best_of_top4_strict_listen`
+- strict-listen top4 offbeat / unresolved / interval repeat: `0.4063 / 0.0313 / 0.0164`
+- strict-listen top4 representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_strict_listen/listen_first_by_progression/`
+- strict-listen top4 walking-context package: `manual_2026_06_13_bebop_language_best_of_top4_walking_context`
+- strict-listen top4 walking-context representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_walking_context/listen_first_by_progression/`
+- walking-context MIDI tracks: solo `64`, walking bass `32`, guide-tone comp `48`
+- strict-listen top4 bar-repair package: `manual_2026_06_13_bebop_language_best_of_top4_bar_repair_probe`
+- strict-listen top4 bar-repair candidate count: `4`
+- strict-listen top4 bar-repair offbeat / resolution / unresolved: `0.3984 / 0.9615 / 0.0156`
+- strict-listen top4 bar-repair altered / two-note cycle / interval repeat: `0.1875 / 0.0000 / 0.0000`
+- strict-listen top4 bar-repair average bar pitch-class similarity: `0.6881 -> 0.6012`
+- strict-listen top4 bar-repair major ii-V turnaround bar pitch-class similarity: `0.8000 -> 0.5000`
+- strict-listen top4 bar-repair max gate penalty: `0.0000`
+- strict-listen top4 bar-repair representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_bar_repair_probe/listen_first_by_progression/`
+- strict-listen top4 bar-repair note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_bar_repair_note_review/bebop_language_note_review.md`
+- strict-listen top4 enclosure-repair package: `manual_2026_06_13_bebop_language_best_of_top4_enclosure_repair_probe`
+- strict-listen top4 enclosure-repair candidate count: `4`
+- strict-listen top4 enclosure-repair enclosure proxy: `0.3281`
+- strict-listen top4 enclosure-repair offbeat / resolution / unresolved: `0.3750 / 0.9583 / 0.0156`
+- strict-listen top4 enclosure-repair altered / two-note cycle / interval repeat: `0.1563 / 0.0000 / 0.0082`
+- strict-listen top4 enclosure-repair average bar pitch-class similarity: `0.6429`
+- strict-listen top4 enclosure-repair max gate penalty: `0.0000`
+- strict-listen top4 enclosure-repair representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_enclosure_repair_probe/listen_first_by_progression/`
+- strict-listen top4 enclosure-repair note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_enclosure_repair_note_review/bebop_language_note_review.md`
+- strict-listen top4 enclosure context-strong package: `manual_2026_06_13_bebop_language_best_of_top4_enclosure_context_strong_probe`
+- strict-listen top4 enclosure context-strong context boost: bass `6`, comp `10`
+- strict-listen top4 enclosure context-strong WAV RMS range: `736.76-786.69`
+- strict-listen top4 enclosure context-strong representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_enclosure_context_strong_probe/listen_first_by_progression/`
+- strict-listen top4 enclosure context-strong note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_enclosure_context_strong_note_review/bebop_language_note_review.md`
+- strict-listen top4 post-repair-select package: `manual_2026_06_13_bebop_language_best_of_top4_post_repair_select_probe`
+- strict-listen top4 post-repair-select candidate count: `4`
+- strict-listen top4 post-repair-select offbeat / resolution / unresolved: `0.3750 / 0.9792 / 0.0078`
+- strict-listen top4 post-repair-select enclosure / altered / interval repeat: `0.3125 / 0.1406 / 0.0082`
+- strict-listen top4 post-repair-select average bar pitch-class similarity: `0.6429`
+- strict-listen top4 post-repair-select representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_post_repair_select_probe/listen_first_by_progression/`
+- strict-listen top4 post-repair-select note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_post_repair_select_note_review/bebop_language_note_review.md`
+- strict-listen top4 unresolved-repair package: `manual_2026_06_13_bebop_language_best_of_top4_unresolved_repair_probe`
+- strict-listen top4 unresolved-repair candidate count: `4`
+- strict-listen top4 unresolved-repair offbeat / resolution / unresolved: `0.3750 / 1.0000 / 0.0000`
+- strict-listen top4 unresolved-repair enclosure / altered / interval repeat: `0.3281 / 0.1563 / 0.0082`
+- strict-listen top4 unresolved-repair max gate penalty: `0.0000`
+- strict-listen top4 unresolved-repair representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_unresolved_repair_probe/listen_first_by_progression/`
+- strict-listen top4 unresolved-repair note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_unresolved_repair_note_review/bebop_language_note_review.md`
+- strict-listen top4 large-leap-repair package: `manual_2026_06_13_bebop_language_best_of_top4_large_leap_repair_probe`
+- strict-listen top4 large-leap-repair candidate count: `4`
+- strict-listen top4 large-leap-repair offbeat / resolution / unresolved: `0.3828 / 1.0000 / 0.0000`
+- strict-listen top4 large-leap-repair large leap: `0.1151 -> 0.0595`
+- strict-listen top4 large-leap-repair enclosure / two-note cycle / interval repeat: `0.3203 / 0.0000 / 0.0123`
+- strict-listen top4 large-leap-repair representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_large_leap_repair_probe/listen_first_by_progression/`
+- strict-listen top4 large-leap-repair note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_large_leap_repair_note_review/bebop_language_note_review.md`
+- strict-listen top4 v11 pool expansion package: `manual_2026_06_13_bebop_language_best_of_top4_v11_pool_large_leap_repair_probe`
+- strict-listen top4 v11 pool expansion adoption: `false`
+- strict-listen top4 v11 pool expansion reason: large leap `0.0595`, unresolved `0.0000` 유지, enclosure `0.3203 -> 0.3125`, bar pitch-class similarity `0.6012 -> 0.6369` 악화
+- quality claim: `false`
+- model direct claim: `false`
+- rejected follow-up package: `manual_2026_06_13_bebop_language_best_of_v9_with_v10_interval_sweep`
+- rejection reason: score `0.1905 -> 0.1920`, representative listening change not meaningful
 
 현재 품질 경계:
 
