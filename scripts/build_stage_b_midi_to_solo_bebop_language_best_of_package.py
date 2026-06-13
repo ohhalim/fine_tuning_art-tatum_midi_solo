@@ -231,6 +231,44 @@ def listen_first_consonance_score(item: dict[str, Any]) -> float:
     )
 
 
+def bebop_language_selection_score(item: dict[str, Any]) -> float:
+    metrics = item["objective_metrics"]
+    return (
+        float(item.get("gate_penalty") or 0.0) * 5.0
+        + float(metrics["offbeat_unresolved_non_chord_ratio"]) * 10.0
+        + max(0.0, 0.99 - float(metrics["offbeat_non_chord_resolution_ratio"])) * 6.0
+        + max(0.0, float(metrics["large_leap_ratio"]) - 0.0625) * 3.0
+        + max(0.0, int(metrics["max_abs_interval"]) - 9) * 0.08
+        + max(0.0, 0.3125 - float(metrics["enclosure_proxy_ratio"])) * 2.2
+        + max(0.0, float(metrics["max_bar_pitch_class_jaccard"]) - 0.625) * 1.4
+        + float(metrics["two_note_cycle_ratio"]) * 3.0
+        + max(0.0, float(metrics["interval_trigram_repeat_ratio"]) - 0.0125) * 2.0
+        + float(metrics["bar_half_repeat_ratio"]) * 2.5
+        + abs(float(metrics["offbeat_non_chord_ratio"]) - 0.390625) * 1.0
+        + abs(float(metrics["chord_tone_ratio"]) - 0.8046875) * 0.8
+        + max(0.0, 0.18 - float(metrics["chromatic_step_ratio"])) * 0.6
+        + max(0.0, 0.125 - float(metrics["dominant_altered_offbeat_ratio"])) * 0.35
+        + max(0, 14 - int(metrics["unique_pitch_count"])) * 0.03
+        + float(item["score"]) * 0.10
+    )
+
+
+def selection_sort_key(row: dict[str, Any], *, selection_profile: str) -> tuple[float, float, str, str, int]:
+    if selection_profile == "score":
+        primary_score = float(row["score"])
+    elif selection_profile == "bebop_language":
+        primary_score = bebop_language_selection_score(row)
+    else:
+        raise BebopLanguagePackageError(f"unknown selection profile: {selection_profile}")
+    return (
+        primary_score,
+        float(row["gate_penalty"]),
+        str(row["case_label"]),
+        str(row["source_run_id"]),
+        int(row["variant_index"]),
+    )
+
+
 def order_rendered_for_listen_first(rendered: list[dict[str, Any]], *, listen_first_mode: str) -> list[dict[str, Any]]:
     if listen_first_mode == "rank":
         return rendered
@@ -965,6 +1003,7 @@ def build_best_of_package(
     repair_large_leaps_enabled: bool = False,
     repair_large_leaps_iterations: int = 4,
     min_large_leap_repair_enclosure_proxy_ratio: float = 0.28125,
+    selection_profile: str = "score",
 ) -> dict[str, Any]:
     paths = package_paths(source_root, package_globs)
     rows = candidate_rows(
@@ -1026,14 +1065,10 @@ def build_best_of_package(
             )
         selection_rows = sorted(
             repaired_selection_rows,
-            key=lambda row: (
-                float(row["score"]),
-                float(row["gate_penalty"]),
-                str(row["case_label"]),
-                str(row["source_run_id"]),
-                int(row["variant_index"]),
-            ),
+            key=lambda row: selection_sort_key(row, selection_profile=selection_profile),
         )
+    elif selection_profile != "score":
+        selection_rows = sorted(selection_rows, key=lambda row: selection_sort_key(row, selection_profile=selection_profile))
     selected = select_candidates(selection_rows, selected_count=selected_count, max_per_case=max_per_case)
     solo_dir = output_dir / "midi"
     mix_midi_dir = output_dir / "midi_with_context"
@@ -1150,6 +1185,7 @@ def build_best_of_package(
             "context_bass_velocity_boost": int(context_bass_velocity_boost),
             "context_comp_velocity_boost": int(context_comp_velocity_boost),
             "select_after_repair": bool(select_after_repair),
+            "selection_profile": selection_profile,
         },
         "renderer": render_config.renderer,
         "soundfont": render_config.soundfont,
@@ -1208,6 +1244,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--context_bass_velocity_boost", type=int, default=0)
     parser.add_argument("--context_comp_velocity_boost", type=int, default=0)
     parser.add_argument("--select_after_repair", action="store_true")
+    parser.add_argument("--selection_profile", choices=["score", "bebop_language"], default="score")
     return parser
 
 
@@ -1251,6 +1288,7 @@ def main() -> int:
         context_bass_velocity_boost=int(args.context_bass_velocity_boost),
         context_comp_velocity_boost=int(args.context_comp_velocity_boost),
         select_after_repair=bool(args.select_after_repair),
+        selection_profile=str(args.selection_profile),
     )
     print(json.dumps(validate_report(report, int(args.sample_rate)), ensure_ascii=False, indent=2))
     return 0

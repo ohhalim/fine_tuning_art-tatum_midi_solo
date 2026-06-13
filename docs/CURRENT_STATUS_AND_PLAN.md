@@ -42,6 +42,22 @@
 
 2026-06-13 best-of strict consonance 기준:
 
+- latest local package: `manual_2026_06_13_bebop_language_best_of_top4_bebop_selection_profile_probe`
+- source package count: `125`
+- candidate pool / selection pool / selected: `1807 / 18 / 4`
+- selection profile: `bebop_language`
+- strong-beat chord-tone: `1.0000`
+- offbeat non-chord / resolution / unresolved: `0.3906 / 1.0000 / 0.0000`
+- large leap / enclosure proxy / bar pitch-class similarity: `0.0476 / 0.3516 / 0.5774`
+- altered offbeat / two-note cycle / interval trigram repeat: `0.1250 / 0.0000 / 0.0123`
+- max gate penalty: `0.0000`
+- representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_bebop_selection_profile_probe/listen_first_by_progression/`
+- note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_bebop_selection_profile_note_review/bebop_language_note_review.md`
+- quality claim: `false`
+- model direct claim: `false`
+
+2026-06-13 previous best-of strict consonance 기준:
+
 - latest local package: `manual_2026_06_13_bebop_language_best_of_v8_interval_repeat_tight`
 - source package count: `107`
 - candidate pool / selection pool / selected: `1519 / 64 / 16`
@@ -104,6 +120,9 @@
 - strict-listen top4 large-leap-repair enclosure / two-note cycle / interval repeat: `0.3203 / 0.0000 / 0.0123`
 - strict-listen top4 large-leap-repair representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_large_leap_repair_probe/listen_first_by_progression/`
 - strict-listen top4 large-leap-repair note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_large_leap_repair_note_review/bebop_language_note_review.md`
+- strict-listen top4 v11 pool expansion package: `manual_2026_06_13_bebop_language_best_of_top4_v11_pool_large_leap_repair_probe`
+- strict-listen top4 v11 pool expansion adoption: `false`
+- strict-listen top4 v11 pool expansion reason: large leap `0.0595`, unresolved `0.0000` 유지, enclosure `0.3203 -> 0.3125`, bar pitch-class similarity `0.6012 -> 0.6369` 악화
 - quality claim: `false`
 - model direct claim: `false`
 - rejected follow-up package: `manual_2026_06_13_bebop_language_best_of_v9_with_v10_interval_sweep`
