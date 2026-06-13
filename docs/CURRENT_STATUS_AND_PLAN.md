@@ -52,6 +52,8 @@
 - max gate penalty: `0.0000`
 - listen-first mode: `consonance`
 - representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v8_interval_repeat_tight/listen_first_by_progression/`
+- note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_v8_listen_first_note_review/bebop_language_note_review.md`
+- first 32 notes outside count by listen-first candidate: `2 / 3 / 2 / 2`
 - quality claim: `false`
 - model direct claim: `false`
 - rejected follow-up package: `manual_2026_06_13_bebop_language_best_of_v9_with_v10_interval_sweep`

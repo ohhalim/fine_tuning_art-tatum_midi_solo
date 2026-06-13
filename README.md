@@ -58,6 +58,7 @@
 - best-of strict consonance 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v8_interval_repeat_tight/listen_first_by_progression/`
 - best-of strict consonance 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v8_interval_repeat_tight/audio_with_context/`
 - best-of strict consonance package report: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v8_interval_repeat_tight/bebop_language_best_of_package.md`
+- best-of strict consonance note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_v8_listen_first_note_review/bebop_language_note_review.md`
 - altered-color balanced 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/listen_first_by_progression/`
 - altered-color balanced 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/audio_with_context/`
 - altered-color balanced package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/bebop_language_package.md`
@@ -222,6 +223,7 @@
 ## 주요 파일
 
 - `scripts/build_stage_b_midi_to_solo_bebop_language_best_of_package.py`
+- `scripts/build_stage_b_midi_to_solo_bebop_language_note_review.py`
 - `scripts/run_stage_b_midi_to_solo_bebop_language_parameter_sweep.py`
 - `scripts/build_stage_b_midi_to_solo_bebop_language_package.py`
 - `scripts/build_music_transformer_solo_yield_rhythm_syncopation_balance_repair_package.py`
