@@ -22,9 +22,9 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1428, Stage B MIDI-to-solo bebop language motion-balance guard feasibility sweep
+- current issue: Issue #1430, Stage B MIDI-to-solo bebop language targeted offbeat pool expansion
 - open issue queue after residual-aware listening input guard merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware user listening review fill`
+- 다음 권장 이슈: `Stage B MIDI-to-solo targeted-low-offbeat listening review or case-balance repair`
 
 현재 범위가 아닌 것:
 
@@ -231,6 +231,42 @@
 - report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of_feasibility/manual_2026_06_13_bebop_language_motion_balance_guard_feasibility_sweep/bebop_language_safety_gate_feasibility_sweep.md`
 - judgment: 현 repaired pool 기준 offbeat cap 하향은 top8 유지 불가, bar similarity cap `0.675` 하향은 top8 유지 가능
 - next boundary: `motion_balance_guard_tightening_candidate_package`
+- representative replacement: `false`
+- quality claim: `false`
+- model direct claim: `false`
+
+2026-06-13 targeted low-offbeat package 기준:
+
+- source attempt package: `manual_2026_06_13_bebop_language_v24_targeted_low_offbeat_pool`
+- source generated / selected: `4000 / 128`
+- source strict offbeat `<=0.390625` rows: `23`
+- source strict offbeat gate `0` rows: `0`
+- source judgment: 낮은 offbeat 후보 생성 확인, pre-repair resolution/unresolved/gate 미충족
+- best-of package: `manual_2026_06_13_bebop_language_best_of_top8_targeted_low_offbeat_dedup_probe`
+- frontier role: outside-feel/offbeat reduction review expansion, representative replacement `false`
+- best-of candidate pool / selected: `1999 / 8`
+- max-per-case: `3`
+- pre-repair gate widened: max gate penalty `1.0000`, max unresolved offbeat non-chord `0.1000`
+- final strict offbeat cap: `0.390625`
+- final strict bar pitch-class similarity cap: `0.6750`
+- selected source duplicate sha/path: `0 / 0`
+- selected source note: 최종 top8은 v24 source package 직접 선택이 아니라 기존 parameter sweep 후보의 widened pre-repair gate 통과 후 repair/filter 결과
+- strong-beat chord-tone: `1.0000`
+- offbeat non-chord / resolution / unresolved: `0.3711 / 1.0000 / 0.0000`
+- max gate penalty / adjacent repeat: `0.0000 / 0.0000`
+- step motion / chromatic step / large leap: `0.4345 / 0.2401 / 0.0437`
+- enclosure proxy / bar pitch-class similarity: `0.3242 / 0.6429`
+- altered offbeat / interval trigram repeat: `0.1719 / 0.0082`
+- motion balance changed candidates / pitch repair steps: `8 / 36`
+- compared against motion-balance: offbeat `0.4063 -> 0.3711`, step motion `0.4226 -> 0.4345`, enclosure `0.3125 -> 0.3242`
+- recorded tradeoff against motion-balance: chromatic step `0.2440 -> 0.2401`, bar pitch-class similarity `0.6339 -> 0.6429`
+- preserved metrics against motion-balance: max gate penalty `0.0000`, adjacent repeat `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`, large leap `0.0437`
+- MIDI / solo WAV / context WAV: `8 / 8 / 8`
+- all-selected note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_targeted_low_offbeat_dedup_all_selected_note_review/bebop_language_note_review.md`
+- package report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_targeted_low_offbeat_dedup_probe/bebop_language_best_of_package.md`
+- review handoff path: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_targeted_low_offbeat_review_handoff/bebop_language_review_handoff.md`
+- review ready: `true`
+- next boundary: `listening_review_input_or_motion_balance_guard_tightening`
 - representative replacement: `false`
 - quality claim: `false`
 - model direct claim: `false`
