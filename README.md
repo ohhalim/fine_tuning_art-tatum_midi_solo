@@ -46,7 +46,7 @@
 - residual-aware completion audit: technical MVP complete `true`, local review ready `true`
 - residual-aware final status sync: synced `true`, next `listening_review_input_wait`
 - residual-aware listening review input wait: quality claim blocked `true`
-- bebop language best-of strict consonance listen-first package: source package `91`, pool `1263`, selection pool `54`, selected `16`, score `0.1908`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4238`, offbeat resolution `0.9259`, unresolved offbeat non-chord `0.0313`, altered offbeat `0.1602`, two-note cycle `0.0092`, max gate penalty `0.0000`, listen-first mode `consonance`
+- bebop language best-of strict consonance listen-first package: source package `107`, pool `1519`, selection pool `64`, selected `16`, score `0.1905`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4219`, offbeat resolution `0.9256`, unresolved offbeat non-chord `0.0313`, altered offbeat `0.1797`, two-note cycle `0.0092`, max gate penalty `0.0000`, listen-first mode `consonance`
 - bebop language best-of with-sweeps package: source package `91`, pool `1263`, selected `16`, score `0.2143`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4277`, offbeat resolution `0.9177`, unresolved offbeat non-chord `0.0352`, altered offbeat `0.1836`, two-note cycle `0.0082`, max gate penalty `0.0639`
 - bebop language best-of balanced package: source package `33`, pool `335`, selected `16`, score `0.2728`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4414`, offbeat resolution `0.8983`, unresolved offbeat non-chord `0.0449`, altered offbeat `0.1602`, two-note cycle `0.0092`, max-per-case `4`
 - bebop language altered-color balanced package: generated `4000`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4512`, offbeat resolution `0.8914`, unresolved offbeat non-chord `0.0488`, unique pitch avg `14.8125`, 3rd/4th motion `0.4831`, large leap `0.0863`, altered offbeat `0.1445`, bar pitch-class similarity `0.7027`, half-repeat `0.0000`
@@ -55,9 +55,9 @@
 
 ## 최신 산출물
 
-- best-of strict consonance 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v5_listen_consonance/listen_first_by_progression/`
-- best-of strict consonance 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v5_listen_consonance/audio_with_context/`
-- best-of strict consonance package report: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v5_listen_consonance/bebop_language_best_of_package.md`
+- best-of strict consonance 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v6_with_v9_sweep/listen_first_by_progression/`
+- best-of strict consonance 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v6_with_v9_sweep/audio_with_context/`
+- best-of strict consonance package report: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v6_with_v9_sweep/bebop_language_best_of_package.md`
 - altered-color balanced 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/listen_first_by_progression/`
 - altered-color balanced 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/audio_with_context/`
 - altered-color balanced package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/bebop_language_package.md`
@@ -80,8 +80,8 @@
 
 ```bash
 .venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_best_of_package.py \
-  --run_id manual_2026_06_13_bebop_language_best_of_v5_listen_consonance \
-  --package_globs 'manual_2026_06_13_bebop_language_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v6_data_contour_resolution/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v7_altered_balanced/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v8_v22_micro/config_*/bebop_language_package.json' \
+  --run_id manual_2026_06_13_bebop_language_best_of_v6_with_v9_sweep \
+  --package_globs 'manual_2026_06_13_bebop_language_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v6_data_contour_resolution/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v7_altered_balanced/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v8_v22_micro/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v9_strict_consonance/config_*/bebop_language_package.json' \
   --selected_count 16 \
   --max_per_case 4 \
   --bars 8 \
@@ -93,6 +93,20 @@
   --max_unresolved_offbeat_non_chord_ratio 0.03125 \
   --max_dominant_altered_offbeat_ratio 0.25 \
   --listen_first_mode consonance
+```
+
+```bash
+.venv/bin/python scripts/run_stage_b_midi_to_solo_bebop_language_parameter_sweep.py \
+  --run_id manual_2026_06_13_bebop_language_param_sweep_v9_strict_consonance \
+  --variants_per_progression 240 \
+  --selected_count 16 \
+  --bars 8 \
+  --bpm 124 \
+  --seed_base 4010000 \
+  --non_chord_probabilities 0.22,0.24,0.26,0.28 \
+  --target_chord_tone_ratios 0.78,0.80 \
+  --target_offbeat_non_chord_ratios 0.36,0.38,0.40 \
+  --max_configs 16
 ```
 
 ```bash
