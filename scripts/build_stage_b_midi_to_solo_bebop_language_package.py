@@ -761,6 +761,43 @@ def render_wav(render_config: RenderConfig, midi_path: Path, wav_path: Path) -> 
     }
 
 
+def build_listen_first_package(output_dir: Path, rendered: list[dict[str, Any]]) -> dict[str, Any]:
+    listen_dir = output_dir / "listen_first_by_progression"
+    listen_dir.mkdir(parents=True, exist_ok=True)
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for item in rendered:
+        case_label = str(item["case_label"])
+        if case_label in seen:
+            continue
+        seen.add(case_label)
+        index = len(rows) + 1
+        context_source = Path(str(item["context_audio"]["wav_file"]["path"]))
+        solo_source = Path(str(item["solo_audio"]["wav_file"]["path"]))
+        context_target = listen_dir / f"{index:02d}_{case_label}_rank_{int(item['rank']):02d}_with_context.wav"
+        solo_target = listen_dir / f"{index:02d}_{case_label}_rank_{int(item['rank']):02d}_solo_only.wav"
+        shutil.copy2(context_source, context_target)
+        shutil.copy2(solo_source, solo_target)
+        rows.append(
+            {
+                "case_label": case_label,
+                "rank": int(item["rank"]),
+                "variant_index": int(item["variant_index"]),
+                "chords": list(item["chords"]),
+                "context_wav": str(context_target),
+                "solo_wav": str(solo_target),
+                "objective_metrics": dict(item["objective_metrics"]),
+            }
+        )
+    report = {
+        "path": str(listen_dir),
+        "case_count": len(rows),
+        "files": rows,
+    }
+    write_json(listen_dir / "listen_first_by_progression.json", report)
+    return report
+
+
 def source_progressions(source_package: dict[str, Any]) -> list[dict[str, Any]]:
     seen: set[tuple[str, ...]] = set()
     rows: list[dict[str, Any]] = []
@@ -883,9 +920,11 @@ def build_package(
             }
         )
 
+    listen_first = build_listen_first_package(output_dir, rendered)
     aggregate_metrics = {
         "generated_candidate_count": len(generated),
         "selected_candidate_count": len(rendered),
+        "listen_first_case_count": int(listen_first["case_count"]),
         "avg_score": mean([float(item["score"]) for item in rendered]) if rendered else 0.0,
         "avg_chord_tone_ratio": mean([float(item["objective_metrics"]["chord_tone_ratio"]) for item in rendered])
         if rendered
@@ -947,6 +986,7 @@ def build_package(
             "sha256": sha256_file(Path(render_config.soundfont)),
         },
         "aggregate": aggregate_metrics,
+        "listen_first": listen_first,
         "selected_candidates": rendered,
         "quality_claimed": False,
         "model_direct_claimed": False,

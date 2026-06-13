@@ -46,13 +46,13 @@
 - residual-aware completion audit: technical MVP complete `true`, local review ready `true`
 - residual-aware final status sync: synced `true`, next `listening_review_input_wait`
 - residual-aware listening review input wait: quality claim blocked `true`
-- bebop language package: generated `320`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4707`, offbeat resolution `0.8511`
+- bebop language package: generated `320`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4609`, offbeat resolution `0.8512`, unresolved offbeat non-chord `0.0684`
 
 ## 최신 산출물
 
-- bebop language 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v6_balanced/listen_first_by_progression/`
-- bebop language 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v6_balanced/audio_with_context/`
-- bebop language package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v6_balanced/bebop_language_package.md`
+- bebop language 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v7_auto_listen_first/listen_first_by_progression/`
+- bebop language 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v7_auto_listen_first/audio_with_context/`
+- bebop language package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v7_auto_listen_first/bebop_language_package.md`
 - final review package: `outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_final_review/issue_1388_residual_aware_final_review_package/residual_aware_final_review_package.md`
 - review input template: `outputs/music_transformer_finetune_mvp/solo_yield_residual_aware_final_review/issue_1388_residual_aware_final_review_package/residual_aware_review_input_template.json`
 - MIDI 후보: `outputs/music_transformer_finetune_mvp/solo_yield_rhythm_syncopation_balance_repair/issue_1384_rhythm_syncopation_balance_repair_package/midi/`
@@ -69,12 +69,12 @@
 
 ```bash
 .venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_package.py \
-  --run_id manual_2026_06_13_bebop_language_v6_balanced \
+  --run_id manual_2026_06_13_bebop_language_v7_auto_listen_first \
   --variants_per_progression 80 \
   --selected_count 16 \
   --bars 8 \
   --bpm 124 \
-  --seed_base 131000 \
+  --seed_base 141000 \
   --non_chord_probability 0.34 \
   --target_chord_tone_ratio 0.74 \
   --target_offbeat_non_chord_ratio 0.44
