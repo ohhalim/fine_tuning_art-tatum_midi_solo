@@ -22,9 +22,9 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1432, Stage B MIDI-to-solo bebop language targeted low-offbeat case balance repair
+- current issue: Issue #1434, Stage B MIDI-to-solo bebop language case-balanced motion guard tightening
 - open issue queue after residual-aware listening input guard merge: `0`
-- 다음 권장 이슈: `Stage B MIDI-to-solo targeted-low-offbeat listening review input or motion-balance guard tightening`
+- 다음 권장 이슈: `Stage B MIDI-to-solo case-balanced motion-tight listening review input or interval-repeat guard audit`
 
 현재 범위가 아닌 것:
 
@@ -296,6 +296,38 @@
 - all-selected note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_targeted_low_offbeat_case_balanced_all_selected_note_review/bebop_language_note_review.md`
 - package report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_targeted_low_offbeat_case_balanced_probe/bebop_language_best_of_package.md`
 - review handoff path: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_targeted_low_offbeat_case_balanced_review_handoff/bebop_language_review_handoff.md`
+- review ready: `true`
+- next boundary: `listening_review_input_or_motion_balance_guard_tightening`
+- representative replacement: `false`
+- quality claim: `false`
+- model direct claim: `false`
+
+2026-06-13 case-balanced motion-tight package 기준:
+
+- package: `manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_tight_probe`
+- baseline package: `manual_2026_06_13_bebop_language_best_of_top8_targeted_low_offbeat_case_balanced_probe`
+- source pool unchanged: `true`
+- best-of candidate pool / selected: `1999 / 8`
+- max-per-case: `2`
+- selected case counts: dominant_cycle `2`, major_ii_v_turnaround `2`, minor_backdoor `2`, rhythm_turnaround `2`
+- final strict offbeat cap: `0.390625`
+- final strict bar pitch-class similarity cap: `0.6750`
+- motion target min step / chromatic / max large leap: `0.4300 / 0.2400 / 0.0450`
+- repair motion balance iterations: `24`
+- strong-beat chord-tone: `1.0000`
+- offbeat non-chord / resolution / unresolved: `0.3672 / 1.0000 / 0.0000`
+- max gate penalty / adjacent repeat: `0.0000 / 0.0000`
+- step motion / chromatic step / large leap: `0.4583 / 0.2599 / 0.0337`
+- enclosure proxy / bar pitch-class similarity: `0.3242 / 0.6345`
+- dominant altered offbeat / interval trigram repeat: `0.0703 / 0.0123`
+- motion balance pitch repair steps: `60`
+- compared against case-balanced baseline: step motion `0.4325 -> 0.4583`, chromatic step `0.2321 -> 0.2599`, large leap `0.0456 -> 0.0337`, enclosure `0.3164 -> 0.3242`
+- recorded improvement against case-balanced baseline: offbeat `0.3711 -> 0.3672`, bar pitch-class similarity `0.6429 -> 0.6345`, dominant altered offbeat `0.1719 -> 0.0703`
+- preserved metrics against case-balanced baseline: selected case counts `2/2/2/2`, max gate penalty `0.0000`, adjacent repeat `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`
+- MIDI / solo WAV / context WAV: `8 / 8 / 8`
+- all-selected note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_case_balanced_motion_tight_all_selected_note_review/bebop_language_note_review.md`
+- package report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_case_balanced_motion_tight_probe/bebop_language_best_of_package.md`
+- review handoff path: `outputs/stage_b_midi_to_solo_bebop_language_review_handoff/manual_2026_06_13_bebop_language_case_balanced_motion_tight_review_handoff/bebop_language_review_handoff.md`
 - review ready: `true`
 - next boundary: `listening_review_input_or_motion_balance_guard_tightening`
 - representative replacement: `false`
