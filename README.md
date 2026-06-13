@@ -6,11 +6,11 @@
 
 - 생성 방식: Music Transformer 계열 symbolic checkpoint + constrained decoding
 - 출력 단위: 2-8마디 solo-line MIDI 후보
-- 최신 review package: MIDI `16`, WAV `16`
-- objective rubric: pass/fail `6 / 2`
-- 남은 major label: `low_tension_color=2`
-- 남은 watch label: `dead_air_watch=3`
-- tension 추가 repair 가능성: current guard 기준 `false`
+- 최신 대표 review package: strict-listen top4 bar-repair, MIDI `4`, WAV `4`
+- 최신 objective gate: max gate penalty `0.0000`
+- 최신 chord/rhythm 지표: strong-beat chord-tone `1.0000`, unresolved offbeat `0.0156`, interval repeat `0.0000`, bar similarity `0.6012`
+- 기준 best-of review package: MIDI `16`, WAV `16`
+- residual-aware objective rubric: pass/fail `6 / 2`
 - validated listening input: `false`
 - human/audio preference claim: `false`
 - musical quality claim: `false`
@@ -47,6 +47,7 @@
 - residual-aware final status sync: synced `true`, next `listening_review_input_wait`
 - residual-aware listening review input wait: quality claim blocked `true`
 - bebop language best-of strict consonance listen-first package: source package `107`, pool `1519`, selection pool `64`, selected `16`, score `0.1905`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4219`, offbeat resolution `0.9256`, unresolved offbeat non-chord `0.0313`, altered offbeat `0.1797`, two-note cycle `0.0092`, interval trigram repeat `0.0369`, max gate penalty `0.0000`, listen-first mode `consonance`
+- bebop language strict-listen top4 bar-repair package: source package `119`, pool `1711`, selection pool `16`, selected `4`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.3984`, offbeat resolution `0.9615`, unresolved offbeat non-chord `0.0156`, altered offbeat `0.1875`, two-note cycle `0.0000`, interval trigram repeat `0.0000`, bar pitch-class similarity `0.6012`, max gate penalty `0.0000`, major ii-V turnaround bar similarity `0.8000 -> 0.5000`
 - bebop language best-of with-sweeps package: source package `91`, pool `1263`, selected `16`, score `0.2143`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4277`, offbeat resolution `0.9177`, unresolved offbeat non-chord `0.0352`, altered offbeat `0.1836`, two-note cycle `0.0082`, max gate penalty `0.0639`
 - bebop language best-of balanced package: source package `33`, pool `335`, selected `16`, score `0.2728`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4414`, offbeat resolution `0.8983`, unresolved offbeat non-chord `0.0449`, altered offbeat `0.1602`, two-note cycle `0.0092`, max-per-case `4`
 - bebop language altered-color balanced package: generated `4000`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4512`, offbeat resolution `0.8914`, unresolved offbeat non-chord `0.0488`, unique pitch avg `14.8125`, 3rd/4th motion `0.4831`, large leap `0.0863`, altered offbeat `0.1445`, bar pitch-class similarity `0.7027`, half-repeat `0.0000`
@@ -63,6 +64,8 @@
 - strict-listen top4 note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_strict_listen_note_review/bebop_language_note_review.md`
 - strict-listen top4 walking-context 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_walking_context/listen_first_by_progression/`
 - strict-listen top4 walking-context note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_walking_context_note_review/bebop_language_note_review.md`
+- strict-listen top4 bar-repair 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_bar_repair_probe/listen_first_by_progression/`
+- strict-listen top4 bar-repair note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_bar_repair_note_review/bebop_language_note_review.md`
 - altered-color balanced 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/listen_first_by_progression/`
 - altered-color balanced 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/audio_with_context/`
 - altered-color balanced package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/bebop_language_package.md`
@@ -82,6 +85,25 @@
 - listening review input wait doc: `docs/STAGE_B_MIDI_TO_SOLO_RESIDUAL_AWARE_LISTENING_REVIEW_INPUT_WAIT_2026-06-11.md`
 
 ## 재현 명령
+
+```bash
+.venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_best_of_package.py \
+  --run_id manual_2026_06_13_bebop_language_best_of_top4_bar_repair_probe \
+  --package_globs 'manual_2026_06_13_bebop_language_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v6_data_contour_resolution/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v7_altered_balanced/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v8_v22_micro/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v9_strict_consonance/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v10_interval_repeat_rank/config_*/bebop_language_package.json' \
+  --selected_count 4 \
+  --max_per_case 1 \
+  --bars 8 \
+  --bpm 124 \
+  --target_chord_tone_ratio 0.78 \
+  --target_offbeat_non_chord_ratio 0.38 \
+  --max_gate_penalty 0 \
+  --max_offbeat_non_chord_ratio 0.40625 \
+  --max_unresolved_offbeat_non_chord_ratio 0.03125 \
+  --max_dominant_altered_offbeat_ratio 0.25 \
+  --listen_first_mode consonance \
+  --repair_bar_similarity \
+  --repair_bar_similarity_iterations 4
+```
 
 ```bash
 .venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_best_of_package.py \

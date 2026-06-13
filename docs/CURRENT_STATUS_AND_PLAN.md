@@ -22,7 +22,7 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1404, Stage B MIDI-to-solo residual-aware listening review input wait
+- current issue: Issue #1406, Stage B MIDI-to-solo bebop language listen-first quality iteration
 - open issue queue after residual-aware listening input guard merge: `0`
 - 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware user listening review fill`
 
@@ -60,6 +60,15 @@
 - strict-listen top4 walking-context package: `manual_2026_06_13_bebop_language_best_of_top4_walking_context`
 - strict-listen top4 walking-context representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_walking_context/listen_first_by_progression/`
 - walking-context MIDI tracks: solo `64`, walking bass `32`, guide-tone comp `48`
+- strict-listen top4 bar-repair package: `manual_2026_06_13_bebop_language_best_of_top4_bar_repair_probe`
+- strict-listen top4 bar-repair candidate count: `4`
+- strict-listen top4 bar-repair offbeat / resolution / unresolved: `0.3984 / 0.9615 / 0.0156`
+- strict-listen top4 bar-repair altered / two-note cycle / interval repeat: `0.1875 / 0.0000 / 0.0000`
+- strict-listen top4 bar-repair average bar pitch-class similarity: `0.6881 -> 0.6012`
+- strict-listen top4 bar-repair major ii-V turnaround bar pitch-class similarity: `0.8000 -> 0.5000`
+- strict-listen top4 bar-repair max gate penalty: `0.0000`
+- strict-listen top4 bar-repair representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_bar_repair_probe/listen_first_by_progression/`
+- strict-listen top4 bar-repair note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_bar_repair_note_review/bebop_language_note_review.md`
 - quality claim: `false`
 - model direct claim: `false`
 - rejected follow-up package: `manual_2026_06_13_bebop_language_best_of_v9_with_v10_interval_sweep`
