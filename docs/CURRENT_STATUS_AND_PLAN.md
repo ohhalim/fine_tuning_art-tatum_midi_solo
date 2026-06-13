@@ -2,6 +2,8 @@
 
 작성일: 2026-06-11
 
+최신 로컬 갱신: 2026-06-13
+
 ## Current Focus
 
 현재 이 저장소의 우선순위는 입력 MIDI를 받아 jazz solo MIDI 후보를 출력하는 Stage B MIDI-to-solo MVP를 완성하는 것이다.
@@ -37,6 +39,23 @@
 ## Current Decision
 
 현재 목표는 완성형 jazz model claim이 아니라, `input.mid -> ranked solo MIDI candidates` 실행 경로를 만드는 것이다.
+
+2026-06-13 best-of strict consonance 기준:
+
+- latest local package: `manual_2026_06_13_bebop_language_best_of_v8_interval_repeat_tight`
+- source package count: `107`
+- candidate pool / selection pool / selected: `1519 / 64 / 16`
+- score: `0.1905`
+- strong-beat chord-tone: `1.0000`
+- offbeat non-chord / resolution / unresolved: `0.4219 / 0.9256 / 0.0313`
+- altered offbeat / two-note cycle / interval trigram repeat: `0.1797 / 0.0092 / 0.0369`
+- max gate penalty: `0.0000`
+- listen-first mode: `consonance`
+- representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_v8_interval_repeat_tight/listen_first_by_progression/`
+- quality claim: `false`
+- model direct claim: `false`
+- rejected follow-up package: `manual_2026_06_13_bebop_language_best_of_v9_with_v10_interval_sweep`
+- rejection reason: score `0.1905 -> 0.1920`, representative listening change not meaningful
 
 현재 품질 경계:
 
