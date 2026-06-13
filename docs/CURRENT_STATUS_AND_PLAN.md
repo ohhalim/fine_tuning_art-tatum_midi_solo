@@ -57,6 +57,9 @@
 - strict-listen top4 package: `manual_2026_06_13_bebop_language_best_of_top4_strict_listen`
 - strict-listen top4 offbeat / unresolved / interval repeat: `0.4063 / 0.0313 / 0.0164`
 - strict-listen top4 representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_strict_listen/listen_first_by_progression/`
+- strict-listen top4 walking-context package: `manual_2026_06_13_bebop_language_best_of_top4_walking_context`
+- strict-listen top4 walking-context representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_walking_context/listen_first_by_progression/`
+- walking-context MIDI tracks: solo `64`, walking bass `32`, guide-tone comp `48`
 - quality claim: `false`
 - model direct claim: `false`
 - rejected follow-up package: `manual_2026_06_13_bebop_language_best_of_v9_with_v10_interval_sweep`

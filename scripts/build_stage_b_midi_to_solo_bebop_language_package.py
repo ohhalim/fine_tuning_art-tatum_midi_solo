@@ -1007,19 +1007,33 @@ def add_context(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: int, bpm
             )
         out.instruments.append(copied)
 
-    bass = pretty_midi.Instrument(program=32, is_drum=False, name="review_root_fifth_bass")
+    bass = pretty_midi.Instrument(program=32, is_drum=False, name="review_walking_bass")
     comp = pretty_midi.Instrument(program=0, is_drum=False, name="review_guide_tone_comp")
     seconds_per_beat = 60.0 / float(bpm)
     for bar_index in range(bars):
         chord = chords[bar_index % len(chords)]
+        next_chord = chords[(bar_index + 1) % len(chords)]
         start = bar_index * 4 * seconds_per_beat
         end = (bar_index + 1) * 4 * seconds_per_beat
         root, intervals = parse_chord(chord)
-        bass_root = 36 + root
-        while bass_root > 47:
-            bass_root -= 12
-        bass.notes.append(pretty_midi.Note(velocity=76, pitch=bass_root, start=start, end=start + seconds_per_beat * 1.85))
-        bass.notes.append(pretty_midi.Note(velocity=66, pitch=bass_root + 7, start=start + seconds_per_beat * 2, end=end))
+        next_root, _ = parse_chord(next_chord)
+        bass_pitches = [
+            nearest(pitches_for_pcs({root}, low=36, high=54), 40),
+            nearest(pitches_for_pcs({(root + 7) % 12}, low=36, high=54), 43),
+            nearest(pitches_for_intervals(chord, list(guide_intervals(chord)), 36, 56), 45),
+            nearest(pitches_for_pcs({(next_root - 1) % 12}, low=36, high=56), 47),
+        ]
+        for beat_index, pitch in enumerate(bass_pitches):
+            note_start = start + beat_index * seconds_per_beat
+            note_end = min(end, note_start + seconds_per_beat * 0.86)
+            bass.notes.append(
+                pretty_midi.Note(
+                    velocity=70 if beat_index == 0 else 62,
+                    pitch=int(pitch),
+                    start=note_start,
+                    end=note_end,
+                )
+            )
 
         guides = list(guide_intervals(chord))
         if 14 not in intervals:
