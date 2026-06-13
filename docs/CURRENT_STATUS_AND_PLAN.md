@@ -22,7 +22,7 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1412, Stage B MIDI-to-solo bebop language stepwise chromatic selection repair
+- current issue: Issue #1414, Stage B MIDI-to-solo bebop language stepwise large-leap guard package
 - open issue queue after residual-aware listening input guard merge: `0`
 - 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware user listening review fill`
 
@@ -42,27 +42,27 @@
 
 2026-06-13 best-of strict consonance 기준:
 
-- latest local package: `manual_2026_06_13_bebop_language_best_of_top4_stepwise_chromatic_selection_probe`
+- latest local package: `manual_2026_06_13_bebop_language_best_of_top4_stepwise_large_leap_guard_probe`
 - source package count: `125`
 - candidate pool / selection pool / selected: `1807 / 18 / 4`
 - selection profile: `bebop_stepwise_chromatic`
 - strong-beat chord-tone: `1.0000`
-- offbeat non-chord / resolution / unresolved: `0.3828 / 1.0000 / 0.0000`
-- large leap / adjacent repeat / enclosure proxy / bar pitch-class similarity: `0.0556 / 0.0000 / 0.3359 / 0.6369`
-- step motion / chromatic step / third-fourth motion: `0.4048 / 0.2183 / 0.5397`
-- altered offbeat / two-note cycle / interval trigram repeat: `0.1406 / 0.0000 / 0.0123`
+- offbeat non-chord / resolution / unresolved: `0.3984 / 1.0000 / 0.0000`
+- large leap / adjacent repeat / enclosure proxy / bar pitch-class similarity: `0.0437 / 0.0000 / 0.3203 / 0.6131`
+- step motion / chromatic step / third-fourth motion: `0.4087 / 0.2143 / 0.5476`
+- altered offbeat / two-note cycle / interval trigram repeat: `0.1094 / 0.0000 / 0.0123`
 - max gate penalty: `0.0000`
 - rhythm articulation accepted: `4 / 4`
 - duration template repeat / most common duration: `0.8750 -> 0.3750 / 0.5000 -> 0.2031`
 - duration bucket / velocity count: `3 -> 16 / 4 -> 17`
-- representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_stepwise_chromatic_selection_probe/listen_first_by_progression/`
-- note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_stepwise_chromatic_selection_note_review/bebop_language_note_review.md`
+- representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_stepwise_large_leap_guard_probe/listen_first_by_progression/`
+- note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_stepwise_large_leap_guard_note_review/bebop_language_note_review.md`
 - quality claim: `false`
 - model direct claim: `false`
-- previous top4 rhythm-articulation package: `manual_2026_06_13_bebop_language_best_of_top4_rhythm_articulation_repair_probe`
-- stepwise-chromatic selection delta: step motion `0.3849 -> 0.4048`, chromatic step `0.1905 -> 0.2183`, third/fourth motion `0.5635 -> 0.5397`
-- recorded tradeoff after stepwise-chromatic selection: large leap `0.0516 -> 0.0556`, bar pitch-class similarity `0.5774 -> 0.6369`, enclosure proxy `0.3516 -> 0.3359`
-- preserved metrics after stepwise-chromatic selection: gate `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`, adjacent repeat `0.0000`
+- previous top4 stepwise-chromatic package: `manual_2026_06_13_bebop_language_best_of_top4_stepwise_chromatic_selection_probe`
+- stepwise large-leap guard delta: large leap `0.0556 -> 0.0437`, bar pitch-class similarity `0.6369 -> 0.6131`, step motion `0.4048 -> 0.4087`
+- recorded tradeoff after large-leap guard: chromatic step `0.2183 -> 0.2143`, enclosure proxy `0.3359 -> 0.3203`, dominant altered offbeat `0.1406 -> 0.1094`
+- preserved metrics after large-leap guard: gate `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`, adjacent repeat `0.0000`
 
 2026-06-13 previous best-of strict consonance 기준:
 
