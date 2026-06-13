@@ -207,6 +207,40 @@ def aggregate_metrics(*, generated_count: int, rendered: list[dict[str, Any]], l
     }
 
 
+def listen_first_consonance_score(item: dict[str, Any]) -> float:
+    metrics = item["objective_metrics"]
+    return (
+        float(item.get("gate_penalty") or 0.0) * 3.0
+        + float(metrics["offbeat_unresolved_non_chord_ratio"]) * 6.0
+        + abs(float(metrics["offbeat_non_chord_ratio"]) - 0.40625) * 1.4
+        + max(0.0, float(metrics["dominant_altered_offbeat_ratio"]) - 0.1875) * 2.0
+        + max(0.0, 0.10 - float(metrics["dominant_altered_offbeat_ratio"])) * 0.5
+        + max(0.0, float(metrics["max_bar_pitch_class_jaccard"]) - 0.72) * 1.2
+        + max(0.0, 14.0 - float(metrics["unique_pitch_count"])) * 0.04
+        + float(metrics["two_note_cycle_ratio"]) * 1.0
+        + float(item["score"]) * 0.12
+    )
+
+
+def order_rendered_for_listen_first(rendered: list[dict[str, Any]], *, listen_first_mode: str) -> list[dict[str, Any]]:
+    if listen_first_mode == "rank":
+        return rendered
+    if listen_first_mode != "consonance":
+        raise BebopLanguagePackageError(f"unknown listen-first mode: {listen_first_mode}")
+
+    best_by_case: dict[str, dict[str, Any]] = {}
+    for item in rendered:
+        case_label = str(item["case_label"])
+        current = best_by_case.get(case_label)
+        if current is None or listen_first_consonance_score(item) < listen_first_consonance_score(current):
+            best_by_case[case_label] = item
+
+    priority_hashes = {str(item["midi_sha256"]) for item in best_by_case.values()}
+    priority_rows = sorted(best_by_case.values(), key=lambda item: str(item["case_label"]))
+    remaining = [item for item in rendered if str(item["midi_sha256"]) not in priority_hashes]
+    return priority_rows + remaining
+
+
 def build_best_of_package(
     *,
     output_dir: Path,
@@ -223,6 +257,7 @@ def build_best_of_package(
     max_offbeat_non_chord_ratio: float | None = None,
     max_unresolved_offbeat_non_chord_ratio: float | None = None,
     max_dominant_altered_offbeat_ratio: float | None = None,
+    listen_first_mode: str = "rank",
 ) -> dict[str, Any]:
     paths = package_paths(source_root, package_globs)
     rows = candidate_rows(
@@ -269,7 +304,8 @@ def build_best_of_package(
                 "context_audio": render_wav(render_config, mix_midi_path, mix_audio_dir / f"{stem}_with_context.wav"),
             }
         )
-    listen_first = build_listen_first_package(output_dir, rendered)
+    listen_first_rendered = order_rendered_for_listen_first(rendered, listen_first_mode=listen_first_mode)
+    listen_first = build_listen_first_package(output_dir, listen_first_rendered)
     report = {
         "schema_version": "stage_b_midi_to_solo_bebop_language_best_of_package_v1",
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
@@ -291,6 +327,7 @@ def build_best_of_package(
             "max_offbeat_non_chord_ratio": max_offbeat_non_chord_ratio,
             "max_unresolved_offbeat_non_chord_ratio": max_unresolved_offbeat_non_chord_ratio,
             "max_dominant_altered_offbeat_ratio": max_dominant_altered_offbeat_ratio,
+            "listen_first_mode": listen_first_mode,
         },
         "renderer": render_config.renderer,
         "soundfont": render_config.soundfont,
@@ -335,6 +372,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max_offbeat_non_chord_ratio", type=float, default=None)
     parser.add_argument("--max_unresolved_offbeat_non_chord_ratio", type=float, default=None)
     parser.add_argument("--max_dominant_altered_offbeat_ratio", type=float, default=None)
+    parser.add_argument("--listen_first_mode", choices=["rank", "consonance"], default="rank")
     return parser
 
 
@@ -364,6 +402,7 @@ def main() -> int:
         max_offbeat_non_chord_ratio=args.max_offbeat_non_chord_ratio,
         max_unresolved_offbeat_non_chord_ratio=args.max_unresolved_offbeat_non_chord_ratio,
         max_dominant_altered_offbeat_ratio=args.max_dominant_altered_offbeat_ratio,
+        listen_first_mode=str(args.listen_first_mode),
     )
     print(json.dumps(validate_report(report, int(args.sample_rate)), ensure_ascii=False, indent=2))
     return 0
