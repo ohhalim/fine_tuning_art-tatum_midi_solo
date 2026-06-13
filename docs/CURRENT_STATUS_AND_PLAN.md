@@ -22,7 +22,7 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1418, Stage B MIDI-to-solo bebop language top8 safety gate package
+- current issue: Issue #1420, Stage B MIDI-to-solo bebop language safety gate motion feasibility sweep
 - open issue queue after residual-aware listening input guard merge: `0`
 - 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware user listening review fill`
 
@@ -123,6 +123,24 @@
 - recorded tradeoff against top8 frontier: max-per-case `2 -> 3`, step motion `0.3968 -> 0.3790`, chromatic step `0.2202 -> 0.2044`, large leap `0.0456 -> 0.0595`, enclosure proxy `0.3125 -> 0.2969`
 - rejected stricter case-balanced gate: max-per-case `2`, max adjacent repeat `0.0000`, max bar pitch-class similarity `0.7000-0.7200`, selectable count `7`
 - preserved metrics against top8 frontier: gate `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`
+
+2026-06-13 safety gate motion feasibility sweep 기준:
+
+- latest feasibility sweep: `manual_2026_06_13_bebop_language_top8_safety_motion_feasibility_sweep`
+- repaired pool count: `18`
+- safety baseline candidate count: `11`
+- safety baseline case counts: dominant_cycle `3`, major_ii_v_turnaround `1`, minor_backdoor `2`, rhythm_turnaround `5`
+- safety baseline selectable max-per-case `2 / 3`: `7 / 9`
+- selected count target: `8`
+- feasible strict motion config count: `0`
+- best strict motion config: min step `0.3600`, min chromatic `0.1800`, max large leap `0.1000`
+- best strict motion config selectable max-per-case `2 / 3`: `5 / 6`
+- report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of_feasibility/manual_2026_06_13_bebop_language_top8_safety_motion_feasibility_sweep/bebop_language_safety_gate_feasibility_sweep.md`
+- judgment: current repaired pool에서 hard filter만 추가하는 방식으로는 top8 유지와 motion/leap strictness 동시 만족 불가
+- next boundary: `selection_score_reweight_or_pool_expansion`
+- representative replacement: `false`
+- quality claim: `false`
+- model direct claim: `false`
 
 2026-06-13 previous best-of strict consonance 기준:
 
