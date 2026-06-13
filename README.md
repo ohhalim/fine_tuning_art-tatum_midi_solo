@@ -6,9 +6,9 @@
 
 - 생성 방식: Music Transformer 계열 symbolic checkpoint + constrained decoding
 - 출력 단위: 2-8마디 solo-line MIDI 후보
-- 최신 대표 review package: strict-listen top4 enclosure context-strong, MIDI `4`, WAV `4`
+- 최신 대표 review package: strict-listen top4 post-repair-select, MIDI `4`, WAV `4`
 - 최신 objective gate: max gate penalty `0.0000`
-- 최신 chord/rhythm 지표: strong-beat chord-tone `1.0000`, enclosure proxy `0.3281`, unresolved offbeat `0.0156`, interval repeat `0.0082`, bar similarity `0.6429`
+- 최신 chord/rhythm 지표: strong-beat chord-tone `1.0000`, enclosure proxy `0.3125`, unresolved offbeat `0.0078`, interval repeat `0.0082`, bar similarity `0.6429`
 - 기준 best-of review package: MIDI `16`, WAV `16`
 - residual-aware objective rubric: pass/fail `6 / 2`
 - validated listening input: `false`
@@ -50,6 +50,7 @@
 - bebop language strict-listen top4 bar-repair package: source package `119`, pool `1711`, selection pool `16`, selected `4`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.3984`, offbeat resolution `0.9615`, unresolved offbeat non-chord `0.0156`, altered offbeat `0.1875`, two-note cycle `0.0000`, interval trigram repeat `0.0000`, bar pitch-class similarity `0.6012`, max gate penalty `0.0000`, major ii-V turnaround bar similarity `0.8000 -> 0.5000`
 - bebop language strict-listen top4 enclosure-repair package: source package `119`, pool `1711`, selection pool `16`, selected `4`, strong-beat chord-tone `1.0000`, enclosure proxy `0.3281`, offbeat non-chord `0.3750`, offbeat resolution `0.9583`, unresolved offbeat non-chord `0.0156`, altered offbeat `0.1563`, two-note cycle `0.0000`, interval trigram repeat `0.0082`, bar pitch-class similarity `0.6429`, max gate penalty `0.0000`
 - bebop language strict-listen top4 enclosure context-strong package: source package `119`, pool `1711`, selection pool `16`, selected `4`, context bass velocity boost `6`, context comp velocity boost `10`, WAV RMS range `736.76-786.69`, max gate penalty `0.0000`, quality claim `false`
+- bebop language strict-listen top4 post-repair-select package: source package `119`, pool `1711`, selection pool `16`, selected `4`, select-after-repair `true`, strong-beat chord-tone `1.0000`, enclosure proxy `0.3125`, offbeat non-chord `0.3750`, offbeat resolution `0.9792`, unresolved offbeat non-chord `0.0078`, altered offbeat `0.1406`, two-note cycle `0.0000`, interval trigram repeat `0.0082`, bar pitch-class similarity `0.6429`, max gate penalty `0.0000`
 - bebop language best-of with-sweeps package: source package `91`, pool `1263`, selected `16`, score `0.2143`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4277`, offbeat resolution `0.9177`, unresolved offbeat non-chord `0.0352`, altered offbeat `0.1836`, two-note cycle `0.0082`, max gate penalty `0.0639`
 - bebop language best-of balanced package: source package `33`, pool `335`, selected `16`, score `0.2728`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4414`, offbeat resolution `0.8983`, unresolved offbeat non-chord `0.0449`, altered offbeat `0.1602`, two-note cycle `0.0092`, max-per-case `4`
 - bebop language altered-color balanced package: generated `4000`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4512`, offbeat resolution `0.8914`, unresolved offbeat non-chord `0.0488`, unique pitch avg `14.8125`, 3rd/4th motion `0.4831`, large leap `0.0863`, altered offbeat `0.1445`, bar pitch-class similarity `0.7027`, half-repeat `0.0000`
@@ -72,6 +73,8 @@
 - strict-listen top4 enclosure-repair note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_enclosure_repair_note_review/bebop_language_note_review.md`
 - strict-listen top4 enclosure context-strong 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_enclosure_context_strong_probe/listen_first_by_progression/`
 - strict-listen top4 enclosure context-strong note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_enclosure_context_strong_note_review/bebop_language_note_review.md`
+- strict-listen top4 post-repair-select 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_post_repair_select_probe/listen_first_by_progression/`
+- strict-listen top4 post-repair-select note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_post_repair_select_note_review/bebop_language_note_review.md`
 - altered-color balanced 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/listen_first_by_progression/`
 - altered-color balanced 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/audio_with_context/`
 - altered-color balanced package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/bebop_language_package.md`
@@ -94,7 +97,7 @@
 
 ```bash
 .venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_best_of_package.py \
-  --run_id manual_2026_06_13_bebop_language_best_of_top4_enclosure_context_strong_probe \
+  --run_id manual_2026_06_13_bebop_language_best_of_top4_post_repair_select_probe \
   --package_globs 'manual_2026_06_13_bebop_language_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v6_data_contour_resolution/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v7_altered_balanced/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v8_v22_micro/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v9_strict_consonance/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v10_interval_repeat_rank/config_*/bebop_language_package.json' \
   --selected_count 4 \
   --max_per_case 1 \
@@ -113,7 +116,8 @@
   --repair_enclosure_density_iterations 8 \
   --max_enclosure_repair_offbeat_non_chord_ratio 0.421875 \
   --context_bass_velocity_boost 6 \
-  --context_comp_velocity_boost 10
+  --context_comp_velocity_boost 10 \
+  --select_after_repair
 ```
 
 ```bash

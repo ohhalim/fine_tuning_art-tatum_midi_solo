@@ -83,6 +83,13 @@
 - strict-listen top4 enclosure context-strong WAV RMS range: `736.76-786.69`
 - strict-listen top4 enclosure context-strong representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_enclosure_context_strong_probe/listen_first_by_progression/`
 - strict-listen top4 enclosure context-strong note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_enclosure_context_strong_note_review/bebop_language_note_review.md`
+- strict-listen top4 post-repair-select package: `manual_2026_06_13_bebop_language_best_of_top4_post_repair_select_probe`
+- strict-listen top4 post-repair-select candidate count: `4`
+- strict-listen top4 post-repair-select offbeat / resolution / unresolved: `0.3750 / 0.9792 / 0.0078`
+- strict-listen top4 post-repair-select enclosure / altered / interval repeat: `0.3125 / 0.1406 / 0.0082`
+- strict-listen top4 post-repair-select average bar pitch-class similarity: `0.6429`
+- strict-listen top4 post-repair-select representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_post_repair_select_probe/listen_first_by_progression/`
+- strict-listen top4 post-repair-select note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_post_repair_select_note_review/bebop_language_note_review.md`
 - quality claim: `false`
 - model direct claim: `false`
 - rejected follow-up package: `manual_2026_06_13_bebop_language_best_of_v9_with_v10_interval_sweep`
