@@ -131,6 +131,7 @@ def build_markdown(report: dict[str, Any]) -> str:
         f"- best enclosure proxy: `{float(report['best_config']['summary']['avg_enclosure_proxy_ratio']):.4f}`",
         f"- best dominant altered offbeat: `{float(report['best_config']['summary']['avg_dominant_altered_offbeat_ratio']):.4f}`",
         f"- best two-note cycle: `{float(report['best_config']['summary']['avg_two_note_cycle_ratio']):.4f}`",
+        f"- best interval trigram repeat: `{float(report['best_config']['summary'].get('avg_interval_trigram_repeat_ratio') or 0.0):.4f}`",
         f"- best bar half-repeat: `{float(report['best_config']['summary']['avg_bar_half_repeat_ratio']):.4f}`",
         f"- best max bar pitch-class similarity: `{float(report['best_config']['summary']['avg_max_bar_pitch_class_jaccard']):.4f}`",
         f"- best bar pitch-shape repeat: `{float(report['best_config']['summary']['avg_bar_pitch_shape_repeat_ratio']):.4f}`",
@@ -139,8 +140,8 @@ def build_markdown(report: dict[str, Any]) -> str:
         "",
         "## Configs",
         "",
-        "| rank | config | score | gate | unique pitch | step | 3rd/4th | leap | chord-tone | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | half repeat | bar sim | shape repeat | min bar unique | package |",
-        "|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        "| rank | config | score | gate | unique pitch | step | 3rd/4th | leap | chord-tone | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | interval repeat | half repeat | bar sim | shape repeat | min bar unique | package |",
+        "|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
     for rank, row in enumerate(report["ranked_configs"], start=1):
         summary = row["summary"]
@@ -164,6 +165,7 @@ def build_markdown(report: dict[str, Any]) -> str:
                     f"{float(summary['avg_enclosure_proxy_ratio']):.4f}",
                     f"{float(summary['avg_dominant_altered_offbeat_ratio']):.4f}",
                     f"{float(summary['avg_two_note_cycle_ratio']):.4f}",
+                    f"{float(summary.get('avg_interval_trigram_repeat_ratio') or 0.0):.4f}",
                     f"{float(summary['avg_bar_half_repeat_ratio']):.4f}",
                     f"{float(summary['avg_max_bar_pitch_class_jaccard']):.4f}",
                     f"{float(summary['avg_bar_pitch_shape_repeat_ratio']):.4f}",

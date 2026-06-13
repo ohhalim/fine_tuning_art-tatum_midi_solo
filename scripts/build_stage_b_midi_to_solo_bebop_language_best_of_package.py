@@ -199,6 +199,7 @@ def aggregate_metrics(*, generated_count: int, rendered: list[dict[str, Any]], l
         "avg_enclosure_proxy_ratio": avg("enclosure_proxy_ratio"),
         "avg_dominant_altered_offbeat_ratio": avg("dominant_altered_offbeat_ratio"),
         "avg_two_note_cycle_ratio": avg("two_note_cycle_ratio"),
+        "avg_interval_trigram_repeat_ratio": avg("interval_trigram_repeat_ratio"),
         "avg_bar_half_repeat_ratio": avg("bar_half_repeat_ratio"),
         "avg_max_bar_pitch_class_jaccard": avg("max_bar_pitch_class_jaccard"),
         "avg_bar_pitch_shape_repeat_ratio": avg("bar_pitch_shape_repeat_ratio"),
@@ -218,6 +219,7 @@ def listen_first_consonance_score(item: dict[str, Any]) -> float:
         + max(0.0, float(metrics["max_bar_pitch_class_jaccard"]) - 0.72) * 1.2
         + max(0.0, 14.0 - float(metrics["unique_pitch_count"])) * 0.04
         + float(metrics["two_note_cycle_ratio"]) * 1.0
+        + max(0.0, float(metrics["interval_trigram_repeat_ratio"]) - 0.02) * 1.4
         + float(item["score"]) * 0.12
     )
 

@@ -759,6 +759,14 @@ def bar_pitch_class_similarity_metrics(pitches: list[int], *, slots_per_bar: int
     }
 
 
+def interval_ngram_repeat_ratio(pitches: list[int], *, ngram_size: int = 3) -> float:
+    intervals = [right - left for left, right in zip(pitches, pitches[1:])]
+    if len(intervals) < ngram_size:
+        return 0.0
+    grams = [tuple(intervals[index : index + ngram_size]) for index in range(len(intervals) - ngram_size + 1)]
+    return (len(grams) - len(set(grams))) / max(1, len(grams))
+
+
 def solo_notes(pm: pretty_midi.PrettyMIDI) -> list[pretty_midi.Note]:
     notes: list[pretty_midi.Note] = []
     for instrument in pm.instruments:
@@ -876,6 +884,7 @@ def objective_metrics(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: in
         "adjacent_repeat_ratio": adjacent_repeat_ratio(pitches),
         "chromatic_step_ratio": chromatic_step_ratio(pitches),
         "two_note_cycle_ratio": two_note_cycle_ratio(pitches),
+        "interval_trigram_repeat_ratio": interval_ngram_repeat_ratio(pitches, ngram_size=3),
         "bar_half_repeat_ratio": bar_half_repeat_ratio(pitches),
         "max_bar_pitch_class_jaccard": bar_similarity["max_bar_pitch_class_jaccard"],
         "avg_bar_pitch_class_jaccard": bar_similarity["avg_bar_pitch_class_jaccard"],
@@ -916,6 +925,7 @@ def candidate_score(
     enclosure = float(metrics.get("enclosure_proxy_ratio") or 0.0)
     dominant_altered = float(metrics.get("dominant_altered_offbeat_ratio") or 0.0)
     cycle = float(metrics.get("two_note_cycle_ratio") or 0.0)
+    interval_trigram_repeat = float(metrics.get("interval_trigram_repeat_ratio") or 0.0)
     half_repeat = float(metrics.get("bar_half_repeat_ratio") or 0.0)
     max_bar_similarity = float(metrics.get("max_bar_pitch_class_jaccard") or 0.0)
     shape_repeat = float(metrics.get("bar_pitch_shape_repeat_ratio") or 0.0)
@@ -940,6 +950,7 @@ def candidate_score(
         + max(0.0, 0.04 - enclosure) * 0.6
         + max(0.0, 0.14 - dominant_altered) * 0.7
         + cycle * 1.5
+        + max(0.0, interval_trigram_repeat - 0.02) * 1.4
         + half_repeat * 1.2
         + max(0.0, max_bar_similarity - 0.72) * 1.4
         + shape_repeat * 1.4
@@ -1276,6 +1287,11 @@ def build_package(
         )
         if rendered
         else 0.0,
+        "avg_interval_trigram_repeat_ratio": mean(
+            [float(item["objective_metrics"]["interval_trigram_repeat_ratio"]) for item in rendered]
+        )
+        if rendered
+        else 0.0,
         "avg_bar_half_repeat_ratio": mean(
             [float(item["objective_metrics"]["bar_half_repeat_ratio"]) for item in rendered]
         )
@@ -1391,6 +1407,7 @@ def validate_report(report: dict[str, Any], expected_sample_rate: int) -> dict[s
         "avg_enclosure_proxy_ratio": float(aggregate["avg_enclosure_proxy_ratio"]),
         "avg_dominant_altered_offbeat_ratio": float(aggregate["avg_dominant_altered_offbeat_ratio"]),
         "avg_two_note_cycle_ratio": float(aggregate["avg_two_note_cycle_ratio"]),
+        "avg_interval_trigram_repeat_ratio": float(aggregate.get("avg_interval_trigram_repeat_ratio") or 0.0),
         "avg_bar_half_repeat_ratio": float(aggregate["avg_bar_half_repeat_ratio"]),
         "avg_max_bar_pitch_class_jaccard": float(aggregate["avg_max_bar_pitch_class_jaccard"]),
         "avg_bar_pitch_shape_repeat_ratio": float(aggregate["avg_bar_pitch_shape_repeat_ratio"]),
@@ -1431,6 +1448,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         f"- avg enclosure proxy ratio: `{float(aggregate['avg_enclosure_proxy_ratio']):.4f}`",
         f"- avg dominant altered offbeat ratio: `{float(aggregate['avg_dominant_altered_offbeat_ratio']):.4f}`",
         f"- avg two-note cycle ratio: `{float(aggregate['avg_two_note_cycle_ratio']):.4f}`",
+        f"- avg interval trigram repeat ratio: `{float(aggregate.get('avg_interval_trigram_repeat_ratio') or 0.0):.4f}`",
         f"- avg bar half-repeat ratio: `{float(aggregate['avg_bar_half_repeat_ratio']):.4f}`",
         f"- avg max bar pitch-class similarity: `{float(aggregate['avg_max_bar_pitch_class_jaccard']):.4f}`",
         f"- avg bar pitch-shape repeat ratio: `{float(aggregate['avg_bar_pitch_shape_repeat_ratio']):.4f}`",
@@ -1441,8 +1459,8 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         "## Selected Files",
         "",
-        "| rank | case | chords | gate | score | unique pitch | step | 3rd/4th | leap | chord-tone | strong beat | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | half repeat | bar sim | shape repeat | min bar unique | solo WAV | context WAV |",
-        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
+        "| rank | case | chords | gate | score | unique pitch | step | 3rd/4th | leap | chord-tone | strong beat | offbeat non-chord | resolved | unresolved | chromatic | enclosure | altered | cycle | interval repeat | half repeat | bar sim | shape repeat | min bar unique | solo WAV | context WAV |",
+        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|",
     ]
     for item in report["selected_candidates"]:
         metrics = item["objective_metrics"]
@@ -1468,6 +1486,7 @@ def markdown_report(report: dict[str, Any]) -> str:
                     f"{float(metrics['enclosure_proxy_ratio']):.4f}",
                     f"{float(metrics['dominant_altered_offbeat_ratio']):.4f}",
                     f"{float(metrics['two_note_cycle_ratio']):.4f}",
+                    f"{float(metrics['interval_trigram_repeat_ratio']):.4f}",
                     f"{float(metrics['bar_half_repeat_ratio']):.4f}",
                     f"{float(metrics['max_bar_pitch_class_jaccard']):.4f}",
                     f"{float(metrics['bar_pitch_shape_repeat_ratio']):.4f}",
