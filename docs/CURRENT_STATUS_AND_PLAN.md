@@ -22,7 +22,7 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1420, Stage B MIDI-to-solo bebop language safety gate motion feasibility sweep
+- current issue: Issue #1422, Stage B MIDI-to-solo bebop language safety motion pool expansion package
 - open issue queue after residual-aware listening input guard merge: `0`
 - 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware user listening review fill`
 
@@ -139,6 +139,32 @@
 - judgment: current repaired pool에서 hard filter만 추가하는 방식으로는 top8 유지와 motion/leap strictness 동시 만족 불가
 - next boundary: `selection_score_reweight_or_pool_expansion`
 - representative replacement: `false`
+- quality claim: `false`
+- model direct claim: `false`
+
+2026-06-13 safety motion pool expansion package 기준:
+
+- source expansion package: `manual_2026_06_13_bebop_language_v23_safety_motion_pool_expansion`
+- source generated / selected: `4800 / 64`
+- source generation: variants-per-progression `1200`, seed-base `5010000`, non-chord probability `0.28`
+- source aggregate gate max / avg: `2.0000 / 0.0811`
+- best-of package: `manual_2026_06_13_bebop_language_best_of_top8_safety_pool_expansion_probe`
+- best-of candidate pool / selection pool / selected: `1871 / 12 / 8`
+- max-per-case: `3`
+- safety gate: max adjacent repeat `0.0000`, max bar pitch-class similarity `0.7000`
+- strong-beat chord-tone: `1.0000`
+- offbeat non-chord / resolution / unresolved: `0.3828 / 1.0000 / 0.0000`
+- large leap / adjacent repeat / enclosure proxy / bar pitch-class similarity: `0.0516 / 0.0000 / 0.3086 / 0.6256`
+- step motion / chromatic step / third-fourth motion: `0.3770 / 0.2004 / 0.5714`
+- altered offbeat / two-note cycle / interval trigram repeat: `0.1172 / 0.0000 / 0.0102`
+- MIDI / solo WAV / context WAV: `8 / 8 / 8`
+- all-selected note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_safety_pool_expansion_all_selected_note_review/bebop_language_note_review.md`
+- package report path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_safety_pool_expansion_probe/bebop_language_best_of_package.md`
+- recorded improvement against top8 safety gate: large leap `0.0595 -> 0.0516`, enclosure proxy `0.2969 -> 0.3086`, dominant altered offbeat `0.1016 -> 0.1172`
+- recorded tradeoff against top8 safety gate: step motion `0.3790 -> 0.3770`, chromatic step `0.2044 -> 0.2004`, bar pitch-class similarity `0.6131 -> 0.6256`
+- preserved metrics against top8 safety gate: gate `0.0000`, adjacent repeat `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`
+- representative replacement: `false`
+- next boundary: `selection_score_reweight_with_expanded_pool_or_targeted_generation`
 - quality claim: `false`
 - model direct claim: `false`
 
