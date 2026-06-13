@@ -1050,6 +1050,215 @@ def repair_large_leaps(
     return current, current_metrics, repair_report
 
 
+def motion_balance_score(
+    metrics: dict[str, Any],
+    *,
+    target_min_step_motion_ratio: float,
+    target_min_chromatic_step_ratio: float,
+    target_max_large_leap_ratio: float,
+) -> float:
+    return (
+        max(0.0, float(target_min_step_motion_ratio) - float(metrics["step_motion_ratio"])) * 5.0
+        + max(0.0, float(target_min_chromatic_step_ratio) - float(metrics["chromatic_step_ratio"])) * 5.0
+        + max(0.0, float(metrics["large_leap_ratio"]) - float(target_max_large_leap_ratio)) * 4.0
+        + max(0.0, 0.30 - float(metrics["enclosure_proxy_ratio"])) * 1.2
+        + float(metrics["adjacent_repeat_ratio"]) * 3.0
+        + float(metrics["offbeat_unresolved_non_chord_ratio"]) * 8.0
+        + max(0.0, float(metrics["max_bar_pitch_class_jaccard"]) - 0.70) * 2.0
+    )
+
+
+def motion_balance_replacement_pitches(
+    notes: list[pretty_midi.Note],
+    note_index: int,
+    chords: list[str],
+    *,
+    bars: int,
+    bpm: float,
+) -> list[int]:
+    note = notes[note_index]
+    previous = notes[note_index - 1] if note_index > 0 else None
+    next_note = notes[note_index + 1] if note_index + 1 < len(notes) else None
+    chord = chord_for_time(chords, float(note.start), bars=bars, bpm=bpm)
+    if is_strong_beat_note(note, bpm=bpm):
+        allowed_pcs = chord_pitch_classes(chord)
+    else:
+        chord_root, _intervals = parse_chord(chord)
+        root_pitch_class = chord_root % 12
+        allowed_pcs = {(root_pitch_class + interval) % 12 for interval in scale_intervals(chord)}
+        allowed_pcs |= chord_pitch_classes(chord)
+
+    references = {int(note.pitch)}
+    if previous is not None:
+        for offset in (-4, -3, -2, -1, 1, 2, 3, 4):
+            references.add(int(previous.pitch) + offset)
+    if next_note is not None:
+        for offset in (-4, -3, -2, -1, 1, 2, 3, 4):
+            references.add(int(next_note.pitch) + offset)
+
+    candidates: set[int] = set()
+    for reference in references:
+        for pitch in pitches_for_pcs(
+            allowed_pcs,
+            low=max(56, int(reference) - 2),
+            high=min(86, int(reference) + 2),
+        ):
+            if int(pitch) != int(note.pitch):
+                candidates.add(int(pitch))
+
+    def local_key(pitch: int) -> tuple[int, int, int, int]:
+        left = abs(int(pitch) - int(previous.pitch)) if previous is not None else 0
+        right = abs(int(next_note.pitch) - int(pitch)) if next_note is not None else 0
+        large_count = int(left >= 6) + int(right >= 6)
+        chromatic_count = int(left == 1) + int(right == 1)
+        step_count = int(left <= 2) + int(right <= 2)
+        return (large_count, -chromatic_count, -step_count, abs(int(pitch) - int(note.pitch)))
+
+    return sorted(candidates, key=local_key)[:10]
+
+
+def repair_motion_balance(
+    pm: pretty_midi.PrettyMIDI,
+    chords: list[str],
+    *,
+    bars: int,
+    bpm: float,
+    target_chord_tone_ratio: float,
+    target_offbeat_non_chord_ratio: float,
+    max_offbeat_non_chord_ratio: float,
+    max_bar_pitch_class_jaccard: float,
+    target_min_step_motion_ratio: float,
+    target_min_chromatic_step_ratio: float,
+    target_max_large_leap_ratio: float,
+    max_iterations: int = 8,
+) -> tuple[pretty_midi.PrettyMIDI, dict[str, Any], dict[str, Any]]:
+    current = copy.deepcopy(pm)
+    current_metrics = objective_metrics(current, chords, bars=bars, bpm=bpm)
+    current_score = candidate_score(
+        current_metrics,
+        target_chord_tone_ratio=target_chord_tone_ratio,
+        target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
+    )
+    current_gate = candidate_gate_penalty(current_metrics)
+    current_motion_score = motion_balance_score(
+        current_metrics,
+        target_min_step_motion_ratio=target_min_step_motion_ratio,
+        target_min_chromatic_step_ratio=target_min_chromatic_step_ratio,
+        target_max_large_leap_ratio=target_max_large_leap_ratio,
+    )
+    original_metrics = {
+        "step_motion_ratio": float(current_metrics["step_motion_ratio"]),
+        "chromatic_step_ratio": float(current_metrics["chromatic_step_ratio"]),
+        "large_leap_ratio": float(current_metrics["large_leap_ratio"]),
+        "enclosure_proxy_ratio": float(current_metrics["enclosure_proxy_ratio"]),
+        "max_bar_pitch_class_jaccard": float(current_metrics["max_bar_pitch_class_jaccard"]),
+    }
+    repair_steps: list[dict[str, Any]] = []
+
+    for _ in range(int(max_iterations)):
+        best_candidate: tuple[tuple[float, float, float, float, float], pretty_midi.PrettyMIDI, dict[str, Any], dict[str, Any]] | None = None
+        notes = solo_notes(current)
+        for note_index in range(len(notes)):
+            for replacement in motion_balance_replacement_pitches(notes, note_index, chords, bars=bars, bpm=bpm):
+                trial = copy.deepcopy(current)
+                trial_notes = solo_notes(trial)
+                old_pitch = int(trial_notes[note_index].pitch)
+                trial_notes[note_index].pitch = int(replacement)
+                metrics = objective_metrics(trial, chords, bars=bars, bpm=bpm)
+                gate = candidate_gate_penalty(metrics)
+                if gate > current_gate:
+                    continue
+                if float(metrics["offbeat_unresolved_non_chord_ratio"]) > float(
+                    current_metrics["offbeat_unresolved_non_chord_ratio"]
+                ):
+                    continue
+                if float(metrics["offbeat_non_chord_resolution_ratio"]) < float(
+                    current_metrics["offbeat_non_chord_resolution_ratio"]
+                ):
+                    continue
+                if float(metrics["offbeat_non_chord_ratio"]) > float(max_offbeat_non_chord_ratio):
+                    continue
+                if float(metrics["dominant_altered_offbeat_ratio"]) > 0.25:
+                    continue
+                if float(metrics["adjacent_repeat_ratio"]) > float(current_metrics["adjacent_repeat_ratio"]):
+                    continue
+                if float(metrics["two_note_cycle_ratio"]) > float(current_metrics["two_note_cycle_ratio"]):
+                    continue
+                if float(metrics["interval_trigram_repeat_ratio"]) > max(
+                    0.02,
+                    float(current_metrics["interval_trigram_repeat_ratio"]),
+                ):
+                    continue
+                if float(metrics["max_bar_pitch_class_jaccard"]) > float(max_bar_pitch_class_jaccard):
+                    continue
+                motion_score = motion_balance_score(
+                    metrics,
+                    target_min_step_motion_ratio=target_min_step_motion_ratio,
+                    target_min_chromatic_step_ratio=target_min_chromatic_step_ratio,
+                    target_max_large_leap_ratio=target_max_large_leap_ratio,
+                )
+                if motion_score >= current_motion_score:
+                    continue
+                score = candidate_score(
+                    metrics,
+                    target_chord_tone_ratio=target_chord_tone_ratio,
+                    target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
+                )
+                if score > current_score + 0.12:
+                    continue
+                improvement_key = (
+                    float(motion_score),
+                    float(metrics["large_leap_ratio"]),
+                    -float(metrics["chromatic_step_ratio"]),
+                    -float(metrics["step_motion_ratio"]),
+                    float(score),
+                )
+                step = {
+                    "changed_note_index": int(note_index + 1),
+                    "old_pitch": old_pitch,
+                    "new_pitch": int(replacement),
+                    "old_motion_balance_score": float(current_motion_score),
+                    "new_motion_balance_score": float(motion_score),
+                    "old_step_motion_ratio": float(current_metrics["step_motion_ratio"]),
+                    "new_step_motion_ratio": float(metrics["step_motion_ratio"]),
+                    "old_chromatic_step_ratio": float(current_metrics["chromatic_step_ratio"]),
+                    "new_chromatic_step_ratio": float(metrics["chromatic_step_ratio"]),
+                    "old_large_leap_ratio": float(current_metrics["large_leap_ratio"]),
+                    "new_large_leap_ratio": float(metrics["large_leap_ratio"]),
+                    "old_score": float(current_score),
+                    "new_score": float(score),
+                }
+                if best_candidate is None or improvement_key < best_candidate[0]:
+                    best_candidate = (improvement_key, trial, metrics, step)
+        if best_candidate is None:
+            break
+        _key, current, current_metrics, step = best_candidate
+        current_score = float(step["new_score"])
+        current_gate = candidate_gate_penalty(current_metrics)
+        current_motion_score = float(step["new_motion_balance_score"])
+        repair_steps.append(step)
+
+    repair_report = {
+        "attempted": True,
+        "changed": bool(repair_steps),
+        "step_count": len(repair_steps),
+        "original": original_metrics,
+        "final": {
+            "step_motion_ratio": float(current_metrics["step_motion_ratio"]),
+            "chromatic_step_ratio": float(current_metrics["chromatic_step_ratio"]),
+            "large_leap_ratio": float(current_metrics["large_leap_ratio"]),
+            "enclosure_proxy_ratio": float(current_metrics["enclosure_proxy_ratio"]),
+            "max_bar_pitch_class_jaccard": float(current_metrics["max_bar_pitch_class_jaccard"]),
+        },
+        "target_min_step_motion_ratio": float(target_min_step_motion_ratio),
+        "target_min_chromatic_step_ratio": float(target_min_chromatic_step_ratio),
+        "target_max_large_leap_ratio": float(target_max_large_leap_ratio),
+        "max_bar_pitch_class_jaccard": float(max_bar_pitch_class_jaccard),
+        "steps": repair_steps,
+    }
+    return current, current_metrics, repair_report
+
+
 def rhythm_articulation_metrics(pm: pretty_midi.PrettyMIDI, *, bars: int, bpm: float) -> dict[str, Any]:
     notes = solo_notes(pm)
     if not notes:
@@ -1193,11 +1402,18 @@ def apply_candidate_repairs(
     repair_large_leaps_enabled: bool,
     repair_large_leaps_iterations: int,
     min_large_leap_repair_enclosure_proxy_ratio: float,
+    repair_motion_balance_enabled: bool,
+    repair_motion_balance_iterations: int,
+    target_min_step_motion_ratio: float,
+    target_min_chromatic_step_ratio: float,
+    target_max_large_leap_ratio: float,
+    max_motion_balance_bar_pitch_class_jaccard: float,
 ) -> tuple[
     pretty_midi.PrettyMIDI,
     dict[str, Any],
     float,
     float,
+    dict[str, Any],
     dict[str, Any],
     dict[str, Any],
     dict[str, Any],
@@ -1209,6 +1425,7 @@ def apply_candidate_repairs(
     unresolved_offbeat_repair = {"attempted": False, "changed": False, "step_count": 0}
     adjacent_repeat_repair = {"attempted": False, "changed": False, "step_count": 0}
     large_leap_repair = {"attempted": False, "changed": False, "step_count": 0}
+    motion_balance_repair = {"attempted": False, "changed": False, "step_count": 0}
     item_metrics = objective_metrics(pm, item["chords"], bars=bars, bpm=bpm)
     item_score = candidate_score(
         item_metrics,
@@ -1301,6 +1518,27 @@ def apply_candidate_repairs(
             target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
         )
         item_gate_penalty = candidate_gate_penalty(item_metrics)
+    if repair_motion_balance_enabled:
+        pm, item_metrics, motion_balance_repair = repair_motion_balance(
+            pm,
+            item["chords"],
+            bars=bars,
+            bpm=bpm,
+            target_chord_tone_ratio=target_chord_tone_ratio,
+            target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
+            max_iterations=repair_motion_balance_iterations,
+            max_offbeat_non_chord_ratio=max_enclosure_repair_offbeat_non_chord_ratio,
+            max_bar_pitch_class_jaccard=max_motion_balance_bar_pitch_class_jaccard,
+            target_min_step_motion_ratio=target_min_step_motion_ratio,
+            target_min_chromatic_step_ratio=target_min_chromatic_step_ratio,
+            target_max_large_leap_ratio=target_max_large_leap_ratio,
+        )
+        item_score = candidate_score(
+            item_metrics,
+            target_chord_tone_ratio=target_chord_tone_ratio,
+            target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
+        )
+        item_gate_penalty = candidate_gate_penalty(item_metrics)
     return (
         pm,
         item_metrics,
@@ -1311,6 +1549,7 @@ def apply_candidate_repairs(
         unresolved_offbeat_repair,
         adjacent_repeat_repair,
         large_leap_repair,
+        motion_balance_repair,
     )
 
 
@@ -1348,6 +1587,12 @@ def build_best_of_package(
     repair_large_leaps_enabled: bool = False,
     repair_large_leaps_iterations: int = 4,
     min_large_leap_repair_enclosure_proxy_ratio: float = 0.28125,
+    repair_motion_balance_enabled: bool = False,
+    repair_motion_balance_iterations: int = 8,
+    target_min_step_motion_ratio: float = 0.40,
+    target_min_chromatic_step_ratio: float = 0.22,
+    target_max_large_leap_ratio: float = 0.055,
+    max_motion_balance_bar_pitch_class_jaccard: float = 0.70,
     repair_rhythm_articulation_enabled: bool = False,
     selection_profile: str = "score",
 ) -> dict[str, Any]:
@@ -1372,6 +1617,7 @@ def build_best_of_package(
         repair_bar_similarity_enabled or repair_enclosure_density_enabled or repair_unresolved_offbeat_enabled
         or repair_adjacent_repeats_enabled
         or repair_large_leaps_enabled
+        or repair_motion_balance_enabled
     ):
         repaired_selection_rows: list[dict[str, Any]] = []
         for item in selection_rows:
@@ -1387,6 +1633,7 @@ def build_best_of_package(
                 _unresolved_repair,
                 _adjacent_repair,
                 _large_leap_repair,
+                _motion_balance_repair,
             ) = apply_candidate_repairs(
                 pm,
                 item,
@@ -1406,6 +1653,12 @@ def build_best_of_package(
                 repair_large_leaps_enabled=repair_large_leaps_enabled,
                 repair_large_leaps_iterations=repair_large_leaps_iterations,
                 min_large_leap_repair_enclosure_proxy_ratio=min_large_leap_repair_enclosure_proxy_ratio,
+                repair_motion_balance_enabled=repair_motion_balance_enabled,
+                repair_motion_balance_iterations=repair_motion_balance_iterations,
+                target_min_step_motion_ratio=target_min_step_motion_ratio,
+                target_min_chromatic_step_ratio=target_min_chromatic_step_ratio,
+                target_max_large_leap_ratio=target_max_large_leap_ratio,
+                max_motion_balance_bar_pitch_class_jaccard=max_motion_balance_bar_pitch_class_jaccard,
             )
             repaired_selection_rows.append(
                 {
@@ -1450,6 +1703,7 @@ def build_best_of_package(
             unresolved_offbeat_repair,
             adjacent_repeat_repair,
             large_leap_repair,
+            motion_balance_repair,
         ) = apply_candidate_repairs(
             pm,
             item,
@@ -1469,6 +1723,12 @@ def build_best_of_package(
             repair_large_leaps_enabled=repair_large_leaps_enabled,
             repair_large_leaps_iterations=repair_large_leaps_iterations,
             min_large_leap_repair_enclosure_proxy_ratio=min_large_leap_repair_enclosure_proxy_ratio,
+            repair_motion_balance_enabled=repair_motion_balance_enabled,
+            repair_motion_balance_iterations=repair_motion_balance_iterations,
+            target_min_step_motion_ratio=target_min_step_motion_ratio,
+            target_min_chromatic_step_ratio=target_min_chromatic_step_ratio,
+            target_max_large_leap_ratio=target_max_large_leap_ratio,
+            max_motion_balance_bar_pitch_class_jaccard=max_motion_balance_bar_pitch_class_jaccard,
         )
         rhythm_articulation_repair = {"attempted": False, "changed": False, "accepted": False}
         if repair_rhythm_articulation_enabled:
@@ -1540,6 +1800,7 @@ def build_best_of_package(
             or (repair_unresolved_offbeat_enabled and bool(unresolved_offbeat_repair.get("changed")))
             or (repair_adjacent_repeats_enabled and bool(adjacent_repeat_repair.get("changed")))
             or (repair_large_leaps_enabled and bool(large_leap_repair.get("changed")))
+            or (repair_motion_balance_enabled and bool(motion_balance_repair.get("changed")))
             or (repair_rhythm_articulation_enabled and bool(rhythm_articulation_repair.get("accepted")))
         ):
             pm.write(str(solo_midi_path))
@@ -1557,6 +1818,7 @@ def build_best_of_package(
                 "unresolved_offbeat_repair": unresolved_offbeat_repair,
                 "adjacent_repeat_repair": adjacent_repeat_repair,
                 "large_leap_repair": large_leap_repair,
+                "motion_balance_repair": motion_balance_repair,
                 "rhythm_articulation_repair": rhythm_articulation_repair,
                 "rhythm_articulation_metrics": rhythm_metrics,
                 "rank": int(rank),
@@ -1604,6 +1866,12 @@ def build_best_of_package(
             "repair_adjacent_repeats_iterations": int(repair_adjacent_repeats_iterations),
             "repair_large_leaps": bool(repair_large_leaps_enabled),
             "repair_large_leaps_iterations": int(repair_large_leaps_iterations),
+            "repair_motion_balance": bool(repair_motion_balance_enabled),
+            "repair_motion_balance_iterations": int(repair_motion_balance_iterations),
+            "target_min_step_motion_ratio": float(target_min_step_motion_ratio),
+            "target_min_chromatic_step_ratio": float(target_min_chromatic_step_ratio),
+            "target_max_large_leap_ratio": float(target_max_large_leap_ratio),
+            "max_motion_balance_bar_pitch_class_jaccard": float(max_motion_balance_bar_pitch_class_jaccard),
             "repair_rhythm_articulation": bool(repair_rhythm_articulation_enabled),
             "min_large_leap_repair_enclosure_proxy_ratio": float(min_large_leap_repair_enclosure_proxy_ratio),
             "max_enclosure_repair_offbeat_non_chord_ratio": float(max_enclosure_repair_offbeat_non_chord_ratio),
@@ -1668,6 +1936,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--repair_adjacent_repeats_iterations", type=int, default=4)
     parser.add_argument("--repair_large_leaps", action="store_true")
     parser.add_argument("--repair_large_leaps_iterations", type=int, default=4)
+    parser.add_argument("--repair_motion_balance", action="store_true")
+    parser.add_argument("--repair_motion_balance_iterations", type=int, default=8)
+    parser.add_argument("--target_min_step_motion_ratio", type=float, default=0.40)
+    parser.add_argument("--target_min_chromatic_step_ratio", type=float, default=0.22)
+    parser.add_argument("--target_max_large_leap_ratio", type=float, default=0.055)
+    parser.add_argument("--max_motion_balance_bar_pitch_class_jaccard", type=float, default=0.70)
     parser.add_argument("--repair_rhythm_articulation", action="store_true")
     parser.add_argument("--min_large_leap_repair_enclosure_proxy_ratio", type=float, default=0.28125)
     parser.add_argument("--max_enclosure_repair_offbeat_non_chord_ratio", type=float, default=0.421875)
@@ -1722,6 +1996,12 @@ def main() -> int:
         repair_large_leaps_enabled=bool(args.repair_large_leaps),
         repair_large_leaps_iterations=int(args.repair_large_leaps_iterations),
         min_large_leap_repair_enclosure_proxy_ratio=float(args.min_large_leap_repair_enclosure_proxy_ratio),
+        repair_motion_balance_enabled=bool(args.repair_motion_balance),
+        repair_motion_balance_iterations=int(args.repair_motion_balance_iterations),
+        target_min_step_motion_ratio=float(args.target_min_step_motion_ratio),
+        target_min_chromatic_step_ratio=float(args.target_min_chromatic_step_ratio),
+        target_max_large_leap_ratio=float(args.target_max_large_leap_ratio),
+        max_motion_balance_bar_pitch_class_jaccard=float(args.max_motion_balance_bar_pitch_class_jaccard),
         repair_rhythm_articulation_enabled=bool(args.repair_rhythm_articulation),
         max_enclosure_repair_offbeat_non_chord_ratio=float(args.max_enclosure_repair_offbeat_non_chord_ratio),
         context_bass_velocity_boost=int(args.context_bass_velocity_boost),

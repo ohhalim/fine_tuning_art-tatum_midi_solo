@@ -4,6 +4,7 @@ from scripts.build_stage_b_midi_to_solo_bebop_language_best_of_package import (
     apply_rhythm_articulation_variation,
     bebop_stepwise_chromatic_selection_score,
     filter_candidate_rows,
+    motion_balance_score,
     rhythm_articulation_metrics,
 )
 from scripts.build_stage_b_midi_to_solo_bebop_language_package import (
@@ -131,6 +132,39 @@ class BebopLanguageRhythmArticulationTest(unittest.TestCase):
         )
 
         self.assertEqual(filtered, [safe])
+
+    def test_motion_balance_score_prefers_stepwise_chromatic_lower_leap_candidate(self) -> None:
+        base_metrics = {
+            "step_motion_ratio": 0.34,
+            "chromatic_step_ratio": 0.16,
+            "large_leap_ratio": 0.10,
+            "enclosure_proxy_ratio": 0.28,
+            "adjacent_repeat_ratio": 0.0,
+            "offbeat_unresolved_non_chord_ratio": 0.0,
+            "max_bar_pitch_class_jaccard": 0.62,
+        }
+        improved_metrics = {
+            **base_metrics,
+            "step_motion_ratio": 0.42,
+            "chromatic_step_ratio": 0.24,
+            "large_leap_ratio": 0.04,
+            "enclosure_proxy_ratio": 0.32,
+        }
+
+        self.assertLess(
+            motion_balance_score(
+                improved_metrics,
+                target_min_step_motion_ratio=0.40,
+                target_min_chromatic_step_ratio=0.22,
+                target_max_large_leap_ratio=0.055,
+            ),
+            motion_balance_score(
+                base_metrics,
+                target_min_step_motion_ratio=0.40,
+                target_min_chromatic_step_ratio=0.22,
+                target_max_large_leap_ratio=0.055,
+            ),
+        )
 
 
 if __name__ == "__main__":
