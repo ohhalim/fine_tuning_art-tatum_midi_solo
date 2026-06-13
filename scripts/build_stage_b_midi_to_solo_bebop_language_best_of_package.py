@@ -537,6 +537,8 @@ def build_best_of_package(
     repair_enclosure_density_enabled: bool = False,
     repair_enclosure_density_iterations: int = 8,
     max_enclosure_repair_offbeat_non_chord_ratio: float = 0.421875,
+    context_bass_velocity_boost: int = 0,
+    context_comp_velocity_boost: int = 0,
 ) -> dict[str, Any]:
     paths = package_paths(source_root, package_globs)
     rows = candidate_rows(
@@ -600,7 +602,14 @@ def build_best_of_package(
                 target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
             )
             item_gate_penalty = candidate_gate_penalty(item_metrics)
-        context_pm = add_context(pm, item["chords"], bars=bars, bpm=bpm)
+        context_pm = add_context(
+            pm,
+            item["chords"],
+            bars=bars,
+            bpm=bpm,
+            bass_velocity_boost=context_bass_velocity_boost,
+            comp_velocity_boost=context_comp_velocity_boost,
+        )
         safe_case = str(item["case_label"]).replace("/", "_").replace(" ", "_")
         stem = f"candidate_{rank:02d}_{safe_case}_variant_{int(item['variant_index']):02d}_best_of"
         solo_midi_path = solo_dir / f"{stem}.mid"
@@ -661,6 +670,8 @@ def build_best_of_package(
             "repair_enclosure_density": bool(repair_enclosure_density_enabled),
             "repair_enclosure_density_iterations": int(repair_enclosure_density_iterations),
             "max_enclosure_repair_offbeat_non_chord_ratio": float(max_enclosure_repair_offbeat_non_chord_ratio),
+            "context_bass_velocity_boost": int(context_bass_velocity_boost),
+            "context_comp_velocity_boost": int(context_comp_velocity_boost),
         },
         "renderer": render_config.renderer,
         "soundfont": render_config.soundfont,
@@ -711,6 +722,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--repair_enclosure_density", action="store_true")
     parser.add_argument("--repair_enclosure_density_iterations", type=int, default=8)
     parser.add_argument("--max_enclosure_repair_offbeat_non_chord_ratio", type=float, default=0.421875)
+    parser.add_argument("--context_bass_velocity_boost", type=int, default=0)
+    parser.add_argument("--context_comp_velocity_boost", type=int, default=0)
     return parser
 
 
@@ -746,6 +759,8 @@ def main() -> int:
         repair_enclosure_density_enabled=bool(args.repair_enclosure_density),
         repair_enclosure_density_iterations=int(args.repair_enclosure_density_iterations),
         max_enclosure_repair_offbeat_non_chord_ratio=float(args.max_enclosure_repair_offbeat_non_chord_ratio),
+        context_bass_velocity_boost=int(args.context_bass_velocity_boost),
+        context_comp_velocity_boost=int(args.context_comp_velocity_boost),
     )
     print(json.dumps(validate_report(report, int(args.sample_rate)), ensure_ascii=False, indent=2))
     return 0

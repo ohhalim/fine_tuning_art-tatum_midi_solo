@@ -992,7 +992,15 @@ def generated_sort_key(item: dict[str, Any]) -> tuple[float, float, str, int]:
     )
 
 
-def add_context(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: int, bpm: float) -> pretty_midi.PrettyMIDI:
+def add_context(
+    pm: pretty_midi.PrettyMIDI,
+    chords: list[str],
+    *,
+    bars: int,
+    bpm: float,
+    bass_velocity_boost: int = 0,
+    comp_velocity_boost: int = 0,
+) -> pretty_midi.PrettyMIDI:
     out = pretty_midi.PrettyMIDI(initial_tempo=bpm)
     for instrument in pm.instruments:
         copied = pretty_midi.Instrument(program=instrument.program, is_drum=instrument.is_drum, name=instrument.name)
@@ -1028,7 +1036,7 @@ def add_context(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: int, bpm
             note_end = min(end, note_start + seconds_per_beat * 0.86)
             bass.notes.append(
                 pretty_midi.Note(
-                    velocity=70 if beat_index == 0 else 62,
+                    velocity=min(127, (70 if beat_index == 0 else 62) + int(bass_velocity_boost)),
                     pitch=int(pitch),
                     start=note_start,
                     end=note_end,
@@ -1042,7 +1050,14 @@ def add_context(pm: pretty_midi.PrettyMIDI, chords: list[str], *, bars: int, bpm
         for comp_start in (start + seconds_per_beat, start + 3 * seconds_per_beat):
             comp_end = min(end, comp_start + seconds_per_beat * 0.58)
             for pitch in guide_notes:
-                comp.notes.append(pretty_midi.Note(velocity=62, pitch=int(pitch), start=comp_start, end=comp_end))
+                comp.notes.append(
+                    pretty_midi.Note(
+                        velocity=min(127, 62 + int(comp_velocity_boost)),
+                        pitch=int(pitch),
+                        start=comp_start,
+                        end=comp_end,
+                    )
+                )
     out.instruments.extend([bass, comp])
     return out
 

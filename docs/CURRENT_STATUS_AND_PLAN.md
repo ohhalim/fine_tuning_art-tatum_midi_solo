@@ -78,6 +78,11 @@
 - strict-listen top4 enclosure-repair max gate penalty: `0.0000`
 - strict-listen top4 enclosure-repair representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_enclosure_repair_probe/listen_first_by_progression/`
 - strict-listen top4 enclosure-repair note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_enclosure_repair_note_review/bebop_language_note_review.md`
+- strict-listen top4 enclosure context-strong package: `manual_2026_06_13_bebop_language_best_of_top4_enclosure_context_strong_probe`
+- strict-listen top4 enclosure context-strong context boost: bass `6`, comp `10`
+- strict-listen top4 enclosure context-strong WAV RMS range: `736.76-786.69`
+- strict-listen top4 enclosure context-strong representative path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_enclosure_context_strong_probe/listen_first_by_progression/`
+- strict-listen top4 enclosure context-strong note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_enclosure_context_strong_note_review/bebop_language_note_review.md`
 - quality claim: `false`
 - model direct claim: `false`
 - rejected follow-up package: `manual_2026_06_13_bebop_language_best_of_v9_with_v10_interval_sweep`
