@@ -5,9 +5,9 @@ from __future__ import annotations
 import argparse
 import copy
 import json
-import shutil
 import sys
-from collections import defaultdict
+import shutil
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from statistics import mean
@@ -181,9 +181,14 @@ def select_candidates(rows: list[dict[str, Any]], *, selected_count: int, max_pe
 
 def aggregate_metrics(*, generated_count: int, rendered: list[dict[str, Any]], listen_first: dict[str, Any]) -> dict[str, Any]:
     metrics = [item["objective_metrics"] for item in rendered]
+    rhythm_metrics = [item.get("rhythm_articulation_metrics") or {} for item in rendered]
 
     def avg(key: str) -> float:
         return mean([float(item[key]) for item in metrics]) if metrics else 0.0
+
+    def rhythm_avg(key: str) -> float:
+        values = [float(item[key]) for item in rhythm_metrics if key in item]
+        return mean(values) if values else 0.0
 
     return {
         "generated_candidate_count": int(generated_count),
@@ -211,6 +216,14 @@ def aggregate_metrics(*, generated_count: int, rendered: list[dict[str, Any]], l
         "avg_bar_half_repeat_ratio": avg("bar_half_repeat_ratio"),
         "avg_max_bar_pitch_class_jaccard": avg("max_bar_pitch_class_jaccard"),
         "avg_bar_pitch_shape_repeat_ratio": avg("bar_pitch_shape_repeat_ratio"),
+        "avg_duration_template_repeat_ratio": rhythm_avg("duration_template_repeat_ratio"),
+        "avg_most_common_duration_ratio": rhythm_avg("most_common_duration_ratio"),
+        "avg_unique_duration_bucket_count": rhythm_avg("unique_duration_bucket_count"),
+        "avg_unique_velocity_count": rhythm_avg("unique_velocity_count"),
+        "max_offbeat_start_shift_seconds": max(
+            (float(item.get("max_offbeat_start_shift_seconds") or 0.0) for item in rhythm_metrics),
+            default=0.0,
+        ),
         "min_bar_unique_pitch_count_min": min((int(item["min_bar_unique_pitch_count"]) for item in metrics), default=0),
         "all_final_landings_chord_tone": all(bool(item["final_landing_is_chord_tone"]) for item in metrics),
     }
@@ -1010,6 +1023,129 @@ def repair_large_leaps(
     return current, current_metrics, repair_report
 
 
+def rhythm_articulation_metrics(pm: pretty_midi.PrettyMIDI, *, bars: int, bpm: float) -> dict[str, Any]:
+    notes = solo_notes(pm)
+    if not notes:
+        return {
+            "note_count": 0,
+            "duration_template_repeat_ratio": 0.0,
+            "most_common_duration_ratio": 0.0,
+            "unique_duration_bucket_count": 0,
+            "unique_velocity_count": 0,
+            "velocity_range": 0,
+            "max_offbeat_start_shift_seconds": 0.0,
+        }
+    seconds_per_beat = 60.0 / float(bpm)
+    durations = [max(0.0, float(note.end) - float(note.start)) / seconds_per_beat for note in notes]
+    duration_buckets = [round(duration, 2) for duration in durations]
+    duration_counts = Counter(duration_buckets)
+    most_common_duration_ratio = max(duration_counts.values(), default=0) / max(1, len(duration_buckets))
+    bar_templates = [
+        tuple(duration_buckets[index : index + 8])
+        for index in range(0, min(len(duration_buckets), int(bars) * 8), 8)
+        if len(duration_buckets[index : index + 8]) == 8
+    ]
+    template_counts = Counter(bar_templates)
+    duration_template_repeat_ratio = max(template_counts.values(), default=0) / max(1, len(bar_templates))
+    velocities = [int(note.velocity) for note in notes]
+    ideal_starts = []
+    for bar_index in range(int(bars)):
+        bar_start = bar_index * 4 * seconds_per_beat
+        for beat_index in range(4):
+            ideal_starts.append(bar_start + beat_index * seconds_per_beat)
+            ideal_starts.append(bar_start + (beat_index + 2 / 3) * seconds_per_beat)
+    offbeat_shifts = []
+    for index, note in enumerate(notes[: len(ideal_starts)]):
+        if index % 2 == 1:
+            offbeat_shifts.append(abs(float(note.start) - float(ideal_starts[index])))
+    return {
+        "note_count": len(notes),
+        "duration_template_repeat_ratio": float(duration_template_repeat_ratio),
+        "most_common_duration_ratio": float(most_common_duration_ratio),
+        "unique_duration_bucket_count": len(set(duration_buckets)),
+        "unique_velocity_count": len(set(velocities)),
+        "velocity_range": max(velocities) - min(velocities) if velocities else 0,
+        "max_offbeat_start_shift_seconds": max(offbeat_shifts or [0.0]),
+    }
+
+
+def apply_rhythm_articulation_variation(
+    pm: pretty_midi.PrettyMIDI,
+    *,
+    bars: int,
+    bpm: float,
+) -> tuple[pretty_midi.PrettyMIDI, dict[str, Any]]:
+    current = copy.deepcopy(pm)
+    notes = solo_notes(current)
+    before_metrics = rhythm_articulation_metrics(current, bars=bars, bpm=bpm)
+    if not notes:
+        return current, {
+            "attempted": True,
+            "changed": False,
+            "reason": "no solo notes",
+            "before": before_metrics,
+            "after": before_metrics,
+        }
+
+    seconds_per_beat = 60.0 / float(bpm)
+    total_duration = int(bars) * 4 * seconds_per_beat
+    duration_patterns = (
+        (0.78, 0.54, 0.90, 0.62, 0.74, 0.58, 0.86, 0.66),
+        (0.70, 0.68, 0.84, 0.52, 0.82, 0.60, 0.76, 0.72),
+        (0.88, 0.50, 0.76, 0.70, 0.92, 0.56, 0.80, 0.64),
+    )
+    velocity_offsets = (
+        (10, -14, 4, -10, 8, -16, 2, -8),
+        (6, -8, 12, -16, 2, -10, 10, -12),
+        (12, -18, 0, -6, 10, -12, 4, -14),
+    )
+    offbeat_shift_beats = (
+        (0.0, -0.030, 0.0, 0.018, 0.0, -0.014, 0.0, 0.024),
+        (0.0, 0.020, 0.0, -0.026, 0.0, 0.014, 0.0, -0.018),
+        (0.0, -0.018, 0.0, 0.026, 0.0, -0.024, 0.0, 0.012),
+    )
+
+    original_starts = [float(note.start) for note in notes]
+    shifted_starts: list[float] = []
+    for index, note in enumerate(notes):
+        slot = index % 8
+        bar_index = min(index // 8, int(bars) - 1)
+        pattern_index = bar_index % len(duration_patterns)
+        shift_seconds = offbeat_shift_beats[pattern_index][slot] * seconds_per_beat
+        if slot % 2 == 0:
+            shift_seconds = 0.0
+        new_start = max(0.0, min(total_duration - 0.02, original_starts[index] + shift_seconds))
+        if shifted_starts:
+            new_start = max(new_start, shifted_starts[-1] + 0.02)
+        shifted_starts.append(float(new_start))
+        note.velocity = int(max(52, min(118, int(note.velocity) + velocity_offsets[pattern_index][slot])))
+
+    for index, note in enumerate(notes):
+        slot = index % 8
+        bar_index = min(index // 8, int(bars) - 1)
+        pattern_index = bar_index % len(duration_patterns)
+        next_start = shifted_starts[index + 1] if index + 1 < len(shifted_starts) else total_duration
+        available = max(0.05, next_start - shifted_starts[index])
+        duration = max(0.055, available * duration_patterns[pattern_index][slot])
+        note.start = float(shifted_starts[index])
+        note.end = float(min(total_duration, shifted_starts[index] + duration))
+        if index + 1 < len(notes):
+            note.end = min(float(note.end), float(next_start - 0.006))
+        if index == len(notes) - 1:
+            note.end = float(total_duration)
+
+    for instrument in current.instruments:
+        instrument.notes.sort(key=lambda note: (float(note.start), int(note.pitch), float(note.end)))
+
+    after_metrics = rhythm_articulation_metrics(current, bars=bars, bpm=bpm)
+    return current, {
+        "attempted": True,
+        "changed": after_metrics != before_metrics,
+        "before": before_metrics,
+        "after": after_metrics,
+    }
+
+
 def apply_candidate_repairs(
     pm: pretty_midi.PrettyMIDI,
     item: dict[str, Any],
@@ -1183,6 +1319,7 @@ def build_best_of_package(
     repair_large_leaps_enabled: bool = False,
     repair_large_leaps_iterations: int = 4,
     min_large_leap_repair_enclosure_proxy_ratio: float = 0.28125,
+    repair_rhythm_articulation_enabled: bool = False,
     selection_profile: str = "score",
 ) -> dict[str, Any]:
     paths = package_paths(source_root, package_globs)
@@ -1292,6 +1429,56 @@ def build_best_of_package(
             repair_large_leaps_iterations=repair_large_leaps_iterations,
             min_large_leap_repair_enclosure_proxy_ratio=min_large_leap_repair_enclosure_proxy_ratio,
         )
+        rhythm_articulation_repair = {"attempted": False, "changed": False, "accepted": False}
+        if repair_rhythm_articulation_enabled:
+            candidate_pm, rhythm_articulation_repair = apply_rhythm_articulation_variation(
+                pm,
+                bars=bars,
+                bpm=bpm,
+            )
+            candidate_metrics = objective_metrics(candidate_pm, item["chords"], bars=bars, bpm=bpm)
+            candidate_gate = candidate_gate_penalty(candidate_metrics)
+            guard_passed = (
+                candidate_gate <= item_gate_penalty
+                and float(candidate_metrics["offbeat_unresolved_non_chord_ratio"])
+                <= float(item_metrics["offbeat_unresolved_non_chord_ratio"])
+                and float(candidate_metrics["offbeat_non_chord_resolution_ratio"])
+                >= float(item_metrics["offbeat_non_chord_resolution_ratio"])
+                and float(candidate_metrics["adjacent_repeat_ratio"]) <= float(item_metrics["adjacent_repeat_ratio"])
+                and float(candidate_metrics["max_bar_pitch_class_jaccard"])
+                <= max(0.72, float(item_metrics["max_bar_pitch_class_jaccard"]) + 0.01)
+            )
+            rhythm_articulation_repair["accepted"] = bool(guard_passed)
+            rhythm_articulation_repair["guard"] = {
+                "before_gate_penalty": float(item_gate_penalty),
+                "after_gate_penalty": float(candidate_gate),
+                "before_offbeat_unresolved_non_chord_ratio": float(
+                    item_metrics["offbeat_unresolved_non_chord_ratio"]
+                ),
+                "after_offbeat_unresolved_non_chord_ratio": float(
+                    candidate_metrics["offbeat_unresolved_non_chord_ratio"]
+                ),
+                "before_offbeat_non_chord_resolution_ratio": float(
+                    item_metrics["offbeat_non_chord_resolution_ratio"]
+                ),
+                "after_offbeat_non_chord_resolution_ratio": float(
+                    candidate_metrics["offbeat_non_chord_resolution_ratio"]
+                ),
+                "before_adjacent_repeat_ratio": float(item_metrics["adjacent_repeat_ratio"]),
+                "after_adjacent_repeat_ratio": float(candidate_metrics["adjacent_repeat_ratio"]),
+                "before_max_bar_pitch_class_jaccard": float(item_metrics["max_bar_pitch_class_jaccard"]),
+                "after_max_bar_pitch_class_jaccard": float(candidate_metrics["max_bar_pitch_class_jaccard"]),
+            }
+            if guard_passed:
+                pm = candidate_pm
+                item_metrics = candidate_metrics
+                item_score = candidate_score(
+                    item_metrics,
+                    target_chord_tone_ratio=target_chord_tone_ratio,
+                    target_offbeat_non_chord_ratio=target_offbeat_non_chord_ratio,
+                )
+                item_gate_penalty = candidate_gate
+        rhythm_metrics = rhythm_articulation_metrics(pm, bars=bars, bpm=bpm)
         context_pm = add_context(
             pm,
             item["chords"],
@@ -1312,6 +1499,7 @@ def build_best_of_package(
             or (repair_unresolved_offbeat_enabled and bool(unresolved_offbeat_repair.get("changed")))
             or (repair_adjacent_repeats_enabled and bool(adjacent_repeat_repair.get("changed")))
             or (repair_large_leaps_enabled and bool(large_leap_repair.get("changed")))
+            or (repair_rhythm_articulation_enabled and bool(rhythm_articulation_repair.get("accepted")))
         ):
             pm.write(str(solo_midi_path))
         else:
@@ -1328,6 +1516,8 @@ def build_best_of_package(
                 "unresolved_offbeat_repair": unresolved_offbeat_repair,
                 "adjacent_repeat_repair": adjacent_repeat_repair,
                 "large_leap_repair": large_leap_repair,
+                "rhythm_articulation_repair": rhythm_articulation_repair,
+                "rhythm_articulation_metrics": rhythm_metrics,
                 "rank": int(rank),
                 "midi_path": str(solo_midi_path),
                 "midi_sha256": sha256_file(solo_midi_path),
@@ -1371,6 +1561,7 @@ def build_best_of_package(
             "repair_adjacent_repeats_iterations": int(repair_adjacent_repeats_iterations),
             "repair_large_leaps": bool(repair_large_leaps_enabled),
             "repair_large_leaps_iterations": int(repair_large_leaps_iterations),
+            "repair_rhythm_articulation": bool(repair_rhythm_articulation_enabled),
             "min_large_leap_repair_enclosure_proxy_ratio": float(min_large_leap_repair_enclosure_proxy_ratio),
             "max_enclosure_repair_offbeat_non_chord_ratio": float(max_enclosure_repair_offbeat_non_chord_ratio),
             "context_bass_velocity_boost": int(context_bass_velocity_boost),
@@ -1432,6 +1623,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--repair_adjacent_repeats_iterations", type=int, default=4)
     parser.add_argument("--repair_large_leaps", action="store_true")
     parser.add_argument("--repair_large_leaps_iterations", type=int, default=4)
+    parser.add_argument("--repair_rhythm_articulation", action="store_true")
     parser.add_argument("--min_large_leap_repair_enclosure_proxy_ratio", type=float, default=0.28125)
     parser.add_argument("--max_enclosure_repair_offbeat_non_chord_ratio", type=float, default=0.421875)
     parser.add_argument("--context_bass_velocity_boost", type=int, default=0)
@@ -1479,6 +1671,7 @@ def main() -> int:
         repair_large_leaps_enabled=bool(args.repair_large_leaps),
         repair_large_leaps_iterations=int(args.repair_large_leaps_iterations),
         min_large_leap_repair_enclosure_proxy_ratio=float(args.min_large_leap_repair_enclosure_proxy_ratio),
+        repair_rhythm_articulation_enabled=bool(args.repair_rhythm_articulation),
         max_enclosure_repair_offbeat_non_chord_ratio=float(args.max_enclosure_repair_offbeat_non_chord_ratio),
         context_bass_velocity_boost=int(args.context_bass_velocity_boost),
         context_comp_velocity_boost=int(args.context_comp_velocity_boost),

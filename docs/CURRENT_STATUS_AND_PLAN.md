@@ -22,7 +22,7 @@
 - latest residual-aware listening review pending: Issue #1398, Stage B MIDI-to-solo residual-aware listening review pending boundary
 - latest residual-aware completion audit: Issue #1400, Stage B MIDI-to-solo residual-aware completion audit
 - latest residual-aware final status sync: Issue #1402, Stage B MIDI-to-solo residual-aware final status sync
-- current issue: Issue #1408, Stage B MIDI-to-solo bebop language residual adjacent repeat repair
+- current issue: Issue #1410, Stage B MIDI-to-solo bebop language rhythm articulation repair
 - open issue queue after residual-aware listening input guard merge: `0`
 - 다음 권장 이슈: `Stage B MIDI-to-solo residual-aware user listening review fill`
 
@@ -42,7 +42,7 @@
 
 2026-06-13 best-of strict consonance 기준:
 
-- latest local package: `manual_2026_06_13_bebop_language_best_of_top4_residual_adjacent_search_repair_probe`
+- latest local package: `manual_2026_06_13_bebop_language_best_of_top4_rhythm_articulation_repair_probe`
 - source package count: `125`
 - candidate pool / selection pool / selected: `1807 / 18 / 4`
 - selection profile: `bebop_language`
@@ -51,13 +51,16 @@
 - large leap / adjacent repeat / enclosure proxy / bar pitch-class similarity: `0.0516 / 0.0000 / 0.3516 / 0.5774`
 - altered offbeat / two-note cycle / interval trigram repeat: `0.1250 / 0.0000 / 0.0123`
 - max gate penalty: `0.0000`
-- representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_residual_adjacent_search_repair_probe/listen_first_by_progression/`
-- note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_residual_adjacent_search_repair_note_review/bebop_language_note_review.md`
+- rhythm articulation accepted: `4 / 4`
+- duration template repeat / most common duration: `0.8750 -> 0.3750 / 0.5000 -> 0.2031`
+- duration bucket / velocity count: `3 -> 16 / 4 -> 17`
+- representative listening path: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top4_rhythm_articulation_repair_probe/listen_first_by_progression/`
+- note review path: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top4_rhythm_articulation_repair_note_review/bebop_language_note_review.md`
 - quality claim: `false`
 - model direct claim: `false`
-- previous top4 adjacent-repeat-final package: `manual_2026_06_13_bebop_language_best_of_top4_adjacent_repeat_final_repair_probe`
-- residual adjacent-search repair delta: adjacent repeat `0.0040 -> 0.0000`, large leap `0.0476 -> 0.0516`, enclosure proxy `0.3438 -> 0.3516`
-- preserved metrics after residual adjacent-search repair: gate `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`, bar pitch-class similarity `0.5774`
+- previous top4 residual-adjacent-search package: `manual_2026_06_13_bebop_language_best_of_top4_residual_adjacent_search_repair_probe`
+- rhythm articulation repair delta: duration template repeat `0.8750 -> 0.3750`, most common duration `0.5000 -> 0.2031`, duration bucket `3 -> 16`, velocity count `4 -> 17`
+- preserved metrics after rhythm articulation repair: gate `0.0000`, offbeat resolution `1.0000`, unresolved `0.0000`, adjacent repeat `0.0000`, bar pitch-class similarity `0.5774`
 
 2026-06-13 previous best-of strict consonance 기준:
 
