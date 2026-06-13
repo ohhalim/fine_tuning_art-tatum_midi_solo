@@ -5,8 +5,8 @@
 ## 현재 상태
 
 - 생성 방식: Music Transformer 계열 symbolic checkpoint + constrained decoding
-- 출력 단위: 2-4마디 solo-line MIDI 후보
-- 최신 review package: MIDI `8`, WAV `8`
+- 출력 단위: 2-8마디 solo-line MIDI 후보
+- 최신 review package: MIDI `16`, WAV `16`
 - objective rubric: pass/fail `6 / 2`
 - 남은 major label: `low_tension_color=2`
 - 남은 watch label: `dead_air_watch=3`
