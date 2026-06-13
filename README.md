@@ -7,7 +7,7 @@
 - 생성 방식: Music Transformer 계열 symbolic checkpoint + constrained decoding
 - 출력 단위: 2-8마디 solo-line MIDI 후보
 - 최신 대표 review package: strict-listen top4 stepwise-large-leap-guard, MIDI `4`, WAV `4`
-- 최신 frontier review package: strict-listen top8 stepwise-frontier, MIDI `8`, solo/context WAV `8 / 8`, all-selected note review `8`
+- 최신 frontier review package: strict-listen top8 safety-gate, MIDI `8`, solo/context WAV `8 / 8`, all-selected note review `8`
 - 최신 objective gate: max gate penalty `0.0000`
 - 최신 chord/rhythm 지표: strong-beat chord-tone `1.0000`, offbeat non-chord `0.3984`, offbeat resolution `1.0000`, unresolved offbeat `0.0000`, large leap `0.0437`, adjacent repeat `0.0000`, enclosure proxy `0.3203`, bar pitch-class similarity `0.6131`
 - 최신 contour 지표: step motion `0.3849 -> 0.4087`, chromatic step `0.1905 -> 0.2143`, third/fourth motion `0.5635 -> 0.5476`
@@ -63,6 +63,7 @@
 - bebop language strict-listen top4 stepwise-chromatic-selection package: source package `125`, pool `1807`, selection pool `18`, selected `4`, selection profile `bebop_stepwise_chromatic`, step motion `0.3849 -> 0.4048`, chromatic step `0.1905 -> 0.2183`, third/fourth motion `0.5635 -> 0.5397`, large leap `0.0516 -> 0.0556`, bar pitch-class similarity `0.5774 -> 0.6369`, max gate penalty `0.0000`, offbeat resolution `1.0000`, unresolved offbeat non-chord `0.0000`, adjacent repeat `0.0000`
 - bebop language strict-listen top4 stepwise-large-leap-guard package: source package `125`, pool `1807`, selection pool `18`, selected `4`, selection profile `bebop_stepwise_chromatic`, large-leap repair iterations `8`, step motion `0.3849 -> 0.4087`, chromatic step `0.1905 -> 0.2143`, third/fourth motion `0.5635 -> 0.5476`, large leap `0.0556 -> 0.0437`, bar pitch-class similarity `0.6369 -> 0.6131`, max gate penalty `0.0000`, offbeat resolution `1.0000`, unresolved offbeat non-chord `0.0000`, adjacent repeat `0.0000`
 - bebop language strict-listen top8 stepwise-frontier review package: source package `125`, pool `1807`, selection pool `18`, selected `8`, max-per-case `2`, selection profile `bebop_stepwise_chromatic`, large-leap repair iterations `8`, max gate penalty `0.0000`, offbeat resolution `1.0000`, unresolved offbeat non-chord `0.0000`, step motion `0.3968`, chromatic step `0.2202`, third/fourth motion `0.5575`, large leap `0.0456`, adjacent repeat `0.0020`, bar pitch-class similarity `0.6458`, duration template repeat `0.3750`, most common duration `0.2031`, quality claim `false`
+- bebop language strict-listen top8 safety-gate review package: source package `125`, pool `1807`, selection pool `11`, selected `8`, max-per-case `3`, max adjacent repeat `0.0000`, max bar pitch-class similarity `0.7000`, adjacent repeat `0.0020 -> 0.0000`, bar pitch-class similarity `0.6458 -> 0.6131`, max gate penalty `0.0000`, offbeat resolution `1.0000`, unresolved offbeat non-chord `0.0000`, step motion `0.3968 -> 0.3790`, chromatic step `0.2202 -> 0.2044`, large leap `0.0456 -> 0.0595`, quality claim `false`
 - bebop language best-of with-sweeps package: source package `91`, pool `1263`, selected `16`, score `0.2143`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4277`, offbeat resolution `0.9177`, unresolved offbeat non-chord `0.0352`, altered offbeat `0.1836`, two-note cycle `0.0082`, max gate penalty `0.0639`
 - bebop language best-of balanced package: source package `33`, pool `335`, selected `16`, score `0.2728`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4414`, offbeat resolution `0.8983`, unresolved offbeat non-chord `0.0449`, altered offbeat `0.1602`, two-note cycle `0.0092`, max-per-case `4`
 - bebop language altered-color balanced package: generated `4000`, selected `16`, strong-beat chord-tone `1.0000`, offbeat non-chord `0.4512`, offbeat resolution `0.8914`, unresolved offbeat non-chord `0.0488`, unique pitch avg `14.8125`, 3rd/4th motion `0.4831`, large leap `0.0863`, altered offbeat `0.1445`, bar pitch-class similarity `0.7027`, half-repeat `0.0000`
@@ -107,6 +108,10 @@
 - strict-listen top8 stepwise-frontier 전체 solo WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_stepwise_frontier_probe/audio/`
 - strict-listen top8 stepwise-frontier package report: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_stepwise_frontier_probe/bebop_language_best_of_package.md`
 - strict-listen top8 stepwise-frontier all-selected note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_stepwise_frontier_all_selected_note_review/bebop_language_note_review.md`
+- strict-listen top8 safety-gate 전체 context WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_safety_gate_probe/audio_with_context/`
+- strict-listen top8 safety-gate 전체 solo WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_safety_gate_probe/audio/`
+- strict-listen top8 safety-gate package report: `outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_safety_gate_probe/bebop_language_best_of_package.md`
+- strict-listen top8 safety-gate all-selected note review: `outputs/stage_b_midi_to_solo_bebop_language_note_review/manual_2026_06_13_bebop_language_top8_safety_gate_all_selected_note_review/bebop_language_note_review.md`
 - altered-color balanced 대표 청취: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/listen_first_by_progression/`
 - altered-color balanced 전체 WAV: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/audio_with_context/`
 - altered-color balanced package report: `outputs/stage_b_midi_to_solo_bebop_language_package/manual_2026_06_13_bebop_language_v22_altered_color_balanced/bebop_language_package.md`
@@ -170,10 +175,10 @@
 
 ```bash
 .venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_best_of_package.py \
-  --run_id manual_2026_06_13_bebop_language_best_of_top8_stepwise_frontier_probe \
+  --run_id manual_2026_06_13_bebop_language_best_of_top8_safety_gate_probe \
   --package_globs 'manual_2026_06_13_bebop_language_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v6_data_contour_resolution/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v7_altered_balanced/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v8_v22_micro/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v9_strict_consonance/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v10_interval_repeat_rank/config_*/bebop_language_package.json,parameter_sweep/manual_2026_06_13_bebop_language_param_sweep_v11_large_leap_pool/config_*/bebop_language_package.json' \
   --selected_count 8 \
-  --max_per_case 2 \
+  --max_per_case 3 \
   --bars 8 \
   --bpm 124 \
   --target_chord_tone_ratio 0.78 \
@@ -182,6 +187,8 @@
   --max_offbeat_non_chord_ratio 0.40625 \
   --max_unresolved_offbeat_non_chord_ratio 0.03125 \
   --max_dominant_altered_offbeat_ratio 0.25 \
+  --max_adjacent_repeat_ratio 0 \
+  --max_bar_pitch_class_jaccard 0.70 \
   --listen_first_mode consonance \
   --repair_bar_similarity \
   --repair_bar_similarity_iterations 4 \
@@ -204,8 +211,8 @@
 
 ```bash
 .venv/bin/python scripts/build_stage_b_midi_to_solo_bebop_language_note_review.py \
-  --run_id manual_2026_06_13_bebop_language_top8_stepwise_frontier_all_selected_note_review \
-  --package outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_stepwise_frontier_probe/bebop_language_best_of_package.json \
+  --run_id manual_2026_06_13_bebop_language_top8_safety_gate_all_selected_note_review \
+  --package outputs/stage_b_midi_to_solo_bebop_language_package/best_of/manual_2026_06_13_bebop_language_best_of_top8_safety_gate_probe/bebop_language_best_of_package.json \
   --all_candidates \
   --max_notes 32
 ```

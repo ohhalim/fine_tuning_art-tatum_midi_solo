@@ -3,6 +3,7 @@ import unittest
 from scripts.build_stage_b_midi_to_solo_bebop_language_best_of_package import (
     apply_rhythm_articulation_variation,
     bebop_stepwise_chromatic_selection_score,
+    filter_candidate_rows,
     rhythm_articulation_metrics,
 )
 from scripts.build_stage_b_midi_to_solo_bebop_language_package import (
@@ -91,6 +92,45 @@ class BebopLanguageRhythmArticulationTest(unittest.TestCase):
             bebop_stepwise_chromatic_selection_score(stepwise_like),
             bebop_stepwise_chromatic_selection_score(arpeggio_like),
         )
+
+    def test_safety_filter_excludes_adjacent_repeat_and_bar_similarity_regressions(self) -> None:
+        base_metrics = {
+            "offbeat_non_chord_ratio": 0.390625,
+            "offbeat_unresolved_non_chord_ratio": 0.0,
+            "dominant_altered_offbeat_ratio": 0.125,
+            "adjacent_repeat_ratio": 0.0,
+            "max_bar_pitch_class_jaccard": 0.62,
+        }
+        safe = {
+            "gate_penalty": 0.0,
+            "objective_metrics": base_metrics,
+        }
+        adjacent_repeat_regression = {
+            "gate_penalty": 0.0,
+            "objective_metrics": {
+                **base_metrics,
+                "adjacent_repeat_ratio": 0.02,
+            },
+        }
+        bar_similarity_regression = {
+            "gate_penalty": 0.0,
+            "objective_metrics": {
+                **base_metrics,
+                "max_bar_pitch_class_jaccard": 0.72,
+            },
+        }
+
+        filtered = filter_candidate_rows(
+            [safe, adjacent_repeat_regression, bar_similarity_regression],
+            max_gate_penalty=0.0,
+            max_offbeat_non_chord_ratio=0.40625,
+            max_unresolved_offbeat_non_chord_ratio=0.0,
+            max_dominant_altered_offbeat_ratio=0.25,
+            max_adjacent_repeat_ratio=0.0,
+            max_bar_pitch_class_jaccard=0.625,
+        )
+
+        self.assertEqual(filtered, [safe])
 
 
 if __name__ == "__main__":
