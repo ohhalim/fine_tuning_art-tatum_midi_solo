@@ -1,0 +1,661 @@
+"""
+Music Transformer QLoRA Fine-tuning Script
+재즈 피아노 MIDI 데이터셋으로 Music Transformer를 QLoRA 파인튜닝
+
+Usage:
+    python scripts/train_qlora.py --data_dir ./data/jazz_processed --epochs 3
+
+Reference:
+    - gwinndr/MusicTransformer-Pytorch
+    - ICLR 2019: Music Transformer (Huang et al.)
+"""
+
+import os
+import sys
+import argparse
+import math
+import random
+from pathlib import Path
+from typing import Any
+
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, Dataset
+from torch.optim import AdamW
+from torch.optim.lr_scheduler import CosineAnnealingLR
+from tqdm import tqdm
+
+# Add music_transformer to path. Walk up from this file until we find the
+# repo root that actually contains music_transformer/ (robust to the script
+# living in scripts/ or archive/scripts/).
+def _find_repo_root(start: Path) -> Path:
+    for cand in [start, *start.parents]:
+        if (cand / "music_transformer").is_dir():
+            return cand
+    return start.parent.parent  # fallback to original behaviour
+
+SCRIPT_DIR = _find_repo_root(Path(__file__).resolve())
+sys.path.insert(0, str(SCRIPT_DIR / "music_transformer"))
+sys.path.insert(0, str(SCRIPT_DIR / "music_transformer" / "third_party"))
+
+from model.music_transformer import MusicTransformer
+from model.loss import SmoothCrossEntropyLoss
+from utilities.constants import TOKEN_COND_SEP, TOKEN_PAD, VOCAB_SIZE
+
+# checkpoint_utils lives next to this script; make sure its dir is importable.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from checkpoint_utils import load_state_dict_with_token_resize
+except ModuleNotFoundError:
+    from scripts.checkpoint_utils import load_state_dict_with_token_resize
+
+
+# =============================================================================
+# LoRA Implementation for Music Transformer
+# =============================================================================
+
+class LoRALayer(nn.Module):
+    """Low-Rank Adaptation layer for linear projections.
+    
+    This wrapper provides weight/bias properties for compatibility with
+    rpr.py's multi_head_attention_forward_rpr which accesses .weight directly.
+    """
+    
+    def __init__(self, original_layer: nn.Linear, r: int = 16, alpha: int = 32, dropout: float = 0.05):
+        super().__init__()
+        self.original_layer = original_layer
+        self.r = r
+        self.alpha = alpha
+        self.scaling = alpha / r
+        
+        in_features = original_layer.in_features
+        out_features = original_layer.out_features
+        
+        # LoRA matrices
+        self.lora_A = nn.Parameter(torch.zeros(r, in_features))
+        self.lora_B = nn.Parameter(torch.zeros(out_features, r))
+        self.lora_dropout = nn.Dropout(dropout)
+        
+        # Initialize
+        nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
+        nn.init.zeros_(self.lora_B)
+        
+        # Freeze original weights
+        self.original_layer.weight.requires_grad = False
+        if self.original_layer.bias is not None:
+            self.original_layer.bias.requires_grad = False
+    
+    @property
+    def weight(self):
+        """Return the effective weight with LoRA applied.
+        
+        This allows rpr.py to use .weight directly while still applying LoRA.
+        """
+        # Compute LoRA delta: B @ A gives [out_features, in_features]
+        lora_weight = self.lora_B @ self.lora_A
+        return self.original_layer.weight + lora_weight * self.scaling
+    
+    @property
+    def bias(self):
+        """Return the original bias"""
+        return self.original_layer.bias
+    
+    @property
+    def in_features(self):
+        return self.original_layer.in_features
+    
+    @property
+    def out_features(self):
+        return self.original_layer.out_features
+    
+    def forward(self, x):
+        # Original forward
+        result = self.original_layer(x)
+        # LoRA forward
+        lora_out = self.lora_dropout(x) @ self.lora_A.T @ self.lora_B.T
+        return result + lora_out * self.scaling
+
+
+class LoRALinearWeight(nn.Module):
+    """LoRA for in_proj_weight style (combined Q, K, V projection)"""
+    
+    def __init__(self, embed_dim: int, r: int = 16, alpha: int = 32, dropout: float = 0.05):
+        super().__init__()
+        self.r = r
+        self.alpha = alpha
+        self.scaling = alpha / r
+        
+        # LoRA for Q, K, V separately
+        self.lora_A_q = nn.Parameter(torch.zeros(r, embed_dim))
+        self.lora_B_q = nn.Parameter(torch.zeros(embed_dim, r))
+        self.lora_A_k = nn.Parameter(torch.zeros(r, embed_dim))
+        self.lora_B_k = nn.Parameter(torch.zeros(embed_dim, r))
+        self.lora_A_v = nn.Parameter(torch.zeros(r, embed_dim))
+        self.lora_B_v = nn.Parameter(torch.zeros(embed_dim, r))
+        
+        self.lora_dropout = nn.Dropout(dropout)
+        
+        # Initialize
+        for param in [self.lora_A_q, self.lora_A_k, self.lora_A_v]:
+            nn.init.kaiming_uniform_(param, a=math.sqrt(5))
+        for param in [self.lora_B_q, self.lora_B_k, self.lora_B_v]:
+            nn.init.zeros_(param)
+    
+    def forward(self, x, original_weight, original_bias=None):
+        """Apply LoRA to QKV projection"""
+        # Original projection
+        result = torch.nn.functional.linear(x, original_weight, original_bias)
+        
+        # Split into Q, K, V
+        embed_dim = original_weight.shape[0] // 3
+        
+        # LoRA additions
+        x_drop = self.lora_dropout(x)
+        lora_q = x_drop @ self.lora_A_q.T @ self.lora_B_q.T * self.scaling
+        lora_k = x_drop @ self.lora_A_k.T @ self.lora_B_k.T * self.scaling
+        lora_v = x_drop @ self.lora_A_v.T @ self.lora_B_v.T * self.scaling
+        
+        # Add LoRA to result
+        result_q = result[..., :embed_dim] + lora_q
+        result_k = result[..., embed_dim:2*embed_dim] + lora_k
+        result_v = result[..., 2*embed_dim:] + lora_v
+        
+        return torch.cat([result_q, result_k, result_v], dim=-1)
+
+
+def add_lora_to_model(model: MusicTransformer, r: int = 16, alpha: int = 32, dropout: float = 0.05):
+    """Add LoRA layers to Music Transformer attention layers"""
+    
+    # Freeze all parameters first
+    for param in model.parameters():
+        param.requires_grad = False
+    
+    # Add LoRA to each encoder layer's output projection
+    lora_modules = nn.ModuleList()
+    
+    if hasattr(model.transformer, 'encoder'):
+        encoder = model.transformer.encoder
+    else:
+        encoder = model.transformer.custom_encoder if hasattr(model.transformer, 'custom_encoder') else None
+    
+    if encoder is None:
+        print("Warning: Could not find encoder in model")
+        return model, lora_modules
+    
+    for i, layer in enumerate(encoder.layers):
+        if hasattr(layer, 'self_attn'):
+            attn = layer.self_attn
+            
+            # Add LoRA to out_proj
+            if hasattr(attn, 'out_proj'):
+                original_out_proj = attn.out_proj
+                lora_out = LoRALayer(original_out_proj, r=r, alpha=alpha, dropout=dropout)
+                attn.out_proj = lora_out
+                lora_modules.append(lora_out)
+                print(f"  Added LoRA to layer {i} out_proj")
+    
+    # Count trainable parameters
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total_params = sum(p.numel() for p in model.parameters())
+    print(f"\nTrainable params: {trainable_params:,} / {total_params:,} ({100*trainable_params/total_params:.2f}%)")
+    
+    return model, lora_modules
+
+
+def set_seed(seed: int) -> None:
+    random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
+def count_trainable_parameters(model: nn.Module) -> tuple[int, int]:
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total_params = sum(p.numel() for p in model.parameters())
+    return trainable_params, total_params
+
+
+def unfreeze_base_model(model: nn.Module) -> None:
+    for param in model.parameters():
+        param.requires_grad = True
+
+
+def model_config_from_args(args: argparse.Namespace) -> dict[str, Any]:
+    return {
+        "n_layers": int(args.n_layers),
+        "num_heads": int(args.num_heads),
+        "d_model": int(args.d_model),
+        "dim_feedforward": int(args.dim_feedforward),
+        "max_sequence": int(args.max_sequence),
+        "rpr": bool(args.rpr),
+        "lora_r": int(args.lora_r),
+        "lora_alpha": int(args.lora_alpha),
+        "lora_dropout": float(args.lora_dropout),
+    }
+
+
+def checkpoint_payload_state_dict(checkpoint: object) -> dict[str, torch.Tensor]:
+    if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+        state_dict = checkpoint["model_state_dict"]
+        if isinstance(state_dict, dict):
+            return state_dict
+        raise ValueError(f"Unsupported model_state_dict type: {type(state_dict)}")
+    if isinstance(checkpoint, dict):
+        return checkpoint
+    raise ValueError(f"Unsupported checkpoint payload type: {type(checkpoint)}")
+
+
+def checkpoint_model_config(checkpoint: object) -> dict[str, Any]:
+    if isinstance(checkpoint, dict) and isinstance(checkpoint.get("model_config"), dict):
+        return dict(checkpoint["model_config"])
+    return {}
+
+
+def state_dict_uses_lora_wrappers(state_dict: dict[str, torch.Tensor]) -> bool:
+    return any("lora_" in key.lower() or ".original_layer." in key for key in state_dict)
+
+
+def state_dict_is_lora_only(state_dict: dict[str, torch.Tensor]) -> bool:
+    return bool(state_dict) and all("lora_" in key.lower() for key in state_dict)
+
+
+def apply_checkpoint_model_config(args: argparse.Namespace, model_config: dict[str, Any]) -> None:
+    for name in [
+        "n_layers",
+        "num_heads",
+        "d_model",
+        "dim_feedforward",
+        "max_sequence",
+        "lora_r",
+        "lora_alpha",
+    ]:
+        if name in model_config:
+            setattr(args, name, int(model_config[name]))
+    if "rpr" in model_config:
+        args.rpr = bool(model_config["rpr"])
+    if "lora_dropout" in model_config:
+        args.lora_dropout = float(model_config["lora_dropout"])
+
+
+def training_mode_name(args: argparse.Namespace) -> str:
+    if args.train_full_model:
+        return "full_model"
+    if args.checkpoint:
+        return "adapter"
+    return "random_base_lora"
+
+
+# =============================================================================
+# Dataset
+# =============================================================================
+
+CONTROL_PREFIX_LEN = 3
+CONTROL_CONDITIONING_MAX_TOKENS = 64
+
+
+def crop_control_v1_sequence(
+    tokens: torch.Tensor,
+    max_seq: int,
+    conditioning_max_tokens: int = CONTROL_CONDITIONING_MAX_TOKENS,
+) -> torch.Tensor:
+    sep_positions = (tokens == TOKEN_COND_SEP).nonzero(as_tuple=False).flatten()
+    if len(sep_positions) == 0:
+        start = random.randint(0, len(tokens) - max_seq)
+        return tokens[start : start + max_seq]
+
+    sep_index = int(sep_positions[0].item())
+    prefix_len = min(CONTROL_PREFIX_LEN, sep_index)
+    prefix = tokens[:prefix_len]
+    conditioning = tokens[prefix_len:sep_index]
+    target = tokens[sep_index + 1 :]
+    if len(target) == 0:
+        return tokens[:max_seq]
+
+    max_conditioning = max(0, min(int(conditioning_max_tokens), max_seq - len(prefix) - 2))
+    conditioning_tail = conditioning[-max_conditioning:] if max_conditioning > 0 else conditioning[:0]
+    target_budget = max_seq - len(prefix) - len(conditioning_tail) - 1
+    if target_budget <= 0:
+        return tokens[:max_seq]
+
+    if len(target) > target_budget:
+        target_start = random.randint(0, len(target) - target_budget)
+        target = target[target_start : target_start + target_budget]
+
+    cropped = torch.cat(
+        [
+            prefix,
+            conditioning_tail,
+            tokens.new_tensor([TOKEN_COND_SEP]),
+            target,
+        ]
+    )
+    if len(cropped) < max_seq:
+        padding = torch.full((max_seq - len(cropped),), TOKEN_PAD, dtype=torch.long)
+        cropped = torch.cat([cropped, padding])
+    return cropped[:max_seq]
+
+
+class MidiDataset(Dataset):
+    """Dataset for preprocessed MIDI token sequences"""
+    
+    def __init__(self, data_dir: str, max_seq: int = 2048, split: str = "train"):
+        self.max_seq = max_seq
+        self.data_dir = Path(data_dir) / split
+        
+        # Load all .npy files
+        self.files = list(self.data_dir.glob("*.npy"))
+        if not self.files:
+            raise ValueError(f"No .npy files found in {self.data_dir}")
+        
+        print(f"Loaded {len(self.files)} files for {split}")
+    
+    def __len__(self):
+        return len(self.files)
+    
+    def __getitem__(self, idx):
+        import numpy as np
+        
+        tokens = np.load(self.files[idx])
+        tokens = torch.from_numpy(tokens).long()
+        
+        # Truncate or pad
+        if len(tokens) > self.max_seq:
+            tokens = crop_control_v1_sequence(tokens, self.max_seq)
+        elif len(tokens) < self.max_seq:
+            padding = torch.full((self.max_seq - len(tokens),), TOKEN_PAD, dtype=torch.long)
+            tokens = torch.cat([tokens, padding])
+        
+        # Input and target (shifted by 1)
+        x = tokens[:-1]
+        y = tokens[1:]
+        
+        return x, y
+
+
+# =============================================================================
+# Training
+# =============================================================================
+
+def train_epoch(
+    model,
+    dataloader,
+    optimizer,
+    scheduler,
+    loss_fn,
+    device,
+    epoch,
+    gradient_accumulation: int = 1,
+):
+    model.train()
+    total_loss = 0
+
+    gradient_accumulation = max(1, int(gradient_accumulation))
+    optimizer.zero_grad(set_to_none=True)
+
+    pbar = tqdm(dataloader, desc=f"Epoch {epoch}")
+    for batch_idx, (x, y) in enumerate(pbar):
+        x, y = x.to(device), y.to(device)
+
+        # Forward
+        output = model(x)
+
+        # Compute loss
+        raw_loss = loss_fn(output.view(-1, output.size(-1)), y.view(-1))
+        loss = raw_loss / gradient_accumulation
+
+        # Backward
+        loss.backward()
+        should_step = (
+            (batch_idx + 1) % gradient_accumulation == 0
+            or (batch_idx + 1) == len(dataloader)
+        )
+        if should_step:
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            optimizer.step()
+            if scheduler is not None:
+                scheduler.step()
+            optimizer.zero_grad(set_to_none=True)
+
+        total_loss += raw_loss.item()
+        current_lr = optimizer.param_groups[0]["lr"]
+        pbar.set_postfix({"loss": f"{raw_loss.item():.4f}", "lr": f"{current_lr:.2e}"})
+
+    return total_loss / len(dataloader)
+
+
+def evaluate(model, dataloader, loss_fn, device):
+    model.eval()
+    total_loss = 0
+    
+    with torch.no_grad():
+        for x, y in tqdm(dataloader, desc="Evaluating"):
+            x, y = x.to(device), y.to(device)
+            output = model(x)
+            loss = loss_fn(output.view(-1, output.size(-1)), y.view(-1))
+            total_loss += loss.item()
+    
+    return total_loss / len(dataloader)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Train Music Transformer with LoRA")
+    
+    # Data
+    parser.add_argument("--data_dir", type=str, default="./data/jazz_processed",
+                        help="Directory containing preprocessed MIDI data")
+    parser.add_argument("--checkpoint", type=str, default=None,
+                        help="Path to pretrained checkpoint")
+    
+    # Model
+    parser.add_argument("--n_layers", type=int, default=6)
+    parser.add_argument("--num_heads", type=int, default=8)
+    parser.add_argument("--d_model", type=int, default=512)
+    parser.add_argument("--dim_feedforward", type=int, default=1024)
+    parser.add_argument("--max_sequence", type=int, default=512)
+    parser.add_argument("--rpr", action="store_true", default=True,
+                        help="Use Relative Position Representation")
+    
+    # LoRA
+    parser.add_argument("--lora_r", type=int, default=16, help="LoRA rank")
+    parser.add_argument("--lora_alpha", type=int, default=32, help="LoRA alpha")
+    parser.add_argument("--lora_dropout", type=float, default=0.05)
+    parser.add_argument(
+        "--train_full_model",
+        action="store_true",
+        help=(
+            "Keep LoRA modules in the checkpoint format, but unfreeze the base "
+            "Music Transformer too. Intended for tiny overfit smoke tests from "
+            "a random base."
+        ),
+    )
+    
+    # Training
+    parser.add_argument("--epochs", type=int, default=3)
+    parser.add_argument("--batch_size", type=int, default=8)  # Optimized for 24GB VRAM
+    parser.add_argument("--lr", type=float, default=2e-4)
+    parser.add_argument("--gradient_accumulation", type=int, default=4)
+    parser.add_argument("--num_workers", type=int, default=0)
+    parser.add_argument("--label_smoothing", type=float, default=0.1)
+    parser.add_argument("--seed", type=int, default=42)
+    
+    # Output
+    parser.add_argument("--output_dir", type=str, default="./checkpoints/jazz_lora")
+
+    # Device: auto -> cuda, else mps (Apple Silicon), else cpu
+    parser.add_argument(
+        "--device", type=str, default="auto",
+        choices=["auto", "cuda", "mps", "cpu"],
+        help="Compute device. 'auto' prefers CUDA, then MPS, then CPU.",
+    )
+
+    args = parser.parse_args()
+    set_seed(args.seed)
+
+    # Device selection. Must stay consistent with the model's internal
+    # get_device() (music_transformer.py builds the causal mask via get_device()),
+    # so we drive both through utilities.device.
+    from utilities.device import get_device, use_cuda, mps_device
+    if args.device == "cpu":
+        use_cuda(False)
+    elif args.device == "cuda":
+        if not torch.cuda.is_available():
+            raise SystemExit("--device cuda requested but CUDA is not available.")
+        use_cuda(True)
+    elif args.device == "mps":
+        if mps_device() is None:
+            raise SystemExit(
+                "--device mps requested but MPS is not available. "
+                "Need Apple Silicon + macOS 14+ and an MPS-enabled torch build. "
+                "Run scripts/mps_smoke_test.py to diagnose."
+            )
+        use_cuda(True)  # get_device() falls through CUDA(None) -> MPS
+    else:  # auto
+        use_cuda(True)
+    device = get_device()
+    print(f"Using device: {device}")
+    
+    # Create output directory
+    os.makedirs(args.output_dir, exist_ok=True)
+
+    checkpoint_state_dict = None
+    checkpoint_uses_lora_wrappers = False
+    if args.checkpoint:
+        print(f"Loading checkpoint metadata: {args.checkpoint}")
+        checkpoint_payload = torch.load(args.checkpoint, map_location=device)
+        checkpoint_state_dict = checkpoint_payload_state_dict(checkpoint_payload)
+        if state_dict_is_lora_only(checkpoint_state_dict):
+            raise ValueError(
+                "Adapter/full training requires a full checkpoint or base model checkpoint; "
+                f"got LoRA-only weights: {args.checkpoint}"
+            )
+        apply_checkpoint_model_config(args, checkpoint_model_config(checkpoint_payload))
+        checkpoint_uses_lora_wrappers = state_dict_uses_lora_wrappers(checkpoint_state_dict)
+    
+    # Initialize model
+    print("\n=== Initializing Music Transformer ===")
+    model = MusicTransformer(
+        n_layers=args.n_layers,
+        num_heads=args.num_heads,
+        d_model=args.d_model,
+        dim_feedforward=args.dim_feedforward,
+        max_sequence=args.max_sequence,
+        rpr=args.rpr
+    )
+    
+    if checkpoint_state_dict is not None and not checkpoint_uses_lora_wrappers:
+        print(f"Loading base checkpoint before LoRA: {args.checkpoint}")
+        _, resized_keys = load_state_dict_with_token_resize(model, checkpoint_state_dict, strict=True)
+        if resized_keys:
+            print(f"Resized checkpoint token layers for current vocab: {', '.join(resized_keys)}")
+    
+    # Add LoRA
+    print("\n=== Adding LoRA Layers ===")
+    model, lora_modules = add_lora_to_model(
+        model, 
+        r=args.lora_r, 
+        alpha=args.lora_alpha, 
+        dropout=args.lora_dropout
+    )
+    if checkpoint_state_dict is not None and checkpoint_uses_lora_wrappers:
+        print(f"Loading LoRA-wrapped full checkpoint after LoRA: {args.checkpoint}")
+        _, resized_keys = load_state_dict_with_token_resize(model, checkpoint_state_dict, strict=True)
+        if resized_keys:
+            print(f"Resized checkpoint token layers for current vocab: {', '.join(resized_keys)}")
+    if args.train_full_model:
+        print("\n=== Tiny-overfit mode: unfreezing base model parameters ===")
+        unfreeze_base_model(model)
+        trainable_params, total_params = count_trainable_parameters(model)
+        print(f"Trainable params: {trainable_params:,} / {total_params:,} ({100*trainable_params/total_params:.2f}%)")
+    model = model.to(device)
+    
+    # Dataset
+    print("\n=== Loading Dataset ===")
+    train_dataset = MidiDataset(args.data_dir, max_seq=args.max_sequence, split="train")
+    val_dataset = MidiDataset(args.data_dir, max_seq=args.max_sequence, split="val")
+    
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=max(0, args.num_workers),
+        pin_memory=device.type == "cuda",
+    )
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=args.batch_size,
+        shuffle=False,
+        num_workers=max(0, args.num_workers),
+        pin_memory=device.type == "cuda",
+    )
+    
+    # Optimizer & Scheduler
+    optimizer = AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr, weight_decay=0.01)
+    
+    total_steps = len(train_loader) * args.epochs
+    scheduler = CosineAnnealingLR(optimizer, T_max=total_steps, eta_min=1e-6)
+    
+    # Loss
+    loss_fn = SmoothCrossEntropyLoss(
+        args.label_smoothing,
+        VOCAB_SIZE,
+        ignore_index=TOKEN_PAD,
+    )
+    
+    # Training loop
+    print("\n=== Starting Training ===")
+    best_val_loss = float("inf")
+    model_config = model_config_from_args(args)
+    training_config = {
+        "epochs": int(args.epochs),
+        "batch_size": int(args.batch_size),
+        "lr": float(args.lr),
+        "gradient_accumulation": int(args.gradient_accumulation),
+        "label_smoothing": float(args.label_smoothing),
+        "seed": int(args.seed),
+        "train_full_model": bool(args.train_full_model),
+        "training_mode": training_mode_name(args),
+        "checkpoint": args.checkpoint,
+    }
+    
+    for epoch in range(1, args.epochs + 1):
+        train_loss = train_epoch(
+            model,
+            train_loader,
+            optimizer,
+            scheduler,
+            loss_fn,
+            device,
+            epoch,
+            gradient_accumulation=args.gradient_accumulation,
+        )
+        val_loss = evaluate(model, val_loader, loss_fn, device)
+        
+        print(f"Epoch {epoch}: Train Loss = {train_loss:.4f}, Val Loss = {val_loss:.4f}")
+        
+        # Save best model
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            
+            # Save only LoRA weights
+            lora_state_dict = {k: v for k, v in model.state_dict().items() if "lora" in k.lower()}
+            torch.save(lora_state_dict, os.path.join(args.output_dir, "lora_weights.pt"))
+            print(f"  Saved best LoRA weights (val_loss={val_loss:.4f})")
+        
+        # Save checkpoint
+        torch.save({
+            "epoch": epoch,
+            "model_config": model_config,
+            "training_config": training_config,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "train_loss": train_loss,
+            "val_loss": val_loss,
+        }, os.path.join(args.output_dir, f"checkpoint_epoch{epoch}.pt"))
+    
+    print(f"\n=== Training Complete ===")
+    print(f"Best validation loss: {best_val_loss:.4f}")
+    print(f"LoRA weights saved to: {args.output_dir}/lora_weights.pt")
+
+
+if __name__ == "__main__":
+    main()
