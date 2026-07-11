@@ -25,6 +25,26 @@ MIDI/WAV/review package까지 생성하는 symbolic MIDI generation MVP입니다
 - review package 생성
 - listening review 전 quality claim 차단
 
+## 스타일 파인튜닝 표준 레시피 (D0/D1 실험 결론, 2026-07)
+
+스타일 모델을 만들 때는 아래 2단계 커리큘럼을 기본으로 한다:
+
+1. **사전학습**: 전체 재즈 코퍼스(2,777조각)로 모델 전체 학습 → 넓은 재즈 분포 습득
+2. **LoRA 적응**: base 동결, LoRA 어댑터만 스타일 서브셋으로 학습
+   (`train_qlora.py --checkpoint <사전학습ckpt>` — `--train_full_model` 없이)
+
+근거 (통제 실험, 판정 기준 사전 등록):
+
+| 방식 | 생성 다양성 (pooled 고유 보이싱) | 결과 |
+|---|---|---|
+| 스타일 데이터만 직접 학습 | 81 | 붕괴 ([D0](docs/d0_experiment/D0_RESULTS.md)) |
+| 사전학습 → full FT | 108 | 부분 보존 ([D1](docs/d1_experiment/D1_RESULTS.md) Arm C) |
+| 사전학습 → full FT + 증강 ×12 | 80 | 재붕괴 (D1 Arm E) |
+| **사전학습 → LoRA 적응** | **142** (사전학습 상한 145의 98%) | **채택** (D1 Arm D) |
+
+붕괴의 원인은 데이터 양이 아니라 사전학습 분포 이탈량이므로, base 동결(LoRA)이
+구조적 해법이다. 연주자별 어댑터를 같은 base 위에 스왑하는 확장도 이 구조에서 나온다.
+
 ## 대표 결과
 
 최신 accepted frontier:
