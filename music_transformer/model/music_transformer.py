@@ -35,6 +35,32 @@ def _sample_probs_from_logits(logits, temperature=1.0, top_k=None, top_p=None):
     return probs / total
 
 
+def _grammar_update_active_pitches(active_pitches: set, token: int) -> None:
+    if 0 <= token < RANGE_NOTE_ON:
+        active_pitches.add(token)
+    elif RANGE_NOTE_ON <= token < RANGE_NOTE_ON + RANGE_NOTE_OFF:
+        active_pitches.discard(token - RANGE_NOTE_ON)
+
+
+def _apply_grammar_mask(token_logits, active_pitches: set):
+    # Block tokens that decode_midi would discard: note_off without an active
+    # note_on (orphan), and note_on for an already-active pitch (silently
+    # overwrites the pending note_on in _merge_note).
+    vocab = token_logits.shape[-1]
+    off_start = RANGE_NOTE_ON
+    off_end = min(RANGE_NOTE_ON + RANGE_NOTE_OFF, vocab)
+    mask = torch.zeros(vocab, dtype=torch.bool, device=token_logits.device)
+    if off_start < vocab:
+        mask[off_start:off_end] = True
+    for pitch in active_pitches:
+        off_idx = RANGE_NOTE_ON + pitch
+        if off_idx < vocab:
+            mask[off_idx] = False
+        if pitch < min(RANGE_NOTE_ON, vocab):
+            mask[pitch] = True
+    return token_logits.masked_fill(mask, float("-inf"))
+
+
 # MusicTransformer
 class MusicTransformer(nn.Module):
     """
@@ -147,6 +173,7 @@ class MusicTransformer(nn.Module):
         top_k=None,
         top_p=None,
         sample_vocab_size=None,
+        grammar_mask=False,
     ):
         """
         ----------
@@ -172,11 +199,18 @@ class MusicTransformer(nn.Module):
 
         # print("primer:",primer)
         # print(gen_seq)
+        active_pitches: set = set()
+        if grammar_mask:
+            for tok in primer.flatten().tolist():
+                _grammar_update_active_pitches(active_pitches, int(tok))
+
         cur_i = num_primer
         while(cur_i < target_seq_length):
             # gen_seq_batch     = gen_seq.clone()
             logits = self.forward(gen_seq[..., :cur_i])[..., :sample_vocab_size]
             token_logits = logits[:, cur_i - 1, :]
+            if grammar_mask:
+                token_logits = _apply_grammar_mask(token_logits, active_pitches)
             token_probs = _sample_probs_from_logits(
                 token_logits,
                 temperature=temperature,
@@ -204,6 +238,8 @@ class MusicTransformer(nn.Module):
                 next_token = distrib.sample()
                 # print("next token:",next_token)
                 gen_seq[:, cur_i] = next_token
+                if grammar_mask:
+                    _grammar_update_active_pitches(active_pitches, int(next_token))
 
 
                 # Let the transformer decide to end if it wants to
