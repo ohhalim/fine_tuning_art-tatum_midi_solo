@@ -35,3 +35,7 @@ __pycache__/
 .DS_Store
 .claude/
 .venv/
+
+# generated tokenized data / local PR drafts
+data/jazz_full/
+.git-pr-drafts/
