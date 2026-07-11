@@ -117,7 +117,7 @@ measure_arm () {
   "${PY}" scripts/diversity_metrics.py \
     --npy_dir "${base}/samples" \
     --compare_dir "${SAMP_A}" \
-    --output "${json}"
+    --json_out "${json}"
 }
 
 # ---- 실행 ---------------------------------------------------------------------
