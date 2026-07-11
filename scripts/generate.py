@@ -259,6 +259,7 @@ def generate_once(
     top_k: int | None,
     top_p: float | None,
     sample_vocab_size: int | None = None,
+    grammar_mask: bool = False,
 ) -> List[int]:
     device = get_device()
     primer = primer.to(device)
@@ -273,6 +274,7 @@ def generate_once(
             top_k=top_k,
             top_p=top_p,
             sample_vocab_size=sample_vocab_size,
+            grammar_mask=grammar_mask,
         )
 
     sequence = generated[0].detach().cpu().tolist()
@@ -331,6 +333,12 @@ def main():
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--top_k", type=int, default=None)
     parser.add_argument("--top_p", type=float, default=None)
+    parser.add_argument(
+        "--grammar_mask",
+        action="store_true",
+        help="Mask grammatically invalid tokens during sampling "
+             "(orphan note_off, duplicate note_on for an active pitch).",
+    )
 
     # Output
     parser.add_argument("--output", type=str, default="./samples")
@@ -389,6 +397,7 @@ def main():
             temperature=args.temperature,
             top_k=args.top_k,
             top_p=args.top_p,
+            grammar_mask=args.grammar_mask,
         )
         if not generated_tokens:
             print("No decodable tokens produced; skipping sample.")
