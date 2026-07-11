@@ -25,8 +25,16 @@ from torch.optim import AdamW
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from tqdm import tqdm
 
-# Add music_transformer to path
-SCRIPT_DIR = Path(__file__).parent.parent
+# Add music_transformer to path. Walk up from this file until we find the
+# repo root that actually contains music_transformer/ (robust to the script
+# living in scripts/ or archive/scripts/).
+def _find_repo_root(start: Path) -> Path:
+    for cand in [start, *start.parents]:
+        if (cand / "music_transformer").is_dir():
+            return cand
+    return start.parent.parent  # fallback to original behaviour
+
+SCRIPT_DIR = _find_repo_root(Path(__file__).resolve())
 sys.path.insert(0, str(SCRIPT_DIR / "music_transformer"))
 sys.path.insert(0, str(SCRIPT_DIR / "music_transformer" / "third_party"))
 
@@ -34,6 +42,8 @@ from model.music_transformer import MusicTransformer
 from model.loss import SmoothCrossEntropyLoss
 from utilities.constants import TOKEN_COND_SEP, TOKEN_PAD, VOCAB_SIZE
 
+# checkpoint_utils lives next to this script; make sure its dir is importable.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 try:
     from checkpoint_utils import load_state_dict_with_token_resize
 except ModuleNotFoundError:
@@ -470,12 +480,38 @@ def main():
     
     # Output
     parser.add_argument("--output_dir", type=str, default="./checkpoints/jazz_lora")
-    
+
+    # Device: auto -> cuda, else mps (Apple Silicon), else cpu
+    parser.add_argument(
+        "--device", type=str, default="auto",
+        choices=["auto", "cuda", "mps", "cpu"],
+        help="Compute device. 'auto' prefers CUDA, then MPS, then CPU.",
+    )
+
     args = parser.parse_args()
     set_seed(args.seed)
-    
-    # Device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # Device selection. Must stay consistent with the model's internal
+    # get_device() (music_transformer.py builds the causal mask via get_device()),
+    # so we drive both through utilities.device.
+    from utilities.device import get_device, use_cuda, mps_device
+    if args.device == "cpu":
+        use_cuda(False)
+    elif args.device == "cuda":
+        if not torch.cuda.is_available():
+            raise SystemExit("--device cuda requested but CUDA is not available.")
+        use_cuda(True)
+    elif args.device == "mps":
+        if mps_device() is None:
+            raise SystemExit(
+                "--device mps requested but MPS is not available. "
+                "Need Apple Silicon + macOS 14+ and an MPS-enabled torch build. "
+                "Run scripts/mps_smoke_test.py to diagnose."
+            )
+        use_cuda(True)  # get_device() falls through CUDA(None) -> MPS
+    else:  # auto
+        use_cuda(True)
+    device = get_device()
     print(f"Using device: {device}")
     
     # Create output directory

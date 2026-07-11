@@ -1,6 +1,7 @@
 # For all things related to devices
 #### ONLY USE PROVIDED FUNCTIONS, DO NOT USE GLOBAL CONSTANTS ####
 
+import os
 import torch
 
 TORCH_CPU_DEVICE = torch.device("cpu")
@@ -8,9 +9,25 @@ TORCH_CPU_DEVICE = torch.device("cpu")
 if(torch.cuda.device_count() > 0):
     TORCH_CUDA_DEVICE = torch.device("cuda")
 else:
-    print("----- WARNING: CUDA devices not detected. This will cause the model to run very slow! -----")
-    print("")
     TORCH_CUDA_DEVICE = None
+
+# Apple Silicon GPU (Metal / MPS). Detected once at import.
+# Disable explicitly with env FORCE_CPU=1 (useful for debugging).
+def _detect_mps():
+    if os.environ.get("FORCE_CPU", "") == "1":
+        return None
+    try:
+        if torch.backends.mps.is_available() and torch.backends.mps.is_built():
+            return torch.device("mps")
+    except Exception:
+        pass
+    return None
+
+TORCH_MPS_DEVICE = _detect_mps()
+
+if(TORCH_CUDA_DEVICE is None and TORCH_MPS_DEVICE is None):
+    print("----- WARNING: no CUDA or MPS device detected. Training will run on CPU (slow). -----")
+    print("")
 
 USE_CUDA = True
 
@@ -20,7 +37,8 @@ def use_cuda(cuda_bool):
     ----------
     Author: Damon Gwinn
     ----------
-    Sets whether to use CUDA (if available), or use the CPU (not recommended)
+    Sets whether to use the GPU (CUDA or MPS, if available), or force the CPU.
+    Passing False forces CPU regardless of available accelerators.
     ----------
     """
 
@@ -31,16 +49,27 @@ def use_cuda(cuda_bool):
 def get_device():
     """
     ----------
-    Author: Damon Gwinn
+    Author: Damon Gwinn (MPS support added)
     ----------
-    Grabs the default device. Default device is CUDA if available and use_cuda is not False, CPU otherwise.
+    Grabs the default device. Preference order when use_cuda is not False:
+    CUDA -> MPS (Apple Silicon) -> CPU. Passing use_cuda(False) forces CPU.
+    Set env FORCE_CPU=1 to disable MPS detection at import time.
     ----------
     """
 
-    if((not USE_CUDA) or (TORCH_CUDA_DEVICE is None)):
+    if(not USE_CUDA):
         return TORCH_CPU_DEVICE
-    else:
+    if(TORCH_CUDA_DEVICE is not None):
         return TORCH_CUDA_DEVICE
+    if(TORCH_MPS_DEVICE is not None):
+        return TORCH_MPS_DEVICE
+    return TORCH_CPU_DEVICE
+
+# mps_device
+def mps_device():
+    """Grabs the MPS (Apple Silicon GPU) device, or None if unavailable."""
+
+    return TORCH_MPS_DEVICE
 
 # cuda_device
 def cuda_device():
