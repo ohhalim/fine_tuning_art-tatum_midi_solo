@@ -6,6 +6,24 @@ MIDI/WAV/review package까지 생성하는 symbolic MIDI generation MVP입니다
 현재 목표는 "완성된 고품질 재즈 연주 모델"이 아니라, 입력 context를 받아
 재현 가능한 solo 후보를 생성하고 객관 지표로 후보를 고르는 로컬 파이프라인입니다.
 
+## 연구 개요 — 스타일 파인튜닝 병목 진단 (D0→D4)
+
+작은(13.4M) Music Transformer를 특정 재즈 피아니스트 스타일로 파인튜닝하자 생긴
+다양성 붕괴·단선율 문제를, **하나의 실험이 하나의 질문에 답하는 통제 실험 5단계**로
+역추적했습니다. 핵심 결론: **품질 저하는 base 모델의 표현력 한계가 아니라**, 아래 네
+층에 나뉜 원인이었고 각각 처방을 확정했습니다.
+
+| 실험 | 층 | 물음 | 결론 |
+|---|---|---|---|
+| [D0](docs/d0_experiment/D0_RESULTS.md) | L2 다양성 | base 크기 탓? | 아니오 — **데이터 레짐** (val 5.06→3.19, 학습데이터 상한의 93% 도달) |
+| [D1](docs/d1_experiment/D1_RESULTS.md) | L3 스타일 | 붕괴 막는 FT 방식? | pretrain → **LoRA 적응** (다양성 142, 상한의 98%) |
+| [D2](docs/d2_experiment/D2_RESULTS.md) | L1 문법 | 깨진 MIDI 문법? | **문법 마스킹**으로 고아 이벤트 0, 밀도 +40% |
+| [D3](docs/d3_experiment/D3_RESULTS.md) | L4 음악성 | 단선율 원인? | **조건 프라이머 텍스처 잠김** (진단) |
+| [D4](docs/d4_experiment/D4_RESULTS.md) | L4→L5 | 프라이머로 해소? | 화음 프라이머 1.31→1.78 **강한 성공** (처방) |
+
+전체 서사와 기각된 가설 기록은 **[docs/RESEARCH_SUMMARY.md](docs/RESEARCH_SUMMARY.md)**,
+층별 로드맵은 [docs/RESEARCH_ROADMAP.md](docs/RESEARCH_ROADMAP.md)를 보세요.
+
 ## 무엇을 만들었나
 
 - 입력: chord progression 또는 guide MIDI context
