@@ -59,7 +59,7 @@ gen_arm () {
   [ -n "${primer}" ] && cond_arg=(--conditioning_midi "${primer}")
   "${PY}" scripts/generate.py \
     --lora_path "${BASE_CKPT}" \
-    "${cond_arg[@]}" \
+    ${cond_arg[@]+"${cond_arg[@]}"} \
     --num_samples "${NUM_SAMPLES}" \
     --length "${GEN_LENGTH}" \
     --temperature "${GEN_TEMP}" \
