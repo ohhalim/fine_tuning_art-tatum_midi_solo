@@ -1,0 +1,128 @@
+{
+  "A": {
+    "per_sequence_mean_std": {
+      "n_notes": {
+        "mean": 107.25,
+        "std": 6.247
+      },
+      "n_voicings": {
+        "mean": 56.0,
+        "std": 8.317
+      },
+      "duration_sec": {
+        "mean": 24.695,
+        "std": 5.416
+      },
+      "note_density_per_sec": {
+        "mean": 4.59,
+        "std": 1.219
+      },
+      "pitch_class_entropy_bits": {
+        "mean": 3.224,
+        "std": 0.174
+      },
+      "pitch_range_semitones": {
+        "mean": 60.917,
+        "std": 13.025
+      },
+      "unique_voicings": {
+        "mean": 30.583,
+        "std": 3.487
+      },
+      "voicing_entropy_bits": {
+        "mean": 4.512,
+        "std": 0.306
+      },
+      "distinct_voicing_ratio": {
+        "mean": 0.561,
+        "std": 0.122
+      },
+      "mean_voicing_size": {
+        "mean": 1.784,
+        "std": 0.295
+      },
+      "voicing_4gram_repeat": {
+        "mean": 0.002,
+        "std": 0.007
+      },
+      "pitch_4gram_repeat": {
+        "mean": 0.005,
+        "std": 0.01
+      },
+      "ioi_cv": {
+        "mean": 1.523,
+        "std": 0.31
+      }
+    },
+    "pooled": {
+      "n_sequences": 24,
+      "pooled_unique_voicings": 270,
+      "pooled_total_voicings": 1344,
+      "pooled_voicing_entropy_bits": 6.155,
+      "pooled_distinct_voicing_ratio": 0.201
+    }
+  },
+  "B": {
+    "per_sequence_mean_std": {
+      "n_notes": {
+        "mean": 96.958,
+        "std": 5.037
+      },
+      "n_voicings": {
+        "mean": 72.5,
+        "std": 10.033
+      },
+      "duration_sec": {
+        "mean": 35.101,
+        "std": 11.435
+      },
+      "note_density_per_sec": {
+        "mean": 3.074,
+        "std": 1.066
+      },
+      "pitch_class_entropy_bits": {
+        "mean": 3.196,
+        "std": 0.19
+      },
+      "pitch_range_semitones": {
+        "mean": 60.917,
+        "std": 10.02
+      },
+      "unique_voicings": {
+        "mean": 24.083,
+        "std": 3.523
+      },
+      "voicing_entropy_bits": {
+        "mean": 3.941,
+        "std": 0.358
+      },
+      "distinct_voicing_ratio": {
+        "mean": 0.343,
+        "std": 0.086
+      },
+      "mean_voicing_size": {
+        "mean": 1.306,
+        "std": 0.126
+      },
+      "voicing_4gram_repeat": {
+        "mean": 0.021,
+        "std": 0.034
+      },
+      "pitch_4gram_repeat": {
+        "mean": 0.019,
+        "std": 0.036
+      },
+      "ioi_cv": {
+        "mean": 1.503,
+        "std": 0.353
+      }
+    },
+    "pooled": {
+      "n_sequences": 24,
+      "pooled_unique_voicings": 158,
+      "pooled_total_voicings": 1740,
+      "pooled_voicing_entropy_bits": 4.903,
+      "pooled_distinct_voicing_ratio": 0.091
+    }
+  }
+}
