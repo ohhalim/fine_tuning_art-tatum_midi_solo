@@ -101,26 +101,57 @@ def _divide_note(notes):
     return result_array
 
 
-def _merge_note(snote_sequence):
+def _merge_note(snote_sequence, unclosed_note_dur=0.5, verbose=False):
+    """Merge note_on/note_off events into pretty_midi Notes.
+
+    Robust against grammatically imperfect sequences (e.g. model output):
+      - re-articulation (note_on for an already-active pitch) closes the
+        previous note at the new onset instead of silently dropping it;
+      - a note_on left unclosed at the end of the sequence is emitted with a
+        fallback duration instead of being discarded.
+    On normal (encoder-produced) data these paths never trigger, so the output
+    is byte-identical to the previous behaviour — see tests/test_decode_note_loss.py.
+
+    unclosed_note_dur: fallback seconds for note_on events that never receive a
+        matching note_off. Set <= 0 to keep the legacy drop behaviour.
+    """
     note_on_dict = {}
     result_array = []
 
     for snote in snote_sequence:
-        # print(note_on_dict)
         if snote.type == 'note_on':
+            # Re-articulation: close the pending note at this onset so the
+            # earlier note_on is preserved rather than silently overwritten.
+            prev = note_on_dict.get(snote.value)
+            if prev is not None and snote.time - prev.time > 0:
+                result_array.append(
+                    pretty_midi.Note(prev.velocity, snote.value, prev.time, snote.time)
+                )
             note_on_dict[snote.value] = snote
         elif snote.type == 'note_off':
-            try:
-                # Consume the active note so stray later note_off events cannot
-                # reuse the same note_on and create ghost sustain notes.
-                on = note_on_dict.pop(snote.value)
-                off = snote
-                if off.time - on.time == 0:
-                    continue
-                result = pretty_midi.Note(on.velocity, snote.value, on.time, off.time)
-                result_array.append(result)
-            except KeyError:
-                print('info removed pitch: {}'.format(snote.value))
+            # Consume the active note so stray later note_off events cannot
+            # reuse the same note_on and create ghost sustain notes.
+            on = note_on_dict.pop(snote.value, None)
+            if on is None:
+                # Orphan note_off: nothing to close (expected for imperfect
+                # model output). Discard without loss of a real note.
+                if verbose:
+                    print('info orphan note_off: {}'.format(snote.value))
+                continue
+            if snote.time - on.time == 0:
+                continue
+            result_array.append(
+                pretty_midi.Note(on.velocity, snote.value, on.time, snote.time)
+            )
+
+    # Notes never closed by a note_off: emit with a fallback duration instead
+    # of dropping them (main source of note loss in generated sequences).
+    if unclosed_note_dur > 0:
+        for pitch, on in note_on_dict.items():
+            result_array.append(
+                pretty_midi.Note(on.velocity, pitch, on.time, on.time + unclosed_note_dur)
+            )
+
     return result_array
 
 
