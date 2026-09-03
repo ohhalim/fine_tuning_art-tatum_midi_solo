@@ -25,6 +25,12 @@ Modes:
   status        Show branch and working tree status.
   quick         Run unit tests, compile checks, and git whitespace check.
   demo          Run quick checks plus the MVP demo.
+  direct-midi-echo
+                Run a 600-second logical direct MIDI echo integrity probe.
+  direct-midi-coremidi-smoke
+                Run a 2-second CoreMIDI virtual loopback with independent capture.
+  direct-midi-coremidi-soak
+                Run the 600-second CoreMIDI R0 gate with independent capture.
   tiny-prepare  Verify tiny-overfit dataset preparation only.
   tiny-compare  Compare full-model tiny training with random-base LoRA-only.
   control-tiny  Run control_v1 full-model tiny-overfit smoke.
@@ -534,9 +540,9 @@ run_quick() {
 
   print_header "Compile checks"
   local active_python_count
-  active_python_count="$(find scripts inference/app tests -type f -name '*.py' | wc -l | tr -d ' ')"
+  active_python_count="$(find scripts inference tests -type f -name '*.py' | wc -l | tr -d ' ')"
   echo "active_python_files=$active_python_count"
-  "$PYTHON_BIN" -m compileall scripts inference/app tests
+  "$PYTHON_BIN" -m compileall scripts inference tests
 
   print_header "Diff whitespace check"
   git diff --check
@@ -546,6 +552,33 @@ run_demo() {
   run_quick
   print_header "MVP demo"
   bash scripts/run_mvp_demo.sh
+}
+
+run_direct_midi_echo() {
+  local run_id="${RUN_ID:-harness_direct_midi_echo}"
+  print_header "Direct MIDI echo logical fixture"
+  "$PYTHON_BIN" scripts/run_direct_midi_echo_probe.py \
+    --run_id "$run_id" \
+    --logical_duration_seconds 600 \
+    --bpm 120
+}
+
+run_direct_midi_coremidi_smoke() {
+  local run_id="${RUN_ID:-harness_direct_midi_coremidi_smoke}"
+  print_header "Direct MIDI CoreMIDI virtual loopback smoke"
+  "$PYTHON_BIN" scripts/run_coremidi_virtual_loopback_probe.py \
+    --run_id "$run_id" \
+    --duration_seconds 2 \
+    --rate_hz 50
+}
+
+run_direct_midi_coremidi_soak() {
+  local run_id="${RUN_ID:-harness_direct_midi_coremidi_soak}"
+  print_header "Direct MIDI CoreMIDI virtual loopback 10-minute soak"
+  "$PYTHON_BIN" scripts/run_coremidi_virtual_loopback_probe.py \
+    --run_id "$run_id" \
+    --duration_seconds 600 \
+    --rate_hz 50
 }
 
 run_tiny_prepare() {
@@ -8598,6 +8631,15 @@ case "$MODE" in
     ;;
   demo)
     run_demo
+    ;;
+  direct-midi-echo)
+    run_direct_midi_echo
+    ;;
+  direct-midi-coremidi-smoke)
+    run_direct_midi_coremidi_smoke
+    ;;
+  direct-midi-coremidi-soak)
+    run_direct_midi_coremidi_soak
     ;;
   tiny-prepare)
     run_tiny_prepare

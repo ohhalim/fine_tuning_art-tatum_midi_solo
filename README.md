@@ -113,6 +113,22 @@ MIDI/WAV/review package까지 생성하는 symbolic MIDI generation MVP입니다
 bash scripts/agent_harness.sh quick
 ```
 
+모델·clock·DAW를 제외한 direct MIDI transport 논리 fixture:
+
+```bash
+bash scripts/agent_harness.sh direct-midi-echo
+bash scripts/agent_harness.sh direct-midi-coremidi-smoke
+bash scripts/agent_harness.sh direct-midi-coremidi-soak
+```
+
+- 논리 duration: `600초`
+- 검증 범위: event loss, duplicate output, order mismatch, stuck note, callback 처리 시간
+- CoreMIDI 경로: 프로세스 임시 virtual source 2개와 독립 capture
+- 10분 R0 결과: `30000/30000`, integrity failure `0`, R0 gate `true`
+- sender-to-capture p50 / p99 / max: `0.3631 / 1.3727 / 11.7968ms`
+- 상세 결과: [Direct MIDI Echo R0 Result](docs/DIRECT_MIDI_ECHO_R0_RESULT_2026-09-03.md)
+- 제외 범위: clock, scheduler, model, FL Studio/Serum audio latency
+
 MVP demo:
 
 ```bash
