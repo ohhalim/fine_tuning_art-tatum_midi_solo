@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-ACTIVE_SOURCE_DIRS = (ROOT_DIR / "scripts", ROOT_DIR / "inference" / "app", ROOT_DIR / "tests")
+ACTIVE_SOURCE_DIRS = (ROOT_DIR / "scripts", ROOT_DIR / "inference", ROOT_DIR / "tests")
 
 
 def imported_script_modules(source_path: Path) -> set[str]:

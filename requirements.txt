@@ -12,6 +12,7 @@ accelerate
 music21
 pretty_midi
 mido
+python-rtmidi>=1.5.8,<2
 
 # Math & Utils
 numpy
