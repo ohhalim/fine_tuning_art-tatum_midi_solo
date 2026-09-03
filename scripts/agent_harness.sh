@@ -533,79 +533,10 @@ run_quick() {
   "$PYTHON_BIN" -m unittest discover tests
 
   print_header "Compile checks"
-  "$PYTHON_BIN" -m compileall \
-    scripts/generate.py \
-    scripts/control_tokens.py \
-    scripts/checkpoint_utils.py \
-    scripts/train_qlora.py \
-    scripts/run_stage_a_tiny_overfit.py \
-    scripts/compare_stage_a_tiny_modes.py \
-    scripts/run_control_v1_tiny_overfit.py \
-    scripts/stage_b_tokens.py \
-    scripts/prepare_role_dataset.py \
-    scripts/run_stage_b_window_tiny_overfit.py \
-    scripts/run_stage_b_generation_probe.py \
-    scripts/run_stage_b_raw_generation_repeatability_sweep.py \
-    scripts/diagnose_stage_b_dead_air_outliers.py \
-    scripts/diagnose_stage_b_seed_strict_margins.py \
-    scripts/build_stage_b_margin_recovered_review_export.py \
-    scripts/build_stage_b_margin_recovered_listening_notes.py \
-    scripts/fill_stage_b_margin_recovered_proxy_review.py \
-    scripts/build_stage_b_margin_recovered_focused_package.py \
-    scripts/review_stage_b_margin_recovered_focused_context.py \
-    scripts/select_stage_b_margin_recovered_repair_candidate.py \
-    scripts/summarize_stage_b_margin_recovered_pitch_vocab_sweep.py \
-    scripts/build_stage_b_margin_recovered_pitch_vocab_focused_package.py \
-    scripts/build_stage_b_margin_recovered_pitch_vocab_focused_listening_notes.py \
-    scripts/fill_stage_b_margin_recovered_pitch_vocab_focused_listening_notes.py \
-    scripts/summarize_stage_b_margin_recovered_timing_repetition_repair.py \
-    scripts/build_stage_b_margin_recovered_timing_repetition_focused_package.py \
-    scripts/build_stage_b_margin_recovered_timing_repetition_focused_listening_notes.py \
-    scripts/fill_stage_b_margin_recovered_timing_repetition_focused_listening_notes.py \
-    scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_repair.py \
-    scripts/build_stage_b_margin_recovered_phrase_vocabulary_focused_package.py \
-    scripts/build_stage_b_margin_recovered_phrase_vocabulary_focused_listening_notes.py \
-    scripts/fill_stage_b_margin_recovered_phrase_vocabulary_focused_listening_notes.py \
-    scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_keep_stability.py \
-    scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_two_candidate_keep.py \
-    scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_sweep.py \
-    scripts/render_stage_b_duration_coverage_fill_outside_soloing_repair_audio_review_package.py \
-    scripts/fill_stage_b_duration_coverage_outside_soloing_repair_user_listening_review.py \
-    scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_objective_evidence_consolidation.py \
-    scripts/decide_stage_b_duration_coverage_outside_soloing_repair_next_step.py \
-    scripts/summarize_stage_b_duration_coverage_fill_outside_soloing_repair_broader_repeatability_sweep.py \
-    scripts/assess_stage_b_generic_base_readiness.py \
-    scripts/check_stage_b_generic_base_manifest_contract.py \
-    scripts/run_stage_b_generic_manifest_window_smoke.py \
-    scripts/run_stage_b_generic_base_tiny_training_smoke.py \
-    scripts/build_stage_b_margin_recovered_phrase_vocabulary_human_listening_comparison.py \
-    scripts/audit_stage_b_margin_recovered_phrase_vocabulary_duplicate_source_divergence.py \
-    scripts/repair_stage_b_margin_recovered_phrase_vocabulary_sample_seed_diversity.py \
-    scripts/summarize_stage_b_margin_recovered_phrase_vocabulary_distinct_sample_seed_sweep.py \
-    scripts/run_stage_b_sampling_sweep.py \
-    scripts/run_stage_b_coverage_ab_sweep.py \
-    scripts/run_stage_b_pitch_mode_compare.py \
-    scripts/run_stage_b_phrase_grammar_compare.py \
-    scripts/run_stage_b_reference_stats.py \
-    scripts/run_stage_b_motif_template_extraction.py \
-    scripts/run_stage_b_data_motif_generation_compare.py \
-    scripts/rank_stage_b_candidates.py \
-    scripts/audit_brad_mehldau_dataset.py \
-    scripts/audit_jazz_piano_dataset.py \
-    scripts/build_jazz_training_manifests.py \
-    scripts/run_manifest_prepare_smoke.py \
-    scripts/audit_chord_progression_coverage.py \
-    scripts/evaluate_chord_labeled_subset.py \
-    scripts/evaluate_generated_candidate_chords.py \
-    scripts/build_listening_review_notes.py \
-    scripts/build_focused_listening_review_notes.py \
-    scripts/summarize_listening_review_notes.py \
-    scripts/build_focused_review_package.py \
-    scripts/review_midi_note_objectives.py \
-    scripts/train_stage_a_full.py \
-    scripts/train_stage_a_adapter.py \
-    inference/app \
-    tests
+  local active_python_count
+  active_python_count="$(find scripts inference/app tests -type f -name '*.py' | wc -l | tr -d ' ')"
+  echo "active_python_files=$active_python_count"
+  "$PYTHON_BIN" -m compileall scripts inference/app tests
 
   print_header "Diff whitespace check"
   git diff --check
