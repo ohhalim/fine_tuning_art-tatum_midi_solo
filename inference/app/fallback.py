@@ -95,10 +95,10 @@ def chord_for_time(request: GenerationRequest, start_sec: float) -> str:
     return request.chord_progression[chord_index]
 
 
-def generate_fallback_midi(request: GenerationRequest, output_path: str | Path) -> Path:
+def build_fallback_midi(request: GenerationRequest) -> pretty_midi.PrettyMIDI:
+    """Build the deterministic fallback phrase without filesystem I/O."""
+
     rng = random.Random(request.seed)
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
 
     beats_per_bar = parse_time_signature(request.time_signature)
     seconds_per_beat = 60.0 / float(request.bpm)
@@ -113,6 +113,7 @@ def generate_fallback_midi(request: GenerationRequest, output_path: str | Path) 
     velocity_min, velocity_max = energy["velocity"]
     dur_min, dur_max = energy["duration_beats"]
 
+    pitch_end_by_pitch: dict[int, float] = {}
     for bar_idx in range(request.bars):
         notes_per_bar = rng.randint(density_min, density_max)
         grid_size = 16
@@ -133,6 +134,21 @@ def generate_fallback_midi(request: GenerationRequest, output_path: str | Path) 
             chord_tones = chord_pitches_in_range(root_pc, intervals, pitch_min, pitch_max)
             if not chord_tones:
                 chord_tones = list(range(pitch_min, pitch_max + 1))
+            available_chord_tones = [
+                pitch
+                for pitch in chord_tones
+                if pitch_end_by_pitch.get(pitch, 0.0) <= start + 1e-9
+            ]
+            if available_chord_tones:
+                chord_tones = available_chord_tones
+            else:
+                chord_tones = [
+                    pitch
+                    for pitch in range(pitch_min, pitch_max + 1)
+                    if pitch_end_by_pitch.get(pitch, 0.0) <= start + 1e-9
+                ]
+            if not chord_tones:
+                raise RuntimeError("fallback pitch range exhausted by active notes")
 
             pitch = rng.choice(chord_tones)
             if previous_pitch is not None and rng.random() < 0.55:
@@ -140,6 +156,7 @@ def generate_fallback_midi(request: GenerationRequest, output_path: str | Path) 
                 if nearby:
                     pitch = rng.choice(nearby)
             previous_pitch = pitch
+            pitch_end_by_pitch[pitch] = end
 
             velocity = rng.randint(int(velocity_min), int(velocity_max))
             piano.notes.append(
@@ -166,5 +183,12 @@ def generate_fallback_midi(request: GenerationRequest, output_path: str | Path) 
 
     piano.notes.sort(key=lambda note: (note.start, note.pitch))
     pm.instruments.append(piano)
+    return pm
+
+
+def generate_fallback_midi(request: GenerationRequest, output_path: str | Path) -> Path:
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    pm = build_fallback_midi(request)
     pm.write(str(output_path))
     return output_path

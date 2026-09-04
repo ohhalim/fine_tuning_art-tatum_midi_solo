@@ -12,10 +12,14 @@ import time
 from pathlib import Path
 from typing import Sequence
 
+import pretty_midi
+
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 
+from inference.app.fallback import build_fallback_midi, phrase_duration_sec  # noqa: E402
+from inference.app.schemas import GenerationRequest  # noqa: E402
 from scripts.generate import build_primer, generate_once, load_model_with_lora  # noqa: E402
 from midi_processor.processor import (  # noqa: E402
     RANGE_NOTE_OFF,
@@ -25,7 +29,7 @@ from midi_processor.processor import (  # noqa: E402
 )
 
 
-REPORT_SCHEMA_VERSION = "resident_model_generation_probe_v5"
+REPORT_SCHEMA_VERSION = "resident_model_generation_probe_v6"
 TIME_SHIFT_START = RANGE_NOTE_ON + RANGE_NOTE_OFF
 TIME_SHIFT_END = TIME_SHIFT_START + RANGE_TIME_SHIFT - 1
 TIME_STEP_MS = 1000.0 / RANGE_TIME_SHIFT
@@ -137,44 +141,128 @@ def validate_generated_token_block(
     }
 
 
+def validate_in_memory_midi_block(
+    midi: pretty_midi.PrettyMIDI,
+    *,
+    lookahead_ms: float,
+    block_duration_ms: float,
+) -> dict[str, object]:
+    notes = sorted(
+        (
+            note
+            for instrument in midi.instruments
+            if not instrument.is_drum
+            for note in instrument.notes
+        ),
+        key=lambda note: (note.start, note.pitch, note.end),
+    )
+    target_seconds = lookahead_ms / 1000.0
+    invalid_pitch_count = sum(not 0 <= int(note.pitch) <= 127 for note in notes)
+    invalid_velocity_count = sum(not 1 <= int(note.velocity) <= 127 for note in notes)
+    invalid_time_count = sum(
+        float(note.start) < 0.0 or float(note.end) <= float(note.start)
+        for note in notes
+    )
+    target_overrun_count = sum(float(note.end) > target_seconds + 1e-9 for note in notes)
+    duration_matches_target = math.isclose(
+        block_duration_ms,
+        lookahead_ms,
+        abs_tol=1e-6,
+    )
+
+    last_end_by_pitch: dict[int, float] = {}
+    same_pitch_overlap_count = 0
+    for note in notes:
+        pitch = int(note.pitch)
+        if float(note.start) < last_end_by_pitch.get(pitch, 0.0) - 1e-9:
+            same_pitch_overlap_count += 1
+        last_end_by_pitch[pitch] = max(last_end_by_pitch.get(pitch, 0.0), float(note.end))
+
+    valid = bool(notes) and duration_matches_target and all(
+        count == 0
+        for count in (
+            invalid_pitch_count,
+            invalid_velocity_count,
+            invalid_time_count,
+            target_overrun_count,
+            same_pitch_overlap_count,
+        )
+    )
+    return {
+        "valid": valid,
+        "decoded_note_count": len(notes),
+        "decoded_note_end_max_ms": (
+            max(float(note.end) for note in notes) * 1000.0 if notes else None
+        ),
+        "target_window_ms": lookahead_ms,
+        "block_duration_ms": block_duration_ms,
+        "duration_matches_target": duration_matches_target,
+        "invalid_pitch_count": invalid_pitch_count,
+        "invalid_velocity_count": invalid_velocity_count,
+        "invalid_time_count": invalid_time_count,
+        "target_overrun_count": target_overrun_count,
+        "same_pitch_overlap_count": same_pitch_overlap_count,
+    }
+
+
 def evaluate_generation_arm(
     *,
     target_total_tokens: int,
     primer_tokens: int,
     generated_token_counts: Sequence[int],
-    musical_durations_ms: Sequence[float],
+    final_block_durations_ms: Sequence[float],
     generation_times_ms: Sequence[float],
-    decode_validation_times_ms: Sequence[float],
+    model_validation_times_ms: Sequence[float],
+    fallback_generation_times_ms: Sequence[float],
+    fallback_validation_times_ms: Sequence[float],
     lookahead_ms: float,
     scheduling_margin_ms: float,
     minimum_gate_samples: int,
     one_bar_contract_validated: bool,
 ) -> dict[str, object]:
     summary = timing_summary(generation_times_ms)
-    decode_validation_summary = timing_summary(decode_validation_times_ms)
+    model_validation_summary = timing_summary(model_validation_times_ms)
+    fallback_generation_summary = timing_summary(fallback_generation_times_ms)
+    fallback_validation_summary = timing_summary(fallback_validation_times_ms)
+    block_resolution_times_ms = [
+        model_validation_ms + fallback_generation_ms + fallback_validation_ms
+        for model_validation_ms, fallback_generation_ms, fallback_validation_ms in zip(
+            model_validation_times_ms,
+            fallback_generation_times_ms,
+            fallback_validation_times_ms,
+        )
+    ]
+    block_resolution_summary = timing_summary(block_resolution_times_ms)
     block_ready_times_ms = [
-        generation_ms + decode_ms
-        for generation_ms, decode_ms in zip(
+        generation_ms + resolution_ms
+        for generation_ms, resolution_ms in zip(
             generation_times_ms,
-            decode_validation_times_ms,
+            block_resolution_times_ms,
         )
     ]
     block_ready_summary = timing_summary(block_ready_times_ms)
-    timing_samples_aligned = len(generation_times_ms) == len(decode_validation_times_ms)
+    timing_samples_aligned = len(
+        {
+            len(generation_times_ms),
+            len(model_validation_times_ms),
+            len(fallback_generation_times_ms),
+            len(fallback_validation_times_ms),
+        }
+    ) == 1
     enough_timing_samples = (
         timing_samples_aligned and len(generation_times_ms) >= minimum_gate_samples
     )
-    all_samples_reach_target_duration = bool(musical_durations_ms) and all(
-        duration_ms >= lookahead_ms for duration_ms in musical_durations_ms
+    all_samples_reach_target_duration = bool(final_block_durations_ms) and all(
+        duration_ms >= lookahead_ms for duration_ms in final_block_durations_ms
     )
     samples_reaching_target_duration = sum(
-        duration_ms >= lookahead_ms for duration_ms in musical_durations_ms
+        duration_ms >= lookahead_ms for duration_ms in final_block_durations_ms
     )
     generation_p99 = summary["p99"]
-    decode_validation_p99 = decode_validation_summary["p99"]
+    block_resolution_p99 = block_resolution_summary["p99"]
     deadline_measurement_ms = None
-    if generation_p99 is not None and decode_validation_p99 is not None:
-        deadline_measurement_ms = float(generation_p99) + float(decode_validation_p99)
+    if generation_p99 is not None and block_resolution_p99 is not None:
+        deadline_measurement_ms = float(generation_p99) + float(block_resolution_p99)
     deadline_budget_ms = lookahead_ms - scheduling_margin_ms
     passed = None
     measurement_sufficient = enough_timing_samples and one_bar_contract_validated
@@ -188,21 +276,24 @@ def evaluate_generation_arm(
         "primer_tokens": primer_tokens,
         "requested_generated_tokens": target_total_tokens - primer_tokens,
         "generated_token_counts": list(generated_token_counts),
-        "generated_musical_duration_ms": timing_summary(musical_durations_ms),
+        "final_block_duration_ms": timing_summary(final_block_durations_ms),
         "samples_reaching_target_duration": samples_reaching_target_duration,
         "samples_under_target_duration": (
-            len(musical_durations_ms) - samples_reaching_target_duration
+            len(final_block_durations_ms) - samples_reaching_target_duration
         ),
         "all_samples_reach_target_duration": all_samples_reach_target_duration,
         "generation_time_ms": summary,
-        "decode_validation_time_ms": decode_validation_summary,
+        "model_validation_time_ms": model_validation_summary,
+        "fallback_generation_time_ms": fallback_generation_summary,
+        "fallback_validation_time_ms": fallback_validation_summary,
+        "block_resolution_time_ms": block_resolution_summary,
         "block_ready_time_ms": block_ready_summary,
         "lookahead_ms": lookahead_ms,
         "scheduling_margin_ms": scheduling_margin_ms,
         "generation_deadline_budget_ms": deadline_budget_ms,
-        "generation_p99_plus_decode_validation_p99_ms": deadline_measurement_ms,
+        "generation_p99_plus_block_resolution_p99_ms": deadline_measurement_ms,
         "minimum_gate_samples": minimum_gate_samples,
-        "generation_decode_sample_counts_aligned": timing_samples_aligned,
+        "block_ready_sample_counts_aligned": timing_samples_aligned,
         "timing_sample_count_sufficient": enough_timing_samples,
         "one_bar_musical_duration_contract_validated": one_bar_contract_validated,
         "measurement_sufficient_for_r2_gate": measurement_sufficient,
@@ -226,6 +317,13 @@ def parse_target_lengths(value: str) -> list[int]:
     return lengths
 
 
+def parse_chords(value: str) -> list[str]:
+    chords = [item.strip() for item in value.split(",") if item.strip()]
+    if not chords:
+        raise argparse.ArgumentTypeError("fallback chords must not be empty")
+    return chords
+
+
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checkpoint", type=Path, required=True)
@@ -243,6 +341,13 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--top-k", type=int, default=32)
     parser.add_argument("--top-p", type=float, default=0.95)
+    parser.add_argument(
+        "--fallback-chords",
+        type=parse_chords,
+        default=["Dm7", "G7", "Cmaj7", "A7"],
+    )
+    parser.add_argument("--fallback-density", choices=("sparse", "medium", "dense"), default="medium")
+    parser.add_argument("--fallback-energy", choices=("low", "mid", "high"), default="mid")
     parser.add_argument("--no-grammar-mask", action="store_false", dest="grammar_mask")
     parser.set_defaults(grammar_mask=True)
     return parser.parse_args(argv)
@@ -304,13 +409,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     arms = []
     for target_total_tokens in args.target_total_tokens:
         generation_times_ms: list[float] = []
-        decode_validation_times_ms: list[float] = []
+        model_validation_times_ms: list[float] = []
+        fallback_generation_times_ms: list[float] = []
+        fallback_validation_times_ms: list[float] = []
         generated_token_counts: list[int] = []
-        musical_durations_ms: list[float] = []
-        block_validations: list[dict[str, object]] = []
+        model_musical_durations_ms: list[float] = []
+        final_block_durations_ms: list[float] = []
+        model_block_validations: list[dict[str, object]] = []
+        final_block_validations: list[dict[str, object]] = []
+        fallback_used: list[bool] = []
         generation_metadata: list[dict[str, object]] = []
         for repetition in range(args.repetitions):
-            torch.manual_seed(args.seed + repetition)
+            sample_seed = args.seed + repetition
+            torch.manual_seed(sample_seed)
             started_ns = time.perf_counter_ns()
             tokens, sample_metadata = generate_once(
                 model=model,
@@ -327,64 +438,148 @@ def main(argv: Sequence[str] | None = None) -> int:
             generation_times_ms.append((time.perf_counter_ns() - started_ns) / 1_000_000)
             generation_metadata.append(sample_metadata)
             generated_token_counts.append(len(tokens))
-            musical_durations_ms.append(stage_a_musical_duration_ms(tokens))
+            model_duration_ms = stage_a_musical_duration_ms(tokens)
+            model_musical_durations_ms.append(model_duration_ms)
             validation_started_ns = time.perf_counter_ns()
-            block_validations.append(
-                validate_generated_token_block(tokens, lookahead_ms=lookahead_ms)
-            )
-            decode_validation_times_ms.append(
+            model_validation = validate_generated_token_block(tokens, lookahead_ms=lookahead_ms)
+            model_validation_times_ms.append(
                 (time.perf_counter_ns() - validation_started_ns) / 1_000_000
             )
-        one_bar_contract_validated = bool(block_validations) and all(
-            bool(validation["valid"]) for validation in block_validations
+            model_block_validations.append(model_validation)
+
+            used_fallback = not bool(model_validation["valid"])
+            fallback_used.append(used_fallback)
+            fallback_generation_ms = 0.0
+            fallback_validation_ms = 0.0
+            if used_fallback:
+                fallback_request = GenerationRequest(
+                    bpm=args.bpm,
+                    chord_progression=list(args.fallback_chords),
+                    bars=1,
+                    time_signature=f"{args.beats_per_bar}/4",
+                    energy=args.fallback_energy,
+                    density=args.fallback_density,
+                    style="deterministic_fallback",
+                    seed=sample_seed,
+                    job_id=f"resident-fallback-{sample_seed}",
+                )
+                fallback_request.validate()
+                fallback_started_ns = time.perf_counter_ns()
+                fallback_midi = build_fallback_midi(fallback_request)
+                fallback_generation_ms = (
+                    time.perf_counter_ns() - fallback_started_ns
+                ) / 1_000_000
+                fallback_validation_started_ns = time.perf_counter_ns()
+                fallback_duration_ms = phrase_duration_sec(fallback_request) * 1000.0
+                fallback_validation = validate_in_memory_midi_block(
+                    fallback_midi,
+                    lookahead_ms=lookahead_ms,
+                    block_duration_ms=fallback_duration_ms,
+                )
+                fallback_validation_ms = (
+                    time.perf_counter_ns() - fallback_validation_started_ns
+                ) / 1_000_000
+                final_block_validations.append(
+                    {
+                        "source": "deterministic_fallback",
+                        "valid": bool(fallback_validation["valid"]),
+                        "validation": fallback_validation,
+                    }
+                )
+                final_block_durations_ms.append(fallback_duration_ms)
+            else:
+                final_block_validations.append(
+                    {
+                        "source": "resident_model",
+                        "valid": True,
+                        "validation": model_validation,
+                    }
+                )
+                final_block_durations_ms.append(model_duration_ms)
+            fallback_generation_times_ms.append(fallback_generation_ms)
+            fallback_validation_times_ms.append(fallback_validation_ms)
+
+        one_bar_contract_validated = bool(final_block_validations) and all(
+            bool(validation["valid"]) for validation in final_block_validations
         )
         arm = evaluate_generation_arm(
             target_total_tokens=target_total_tokens,
             primer_tokens=primer_tokens,
             generated_token_counts=generated_token_counts,
-            musical_durations_ms=musical_durations_ms,
+            final_block_durations_ms=final_block_durations_ms,
             generation_times_ms=generation_times_ms,
-            decode_validation_times_ms=decode_validation_times_ms,
+            model_validation_times_ms=model_validation_times_ms,
+            fallback_generation_times_ms=fallback_generation_times_ms,
+            fallback_validation_times_ms=fallback_validation_times_ms,
             lookahead_ms=lookahead_ms,
             scheduling_margin_ms=args.scheduling_margin_ms,
             minimum_gate_samples=args.minimum_gate_samples,
             one_bar_contract_validated=one_bar_contract_validated,
         )
-        arm["valid_block_count"] = sum(
-            bool(validation["valid"]) for validation in block_validations
+        arm["model_generated_musical_duration_ms"] = timing_summary(
+            model_musical_durations_ms
         )
-        arm["invalid_block_count"] = len(block_validations) - int(
-            arm["valid_block_count"]
+        arm["model_valid_block_count"] = sum(
+            bool(validation["valid"]) for validation in model_block_validations
         )
-        arm["block_validation_failure_counts"] = {
+        arm["model_invalid_block_count"] = len(model_block_validations) - int(
+            arm["model_valid_block_count"]
+        )
+        arm["fallback_count"] = sum(fallback_used)
+        arm["fallback_generation_time_ms_used"] = timing_summary(
+            [
+                duration_ms
+                for duration_ms, used in zip(fallback_generation_times_ms, fallback_used)
+                if used
+            ]
+        )
+        arm["fallback_validation_time_ms_used"] = timing_summary(
+            [
+                duration_ms
+                for duration_ms, used in zip(fallback_validation_times_ms, fallback_used)
+                if used
+            ]
+        )
+        arm["fallback_failure_count"] = sum(
+            validation["source"] == "deterministic_fallback"
+            and not bool(validation["valid"])
+            for validation in final_block_validations
+        )
+        arm["final_valid_block_count"] = sum(
+            bool(validation["valid"]) for validation in final_block_validations
+        )
+        arm["final_invalid_block_count"] = len(final_block_validations) - int(
+            arm["final_valid_block_count"]
+        )
+        arm["model_block_validation_failure_counts"] = {
             "duration_mismatch": sum(
                 not bool(validation["duration_matches_target"])
-                for validation in block_validations
+                for validation in model_block_validations
             ),
             "empty_decoded_block": sum(
                 int(validation["decoded_note_count"]) == 0
-                for validation in block_validations
+                for validation in model_block_validations
             ),
             "decoded_target_overrun": sum(
                 not bool(validation["decoded_notes_within_target"])
                 and int(validation["decoded_note_count"]) > 0
-                for validation in block_validations
+                for validation in model_block_validations
             ),
             "orphan_note_off": sum(
                 int(validation["orphan_note_off_count"])
-                for validation in block_validations
+                for validation in model_block_validations
             ),
             "duplicate_note_on": sum(
                 int(validation["duplicate_note_on_count"])
-                for validation in block_validations
+                for validation in model_block_validations
             ),
             "stuck_note": sum(
                 int(validation["stuck_note_count"])
-                for validation in block_validations
+                for validation in model_block_validations
             ),
             "decode_error": sum(
                 validation["decode_error"] is not None
-                for validation in block_validations
+                for validation in model_block_validations
             ),
         }
         model_forward_step_counts = [
@@ -418,12 +613,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             reason: sum(
                 metadata["stop_reason"] == reason
                 and not bool(validation["duration_matches_target"])
-                for metadata, validation in zip(generation_metadata, block_validations)
+                for metadata, validation in zip(generation_metadata, model_block_validations)
             )
             for reason in ("duration_target", "token_budget", "end_token")
         }
         arm["generation_metadata"] = generation_metadata
-        arm["block_validations"] = block_validations
+        arm["model_block_validations"] = model_block_validations
+        arm["final_block_validations"] = final_block_validations
         arms.append(arm)
 
     report = {
@@ -453,7 +649,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         "generation_duration_target_enabled": True,
         "boundary_time_shift_crop_enabled": True,
         "generated_note_off_closure_enabled": True,
-        "underfill_fallback_enabled": False,
+        "invalid_block_fallback_enabled": True,
+        "fallback": {
+            "mode": "in_memory_deterministic",
+            "chord_progression": list(args.fallback_chords),
+            "density": args.fallback_density,
+            "energy": args.fallback_energy,
+            "bars": 1,
+            "time_signature": f"{args.beats_per_bar}/4",
+            "filesystem_io_included": False,
+        },
         "primer_max_tokens": args.primer_max_tokens,
         "primer_tokens": primer_tokens,
         "warmup_target_total_tokens": warmup_target,
@@ -468,7 +673,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         "one_bar_musical_duration_contract_validated": bool(arms) and all(
             bool(arm["one_bar_musical_duration_contract_validated"]) for arm in arms
         ),
-        "decode_validation_included": True,
+        "model_decode_validation_included": True,
+        "fallback_validation_included": True,
         "scheduler_included": False,
         "arms": arms,
     }
