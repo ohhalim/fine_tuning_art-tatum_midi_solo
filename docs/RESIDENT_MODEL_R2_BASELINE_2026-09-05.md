@@ -201,8 +201,8 @@ Technical block validation requires all of the following:
 | Field | Value |
 |---|---:|
 | model load | `168.736ms` |
-| target duration coverage | `17/20` |
 | technically valid blocks | `16/20` |
+| reached target duration | `17/20` (includes one empty block) |
 | duration underfill | `3/20` |
 | empty decoded block | `1/20` |
 | decoded target overrun | `0/20` |
@@ -226,16 +226,63 @@ exceeds the separate 50% operating-headroom threshold.
 The `16/20` count is a technical block-validity result only. It does not include existing density,
 phrase, chord-tone, preference, or performer-style quality gates.
 
+## Token-budget v5 Sweep
+
+### Review Corrections
+
+- returned token count split into model forward steps, sampled output tokens, and appended
+  boundary note-offs
+- stop reason split into `duration_target`, `token_budget`, and `end_token`
+- `samples_covering_target_bar` renamed to `samples_reaching_target_duration`
+- separate percentile sum renamed to `generation_p99_plus_decode_validation_p99_ms`
+- paired generation+decode measurement retained as `block_ready_time_ms`
+
+`generation_p99_plus_decode_validation_p99_ms` is the sum of two separately calculated p99
+values and therefore a conservative deadline input. `block_ready_time_ms.p99` is the p99 of
+paired per-sample totals.
+
+### Fixed Conditions
+
+- total-token ceiling arms: `64 / 72 / 80`
+- generated model-step ceilings after the 32-token primer: `32 / 40 / 48`
+- seeds: `42..61`
+- samples per arm: `20`
+- checkpoint, primer, sampling parameters, BPM, meter, and duration target unchanged
+
+### Result
+
+| Total-token ceiling | Forward steps max | Stop reason duration / budget / end | Underfill | Empty | Valid | Forward-step cost p50 / p99 | Generation+decode p99 sum | Paired block-ready p99 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `64` | `32` | `17 / 3 / 0` | `3/20` | `1/20` | `16/20` | `22.864 / 25.775ms` | `807.552ms` | `807.542ms` |
+| `72` | `40` | `19 / 1 / 0` | `1/20` | `1/20` | `18/20` | `23.163 / 25.303ms` | `947.958ms` | `947.958ms` |
+| `80` | `42` | `20 / 0 / 0` | `0/20` | `1/20` | `19/20` | `22.882 / 28.339ms` | `992.553ms` | `992.552ms` |
+
+Artifact:
+
+- `outputs/resident_model/issue_1480_token_budget_sweep_v5/report.json`
+
+Observed underfill stop reasons are exclusively `token_budget`. Raising the ceiling from 64 to
+80 removes underfill for the registered seed set. Appended boundary note-offs do not contribute
+model forward steps; the 64-token arm's returned maximum of 38 tokens consists of 32 sampled
+tokens and 6 boundary note-offs.
+
+The 80-token arm remains below the `1,855ms` deadline input but above the `937.5ms` operating
+headroom threshold. Its R2 gates remain `null` because seed 60 reaches the duration target with
+zero decoded notes. The next fallback boundary is therefore one technically invalid block, not
+the three token-budget underfills removed by the 80-token ceiling.
+
 ## Decision
 
 - Resident checkpoint load: confirmed
 - Grammar-constrained repeated generation: confirmed
 - Musical-time upper boundary: established for sampling generation
-- Guaranteed one-bar block production: not established
+- 80-token target-duration production: `20/20`
+- technically valid model block production: `19/20`; not established as guaranteed
 - 20-sample 64-token Arm B campaign: completed; gate withheld
+- 20-sample 64/72/80 token-budget sweep: completed; gate withheld
 - Scheduler integration: deferred
-- Required next implementation: in-memory deterministic fallback for invalid blocks and
-  fallback-inclusive block-ready timing
+- Required next implementation: in-memory deterministic fallback for technically invalid blocks
+  and fallback-inclusive block-ready timing
 
 Running 20 repetitions before the block contract would only improve the precision of the wrong
 unit. The next probe must measure a musical-time-bounded block before a p99 R2 decision.
@@ -265,4 +312,11 @@ unit. The next probe must measure a musical-time-bounded block before a p99 R2 d
 - `uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo`
   - environment/tooling failure: `scripts/run_mvp_demo.sh` absent from the active tree
   - failure predates this change; no inference result produced by this command
+- `uv run --with-requirements requirements.txt python -m unittest tests.test_music_transformer_duration_limit tests.test_resident_model_probe tests.test_stage_a_checkpoint_loading`
+  - token-budget metadata focused result: `24 tests`, pass
+- `uv run --with-requirements requirements.txt bash scripts/agent_harness.sh quick`
+  - token-budget v5 result: `60 tests`, compile checks and diff check pass
+- `uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo`
+  - token-budget v5 unit tests, compile checks and diff check pass
+  - environment/tooling failure at demo step: `scripts/run_mvp_demo.sh` absent from the active tree
 - `git diff --check`

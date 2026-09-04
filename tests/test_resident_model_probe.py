@@ -70,7 +70,10 @@ class ResidentModelProbeTest(unittest.TestCase):
         )
 
         self.assertTrue(passing["passed_r2_generation_deadline_gate"])
-        self.assertEqual(1005.0, passing["generation_plus_decode_p99_ms"])
+        self.assertEqual(
+            1005.0,
+            passing["generation_p99_plus_decode_validation_p99_ms"],
+        )
         self.assertTrue(passing["generation_decode_sample_counts_aligned"])
         self.assertFalse(failing["passed_r2_generation_deadline_gate"])
 
@@ -88,9 +91,9 @@ class ResidentModelProbeTest(unittest.TestCase):
             one_bar_contract_validated=True,
         )
 
-        self.assertFalse(result["all_samples_cover_target_bar"])
-        self.assertEqual(0, result["samples_covering_target_bar"])
-        self.assertEqual(20, result["samples_under_target_bar"])
+        self.assertFalse(result["all_samples_reach_target_duration"])
+        self.assertEqual(0, result["samples_reaching_target_duration"])
+        self.assertEqual(20, result["samples_under_target_duration"])
         self.assertEqual(500.0, result["generated_musical_duration_ms"]["minimum"])
         self.assertFalse(result["passed_r2_generation_deadline_gate"])
 

@@ -75,6 +75,74 @@ class MusicTransformerDurationLimitTest(unittest.TestCase):
             generated[0].tolist(),
         )
 
+    def test_generation_metadata_separates_model_steps_from_boundary_note_offs(self) -> None:
+        sampled_note_on = 61
+        sampled_ten_step_shift = RANGE_NOTE_ON * 2 + 9
+        model = DeterministicTokenModel([sampled_note_on, sampled_ten_step_shift])
+
+        with patch("model.music_transformer.get_device", return_value=torch.device("cpu")):
+            generated, metadata = MusicTransformer.generate(
+                model,
+                primer=torch.tensor([60]),
+                target_seq_length=3,
+                top_k=1,
+                sample_vocab_size=TOKEN_END,
+                grammar_mask=True,
+                target_duration_steps=5,
+                return_metadata=True,
+            )
+
+        self.assertEqual(2, metadata["model_forward_step_count"])
+        self.assertEqual(2, metadata["sampled_output_token_count"])
+        self.assertEqual(1, metadata["boundary_note_off_count"])
+        self.assertEqual(3, metadata["returned_generated_token_count"])
+        self.assertEqual("duration_target", metadata["stop_reason"])
+        self.assertTrue(metadata["duration_target_reached"])
+        self.assertEqual(4, generated.shape[1])
+
+    def test_generation_metadata_records_token_budget_underfill(self) -> None:
+        sampled_note_on = 61
+        sampled_velocity = RANGE_NOTE_ON * 2 + 100
+        model = DeterministicTokenModel([sampled_note_on, sampled_velocity])
+
+        with patch("model.music_transformer.get_device", return_value=torch.device("cpu")):
+            _generated, metadata = MusicTransformer.generate(
+                model,
+                primer=torch.tensor([60]),
+                target_seq_length=3,
+                top_k=1,
+                sample_vocab_size=TOKEN_END,
+                grammar_mask=True,
+                target_duration_steps=5,
+                return_metadata=True,
+            )
+
+        self.assertEqual("token_budget", metadata["stop_reason"])
+        self.assertEqual(2, metadata["model_forward_step_count"])
+        self.assertEqual(1, metadata["boundary_note_off_count"])
+        self.assertFalse(metadata["duration_target_reached"])
+
+    def test_generation_metadata_records_end_token_without_returning_it(self) -> None:
+        model = DeterministicTokenModel([TOKEN_END])
+
+        with patch("model.music_transformer.get_device", return_value=torch.device("cpu")):
+            generated, metadata = MusicTransformer.generate(
+                model,
+                primer=torch.tensor([60]),
+                target_seq_length=3,
+                top_k=1,
+                sample_vocab_size=TOKEN_END + 1,
+                grammar_mask=True,
+                target_duration_steps=5,
+                return_metadata=True,
+            )
+
+        self.assertEqual([60], generated[0].tolist())
+        self.assertEqual("end_token", metadata["stop_reason"])
+        self.assertEqual(1, metadata["model_forward_step_count"])
+        self.assertEqual(0, metadata["sampled_output_token_count"])
+        self.assertEqual(0, metadata["returned_generated_token_count"])
+
 
 if __name__ == "__main__":
     unittest.main()

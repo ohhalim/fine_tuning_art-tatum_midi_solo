@@ -25,7 +25,7 @@ from midi_processor.processor import (  # noqa: E402
 )
 
 
-REPORT_SCHEMA_VERSION = "resident_model_generation_probe_v4"
+REPORT_SCHEMA_VERSION = "resident_model_generation_probe_v5"
 TIME_SHIFT_START = RANGE_NOTE_ON + RANGE_NOTE_OFF
 TIME_SHIFT_END = TIME_SHIFT_START + RANGE_TIME_SHIFT - 1
 TIME_STEP_MS = 1000.0 / RANGE_TIME_SHIFT
@@ -164,10 +164,10 @@ def evaluate_generation_arm(
     enough_timing_samples = (
         timing_samples_aligned and len(generation_times_ms) >= minimum_gate_samples
     )
-    covers_target_bar = bool(musical_durations_ms) and all(
+    all_samples_reach_target_duration = bool(musical_durations_ms) and all(
         duration_ms >= lookahead_ms for duration_ms in musical_durations_ms
     )
-    samples_covering_target_bar = sum(
+    samples_reaching_target_duration = sum(
         duration_ms >= lookahead_ms for duration_ms in musical_durations_ms
     )
     generation_p99 = summary["p99"]
@@ -179,7 +179,7 @@ def evaluate_generation_arm(
     passed = None
     measurement_sufficient = enough_timing_samples and one_bar_contract_validated
     if measurement_sufficient and deadline_measurement_ms is not None:
-        passed = covers_target_bar and deadline_measurement_ms <= deadline_budget_ms
+        passed = all_samples_reach_target_duration and deadline_measurement_ms <= deadline_budget_ms
     operating_headroom_passed = None
     if measurement_sufficient and block_ready_summary["p99"] is not None:
         operating_headroom_passed = float(block_ready_summary["p99"]) <= lookahead_ms * 0.5
@@ -189,16 +189,18 @@ def evaluate_generation_arm(
         "requested_generated_tokens": target_total_tokens - primer_tokens,
         "generated_token_counts": list(generated_token_counts),
         "generated_musical_duration_ms": timing_summary(musical_durations_ms),
-        "samples_covering_target_bar": samples_covering_target_bar,
-        "samples_under_target_bar": len(musical_durations_ms) - samples_covering_target_bar,
-        "all_samples_cover_target_bar": covers_target_bar,
+        "samples_reaching_target_duration": samples_reaching_target_duration,
+        "samples_under_target_duration": (
+            len(musical_durations_ms) - samples_reaching_target_duration
+        ),
+        "all_samples_reach_target_duration": all_samples_reach_target_duration,
         "generation_time_ms": summary,
         "decode_validation_time_ms": decode_validation_summary,
         "block_ready_time_ms": block_ready_summary,
         "lookahead_ms": lookahead_ms,
         "scheduling_margin_ms": scheduling_margin_ms,
         "generation_deadline_budget_ms": deadline_budget_ms,
-        "generation_plus_decode_p99_ms": deadline_measurement_ms,
+        "generation_p99_plus_decode_validation_p99_ms": deadline_measurement_ms,
         "minimum_gate_samples": minimum_gate_samples,
         "generation_decode_sample_counts_aligned": timing_samples_aligned,
         "timing_sample_count_sufficient": enough_timing_samples,
@@ -306,10 +308,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         generated_token_counts: list[int] = []
         musical_durations_ms: list[float] = []
         block_validations: list[dict[str, object]] = []
+        generation_metadata: list[dict[str, object]] = []
         for repetition in range(args.repetitions):
             torch.manual_seed(args.seed + repetition)
             started_ns = time.perf_counter_ns()
-            tokens = generate_once(
+            tokens, sample_metadata = generate_once(
                 model=model,
                 primer=primer,
                 target_length=target_total_tokens,
@@ -319,8 +322,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 top_p=args.top_p,
                 grammar_mask=args.grammar_mask,
                 target_duration_seconds=lookahead_ms / 1000.0,
+                return_metadata=True,
             )
             generation_times_ms.append((time.perf_counter_ns() - started_ns) / 1_000_000)
+            generation_metadata.append(sample_metadata)
             generated_token_counts.append(len(tokens))
             musical_durations_ms.append(stage_a_musical_duration_ms(tokens))
             validation_started_ns = time.perf_counter_ns()
@@ -382,6 +387,42 @@ def main(argv: Sequence[str] | None = None) -> int:
                 for validation in block_validations
             ),
         }
+        model_forward_step_counts = [
+            int(metadata["model_forward_step_count"]) for metadata in generation_metadata
+        ]
+        arm["model_forward_step_counts"] = model_forward_step_counts
+        arm["sampled_output_token_counts"] = [
+            int(metadata["sampled_output_token_count"]) for metadata in generation_metadata
+        ]
+        arm["boundary_note_off_counts"] = [
+            int(metadata["boundary_note_off_count"]) for metadata in generation_metadata
+        ]
+        arm["returned_generated_token_counts"] = [
+            int(metadata["returned_generated_token_count"]) for metadata in generation_metadata
+        ]
+        arm["generation_time_per_model_forward_step_ms"] = timing_summary(
+            [
+                generation_ms / forward_steps
+                for generation_ms, forward_steps in zip(
+                    generation_times_ms,
+                    model_forward_step_counts,
+                )
+                if forward_steps > 0
+            ]
+        )
+        arm["stop_reason_counts"] = {
+            reason: sum(metadata["stop_reason"] == reason for metadata in generation_metadata)
+            for reason in ("duration_target", "token_budget", "end_token")
+        }
+        arm["underfill_stop_reason_counts"] = {
+            reason: sum(
+                metadata["stop_reason"] == reason
+                and not bool(validation["duration_matches_target"])
+                for metadata, validation in zip(generation_metadata, block_validations)
+            )
+            for reason in ("duration_target", "token_budget", "end_token")
+        }
+        arm["generation_metadata"] = generation_metadata
         arm["block_validations"] = block_validations
         arms.append(arm)
 

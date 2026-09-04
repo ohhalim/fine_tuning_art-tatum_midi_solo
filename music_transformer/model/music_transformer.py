@@ -195,6 +195,7 @@ class MusicTransformer(nn.Module):
         sample_vocab_size=None,
         grammar_mask=False,
         target_duration_steps=None,
+        return_metadata=False,
     ):
         """
         ----------
@@ -229,6 +230,8 @@ class MusicTransformer(nn.Module):
         active_pitches: set = set()
         generated_active_pitches: set = set()
         generated_duration_steps = 0
+        model_forward_step_count = 0
+        stop_reason = "token_budget"
         if grammar_mask:
             for tok in primer.flatten().tolist():
                 _grammar_update_active_pitches(active_pitches, int(tok))
@@ -237,6 +240,7 @@ class MusicTransformer(nn.Module):
         while(cur_i < target_seq_length):
             # gen_seq_batch     = gen_seq.clone()
             logits = self.forward(gen_seq[..., :cur_i])[..., :sample_vocab_size]
+            model_forward_step_count += 1
             token_logits = logits[:, cur_i - 1, :]
             if grammar_mask:
                 token_logits = _apply_grammar_mask(token_logits, active_pitches)
@@ -275,6 +279,7 @@ class MusicTransformer(nn.Module):
                         )
                     )
                     if bounded_token is None:
+                        stop_reason = "duration_target"
                         break
                     next_token = torch.as_tensor(
                         [bounded_token], dtype=TORCH_LABEL_TYPE, device=gen_seq.device
@@ -289,10 +294,12 @@ class MusicTransformer(nn.Module):
                 # Let the transformer decide to end if it wants to
                 if(next_token == TOKEN_END):
                     print("Model called end of sequence at:", cur_i, "/", target_seq_length)
+                    stop_reason = "end_token"
                     break
 
                 if duration_reached:
                     cur_i += 1
+                    stop_reason = "duration_target"
                     break
 
             cur_i += 1
@@ -300,13 +307,31 @@ class MusicTransformer(nn.Module):
                 print(cur_i, "/", target_seq_length)
 
         result = gen_seq[:, :cur_i]
+        sampled_output_token_count = max(0, cur_i - num_primer)
+        boundary_note_off_count = 0
         if target_duration_steps is not None and generated_active_pitches:
+            boundary_note_off_count = len(generated_active_pitches)
             note_off_tokens = torch.as_tensor(
                 [[RANGE_NOTE_ON + pitch for pitch in sorted(generated_active_pitches)]],
                 dtype=TORCH_LABEL_TYPE,
                 device=gen_seq.device,
             )
             result = torch.cat((result, note_off_tokens), dim=1)
+        if return_metadata:
+            return result, {
+                "primer_token_count": num_primer,
+                "model_forward_step_count": model_forward_step_count,
+                "sampled_output_token_count": sampled_output_token_count,
+                "boundary_note_off_count": boundary_note_off_count,
+                "returned_generated_token_count": max(0, result.shape[1] - num_primer),
+                "stop_reason": stop_reason,
+                "target_duration_steps": target_duration_steps,
+                "generated_duration_steps": generated_duration_steps,
+                "duration_target_reached": (
+                    target_duration_steps is not None
+                    and generated_duration_steps >= target_duration_steps
+                ),
+            }
         return result
 
 # Used as a dummy to nn.Transformer

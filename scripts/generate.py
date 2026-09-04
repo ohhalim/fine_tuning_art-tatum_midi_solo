@@ -289,7 +289,8 @@ def generate_once(
     sample_vocab_size: int | None = None,
     grammar_mask: bool = False,
     target_duration_seconds: float | None = None,
-) -> List[int]:
+    return_metadata: bool = False,
+) -> List[int] | tuple[List[int], dict[str, object]]:
     device = get_device()
     primer = primer.to(device)
 
@@ -297,7 +298,7 @@ def generate_once(
         target_duration_steps = None
         if target_duration_seconds is not None:
             target_duration_steps = _duration_seconds_to_steps(target_duration_seconds)
-        generated = model.generate(
+        generated_result = model.generate(
             primer=primer,
             target_seq_length=target_length,
             beam=0,
@@ -308,12 +309,25 @@ def generate_once(
             sample_vocab_size=sample_vocab_size,
             grammar_mask=grammar_mask,
             target_duration_steps=target_duration_steps,
+            return_metadata=return_metadata,
         )
+
+    if return_metadata:
+        generated, generation_metadata = generated_result
+    else:
+        generated = generated_result
+        generation_metadata = None
 
     sequence = generated[0].detach().cpu().tolist()
     if strip_primer:
         sequence = sequence[len(primer) :]
-    return sanitize_for_decode(sequence)
+    sequence = sanitize_for_decode(sequence)
+    if generation_metadata is not None:
+        generation_metadata = dict(generation_metadata)
+        generation_metadata["returned_decodable_token_count"] = len(sequence)
+        generation_metadata["strip_primer"] = bool(strip_primer)
+        return sequence, generation_metadata
+    return sequence
 
 
 def main():
