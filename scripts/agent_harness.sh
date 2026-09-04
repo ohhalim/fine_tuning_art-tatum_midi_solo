@@ -31,6 +31,10 @@ Modes:
                 Run a 2-second CoreMIDI virtual loopback with independent capture.
   direct-midi-coremidi-soak
                 Run the 600-second CoreMIDI R0 gate with independent capture.
+  internal-scheduler-smoke
+                Run short internal one-bar scheduler probes at four fixed BPM values.
+  internal-scheduler-soak
+                Run 600-second internal scheduler gates at four fixed BPM values.
   tiny-prepare  Verify tiny-overfit dataset preparation only.
   tiny-compare  Compare full-model tiny training with random-base LoRA-only.
   control-tiny  Run control_v1 full-model tiny-overfit smoke.
@@ -579,6 +583,38 @@ run_direct_midi_coremidi_soak() {
     --run_id "$run_id" \
     --duration_seconds 600 \
     --rate_hz 50
+}
+
+run_internal_scheduler_smoke() {
+  local run_id="${RUN_ID:-harness_internal_scheduler_smoke}"
+  local bpm
+  local failed=0
+  for bpm in 90 120 128 160; do
+    print_header "Internal scheduler smoke: ${bpm} BPM"
+    if ! "$PYTHON_BIN" scripts/run_internal_scheduler_probe.py \
+      --run_id "${run_id}_${bpm}bpm" \
+      --bpm "$bpm" \
+      --duration_seconds 4; then
+      failed=1
+    fi
+  done
+  return "$failed"
+}
+
+run_internal_scheduler_soak() {
+  local run_id="${RUN_ID:-harness_internal_scheduler_soak}"
+  local bpm
+  local failed=0
+  for bpm in 90 120 128 160; do
+    print_header "Internal scheduler 10-minute gate: ${bpm} BPM"
+    if ! "$PYTHON_BIN" scripts/run_internal_scheduler_probe.py \
+      --run_id "${run_id}_${bpm}bpm" \
+      --bpm "$bpm" \
+      --duration_seconds 600; then
+      failed=1
+    fi
+  done
+  return "$failed"
 }
 
 run_tiny_prepare() {
@@ -8640,6 +8676,12 @@ case "$MODE" in
     ;;
   direct-midi-coremidi-soak)
     run_direct_midi_coremidi_soak
+    ;;
+  internal-scheduler-smoke)
+    run_internal_scheduler_smoke
+    ;;
+  internal-scheduler-soak)
+    run_internal_scheduler_soak
     ;;
   tiny-prepare)
     run_tiny_prepare

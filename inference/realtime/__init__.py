@@ -9,6 +9,15 @@ from .transport import (
     build_logical_midi_fixture,
     evaluate_event_integrity,
 )
+from .scheduler import (
+    InternalSchedulerReport,
+    MonotonicBarClock,
+    OneBarMidiScheduler,
+    SchedulerDispatchDeadlineMiss,
+    ScheduledMidiBlock,
+    ScheduledMidiEvent,
+    build_deterministic_blocks,
+)
 
 __all__ = [
     "DirectMidiEcho",
@@ -18,4 +27,11 @@ __all__ = [
     "TimedMidiMessage",
     "build_logical_midi_fixture",
     "evaluate_event_integrity",
+    "InternalSchedulerReport",
+    "MonotonicBarClock",
+    "OneBarMidiScheduler",
+    "SchedulerDispatchDeadlineMiss",
+    "ScheduledMidiBlock",
+    "ScheduledMidiEvent",
+    "build_deterministic_blocks",
 ]
