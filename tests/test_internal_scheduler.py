@@ -11,6 +11,9 @@ from mido import Message
 
 from inference.realtime.scheduler import (
     DEFAULT_SPIN_WINDOW_MS,
+    DEADLINE_POLICY_ABORT_ON_FIRST_MISS,
+    DEADLINE_POLICY_RECORD_AND_CONTINUE,
+    INTERNAL_SCHEDULER_REPORT_SCHEMA_VERSION,
     MonotonicBarClock,
     OneBarMidiScheduler,
     build_deterministic_blocks,
@@ -314,11 +317,104 @@ class InternalSchedulerTest(unittest.TestCase):
         self.assertEqual("dispatch_deadline_miss", result.watchdog_trigger_reason)
         self.assertEqual(0, len(result.records))
         self.assertEqual(1, len(result.scheduler_dispatch_deadline_misses))
+        self.assertEqual(DEADLINE_POLICY_ABORT_ON_FIRST_MISS, result.deadline_policy)
+        self.assertEqual(1, result.primary_dispatch_stall_count)
+        self.assertEqual(0, result.catch_up_dispatch_event_count)
+        self.assertEqual((21_000_000,), result.dispatch_attempt_lateness_ns)
         miss = result.scheduler_dispatch_deadline_misses[0]
         self.assertEqual(21_000_000, miss.lateness_ns)
         self.assertEqual(0, miss.sequence_index)
         self.assertEqual(0, miss.bar_index)
         self.assertTrue(miss.is_bar_start)
+        self.assertFalse(miss.is_catch_up)
+        self.assertEqual("abort_before_send", miss.action)
+
+    def test_record_and_continue_finishes_after_primary_stall_and_catch_up(self) -> None:
+        fake_time = FakeMonotonicTime()
+        sink = RecordingSink()
+        clock = MonotonicBarClock(bpm=120.0, beats_per_bar=4, start_ns=1_000_000_000)
+        blocks = build_deterministic_blocks(clock=clock, bar_count=1)
+        stalled_target_ns = clock.beat_target_ns(1)
+        stall_injected = False
+
+        def one_stall_wait(target_ns: int, stop: Event) -> None:
+            nonlocal stall_injected
+            if stop.is_set():
+                return
+            if target_ns == stalled_target_ns and not stall_injected:
+                fake_time.now_ns = target_ns + 25_000_000
+                stall_injected = True
+                return
+            fake_time.now_ns = max(fake_time.now_ns, target_ns)
+
+        scheduler = OneBarMidiScheduler(
+            sink=sink,
+            clock=clock,
+            clock_ns=fake_time.clock_ns,
+            wait_until=one_stall_wait,
+            deadline_threshold_ms=20.0,
+            deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE,
+        )
+
+        result = scheduler.run(blocks=blocks, expected_bar_count=1)
+
+        self.assertTrue(result.run_completed)
+        self.assertIsNone(result.watchdog_trigger_reason)
+        self.assertEqual(EVENTS_PER_BAR, len(result.records))
+        self.assertEqual(6, result.scheduler_dispatch_deadline_miss_count)
+        self.assertEqual(1, result.primary_dispatch_stall_count)
+        self.assertEqual(5, result.catch_up_dispatch_event_count)
+        self.assertEqual(
+            [False, True, True, True, True, True],
+            [miss.is_catch_up for miss in result.scheduler_dispatch_deadline_misses],
+        )
+        self.assertTrue(
+            all(
+                miss.action == "sent_late_for_diagnostic"
+                for miss in result.scheduler_dispatch_deadline_misses
+            )
+        )
+
+        expected_messages = [event.message.copy() for event in blocks[0].events]
+        report = scheduler_probe.build_report(
+            bpm=120.0,
+            beats_per_bar=4,
+            requested_duration_seconds=2.0,
+            scheduled_duration_seconds=2.0,
+            start_delay_seconds=0.25,
+            wall_clock_seconds=2.25,
+            realtime_elapsed_seconds=2.25,
+            monotonic_elapsed_seconds=2.25,
+            expected_messages=expected_messages,
+            run_result=result,
+            captured_messages=[record.message.copy() for record in result.records],
+            captured_ns=[record.dispatch_started_ns + 1_000_000 for record in result.records],
+            safe_reset_sent=True,
+            deadline_threshold_ms=20.0,
+            spin_window_ms=15.0,
+        )
+
+        self.assertTrue(report.record_and_continue_completed)
+        self.assertFalse(report.passed_scheduler_smoke)
+        self.assertFalse(report.passed_r1_internal_scheduler_gate)
+        self.assertEqual(6 / EVENTS_PER_BAR, report.scheduler_dispatch_deadline_miss_rate)
+        self.assertEqual(
+            {"note_off": 3, "note_on": 3},
+            report.scheduler_dispatch_deadline_miss_type_counts,
+        )
+        self.assertEqual(
+            EVENTS_PER_BAR,
+            report.scheduler_dispatch_attempt_lateness_ms.sample_count,
+        )
+        self.assertIsNotNone(report.scheduler_dispatch_attempt_lateness_p999_ms)
+        self.assertEqual(
+            0,
+            scheduler_probe.exit_code_for_report(
+                report,
+                require_r1_gate=False,
+                require_diagnostic_completion=True,
+            ),
+        )
 
     def test_dispatch_deadline_miss_report_round_trips_json(self) -> None:
         fake_time = FakeMonotonicTime()
@@ -345,6 +441,8 @@ class InternalSchedulerTest(unittest.TestCase):
             scheduled_duration_seconds=2.0,
             start_delay_seconds=0.25,
             wall_clock_seconds=0.25,
+            realtime_elapsed_seconds=0.25,
+            monotonic_elapsed_seconds=0.25,
             expected_messages=expected_messages,
             run_result=run_result,
             captured_messages=[],
@@ -360,6 +458,16 @@ class InternalSchedulerTest(unittest.TestCase):
             payload = json.loads(report_path.read_text(encoding="utf-8"))
 
         self.assertIsNone(payload["capture_deadline_miss_count"])
+        self.assertEqual(INTERNAL_SCHEDULER_REPORT_SCHEMA_VERSION, payload["schema_version"])
+        self.assertEqual(DEADLINE_POLICY_ABORT_ON_FIRST_MISS, payload["deadline_policy"])
+        self.assertTrue(payload["environment_valid"])
+        self.assertEqual(1, payload["primary_dispatch_stall_count"])
+        self.assertEqual(0, payload["catch_up_dispatch_event_count"])
+        self.assertEqual(
+            1, payload["scheduler_dispatch_attempt_lateness_ms"]["sample_count"]
+        )
+        self.assertIsNone(payload["scheduler_dispatch_deadline_miss_rate"])
+        self.assertIsNone(payload["scheduler_dispatch_attempt_lateness_p999_ms"])
         self.assertFalse(payload["passed_scheduler_smoke"])
         self.assertEqual(21.0, payload["scheduler_dispatch_deadline_miss_lateness_ms"]["maximum"])
         self.assertEqual(21_000_000, payload["scheduler_dispatch_deadline_misses"][0]["lateness_ns"])
@@ -398,6 +506,8 @@ class InternalSchedulerTest(unittest.TestCase):
             scheduled_duration_seconds=600.0,
             start_delay_seconds=0.25,
             wall_clock_seconds=600.25,
+            realtime_elapsed_seconds=600.25,
+            monotonic_elapsed_seconds=600.25,
             expected_messages=expected_messages,
             run_result=run_result,
             captured_messages=[record.message.copy() for record in run_result.records],
@@ -415,6 +525,50 @@ class InternalSchedulerTest(unittest.TestCase):
         self.assertTrue(report.passed_scheduler_smoke)
         self.assertTrue(report.passed_r1_internal_scheduler_gate)
         self.assertEqual(0, scheduler_probe.exit_code_for_report(report, require_r1_gate=True))
+
+    def test_realtime_monotonic_clock_gap_invalidates_environment_in_both_directions(self) -> None:
+        fake_time = FakeMonotonicTime()
+        clock = MonotonicBarClock(bpm=120.0, beats_per_bar=4, start_ns=1_000_000_000)
+        blocks = build_deterministic_blocks(clock=clock, bar_count=1)
+        scheduler = OneBarMidiScheduler(
+            sink=RecordingSink(),
+            clock=clock,
+            clock_ns=fake_time.clock_ns,
+            wait_until=fake_time.wait_until,
+        )
+        run_result = scheduler.run(blocks=blocks, expected_bar_count=1)
+        expected_messages = [event.message.copy() for event in blocks[0].events]
+        captured_messages = [record.message.copy() for record in run_result.records]
+        captured_ns = [record.target_ns + 1_000_000 for record in run_result.records]
+
+        for realtime_elapsed_seconds in (4.0, 0.0):
+            with self.subTest(realtime_elapsed_seconds=realtime_elapsed_seconds):
+                report = scheduler_probe.build_report(
+                    bpm=120.0,
+                    beats_per_bar=4,
+                    requested_duration_seconds=2.0,
+                    scheduled_duration_seconds=2.0,
+                    start_delay_seconds=0.25,
+                    wall_clock_seconds=2.0,
+                    realtime_elapsed_seconds=realtime_elapsed_seconds,
+                    monotonic_elapsed_seconds=2.0,
+                    expected_messages=expected_messages,
+                    run_result=run_result,
+                    captured_messages=captured_messages,
+                    captured_ns=captured_ns,
+                    safe_reset_sent=True,
+                    deadline_threshold_ms=20.0,
+                    spin_window_ms=15.0,
+                    environment_clock_gap_threshold_seconds=1.0,
+                )
+
+                self.assertFalse(report.environment_valid)
+                self.assertEqual(
+                    realtime_elapsed_seconds - 2.0,
+                    report.realtime_minus_monotonic_seconds,
+                )
+                self.assertFalse(report.passed_scheduler_smoke)
+                self.assertFalse(report.passed_r1_internal_scheduler_gate)
 
     def test_missing_capture_cannot_report_timing_or_pass_scheduler_gate(self) -> None:
         fake_time = FakeMonotonicTime()
@@ -436,6 +590,8 @@ class InternalSchedulerTest(unittest.TestCase):
             scheduled_duration_seconds=2.0,
             start_delay_seconds=0.25,
             wall_clock_seconds=2.25,
+            realtime_elapsed_seconds=2.25,
+            monotonic_elapsed_seconds=2.25,
             expected_messages=expected_messages,
             run_result=run_result,
             captured_messages=[record.message.copy() for record in run_result.records[:-1]],
