@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT_DIR))
 from inference.realtime.transport import (  # noqa: E402
     DirectMidiEcho,
     MidiSendAcceptanceReport,
+    close_mido_input,
 )
 
 
@@ -94,8 +95,11 @@ def run_port_echo(
                 stopped.set()
 
         try:
-            with mido.open_input(input_port_name, callback=callback):
+            input_port = mido.open_input(input_port_name, callback=callback)
+            try:
                 stopped.wait(timeout=duration_seconds)
+            finally:
+                close_mido_input(input_port)
         finally:
             sink.reset()
             safe_reset_sent = True

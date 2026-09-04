@@ -11,7 +11,7 @@ accelerate
 # Music Processing
 music21
 pretty_midi
-mido
+mido==1.3.3
 python-rtmidi>=1.5.8,<2
 
 # Math & Utils
