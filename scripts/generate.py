@@ -150,6 +150,7 @@ def load_model_with_lora(
     rpr: bool = True,
     lora_r: int = 16,
     lora_alpha: int = 32,
+    return_metadata: bool = False,
 ):
     """Load Stage A Music Transformer.
 
@@ -164,6 +165,8 @@ def load_model_with_lora(
         resolve_full_checkpoint_path(lora_path, checkpoint_path) if prefer_full_checkpoint else None
     )
     full_checkpoint_state = None
+    model_config: dict[str, Any] = {}
+    resized_keys: list[str] = []
     model_max_sequence = int(max_sequence)
     if full_checkpoint_path is not None:
         checkpoint = torch.load(full_checkpoint_path, map_location=device)
@@ -207,6 +210,23 @@ def load_model_with_lora(
 
     model = model.to(device)
     model.eval()
+    if return_metadata:
+        rpr_embedding_shapes = {
+            key: list(value.shape)
+            for key, value in model.state_dict().items()
+            if key.endswith(".Er")
+        }
+        return model, {
+            "model_max_sequence": int(model.max_seq),
+            "rpr": bool(model.rpr),
+            "n_layers": int(model.nlayers),
+            "num_heads": int(model.nhead),
+            "d_model": int(model.d_model),
+            "dim_feedforward": int(model.d_ff),
+            "checkpoint_model_config_present": bool(model_config),
+            "resized_token_layer_keys": sorted(resized_keys),
+            "rpr_embedding_shapes": rpr_embedding_shapes,
+        }
     return model
 
 
