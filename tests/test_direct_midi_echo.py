@@ -54,13 +54,18 @@ class FakeCoreMidiInput:
         self.backend = backend
         self.name = name
         self.callback = callback
+        self.closed = False
+        self.backend.callbacks[self.name] = self.callback
 
     def __enter__(self) -> "FakeCoreMidiInput":
-        self.backend.callbacks[self.name] = self.callback
         return self
 
     def __exit__(self, *args: object) -> None:
-        del self.backend.callbacks[self.name]
+        self.close()
+
+    def close(self) -> None:
+        self.backend.callbacks.pop(self.name, None)
+        self.closed = True
 
 
 class FakeCoreMidiBackend:
@@ -106,14 +111,18 @@ class FakeNamedInput:
     def __init__(self, callback: object, messages: list[Message]) -> None:
         self.callback = callback
         self.messages = messages
-
-    def __enter__(self) -> "FakeNamedInput":
+        self.closed = False
         for message in self.messages:
             self.callback(message.copy())
+
+    def __enter__(self) -> "FakeNamedInput":
         return self
 
     def __exit__(self, *args: object) -> None:
-        return None
+        self.close()
+
+    def close(self) -> None:
+        self.closed = True
 
 
 class DirectMidiEchoTest(unittest.TestCase):

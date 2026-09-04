@@ -24,6 +24,7 @@ from inference.realtime.transport import (  # noqa: E402
     DirectMidiEcho,
     EchoIntegrityReport,
     canonical_message,
+    close_mido_input,
     evaluate_event_integrity,
 )
 
@@ -168,8 +169,14 @@ def run_coremidi_virtual_loopback(
                                 callback_errors.append(exc)
                             failure_stop.set()
 
-                    with mido.open_input(echo_source_name, callback=capture_callback):
-                        with mido.open_input(sender_source_name, callback=echo_callback):
+                    capture_input = mido.open_input(
+                        echo_source_name, callback=capture_callback
+                    )
+                    try:
+                        sender_input = mido.open_input(
+                            sender_source_name, callback=echo_callback
+                        )
+                        try:
                             time.sleep(0.1)
                             send_started = time.perf_counter()
                             for index in range(event_count):
@@ -186,6 +193,10 @@ def run_coremidi_virtual_loopback(
                             _wait_until(send_started + duration_seconds, failure_stop)
                             if not failure_stop.is_set() and not capture_complete.is_set():
                                 capture_complete.wait(timeout=drain_timeout_seconds)
+                        finally:
+                            close_mido_input(sender_input)
+                    finally:
+                        close_mido_input(capture_input)
                 finally:
                     echo_output_port.reset()
                     safe_reset_sent = True

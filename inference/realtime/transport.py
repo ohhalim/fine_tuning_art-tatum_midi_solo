@@ -20,6 +20,36 @@ class MidiSink(Protocol):
     def send(self, message: Message) -> None: ...
 
 
+def close_mido_input(port: object) -> None:
+    """Close a Mido RtMidi input without re-registering its callback wrapper.
+
+    Mido 1.3.3's RtMidi ``Input._close`` assigns ``callback = None``. Its callback
+    setter cancels the native callback but then installs Mido's wrapper again
+    before ``close_port``. On CoreMIDI this can deadlock in ``MIDIPortDispose``
+    while the new callback waits for the Python GIL.
+
+    The RtMidi path mirrors Mido's native close/delete sequence while skipping
+    that callback reinstallation. Other backends and test doubles use the public
+    ``close`` method.
+    """
+    raw_port = getattr(port, "_rt", None)
+    if raw_port is None:
+        if type(port).__module__ == "mido.backends.rtmidi":
+            raise RuntimeError("unsupported Mido RtMidi input internals: missing _rt")
+        port.close()
+        return
+
+    raw_port.cancel_callback()
+    setattr(port, "_callback", None)
+    try:
+        raw_port.close_port()
+    finally:
+        # Mark the Mido wrapper unusable before delete. If delete raises, its
+        # BasePort finalizer must not enter the already-torn-down RtMidi handle.
+        setattr(port, "closed", True)
+        raw_port.delete()
+
+
 @dataclass(frozen=True)
 class TimedMidiMessage:
     logical_time_seconds: float

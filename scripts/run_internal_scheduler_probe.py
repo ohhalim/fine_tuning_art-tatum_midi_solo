@@ -38,6 +38,7 @@ from inference.realtime.scheduler import (  # noqa: E402
 )
 from inference.realtime.transport import (  # noqa: E402
     canonical_message,
+    close_mido_input,
     evaluate_event_integrity,
     summarize_latency,
 )
@@ -331,7 +332,8 @@ def run_internal_scheduler_probe(
                     spin_window_ms=spin_window_ms,
                     deadline_threshold_ms=deadline_threshold_ms,
                 )
-                with mido.open_input(output_source_name, callback=capture_callback):
+                input_port = mido.open_input(output_source_name, callback=capture_callback)
+                try:
                     run_result = scheduler.run(
                         blocks=blocks,
                         expected_bar_count=expected_bar_count,
@@ -342,6 +344,8 @@ def run_internal_scheduler_probe(
                         and run_result.records
                     ):
                         capture_complete.wait(timeout=drain_timeout_seconds)
+                finally:
+                    close_mido_input(input_port)
             finally:
                 output_port.reset()
                 safe_reset_sent = True

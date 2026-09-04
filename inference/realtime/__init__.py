@@ -7,6 +7,7 @@ from .transport import (
     RecordingMidiSink,
     TimedMidiMessage,
     build_logical_midi_fixture,
+    close_mido_input,
     evaluate_event_integrity,
 )
 from .scheduler import (
@@ -26,6 +27,7 @@ __all__ = [
     "RecordingMidiSink",
     "TimedMidiMessage",
     "build_logical_midi_fixture",
+    "close_mido_input",
     "evaluate_event_integrity",
     "InternalSchedulerReport",
     "MonotonicBarClock",

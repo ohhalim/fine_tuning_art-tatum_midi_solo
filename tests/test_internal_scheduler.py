@@ -17,6 +17,7 @@ from inference.realtime.scheduler import (
     deterministic_events_per_bar,
     timing_histogram,
 )
+from inference.realtime.transport import close_mido_input
 from scripts import run_internal_scheduler_probe as scheduler_probe
 
 
@@ -75,13 +76,45 @@ class FakeVirtualInput:
         self.backend = backend
         self.name = name
         self.callback = callback
+        self.closed = False
+        self.backend.callbacks[self.name] = self.callback
 
     def __enter__(self) -> "FakeVirtualInput":
-        self.backend.callbacks[self.name] = self.callback
         return self
 
     def __exit__(self, *args: object) -> None:
-        del self.backend.callbacks[self.name]
+        self.close()
+
+    def close(self) -> None:
+        self.backend.callbacks.pop(self.name, None)
+        self.closed = True
+
+
+class FakeRawMidiInput:
+    def __init__(self, *, fail_delete: bool = False) -> None:
+        self.calls: list[str] = []
+        self.fail_delete = fail_delete
+
+    def cancel_callback(self) -> None:
+        self.calls.append("cancel_callback")
+
+    def close_port(self) -> None:
+        self.calls.append("close_port")
+
+    def delete(self) -> None:
+        self.calls.append("delete")
+        if self.fail_delete:
+            raise RuntimeError("delete failed")
+
+
+class FakeMidoRtMidiInput:
+    def __init__(self, *, fail_delete: bool = False) -> None:
+        self._rt = FakeRawMidiInput(fail_delete=fail_delete)
+        self._callback = object()
+        self.closed = False
+
+    def close(self) -> None:
+        raise AssertionError("public Mido close would re-register the callback")
 
 
 class FakeCoreMidiBackend:
@@ -106,6 +139,24 @@ class FakeCoreMidiBackend:
 
 
 class InternalSchedulerTest(unittest.TestCase):
+    def test_rtmidi_capture_close_cancels_callback_without_mido_reregistration(self) -> None:
+        port = FakeMidoRtMidiInput()
+
+        close_mido_input(port)
+
+        self.assertEqual(["cancel_callback", "close_port", "delete"], port._rt.calls)
+        self.assertIsNone(port._callback)
+        self.assertTrue(port.closed)
+
+    def test_rtmidi_capture_close_marks_wrapper_closed_before_delete_failure(self) -> None:
+        port = FakeMidoRtMidiInput(fail_delete=True)
+
+        with self.assertRaisesRegex(RuntimeError, "delete failed"):
+            close_mido_input(port)
+
+        self.assertEqual(["cancel_callback", "close_port", "delete"], port._rt.calls)
+        self.assertTrue(port.closed)
+
     def test_monotonic_clock_maps_beats_and_bars_without_accumulated_rounding(self) -> None:
         clock = MonotonicBarClock(bpm=120.0, beats_per_bar=4, start_ns=1_000_000_000)
 
