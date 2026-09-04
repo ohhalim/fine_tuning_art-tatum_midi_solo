@@ -121,6 +121,8 @@ def build_report(
     wall_clock_seconds: float,
     realtime_elapsed_seconds: float,
     monotonic_elapsed_seconds: float,
+    scheduler_run_realtime_elapsed_seconds: float,
+    scheduler_run_monotonic_elapsed_seconds: float,
     expected_messages: Sequence[Message],
     run_result: SchedulerRunResult,
     captured_messages: Sequence[Message],
@@ -195,8 +197,12 @@ def build_report(
     realtime_minus_monotonic_seconds = (
         float(realtime_elapsed_seconds) - float(monotonic_elapsed_seconds)
     )
+    scheduler_run_realtime_minus_monotonic_seconds = (
+        float(scheduler_run_realtime_elapsed_seconds)
+        - float(scheduler_run_monotonic_elapsed_seconds)
+    )
     environment_valid = (
-        abs(realtime_minus_monotonic_seconds)
+        abs(scheduler_run_realtime_minus_monotonic_seconds)
         <= environment_clock_gap_threshold_seconds
     )
 
@@ -273,7 +279,7 @@ def build_report(
         (
             requested_duration_seconds >= 600.0,
             scheduled_duration_seconds >= 600.0,
-            monotonic_elapsed_seconds >= scheduled_duration_seconds,
+            scheduler_run_monotonic_elapsed_seconds >= scheduled_duration_seconds,
             run_result.run_completed,
             environment_valid,
         )
@@ -290,6 +296,15 @@ def build_report(
         realtime_elapsed_seconds=float(realtime_elapsed_seconds),
         monotonic_elapsed_seconds=float(monotonic_elapsed_seconds),
         realtime_minus_monotonic_seconds=realtime_minus_monotonic_seconds,
+        scheduler_run_realtime_elapsed_seconds=float(
+            scheduler_run_realtime_elapsed_seconds
+        ),
+        scheduler_run_monotonic_elapsed_seconds=float(
+            scheduler_run_monotonic_elapsed_seconds
+        ),
+        scheduler_run_realtime_minus_monotonic_seconds=(
+            scheduler_run_realtime_minus_monotonic_seconds
+        ),
         environment_clock_gap_threshold_seconds=float(
             environment_clock_gap_threshold_seconds
         ),
@@ -443,10 +458,14 @@ def run_internal_scheduler_probe(
                 )
                 input_port = mido.open_input(output_source_name, callback=capture_callback)
                 try:
+                    scheduler_started_monotonic_ns = time.perf_counter_ns()
+                    scheduler_started_realtime_ns = time.time_ns()
                     run_result = scheduler.run(
                         blocks=blocks,
                         expected_bar_count=expected_bar_count,
                     )
+                    scheduler_ended_monotonic_ns = time.perf_counter_ns()
+                    scheduler_ended_realtime_ns = time.time_ns()
                     if (
                         run_result.watchdog_trigger_reason is None
                         and not capture_complete.is_set()
@@ -469,6 +488,12 @@ def run_internal_scheduler_probe(
     realtime_elapsed_seconds = (
         ended_realtime_ns - started_realtime_ns
     ) / 1_000_000_000
+    scheduler_run_monotonic_elapsed_seconds = (
+        scheduler_ended_monotonic_ns - scheduler_started_monotonic_ns
+    ) / 1_000_000_000
+    scheduler_run_realtime_elapsed_seconds = (
+        scheduler_ended_realtime_ns - scheduler_started_realtime_ns
+    ) / 1_000_000_000
     with capture_lock:
         captured_messages_copy = list(captured_messages)
         captured_ns_copy = list(captured_ns)
@@ -482,6 +507,12 @@ def run_internal_scheduler_probe(
         wall_clock_seconds=monotonic_elapsed_seconds,
         realtime_elapsed_seconds=realtime_elapsed_seconds,
         monotonic_elapsed_seconds=monotonic_elapsed_seconds,
+        scheduler_run_realtime_elapsed_seconds=(
+            scheduler_run_realtime_elapsed_seconds
+        ),
+        scheduler_run_monotonic_elapsed_seconds=(
+            scheduler_run_monotonic_elapsed_seconds
+        ),
         expected_messages=expected_messages,
         run_result=run_result,
         captured_messages=captured_messages_copy,

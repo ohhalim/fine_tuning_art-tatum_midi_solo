@@ -12,7 +12,7 @@ from mido import Message
 from .transport import LatencySummary, summarize_latency
 
 
-INTERNAL_SCHEDULER_REPORT_SCHEMA_VERSION = "internal_midi_scheduler_report_v4"
+INTERNAL_SCHEDULER_REPORT_SCHEMA_VERSION = "internal_midi_scheduler_report_v5"
 DETERMINISTIC_FIXTURE_ID = "dense_chord_sub_spin_v1"
 DEFAULT_DEADLINE_THRESHOLD_MS = 20.0
 DEFAULT_SPIN_WINDOW_MS = 15.0
@@ -162,6 +162,9 @@ class InternalSchedulerReport:
     realtime_elapsed_seconds: float
     monotonic_elapsed_seconds: float
     realtime_minus_monotonic_seconds: float
+    scheduler_run_realtime_elapsed_seconds: float
+    scheduler_run_monotonic_elapsed_seconds: float
+    scheduler_run_realtime_minus_monotonic_seconds: float
     environment_clock_gap_threshold_seconds: float
     environment_valid: bool
     deadline_policy: str
