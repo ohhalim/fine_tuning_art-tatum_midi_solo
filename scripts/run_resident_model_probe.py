@@ -21,10 +21,11 @@ from midi_processor.processor import (  # noqa: E402
     RANGE_NOTE_OFF,
     RANGE_NOTE_ON,
     RANGE_TIME_SHIFT,
+    decode_midi,
 )
 
 
-REPORT_SCHEMA_VERSION = "resident_model_generation_probe_v3"
+REPORT_SCHEMA_VERSION = "resident_model_generation_probe_v4"
 TIME_SHIFT_START = RANGE_NOTE_ON + RANGE_NOTE_OFF
 TIME_SHIFT_END = TIME_SHIFT_START + RANGE_TIME_SHIFT - 1
 TIME_STEP_MS = 1000.0 / RANGE_TIME_SHIFT
@@ -62,6 +63,80 @@ def stage_a_musical_duration_ms(tokens: Sequence[int]) -> float:
     )
 
 
+def validate_generated_token_block(
+    tokens: Sequence[int],
+    *,
+    lookahead_ms: float,
+) -> dict[str, object]:
+    active_pitches: set[int] = set()
+    orphan_note_off_count = 0
+    duplicate_note_on_count = 0
+    for raw_token in tokens:
+        token = int(raw_token)
+        if 0 <= token < RANGE_NOTE_ON:
+            if token in active_pitches:
+                duplicate_note_on_count += 1
+            active_pitches.add(token)
+        elif RANGE_NOTE_ON <= token < RANGE_NOTE_ON + RANGE_NOTE_OFF:
+            pitch = token - RANGE_NOTE_ON
+            if pitch not in active_pitches:
+                orphan_note_off_count += 1
+            active_pitches.discard(pitch)
+
+    musical_duration_ms = stage_a_musical_duration_ms(tokens)
+    quantized_target_ms = math.ceil(lookahead_ms / TIME_STEP_MS) * TIME_STEP_MS
+    decoded_note_count = 0
+    decoded_note_end_max_ms = None
+    decode_error = None
+    try:
+        decoded = decode_midi([int(token) for token in tokens])
+        notes = [
+            note
+            for instrument in decoded.instruments
+            if not instrument.is_drum
+            for note in instrument.notes
+        ]
+        decoded_note_count = len(notes)
+        if notes:
+            decoded_note_end_max_ms = max(float(note.end) * 1000.0 for note in notes)
+    except Exception as exc:
+        decode_error = f"{type(exc).__name__}: {exc}"
+
+    duration_matches_target = math.isclose(
+        musical_duration_ms,
+        quantized_target_ms,
+        abs_tol=1e-6,
+    )
+    decoded_notes_within_target = (
+        decoded_note_end_max_ms is not None
+        and decoded_note_end_max_ms <= quantized_target_ms + 1e-6
+    )
+    valid = all(
+        (
+            decode_error is None,
+            decoded_note_count > 0,
+            duration_matches_target,
+            decoded_notes_within_target,
+            orphan_note_off_count == 0,
+            duplicate_note_on_count == 0,
+            not active_pitches,
+        )
+    )
+    return {
+        "valid": valid,
+        "musical_duration_ms": musical_duration_ms,
+        "quantized_target_ms": quantized_target_ms,
+        "duration_matches_target": duration_matches_target,
+        "decoded_note_count": decoded_note_count,
+        "decoded_note_end_max_ms": decoded_note_end_max_ms,
+        "decoded_notes_within_target": decoded_notes_within_target,
+        "orphan_note_off_count": orphan_note_off_count,
+        "duplicate_note_on_count": duplicate_note_on_count,
+        "stuck_note_count": len(active_pitches),
+        "decode_error": decode_error,
+    }
+
+
 def evaluate_generation_arm(
     *,
     target_total_tokens: int,
@@ -69,25 +144,45 @@ def evaluate_generation_arm(
     generated_token_counts: Sequence[int],
     musical_durations_ms: Sequence[float],
     generation_times_ms: Sequence[float],
+    decode_validation_times_ms: Sequence[float],
     lookahead_ms: float,
     scheduling_margin_ms: float,
     minimum_gate_samples: int,
     one_bar_contract_validated: bool,
 ) -> dict[str, object]:
     summary = timing_summary(generation_times_ms)
-    enough_timing_samples = len(generation_times_ms) >= minimum_gate_samples
+    decode_validation_summary = timing_summary(decode_validation_times_ms)
+    block_ready_times_ms = [
+        generation_ms + decode_ms
+        for generation_ms, decode_ms in zip(
+            generation_times_ms,
+            decode_validation_times_ms,
+        )
+    ]
+    block_ready_summary = timing_summary(block_ready_times_ms)
+    timing_samples_aligned = len(generation_times_ms) == len(decode_validation_times_ms)
+    enough_timing_samples = (
+        timing_samples_aligned and len(generation_times_ms) >= minimum_gate_samples
+    )
     covers_target_bar = bool(musical_durations_ms) and all(
         duration_ms >= lookahead_ms for duration_ms in musical_durations_ms
     )
     samples_covering_target_bar = sum(
         duration_ms >= lookahead_ms for duration_ms in musical_durations_ms
     )
-    p99 = summary["p99"]
+    generation_p99 = summary["p99"]
+    decode_validation_p99 = decode_validation_summary["p99"]
+    deadline_measurement_ms = None
+    if generation_p99 is not None and decode_validation_p99 is not None:
+        deadline_measurement_ms = float(generation_p99) + float(decode_validation_p99)
     deadline_budget_ms = lookahead_ms - scheduling_margin_ms
     passed = None
     measurement_sufficient = enough_timing_samples and one_bar_contract_validated
-    if measurement_sufficient and p99 is not None:
-        passed = covers_target_bar and float(p99) <= deadline_budget_ms
+    if measurement_sufficient and deadline_measurement_ms is not None:
+        passed = covers_target_bar and deadline_measurement_ms <= deadline_budget_ms
+    operating_headroom_passed = None
+    if measurement_sufficient and block_ready_summary["p99"] is not None:
+        operating_headroom_passed = float(block_ready_summary["p99"]) <= lookahead_ms * 0.5
     return {
         "target_total_tokens": target_total_tokens,
         "primer_tokens": primer_tokens,
@@ -98,14 +193,19 @@ def evaluate_generation_arm(
         "samples_under_target_bar": len(musical_durations_ms) - samples_covering_target_bar,
         "all_samples_cover_target_bar": covers_target_bar,
         "generation_time_ms": summary,
+        "decode_validation_time_ms": decode_validation_summary,
+        "block_ready_time_ms": block_ready_summary,
         "lookahead_ms": lookahead_ms,
         "scheduling_margin_ms": scheduling_margin_ms,
         "generation_deadline_budget_ms": deadline_budget_ms,
+        "generation_plus_decode_p99_ms": deadline_measurement_ms,
         "minimum_gate_samples": minimum_gate_samples,
+        "generation_decode_sample_counts_aligned": timing_samples_aligned,
         "timing_sample_count_sufficient": enough_timing_samples,
         "one_bar_musical_duration_contract_validated": one_bar_contract_validated,
         "measurement_sufficient_for_r2_gate": measurement_sufficient,
         "passed_r2_generation_deadline_gate": passed,
+        "passed_r2_operating_headroom_gate": operating_headroom_passed,
     }
 
 
@@ -202,8 +302,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     arms = []
     for target_total_tokens in args.target_total_tokens:
         generation_times_ms: list[float] = []
+        decode_validation_times_ms: list[float] = []
         generated_token_counts: list[int] = []
         musical_durations_ms: list[float] = []
+        block_validations: list[dict[str, object]] = []
         for repetition in range(args.repetitions):
             torch.manual_seed(args.seed + repetition)
             started_ns = time.perf_counter_ns()
@@ -221,23 +323,71 @@ def main(argv: Sequence[str] | None = None) -> int:
             generation_times_ms.append((time.perf_counter_ns() - started_ns) / 1_000_000)
             generated_token_counts.append(len(tokens))
             musical_durations_ms.append(stage_a_musical_duration_ms(tokens))
-        arms.append(
-            evaluate_generation_arm(
-                target_total_tokens=target_total_tokens,
-                primer_tokens=primer_tokens,
-                generated_token_counts=generated_token_counts,
-                musical_durations_ms=musical_durations_ms,
-                generation_times_ms=generation_times_ms,
-                lookahead_ms=lookahead_ms,
-                scheduling_margin_ms=args.scheduling_margin_ms,
-                minimum_gate_samples=args.minimum_gate_samples,
-                one_bar_contract_validated=False,
+            validation_started_ns = time.perf_counter_ns()
+            block_validations.append(
+                validate_generated_token_block(tokens, lookahead_ms=lookahead_ms)
             )
+            decode_validation_times_ms.append(
+                (time.perf_counter_ns() - validation_started_ns) / 1_000_000
+            )
+        one_bar_contract_validated = bool(block_validations) and all(
+            bool(validation["valid"]) for validation in block_validations
         )
+        arm = evaluate_generation_arm(
+            target_total_tokens=target_total_tokens,
+            primer_tokens=primer_tokens,
+            generated_token_counts=generated_token_counts,
+            musical_durations_ms=musical_durations_ms,
+            generation_times_ms=generation_times_ms,
+            decode_validation_times_ms=decode_validation_times_ms,
+            lookahead_ms=lookahead_ms,
+            scheduling_margin_ms=args.scheduling_margin_ms,
+            minimum_gate_samples=args.minimum_gate_samples,
+            one_bar_contract_validated=one_bar_contract_validated,
+        )
+        arm["valid_block_count"] = sum(
+            bool(validation["valid"]) for validation in block_validations
+        )
+        arm["invalid_block_count"] = len(block_validations) - int(
+            arm["valid_block_count"]
+        )
+        arm["block_validation_failure_counts"] = {
+            "duration_mismatch": sum(
+                not bool(validation["duration_matches_target"])
+                for validation in block_validations
+            ),
+            "empty_decoded_block": sum(
+                int(validation["decoded_note_count"]) == 0
+                for validation in block_validations
+            ),
+            "decoded_target_overrun": sum(
+                not bool(validation["decoded_notes_within_target"])
+                and int(validation["decoded_note_count"]) > 0
+                for validation in block_validations
+            ),
+            "orphan_note_off": sum(
+                int(validation["orphan_note_off_count"])
+                for validation in block_validations
+            ),
+            "duplicate_note_on": sum(
+                int(validation["duplicate_note_on_count"])
+                for validation in block_validations
+            ),
+            "stuck_note": sum(
+                int(validation["stuck_note_count"])
+                for validation in block_validations
+            ),
+            "decode_error": sum(
+                validation["decode_error"] is not None
+                for validation in block_validations
+            ),
+        }
+        arm["block_validations"] = block_validations
+        arms.append(arm)
 
     report = {
         "schema_version": REPORT_SCHEMA_VERSION,
-        "scope": "resident_model_generation_only",
+        "scope": "resident_model_generation_and_decode_validation",
         "checkpoint": str(args.checkpoint.resolve()),
         "checkpoint_sha256": file_sha256(args.checkpoint),
         "conditioning_midi": str(args.conditioning_midi.resolve()),
@@ -263,10 +413,22 @@ def main(argv: Sequence[str] | None = None) -> int:
         "boundary_time_shift_crop_enabled": True,
         "generated_note_off_closure_enabled": True,
         "underfill_fallback_enabled": False,
+        "primer_max_tokens": args.primer_max_tokens,
+        "primer_tokens": primer_tokens,
         "warmup_target_total_tokens": warmup_target,
         "repetitions": args.repetitions,
-        "one_bar_musical_duration_contract_validated": False,
-        "decode_validation_scheduler_included": False,
+        "seed_start": args.seed,
+        "sample_seeds": [args.seed + repetition for repetition in range(args.repetitions)],
+        "sampling": {
+            "temperature": args.temperature,
+            "top_k": args.top_k,
+            "top_p": args.top_p,
+        },
+        "one_bar_musical_duration_contract_validated": bool(arms) and all(
+            bool(arm["one_bar_musical_duration_contract_validated"]) for arm in arms
+        ),
+        "decode_validation_included": True,
+        "scheduler_included": False,
         "arms": arms,
     }
     args.output_json.parent.mkdir(parents=True, exist_ok=True)

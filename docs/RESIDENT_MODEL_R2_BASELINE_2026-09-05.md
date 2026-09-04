@@ -9,7 +9,7 @@
 - Device: Apple MPS
 - Result: checkpoint resident load, repeated generation, and musical-time target stop confirmed
 - R2 gate: **not evaluated**
-- Next boundary: token-budget underfill handling and decoded one-bar block validation
+- Next boundary: invalid-block deterministic fallback and fallback-inclusive block-ready timing
 
 ## Context
 
@@ -172,16 +172,70 @@ The 48-token ceiling retains one `1,180ms` underfill. The 64-token ceiling cover
 three samples, but the registered minimum is 20 samples. No token ceiling is selected from this
 probe.
 
+## Decode-validated v4 Follow-up
+
+### Fixed Conditions
+
+- total-token ceiling: `64`
+- primer tokens: `32`
+- seeds: `42..61`
+- repetitions: `20`
+- duration target: `1,875ms`; quantized target: `1,880ms`
+- grammar mask: enabled
+- sampling: temperature `1.0`, top-k `32`, top-p `0.95`
+- in-memory decode and token note-state validation: included
+- file write, scheduler, CoreMIDI, FL Studio: excluded
+
+Technical block validation requires all of the following:
+
+- token duration exactly `1,880ms`
+- at least one decoded note
+- decoded note end at or before `1,880ms`
+- orphan note-off: `0`
+- duplicate note-on: `0`
+- final active note: `0`
+- decode error: none
+
+### Result
+
+| Field | Value |
+|---|---:|
+| model load | `168.736ms` |
+| target duration coverage | `17/20` |
+| technically valid blocks | `16/20` |
+| duration underfill | `3/20` |
+| empty decoded block | `1/20` |
+| decoded target overrun | `0/20` |
+| orphan note-off / duplicate note-on / stuck note | `0 / 0 / 0` |
+| generation p50 / p95 / p99 / max | `577.140 / 1,180.904 / 1,237.037 / 1,251.070ms` |
+| decode+validation p99 | `0.097ms` |
+| generation p99 + decode p99 | `1,237.134ms` |
+| deadline budget | `1,855ms` |
+| block-ready p99 | `1,237.133ms` |
+| operating-headroom threshold | `937.5ms` |
+| R2 deadline / headroom gate | `null / null` |
+
+Artifact:
+
+- `outputs/resident_model/issue_1480_one_bar_decode_validated_v4/report.json`
+
+The measured generation-plus-decode p99 is below the deadline budget. The contract is not valid
+for all samples, so the timing observation cannot produce an R2 pass. The block-ready p99 also
+exceeds the separate 50% operating-headroom threshold.
+
+The `16/20` count is a technical block-validity result only. It does not include existing density,
+phrase, chord-tone, preference, or performer-style quality gates.
+
 ## Decision
 
 - Resident checkpoint load: confirmed
 - Grammar-constrained repeated generation: confirmed
 - Musical-time upper boundary: established for sampling generation
 - Guaranteed one-bar block production: not established
-- 20-sample timing campaign: deferred
+- 20-sample 64-token Arm B campaign: completed; gate withheld
 - Scheduler integration: deferred
-- Required next implementation: token-budget underfill handling, decoded duration validation,
-  and boundary note-state validation
+- Required next implementation: in-memory deterministic fallback for invalid blocks and
+  fallback-inclusive block-ready timing
 
 Running 20 repetitions before the block contract would only improve the precision of the wrong
 unit. The next probe must measure a musical-time-bounded block before a p99 R2 decision.
@@ -196,6 +250,13 @@ unit. The next probe must measure a musical-time-bounded block before a p99 R2 d
   - environment/tooling failure: `python` executable absent outside the project environment
 - `uv run --with-requirements requirements.txt bash scripts/agent_harness.sh quick`
   - duration-bounded result: `55 tests`, compile checks and diff check pass
+- `uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo`
+  - unit tests, compile checks and diff check pass
+  - environment/tooling failure at demo step: `scripts/run_mvp_demo.sh` absent from the active tree
+- `uv run --with-requirements requirements.txt python -m unittest tests.test_resident_model_probe tests.test_music_transformer_duration_limit tests.test_stage_a_checkpoint_loading`
+  - decode-validated focused result: `21 tests`, pass
+- `uv run --with-requirements requirements.txt bash scripts/agent_harness.sh quick`
+  - decode-validated result: `57 tests`, compile checks and diff check pass
 - `uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo`
   - unit tests, compile checks and diff check pass
   - environment/tooling failure at demo step: `scripts/run_mvp_demo.sh` absent from the active tree
