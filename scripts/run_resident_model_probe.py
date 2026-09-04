@@ -24,7 +24,7 @@ from midi_processor.processor import (  # noqa: E402
 )
 
 
-REPORT_SCHEMA_VERSION = "resident_model_generation_probe_v2"
+REPORT_SCHEMA_VERSION = "resident_model_generation_probe_v3"
 TIME_SHIFT_START = RANGE_NOTE_ON + RANGE_NOTE_OFF
 TIME_SHIFT_END = TIME_SHIFT_START + RANGE_TIME_SHIFT - 1
 TIME_STEP_MS = 1000.0 / RANGE_TIME_SHIFT
@@ -46,6 +46,7 @@ def percentile(values: Sequence[float], quantile: float) -> float | None:
 def timing_summary(values_ms: Sequence[float]) -> dict[str, float | int | None]:
     return {
         "sample_count": len(values_ms),
+        "minimum": min(values_ms) if values_ms else None,
         "p50": percentile(values_ms, 0.50),
         "p95": percentile(values_ms, 0.95),
         "p99": percentile(values_ms, 0.99),
@@ -78,6 +79,9 @@ def evaluate_generation_arm(
     covers_target_bar = bool(musical_durations_ms) and all(
         duration_ms >= lookahead_ms for duration_ms in musical_durations_ms
     )
+    samples_covering_target_bar = sum(
+        duration_ms >= lookahead_ms for duration_ms in musical_durations_ms
+    )
     p99 = summary["p99"]
     deadline_budget_ms = lookahead_ms - scheduling_margin_ms
     passed = None
@@ -90,6 +94,8 @@ def evaluate_generation_arm(
         "requested_generated_tokens": target_total_tokens - primer_tokens,
         "generated_token_counts": list(generated_token_counts),
         "generated_musical_duration_ms": timing_summary(musical_durations_ms),
+        "samples_covering_target_bar": samples_covering_target_bar,
+        "samples_under_target_bar": len(musical_durations_ms) - samples_covering_target_bar,
         "all_samples_cover_target_bar": covers_target_bar,
         "generation_time_ms": summary,
         "lookahead_ms": lookahead_ms,
@@ -179,6 +185,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
 
     warmup_target = max(primer_tokens + 1, args.warmup_target_total_tokens)
+    lookahead_ms = args.beats_per_bar * 60_000.0 / args.bpm
     torch.manual_seed(args.seed)
     generate_once(
         model=model,
@@ -189,9 +196,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         top_k=args.top_k,
         top_p=args.top_p,
         grammar_mask=args.grammar_mask,
+        target_duration_seconds=lookahead_ms / 1000.0,
     )
 
-    lookahead_ms = args.beats_per_bar * 60_000.0 / args.bpm
     arms = []
     for target_total_tokens in args.target_total_tokens:
         generation_times_ms: list[float] = []
@@ -209,6 +216,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 top_k=args.top_k,
                 top_p=args.top_p,
                 grammar_mask=args.grammar_mask,
+                target_duration_seconds=lookahead_ms / 1000.0,
             )
             generation_times_ms.append((time.perf_counter_ns() - started_ns) / 1_000_000)
             generated_token_counts.append(len(tokens))
@@ -251,6 +259,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         "bpm": args.bpm,
         "beats_per_bar": args.beats_per_bar,
         "grammar_mask": args.grammar_mask,
+        "generation_duration_target_enabled": True,
+        "boundary_time_shift_crop_enabled": True,
+        "generated_note_off_closure_enabled": True,
+        "underfill_fallback_enabled": False,
         "warmup_target_total_tokens": warmup_target,
         "repetitions": args.repetitions,
         "one_bar_musical_duration_contract_validated": False,

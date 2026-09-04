@@ -12,6 +12,7 @@ Stage A usage:
 """
 
 import argparse
+import math
 import os
 import re
 import sys
@@ -270,6 +271,13 @@ def sanitize_for_decode(tokens: List[int]) -> List[int]:
     return [int(t) for t in tokens if 0 <= int(t) < TOKEN_END and int(t) != TOKEN_PAD]
 
 
+def _duration_seconds_to_steps(duration_seconds: float) -> int:
+    duration_seconds = float(duration_seconds)
+    if not math.isfinite(duration_seconds) or duration_seconds <= 0:
+        raise ValueError("target_duration_seconds must be finite and positive")
+    return math.ceil(duration_seconds * RANGE_TIME_SHIFT)
+
+
 def generate_once(
     model: MusicTransformer,
     primer: torch.Tensor,
@@ -280,11 +288,15 @@ def generate_once(
     top_p: float | None,
     sample_vocab_size: int | None = None,
     grammar_mask: bool = False,
+    target_duration_seconds: float | None = None,
 ) -> List[int]:
     device = get_device()
     primer = primer.to(device)
 
     with torch.no_grad():
+        target_duration_steps = None
+        if target_duration_seconds is not None:
+            target_duration_steps = _duration_seconds_to_steps(target_duration_seconds)
         generated = model.generate(
             primer=primer,
             target_seq_length=target_length,
@@ -295,6 +307,7 @@ def generate_once(
             top_p=top_p,
             sample_vocab_size=sample_vocab_size,
             grammar_mask=grammar_mask,
+            target_duration_steps=target_duration_steps,
         )
 
     sequence = generated[0].detach().cpu().tolist()

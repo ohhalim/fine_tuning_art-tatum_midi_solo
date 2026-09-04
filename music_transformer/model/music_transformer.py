@@ -42,6 +42,26 @@ def _grammar_update_active_pitches(active_pitches: set, token: int) -> None:
         active_pitches.discard(token - RANGE_NOTE_ON)
 
 
+def _apply_generated_duration_limit(
+    token: int,
+    elapsed_steps: int,
+    target_steps: int,
+) -> tuple[int | None, int, bool]:
+    """Crop a sampled time-shift token to the remaining 10ms duration steps."""
+    time_shift_start = RANGE_NOTE_ON + RANGE_NOTE_OFF
+    time_shift_end = time_shift_start + RANGE_TIME_SHIFT
+    if not time_shift_start <= token < time_shift_end:
+        return token, elapsed_steps, False
+
+    remaining_steps = target_steps - elapsed_steps
+    if remaining_steps <= 0:
+        return None, elapsed_steps, True
+    sampled_steps = token - time_shift_start + 1
+    bounded_steps = min(sampled_steps, remaining_steps)
+    bounded_token = time_shift_start + bounded_steps - 1
+    return bounded_token, elapsed_steps + bounded_steps, sampled_steps >= remaining_steps
+
+
 def _apply_grammar_mask(token_logits, active_pitches: set):
     # Block tokens that decode_midi would discard: note_off without an active
     # note_on (orphan), and note_on for an already-active pitch (silently
@@ -174,6 +194,7 @@ class MusicTransformer(nn.Module):
         top_p=None,
         sample_vocab_size=None,
         grammar_mask=False,
+        target_duration_steps=None,
     ):
         """
         ----------
@@ -188,6 +209,12 @@ class MusicTransformer(nn.Module):
         sample_vocab_size = int(sample_vocab_size or TOKEN_END)
         if sample_vocab_size <= 0 or sample_vocab_size > VOCAB_SIZE:
             raise ValueError(f"sample_vocab_size out of range: {sample_vocab_size}")
+        if target_duration_steps is not None:
+            target_duration_steps = int(target_duration_steps)
+            if target_duration_steps <= 0:
+                raise ValueError("target_duration_steps must be positive")
+            if beam != 0:
+                raise ValueError("target_duration_steps currently supports sampling only")
 
         print("Generating sequence of max length:", target_seq_length)
 
@@ -200,6 +227,8 @@ class MusicTransformer(nn.Module):
         # print("primer:",primer)
         # print(gen_seq)
         active_pitches: set = set()
+        generated_active_pitches: set = set()
+        generated_duration_steps = 0
         if grammar_mask:
             for tok in primer.flatten().tolist():
                 _grammar_update_active_pitches(active_pitches, int(tok))
@@ -236,10 +265,25 @@ class MusicTransformer(nn.Module):
             else:
                 distrib = torch.distributions.categorical.Categorical(probs=token_probs)
                 next_token = distrib.sample()
+                duration_reached = False
+                if target_duration_steps is not None:
+                    bounded_token, generated_duration_steps, duration_reached = (
+                        _apply_generated_duration_limit(
+                            int(next_token),
+                            generated_duration_steps,
+                            target_duration_steps,
+                        )
+                    )
+                    if bounded_token is None:
+                        break
+                    next_token = torch.as_tensor(
+                        [bounded_token], dtype=TORCH_LABEL_TYPE, device=gen_seq.device
+                    )
                 # print("next token:",next_token)
                 gen_seq[:, cur_i] = next_token
                 if grammar_mask:
                     _grammar_update_active_pitches(active_pitches, int(next_token))
+                _grammar_update_active_pitches(generated_active_pitches, int(next_token))
 
 
                 # Let the transformer decide to end if it wants to
@@ -247,11 +291,23 @@ class MusicTransformer(nn.Module):
                     print("Model called end of sequence at:", cur_i, "/", target_seq_length)
                     break
 
+                if duration_reached:
+                    cur_i += 1
+                    break
+
             cur_i += 1
             if(cur_i % 50 == 0):
                 print(cur_i, "/", target_seq_length)
 
-        return gen_seq[:, :cur_i]
+        result = gen_seq[:, :cur_i]
+        if target_duration_steps is not None and generated_active_pitches:
+            note_off_tokens = torch.as_tensor(
+                [[RANGE_NOTE_ON + pitch for pitch in sorted(generated_active_pitches)]],
+                dtype=TORCH_LABEL_TYPE,
+                device=gen_seq.device,
+            )
+            result = torch.cat((result, note_off_tokens), dim=1)
+        return result
 
 # Used as a dummy to nn.Transformer
 # DummyDecoder

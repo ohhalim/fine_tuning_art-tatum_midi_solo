@@ -80,6 +80,16 @@ class StageAModelRunner:
             target_sequence = min(self.max_sequence, len(primer) + 128)
 
         torch.manual_seed(int(request.seed))
+        numerator, denominator = (int(part) for part in request.time_signature.split("/", 1))
+        if numerator <= 0 or denominator <= 0:
+            raise ValueError("time signature values must be positive")
+        target_duration_seconds = (
+            float(request.bars)
+            * numerator
+            * (4.0 / denominator)
+            * 60.0
+            / float(request.bpm)
+        )
         candidates: list[Path] = []
         for index in range(max(1, int(model_candidates))):
             output_path = model_output_dir / f"jazz_sample_{index + 1}.mid"
@@ -92,6 +102,7 @@ class StageAModelRunner:
                 top_k=request.top_k,
                 top_p=request.top_p,
                 grammar_mask=self.grammar_mask,
+                target_duration_seconds=target_duration_seconds,
             )
             if not generated_tokens:
                 continue

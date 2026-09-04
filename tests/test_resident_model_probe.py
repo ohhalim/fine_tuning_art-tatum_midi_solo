@@ -9,6 +9,7 @@ import torch
 
 from inference.app.model_runner import StageAModelRunner
 from inference.app.schemas import GenerationRequest
+from scripts.generate import _duration_seconds_to_steps
 from scripts.run_resident_model_probe import (
     evaluate_generation_arm,
     parse_target_lengths,
@@ -17,6 +18,12 @@ from scripts.run_resident_model_probe import (
 
 
 class ResidentModelProbeTest(unittest.TestCase):
+    def test_duration_target_rounds_up_to_avoid_bar_underfill(self) -> None:
+        self.assertEqual(188, _duration_seconds_to_steps(1.875))
+        self.assertEqual(177, _duration_seconds_to_steps(1.7641))
+        with self.assertRaises(ValueError):
+            _duration_seconds_to_steps(0)
+
     def test_generation_gate_stays_unknown_below_registered_sample_count(self) -> None:
         result = evaluate_generation_arm(
             target_total_tokens=64,
@@ -75,6 +82,9 @@ class ResidentModelProbeTest(unittest.TestCase):
         )
 
         self.assertFalse(result["all_samples_cover_target_bar"])
+        self.assertEqual(0, result["samples_covering_target_bar"])
+        self.assertEqual(20, result["samples_under_target_bar"])
+        self.assertEqual(500.0, result["generated_musical_duration_ms"]["minimum"])
         self.assertFalse(result["passed_r2_generation_deadline_gate"])
 
     def test_unvalidated_one_bar_contract_keeps_gate_unknown(self) -> None:
@@ -139,6 +149,7 @@ class ResidentModelProbeTest(unittest.TestCase):
 
         self.assertEqual(1, len(candidates))
         self.assertTrue(generate_once.call_args.kwargs["grammar_mask"])
+        self.assertEqual(1.875, generate_once.call_args.kwargs["target_duration_seconds"])
 
 
 if __name__ == "__main__":

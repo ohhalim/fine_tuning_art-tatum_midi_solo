@@ -7,9 +7,9 @@
 - Checkpoint: D1 Arm D epoch 8, SHA-256
   `5bfef8fcc8fdbbde7e23e5ac55711271194673f2fef66ab3fb3a3e067e7626f8`
 - Device: Apple MPS
-- Result: checkpoint resident load and repeated generation confirmed
+- Result: checkpoint resident load, repeated generation, and musical-time target stop confirmed
 - R2 gate: **not evaluated**
-- Next boundary: decoded musical-time target stop/crop/fill contract
+- Next boundary: token-budget underfill handling and decoded one-bar block validation
 
 ## Context
 
@@ -33,11 +33,14 @@ Included:
 - three repeated generations per arm with the same seed set
 - generated Stage A time-shift duration measurement
 - actual model shape, RPR embedding shape, token-layer resize record
+- request BPM, meter, and bar count to generated-duration target conversion
+- boundary time-shift crop and generated active-note closure
 
 Excluded:
 
 - MIDI decode and repair
-- exact one-bar stop/crop/fill
+- token-budget underfill fallback
+- decoded one-bar duration and note-boundary validation
 - generated block conversion
 - scheduler and CoreMIDI output
 - FL Studio and audio output
@@ -132,15 +135,53 @@ time target. The 48-token arm did not cover one bar in every sample. Longer arms
 generated several bars of time and therefore cannot be treated as one-bar output without a
 stop/crop/fill contract.
 
+## Duration-bounded v3 Follow-up
+
+### Change
+
+- duration target: `bars × meter quarter-note length × 60 / BPM`
+- Stage A time unit: `10ms`
+- target-step conversion: ceiling; `1,875ms → 188 steps → 1,880ms`
+- final sampled time-shift: crop to the remaining duration-step count
+- target reached: autoregressive generation stop
+- generated active notes: boundary note-off append
+- token ceiling reached first: underfill retained; no fallback
+
+Returned token counts include boundary note-off tokens appended after autoregressive generation.
+This can make a returned count exceed `target_total_tokens - primer_tokens` without additional
+model forward passes.
+
+### Result
+
+| Total-token ceiling | Returned tokens by seed | Duration min / p50 / max | Cover / underfill | Generation p50 / p99 / max | R2 gate |
+|---:|---:|---:|---:|---:|---:|
+| `48` | `13 / 20 / 17` | `1,180 / 1,880 / 1,880ms` | `2 / 1` | `438.637 / 461.215 / 461.676ms` | `null` |
+| `64` | `13 / 20 / 18` | `1,880 / 1,880 / 1,880ms` | `3 / 0` | `502.300 / 597.903 / 599.854ms` | `null` |
+| `96` | `13 / 20 / 18` | `1,880 / 1,880 / 1,880ms` | `3 / 0` | `497.271 / 600.603 / 602.712ms` | `null` |
+| `128` | `13 / 20 / 18` | `1,880 / 1,880 / 1,880ms` | `3 / 0` | `508.434 / 597.229 / 599.041ms` | `null` |
+
+Artifact:
+
+- `outputs/resident_model/issue_1480_duration_bounded_v3/report.json`
+
+96-token ceiling p50: `2,040.589ms → 497.271ms`. 128-token ceiling p50:
+`3,222.321ms → 508.434ms`. The v3 stop condition removes post-bar token generation in these
+three-seed probes. It does not establish a production p99 or musical-quality result.
+
+The 48-token ceiling retains one `1,180ms` underfill. The 64-token ceiling covers the target in
+three samples, but the registered minimum is 20 samples. No token ceiling is selected from this
+probe.
+
 ## Decision
 
 - Resident checkpoint load: confirmed
 - Grammar-constrained repeated generation: confirmed
-- Current fixed-token generation as one-bar block producer: not established
+- Musical-time upper boundary: established for sampling generation
+- Guaranteed one-bar block production: not established
 - 20-sample timing campaign: deferred
 - Scheduler integration: deferred
-- Required next implementation: decoded musical-time target stop, boundary note-off repair,
-  overrun crop and underrun/fallback record
+- Required next implementation: token-budget underfill handling, decoded duration validation,
+  and boundary note-state validation
 
 Running 20 repetitions before the block contract would only improve the precision of the wrong
 unit. The next probe must measure a musical-time-bounded block before a p99 R2 decision.
@@ -149,6 +190,15 @@ unit. The next probe must measure a musical-time-bounded block before a p99 R2 d
 
 - `uv run --with-requirements requirements.txt python -m unittest tests.test_resident_model_probe tests.test_stage_a_checkpoint_loading`
 - focused result: `13 tests`, pass
+- `uv run --with-requirements requirements.txt python -m unittest tests.test_music_transformer_duration_limit tests.test_resident_model_probe tests.test_stage_a_checkpoint_loading`
+- duration-bounded focused result: `19 tests`, pass
+- `bash scripts/agent_harness.sh quick`
+  - environment/tooling failure: `python` executable absent outside the project environment
+- `uv run --with-requirements requirements.txt bash scripts/agent_harness.sh quick`
+  - duration-bounded result: `55 tests`, compile checks and diff check pass
+- `uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo`
+  - unit tests, compile checks and diff check pass
+  - environment/tooling failure at demo step: `scripts/run_mvp_demo.sh` absent from the active tree
 - `uv run --with-requirements requirements.txt bash scripts/agent_harness.sh quick`
   - result before review corrections: `46 tests`, pass
 - `uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo`
