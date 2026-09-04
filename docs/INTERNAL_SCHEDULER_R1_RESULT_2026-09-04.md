@@ -6,7 +6,9 @@
 - Scope: internal monotonic clock, deterministic one-bar lookahead scheduler, CoreMIDI
   independent capture, 20ms dispatch/bar-start gate, cumulative timing histogram, watchdog
 - Initial v2 result: **R1 transport gate not passed**
-- v3 observability remeasurement: **pending**
+- Close-fixed v3 remeasurement: **R1 transport gate not passed on two awake runs**
+- Environment validity: 90/120 BPM invalidated by clamshell sleep; 128/160 BPM valid
+- CoreMIDI input close boundary: **four-BPM report write and process exit restored**
 - Runtime boundary: external MIDI Clock, model inference, FL Studio, Serum, audio output excluded
 
 ## Context
@@ -133,11 +135,21 @@ oversized.
 
 ```bash
 uv run --with-requirements requirements.txt bash scripts/agent_harness.sh quick
-uv run --with-requirements requirements.txt python scripts/run_internal_scheduler_probe.py \
-  --bpm 90 --duration_seconds 600 --spin_window_ms 15 --run_id issue_1478_r1_soak_bpm90
+RUN_ID=issue_1478_r1_v3_close_fixed_soak \
+  uv run --with-requirements requirements.txt \
+  bash scripts/agent_harness.sh internal-scheduler-soak
+uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo
 ```
 
-Environment: Python `3.14.7`, `python-rtmidi` `1.5.8`, compiled MIDI API `CoreMidi`.
+Environment: Python `3.14.7`, `mido` `1.3.3`, `python-rtmidi` `1.5.8`, compiled
+MIDI API `CoreMidi`.
+
+- `quick`: 39 tests passed; 36 active Python files compiled; diff whitespace check passed
+- `internal-scheduler-soak`: expected non-zero exit because the frozen R1 gate failed; all
+  four reports written and the harness reached its final BPM
+- `demo`: exit `127` before demo execution because active-path `scripts/run_mvp_demo.sh` is
+  absent from `origin/main`; the file exists only under `archive/scripts/`. Unit/compile/diff
+  checks inside `demo` passed before the missing-script boundary. No demo-pass claim.
 
 ## Initial v2 soak result
 
@@ -191,10 +203,95 @@ Both were formed before the soak and are recorded because they are wrong:
 
 What remains is a general OS/runtime scheduling stall that can land on any wait.
 
+## v3 input-close fault isolation
+
+The first v3 90 BPM run reached the input-close boundary after its scheduler loop but did not
+write a report or exit. A process sample placed the main thread in
+`mido.backends.rtmidi.Input.close` → `rtmidi.MidiIn.close_port` → CoreMIDI
+`MIDIPortDispose`; the callback thread was waiting to acquire the Python GIL. The missing 90
+BPM report means this interrupted run is not R1 evidence.
+
+The installed Mido `1.3.3` RtMidi input close path assigns `callback = None`. Its callback
+setter cancels the native callback and installs Mido's callback wrapper again before closing
+the native port. The repository now centralizes input teardown in `close_mido_input`:
+
+- native callback cancellation
+- Mido callback reference removal without callback-wrapper reinstallation
+- raw RtMidi port close
+- Mido wrapper closed-state transition before native handle deletion
+- public `close()` fallback for non-RtMidi backends and test doubles
+- fail-closed behavior when a Mido RtMidi input does not expose the expected `_rt` handle
+
+All repository Mido input paths use the same helper: the R1 independent capture, the R0 named
+echo input, and the R0 virtual sender/capture inputs. `mido==1.3.3` is pinned because the helper
+depends on the inspected backend lifecycle.
+
+Close-boundary verification before the second v3 soak:
+
+- R0 CoreMIDI 2-second smoke: sent/captured `100/100`, six integrity counters `0`, reset
+  `true`, process exit
+- CoreMIDI 20-cycle one-bar close stress at 600 BPM: `20/20` process cycles completed, reset
+  `true`, sent/captured counts equal in every cycle
+- four-BPM R1 smoke: 90 BPM dispatch failure recorded; 120/128/160 BPM short-run pass; all
+  four reports written and harness progression completed
+
+## Close-fixed v3 soak result
+
+Four sequential runs, `spin_window_ms 15`, `deadline_threshold_ms 20`,
+`internal_midi_scheduler_report_v3`, artifacts under
+`outputs/internal_midi_scheduler/issue_1478_r1_v3_close_fixed_soak_*bpm/`.
+
+| BPM | environment | wall | completed/expected bars | captured | bar-start p50/p99/max | successful dispatch p99/max | target→capture p99/max | missed event lateness | missed event |
+|---:|---|---:|---:|---:|---|---|---|---:|---|
+| `90` | **invalid: lid wake** | `9.021s` | `3/225` | `42` | `0.564 / 0.851 / 0.857` | `2.865 / 2.910` | `4.590 / 4.712` | `25.594ms` | bar `3`, seq `42`, bar-start `note_on 67` |
+| `120` | **invalid: lid wake** | `268.768s` | `134/300` | `1,877` | `0.445 / 3.958 / 5.099` | `8.288 / 15.609` | `11.906 / 18.171` | `116.653ms` | bar `134`, seq `1877`, `note_off 64` |
+| `128` | valid: awake | `146.929s` | `78/320` | `1,093` | `0.451 / 10.610 / 14.385` | `9.146 / 14.799` | `10.475 / 14.928` | **`70.101ms`** | bar `78`, seq `1093`, `note_off 64` |
+| `160` | valid: awake | `15.217s` | `9/400` | `138` | `0.306 / 3.043 / 3.301` | `9.859 / 11.221` | `12.963 / 13.036` | **`23.717ms`** | bar `9`, seq `138`, `note_off 69` |
+
+Power-log correlation invalidates the 90 and 120 BPM timing results:
+
+- 90 BPM report write `15:23:38 KST`; lid wake `15:23:38 KST`; preceding clamshell sleep
+  began `15:12:56 KST`
+- 120 BPM report write `15:41:37 KST`; lid wake `15:41:37 KST`; preceding clamshell sleep
+  began `15:27:43 KST`
+- no sleep transition between the 128 BPM interval `15:41:37–15:44:04 KST` or the 160 BPM
+  interval `15:44:04–15:44:20 KST`
+
+The 90/120 reports remain useful only for close/report-write verification after resume. They
+are excluded from scheduler timing judgment. `caffeinate` does not prevent clamshell sleep;
+future timing runs require an open lid and a post-run power-log validity check.
+
+Common to all four:
+
+- `scheduler_dispatch_deadline_miss_count = 1`
+- `watchdog_trigger_reason = "dispatch_deadline_miss"`
+- `run_completed = false`, `wall_clock_soak_completed = false`
+- `capture_deadline_miss_count = null` because capture is incomplete
+- `queue_underrun_count = 0`, `send_failure_count = 0`,
+  `unmatched_note_off_count = 0`
+- `safe_reset_sent = true`
+- report write completed, input close completed, harness proceeded to the next BPM
+
+The v3 fields remove the v2 ambiguity: the missed event itself is now recorded even though it
+is not sent, while latency summaries cover successful dispatches only. At 120 BPM, for
+example, the successful target→capture maximum was `18.171ms`; the event that stopped the run
+was never sent and its dispatch began `116.653ms` late. Successful-event percentiles therefore
+cannot be used to override the failed zero-miss gate.
+
+All four v3 runs stop on their first miss, so this result does not estimate a full-run miss
+rate or p99.9. The two valid awake runs are sufficient to reject the four-BPM zero-miss gate.
+The run also establishes that miss location/lateness and teardown are now observable.
+
 ## Decision
 
 - R1 gate is recorded as **not passed**. No retuning of spin window, fixture or threshold was
   performed to change that outcome; the frozen failure policy was followed.
+- v3 remeasurement is complete for gate rejection, not for four-BPM tail characterization.
+  The two awake runs missed by `70.101ms` and `23.717ms`; neither reached 600 seconds. The
+  90/120 timing results are excluded due to clamshell sleep.
+- CoreMIDI input close deadlock is treated separately from scheduler readiness. The shared
+  close path restored report write and process exit across all four failed soak runs, but it
+  does not make the R1 scheduler gate pass.
 - `spin_window_ms = 15.0` retained on measurement, not on default.
 - The dense fixture is retained. It is the reason the contention regime is reachable at all,
   and the failure it exposes is a property of the runtime, not of the fixture alone.
@@ -203,17 +300,20 @@ What remains is a general OS/runtime scheduling stall that can land on any wait.
 
 ## Remaining Risk
 
-- v2 did not record the deadline-miss event's own lateness; the recorded successful-dispatch
-  maxima therefore remain below the threshold by construction. v3 records the missed event
-  separately.
-- v2 `processed_bar_count` included an aborted bar. v3 splits this into
-  `started_bar_count` and `completed_bar_count`.
+- A first-miss-abort policy cannot measure full-duration miss rate, p99.9 or recovery behavior.
+- The report schema does not detect system suspend. This run required external `pmset` log
+  correlation to invalidate two BPM results.
+- Three v3 aborts occurred on `note_off`, leaving captured `stuck_note_count` 1, 1 and 2 at
+  120/128/160 BPM until the out-of-band reset. A live policy must define late note-on and
+  note-off handling separately.
 - `queue_underrun_count`, `queue_depth_max` and `enqueue_lead_time_ms` are fixed by
   construction under `block_production_mode = "prebuilt_deterministic_dict"` and are not
   evidence of real-time robustness.
-- Aborting mid-bar leaves `stuck_note_count` 1–2 in the captured stream at 128 and 160 BPM.
-  The physical port is cleaned (`safe_reset_sent true`) because reset messages are
-  deliberately excluded from the integrity capture, as in R0.
+- The physical port is cleaned (`safe_reset_sent true`) after every v3 abort because reset
+  messages are deliberately excluded from integrity capture, as in R0. This does not prove
+  glitch-free recovery during a performance.
+- `close_mido_input` depends on Mido `1.3.3` RtMidi private state. The version is pinned and
+  unexpected internals fail closed, but a dependency upgrade requires lifecycle revalidation.
 - The 20ms scheduler-jitter threshold and jam_bot's wider accompaniment-response budget measure
   different boundaries. The latter is not evidence for relaxing this gate.
 - Runs were executed sequentially on a laptop with no other deliberate load, but with no CPU
@@ -221,12 +321,15 @@ What remains is a general OS/runtime scheduling stall that can land on any wait.
 
 ## Next Gate
 
-Ordered so the open decision is made on data rather than on a retune:
+Separate capability validation from live recovery policy before producer/model integration:
 
-- run the committed v3 four-BPM soak so dispatch misses include their own lateness
-- decide the watchdog policy: abort on first miss, or record and continue so a miss *rate*
-  can be measured over the full 10 minutes
-- decide the gate: zero misses, a miss rate, or a percentile such as p99.9
-- only then, evaluate mitigations — `gc.freeze()` / `gc.disable()` around the scheduler loop,
-  macOS thread time-constraint policy, or moving the dispatch loop out of Python
-- re-run the four-BPM soak under whichever gate is adopted
+- record-and-continue diagnostic mode for a complete 600-second miss rate, p99.9 and maximum
+- system-suspend detection in the report and environment-validity failure; open-lid run
+  requirement because `caffeinate` does not override clamshell sleep
+- explicit late-event policy by message type: late note-on drop/dispatch decision, note-off
+  safety, active-note ledger, and next-bar resynchronization
+- zero stuck notes after in-run recovery, independent of final output reset
+- retain the 20ms signal while deciding whether zero misses is a capability gate or an
+  availability target
+- only after full-run evidence, evaluate mitigations — `gc.freeze()` / `gc.disable()` around
+  the scheduler loop, macOS thread priority, or moving the dispatch loop out of Python
