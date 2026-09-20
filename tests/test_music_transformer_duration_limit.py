@@ -102,7 +102,10 @@ class MusicTransformerDurationLimitTest(unittest.TestCase):
 
     def test_generation_metadata_records_token_budget_underfill(self) -> None:
         sampled_note_on = 61
-        sampled_velocity = RANGE_NOTE_ON * 2 + 100
+        # Velocity bin 16, not bin 0: bin 0 is grammar-masked because it
+        # decodes to MIDI velocity 0. Any audible bin exercises the same
+        # path - a token that consumes budget without advancing duration.
+        sampled_velocity = RANGE_NOTE_ON * 2 + 100 + 16
         model = DeterministicTokenModel([sampled_note_on, sampled_velocity])
 
         with patch("model.music_transformer.get_device", return_value=torch.device("cpu")):
@@ -146,3 +149,30 @@ class MusicTransformerDurationLimitTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GrammarMaskSilentVelocityTest(unittest.TestCase):
+    """Velocity bin 0 decodes to MIDI velocity 0, which is a note-off."""
+
+    def test_silent_velocity_token_is_masked(self) -> None:
+        from model.music_transformer import SILENT_VELOCITY_TOKEN, _apply_grammar_mask
+
+        logits = torch.zeros(1, VOCAB_SIZE)
+        masked = _apply_grammar_mask(logits, set())
+
+        self.assertEqual(float("-inf"), masked[0, SILENT_VELOCITY_TOKEN].item())
+        # The neighbouring audible bin must stay available.
+        self.assertEqual(0.0, masked[0, SILENT_VELOCITY_TOKEN + 1].item())
+
+    def test_generation_never_emits_the_silent_velocity_token(self) -> None:
+        from model.music_transformer import SILENT_VELOCITY_TOKEN
+
+        model = DeterministicTokenModel([SILENT_VELOCITY_TOKEN, 61, RANGE_NOTE_ON * 2 + 9])
+
+        with patch("model.music_transformer.get_device", return_value=torch.device("cpu")):
+            generated = MusicTransformer.generate(
+                model, primer=torch.tensor([60]), target_seq_length=4, top_k=1,
+                sample_vocab_size=TOKEN_END, grammar_mask=True, target_duration_steps=20,
+            )
+
+        self.assertNotIn(SILENT_VELOCITY_TOKEN, generated[0].tolist())

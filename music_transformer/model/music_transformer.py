@@ -62,16 +62,26 @@ def _apply_generated_duration_limit(
     return bounded_token, elapsed_steps + bounded_steps, sampled_steps >= remaining_steps
 
 
+# Stage A stores velocity as ``velocity // 4``, so bin 0 decodes back to MIDI
+# velocity 0 - a note-off by the MIDI spec. The bin never appears in training
+# data, so sampling it is out of distribution and produces an unplayable note.
+VELOCITY_TOKEN_START = RANGE_NOTE_ON + RANGE_NOTE_OFF + RANGE_TIME_SHIFT
+SILENT_VELOCITY_TOKEN = VELOCITY_TOKEN_START
+
+
 def _apply_grammar_mask(token_logits, active_pitches: set):
     # Block tokens that decode_midi would discard: note_off without an active
-    # note_on (orphan), and note_on for an already-active pitch (silently
-    # overwrites the pending note_on in _merge_note).
+    # note_on (orphan), note_on for an already-active pitch (silently
+    # overwrites the pending note_on in _merge_note), and velocity bin 0,
+    # whose notes decode to velocity 0 and are rejected downstream.
     vocab = token_logits.shape[-1]
     off_start = RANGE_NOTE_ON
     off_end = min(RANGE_NOTE_ON + RANGE_NOTE_OFF, vocab)
     mask = torch.zeros(vocab, dtype=torch.bool, device=token_logits.device)
     if off_start < vocab:
         mask[off_start:off_end] = True
+    if SILENT_VELOCITY_TOKEN < vocab:
+        mask[SILENT_VELOCITY_TOKEN] = True
     for pitch in active_pitches:
         off_idx = RANGE_NOTE_ON + pitch
         if off_idx < vocab:
