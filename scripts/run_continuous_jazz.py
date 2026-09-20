@@ -31,7 +31,11 @@ from inference.realtime.continuous import (
     input_events_to_notes,
     summarize_production,
 )
-from inference.realtime.scheduler import MonotonicBarClock, OneBarMidiScheduler
+from inference.realtime.scheduler import (
+    DEADLINE_POLICY_RECORD_AND_CONTINUE,
+    MonotonicBarClock,
+    OneBarMidiScheduler,
+)
 from scripts.run_jazz_mvp import fit_window
 from scripts.run_resident_model_probe import validate_generated_token_block
 
@@ -100,7 +104,10 @@ def make_block_builder(*, clock, duration, generate):
         # `chords` is not passed to the model: generation is not chord
         # conditioned yet. It only shapes the prebuilt fallbacks.
         tokens, _metadata = generate(bar_index, input_events)
-        valid = validate_generated_token_block(tokens, lookahead_ms=duration * 1000)
+        # A whole-bar rest is playable here: the scheduler simply waits it out.
+        valid = validate_generated_token_block(
+            tokens, lookahead_ms=duration * 1000, allow_rest_bar=True
+        )
         if not valid["valid"]:
             raise ValueError(f"invalid model block: {valid}")
         from midi_processor.processor import decode_midi
@@ -110,6 +117,7 @@ def make_block_builder(*, clock, duration, generate):
             clock=clock, bar_index=bar_index, block_id=str(bar_index),
             source_context_id="continuous", context_version=0,
             adapter="model", fallback_used=False,
+            allow_empty=bool(valid["rest_bar_accepted"]),
         )
 
     return build
@@ -117,7 +125,8 @@ def make_block_builder(*, clock, duration, generate):
 
 def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
                 start_delay_seconds=2.5, spin_window_ms=1.0,
-                clock=None, clock_ns=None, wait_until=None):
+                clock=None, clock_ns=None, wait_until=None,
+                deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE):
     """Play ``bars`` bars, producing one bar ahead.
 
     ``clock``/``clock_ns``/``wait_until`` exist so tests can drive the run off a
@@ -143,7 +152,11 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
             else make_block_builder(clock=clock, duration=duration, generate=generate)
         ),
     )
-    scheduler_kwargs = {"sink": port, "clock": clock, "spin_window_ms": spin_window_ms}
+    # A single OS hiccup must not end a performance. The scheduler probe uses
+    # abort_on_first_miss to make timing failures loud; a live instrument wants
+    # the miss recorded and the music continued.
+    scheduler_kwargs = {"sink": port, "clock": clock, "spin_window_ms": spin_window_ms,
+                        "deadline_policy": deadline_policy}
     if clock_ns is not None:
         scheduler_kwargs["clock_ns"] = clock_ns
     if wait_until is not None:
@@ -263,6 +276,7 @@ def build_report(result, producer, *, bars, bpm, capture=None):
         "queue_underrun_count": result.queue_underrun_count,
         "scheduler_dispatch_deadline_miss_count": result.scheduler_dispatch_deadline_miss_count,
         "send_failure_count": result.send_failure_count,
+        "deadline_policy": result.deadline_policy,
         "accepted_sends": len(result.records),
         "production": summarize_production(producer.records),
         "bars_detail": [vars(r) for r in producer.records],

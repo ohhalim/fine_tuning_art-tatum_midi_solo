@@ -26,6 +26,7 @@ def build_scheduled_midi_block(
     fallback_used: bool,
     output_channel: int = 0,
     sequence_start_index: int = 0,
+    allow_empty: bool = False,
 ) -> ScheduledMidiBlock:
     """Map relative note times to one absolute scheduler window without file I/O."""
 
@@ -58,7 +59,10 @@ def build_scheduled_midi_block(
     )
     if drum_note_count:
         raise ValueError("drum notes are not valid in a lead MIDI block")
-    if not notes:
+    if not notes and not allow_empty:
+        # Off by default: an empty block is usually a generation failure. A
+        # caller that can tell a whole-bar rest from a failure opts in, and
+        # gets a block with no events - the scheduler simply waits out the bar.
         raise ValueError("MIDI block must contain at least one note")
 
     note_intervals_by_pitch: dict[int, list[tuple[float, float]]] = defaultdict(list)

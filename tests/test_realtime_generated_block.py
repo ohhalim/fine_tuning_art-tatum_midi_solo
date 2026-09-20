@@ -5,7 +5,7 @@ import unittest
 import pretty_midi
 
 from inference.realtime.blocks import build_scheduled_midi_block
-from inference.realtime.scheduler import MonotonicBarClock
+from inference.realtime.scheduler import MonotonicBarClock, OneBarMidiScheduler
 
 
 def midi_with_notes(*notes: pretty_midi.Note) -> pretty_midi.PrettyMIDI:
@@ -113,3 +113,55 @@ class RealtimeGeneratedBlockTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EmptyBlockTests(unittest.TestCase):
+    """A whole-bar rest is music, but only a caller that knows may ask for it."""
+
+    def _clock(self):
+        return MonotonicBarClock(bpm=128.0, beats_per_bar=4, start_ns=0)
+
+    def _empty_midi(self):
+        midi = pretty_midi.PrettyMIDI()
+        midi.instruments = [pretty_midi.Instrument(program=0)]
+        return midi
+
+    def _build(self, **kwargs):
+        clock = self._clock()
+        return build_scheduled_midi_block(
+            midi=self._empty_midi(), clock=clock, bar_index=0, block_id="0",
+            source_context_id="test", context_version=0, adapter="model",
+            fallback_used=False, **kwargs,
+        )
+
+    def test_empty_block_is_rejected_by_default(self):
+        with self.assertRaisesRegex(ValueError, "at least one note"):
+            self._build()
+
+    def test_opt_in_yields_a_block_with_no_events(self):
+        clock = self._clock()
+        block = self._build(allow_empty=True)
+
+        self.assertEqual((), block.events)
+        self.assertEqual(0, block.bar_index)
+        self.assertEqual(clock.bar_start_ns(0), block.target_start_ns)
+        self.assertEqual(clock.bar_start_ns(1), block.target_end_ns)
+
+    def test_scheduler_plays_a_rest_bar_without_underrun(self):
+        clock = self._clock()
+        sent = []
+
+        class Sink:
+            def send(self, message):
+                sent.append(message)
+
+        blocks = {0: self._build(allow_empty=True)}
+        result = OneBarMidiScheduler(
+            sink=Sink(), clock=clock, clock_ns=lambda: 0,
+            wait_until=lambda target_ns, stop: None,
+        ).run(blocks=blocks, expected_bar_count=1)
+
+        self.assertTrue(result.run_completed)
+        self.assertEqual(1, result.completed_bar_count)
+        self.assertEqual(0, result.queue_underrun_count)
+        self.assertEqual([], sent)

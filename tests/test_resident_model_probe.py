@@ -301,3 +301,38 @@ class SilentNoteValidationTest(unittest.TestCase):
 
         self.assertTrue(result["valid"], result)
         self.assertEqual(0, result["silent_note_count"])
+
+
+class RestBarValidationTest(unittest.TestCase):
+    """A whole-bar rest fills the bar exactly and decodes to no notes."""
+
+    # A 100-step shift (1000ms) plus an 88-step shift (880ms) = 1880ms of
+    # silence, with no note tokens at all.
+    REST_TOKENS = [355, 343]
+
+    def test_rest_bar_is_invalid_by_default(self) -> None:
+        result = validate_generated_token_block(self.REST_TOKENS, lookahead_ms=1875.0)
+
+        self.assertFalse(result["valid"])
+        self.assertTrue(result["is_rest_bar"])
+        self.assertFalse(result["rest_bar_accepted"])
+        self.assertEqual(0, result["decoded_note_count"])
+
+    def test_rest_bar_is_valid_when_the_caller_opts_in(self) -> None:
+        result = validate_generated_token_block(
+            self.REST_TOKENS, lookahead_ms=1875.0, allow_rest_bar=True
+        )
+
+        self.assertTrue(result["valid"], result)
+        self.assertTrue(result["rest_bar_accepted"])
+        self.assertTrue(result["duration_matches_target"])
+
+    def test_token_budget_underfill_is_not_a_rest_bar(self) -> None:
+        """Underfill leaves the bar short; opting into rests must not hide it."""
+        short = [355]  # 1000ms of silence against an 1880ms target
+
+        result = validate_generated_token_block(short, lookahead_ms=1875.0, allow_rest_bar=True)
+
+        self.assertFalse(result["valid"])
+        self.assertFalse(result["is_rest_bar"])
+        self.assertFalse(result["duration_matches_target"])

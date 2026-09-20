@@ -286,3 +286,35 @@ class ColdStartTests(unittest.TestCase):
                         wait_until=lambda target_ns, stop: None)
 
         self.assertEqual([0], waited)
+
+
+class DeadlinePolicyTests(unittest.TestCase):
+    """One OS hiccup must not end a performance."""
+
+    def test_session_records_misses_and_keeps_playing(self):
+        from inference.realtime.scheduler import DEADLINE_POLICY_RECORD_AND_CONTINUE
+
+        port = Port()
+        result, producer = run_session(
+            port=port, bars=BARS, bpm=BPM, chords=CHORDS, seed=42,
+            generate=lambda *_: (_ for _ in ()).throw(RuntimeError("no model")),
+            start_delay_seconds=0.0, spin_window_ms=0.0,
+            clock=clock(), clock_ns=lambda: 0, wait_until=lambda target_ns, stop: None,
+        )
+        report = build_report(result, producer, bars=BARS, bpm=BPM)
+
+        self.assertEqual(DEADLINE_POLICY_RECORD_AND_CONTINUE, report["deadline_policy"])
+
+    def test_abort_policy_is_still_selectable(self):
+        from inference.realtime.scheduler import DEADLINE_POLICY_ABORT_ON_FIRST_MISS
+
+        result, producer = run_session(
+            port=Port(), bars=BARS, bpm=BPM, chords=CHORDS, seed=42,
+            generate=lambda *_: (_ for _ in ()).throw(RuntimeError("no model")),
+            start_delay_seconds=0.0, spin_window_ms=0.0,
+            clock=clock(), clock_ns=lambda: 0, wait_until=lambda target_ns, stop: None,
+            deadline_policy=DEADLINE_POLICY_ABORT_ON_FIRST_MISS,
+        )
+        report = build_report(result, producer, bars=BARS, bpm=BPM)
+
+        self.assertEqual(DEADLINE_POLICY_ABORT_ON_FIRST_MISS, report["deadline_policy"])

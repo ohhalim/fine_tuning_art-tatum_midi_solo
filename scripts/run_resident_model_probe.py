@@ -71,6 +71,7 @@ def validate_generated_token_block(
     tokens: Sequence[int],
     *,
     lookahead_ms: float,
+    allow_rest_bar: bool = False,
 ) -> dict[str, object]:
     active_pitches: set[int] = set()
     orphan_note_off_count = 0
@@ -121,12 +122,18 @@ def validate_generated_token_block(
         decoded_note_end_max_ms is not None
         and decoded_note_end_max_ms <= quantized_target_ms + 1e-6
     )
+    # A whole-bar rest fills the bar exactly and decodes to no notes. That is
+    # music, not truncation, and it is distinguishable from token-budget
+    # underfill, which leaves duration_matches_target False. Callers that can
+    # play silence opt in; the default still requires a note.
+    is_rest_bar = decoded_note_count == 0 and duration_matches_target and decode_error is None
+    rest_bar_accepted = is_rest_bar and allow_rest_bar
     valid = all(
         (
             decode_error is None,
-            decoded_note_count > 0,
+            decoded_note_count > 0 or rest_bar_accepted,
             duration_matches_target,
-            decoded_notes_within_target,
+            decoded_notes_within_target or rest_bar_accepted,
             orphan_note_off_count == 0,
             duplicate_note_on_count == 0,
             silent_note_count == 0,
@@ -143,6 +150,8 @@ def validate_generated_token_block(
         "decoded_notes_within_target": decoded_notes_within_target,
         "orphan_note_off_count": orphan_note_off_count,
         "duplicate_note_on_count": duplicate_note_on_count,
+        "is_rest_bar": is_rest_bar,
+        "rest_bar_accepted": rest_bar_accepted,
         "silent_note_count": silent_note_count,
         "stuck_note_count": len(active_pitches),
         "decode_error": decode_error,

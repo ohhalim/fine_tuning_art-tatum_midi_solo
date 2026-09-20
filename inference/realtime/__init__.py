@@ -20,6 +20,8 @@ from .transport import (
     evaluate_event_integrity,
 )
 from .scheduler import (
+    DEADLINE_POLICY_ABORT_ON_FIRST_MISS,
+    DEADLINE_POLICY_RECORD_AND_CONTINUE,
     InternalSchedulerReport,
     MonotonicBarClock,
     OneBarMidiScheduler,
@@ -45,6 +47,8 @@ __all__ = [
     "build_logical_midi_fixture",
     "close_mido_input",
     "evaluate_event_integrity",
+    "DEADLINE_POLICY_ABORT_ON_FIRST_MISS",
+    "DEADLINE_POLICY_RECORD_AND_CONTINUE",
     "InternalSchedulerReport",
     "MonotonicBarClock",
     "OneBarMidiScheduler",
