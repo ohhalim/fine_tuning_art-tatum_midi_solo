@@ -99,6 +99,39 @@ scheduler 스레드       마디 N 디스패치        (dict 읽기만, 블로�
 반영한 마디는 **다음 마디 경계**에 재생되므로 마디 길이(1875ms)의 배수가
 그대로 들어간다. 반응 속도로 읽어야 할 값은 `input_to_ready_ms` 다.
 
+## 반복 실행 (왕복 3회 연속, 8마디씩)
+
+| run | 완주 | model | 오류 | 늦은폐기 | 생성 p50 | 생성 최대 | 캡처 | 손실/중복 | 디스패치 지각 최대 |
+|---|---|---|---|---|---|---|---|---|---|
+| 7 | ✅ | 8/8 | 0 | 0 | 408ms | 603ms | 158/158 | 0/0 | 12.6ms |
+| 8 | ✅ | 6/8 | 2 | 0 | 533ms | 1483ms | 180/180 | 0/0 | 7.6ms |
+| 9 | ✅ | 8/8 | 0 | 0 | 324ms | 643ms | 136/136 | 0/0 | 10.3ms |
+
+합산 n=24: 생성 p50 371ms, 최대 1483ms, **마디(1875ms) 초과 0/24**.
+3회 모두 포트가 정상 정리됐고 CoreMIDI 교착은 없었다.
+
+### 콜드 스타트 — 선행 깊이가 1 이면 안 된다
+
+스케줄러는 bar 0 의 다운비트에서 bar 1 을 요청한다. 그런데 producer 의
+watermark 는 `get(0)` 에서야 올라가고, `get(0)` 은 `scheduler.run()` 진입
+시점이다. 따라서 `max_lead_bars=1` 이면 **bar 1 은 재생이 시작되기 전까지
+생성을 시작조차 할 수 없다.**
+
+처음에는 "bar 1 도 기다리기" 만 넣었는데 효과가 없었다. 기다려도 생성이
+걸리지 않으므로 대기가 헛돈다. 실측에서 bar 0 이 67ms 로 끝났는데도
+`bar 1: fallback_not_started, generation_ms=None` 이 나왔다.
+
+`max_lead_bars=2` 로 올려 bar 0 과 bar 1 을 재생 전에 만든다.
+
+### 남은 두 가지 무효 사유 (fallback 으로 처리됨)
+
+| 사유 | 관측 | 판단 |
+|---|---|---|
+| 노트 0 개 | bar 0, 24ms, `decoded_note_count=0`, 길이는 1880=1880 으로 정확 | **온마디 쉼표다.** underfill 이 아니다. 검증기가 `decoded_note_count > 0` 을 요구하고 `build_scheduled_midi_block` 도 노트 1 개 이상을 요구해서 fallback 으로 간다. 음악적으로는 정당한 쉼표이므로 **알려진 간극**으로 남긴다 |
+| 밀집 마디 부족 | bar 5, 1483ms, 29 노트, 1830 vs 1880ms | 실제 토큰 예산 부족. `--generation-tokens` 를 올리면 줄지만 지연이 함께 오른다 |
+
+앞의 것은 게이트가 걸린 컴포넌트의 계약 변경이라 이번 범위에서 바꾸지 않았다.
+
 ## 아직 아닌 것
 
 - **실물 키보드 미검증.** 위 측정의 "키보드" 는 같은 머신에서 띄운
@@ -110,6 +143,10 @@ scheduler 스레드       마디 N 디스패치        (dict 읽기만, 블로�
 - **입력 반영은 마디 경계 단위다.** 마디 중간에 들어온 연주는 그 마디에
   반영되지 않는다. 턴테이킹에 가깝고 동시 반응이 아니다.
 - **부하 상태 미측정.** DAW·신스 동시 구동 조건에서 재측정 필요.
+- **데드라인 정책이 abort_on_first_miss 다.** 한 번의 OS 지연으로 연주
+  전체가 중단된다. 실제로 25.0ms 지각 1 회에 8마디 중 2마디에서 멈춘
+  실행이 있었다(임계 20ms). 악기로 쓰려면 정책 재검토가 필요하지만
+  스케줄러 게이트 범위라 이번에는 건드리지 않았다.
 
 ## 실행
 
@@ -128,9 +165,10 @@ FORCE_CPU=1 uv run python scripts/run_continuous_jazz.py ... --port "<포트 이
 FORCE_CPU=1 uv run python scripts/run_continuous_jazz.py ... \
     --input-port "<키보드 포트 이름>" --capture
 
-# 모델 없이 fallback 경로만
-uv run python scripts/run_continuous_jazz.py --fallback-only --bars 8 \
-    --output-dir outputs/continuous/fallback
+# 한 줄 데모 (모델 없으면 fallback 경로)
+scripts/run_continuous_demo.sh
+CHECKPOINT=... PRIMER=... scripts/run_continuous_demo.sh
+CHECKPOINT=... PRIMER=... INPUT_PORT="내 키보드" scripts/run_continuous_demo.sh
 ```
 
 산출물: `continuous_report.json`, `played.mid`
