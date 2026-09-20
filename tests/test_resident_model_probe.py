@@ -283,3 +283,21 @@ class ResidentModelProbeTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SilentNoteValidationTest(unittest.TestCase):
+    """A decoded velocity of 0 must fail token validation, not just the scheduler."""
+
+    def test_velocity_zero_block_is_invalid(self) -> None:
+        # velocity bin 0, note_on 60, time-shift 100 + 88 steps, note_off 60.
+        result = validate_generated_token_block([356, 60, 355, 343, 188], lookahead_ms=1875.0)
+
+        self.assertFalse(result["valid"])
+        self.assertEqual(1, result["silent_note_count"])
+
+    def test_audible_block_is_valid(self) -> None:
+        # velocity bin 16 (MIDI 64) instead of bin 0; everything else identical.
+        result = validate_generated_token_block([372, 60, 355, 343, 188], lookahead_ms=1875.0)
+
+        self.assertTrue(result["valid"], result)
+        self.assertEqual(0, result["silent_note_count"])

@@ -3,6 +3,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import pretty_midi
+from inference.realtime.blocks import build_scheduled_midi_block
 from scripts.run_jazz_mvp import fit_window, prepare_phrase, play_phrase
 
 
@@ -35,25 +36,57 @@ class JazzMvpTests(unittest.TestCase):
         self.assertEqual(phrase.get_end_time(), 7.5)
         self.assertTrue(all(n.end <= 1.875 for m in midis for i in m.instruments for n in i.notes))
 
-    def test_unschedulable_model_block_falls_back_instead_of_aborting(self):
-        """Token validation can pass while the decoded block is unplayable.
-
-        Stage A encodes velocity as ``velocity // 4`` and decodes it as
-        ``value * 4``, so velocity bin 0 is a legitimate learned token that
-        decodes to MIDI velocity 0. ``validate_generated_token_block`` does not
-        check velocity, but ``build_scheduled_midi_block`` rejects it. Such a
-        bar must fall back, not abort the whole phrase.
-        """
+    def test_silent_model_block_is_rejected_by_token_validation(self):
+        """Stage A decodes velocity as ``value * 4`` and carries it as state, so
+        velocity bin 0 decodes to MIDI velocity 0 -- a note-off by the MIDI spec.
+        ``validate_generated_token_block`` rejects it, so the bar falls back."""
         # velocity bin 0, note_on 60, time-shift 100 + 88 steps, note_off 60.
         tokens = [356, 60, 355, 343, 188]
         _, midis, rows = prepare_phrase(generate=lambda _: (tokens, {}),
                                         bpm=128, bars=2, chords=['Dm7'], seed=42)
 
-        self.assertEqual(len(midis), 2)
-        self.assertTrue(all(r['source'] == 'unschedulable_model_fallback' for r in rows))
+        self.assertTrue(all(r['source'] == 'invalid_model_fallback' for r in rows))
+        self.assertEqual(1, rows[0]['invalid_model_validation']['silent_note_count'])
+        self.assertTrue(all(1 <= n.velocity <= 127
+                            for m in midis for i in m.instruments for n in i.notes))
+
+    def test_unschedulable_model_block_falls_back_instead_of_aborting(self):
+        """Defense in depth: token validation and the scheduler check different
+        things, so a block that passes the former can still fail the latter. That
+        must fall back like any other bad bar rather than abort the whole phrase."""
+        real = build_scheduled_midi_block
+        calls = []
+
+        def once(**kwargs):
+            calls.append(kwargs['adapter'])
+            if len(calls) == 1:
+                raise ValueError('note velocity out of range: 0')
+            return real(**kwargs)
+
+        # velocity bin 16 (MIDI 64): this block passes token validation.
+        tokens = [372, 60, 355, 343, 188]
+        with patch('scripts.run_jazz_mvp.build_scheduled_midi_block', side_effect=once):
+            _, midis, rows = prepare_phrase(generate=lambda _: (tokens, {}),
+                                            bpm=128, bars=1, chords=['Dm7'], seed=42)
+
+        self.assertEqual(['model', 'unschedulable_model_fallback'], calls)
+        self.assertEqual('unschedulable_model_fallback', rows[0]['source'])
         self.assertIn('unschedulable_model_block', rows[0]['invalid_model_validation'])
         self.assertTrue(all(1 <= n.velocity <= 127
                             for m in midis for i in m.instruments for n in i.notes))
+
+    def test_unschedulable_fallback_block_is_a_real_bug_and_aborts(self):
+        """Only a *model* block may be rerouted; a failing fallback is not masked."""
+        with patch('scripts.run_jazz_mvp.build_scheduled_midi_block',
+                   side_effect=ValueError('boom')):
+            with self.assertRaisesRegex(ValueError, 'boom'):
+                prepare_phrase(generate=None, bpm=128, bars=1, chords=['Dm7'], seed=42)
+        # ... and a model block that also fails on the fallback retry still raises.
+        with patch('scripts.run_jazz_mvp.build_scheduled_midi_block',
+                   side_effect=ValueError('boom')):
+            with self.assertRaisesRegex(ValueError, 'boom'):
+                prepare_phrase(generate=lambda _: ([372, 60, 355, 343, 188], {}),
+                               bpm=128, bars=1, chords=['Dm7'], seed=42)
 
     def test_inference_error_not_hidden(self):
         def fail(_):

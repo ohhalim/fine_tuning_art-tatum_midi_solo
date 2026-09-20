@@ -91,6 +91,7 @@ def validate_generated_token_block(
     quantized_target_ms = math.ceil(lookahead_ms / TIME_STEP_MS) * TIME_STEP_MS
     decoded_note_count = 0
     decoded_note_end_max_ms = None
+    silent_note_count = 0
     decode_error = None
     try:
         decoded = decode_midi([int(token) for token in tokens])
@@ -101,6 +102,11 @@ def validate_generated_token_block(
             for note in instrument.notes
         ]
         decoded_note_count = len(notes)
+        # Stage A decodes velocity as ``value * 4`` and carries it as state, so a
+        # block can decode to MIDI velocity 0. That is a note-off by the MIDI
+        # spec and ``build_scheduled_midi_block`` rejects it; without this check
+        # the validator would pass a block the scheduler cannot play.
+        silent_note_count = sum(1 for note in notes if int(note.velocity) <= 0)
         if notes:
             decoded_note_end_max_ms = max(float(note.end) * 1000.0 for note in notes)
     except Exception as exc:
@@ -123,6 +129,7 @@ def validate_generated_token_block(
             decoded_notes_within_target,
             orphan_note_off_count == 0,
             duplicate_note_on_count == 0,
+            silent_note_count == 0,
             not active_pitches,
         )
     )
@@ -136,6 +143,7 @@ def validate_generated_token_block(
         "decoded_notes_within_target": decoded_notes_within_target,
         "orphan_note_off_count": orphan_note_off_count,
         "duplicate_note_on_count": duplicate_note_on_count,
+        "silent_note_count": silent_note_count,
         "stuck_note_count": len(active_pitches),
         "decode_error": decode_error,
     }
