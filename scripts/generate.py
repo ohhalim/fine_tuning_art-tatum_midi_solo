@@ -325,7 +325,7 @@ def truncate_tokens_preserving_velocity(tokens: Sequence[int], max_tokens: int) 
     if not carried:
         return tail
     # Prepending costs one slot, so drop one from the front to hold the budget.
-    return [carried[-1]] + tail[1:] if len(tail) == max_tokens else [carried[-1]] + tail
+    return [carried[-1]] + tail[1:]
 
 
 def _carry_velocity_into_block(primer_tokens: List[int], block: List[int]) -> bool:

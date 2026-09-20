@@ -318,3 +318,36 @@ class DeadlinePolicyTests(unittest.TestCase):
         report = build_report(result, producer, bars=BARS, bpm=BPM)
 
         self.assertEqual(DEADLINE_POLICY_ABORT_ON_FIRST_MISS, report["deadline_policy"])
+
+
+class PrimerBudgetTests(unittest.TestCase):
+    """The primer budget must track the real control prefix, not a constant."""
+
+    def test_velocity_survives_at_every_primer_budget(self):
+        from mido import Message
+
+        from inference.realtime.continuous import TimedInputMessage
+        from scripts.generate import VELOCITY_TOKEN_END, VELOCITY_TOKEN_START
+        from scripts.run_continuous_jazz import build_live_primer
+
+        import torch
+
+        events = []
+        stamp = 0
+        for pitch in [60, 63, 65, 67, 70, 72] * 6:
+            events.append(TimedInputMessage(stamp, Message("note_on", note=pitch, velocity=80)))
+            stamp += 120_000_000
+            events.append(TimedInputMessage(stamp, Message("note_off", note=pitch, velocity=0)))
+            stamp += 130_000_000
+
+        for budget in (16, 24, 32, 48):
+            primer, used = build_live_primer(
+                tuple(events), base_primer=torch.tensor([1, 2, 3]),
+                control_format="control_v1", role="lead", tempo_bpm=128,
+                primer_max_tokens=budget,
+            )
+            tokens = primer.tolist()
+            bins = [t for t in tokens if VELOCITY_TOKEN_START <= t < VELOCITY_TOKEN_END]
+            self.assertTrue(used)
+            self.assertLessEqual(len(tokens), budget)
+            self.assertTrue(bins, f"velocity lost at primer_max_tokens={budget}")

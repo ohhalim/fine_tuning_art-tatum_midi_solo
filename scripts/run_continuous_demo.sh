@@ -14,10 +14,14 @@ cd "$ROOT_DIR"
 # resolves requirements.txt for us. Set RUNNER to override.
 if [[ -n "${RUNNER:-}" ]]; then
   read -r -a runner <<< "$RUNNER"
+elif [[ -n "${PYTHON_BIN:-}" ]]; then
+  runner=("$PYTHON_BIN")
 elif command -v uv >/dev/null 2>&1; then
   runner=(uv run --with-requirements requirements.txt python)
+elif [[ -x "$ROOT_DIR/.venv/bin/python" ]]; then
+  runner=("$ROOT_DIR/.venv/bin/python")
 else
-  runner=("${PYTHON_BIN:-python}")
+  runner=(python3)
 fi
 
 OUTPUT_DIR="${OUTPUT_DIR:-outputs/continuous/demo}"

@@ -72,7 +72,7 @@ def build_live_primer(input_events, *, base_primer, control_format, role, tempo_
     """
     import torch
 
-    from scripts.control_tokens import build_control_primer
+    from scripts.control_tokens import build_control_primer, control_prefix_tokens
     from scripts.generate import encode_notes_simple, truncate_tokens_preserving_velocity
 
     notes = input_events_to_notes(input_events, end_ns=now_ns)
@@ -84,7 +84,10 @@ def build_live_primer(input_events, *, base_primer, control_format, role, tempo_
     # Truncate here, preserving velocity state, instead of letting
     # build_control_primer tail-slice it away. Steady playing emits exactly one
     # velocity token, at the very start, so a plain tail slice loses it.
-    prefix_budget = 4  # control prefix + separator; trimmed again below anyway
+    # Derive the room build_control_primer will leave. Hardcoding it would fail
+    # silently the day the control prefix changes length: the second truncation
+    # would drop the velocity token again.
+    prefix_budget = len(control_prefix_tokens(role=role, tempo_bpm=tempo_bpm)) + 1
     tokens = truncate_tokens_preserving_velocity(
         tokens, max(1, primer_max_tokens - prefix_budget)
     )
