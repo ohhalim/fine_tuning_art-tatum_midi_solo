@@ -2,6 +2,7 @@
 
 측정일 2026-09-20. 이 문서는 **생성 구간만** 다룬다.
 Phase 1 게이트인 왕복 지연(키보드 → 모델 → DAW)은 **아직 측정하지 않았다.**
+구간별 예산은 [LATENCY_BUDGET.md](LATENCY_BUDGET.md) 참고.
 
 `quality_claimed: false` — 여기 있는 수치는 전부 능력(capability) 측정이고
 음악적 품질 주장이 아니다.
