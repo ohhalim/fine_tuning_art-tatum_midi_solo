@@ -31,7 +31,13 @@ sys.path.insert(0, str(SCRIPT_DIR / "music_transformer" / "third_party"))
 from model.music_transformer import MusicTransformer
 from utilities.constants import TOKEN_END, TOKEN_PAD
 from utilities.device import get_device
-from midi_processor.processor import decode_midi, RANGE_NOTE_ON, RANGE_NOTE_OFF, RANGE_TIME_SHIFT
+from midi_processor.processor import (
+    decode_midi,
+    RANGE_NOTE_ON,
+    RANGE_NOTE_OFF,
+    RANGE_TIME_SHIFT,
+    RANGE_VEL,
+)
 
 # Import LoRA helper from train script
 from train_qlora import add_lora_to_model
@@ -278,6 +284,41 @@ def _duration_seconds_to_steps(duration_seconds: float) -> int:
     return math.ceil(duration_seconds * RANGE_TIME_SHIFT)
 
 
+VELOCITY_TOKEN_START = RANGE_NOTE_ON + RANGE_NOTE_OFF + RANGE_TIME_SHIFT
+VELOCITY_TOKEN_END = VELOCITY_TOKEN_START + RANGE_VEL
+
+
+def _carry_velocity_into_block(primer_tokens: List[int], block: List[int]) -> bool:
+    """Prepend the primer's trailing velocity token when the block opens without one.
+
+    ``decode_midi`` carries velocity as state starting from 0, and the encoder
+    only emits a velocity token when velocity changes. Every note_on decoded
+    before the block's first velocity token therefore gets MIDI velocity 0, which
+    is a note-off by convention and is unplayable. That happens both when the
+    block has no velocity token at all and when its first one lands after a note.
+
+    Re-seeding with the velocity in effect at the strip point restores what the
+    model was actually conditioned on. It samples nothing, so a given seed still
+    produces the same tokens.
+    """
+    first_note_on = next(
+        (i for i, t in enumerate(block) if 0 <= int(t) < RANGE_NOTE_ON), None
+    )
+    if first_note_on is None:
+        return False
+    first_velocity = next(
+        (i for i, t in enumerate(block) if VELOCITY_TOKEN_START <= int(t) < VELOCITY_TOKEN_END),
+        None,
+    )
+    if first_velocity is not None and first_velocity < first_note_on:
+        return False
+    carried = [t for t in primer_tokens if VELOCITY_TOKEN_START <= int(t) < VELOCITY_TOKEN_END]
+    if not carried:
+        return False
+    block.insert(0, int(carried[-1]))
+    return True
+
+
 def generate_once(
     model: MusicTransformer,
     primer: torch.Tensor,
@@ -319,13 +360,17 @@ def generate_once(
         generation_metadata = None
 
     sequence = generated[0].detach().cpu().tolist()
+    velocity_carried_from_primer = False
     if strip_primer:
+        primer_tokens = sequence[: len(primer)]
         sequence = sequence[len(primer) :]
+        velocity_carried_from_primer = _carry_velocity_into_block(primer_tokens, sequence)
     sequence = sanitize_for_decode(sequence)
     if generation_metadata is not None:
         generation_metadata = dict(generation_metadata)
         generation_metadata["returned_decodable_token_count"] = len(sequence)
         generation_metadata["strip_primer"] = bool(strip_primer)
+        generation_metadata["velocity_carried_from_primer"] = velocity_carried_from_primer
         return sequence, generation_metadata
     return sequence
 
