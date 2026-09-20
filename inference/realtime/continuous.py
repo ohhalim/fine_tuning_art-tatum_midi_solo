@@ -29,6 +29,8 @@ SOURCE_MODEL = "model"
 SOURCE_FALLBACK_NOT_READY = "fallback_not_ready"
 SOURCE_FALLBACK_ERROR = "fallback_error"
 SOURCE_FALLBACK_NOT_STARTED = "fallback_not_started"
+# Generation deliberately switched off, not a failure to generate.
+SOURCE_FALLBACK_DISABLED = "fallback_disabled"
 
 
 @dataclass(frozen=True)
@@ -114,7 +116,7 @@ class BarBlockProducer:
         *,
         bar_count: int,
         fallback_blocks: Mapping[int, ScheduledMidiBlock],
-        build_block: Callable[[int, tuple[TimedInputMessage, ...]], ScheduledMidiBlock],
+        build_block: Callable[[int, tuple[TimedInputMessage, ...]], ScheduledMidiBlock] | None,
         clock: MonotonicBarClock | None = None,
         input_buffer: MidiInputSnapshotBuffer | None = None,
         clock_ns: Callable[[], int] = time.perf_counter_ns,
@@ -186,6 +188,8 @@ class BarBlockProducer:
             block = self._ready.pop(bar_index, None)
             if block is not None:
                 return block
+            if self._build_block is None:
+                return self._fallback[bar_index]
             if bar_index not in self._records or self._records[bar_index].completed_ns is None:
                 self._abandoned.add(bar_index)
                 existing = self._records.get(bar_index)
@@ -207,6 +211,16 @@ class BarBlockProducer:
     # -- producer thread ---------------------------------------------------
 
     def _run(self) -> None:
+        if self._build_block is None:
+            # Generation is off by request; serve prebuilt fallbacks only.
+            with self._cv:
+                for bar_index in range(self._bar_count):
+                    self._records[bar_index] = BarProductionRecord(
+                        bar_index=bar_index, source=SOURCE_FALLBACK_DISABLED,
+                        used_fallback=True,
+                    )
+                self._cv.notify_all()
+            return
         for bar_index in range(self._bar_count):
             with self._cv:
                 while (
@@ -285,6 +299,8 @@ class BarBlockProducer:
     # -- inspection --------------------------------------------------------
 
     def wait_for_bar(self, bar_index: int, *, timeout: float) -> bool:
+        if self._build_block is None:
+            return False
         deadline = time.monotonic() + timeout
         with self._cv:
             while bar_index not in self._ready:

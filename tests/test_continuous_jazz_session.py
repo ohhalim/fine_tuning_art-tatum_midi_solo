@@ -241,3 +241,48 @@ class LivePrimerTests(unittest.TestCase):
                 if VELOCITY_TOKEN_START <= t < VELOCITY_TOKEN_END]
         self.assertTrue(bins)
         self.assertNotIn(0, bins)
+
+
+class ColdStartTests(unittest.TestCase):
+    """Bars 0 and 1 are both needed before the downbeat, not one per bar."""
+
+    def test_both_warmup_bars_are_awaited(self):
+        import scripts.run_continuous_jazz as module
+
+        waited = []
+        real = module.BarBlockProducer
+
+        class Recording(real):
+            def wait_for_bar(self, bar_index, *, timeout):
+                waited.append(bar_index)
+                return super().wait_for_bar(bar_index, timeout=timeout)
+
+        port = Port()
+        with unittest.mock.patch.object(module, "BarBlockProducer", Recording):
+            run_session(port=port, bars=BARS, bpm=BPM, chords=CHORDS, seed=42,
+                        generate=lambda *_: (_ for _ in ()).throw(RuntimeError("no model")),
+                        start_delay_seconds=0.0, spin_window_ms=0.0,
+                        clock=clock(), clock_ns=lambda: 0,
+                        wait_until=lambda target_ns, stop: None)
+
+        self.assertEqual([0, 1], waited)
+
+    def test_single_bar_run_does_not_wait_for_a_second_bar(self):
+        import scripts.run_continuous_jazz as module
+
+        waited = []
+        real = module.BarBlockProducer
+
+        class Recording(real):
+            def wait_for_bar(self, bar_index, *, timeout):
+                waited.append(bar_index)
+                return super().wait_for_bar(bar_index, timeout=timeout)
+
+        with unittest.mock.patch.object(module, "BarBlockProducer", Recording):
+            run_session(port=Port(), bars=1, bpm=BPM, chords=CHORDS, seed=42,
+                        generate=lambda *_: (_ for _ in ()).throw(RuntimeError("no model")),
+                        start_delay_seconds=0.0, spin_window_ms=0.0,
+                        clock=clock(), clock_ns=lambda: 0,
+                        wait_until=lambda target_ns, stop: None)
+
+        self.assertEqual([0], waited)

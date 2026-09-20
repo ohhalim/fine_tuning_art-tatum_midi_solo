@@ -116,7 +116,7 @@ def make_block_builder(*, clock, duration, generate):
 
 
 def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
-                start_delay_seconds=1.0, spin_window_ms=1.0,
+                start_delay_seconds=2.5, spin_window_ms=1.0,
                 clock=None, clock_ns=None, wait_until=None):
     """Play ``bars`` bars, producing one bar ahead.
 
@@ -134,7 +134,10 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
     )
     producer = BarBlockProducer(
         bar_count=bars, fallback_blocks=fallbacks, clock=clock, input_buffer=input_buffer,
-        build_block=make_block_builder(clock=clock, duration=duration, generate=generate),
+        build_block=(
+            None if generate is None
+            else make_block_builder(clock=clock, duration=duration, generate=generate)
+        ),
     )
     scheduler_kwargs = {"sink": port, "clock": clock, "spin_window_ms": spin_window_ms}
     if clock_ns is not None:
@@ -144,8 +147,15 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
     scheduler = OneBarMidiScheduler(**scheduler_kwargs)
     try:
         producer.start()
-        # Give bar 0 the lead time it would get from a bar of playback.
-        producer.wait_for_bar(0, timeout=max(0.0, start_delay_seconds))
+        # Cold start needs room for two bars, not one. The producer is a single
+        # thread, and the scheduler asks for bar 1 at bar 0's downbeat, so bars
+        # 0 and 1 must both be generated inside start_delay_seconds. Measured:
+        # a run whose first two bars summed to 1036ms missed with a 1s delay.
+        deadline = time.monotonic() + max(0.0, start_delay_seconds)
+        for warmup_bar in (0, 1):
+            if warmup_bar >= bars:
+                break
+            producer.wait_for_bar(warmup_bar, timeout=max(0.0, deadline - time.monotonic()))
         result = scheduler.run(blocks=producer, expected_bar_count=bars)
     finally:
         # Reset on completion, abort, exception and Ctrl-C alike.
@@ -343,9 +353,8 @@ def main(argv=None):
                 temperature=1.0, top_k=32, top_p=0.95, grammar_mask=True,
                 target_duration_seconds=240.0 / args.bpm, return_metadata=True,
             )
-    else:
-        def generate(bar_index, _input_events):
-            raise RuntimeError("fallback-only mode: no model configured")
+    # --fallback-only leaves `generate` as None: a deliberate mode, so the
+    # producer records it as fallback_disabled rather than a generation error.
 
     import mido
 

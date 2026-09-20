@@ -350,3 +350,23 @@ class InputToNotesTests(unittest.TestCase):
     def test_non_note_messages_are_ignored(self) -> None:
         events = [TimedInputMessage(0, Message("control_change", control=64, value=127))]
         self.assertEqual([], input_events_to_notes(events))
+
+
+class DisabledGenerationTests(unittest.TestCase):
+    """Switching generation off is a mode, not a failure."""
+
+    def test_no_builder_serves_fallbacks_without_errors(self) -> None:
+        from inference.realtime.continuous import SOURCE_FALLBACK_DISABLED
+
+        clock = make_clock()
+        with BarBlockProducer(bar_count=BARS, fallback_blocks=fallbacks(clock),
+                              build_block=None, clock=clock) as producer:
+            self.assertFalse(producer.wait_for_bar(0, timeout=0.2))
+            blocks = [producer.get(i) for i in range(BARS)]
+
+        self.assertTrue(all(b.adapter == "fallback" for b in blocks))
+        summary = summarize_production(producer.records)
+        self.assertEqual(0, summary["error_count"])
+        self.assertEqual(0, summary["model_bar_count"])
+        self.assertEqual(BARS, summary["fallback_bar_count"])
+        self.assertEqual({SOURCE_FALLBACK_DISABLED: BARS}, summary["source_counts"])
