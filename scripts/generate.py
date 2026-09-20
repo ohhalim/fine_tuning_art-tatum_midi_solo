@@ -297,6 +297,37 @@ VELOCITY_TOKEN_START = RANGE_NOTE_ON + RANGE_NOTE_OFF + RANGE_TIME_SHIFT
 VELOCITY_TOKEN_END = VELOCITY_TOKEN_START + RANGE_VEL
 
 
+def truncate_tokens_preserving_velocity(tokens: Sequence[int], max_tokens: int) -> List[int]:
+    """Keep the last ``max_tokens`` without losing the carried velocity.
+
+    Stage A emits a velocity token only when velocity changes, so the value in
+    force at a cut point may have been set far earlier. Tail-truncating a
+    sequence therefore silently drops velocity state, and every note before the
+    next velocity token decodes to velocity 0 - a note-off.
+
+    Steady playing is the worst case: one velocity token at the very start and
+    none afterwards, so any truncation loses it entirely.
+    """
+    tokens = [int(t) for t in tokens]
+    if max_tokens <= 0:
+        return []
+    if len(tokens) <= max_tokens:
+        return tokens
+    cut = len(tokens) - max_tokens
+    tail = tokens[cut:]
+    first_note_on = next((i for i, t in enumerate(tail) if 0 <= t < RANGE_NOTE_ON), None)
+    first_velocity = next(
+        (i for i, t in enumerate(tail) if VELOCITY_TOKEN_START <= t < VELOCITY_TOKEN_END), None
+    )
+    if first_note_on is None or (first_velocity is not None and first_velocity < first_note_on):
+        return tail
+    carried = [t for t in tokens[:cut] if VELOCITY_TOKEN_START <= t < VELOCITY_TOKEN_END]
+    if not carried:
+        return tail
+    # Prepending costs one slot, so drop one from the front to hold the budget.
+    return [carried[-1]] + tail[1:] if len(tail) == max_tokens else [carried[-1]] + tail
+
+
 def _carry_velocity_into_block(primer_tokens: List[int], block: List[int]) -> bool:
     """Prepend the primer's trailing velocity token when the block opens without one.
 

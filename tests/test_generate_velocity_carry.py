@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 
 from scripts.generate import (
+    truncate_tokens_preserving_velocity,
     VELOCITY_TOKEN_END,
     VELOCITY_TOKEN_START,
     _carry_velocity_into_block,
@@ -72,3 +73,45 @@ class VelocityCarryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TruncationVelocityTests(unittest.TestCase):
+    """Tail-truncating Stage A tokens must not drop carried velocity."""
+
+    def test_short_sequence_is_returned_unchanged(self) -> None:
+        tokens = [VELOCITY_TOKEN_START + 12, 60, RANGE_NOTE_ON + 60]
+        self.assertEqual(tokens, truncate_tokens_preserving_velocity(tokens, 10))
+
+    def test_lone_leading_velocity_token_survives_truncation(self) -> None:
+        """Steady playing emits one velocity token, at the very start."""
+        tokens = [VELOCITY_TOKEN_START + 12] + [60, RANGE_NOTE_ON + 60] * 20
+
+        result = truncate_tokens_preserving_velocity(tokens, 8)
+
+        self.assertEqual(8, len(result))
+        self.assertEqual(VELOCITY_TOKEN_START + 12, result[0])
+
+    def test_velocity_already_ahead_of_the_first_note_is_left_alone(self) -> None:
+        tokens = [60, RANGE_NOTE_ON + 60] * 5 + [VELOCITY_TOKEN_START + 9, 62, RANGE_NOTE_ON + 62]
+
+        result = truncate_tokens_preserving_velocity(tokens, 3)
+
+        self.assertEqual([VELOCITY_TOKEN_START + 9, 62, RANGE_NOTE_ON + 62], result)
+
+    def test_no_velocity_anywhere_returns_the_plain_tail(self) -> None:
+        tokens = [60, RANGE_NOTE_ON + 60] * 10
+        self.assertEqual([60, RANGE_NOTE_ON + 60], truncate_tokens_preserving_velocity(tokens, 2))
+
+    def test_zero_budget_returns_nothing(self) -> None:
+        self.assertEqual([], truncate_tokens_preserving_velocity([60, 61], 0))
+
+    def test_truncated_tokens_decode_without_silent_notes(self) -> None:
+        tokens = [VELOCITY_TOKEN_START + 12]
+        for pitch in range(60, 72):
+            tokens += [pitch, RANGE_NOTE_ON * 2 + 9, RANGE_NOTE_ON + pitch]
+
+        result = truncate_tokens_preserving_velocity(tokens, 12)
+        notes = [n for i in decode_midi(list(result)).instruments for n in i.notes]
+
+        self.assertTrue(notes)
+        self.assertTrue(all(n.velocity > 0 for n in notes), [n.velocity for n in notes])
