@@ -118,7 +118,87 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
     return result, producer
 
 
-def build_report(result, producer, *, bars, bpm):
+def summarize_capture(result, captured, *, drain_completed):
+    """Compare what the scheduler intended to send against what a separate
+    CoreMIDI input actually observed.
+
+    Kept apart from every producer metric: this measures the output path only
+    (scheduled instant -> capture), never model latency.
+    """
+    # The safe reset/panic sent after the run emits control_change traffic that
+    # the scheduler never recorded. Compare note events only, or every one of
+    # those messages reads as a spurious duplicate.
+    sent = [r for r in result.records if r.message.type in ("note_on", "note_off")]
+    notes = [
+        (received_ns, message)
+        for received_ns, message in captured
+        if message.type in ("note_on", "note_off")
+    ]
+    latencies_ms = [
+        (received_ns - sent[i].target_ns) / 1e6
+        for i, (received_ns, _message) in enumerate(notes)
+        if i < len(sent)
+    ]
+    order_mismatch_count = sum(
+        1
+        for i, (_received_ns, message) in enumerate(notes)
+        if i < len(sent) and message.note != sent[i].message.note
+    )
+    ordered = sorted(latencies_ms)
+    return {
+        "capture_observed": bool(notes),
+        "drain_completed": drain_completed,
+        "sent_note_event_count": len(sent),
+        "captured_note_event_count": len(notes),
+        "captured_total_message_count": len(captured),
+        "event_loss_count": max(0, len(sent) - len(notes)),
+        "duplicate_output_count": max(0, len(notes) - len(sent)),
+        "order_mismatch_count": order_mismatch_count,
+        "scheduled_to_capture_ms": (
+            {
+                "p50": ordered[len(ordered) // 2],
+                "maximum": ordered[-1],
+                "sample_count": len(ordered),
+            }
+            if ordered
+            else None
+        ),
+    }
+
+
+def write_played_midi(result, path, *, bpm):
+    """Write what the scheduler actually dispatched, so a run can be listened to.
+
+    Built from the scheduler's own records rather than the generated blocks, so
+    a bar served from fallback appears exactly as it was played.
+    """
+    import pretty_midi
+
+    records = [r for r in result.records if r.message.type in ("note_on", "note_off")]
+    if not records:
+        return None
+    origin_ns = records[0].target_ns
+    midi = pretty_midi.PrettyMIDI(initial_tempo=float(bpm))
+    instrument = pretty_midi.Instrument(program=0, name="Continuous lead")
+    open_notes: dict[int, tuple[float, int]] = {}
+    for record in records:
+        seconds = (record.target_ns - origin_ns) / 1e9
+        note = record.message.note
+        if record.message.type == "note_on" and record.message.velocity > 0:
+            open_notes[note] = (seconds, record.message.velocity)
+        else:
+            started = open_notes.pop(note, None)
+            if started is not None and seconds > started[0]:
+                instrument.notes.append(
+                    pretty_midi.Note(velocity=started[1], pitch=note,
+                                     start=started[0], end=seconds)
+                )
+    midi.instruments = [instrument]
+    midi.write(str(path))
+    return len(instrument.notes)
+
+
+def build_report(result, producer, *, bars, bpm, capture=None):
     return {
         "schema": "continuous_jazz_session_v1",
         "bpm": bpm,
@@ -137,13 +217,25 @@ def build_report(result, producer, *, bars, bpm):
         "dispatch_attempt_lateness_ms": sorted(
             ns / 1e6 for ns in result.dispatch_attempt_lateness_ns
         )[-5:],
+        "capture": capture,
         "realtime_coperformance_verified": False,
         "musical_quality_verified": False,
         "model_chord_conditioning": False,
         "external_keyboard_verified": False,
         "daw_audio_verified": False,
-        "output_capture_observed": False,
+        "output_capture_observed": bool(capture and capture["capture_observed"]),
     }
+
+
+def _resolve_capture_name(mido_module, virtual_port):
+    """CoreMIDI may expose a virtual source under a client-prefixed name."""
+    names = mido_module.get_input_names()
+    if virtual_port in names:
+        return virtual_port
+    matches = [n for n in names if virtual_port in n]
+    if not matches:
+        raise RuntimeError(f"virtual port {virtual_port!r} not visible as an input: {names}")
+    return matches[0]
 
 
 def main(argv=None):
@@ -160,6 +252,10 @@ def main(argv=None):
     parser.add_argument("--input-port", help="Exact existing MIDI input name")
     parser.add_argument("--virtual-port", default="ContinuousJazz",
                         help="Name for a virtual output port when --port is absent")
+    parser.add_argument("--capture", action="store_true",
+                        help="Open an independent CoreMIDI input on the virtual port "
+                             "and report scheduled-instant to capture latency")
+    parser.add_argument("--drain-seconds", type=float, default=2.0)
     args = parser.parse_args(argv)
 
     chords = [c.strip() for c in args.chords.split(",") if c.strip()]
@@ -213,25 +309,57 @@ def main(argv=None):
         (lambda: mido.open_output(args.port)) if args.port
         else (lambda: mido.open_output(args.virtual_port, virtual=True))
     )
+    if args.capture and args.port:
+        parser.error("--capture applies to the virtual output port, so omit --port")
+
     report = None
+    captured: list[tuple[int, object]] = []
+    capture_input = None
     try:
         with opener() as port:
+            if args.capture:
+                # Independent consumer: a separate CoreMIDI input, not the sink.
+                capture_input = mido.open_input(
+                    _resolve_capture_name(mido, args.virtual_port),
+                    callback=lambda m: captured.append((time.perf_counter_ns(), m)),
+                )
             result, producer = run_session(
                 port=port, bars=args.bars, bpm=args.bpm, chords=chords, seed=args.seed,
                 generate=generate, input_buffer=input_buffer,
             )
-            report = build_report(result, producer, bars=args.bars, bpm=args.bpm)
+            drain_completed = False
+            if args.capture:
+                # Let in-flight packets land before tearing the port down.
+                deadline = time.monotonic() + args.drain_seconds
+                last = -1
+                while time.monotonic() < deadline and last != len(captured):
+                    last = len(captured)
+                    time.sleep(0.25)
+                drain_completed = last == len(captured)
+            capture_summary = (
+                summarize_capture(result, list(captured), drain_completed=drain_completed)
+                if args.capture
+                else None
+            )
+            report = build_report(result, producer, bars=args.bars, bpm=args.bpm,
+                                  capture=capture_summary)
             report["input_events_received"] = input_buffer.received_count
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+            report["played_note_count"] = write_played_midi(
+                result, args.output_dir / "played.mid", bpm=args.bpm
+            )
     finally:
-        if input_port is not None:
-            from inference.realtime.transport import close_mido_input
+        from inference.realtime.transport import close_mido_input
 
-            close_mido_input(input_port)
+        for opened in (capture_input, input_port):
+            if opened is not None:
+                close_mido_input(opened)
         if report is not None:
             report_path.write_text(json.dumps(report, indent=2, default=str) + "\n")
 
     print(json.dumps(report["production"], indent=2))
     print(f"\nreport: {report_path}")
+    print(f"played MIDI: {args.output_dir / 'played.mid'}")
     print("NOT verified: external keyboard, DAW audio, musical quality, chord conditioning.")
     return 0 if report["run_completed"] else 1
 

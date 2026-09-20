@@ -96,3 +96,73 @@ class SessionTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CaptureSummaryTests(unittest.TestCase):
+    """Reset/panic traffic must not be counted as duplicated output."""
+
+    def test_control_change_traffic_is_excluded(self):
+        from mido import Message
+
+        from scripts.run_continuous_jazz import summarize_capture
+
+        class FakeRecord:
+            def __init__(self, target_ns, note, type_):
+                self.target_ns = target_ns
+                self.message = Message(type_, note=note, velocity=64)
+
+        result = type("R", (), {"records": [FakeRecord(0, 60, "note_on"),
+                                            FakeRecord(1_000_000, 60, "note_off")]})()
+        captured = [
+            (500_000, Message("note_on", note=60, velocity=64)),
+            (1_400_000, Message("note_off", note=60, velocity=0)),
+        ] + [(2_000_000, Message("control_change", control=123, value=0)) for _ in range(48)]
+
+        summary = summarize_capture(result, captured, drain_completed=True)
+
+        self.assertEqual(2, summary["sent_note_event_count"])
+        self.assertEqual(2, summary["captured_note_event_count"])
+        self.assertEqual(50, summary["captured_total_message_count"])
+        self.assertEqual(0, summary["duplicate_output_count"])
+        self.assertEqual(0, summary["event_loss_count"])
+        self.assertEqual(0, summary["order_mismatch_count"])
+        self.assertAlmostEqual(0.5, summary["scheduled_to_capture_ms"]["p50"], places=3)
+
+
+class PlayedMidiTests(unittest.TestCase):
+    def test_played_midi_reflects_dispatched_events(self):
+        import tempfile
+        from pathlib import Path
+
+        from mido import Message
+
+        from scripts.run_continuous_jazz import write_played_midi
+
+        class FakeRecord:
+            def __init__(self, target_ns, type_, note, velocity):
+                self.target_ns = target_ns
+                self.message = Message(type_, note=note, velocity=velocity)
+
+        result = type("R", (), {"records": [
+            FakeRecord(0, "note_on", 60, 90),
+            FakeRecord(500_000_000, "note_off", 60, 0),
+        ]})()
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "played.mid"
+            count = write_played_midi(result, path, bpm=128)
+            self.assertEqual(1, count)
+
+            import pretty_midi
+
+            notes = [n for i in pretty_midi.PrettyMIDI(str(path)).instruments for n in i.notes]
+            self.assertEqual(1, len(notes))
+            self.assertEqual(90, notes[0].velocity)
+            self.assertAlmostEqual(0.5, notes[0].end - notes[0].start, places=2)
+
+    def test_no_note_events_writes_nothing(self):
+        from pathlib import Path
+
+        from scripts.run_continuous_jazz import write_played_midi
+
+        result = type("R", (), {"records": []})()
+        self.assertIsNone(write_played_midi(result, Path("/tmp/unused.mid"), bpm=128))
