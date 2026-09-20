@@ -12,6 +12,8 @@ from inference.realtime.continuous import (
     SOURCE_MODEL,
     BarBlockProducer,
     MidiInputSnapshotBuffer,
+    TimedInputMessage,
+    input_events_to_notes,
     summarize_production,
 )
 from inference.realtime.scheduler import (
@@ -288,3 +290,63 @@ class SummaryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class InputToNotesTests(unittest.TestCase):
+    def test_pairs_note_on_and_off(self) -> None:
+        events = [
+            TimedInputMessage(0, Message("note_on", note=60, velocity=90)),
+            TimedInputMessage(500_000_000, Message("note_off", note=60, velocity=0)),
+        ]
+        notes = input_events_to_notes(events)
+
+        self.assertEqual(1, len(notes))
+        self.assertEqual(60, notes[0].pitch)
+        self.assertEqual(90, notes[0].velocity)
+        self.assertAlmostEqual(0.5, notes[0].end - notes[0].start, places=6)
+
+    def test_held_note_is_closed_at_the_window_edge(self) -> None:
+        """A key still down is the context the next bar most needs."""
+        events = [TimedInputMessage(0, Message("note_on", note=64, velocity=80))]
+        notes = input_events_to_notes(events, end_ns=1_000_000_000)
+
+        self.assertEqual(1, len(notes))
+        self.assertAlmostEqual(1.0, notes[0].end - notes[0].start, places=6)
+
+    def test_quiet_input_cannot_produce_a_silent_primer_velocity(self) -> None:
+        """velocity < 4 bins to 0, which decodes back to a note-off."""
+        from inference.realtime.continuous import MIN_PRIMER_VELOCITY
+
+        events = [
+            TimedInputMessage(0, Message("note_on", note=60, velocity=1)),
+            TimedInputMessage(200_000_000, Message("note_off", note=60, velocity=0)),
+        ]
+        notes = input_events_to_notes(events)
+
+        self.assertEqual(MIN_PRIMER_VELOCITY, notes[0].velocity)
+        self.assertGreaterEqual(notes[0].velocity // 4, 1)
+
+    def test_note_on_zero_velocity_is_treated_as_note_off(self) -> None:
+        events = [
+            TimedInputMessage(0, Message("note_on", note=60, velocity=70)),
+            TimedInputMessage(300_000_000, Message("note_on", note=60, velocity=0)),
+        ]
+        notes = input_events_to_notes(events)
+
+        self.assertEqual(1, len(notes))
+        self.assertAlmostEqual(0.3, notes[0].end - notes[0].start, places=6)
+
+    def test_retrigger_closes_the_previous_note(self) -> None:
+        events = [
+            TimedInputMessage(0, Message("note_on", note=60, velocity=70)),
+            TimedInputMessage(100_000_000, Message("note_on", note=60, velocity=90)),
+            TimedInputMessage(400_000_000, Message("note_off", note=60, velocity=0)),
+        ]
+        notes = input_events_to_notes(events)
+
+        self.assertEqual(2, len(notes))
+        self.assertEqual([70, 90], [n.velocity for n in notes])
+
+    def test_non_note_messages_are_ignored(self) -> None:
+        events = [TimedInputMessage(0, Message("control_change", control=64, value=127))]
+        self.assertEqual([], input_events_to_notes(events))

@@ -17,7 +17,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Sequence
 
 import pretty_midi
 import torch
@@ -97,18 +97,27 @@ def infer_checkpoint_max_sequence(state_dict: dict, fallback: int) -> int:
 
 
 def encode_midi_simple(file_path: str) -> List[int]:
+    mid = pretty_midi.PrettyMIDI(midi_file=file_path)
+    notes = []
+    for inst in mid.instruments:
+        if not inst.is_drum:
+            notes.extend(inst.notes)
+    return encode_notes_simple(notes)
+
+
+def encode_notes_simple(notes: Sequence) -> List[int]:
+    """Stage A encoding straight from note objects.
+
+    Split out of ``encode_midi_simple`` so a primer can be built from live
+    input without a round trip through a temporary file. Behaviour for a given
+    note list is identical.
+    """
     start_idx = {
         "note_on": 0,
         "note_off": RANGE_NOTE_ON,
         "time_shift": RANGE_NOTE_ON + RANGE_NOTE_OFF,
         "velocity": RANGE_NOTE_ON + RANGE_NOTE_OFF + RANGE_TIME_SHIFT,
     }
-
-    mid = pretty_midi.PrettyMIDI(midi_file=file_path)
-    notes = []
-    for inst in mid.instruments:
-        if not inst.is_drum:
-            notes.extend(inst.notes)
 
     if not notes:
         return []

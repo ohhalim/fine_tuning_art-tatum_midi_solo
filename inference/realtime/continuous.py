@@ -340,3 +340,65 @@ def summarize_production(
             [r.input_to_bar_start_ms for r in records if r.input_to_bar_start_ms is not None]
         ),
     }
+
+
+# Stage A bins velocity as ``velocity // 4``, so anything under 4 lands in bin 0
+# and decodes back to MIDI velocity 0 - a note-off. A quiet player must not be
+# able to push a silent velocity into the primer, so clamp on the way in.
+MIN_PRIMER_VELOCITY = 4
+
+
+def input_events_to_notes(
+    events: Sequence[TimedInputMessage],
+    *,
+    end_ns: int | None = None,
+    min_duration_seconds: float = 0.01,
+):
+    """Pair note_on/note_off from captured input into playable notes.
+
+    Notes still held when the window closes are ended at ``end_ns`` rather than
+    dropped: a key the player is holding right now is exactly the context the
+    next bar should be conditioned on.
+    """
+    import pretty_midi
+
+    if not events:
+        return []
+    origin_ns = events[0].received_ns
+    closing_ns = end_ns if end_ns is not None else events[-1].received_ns
+    open_notes: dict[int, tuple[float, int]] = {}
+    notes = []
+
+    def close(pitch: int, started: tuple[float, int], end_seconds: float) -> None:
+        start_seconds, velocity = started
+        end_seconds = max(end_seconds, start_seconds + min_duration_seconds)
+        notes.append(
+            pretty_midi.Note(
+                velocity=max(MIN_PRIMER_VELOCITY, min(127, velocity)),
+                pitch=pitch,
+                start=start_seconds,
+                end=end_seconds,
+            )
+        )
+
+    for event in events:
+        message = event.message
+        if message.type not in ("note_on", "note_off"):
+            continue
+        seconds = (event.received_ns - origin_ns) / 1e9
+        pitch = int(message.note)
+        if message.type == "note_on" and message.velocity > 0:
+            held = open_notes.pop(pitch, None)
+            if held is not None:
+                close(pitch, held, seconds)
+            open_notes[pitch] = (seconds, int(message.velocity))
+        else:
+            held = open_notes.pop(pitch, None)
+            if held is not None:
+                close(pitch, held, seconds)
+
+    tail_seconds = (closing_ns - origin_ns) / 1e9
+    for pitch, held in open_notes.items():
+        close(pitch, held, tail_seconds)
+    notes.sort(key=lambda n: (n.start, n.pitch))
+    return notes

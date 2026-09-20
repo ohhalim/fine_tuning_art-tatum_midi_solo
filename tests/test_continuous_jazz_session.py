@@ -166,3 +166,78 @@ class PlayedMidiTests(unittest.TestCase):
 
         result = type("R", (), {"records": []})()
         self.assertIsNone(write_played_midi(result, Path("/tmp/unused.mid"), bpm=128))
+
+
+class LivePrimerTests(unittest.TestCase):
+    """Input must actually reach the primer, and must never break a silent run."""
+
+    def _base(self):
+        import torch
+
+        return torch.tensor([1, 2, 3], dtype=torch.long)
+
+    def test_empty_input_keeps_the_base_primer(self):
+        from scripts.run_continuous_jazz import build_live_primer
+
+        base = self._base()
+        primer, used = build_live_primer((), base_primer=base, control_format="control_v1",
+                                         role="lead", tempo_bpm=128)
+
+        self.assertFalse(used)
+        self.assertIs(base, primer)
+
+    def test_played_notes_build_a_different_primer(self):
+        from mido import Message
+
+        from inference.realtime.continuous import TimedInputMessage
+        from scripts.run_continuous_jazz import build_live_primer
+
+        events = (
+            TimedInputMessage(0, Message("note_on", note=60, velocity=90)),
+            TimedInputMessage(200_000_000, Message("note_off", note=60, velocity=0)),
+            TimedInputMessage(200_000_000, Message("note_on", note=64, velocity=88)),
+            TimedInputMessage(400_000_000, Message("note_off", note=64, velocity=0)),
+        )
+        base = self._base()
+        primer, used = build_live_primer(events, base_primer=base, control_format="control_v1",
+                                         role="lead", tempo_bpm=128)
+
+        self.assertTrue(used)
+        self.assertNotEqual(base.tolist(), primer.tolist())
+        # The played pitches survive into the primer.
+        self.assertIn(60, primer.tolist())
+        self.assertIn(64, primer.tolist())
+
+    def test_control_change_only_input_keeps_the_base_primer(self):
+        from mido import Message
+
+        from inference.realtime.continuous import TimedInputMessage
+        from scripts.run_continuous_jazz import build_live_primer
+
+        events = (TimedInputMessage(0, Message("control_change", control=64, value=127)),)
+        base = self._base()
+        primer, used = build_live_primer(events, base_primer=base, control_format="control_v1",
+                                         role="lead", tempo_bpm=128)
+
+        self.assertFalse(used)
+        self.assertIs(base, primer)
+
+    def test_quiet_playing_never_yields_a_silent_primer_velocity(self):
+        from mido import Message
+
+        from inference.realtime.continuous import TimedInputMessage
+        from scripts.generate import VELOCITY_TOKEN_END, VELOCITY_TOKEN_START
+        from scripts.run_continuous_jazz import build_live_primer
+
+        events = (
+            TimedInputMessage(0, Message("note_on", note=60, velocity=1)),
+            TimedInputMessage(200_000_000, Message("note_off", note=60, velocity=0)),
+        )
+        primer, used = build_live_primer(events, base_primer=self._base(),
+                                         control_format="control_v1", role="lead", tempo_bpm=128)
+
+        self.assertTrue(used)
+        bins = [t - VELOCITY_TOKEN_START for t in primer.tolist()
+                if VELOCITY_TOKEN_START <= t < VELOCITY_TOKEN_END]
+        self.assertTrue(bins)
+        self.assertNotIn(0, bins)

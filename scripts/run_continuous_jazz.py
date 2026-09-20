@@ -28,6 +28,7 @@ from inference.realtime.blocks import build_scheduled_midi_block
 from inference.realtime.continuous import (
     BarBlockProducer,
     MidiInputSnapshotBuffer,
+    input_events_to_notes,
     summarize_production,
 )
 from inference.realtime.scheduler import MonotonicBarClock, OneBarMidiScheduler
@@ -52,6 +53,37 @@ def build_fallback_blocks(*, clock, bars, bpm, chords, seed, duration):
             adapter="fallback", fallback_used=True,
         )
     return blocks
+
+
+def build_live_primer(input_events, *, base_primer, control_format, role, tempo_bpm,
+                      primer_max_tokens=32, now_ns=None):
+    """Condition the next bar on what the player just played.
+
+    Returns ``(primer, used_input)``. Falls back to ``base_primer`` whenever the
+    window holds nothing encodable, so a silent player still gets a bar.
+
+    Note this inherits the D3 constraint: a MIDI primer carries texture, not
+    just pitch, so the generated bar tracks the input's texture as well as its
+    notes. That is wanted for co-performance but it is not chord conditioning.
+    """
+    import torch
+
+    from scripts.control_tokens import build_control_primer
+    from scripts.generate import encode_notes_simple
+
+    notes = input_events_to_notes(input_events, end_ns=now_ns)
+    if not notes:
+        return base_primer, False
+    tokens = encode_notes_simple(notes)
+    if not tokens:
+        return base_primer, False
+    primer = build_control_primer(
+        tokens, role=role, tempo_bpm=tempo_bpm, append_sep_token=True,
+        primer_max_tokens=primer_max_tokens,
+    )
+    if not primer:
+        return base_primer, False
+    return torch.tensor(primer, dtype=torch.long), True
 
 
 def make_block_builder(*, clock, duration, generate):
@@ -265,6 +297,7 @@ def main(argv=None):
         parser.error("require 40..240 BPM and nonempty chords")
 
     generate = None
+    live_primer_bars: list[bool] = []
     if not args.fallback_only:
         if not args.checkpoint or not args.conditioning_midi:
             parser.error("provide --checkpoint and --conditioning-midi, or --fallback-only")
@@ -281,12 +314,15 @@ def main(argv=None):
             tempo_bpm=args.bpm,
         )
 
-        def generate(bar_index, _input_events):
-            # Input events are captured and timestamped, but folding them into
-            # the primer is not implemented yet; the primer stays fixed.
+        def generate(bar_index, input_events):
+            primer, used_input = build_live_primer(
+                input_events, base_primer=base_primer,
+                control_format="control_v1", role="lead", tempo_bpm=args.bpm,
+            )
+            live_primer_bars.append(used_input)
             torch.manual_seed(args.seed + bar_index)
             return generate_once(
-                model=model, primer=base_primer, target_length=80, strip_primer=True,
+                model=model, primer=primer, target_length=80, strip_primer=True,
                 temperature=1.0, top_k=32, top_p=0.95, grammar_mask=True,
                 target_duration_seconds=240.0 / args.bpm, return_metadata=True,
             )
@@ -344,6 +380,9 @@ def main(argv=None):
             report = build_report(result, producer, bars=args.bars, bpm=args.bpm,
                                   capture=capture_summary)
             report["input_events_received"] = input_buffer.received_count
+            report["live_primer_bar_count"] = (
+                sum(1 for x in live_primer_bars if x) if not args.fallback_only else 0
+            )
             args.output_dir.mkdir(parents=True, exist_ok=True)
             report["played_note_count"] = write_played_midi(
                 result, args.output_dir / "played.mid", bpm=args.bpm

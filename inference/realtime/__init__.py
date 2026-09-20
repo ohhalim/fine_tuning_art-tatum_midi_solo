@@ -6,6 +6,7 @@ from .continuous import (
     BarProductionRecord,
     MidiInputSnapshotBuffer,
     TimedInputMessage,
+    input_events_to_notes,
     summarize_production,
 )
 from .transport import (
@@ -34,6 +35,7 @@ __all__ = [
     "BarProductionRecord",
     "MidiInputSnapshotBuffer",
     "TimedInputMessage",
+    "input_events_to_notes",
     "summarize_production",
     "DirectMidiEcho",
     "EchoIntegrityReport",
