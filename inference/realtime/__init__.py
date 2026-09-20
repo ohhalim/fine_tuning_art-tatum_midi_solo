@@ -1,6 +1,13 @@
 """Realtime MIDI transport primitives."""
 
 from .blocks import build_scheduled_midi_block
+from .continuous import (
+    BarBlockProducer,
+    BarProductionRecord,
+    MidiInputSnapshotBuffer,
+    TimedInputMessage,
+    summarize_production,
+)
 from .transport import (
     DirectMidiEcho,
     EchoIntegrityReport,
@@ -23,6 +30,11 @@ from .scheduler import (
 
 __all__ = [
     "build_scheduled_midi_block",
+    "BarBlockProducer",
+    "BarProductionRecord",
+    "MidiInputSnapshotBuffer",
+    "TimedInputMessage",
+    "summarize_production",
     "DirectMidiEcho",
     "EchoIntegrityReport",
     "MidiSendAcceptanceReport",
