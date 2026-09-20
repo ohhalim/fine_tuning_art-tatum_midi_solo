@@ -69,7 +69,7 @@ def build_live_primer(input_events, *, base_primer, control_format, role, tempo_
     import torch
 
     from scripts.control_tokens import build_control_primer
-    from scripts.generate import encode_notes_simple
+    from scripts.generate import encode_notes_simple, truncate_tokens_preserving_velocity
 
     notes = input_events_to_notes(input_events, end_ns=now_ns)
     if not notes:
@@ -77,6 +77,13 @@ def build_live_primer(input_events, *, base_primer, control_format, role, tempo_
     tokens = encode_notes_simple(notes)
     if not tokens:
         return base_primer, False
+    # Truncate here, preserving velocity state, instead of letting
+    # build_control_primer tail-slice it away. Steady playing emits exactly one
+    # velocity token, at the very start, so a plain tail slice loses it.
+    prefix_budget = 4  # control prefix + separator; trimmed again below anyway
+    tokens = truncate_tokens_preserving_velocity(
+        tokens, max(1, primer_max_tokens - prefix_budget)
+    )
     primer = build_control_primer(
         tokens, role=role, tempo_bpm=tempo_bpm, append_sep_token=True,
         primer_max_tokens=primer_max_tokens,
@@ -288,6 +295,11 @@ def main(argv=None):
                         help="Open an independent CoreMIDI input on the virtual port "
                              "and report scheduled-instant to capture latency")
     parser.add_argument("--drain-seconds", type=float, default=2.0)
+    parser.add_argument("--generation-tokens", type=int, default=96,
+                        help="New tokens allowed per bar, on top of the primer. "
+                             "An absolute cap shrinks the budget whenever the primer "
+                             "grows, which shows up as duration underfill.")
+    parser.add_argument("--max-sequence", type=int, default=192)
     args = parser.parse_args(argv)
 
     chords = [c.strip() for c in args.chords.split(",") if c.strip()]
@@ -295,6 +307,8 @@ def main(argv=None):
         parser.error("this path is limited to 8..16 bars for now")
     if not 40 <= args.bpm <= 240 or not chords:
         parser.error("require 40..240 BPM and nonempty chords")
+    if args.generation_tokens < 1 or args.max_sequence < args.generation_tokens:
+        parser.error("require generation_tokens >= 1 and max_sequence >= generation_tokens")
 
     generate = None
     live_primer_bars: list[bool] = []
@@ -306,7 +320,7 @@ def main(argv=None):
 
         model = load_model_with_lora(
             lora_path=str(args.checkpoint.parent), checkpoint_path=str(args.checkpoint),
-            prefer_full_checkpoint=True, max_sequence=80,
+            prefer_full_checkpoint=True, max_sequence=args.max_sequence,
         )
         base_primer = build_primer(
             conditioning_midi=str(args.conditioning_midi), primer_max_tokens=32,
@@ -321,8 +335,11 @@ def main(argv=None):
             )
             live_primer_bars.append(used_input)
             torch.manual_seed(args.seed + bar_index)
+            # Budget the new tokens, not the total: a longer primer must not
+            # silently eat the room the bar needs to be filled.
+            target_length = min(args.max_sequence, len(primer) + args.generation_tokens)
             return generate_once(
-                model=model, primer=primer, target_length=80, strip_primer=True,
+                model=model, primer=primer, target_length=target_length, strip_primer=True,
                 temperature=1.0, top_k=32, top_p=0.95, grammar_mask=True,
                 target_duration_seconds=240.0 / args.bpm, return_metadata=True,
             )
