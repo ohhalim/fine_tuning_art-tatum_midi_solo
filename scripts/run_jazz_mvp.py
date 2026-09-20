@@ -46,6 +46,7 @@ def prepare_phrase(*, generate, bpm, bars, chords, seed):
         request = GenerationRequest(bpm=bpm, bars=1, chord_progression=[chord], seed=seed + index)
         request.validate()
         fallback_reason = None
+        metadata = None
         if generate is None:
             midi = build_fallback_midi(request)
             source = "fallback_only"
@@ -85,9 +86,12 @@ def prepare_phrase(*, generate, bpm, bars, chords, seed):
             midi = fit_window(build_fallback_midi(request), duration)
             schedulable(midi, source)
         midis.append(midi)
+        # Generation is autoregressive, so wall time tracks emitted token count.
+        # Record it: a latency budget is only checkable against the token budget.
         details.append(dict(bar=index, chord=chord, source=source,
                             invalid_model_validation=fallback_reason,
-                            ready_ms=(time.perf_counter_ns() - started) / 1e6))
+                            ready_ms=(time.perf_counter_ns() - started) / 1e6,
+                            generation=metadata))
         for inst in midi.instruments:
             for note in inst.notes:
                 lead.notes.append(pretty_midi.Note(note.velocity, note.pitch,

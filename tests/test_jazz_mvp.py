@@ -117,3 +117,20 @@ class JazzMvpTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class GenerationMetadataTests(unittest.TestCase):
+    """Latency is linear in emitted tokens, so the report must record them."""
+
+    def test_report_detail_carries_generation_metadata(self):
+        meta = {'model_forward_step_count': 41, 'stop_reason': 'duration_target'}
+        _, _, rows = prepare_phrase(generate=lambda _: ([372, 60, 355, 343, 188], meta),
+                                    bpm=128, bars=1, chords=['Dm7'], seed=42)
+
+        self.assertEqual('model', rows[0]['source'])
+        self.assertEqual(41, rows[0]['generation']['model_forward_step_count'])
+
+    def test_fallback_only_reports_no_generation_metadata(self):
+        _, _, rows = prepare_phrase(generate=None, bpm=128, bars=1, chords=['Dm7'], seed=42)
+
+        self.assertIsNone(rows[0]['generation'])
