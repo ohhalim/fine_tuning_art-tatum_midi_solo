@@ -133,7 +133,11 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
         clock=clock, bars=bars, bpm=bpm, chords=chords, seed=seed, duration=duration
     )
     producer = BarBlockProducer(
+        # Lead of 2, not 1. The scheduler asks for bar 1 at bar 0's downbeat,
+        # and the watermark only advances once it starts, so a lead of 1 leaves
+        # bar 1 unable to begin until playback is already underway.
         bar_count=bars, fallback_blocks=fallbacks, clock=clock, input_buffer=input_buffer,
+        max_lead_bars=2,
         build_block=(
             None if generate is None
             else make_block_builder(clock=clock, duration=duration, generate=generate)

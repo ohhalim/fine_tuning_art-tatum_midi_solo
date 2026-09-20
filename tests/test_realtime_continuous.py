@@ -370,3 +370,37 @@ class DisabledGenerationTests(unittest.TestCase):
         self.assertEqual(0, summary["model_bar_count"])
         self.assertEqual(BARS, summary["fallback_bar_count"])
         self.assertEqual({SOURCE_FALLBACK_DISABLED: BARS}, summary["source_counts"])
+
+
+class WarmupLeadTests(unittest.TestCase):
+    """Bar 1 must be producible before playback starts, not only after."""
+
+    def test_lead_two_produces_the_first_two_bars_before_any_get(self) -> None:
+        clock = make_clock()
+        started: list[int] = []
+
+        def build(bar_index, _events):
+            started.append(bar_index)
+            return make_block(clock, bar_index, pitch=72, adapter="model")
+
+        with BarBlockProducer(bar_count=8, fallback_blocks=fallbacks(clock, 8),
+                              build_block=build, clock=clock, max_lead_bars=2) as producer:
+            self.assertTrue(producer.wait_for_bar(0, timeout=2.0))
+            self.assertTrue(producer.wait_for_bar(1, timeout=2.0))
+
+        self.assertEqual([0, 1], started[:2])
+
+    def test_lead_one_cannot_start_bar_one_before_playback(self) -> None:
+        """Documents why the session uses a lead of 2."""
+        clock = make_clock()
+        started: list[int] = []
+
+        def build(bar_index, _events):
+            started.append(bar_index)
+            return make_block(clock, bar_index, pitch=72, adapter="model")
+
+        with BarBlockProducer(bar_count=8, fallback_blocks=fallbacks(clock, 8),
+                              build_block=build, clock=clock, max_lead_bars=1) as producer:
+            self.assertTrue(producer.wait_for_bar(0, timeout=2.0))
+            self.assertFalse(producer.wait_for_bar(1, timeout=0.3))
+            self.assertEqual([0], started)
