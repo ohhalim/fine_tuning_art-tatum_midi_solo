@@ -100,6 +100,12 @@ class ScheduledMidiBlock:
     bar_index: int
     target_start_ns: int
     events: tuple[ScheduledMidiEvent, ...]
+    target_end_ns: int | None = None
+    block_id: str | None = None
+    source_context_id: str | None = None
+    context_version: int | None = None
+    adapter: str | None = None
+    fallback_used: bool = False
 
 
 @dataclass(frozen=True)
@@ -409,6 +415,19 @@ class OneBarMidiScheduler:
 
             if block.bar_index != bar_index or block.target_start_ns != target_bar_start_ns:
                 raise ValueError(f"block {bar_index} does not match clock target")
+            expected_target_end_ns = self._clock.bar_start_ns(bar_index + 1)
+            if (
+                block.target_end_ns is not None
+                and block.target_end_ns != expected_target_end_ns
+            ):
+                raise ValueError(f"block {bar_index} does not match clock end target")
+            if any(
+                event.bar_index != bar_index
+                or event.target_ns < target_bar_start_ns
+                or event.target_ns > expected_target_end_ns
+                for event in block.events
+            ):
+                raise ValueError(f"block {bar_index} contains an event outside its target window")
 
             started_bar_count += 1
             block_completed = True
