@@ -61,12 +61,29 @@ def prepare_phrase(*, generate, bpm, bars, chords, seed):
                 from midi_processor.processor import decode_midi
                 midi = decode_midi(tokens)
                 source = "model"
+        def schedulable(candidate, candidate_source):
+            build_scheduled_midi_block(
+                midi=candidate, clock=clock, bar_index=index, block_id=str(index),
+                source_context_id="fixed-primer", context_version=0,
+                adapter=candidate_source, fallback_used=candidate_source != "model",
+            )
+
         midi = fit_window(midi, duration)
-        build_scheduled_midi_block(
-            midi=midi, clock=clock, bar_index=index, block_id=str(index),
-            source_context_id="fixed-primer", context_version=0,
-            adapter=source, fallback_used=source != "model",
-        )
+        try:
+            schedulable(midi, source)
+        except ValueError as exc:
+            # A model block can satisfy token validation and still be unschedulable
+            # (e.g. a decoded velocity of 0). Treat it like any other invalid model
+            # block instead of aborting. A fallback block failing here is a real bug.
+            if source != "model":
+                raise
+            fallback_reason = {
+                "valid": False,
+                "unschedulable_model_block": f"{type(exc).__name__}: {exc}",
+            }
+            source = "unschedulable_model_fallback"
+            midi = fit_window(build_fallback_midi(request), duration)
+            schedulable(midi, source)
         midis.append(midi)
         details.append(dict(bar=index, chord=chord, source=source,
                             invalid_model_validation=fallback_reason,

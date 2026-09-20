@@ -35,6 +35,26 @@ class JazzMvpTests(unittest.TestCase):
         self.assertEqual(phrase.get_end_time(), 7.5)
         self.assertTrue(all(n.end <= 1.875 for m in midis for i in m.instruments for n in i.notes))
 
+    def test_unschedulable_model_block_falls_back_instead_of_aborting(self):
+        """Token validation can pass while the decoded block is unplayable.
+
+        Stage A encodes velocity as ``velocity // 4`` and decodes it as
+        ``value * 4``, so velocity bin 0 is a legitimate learned token that
+        decodes to MIDI velocity 0. ``validate_generated_token_block`` does not
+        check velocity, but ``build_scheduled_midi_block`` rejects it. Such a
+        bar must fall back, not abort the whole phrase.
+        """
+        # velocity bin 0, note_on 60, time-shift 100 + 88 steps, note_off 60.
+        tokens = [356, 60, 355, 343, 188]
+        _, midis, rows = prepare_phrase(generate=lambda _: (tokens, {}),
+                                        bpm=128, bars=2, chords=['Dm7'], seed=42)
+
+        self.assertEqual(len(midis), 2)
+        self.assertTrue(all(r['source'] == 'unschedulable_model_fallback' for r in rows))
+        self.assertIn('unschedulable_model_block', rows[0]['invalid_model_validation'])
+        self.assertTrue(all(1 <= n.velocity <= 127
+                            for m in midis for i in m.instruments for n in i.notes))
+
     def test_inference_error_not_hidden(self):
         def fail(_):
             raise RuntimeError('inference failed')
