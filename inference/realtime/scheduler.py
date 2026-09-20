@@ -12,10 +12,16 @@ from mido import Message
 from .transport import LatencySummary, summarize_latency
 
 
-INTERNAL_SCHEDULER_REPORT_SCHEMA_VERSION = "internal_midi_scheduler_report_v3"
+INTERNAL_SCHEDULER_REPORT_SCHEMA_VERSION = "internal_midi_scheduler_report_v5"
 DETERMINISTIC_FIXTURE_ID = "dense_chord_sub_spin_v1"
 DEFAULT_DEADLINE_THRESHOLD_MS = 20.0
 DEFAULT_SPIN_WINDOW_MS = 15.0
+DEFAULT_ENVIRONMENT_CLOCK_GAP_THRESHOLD_SECONDS = 1.0
+DEADLINE_POLICY_ABORT_ON_FIRST_MISS = "abort_on_first_miss"
+DEADLINE_POLICY_RECORD_AND_CONTINUE = "record_and_continue"
+DEADLINE_POLICIES = frozenset(
+    {DEADLINE_POLICY_ABORT_ON_FIRST_MISS, DEADLINE_POLICY_RECORD_AND_CONTINUE}
+)
 TIMING_HISTOGRAM_BOUNDS_MS = (1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0)
 
 # Note-off gap used on the dense beats. Kept well below DEFAULT_SPIN_WINDOW_MS so the
@@ -94,6 +100,12 @@ class ScheduledMidiBlock:
     bar_index: int
     target_start_ns: int
     events: tuple[ScheduledMidiEvent, ...]
+    target_end_ns: int | None = None
+    block_id: str | None = None
+    source_context_id: str | None = None
+    context_version: int | None = None
+    adapter: str | None = None
+    fallback_used: bool = False
 
 
 @dataclass(frozen=True)
@@ -118,10 +130,13 @@ class SchedulerDispatchDeadlineMiss:
     channel: int | None
     note: int | None
     is_bar_start: bool
+    is_catch_up: bool
+    action: str
 
 
 @dataclass(frozen=True)
 class SchedulerRunResult:
+    deadline_policy: str
     expected_bar_count: int
     started_bar_count: int
     completed_bar_count: int
@@ -130,10 +145,13 @@ class SchedulerRunResult:
     queue_depth_max: int
     send_failure_count: int
     scheduler_dispatch_deadline_miss_count: int
+    primary_dispatch_stall_count: int
+    catch_up_dispatch_event_count: int
     scheduler_dispatch_deadline_misses: tuple[SchedulerDispatchDeadlineMiss, ...]
     watchdog_trigger_reason: str | None
     run_completed: bool
     enqueue_lead_time_ns: tuple[int, ...]
+    dispatch_attempt_lateness_ns: tuple[int, ...]
     records: tuple[SchedulerSendRecord, ...]
 
 
@@ -147,6 +165,15 @@ class InternalSchedulerReport:
     scheduled_duration_seconds: float
     start_delay_seconds: float
     wall_clock_seconds: float
+    realtime_elapsed_seconds: float
+    monotonic_elapsed_seconds: float
+    realtime_minus_monotonic_seconds: float
+    scheduler_run_realtime_elapsed_seconds: float
+    scheduler_run_monotonic_elapsed_seconds: float
+    scheduler_run_realtime_minus_monotonic_seconds: float
+    environment_clock_gap_threshold_seconds: float
+    environment_valid: bool
+    deadline_policy: str
     expected_bar_count: int
     started_bar_count: int
     completed_bar_count: int
@@ -173,8 +200,14 @@ class InternalSchedulerReport:
     deadline_threshold_ms: float
     spin_window_ms: float
     scheduler_dispatch_deadline_miss_count: int
+    scheduler_dispatch_deadline_miss_rate: float | None
+    primary_dispatch_stall_count: int
+    catch_up_dispatch_event_count: int
+    scheduler_dispatch_deadline_miss_type_counts: dict[str, int]
     scheduler_dispatch_deadline_misses: tuple[SchedulerDispatchDeadlineMiss, ...]
     scheduler_dispatch_deadline_miss_lateness_ms: LatencySummary
+    scheduler_dispatch_attempt_lateness_ms: LatencySummary
+    scheduler_dispatch_attempt_lateness_p999_ms: float | None
     capture_deadline_miss_count: int | None
     scheduler_dispatch_lateness_ms: LatencySummary
     output_send_call_duration_ms: LatencySummary
@@ -187,6 +220,7 @@ class InternalSchedulerReport:
     safe_reset_sent: bool
     output_capture_observed: bool
     run_completed: bool
+    record_and_continue_completed: bool
     wall_clock_soak_completed: bool
     passed_event_integrity: bool
     passed_scheduler_smoke: bool
@@ -295,16 +329,20 @@ class OneBarMidiScheduler:
         wait_until: Callable[[int, Event], None] | None = None,
         spin_window_ms: float = DEFAULT_SPIN_WINDOW_MS,
         deadline_threshold_ms: float = DEFAULT_DEADLINE_THRESHOLD_MS,
+        deadline_policy: str = DEADLINE_POLICY_ABORT_ON_FIRST_MISS,
     ) -> None:
         if spin_window_ms < 0:
             raise ValueError("spin_window_ms must not be negative")
         if deadline_threshold_ms <= 0:
             raise ValueError("deadline_threshold_ms must be positive")
+        if deadline_policy not in DEADLINE_POLICIES:
+            raise ValueError(f"unsupported deadline_policy: {deadline_policy!r}")
         self._sink = sink
         self._clock = clock
         self._clock_ns = clock_ns
         self._stop = Event()
         self._deadline_threshold_ns = round(deadline_threshold_ms * 1_000_000)
+        self._deadline_policy = deadline_policy
         self._watchdog_trigger_reason: str | None = None
         self._wait_until = wait_until or (
             lambda target_ns, stop: wait_until_ns(
@@ -339,7 +377,11 @@ class OneBarMidiScheduler:
         completed_bar_count = 0
         send_failure_count = 0
         scheduler_dispatch_deadline_miss_count = 0
+        primary_dispatch_stall_count = 0
+        catch_up_dispatch_event_count = 0
         scheduler_dispatch_deadline_misses: list[SchedulerDispatchDeadlineMiss] = []
+        dispatch_attempt_lateness_ns: list[int] = []
+        catching_up_after_stall = False
 
         initial_block = blocks.get(0)
         if initial_block is not None:
@@ -373,6 +415,19 @@ class OneBarMidiScheduler:
 
             if block.bar_index != bar_index or block.target_start_ns != target_bar_start_ns:
                 raise ValueError(f"block {bar_index} does not match clock target")
+            expected_target_end_ns = self._clock.bar_start_ns(bar_index + 1)
+            if (
+                block.target_end_ns is not None
+                and block.target_end_ns != expected_target_end_ns
+            ):
+                raise ValueError(f"block {bar_index} does not match clock end target")
+            if any(
+                event.bar_index != bar_index
+                or event.target_ns < target_bar_start_ns
+                or event.target_ns > expected_target_end_ns
+                for event in block.events
+            ):
+                raise ValueError(f"block {bar_index} contains an event outside its target window")
 
             started_bar_count += 1
             block_completed = True
@@ -383,8 +438,19 @@ class OneBarMidiScheduler:
                     break
                 dispatch_started_ns = self._clock_ns()
                 dispatch_lateness_ns = max(0, dispatch_started_ns - event.target_ns)
+                dispatch_attempt_lateness_ns.append(dispatch_lateness_ns)
                 if dispatch_lateness_ns > self._deadline_threshold_ns:
                     scheduler_dispatch_deadline_miss_count += 1
+                    is_catch_up = catching_up_after_stall
+                    if is_catch_up:
+                        catch_up_dispatch_event_count += 1
+                    else:
+                        primary_dispatch_stall_count += 1
+                    action = (
+                        "abort_before_send"
+                        if self._deadline_policy == DEADLINE_POLICY_ABORT_ON_FIRST_MISS
+                        else "sent_late_for_diagnostic"
+                    )
                     scheduler_dispatch_deadline_misses.append(
                         SchedulerDispatchDeadlineMiss(
                             sequence_index=event.sequence_index,
@@ -396,11 +462,17 @@ class OneBarMidiScheduler:
                             channel=getattr(event.message, "channel", None),
                             note=getattr(event.message, "note", None),
                             is_bar_start=event.is_bar_start,
+                            is_catch_up=is_catch_up,
+                            action=action,
                         )
                     )
-                    block_completed = False
-                    self.stop("dispatch_deadline_miss")
-                    break
+                    if self._deadline_policy == DEADLINE_POLICY_ABORT_ON_FIRST_MISS:
+                        block_completed = False
+                        self.stop("dispatch_deadline_miss")
+                        break
+                    catching_up_after_stall = True
+                else:
+                    catching_up_after_stall = False
                 try:
                     self._sink.send(event.message.copy())
                 except Exception:
@@ -429,6 +501,7 @@ class OneBarMidiScheduler:
 
         run_completed = not self._stop.is_set() and completed_bar_count == expected_bar_count
         return SchedulerRunResult(
+            deadline_policy=self._deadline_policy,
             expected_bar_count=expected_bar_count,
             started_bar_count=started_bar_count,
             completed_bar_count=completed_bar_count,
@@ -437,10 +510,13 @@ class OneBarMidiScheduler:
             queue_depth_max=queue_depth_max,
             send_failure_count=send_failure_count,
             scheduler_dispatch_deadline_miss_count=scheduler_dispatch_deadline_miss_count,
+            primary_dispatch_stall_count=primary_dispatch_stall_count,
+            catch_up_dispatch_event_count=catch_up_dispatch_event_count,
             scheduler_dispatch_deadline_misses=tuple(scheduler_dispatch_deadline_misses),
             watchdog_trigger_reason=self._watchdog_trigger_reason,
             run_completed=run_completed,
             enqueue_lead_time_ns=tuple(enqueue_lead_time_ns),
+            dispatch_attempt_lateness_ns=tuple(dispatch_attempt_lateness_ns),
             records=tuple(records),
         )
 

@@ -10,6 +10,7 @@ import os
 import re
 import sys
 import time
+from collections import Counter
 from pathlib import Path
 from threading import Event, Lock
 from typing import Mapping, Sequence
@@ -24,7 +25,11 @@ sys.path.insert(0, str(ROOT_DIR))
 from inference.realtime.scheduler import (  # noqa: E402
     DEFAULT_DENSE_OFF_GAP_MS,
     DEFAULT_DEADLINE_THRESHOLD_MS,
+    DEFAULT_ENVIRONMENT_CLOCK_GAP_THRESHOLD_SECONDS,
     DEFAULT_SPIN_WINDOW_MS,
+    DEADLINE_POLICIES,
+    DEADLINE_POLICY_ABORT_ON_FIRST_MISS,
+    DEADLINE_POLICY_RECORD_AND_CONTINUE,
     DETERMINISTIC_FIXTURE_ID,
     INTERNAL_SCHEDULER_REPORT_SCHEMA_VERSION,
     InternalSchedulerReport,
@@ -93,6 +98,19 @@ def _flatten_expected_messages(blocks: Mapping[int, ScheduledMidiBlock]) -> list
     return messages
 
 
+def _percentile_ms(values_ns: Sequence[int], percentile: float) -> float | None:
+    if not values_ns:
+        return None
+    ordered_ms = sorted(max(0, int(value)) / 1_000_000 for value in values_ns)
+    position = (len(ordered_ms) - 1) * percentile
+    lower = math.floor(position)
+    upper = math.ceil(position)
+    if lower == upper:
+        return ordered_ms[lower]
+    fraction = position - lower
+    return ordered_ms[lower] + (ordered_ms[upper] - ordered_ms[lower]) * fraction
+
+
 def build_report(
     *,
     bpm: float,
@@ -101,6 +119,10 @@ def build_report(
     scheduled_duration_seconds: float,
     start_delay_seconds: float,
     wall_clock_seconds: float,
+    realtime_elapsed_seconds: float,
+    monotonic_elapsed_seconds: float,
+    scheduler_run_realtime_elapsed_seconds: float,
+    scheduler_run_monotonic_elapsed_seconds: float,
     expected_messages: Sequence[Message],
     run_result: SchedulerRunResult,
     captured_messages: Sequence[Message],
@@ -110,7 +132,12 @@ def build_report(
     spin_window_ms: float,
     dense_off_gap_ms: float = DEFAULT_DENSE_OFF_GAP_MS,
     block_production_mode: str = "prebuilt_deterministic_dict",
+    environment_clock_gap_threshold_seconds: float = (
+        DEFAULT_ENVIRONMENT_CLOCK_GAP_THRESHOLD_SECONDS
+    ),
 ) -> InternalSchedulerReport:
+    if environment_clock_gap_threshold_seconds <= 0:
+        raise ValueError("environment_clock_gap_threshold_seconds must be positive")
     records = list(run_result.records)
     sent_messages = [record.message for record in records]
     sent_keys = [canonical_message(message) for message in sent_messages]
@@ -149,6 +176,35 @@ def build_report(
     dispatch_deadline_miss_lateness_ns = [
         miss.lateness_ns for miss in run_result.scheduler_dispatch_deadline_misses
     ]
+    dispatch_attempt_lateness_ns = list(run_result.dispatch_attempt_lateness_ns)
+    dispatch_attempt_count = len(dispatch_attempt_lateness_ns)
+    measured_dispatch_deadline_miss_rate = (
+        scheduler_dispatch_deadline_miss_count / dispatch_attempt_count
+        if dispatch_attempt_count
+        else 0.0
+    )
+    measured_dispatch_attempt_lateness_p999_ms = _percentile_ms(
+        dispatch_attempt_lateness_ns, 0.999
+    )
+    scheduler_dispatch_deadline_miss_type_counts = dict(
+        sorted(
+            Counter(
+                miss.message_type
+                for miss in run_result.scheduler_dispatch_deadline_misses
+            ).items()
+        )
+    )
+    realtime_minus_monotonic_seconds = (
+        float(realtime_elapsed_seconds) - float(monotonic_elapsed_seconds)
+    )
+    scheduler_run_realtime_minus_monotonic_seconds = (
+        float(scheduler_run_realtime_elapsed_seconds)
+        - float(scheduler_run_monotonic_elapsed_seconds)
+    )
+    environment_valid = (
+        abs(scheduler_run_realtime_minus_monotonic_seconds)
+        <= environment_clock_gap_threshold_seconds
+    )
 
     integrity = evaluate_event_integrity(
         input_messages=expected_messages,
@@ -190,14 +246,42 @@ def build_report(
             scheduler_dispatch_deadline_miss_count == 0,
             capture_deadline_miss_count == 0,
             bar_start_gate_passed,
+            environment_valid,
         )
+    )
+    record_and_continue_completed = all(
+        (
+            run_result.deadline_policy == DEADLINE_POLICY_RECORD_AND_CONTINUE,
+            run_result.run_completed,
+            run_result.started_bar_count == expected_bar_count,
+            run_result.completed_bar_count == expected_bar_count,
+            run_result.enqueued_block_count == expected_bar_count,
+            run_result.queue_underrun_count == 0,
+            run_result.send_failure_count == 0,
+            run_result.watchdog_trigger_reason is None,
+            integrity.passed_event_integrity,
+            bool(captured_messages),
+            safe_reset_sent,
+            environment_valid,
+        )
+    )
+    scheduler_dispatch_deadline_miss_rate = (
+        measured_dispatch_deadline_miss_rate
+        if record_and_continue_completed
+        else None
+    )
+    scheduler_dispatch_attempt_lateness_p999_ms = (
+        measured_dispatch_attempt_lateness_p999_ms
+        if record_and_continue_completed
+        else None
     )
     wall_clock_soak_completed = all(
         (
             requested_duration_seconds >= 600.0,
             scheduled_duration_seconds >= 600.0,
-            wall_clock_seconds >= scheduled_duration_seconds,
+            scheduler_run_monotonic_elapsed_seconds >= scheduled_duration_seconds,
             run_result.run_completed,
+            environment_valid,
         )
     )
     return InternalSchedulerReport(
@@ -209,6 +293,23 @@ def build_report(
         scheduled_duration_seconds=float(scheduled_duration_seconds),
         start_delay_seconds=float(start_delay_seconds),
         wall_clock_seconds=float(wall_clock_seconds),
+        realtime_elapsed_seconds=float(realtime_elapsed_seconds),
+        monotonic_elapsed_seconds=float(monotonic_elapsed_seconds),
+        realtime_minus_monotonic_seconds=realtime_minus_monotonic_seconds,
+        scheduler_run_realtime_elapsed_seconds=float(
+            scheduler_run_realtime_elapsed_seconds
+        ),
+        scheduler_run_monotonic_elapsed_seconds=float(
+            scheduler_run_monotonic_elapsed_seconds
+        ),
+        scheduler_run_realtime_minus_monotonic_seconds=(
+            scheduler_run_realtime_minus_monotonic_seconds
+        ),
+        environment_clock_gap_threshold_seconds=float(
+            environment_clock_gap_threshold_seconds
+        ),
+        environment_valid=environment_valid,
+        deadline_policy=run_result.deadline_policy,
         expected_bar_count=expected_bar_count,
         started_bar_count=run_result.started_bar_count,
         completed_bar_count=run_result.completed_bar_count,
@@ -231,9 +332,21 @@ def build_report(
         deadline_threshold_ms=float(deadline_threshold_ms),
         spin_window_ms=float(spin_window_ms),
         scheduler_dispatch_deadline_miss_count=scheduler_dispatch_deadline_miss_count,
+        scheduler_dispatch_deadline_miss_rate=scheduler_dispatch_deadline_miss_rate,
+        primary_dispatch_stall_count=run_result.primary_dispatch_stall_count,
+        catch_up_dispatch_event_count=run_result.catch_up_dispatch_event_count,
+        scheduler_dispatch_deadline_miss_type_counts=(
+            scheduler_dispatch_deadline_miss_type_counts
+        ),
         scheduler_dispatch_deadline_misses=run_result.scheduler_dispatch_deadline_misses,
         scheduler_dispatch_deadline_miss_lateness_ms=summarize_latency(
             dispatch_deadline_miss_lateness_ns
+        ),
+        scheduler_dispatch_attempt_lateness_ms=summarize_latency(
+            dispatch_attempt_lateness_ns
+        ),
+        scheduler_dispatch_attempt_lateness_p999_ms=(
+            scheduler_dispatch_attempt_lateness_p999_ms
         ),
         capture_deadline_miss_count=capture_deadline_miss_count,
         scheduler_dispatch_lateness_ms=summarize_latency(dispatch_lateness_ns),
@@ -247,6 +360,7 @@ def build_report(
         safe_reset_sent=bool(safe_reset_sent),
         output_capture_observed=bool(captured_messages),
         run_completed=run_result.run_completed,
+        record_and_continue_completed=record_and_continue_completed,
         wall_clock_soak_completed=wall_clock_soak_completed,
         passed_event_integrity=integrity.passed_event_integrity,
         passed_scheduler_smoke=passed_scheduler_smoke,
@@ -268,6 +382,10 @@ def run_internal_scheduler_probe(
     dense_off_gap_ms: float = DEFAULT_DENSE_OFF_GAP_MS,
     drain_timeout_seconds: float = 3.0,
     drop_block_index: int | None = None,
+    deadline_policy: str = DEADLINE_POLICY_ABORT_ON_FIRST_MISS,
+    environment_clock_gap_threshold_seconds: float = (
+        DEFAULT_ENVIRONMENT_CLOCK_GAP_THRESHOLD_SECONDS
+    ),
 ) -> InternalSchedulerReport:
     if bpm <= 0:
         raise ValueError("bpm must be positive")
@@ -281,6 +399,10 @@ def run_internal_scheduler_probe(
         raise ValueError("spin_window_ms must not be negative")
     if dense_off_gap_ms <= 0:
         raise ValueError("dense_off_gap_ms must be positive")
+    if deadline_policy not in DEADLINE_POLICIES:
+        raise ValueError(f"unsupported deadline_policy: {deadline_policy!r}")
+    if environment_clock_gap_threshold_seconds <= 0:
+        raise ValueError("environment_clock_gap_threshold_seconds must be positive")
 
     expected_bar_count = _bar_count_for_duration(
         bpm=bpm,
@@ -304,7 +426,8 @@ def run_internal_scheduler_probe(
                 capture_complete.set()
 
     safe_reset_sent = False
-    started = time.perf_counter()
+    started_monotonic_ns = time.perf_counter_ns()
+    started_realtime_ns = time.time_ns()
     try:
         with mido.open_output(output_source_name, virtual=True) as output_port:
             try:
@@ -331,13 +454,18 @@ def run_internal_scheduler_probe(
                     clock=clock,
                     spin_window_ms=spin_window_ms,
                     deadline_threshold_ms=deadline_threshold_ms,
+                    deadline_policy=deadline_policy,
                 )
                 input_port = mido.open_input(output_source_name, callback=capture_callback)
                 try:
+                    scheduler_started_monotonic_ns = time.perf_counter_ns()
+                    scheduler_started_realtime_ns = time.time_ns()
                     run_result = scheduler.run(
                         blocks=blocks,
                         expected_bar_count=expected_bar_count,
                     )
+                    scheduler_ended_monotonic_ns = time.perf_counter_ns()
+                    scheduler_ended_realtime_ns = time.time_ns()
                     if (
                         run_result.watchdog_trigger_reason is None
                         and not capture_complete.is_set()
@@ -352,7 +480,20 @@ def run_internal_scheduler_probe(
     except (ImportError, OSError, RuntimeError) as exc:
         raise InternalSchedulerProbeError(f"internal scheduler probe failed: {exc}") from exc
 
-    elapsed = time.perf_counter() - started
+    ended_monotonic_ns = time.perf_counter_ns()
+    ended_realtime_ns = time.time_ns()
+    monotonic_elapsed_seconds = (
+        ended_monotonic_ns - started_monotonic_ns
+    ) / 1_000_000_000
+    realtime_elapsed_seconds = (
+        ended_realtime_ns - started_realtime_ns
+    ) / 1_000_000_000
+    scheduler_run_monotonic_elapsed_seconds = (
+        scheduler_ended_monotonic_ns - scheduler_started_monotonic_ns
+    ) / 1_000_000_000
+    scheduler_run_realtime_elapsed_seconds = (
+        scheduler_ended_realtime_ns - scheduler_started_realtime_ns
+    ) / 1_000_000_000
     with capture_lock:
         captured_messages_copy = list(captured_messages)
         captured_ns_copy = list(captured_ns)
@@ -363,7 +504,15 @@ def run_internal_scheduler_probe(
         requested_duration_seconds=requested_duration_seconds,
         scheduled_duration_seconds=scheduled_duration_seconds,
         start_delay_seconds=start_delay_seconds,
-        wall_clock_seconds=elapsed,
+        wall_clock_seconds=monotonic_elapsed_seconds,
+        realtime_elapsed_seconds=realtime_elapsed_seconds,
+        monotonic_elapsed_seconds=monotonic_elapsed_seconds,
+        scheduler_run_realtime_elapsed_seconds=(
+            scheduler_run_realtime_elapsed_seconds
+        ),
+        scheduler_run_monotonic_elapsed_seconds=(
+            scheduler_run_monotonic_elapsed_seconds
+        ),
         expected_messages=expected_messages,
         run_result=run_result,
         captured_messages=captured_messages_copy,
@@ -372,6 +521,9 @@ def run_internal_scheduler_probe(
         deadline_threshold_ms=deadline_threshold_ms,
         spin_window_ms=spin_window_ms,
         dense_off_gap_ms=dense_off_gap_ms,
+        environment_clock_gap_threshold_seconds=(
+            environment_clock_gap_threshold_seconds
+        ),
     )
 
 
@@ -380,12 +532,20 @@ def write_report(path: Path, report: InternalSchedulerReport) -> None:
     path.write_text(json.dumps(report.to_dict(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def exit_code_for_report(report: InternalSchedulerReport, *, require_r1_gate: bool) -> int:
-    passed = (
-        report.passed_r1_internal_scheduler_gate
-        if require_r1_gate
-        else report.passed_scheduler_smoke
-    )
+def exit_code_for_report(
+    report: InternalSchedulerReport,
+    *,
+    require_r1_gate: bool,
+    require_diagnostic_completion: bool = False,
+) -> int:
+    if require_r1_gate and require_diagnostic_completion:
+        raise ValueError("only one report gate can be required")
+    if require_diagnostic_completion:
+        passed = report.record_and_continue_completed
+    elif require_r1_gate:
+        passed = report.passed_r1_internal_scheduler_gate
+    else:
+        passed = report.passed_scheduler_smoke
     return 0 if passed else 1
 
 
@@ -401,12 +561,33 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--dense_off_gap_ms", type=float, default=DEFAULT_DENSE_OFF_GAP_MS)
     parser.add_argument("--drain_timeout_seconds", type=float, default=3.0)
     parser.add_argument("--drop_block_index", type=int)
+    parser.add_argument(
+        "--deadline_policy",
+        choices=sorted(DEADLINE_POLICIES),
+        default=DEADLINE_POLICY_ABORT_ON_FIRST_MISS,
+    )
+    parser.add_argument(
+        "--environment_clock_gap_threshold_seconds",
+        type=float,
+        default=DEFAULT_ENVIRONMENT_CLOCK_GAP_THRESHOLD_SECONDS,
+    )
+    parser.add_argument("--require_diagnostic_completion", action="store_true")
     parser.add_argument("--output_root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     return parser.parse_args(argv)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
+    if (
+        args.require_diagnostic_completion
+        and args.deadline_policy != DEADLINE_POLICY_RECORD_AND_CONTINUE
+    ):
+        print(
+            "--require_diagnostic_completion requires "
+            "--deadline_policy record_and_continue",
+            file=sys.stderr,
+        )
+        return 2
     try:
         report = run_internal_scheduler_probe(
             run_id=args.run_id,
@@ -419,6 +600,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             dense_off_gap_ms=args.dense_off_gap_ms,
             drain_timeout_seconds=args.drain_timeout_seconds,
             drop_block_index=args.drop_block_index,
+            deadline_policy=args.deadline_policy,
+            environment_clock_gap_threshold_seconds=(
+                args.environment_clock_gap_threshold_seconds
+            ),
         )
     except (InternalSchedulerProbeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
@@ -426,7 +611,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     report_path = args.output_root / args.run_id / "internal_scheduler_report.json"
     write_report(report_path, report)
     print(json.dumps({"report_path": str(report_path), **report.to_dict()}, sort_keys=True))
-    return exit_code_for_report(report, require_r1_gate=args.duration_seconds >= 600.0)
+    return exit_code_for_report(
+        report,
+        require_r1_gate=(
+            args.duration_seconds >= 600.0
+            and not args.require_diagnostic_completion
+        ),
+        require_diagnostic_completion=args.require_diagnostic_completion,
+    )
 
 
 if __name__ == "__main__":

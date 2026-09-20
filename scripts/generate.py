@@ -12,11 +12,12 @@ Stage A usage:
 """
 
 import argparse
+import math
 import os
 import re
 import sys
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Sequence
 
 import pretty_midi
 import torch
@@ -30,7 +31,13 @@ sys.path.insert(0, str(SCRIPT_DIR / "music_transformer" / "third_party"))
 from model.music_transformer import MusicTransformer
 from utilities.constants import TOKEN_END, TOKEN_PAD
 from utilities.device import get_device
-from midi_processor.processor import decode_midi, RANGE_NOTE_ON, RANGE_NOTE_OFF, RANGE_TIME_SHIFT
+from midi_processor.processor import (
+    decode_midi,
+    RANGE_NOTE_ON,
+    RANGE_NOTE_OFF,
+    RANGE_TIME_SHIFT,
+    RANGE_VEL,
+)
 
 # Import LoRA helper from train script
 from train_qlora import add_lora_to_model
@@ -90,18 +97,27 @@ def infer_checkpoint_max_sequence(state_dict: dict, fallback: int) -> int:
 
 
 def encode_midi_simple(file_path: str) -> List[int]:
+    mid = pretty_midi.PrettyMIDI(midi_file=file_path)
+    notes = []
+    for inst in mid.instruments:
+        if not inst.is_drum:
+            notes.extend(inst.notes)
+    return encode_notes_simple(notes)
+
+
+def encode_notes_simple(notes: Sequence) -> List[int]:
+    """Stage A encoding straight from note objects.
+
+    Split out of ``encode_midi_simple`` so a primer can be built from live
+    input without a round trip through a temporary file. Behaviour for a given
+    note list is identical.
+    """
     start_idx = {
         "note_on": 0,
         "note_off": RANGE_NOTE_ON,
         "time_shift": RANGE_NOTE_ON + RANGE_NOTE_OFF,
         "velocity": RANGE_NOTE_ON + RANGE_NOTE_OFF + RANGE_TIME_SHIFT,
     }
-
-    mid = pretty_midi.PrettyMIDI(midi_file=file_path)
-    notes = []
-    for inst in mid.instruments:
-        if not inst.is_drum:
-            notes.extend(inst.notes)
 
     if not notes:
         return []
@@ -150,6 +166,7 @@ def load_model_with_lora(
     rpr: bool = True,
     lora_r: int = 16,
     lora_alpha: int = 32,
+    return_metadata: bool = False,
 ):
     """Load Stage A Music Transformer.
 
@@ -164,6 +181,8 @@ def load_model_with_lora(
         resolve_full_checkpoint_path(lora_path, checkpoint_path) if prefer_full_checkpoint else None
     )
     full_checkpoint_state = None
+    model_config: dict[str, Any] = {}
+    resized_keys: list[str] = []
     model_max_sequence = int(max_sequence)
     if full_checkpoint_path is not None:
         checkpoint = torch.load(full_checkpoint_path, map_location=device)
@@ -207,6 +226,23 @@ def load_model_with_lora(
 
     model = model.to(device)
     model.eval()
+    if return_metadata:
+        rpr_embedding_shapes = {
+            key: list(value.shape)
+            for key, value in model.state_dict().items()
+            if key.endswith(".Er")
+        }
+        return model, {
+            "model_max_sequence": int(model.max_seq),
+            "rpr": bool(model.rpr),
+            "n_layers": int(model.nlayers),
+            "num_heads": int(model.nhead),
+            "d_model": int(model.d_model),
+            "dim_feedforward": int(model.d_ff),
+            "checkpoint_model_config_present": bool(model_config),
+            "resized_token_layer_keys": sorted(resized_keys),
+            "rpr_embedding_shapes": rpr_embedding_shapes,
+        }
     return model
 
 
@@ -250,6 +286,79 @@ def sanitize_for_decode(tokens: List[int]) -> List[int]:
     return [int(t) for t in tokens if 0 <= int(t) < TOKEN_END and int(t) != TOKEN_PAD]
 
 
+def _duration_seconds_to_steps(duration_seconds: float) -> int:
+    duration_seconds = float(duration_seconds)
+    if not math.isfinite(duration_seconds) or duration_seconds <= 0:
+        raise ValueError("target_duration_seconds must be finite and positive")
+    return math.ceil(duration_seconds * RANGE_TIME_SHIFT)
+
+
+VELOCITY_TOKEN_START = RANGE_NOTE_ON + RANGE_NOTE_OFF + RANGE_TIME_SHIFT
+VELOCITY_TOKEN_END = VELOCITY_TOKEN_START + RANGE_VEL
+
+
+def truncate_tokens_preserving_velocity(tokens: Sequence[int], max_tokens: int) -> List[int]:
+    """Keep the last ``max_tokens`` without losing the carried velocity.
+
+    Stage A emits a velocity token only when velocity changes, so the value in
+    force at a cut point may have been set far earlier. Tail-truncating a
+    sequence therefore silently drops velocity state, and every note before the
+    next velocity token decodes to velocity 0 - a note-off.
+
+    Steady playing is the worst case: one velocity token at the very start and
+    none afterwards, so any truncation loses it entirely.
+    """
+    tokens = [int(t) for t in tokens]
+    if max_tokens <= 0:
+        return []
+    if len(tokens) <= max_tokens:
+        return tokens
+    cut = len(tokens) - max_tokens
+    tail = tokens[cut:]
+    first_note_on = next((i for i, t in enumerate(tail) if 0 <= t < RANGE_NOTE_ON), None)
+    first_velocity = next(
+        (i for i, t in enumerate(tail) if VELOCITY_TOKEN_START <= t < VELOCITY_TOKEN_END), None
+    )
+    if first_note_on is None or (first_velocity is not None and first_velocity < first_note_on):
+        return tail
+    carried = [t for t in tokens[:cut] if VELOCITY_TOKEN_START <= t < VELOCITY_TOKEN_END]
+    if not carried:
+        return tail
+    # Prepending costs one slot, so drop one from the front to hold the budget.
+    return [carried[-1]] + tail[1:]
+
+
+def _carry_velocity_into_block(primer_tokens: List[int], block: List[int]) -> bool:
+    """Prepend the primer's trailing velocity token when the block opens without one.
+
+    ``decode_midi`` carries velocity as state starting from 0, and the encoder
+    only emits a velocity token when velocity changes. Every note_on decoded
+    before the block's first velocity token therefore gets MIDI velocity 0, which
+    is a note-off by convention and is unplayable. That happens both when the
+    block has no velocity token at all and when its first one lands after a note.
+
+    Re-seeding with the velocity in effect at the strip point restores what the
+    model was actually conditioned on. It samples nothing, so a given seed still
+    produces the same tokens.
+    """
+    first_note_on = next(
+        (i for i, t in enumerate(block) if 0 <= int(t) < RANGE_NOTE_ON), None
+    )
+    if first_note_on is None:
+        return False
+    first_velocity = next(
+        (i for i, t in enumerate(block) if VELOCITY_TOKEN_START <= int(t) < VELOCITY_TOKEN_END),
+        None,
+    )
+    if first_velocity is not None and first_velocity < first_note_on:
+        return False
+    carried = [t for t in primer_tokens if VELOCITY_TOKEN_START <= int(t) < VELOCITY_TOKEN_END]
+    if not carried:
+        return False
+    block.insert(0, int(carried[-1]))
+    return True
+
+
 def generate_once(
     model: MusicTransformer,
     primer: torch.Tensor,
@@ -260,12 +369,17 @@ def generate_once(
     top_p: float | None,
     sample_vocab_size: int | None = None,
     grammar_mask: bool = False,
-) -> List[int]:
+    target_duration_seconds: float | None = None,
+    return_metadata: bool = False,
+) -> List[int] | tuple[List[int], dict[str, object]]:
     device = get_device()
     primer = primer.to(device)
 
     with torch.no_grad():
-        generated = model.generate(
+        target_duration_steps = None
+        if target_duration_seconds is not None:
+            target_duration_steps = _duration_seconds_to_steps(target_duration_seconds)
+        generated_result = model.generate(
             primer=primer,
             target_seq_length=target_length,
             beam=0,
@@ -275,12 +389,30 @@ def generate_once(
             top_p=top_p,
             sample_vocab_size=sample_vocab_size,
             grammar_mask=grammar_mask,
+            target_duration_steps=target_duration_steps,
+            return_metadata=return_metadata,
         )
 
+    if return_metadata:
+        generated, generation_metadata = generated_result
+    else:
+        generated = generated_result
+        generation_metadata = None
+
     sequence = generated[0].detach().cpu().tolist()
+    velocity_carried_from_primer = False
     if strip_primer:
+        primer_tokens = sequence[: len(primer)]
         sequence = sequence[len(primer) :]
-    return sanitize_for_decode(sequence)
+        velocity_carried_from_primer = _carry_velocity_into_block(primer_tokens, sequence)
+    sequence = sanitize_for_decode(sequence)
+    if generation_metadata is not None:
+        generation_metadata = dict(generation_metadata)
+        generation_metadata["returned_decodable_token_count"] = len(sequence)
+        generation_metadata["strip_primer"] = bool(strip_primer)
+        generation_metadata["velocity_carried_from_primer"] = velocity_carried_from_primer
+        return sequence, generation_metadata
+    return sequence
 
 
 def main():

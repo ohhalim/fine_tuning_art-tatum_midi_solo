@@ -6,6 +6,11 @@ MIDI/WAV/review package까지 생성하는 symbolic MIDI generation MVP입니다
 현재 목표는 "완성된 고품질 재즈 연주 모델"이 아니라, 입력 context를 받아
 재현 가능한 solo 후보를 생성하고 객관 지표로 후보를 고르는 로컬 파이프라인입니다.
 
+## 빠른 생성·청취 MVP
+
+[8마디 MIDI 생성·재생 실행 방법](docs/JAZZ_PRELOADED_MVP.md). 체크포인트 생성과 fallback-only demo 지원.
+현재 버전은 생성 완료 후 재생하는 방식이며 실시간 협연·스타일 품질은 미검증입니다.
+
 ## 연구 개요 — 스타일 파인튜닝 병목 진단 (D0→D4)
 
 작은(13.4M) Music Transformer를 특정 재즈 피아니스트 스타일로 파인튜닝하자 생긴

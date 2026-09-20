@@ -333,3 +333,127 @@ Separate capability validation from live recovery policy before producer/model i
   availability target
 - only after full-run evidence, evaluate mitigations — `gc.freeze()` / `gc.disable()` around
   the scheduler loop, macOS thread priority, or moving the dispatch loop out of Python
+
+## Issue #1480 full-run diagnostic follow-up
+
+### Scope
+
+- Commit: `929e2740`
+- Report schema: `internal_midi_scheduler_report_v4`
+- Deadline policy: `record_and_continue`
+- Deadline threshold / spin window: unchanged at `20ms` / `15ms`
+- Fixed BPM and requested duration: `90 / 120 / 128 / 160`, `600s` each
+- Purpose: complete-run tail measurement and environment validity detection
+- Excluded: live note policy, active-note ledger, model producer, FL Studio routing
+
+The v4 diagnostic keeps absolute event targets and sends late fixture events in their existing
+sorted sequence. It records every dispatch attempt and separates a primary stall from events
+that remain late while the scheduler catches up. The original `abort_on_first_miss` remains the
+default and still stops before sending the first late event.
+
+Rate and p99.9 fields are emitted only when `record_and_continue_completed == true`. Abort,
+incomplete and environment-invalid runs report them as `null`; a first-miss-abort prefix is not
+presented as a full-run rate.
+
+### Registered diagnostic completion criteria
+
+- `deadline_policy == "record_and_continue"`
+- `run_completed == true`
+- started, completed and enqueued bar counts equal expected bar count
+- sent and captured event counts equal expected event count
+- loss, duplicate, order mismatch, unmatched note-off, stuck note and send failure all `0`
+- `queue_underrun_count == 0`
+- `watchdog_trigger_reason == null`
+- `safe_reset_sent == true`
+- `environment_valid == true`
+- signed `realtime_elapsed - monotonic_elapsed` absolute value `<= 1.0s`
+
+Diagnostic completion does not imply the R1 gate passed. The R1 gate retains independent
+requirements for zero scheduler dispatch misses, zero capture deadline misses and the existing
+20ms timing limits.
+
+### Result
+
+| BPM | environment | events captured/expected | dispatch miss (primary/catch-up) | dispatch p99/p99.9/max | target→capture p99/max | capture >20ms | R1 gate |
+|---:|---|---:|---:|---|---|---:|---|
+| `90` | valid, gap `-0.0070s` | `3,150/3,150` | `2 (1/1)` | `2.159 / 5.671 / 29.519ms` | `5.081 / 29.775ms` | `2` | fail |
+| `120` | valid, gap `+0.0036s` | `4,200/4,200` | `3 (2/1)` | `4.463 / 18.258 / 33.253ms` | `6.824 / 33.442ms` | `6` | fail |
+| `128` | valid retry, gap `+0.0038s` | `4,480/4,480` | `0 (0/0)` | `0.164 / 0.245 / 2.980ms` | `4.261 / 4.372ms` | `0` | pass |
+| `160` | valid retry, gap `+0.0022s` | `5,600/5,600` | `0 (0/0)` | `0.145 / 0.218 / 12.445ms` | `4.207 / 12.901ms` | `0` | pass |
+
+All four valid runs completed `600s`, captured `17,430/17,430` events and recorded loss,
+duplicate, order mismatch, unmatched note-off, stuck note and send failure counts of `0`.
+Three primary stalls produced two additional catch-up misses. The descriptive aggregate is
+`5/17,430` dispatch misses (`0.0287%`); the per-run rates remain the authoritative report
+values because the runs use different BPM event densities.
+
+The first 128 BPM attempt also completed `4,480/4,480` events with zero integrity errors, but
+its realtime-minus-monotonic gap was `+2.0934s`. v4 therefore set `environment_valid = false`,
+`record_and_continue_completed = false`, the rate and p99.9 fields to `null`, and the R1 gate
+to false. This run is retained as environment-invalid evidence and excluded from scheduler
+timing judgment. The retry uses a separate artifact path rather than overwriting it.
+
+Artifacts:
+
+- `outputs/internal_midi_scheduler/issue_1480_scheduler_diagnostic_soak_20260904_90bpm/`
+- `outputs/internal_midi_scheduler/issue_1480_scheduler_diagnostic_soak_20260904_120bpm/`
+- `outputs/internal_midi_scheduler/issue_1480_scheduler_diagnostic_soak_20260904_128bpm/`
+  (environment-invalid evidence)
+- `outputs/internal_midi_scheduler/issue_1480_scheduler_diagnostic_soak_20260904_128bpm_retry/`
+- `outputs/internal_midi_scheduler/issue_1480_scheduler_diagnostic_soak_20260904_160bpm_retry/`
+
+### Decision
+
+- Four-BPM strict R1 gate: **not passed**; 90 and 120 BPM contain measured >20ms events.
+- Full-run diagnostic path: **completed** across four valid 600-second runs.
+- System-suspend/time-adjustment detection: **validated** by the excluded 128 BPM run.
+- Integrity and teardown: `17,430/17,430`, six integrity counters `0`, safe reset `true` in
+  every valid run.
+- Threshold, spin window and dense fixture: unchanged; no result-driven retuning.
+- Next implementation boundary: live late-event safety, active-note ledger and next-bar
+  resynchronization before resident-model producer integration.
+
+The full-run evidence rejects both extremes: Python/CoreMIDI is not zero-miss across all tested
+BPM values, but the observed failure mode is also not event loss or persistent note corruption.
+The live runtime therefore needs an explicit recovery contract rather than either claiming the
+current scheduler is live-ready or replacing the transport without first testing recovery.
+
+## Issue #1480 scheduler-window v5 follow-up
+
+### Scope
+
+- Commit: `2339b87d`
+- Report schema: `internal_midi_scheduler_report_v5`
+- Change: probe-wide clock gap and scheduler-run clock gap separation
+- Validation target: one environment-valid `128 BPM / 600s` run
+- Excluded: four-BPM gate rerun, threshold retuning, live recovery policy, model producer
+
+The v4 environment check included input-port startup and teardown outside `scheduler.run()`.
+The v5 report retains the full-probe clocks for diagnostics but uses the scheduler-run window
+for environment validity and soak completion. A regression test keeps a probe-only clock gap
+from invalidating an otherwise valid scheduler window.
+
+### Result
+
+- events captured / expected: `4,480 / 4,480`
+- bars completed / expected: `320 / 320`
+- dispatch miss: `0`
+- dispatch lateness p99 / p99.9 / max: `0.138 / 0.198 / 2.191ms`
+- target-to-capture p99 / max: `4.188 / 4.366ms`
+- event loss, duplicate, order mismatch, unmatched note-off, stuck note, send failure: all `0`
+- scheduler-run realtime-minus-monotonic gap: `+0.0022s`
+- environment valid / safe reset / R1 gate: `true / true / true`
+
+Artifact:
+
+- `outputs/internal_midi_scheduler/issue_1480_scheduler_window_v5_128bpm_soak/`
+
+### Decision
+
+- v5 scheduler-window validity fix: accepted for the measured `128 BPM` run.
+- Earlier valid v4 evidence remains unchanged: `90/120 BPM` exceeded the `20ms` threshold;
+  `128/160 BPM` passed their individual runs.
+- Four-BPM strict R1 gate remains **not passed** because v5 did not rerun all four BPM values.
+- Additional scheduler-only tuning and four-BPM soak are deferred until resident-model and
+  FL Studio load are present. The integrated run will determine whether late-event recovery or
+  scheduler isolation is required.

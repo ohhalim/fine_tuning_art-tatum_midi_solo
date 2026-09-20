@@ -24,12 +24,14 @@ class StageAModelRunner:
         dim_feedforward: int = 1024,
         lora_r: int = 16,
         lora_alpha: int = 32,
+        grammar_mask: bool = True,
     ) -> None:
         from scripts.generate import load_model_with_lora
 
         self.lora_path = Path(lora_path)
         self.checkpoint_path = Path(checkpoint_path) if checkpoint_path is not None else None
         self.max_sequence = int(max_sequence)
+        self.grammar_mask = bool(grammar_mask)
         self.model = load_model_with_lora(
             lora_path=str(self.lora_path),
             checkpoint_path=str(self.checkpoint_path) if self.checkpoint_path is not None else None,
@@ -78,6 +80,16 @@ class StageAModelRunner:
             target_sequence = min(self.max_sequence, len(primer) + 128)
 
         torch.manual_seed(int(request.seed))
+        numerator, denominator = (int(part) for part in request.time_signature.split("/", 1))
+        if numerator <= 0 or denominator <= 0:
+            raise ValueError("time signature values must be positive")
+        target_duration_seconds = (
+            float(request.bars)
+            * numerator
+            * (4.0 / denominator)
+            * 60.0
+            / float(request.bpm)
+        )
         candidates: list[Path] = []
         for index in range(max(1, int(model_candidates))):
             output_path = model_output_dir / f"jazz_sample_{index + 1}.mid"
@@ -89,6 +101,8 @@ class StageAModelRunner:
                 temperature=request.temperature or 1.0,
                 top_k=request.top_k,
                 top_p=request.top_p,
+                grammar_mask=self.grammar_mask,
+                target_duration_seconds=target_duration_seconds,
             )
             if not generated_tokens:
                 continue

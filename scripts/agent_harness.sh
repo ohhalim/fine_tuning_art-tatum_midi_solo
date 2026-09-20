@@ -33,8 +33,12 @@ Modes:
                 Run the 600-second CoreMIDI R0 gate with independent capture.
   internal-scheduler-smoke
                 Run short internal one-bar scheduler probes at four fixed BPM values.
+  internal-scheduler-diagnostic-smoke
+                Run full-run scheduler diagnostic probes at four fixed BPM values.
   internal-scheduler-soak
                 Run 600-second internal scheduler gates at four fixed BPM values.
+  internal-scheduler-diagnostic-soak
+                Run 600-second full-run scheduler diagnostics at four fixed BPM values.
   tiny-prepare  Verify tiny-overfit dataset preparation only.
   tiny-compare  Compare full-model tiny training with random-base LoRA-only.
   control-tiny  Run control_v1 full-model tiny-overfit smoke.
@@ -601,6 +605,24 @@ run_internal_scheduler_smoke() {
   return "$failed"
 }
 
+run_internal_scheduler_diagnostic_smoke() {
+  local run_id="${RUN_ID:-harness_internal_scheduler_diagnostic_smoke}"
+  local bpm
+  local failed=0
+  for bpm in 90 120 128 160; do
+    print_header "Internal scheduler diagnostic smoke: ${bpm} BPM"
+    if ! "$PYTHON_BIN" scripts/run_internal_scheduler_probe.py \
+      --run_id "${run_id}_${bpm}bpm" \
+      --bpm "$bpm" \
+      --duration_seconds 4 \
+      --deadline_policy record_and_continue \
+      --require_diagnostic_completion; then
+      failed=1
+    fi
+  done
+  return "$failed"
+}
+
 run_internal_scheduler_soak() {
   local run_id="${RUN_ID:-harness_internal_scheduler_soak}"
   local bpm
@@ -611,6 +633,24 @@ run_internal_scheduler_soak() {
       --run_id "${run_id}_${bpm}bpm" \
       --bpm "$bpm" \
       --duration_seconds 600; then
+      failed=1
+    fi
+  done
+  return "$failed"
+}
+
+run_internal_scheduler_diagnostic_soak() {
+  local run_id="${RUN_ID:-harness_internal_scheduler_diagnostic_soak}"
+  local bpm
+  local failed=0
+  for bpm in 90 120 128 160; do
+    print_header "Internal scheduler 10-minute diagnostic: ${bpm} BPM"
+    if ! "$PYTHON_BIN" scripts/run_internal_scheduler_probe.py \
+      --run_id "${run_id}_${bpm}bpm" \
+      --bpm "$bpm" \
+      --duration_seconds 600 \
+      --deadline_policy record_and_continue \
+      --require_diagnostic_completion; then
       failed=1
     fi
   done
@@ -8680,8 +8720,14 @@ case "$MODE" in
   internal-scheduler-smoke)
     run_internal_scheduler_smoke
     ;;
+  internal-scheduler-diagnostic-smoke)
+    run_internal_scheduler_diagnostic_smoke
+    ;;
   internal-scheduler-soak)
     run_internal_scheduler_soak
+    ;;
+  internal-scheduler-diagnostic-soak)
+    run_internal_scheduler_diagnostic_soak
     ;;
   tiny-prepare)
     run_tiny_prepare
