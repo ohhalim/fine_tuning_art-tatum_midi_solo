@@ -253,6 +253,36 @@ def run_following(model, *, bars, bpm, seeds, generation_tokens, max_sequence, o
         print(f"The notes >= {MIN_NOTES_FOR_RATIO} row is the one to read. A bar with three\n"
               "notes gives a ratio that is almost all sampling noise, and those bars pull\n"
               "the unweighted mean around.")
+
+        # Bars inside one run share a model state and a primer policy, so the
+        # seed is the closest thing to an independent unit here. Collapse each
+        # seed to one number first, then look across seeds.
+        usable = [r for r in scored if r["note_count"] >= MIN_NOTES_FOR_RATIO]
+        per_seed = []
+        for seed in sorted({r["seed"] for r in usable}):
+            rows_for_seed = [r for r in usable if r["seed"] == seed]
+            notes = sum(r["note_count"] for r in rows_for_seed)
+            per_seed.append({
+                "seed": seed, "bars": len(rows_for_seed), "notes": notes,
+                "weighted_delta": sum(r["paired_delta"] * r["note_count"]
+                                      for r in rows_for_seed) / notes,
+            })
+        if per_seed:
+            print(f"\nper seed (notes >= {MIN_NOTES_FOR_RATIO}), the unit that is closest to "
+                  f"independent:")
+            for entry in per_seed:
+                print(f"  seed {entry['seed']:<6} bars {entry['bars']:<3} notes {entry['notes']:<4} "
+                      f"weighted delta {entry['weighted_delta']:+.3f}")
+            values = [e["weighted_delta"] for e in per_seed]
+            positive = sum(1 for v in values if v > 0)
+            line = (f"across {len(values)} seeds: mean {statistics.mean(values):+.3f}, "
+                    f"positive {positive}/{len(values)}")
+            if len(values) > 1:
+                line += f", sd {statistics.stdev(values):.3f}"
+            print(f"  {line}")
+            if len(values) < 5:
+                print(f"  {len(values)} seeds is too few to call. Add seeds before reading "
+                      f"this as a result.")
         print("Bars inside one run share a primer policy and a model state, so these are\n"
               "not independent samples; the count is descriptive, not a significance test.")
         shared = {r["shared_chord_tones"] for r in scored}
@@ -314,6 +344,7 @@ def main(argv=None) -> int:
             generation_tokens=args.generation_tokens, max_sequence=args.max_sequence,
             conditioning_midi=args.conditioning_midi, output_dir=args.output_dir)
     if args.following:
+        report["min_notes_for_ratio"] = MIN_NOTES_FOR_RATIO
         report["following"] = run_following(
             model, bars=args.bars, bpm=args.bpm, seeds=seeds,
             generation_tokens=args.generation_tokens, max_sequence=args.max_sequence,
