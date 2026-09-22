@@ -59,6 +59,39 @@ def build_fallback_blocks(*, clock, bars, bpm, chords, seed, duration):
     return blocks
 
 
+def build_chord_live_primer(input_events, chord, *, bpm, base_primer,
+                            primer_max_tokens=48, now_ns=None):
+    """Opt-in primer that states the bar's harmony under the recent playing.
+
+    Returns ``(primer, used_input, used_chord)``.
+
+    Two things differ from ``build_live_primer`` and both are deliberate:
+
+    * The harmony is carried as notes, because the checkpoint never saw a chord
+      token. Counting the tokenized training sets shows zero control tokens in
+      either the pretrain or the adaptation data, so a chord symbol in the
+      prefix would be an embedding row with no gradient behind it.
+    * No control prefix is added, for the same reason: ROLE_LEAD, TEMPO_*, BAR
+      and COND_SEP are untrained here too. The default path still adds them;
+      this one does not, which is a confound to keep in mind when comparing the
+      two rather than a silent improvement.
+
+    Nothing is filtered. Non-chord tones stay reachable.
+    """
+    import torch
+
+    from inference.control.chord_primer import build_chord_primer
+
+    notes = input_events_to_notes(input_events, end_ns=now_ns)
+    tokens, used_chord = build_chord_primer(
+        [chord] if chord else [], bpm=bpm, bars=1,
+        melodic_notes=notes, primer_max_tokens=primer_max_tokens,
+    )
+    if not tokens:
+        return base_primer, False, False
+    return torch.tensor(tokens, dtype=torch.long), bool(notes), used_chord
+
+
 def build_live_primer(input_events, *, base_primer, control_format, role, tempo_bpm,
                       primer_max_tokens=32, now_ns=None):
     """Condition the next bar on what the player just played.
@@ -331,6 +364,10 @@ def main(argv=None):
                              "An absolute cap shrinks the budget whenever the primer "
                              "grows, which shows up as duration underfill.")
     parser.add_argument("--max-sequence", type=int, default=192)
+    parser.add_argument("--chord-primer", action="store_true",
+                        help="opt-in: state each bar's chord as notes in the primer. "
+                             "Note-based steering, not learned chord conditioning; "
+                             "see docs/experiments/CHORD_PRIMER_AB.md")
     args = parser.parse_args(argv)
 
     chords = [c.strip() for c in args.chords.split(",") if c.strip()]
@@ -343,6 +380,7 @@ def main(argv=None):
 
     generate = None
     live_primer_bars: list[bool] = []
+    chord_primer_bars: list[bool] = []
     if not args.fallback_only:
         if not args.checkpoint or not args.conditioning_midi:
             parser.error("provide --checkpoint and --conditioning-midi, or --fallback-only")
@@ -360,10 +398,17 @@ def main(argv=None):
         )
 
         def generate(bar_index, input_events):
-            primer, used_input = build_live_primer(
-                input_events, base_primer=base_primer,
-                control_format="control_v1", role="lead", tempo_bpm=args.bpm,
-            )
+            if args.chord_primer:
+                primer, used_input, used_chord = build_chord_live_primer(
+                    input_events, chords[bar_index % len(chords)], bpm=args.bpm,
+                    base_primer=base_primer,
+                )
+                chord_primer_bars.append(used_chord)
+            else:
+                primer, used_input = build_live_primer(
+                    input_events, base_primer=base_primer,
+                    control_format="control_v1", role="lead", tempo_bpm=args.bpm,
+                )
             live_primer_bars.append(used_input)
             torch.manual_seed(args.seed + bar_index)
             # Budget the new tokens, not the total: a longer primer must not
@@ -430,6 +475,12 @@ def main(argv=None):
             report["live_primer_bar_count"] = (
                 sum(1 for x in live_primer_bars if x) if not args.fallback_only else 0
             )
+            report["chord_primer_enabled"] = bool(args.chord_primer)
+            report["chord_primer_bar_count"] = sum(1 for x in chord_primer_bars if x)
+            # Note-based steering only. The model has no chord token, and no
+            # human has judged whether the result sounds harmonically right.
+            report["learned_chord_conditioning"] = False
+            report["chord_following_verified"] = False
             args.output_dir.mkdir(parents=True, exist_ok=True)
             report["played_note_count"] = write_played_midi(
                 result, args.output_dir / "played.mid", bpm=args.bpm

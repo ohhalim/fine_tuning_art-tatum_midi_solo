@@ -117,7 +117,27 @@ FORCE_CPU=1 uv run python scripts/run_chord_primer_ab.py \
 산출물: `report.json`, 팔별 `.mid`, 그리고 청취용 `*_with_chords.wav`
 (솔로 + 그 마디 화성 가이드를 같이 깔아 귀로 대조할 수 있게 했다).
 
-기존 런타임 기본 경로는 건드리지 않았다. 이 경로는 opt-in 이다.
+### 연속 런타임 연결 (opt-in)
+
+```
+FORCE_CPU=1 uv run python scripts/run_continuous_jazz.py ... --chord-primer
+```
+
+플래그가 없으면 기존 경로 그대로다. 두 경로를 실제로 돌려 확인했다
+(8마디, seed 42, 독립 캡처):
+
+| 경로 | 완주 | model 마디 | 오류 | 생성 p50 | 캡처 |
+|---|---|---|---|---|---|
+| 기본 (플래그 없음) | ✅ | 8/8 | 0 | 76ms | 44/44 손실 0 |
+| `--chord-primer` | ✅ | 8/8 | 0 | 333ms | 214/214 손실 0 |
+
+리포트에 `chord_primer_enabled`, `chord_primer_bar_count`,
+`learned_chord_conditioning: false`, `chord_following_verified: false` 를 남긴다.
+
+**opt-in 경로는 제어 prefix 를 붙이지 않는다.** §0 에서 확인했듯 그 토큰들이
+미학습이기 때문이다. 기본 경로는 여전히 붙인다. 두 경로를 비교할 때
+**화성 유무와 prefix 유무가 함께 달라진다는 교란**을 기억할 것. 이번에는
+그 둘을 분리하지 않았다.
 
 ## 6. 다음 한 작업
 
