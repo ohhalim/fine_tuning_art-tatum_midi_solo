@@ -247,7 +247,7 @@ def generate_bar_in_blocks(model, chord, *, bpm, bars_seed, generation_tokens,
     """
     bar_seconds = 240.0 / bpm
     block_seconds = bar_seconds / blocks_per_bar
-    collected, any_valid, previous = [], False, []
+    collected, any_valid, previous, block_ms = [], False, [], []
     for block in range(blocks_per_bar):
         # refresh_mode "first" states the harmony only at the downbeat; later
         # blocks continue from what was just played. Block length is unchanged,
@@ -257,10 +257,11 @@ def generate_bar_in_blocks(model, chord, *, bpm, bars_seed, generation_tokens,
             state_chord, bpm=bpm, seconds=block_seconds,
             carry_notes=() if state_chord else _carry_tail(previous, seconds=block_seconds),
         )
-        notes, _ms, ok = generate_block(model, primer, seconds=block_seconds,
-                                        seed=bars_seed + block * 977,
-                                        generation_tokens=generation_tokens,
-                                        max_sequence=max_sequence)
+        notes, ms, ok = generate_block(model, primer, seconds=block_seconds,
+                                       seed=bars_seed + block * 977,
+                                       generation_tokens=generation_tokens,
+                                       max_sequence=max_sequence)
+        block_ms.append(ms)
         any_valid = any_valid or ok
         previous = notes
         for note in notes:
@@ -268,7 +269,7 @@ def generate_bar_in_blocks(model, chord, *, bpm, bars_seed, generation_tokens,
                 note.velocity, note.pitch,
                 note.start + block * block_seconds,
                 min(note.end + block * block_seconds, bar_seconds)))
-    return [n for n in collected if n.end > n.start], any_valid
+    return [n for n in collected if n.end > n.start], any_valid, block_ms
 
 
 def generate_block(model, primer, *, seconds, seed, generation_tokens, max_sequence):
@@ -281,32 +282,36 @@ def generate_block(model, primer, *, seconds, seed, generation_tokens, max_seque
     from scripts.run_resident_model_probe import validate_generated_token_block
 
     torch.manual_seed(seed)
+    started = time.perf_counter_ns()
     tokens, _meta = generate_once(
         model=model, primer=primer,
         target_length=min(max_sequence, len(primer) + generation_tokens),
         strip_primer=True, temperature=1.0, top_k=32, top_p=0.95,
         grammar_mask=True, target_duration_seconds=seconds, return_metadata=True,
     )
+    elapsed_ms = (time.perf_counter_ns() - started) / 1e6
     valid = validate_generated_token_block(tokens, lookahead_ms=seconds * 1000,
                                            allow_rest_bar=True)
     if not valid["valid"]:
-        return [], 0.0, False
+        return [], elapsed_ms, False
     midi = fit_window(decode_midi(tokens), seconds)
-    return ([n for i in midi.instruments for n in i.notes], 0.0, True)
+    return ([n for i in midi.instruments for n in i.notes], elapsed_ms, True)
 
 
 def run_following(model, *, bars, bpm, seeds, generation_tokens, max_sequence, output_dir,
                   blocks_per_bar=1, refresh_mode="all"):
     """Per-bar paired test: the true chord versus a permutation of the same multiset."""
-    rows = []
+    rows, latency, bar_latency = [], [], []
     for seed in seeds:
         for bar in range(bars):
             true_chord = PROGRESSION[bar % len(PROGRESSION)]
             other_chord = PERMUTATION[bar % len(PERMUTATION)]
-            notes, ok = generate_bar_in_blocks(
+            notes, ok, block_ms = generate_bar_in_blocks(
                 model, true_chord, bpm=bpm, bars_seed=seed + bar,
                 generation_tokens=generation_tokens, max_sequence=max_sequence,
                 blocks_per_bar=blocks_per_bar, refresh_mode=refresh_mode)
+            latency.extend(block_ms)
+            bar_latency.append(sum(block_ms))
             if not ok or not notes:
                 continue
             true_fit, other_fit = fit(notes, true_chord), fit(notes, other_chord)
@@ -385,12 +390,30 @@ def run_following(model, *, bars, bpm, seeds, generation_tokens, max_sequence, o
                       f"this as a result.")
         print("Bars inside one run share a primer policy and a model state, so these are\n"
               "not independent samples; the count is descriptive, not a significance test.")
+
+    if scored:
         shared = {r["shared_chord_tones"] for r in scored}
         print(f"shared chord tones per pair: {sorted(shared)} of 4 - the more they share,\n"
               "the less this test can separate, and diatonic sevenths share a lot.")
         identical = len(rows) - len(scored)
         if identical:
             print(f"{identical} bars dropped: permutation put the same chord there.")
+
+    if latency:
+        # A block is a generation call, so this is the number the scheduler has
+        # to fit. The bar budget is 1875ms at 128 BPM and it must cover every
+        # block of that bar, not one.
+        per_block = sorted(latency)
+        per_bar = sorted(bar_latency)
+        bar_budget_ms = 240.0 / bpm * 1000
+        print(f"\nlatency: {len(per_block)} blocks, {blocks_per_bar} per bar")
+        print(f"  per block  p50 {per_block[len(per_block) // 2]:.0f}ms  "
+              f"p90 {per_block[int(len(per_block) * 0.9)]:.0f}ms  max {per_block[-1]:.0f}ms")
+        print(f"  per bar    p50 {per_bar[len(per_bar) // 2]:.0f}ms  "
+              f"p90 {per_bar[int(len(per_bar) * 0.9)]:.0f}ms  max {per_bar[-1]:.0f}ms"
+              f"   (bar budget {bar_budget_ms:.0f}ms)")
+        over = sum(1 for value in per_bar if value > bar_budget_ms)
+        print(f"  bars over budget: {over}/{len(per_bar)}")
     return rows
 
 
