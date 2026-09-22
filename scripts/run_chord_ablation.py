@@ -200,20 +200,44 @@ def run_ablation(model, *, bars, bpm, seeds, generation_tokens, max_sequence,
     return results
 
 
-def build_block_primer(chord: str, *, bpm: int, seconds: float):
-    """Primer for one sub-bar block: the chord held for that block only."""
+def build_block_primer(chord: str | None, *, bpm: int, seconds: float,
+                       carry_notes=()):
+    """Primer for one sub-bar block.
+
+    ``chord`` None means the no-harmony control: the block still gets a real
+    primer, but it is the tail of what was just played rather than a chord.
+    That keeps "has a usable primer" constant and removes only the harmony,
+    which a bare ``[60]`` would not do.
+    """
     import torch
 
     from scripts.generate import encode_notes_simple, truncate_tokens_preserving_velocity
 
-    notes = chord_guide_notes_for_duration(chord, bpm=bpm, seconds=seconds)
+    notes = list(chord_guide_notes_for_duration(chord, bpm=bpm, seconds=seconds)) if chord else []
+    notes.extend(carry_notes)
+    notes.sort(key=lambda note: (note.start, note.pitch))
     tokens = truncate_tokens_preserving_velocity(encode_notes_simple(notes),
                                                  PRIMER_MAX_TOKENS)
     return torch.tensor(tokens or [60], dtype=torch.long)
 
 
+def _carry_tail(notes, *, seconds: float, keep: int = 4):
+    """Re-time the last few notes to sit at the start of the next block."""
+    if not notes:
+        return []
+    tail = sorted(notes, key=lambda n: n.start)[-keep:]
+    origin = tail[0].start
+    out = []
+    for note in tail:
+        start = note.start - origin
+        end = min(max(start + 0.05, note.end - origin), seconds)
+        if end > start:
+            out.append(pretty_midi.Note(note.velocity, note.pitch, start, end))
+    return out
+
+
 def generate_bar_in_blocks(model, chord, *, bpm, bars_seed, generation_tokens,
-                           max_sequence, blocks_per_bar):
+                           max_sequence, blocks_per_bar, refresh_mode="all"):
     """Fill one bar as ``blocks_per_bar`` pieces, restating the chord each time.
 
     At ``blocks_per_bar=1`` this is the original behaviour: the harmony is
@@ -223,14 +247,22 @@ def generate_bar_in_blocks(model, chord, *, bpm, bars_seed, generation_tokens,
     """
     bar_seconds = 240.0 / bpm
     block_seconds = bar_seconds / blocks_per_bar
-    collected, any_valid = [], False
+    collected, any_valid, previous = [], False, []
     for block in range(blocks_per_bar):
-        primer = build_block_primer(chord, bpm=bpm, seconds=block_seconds)
+        # refresh_mode "first" states the harmony only at the downbeat; later
+        # blocks continue from what was just played. Block length is unchanged,
+        # so a difference between the modes is the harmony, not the length.
+        state_chord = chord if (refresh_mode == "all" or block == 0) else None
+        primer = build_block_primer(
+            state_chord, bpm=bpm, seconds=block_seconds,
+            carry_notes=() if state_chord else _carry_tail(previous, seconds=block_seconds),
+        )
         notes, _ms, ok = generate_block(model, primer, seconds=block_seconds,
                                         seed=bars_seed + block * 977,
                                         generation_tokens=generation_tokens,
                                         max_sequence=max_sequence)
         any_valid = any_valid or ok
+        previous = notes
         for note in notes:
             collected.append(pretty_midi.Note(
                 note.velocity, note.pitch,
@@ -264,7 +296,7 @@ def generate_block(model, primer, *, seconds, seed, generation_tokens, max_seque
 
 
 def run_following(model, *, bars, bpm, seeds, generation_tokens, max_sequence, output_dir,
-                  blocks_per_bar=1):
+                  blocks_per_bar=1, refresh_mode="all"):
     """Per-bar paired test: the true chord versus a permutation of the same multiset."""
     rows = []
     for seed in seeds:
@@ -274,13 +306,13 @@ def run_following(model, *, bars, bpm, seeds, generation_tokens, max_sequence, o
             notes, ok = generate_bar_in_blocks(
                 model, true_chord, bpm=bpm, bars_seed=seed + bar,
                 generation_tokens=generation_tokens, max_sequence=max_sequence,
-                blocks_per_bar=blocks_per_bar)
+                blocks_per_bar=blocks_per_bar, refresh_mode=refresh_mode)
             if not ok or not notes:
                 continue
             true_fit, other_fit = fit(notes, true_chord), fit(notes, other_chord)
             shared = chord_tone_pitch_classes(true_chord) & chord_tone_pitch_classes(other_chord)
             rows.append({"seed": seed, "bar": bar, "blocks_per_bar": blocks_per_bar,
-                         "true_chord": true_chord,
+                         "refresh_mode": refresh_mode, "true_chord": true_chord,
                          "permuted_chord": other_chord, "note_count": len(notes),
                          "fit_true": true_fit, "fit_permuted": other_fit,
                          "paired_delta": true_fit - other_fit,
@@ -374,6 +406,10 @@ def main(argv=None) -> int:
     parser.add_argument("--max-sequence", type=int, default=192)
     parser.add_argument("--ablation", action="store_true")
     parser.add_argument("--following", action="store_true")
+    parser.add_argument("--refresh-mode", choices=("all", "first"), default="all",
+                        help="all = state the chord in every block; "
+                             "first = only at the downbeat, later blocks continue "
+                             "from what was played (isolates harmony from block length)")
     parser.add_argument("--blocks-per-bar", type=int, default=1,
                         help="restate the chord this many times per bar "
                              "(1 = downbeat only, the original behaviour)")
@@ -417,10 +453,12 @@ def main(argv=None) -> int:
     if args.following:
         report["min_notes_for_ratio"] = MIN_NOTES_FOR_RATIO
         report["blocks_per_bar"] = args.blocks_per_bar
+        report["refresh_mode"] = args.refresh_mode
         report["following"] = run_following(
             model, bars=args.bars, bpm=args.bpm, seeds=seeds,
             generation_tokens=args.generation_tokens, max_sequence=args.max_sequence,
-            output_dir=args.output_dir, blocks_per_bar=args.blocks_per_bar)
+            output_dir=args.output_dir, blocks_per_bar=args.blocks_per_bar,
+            refresh_mode=args.refresh_mode)
 
     (args.output_dir / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     print(f"\nreport: {args.output_dir / 'report.json'}")
