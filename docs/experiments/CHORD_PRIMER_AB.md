@@ -575,3 +575,80 @@ blocks=4 는 마디 합계로는 여유가 있어 보이지만 **블록 단위�
 `with_chords.wav` 를 듣고 (a) 화성이 맞게 들리는지 (b) blocks=1 과 2 중
 어느 쪽이 나은지 판단이 필요하다. 그 판단 없이 다음 최적화를 고르면
 측정 가능한 것만 좇게 된다.
+
+---
+
+# 34. 재개 문서 — 코드 반응 생성 (이 작업 종료)
+
+## 완료 범위
+
+| 항목 | 상태 |
+|---|---|
+| 가설 검증 (control_prefix 에 코드 심볼) | **기각.** checkpoint 가 제어 토큰 미학습 (§0, §8) |
+| 음표 기반 chord primer | **구현·측정 완료** |
+| prefix 효과 분리 (2×2) | **효과 안 보임.** 기본값 미변경 (§9) |
+| 마디별 진행 추종 | **화성 갱신 빈도에 달림** (§23) |
+| 블록 단위 지연 | **측정 완료. blocks=2 권고** (§27) |
+| 연속 런타임 연결 | **완료 (opt-in)** (§30) |
+| **기술 MVP** | **완료** — 런타임에서 돌고 데이터 손실 0 |
+| **음악적 품질** | **미검증** — 사람이 들은 적 없음 |
+
+기술 MVP 완료와 음악 품질 완료는 **다른 것이다.** 전자는 위 표로 끝났고
+후자는 시작조차 하지 않았다.
+
+## 실행 명령
+
+```bash
+CK=<...>/outputs/d1_experiment/armD_lora/ckpt/checkpoint_epoch8.pt
+PR=<...>/data/roles/lead/000002/conditioning.mid
+
+# 기본 경로 (화성 없음) — 기존 동작
+FORCE_CPU=1 uv run python scripts/run_continuous_jazz.py \
+    --checkpoint $CK --conditioning-midi $PR --bars 8 --capture \
+    --output-dir outputs/continuous/base
+
+# 권고 설정: 마디 안에서 화성 2회 제시
+FORCE_CPU=1 uv run python scripts/run_continuous_jazz.py \
+    --checkpoint $CK --conditioning-midi $PR --bars 8 --capture \
+    --chord-primer --chord-blocks-per-bar 2 \
+    --output-dir outputs/continuous/chord2
+
+# 실물 키보드까지 (사용자 조작 필요)
+... --input-port "<키보드 포트 이름>"
+
+# 오프라인 실험 재현
+python scripts/run_chord_primer_ab.py --dry-run
+python scripts/run_chord_ablation.py --dry-run
+FORCE_CPU=1 uv run python scripts/run_chord_ablation.py --checkpoint $CK \
+    --bars 8 --seeds 42,100,200,300,400,500,600,700 \
+    --following --blocks-per-bar 2 --output-dir outputs/chord_blocks_2
+
+# 테스트
+PYTHON_BIN=<venv python> bash scripts/agent_harness.sh quick    # 169 tests
+scripts/run_continuous_demo.sh
+```
+
+## 산출물 경로
+
+| 경로 | 내용 |
+|---|---|
+| `outputs/continuous/{base,chord1,chord2}/` | 런타임 리포트, `played.mid`, `with_chords.wav` |
+| `outputs/chord_ab*/`, `outputs/chord_blocks_*/`, `outputs/chord_refresh_first/`, `outputs/chord_lat_*/` | 오프라인 실험 리포트와 MIDI |
+
+`outputs/` 는 gitignore 다. 원격에 올라간 것은 소스와 문서뿐이다.
+
+## 실패·미검증 보고
+
+- **인간 청취 미검증.** 사용 가능한 판정자가 없어 미검증으로 남긴다
+- **실물 하드웨어 키보드 미검증.** 위 측정의 키보드는 CoreMIDI 가상 소스다
+- **FL Studio / DAW 오디오 미검증.** 가상 포트로만 냈다
+- **blocks=4 는 연결하지 않았다.** 블록당 지연 예산 초과 (§27)
+- 절대 수준이 낮다. 화성 매 블록에서도 자기 코드 적합도 0.575
+- 순열 대조는 다이아토닉 7화음 공유음에 묶여 분리력 상한이 있다
+- 부하 없는 단독 실행·CPU 경로·8~32마디 단발 측정이다
+
+## 남은 사용자 한 단계
+
+`outputs/continuous/chord{1,2}/with_chords.wav` 를 듣고 **화성이 맞게 들리는지,
+blocks=1 과 2 중 어느 쪽이 나은지** 판단. 이 작업은 여기서 종료한다.
+추가 화성 파라미터 탐색은 하지 않는다.
