@@ -351,3 +351,149 @@ class PrimerBudgetTests(unittest.TestCase):
             self.assertTrue(used)
             self.assertLessEqual(len(tokens), budget)
             self.assertTrue(bins, f"velocity lost at primer_max_tokens={budget}")
+
+
+class ChordPrimerOptInTests(unittest.TestCase):
+    """Opt-in only: the default path must be untouched."""
+
+    def _events(self):
+        from mido import Message
+
+        from inference.realtime.continuous import TimedInputMessage
+
+        return (
+            TimedInputMessage(0, Message("note_on", note=72, velocity=88)),
+            TimedInputMessage(200_000_000, Message("note_off", note=72, velocity=0)),
+        )
+
+    def test_chord_notes_reach_the_primer(self):
+        import torch
+
+        from scripts.run_continuous_jazz import build_chord_live_primer
+
+        base = torch.tensor([1, 2, 3], dtype=torch.long)
+        primer, used_input, used_chord = build_chord_live_primer(
+            self._events(), "Dm7", bpm=BPM, base_primer=base
+        )
+
+        self.assertTrue(used_chord)
+        self.assertTrue(used_input)
+        self.assertIn(72, primer.tolist())  # the played note survived
+
+    def test_different_chords_give_different_primers(self):
+        import torch
+
+        from scripts.run_continuous_jazz import build_chord_live_primer
+
+        base = torch.tensor([1], dtype=torch.long)
+        d_minor, _, _ = build_chord_live_primer((), "Dm7", bpm=BPM, base_primer=base)
+        g_seven, _, _ = build_chord_live_primer((), "G7", bpm=BPM, base_primer=base)
+
+        self.assertNotEqual(d_minor.tolist(), g_seven.tolist())
+
+    def test_primer_carries_no_untrained_control_token(self):
+        import torch
+
+        from utilities.constants import TOKEN_COND_SEP, TOKEN_STAGE_B_CHORD_QUALITY_END
+        from scripts.run_continuous_jazz import build_chord_live_primer
+
+        primer, _, _ = build_chord_live_primer(
+            self._events(), "Cmaj7", bpm=BPM, base_primer=torch.tensor([1])
+        )
+        control = [t for t in primer.tolist()
+                   if TOKEN_COND_SEP <= t <= TOKEN_STAGE_B_CHORD_QUALITY_END]
+
+        self.assertEqual([], control)
+
+    def test_silent_player_and_no_chord_falls_back(self):
+        import torch
+
+        from scripts.run_continuous_jazz import build_chord_live_primer
+
+        base = torch.tensor([1, 2, 3], dtype=torch.long)
+        primer, used_input, used_chord = build_chord_live_primer(
+            (), "", bpm=BPM, base_primer=base
+        )
+
+        self.assertIs(base, primer)
+        self.assertFalse(used_input)
+        self.assertFalse(used_chord)
+
+    def test_default_path_does_not_use_the_chord_primer(self):
+        """The flag is off by default and the old builder is unchanged."""
+        from scripts.run_continuous_jazz import build_live_primer
+        import torch
+
+        base = torch.tensor([1, 2, 3], dtype=torch.long)
+        primer, used = build_live_primer(self._events(), base_primer=base,
+                                         control_format="control_v1", role="lead",
+                                         tempo_bpm=BPM)
+
+        self.assertTrue(used)
+        self.assertNotEqual(base.tolist(), primer.tolist())
+
+
+class SubBlockBuilderTests(unittest.TestCase):
+    """Sub-blocks merge into one bar block; the scheduler contract is unchanged."""
+
+    def _clock(self):
+        return MonotonicBarClock(bpm=BPM, beats_per_bar=4, start_ns=0)
+
+    def _tokens(self, pitch):
+        # velocity bin 16, note_on, 100+88 step shift, note_off: fills one bar.
+        return [372, pitch, 355, 343, 128 + pitch]
+
+    def test_two_sub_blocks_land_in_their_own_halves(self):
+        from scripts.run_continuous_jazz import make_sub_block_builder
+
+        duration = 240.0 / BPM
+        calls = []
+
+        def generate_sub(bar_index, sub_index, _events, sub_duration):
+            calls.append((bar_index, sub_index, round(sub_duration, 6)))
+            # Each half fills its own window: 94 steps of shift for 0.9375s.
+            return [372, 60 + sub_index, 349, 128 + 60 + sub_index]
+
+        build = make_sub_block_builder(clock=self._clock(), duration=duration,
+                                       generate_sub=generate_sub, blocks_per_bar=2)
+        block = build(0, ())
+
+        self.assertEqual([(0, 0, round(duration / 2, 6)), (0, 1, round(duration / 2, 6))],
+                         calls)
+        self.assertTrue(block.events)
+        # Second sub-block's note must start in the second half of the bar.
+        starts = sorted({e.target_ns for e in block.events})
+        self.assertGreater(max(starts), self._clock().bar_start_ns(0) + duration / 2 * 1e9 * 0.9)
+
+    def test_one_failing_sub_block_does_not_lose_the_bar(self):
+        from scripts.run_continuous_jazz import make_sub_block_builder
+
+        def generate_sub(_bar, sub_index, _events, _sub_duration):
+            if sub_index == 0:
+                return [1, 2, 3]  # nonsense: fails validation
+            return [372, 62, 349, 128 + 62]
+
+        build = make_sub_block_builder(clock=self._clock(), duration=240.0 / BPM,
+                                       generate_sub=generate_sub, blocks_per_bar=2)
+        block = build(0, ())
+
+        self.assertTrue(block.events)
+
+    def test_bar_fails_only_when_every_sub_block_fails(self):
+        from scripts.run_continuous_jazz import make_sub_block_builder
+
+        build = make_sub_block_builder(clock=self._clock(), duration=240.0 / BPM,
+                                       generate_sub=lambda *_a: [1, 2, 3], blocks_per_bar=2)
+
+        with self.assertRaisesRegex(ValueError, "sub-blocks failed"):
+            build(0, ())
+
+    def test_builder_selection_keeps_the_default_path(self):
+        from scripts.run_continuous_jazz import _make_builder, make_block_builder
+
+        duration = 240.0 / BPM
+        self.assertIsNone(_make_builder(clock=self._clock(), duration=duration,
+                                        generate=None, sub_builder=None))
+        plain = _make_builder(clock=self._clock(), duration=duration,
+                              generate=lambda *_a: ([], {}), sub_builder=None)
+        self.assertTrue(callable(plain))

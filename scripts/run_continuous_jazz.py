@@ -59,6 +59,39 @@ def build_fallback_blocks(*, clock, bars, bpm, chords, seed, duration):
     return blocks
 
 
+def build_chord_live_primer(input_events, chord, *, bpm, base_primer,
+                            primer_max_tokens=48, now_ns=None):
+    """Opt-in primer that states the bar's harmony under the recent playing.
+
+    Returns ``(primer, used_input, used_chord)``.
+
+    Two things differ from ``build_live_primer`` and both are deliberate:
+
+    * The harmony is carried as notes, because the checkpoint never saw a chord
+      token. Counting the tokenized training sets shows zero control tokens in
+      either the pretrain or the adaptation data, so a chord symbol in the
+      prefix would be an embedding row with no gradient behind it.
+    * No control prefix is added, for the same reason: ROLE_LEAD, TEMPO_*, BAR
+      and COND_SEP are untrained here too. The default path still adds them;
+      this one does not, which is a confound to keep in mind when comparing the
+      two rather than a silent improvement.
+
+    Nothing is filtered. Non-chord tones stay reachable.
+    """
+    import torch
+
+    from inference.control.chord_primer import build_chord_primer
+
+    notes = input_events_to_notes(input_events, end_ns=now_ns)
+    tokens, used_chord = build_chord_primer(
+        [chord] if chord else [], bpm=bpm, bars=1,
+        melodic_notes=notes, primer_max_tokens=primer_max_tokens,
+    )
+    if not tokens:
+        return base_primer, False, False
+    return torch.tensor(tokens, dtype=torch.long), bool(notes), used_chord
+
+
 def build_live_primer(input_events, *, base_primer, control_format, role, tempo_bpm,
                       primer_max_tokens=32, now_ns=None):
     """Condition the next bar on what the player just played.
@@ -100,6 +133,60 @@ def build_live_primer(input_events, *, base_primer, control_format, role, tempo_
     return torch.tensor(primer, dtype=torch.long), True
 
 
+def make_sub_block_builder(*, clock, duration, generate_sub, blocks_per_bar):
+    """Producer callback that fills one bar as several sub-blocks.
+
+    The scheduler is untouched: it still consumes one block per bar. The split
+    happens inside this callback, which restates the harmony at each sub-block.
+    Measured to be the lever that actually moves bar-chord alignment - a bar
+    primed only at its downbeat gives the model no way to see the chord again
+    partway through (docs/experiments/CHORD_PRIMER_AB.md §23).
+
+    A sub-block that fails validation is skipped rather than failing the bar:
+    losing half a bar is better than losing all of it. The bar fails only if
+    every sub-block does.
+    """
+    import pretty_midi
+
+    sub_duration = duration / blocks_per_bar
+
+    def build(bar_index, input_events):
+        notes, valid_subs = [], 0
+        for sub in range(blocks_per_bar):
+            tokens = generate_sub(bar_index, sub, input_events, sub_duration)
+            valid = validate_generated_token_block(
+                tokens, lookahead_ms=sub_duration * 1000, allow_rest_bar=True
+            )
+            if not valid["valid"]:
+                continue
+            valid_subs += 1
+            from midi_processor.processor import decode_midi
+
+            sub_midi = fit_window(decode_midi(tokens), sub_duration)
+            offset = sub * sub_duration
+            for instrument in sub_midi.instruments:
+                for note in instrument.notes:
+                    notes.append(pretty_midi.Note(
+                        note.velocity, note.pitch,
+                        note.start + offset, min(note.end + offset, duration)))
+        if not valid_subs:
+            raise ValueError(f"all {blocks_per_bar} sub-blocks failed validation")
+
+        merged = pretty_midi.PrettyMIDI()
+        instrument = pretty_midi.Instrument(program=0, name="lead")
+        instrument.notes = [n for n in notes if n.end > n.start]
+        merged.instruments = [instrument]
+        return build_scheduled_midi_block(
+            midi=fit_window(merged, duration),
+            clock=clock, bar_index=bar_index, block_id=str(bar_index),
+            source_context_id="continuous_sub_blocks", context_version=0,
+            adapter="model", fallback_used=False,
+            allow_empty=not instrument.notes,
+        )
+
+    return build
+
+
 def make_block_builder(*, clock, duration, generate):
     """Return the producer callback. Runs on the producer thread, never the scheduler's."""
 
@@ -126,10 +213,20 @@ def make_block_builder(*, clock, duration, generate):
     return build
 
 
+def _make_builder(*, clock, duration, generate, sub_builder):
+    """Pick the producer callback: sub-blocks, one bar, or generation disabled."""
+    if sub_builder is not None:
+        return sub_builder(clock=clock, duration=duration)
+    if generate is None:
+        return None
+    return make_block_builder(clock=clock, duration=duration, generate=generate)
+
+
 def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
                 start_delay_seconds=2.5, spin_window_ms=1.0,
                 clock=None, clock_ns=None, wait_until=None,
-                deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE):
+                deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE,
+                sub_builder=None):
     """Play ``bars`` bars, producing one bar ahead.
 
     ``clock``/``clock_ns``/``wait_until`` exist so tests can drive the run off a
@@ -150,10 +247,8 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
         # bar 1 unable to begin until playback is already underway.
         bar_count=bars, fallback_blocks=fallbacks, clock=clock, input_buffer=input_buffer,
         max_lead_bars=2,
-        build_block=(
-            None if generate is None
-            else make_block_builder(clock=clock, duration=duration, generate=generate)
-        ),
+        build_block=_make_builder(clock=clock, duration=duration, generate=generate,
+                                  sub_builder=sub_builder),
     )
     # A single OS hiccup must not end a performance. The scheduler probe uses
     # abort_on_first_miss to make timing failures loud; a live instrument wants
@@ -331,6 +426,14 @@ def main(argv=None):
                              "An absolute cap shrinks the budget whenever the primer "
                              "grows, which shows up as duration underfill.")
     parser.add_argument("--max-sequence", type=int, default=192)
+    parser.add_argument("--chord-blocks-per-bar", type=int, default=1,
+                        help="with --chord-primer: restate the chord this many times "
+                             "per bar. 2 is the measured recommendation; 4 exceeds the "
+                             "per-block latency budget (see the experiment doc)")
+    parser.add_argument("--chord-primer", action="store_true",
+                        help="opt-in: state each bar's chord as notes in the primer. "
+                             "Note-based steering, not learned chord conditioning; "
+                             "see docs/experiments/CHORD_PRIMER_AB.md")
     args = parser.parse_args(argv)
 
     chords = [c.strip() for c in args.chords.split(",") if c.strip()]
@@ -340,9 +443,14 @@ def main(argv=None):
         parser.error("require 40..240 BPM and nonempty chords")
     if args.generation_tokens < 1 or args.max_sequence < args.generation_tokens:
         parser.error("require generation_tokens >= 1 and max_sequence >= generation_tokens")
+    if not 1 <= args.chord_blocks_per_bar <= 4:
+        parser.error("chord_blocks_per_bar must be between 1 and 4")
+    if args.chord_blocks_per_bar > 1 and not args.chord_primer:
+        parser.error("--chord-blocks-per-bar needs --chord-primer")
 
     generate = None
     live_primer_bars: list[bool] = []
+    chord_primer_bars: list[bool] = []
     if not args.fallback_only:
         if not args.checkpoint or not args.conditioning_midi:
             parser.error("provide --checkpoint and --conditioning-midi, or --fallback-only")
@@ -359,11 +467,47 @@ def main(argv=None):
             tempo_bpm=args.bpm,
         )
 
-        def generate(bar_index, input_events):
-            primer, used_input = build_live_primer(
-                input_events, base_primer=base_primer,
-                control_format="control_v1", role="lead", tempo_bpm=args.bpm,
+        def generate_sub(bar_index, sub_index, input_events, sub_duration):
+            """One sub-block: harmony restated, then continue."""
+            from inference.control.chord_primer import chord_guide_notes_for_duration
+            from scripts.generate import (
+                encode_notes_simple,
+                truncate_tokens_preserving_velocity,
             )
+
+            chord = chords[bar_index % len(chords)]
+            notes = list(chord_guide_notes_for_duration(chord, bpm=args.bpm,
+                                                        seconds=sub_duration))
+            # Only the downbeat sub-block folds in what the player just did; a
+            # later sub-block would be conditioning on input it already used.
+            if sub_index == 0:
+                notes.extend(input_events_to_notes(input_events))
+            notes.sort(key=lambda note: (note.start, note.pitch))
+            tokens = truncate_tokens_preserving_velocity(encode_notes_simple(notes), 48)
+            primer = torch.tensor(tokens or [60], dtype=torch.long)
+            chord_primer_bars.append(bool(notes))
+            torch.manual_seed(args.seed + bar_index * 13 + sub_index * 977)
+            tokens_out, _meta = generate_once(
+                model=model, primer=primer,
+                target_length=min(args.max_sequence, len(primer) + args.generation_tokens),
+                strip_primer=True, temperature=1.0, top_k=32, top_p=0.95,
+                grammar_mask=True, target_duration_seconds=sub_duration,
+                return_metadata=True,
+            )
+            return tokens_out
+
+        def generate(bar_index, input_events):
+            if args.chord_primer:
+                primer, used_input, used_chord = build_chord_live_primer(
+                    input_events, chords[bar_index % len(chords)], bpm=args.bpm,
+                    base_primer=base_primer,
+                )
+                chord_primer_bars.append(used_chord)
+            else:
+                primer, used_input = build_live_primer(
+                    input_events, base_primer=base_primer,
+                    control_format="control_v1", role="lead", tempo_bpm=args.bpm,
+                )
             live_primer_bars.append(used_input)
             torch.manual_seed(args.seed + bar_index)
             # Budget the new tokens, not the total: a longer primer must not
@@ -406,9 +550,15 @@ def main(argv=None):
                     _resolve_capture_name(mido, args.virtual_port),
                     callback=lambda m: captured.append((time.perf_counter_ns(), m)),
                 )
+            sub_builder = None
+            if args.chord_blocks_per_bar > 1:
+                def sub_builder(*, clock, duration):
+                    return make_sub_block_builder(
+                        clock=clock, duration=duration, generate_sub=generate_sub,
+                        blocks_per_bar=args.chord_blocks_per_bar)
             result, producer = run_session(
                 port=port, bars=args.bars, bpm=args.bpm, chords=chords, seed=args.seed,
-                generate=generate, input_buffer=input_buffer,
+                generate=generate, input_buffer=input_buffer, sub_builder=sub_builder,
             )
             drain_completed = False
             if args.capture:
@@ -430,6 +580,13 @@ def main(argv=None):
             report["live_primer_bar_count"] = (
                 sum(1 for x in live_primer_bars if x) if not args.fallback_only else 0
             )
+            report["chord_primer_enabled"] = bool(args.chord_primer)
+            report["chord_blocks_per_bar"] = args.chord_blocks_per_bar
+            report["chord_primer_bar_count"] = sum(1 for x in chord_primer_bars if x)
+            # Note-based steering only. The model has no chord token, and no
+            # human has judged whether the result sounds harmonically right.
+            report["learned_chord_conditioning"] = False
+            report["chord_following_verified"] = False
             args.output_dir.mkdir(parents=True, exist_ok=True)
             report["played_note_count"] = write_played_midi(
                 result, args.output_dir / "played.mid", bpm=args.bpm
