@@ -53,7 +53,11 @@ sys.path.insert(0, str(ROOT))
 
 import pretty_midi
 
-from inference.control.chord_primer import chord_guide_notes, chord_tone_pitch_classes
+from inference.control.chord_primer import (
+    chord_guide_notes,
+    chord_guide_notes_for_duration,
+    chord_tone_pitch_classes,
+)
 
 # One key throughout, so key fit cannot explain a difference between orders.
 PROGRESSION = ["Dm7", "G7", "Cmaj7", "Am7"]
@@ -196,23 +200,87 @@ def run_ablation(model, *, bars, bpm, seeds, generation_tokens, max_sequence,
     return results
 
 
-def run_following(model, *, bars, bpm, seeds, generation_tokens, max_sequence, output_dir):
+def build_block_primer(chord: str, *, bpm: int, seconds: float):
+    """Primer for one sub-bar block: the chord held for that block only."""
+    import torch
+
+    from scripts.generate import encode_notes_simple, truncate_tokens_preserving_velocity
+
+    notes = chord_guide_notes_for_duration(chord, bpm=bpm, seconds=seconds)
+    tokens = truncate_tokens_preserving_velocity(encode_notes_simple(notes),
+                                                 PRIMER_MAX_TOKENS)
+    return torch.tensor(tokens or [60], dtype=torch.long)
+
+
+def generate_bar_in_blocks(model, chord, *, bpm, bars_seed, generation_tokens,
+                           max_sequence, blocks_per_bar):
+    """Fill one bar as ``blocks_per_bar`` pieces, restating the chord each time.
+
+    At ``blocks_per_bar=1`` this is the original behaviour: the harmony is
+    stated once at the downbeat and the model fills the whole bar unprompted.
+    Splitting it gives the model the chord again partway through, which is the
+    only lever available without retraining.
+    """
+    bar_seconds = 240.0 / bpm
+    block_seconds = bar_seconds / blocks_per_bar
+    collected, any_valid = [], False
+    for block in range(blocks_per_bar):
+        primer = build_block_primer(chord, bpm=bpm, seconds=block_seconds)
+        notes, _ms, ok = generate_block(model, primer, seconds=block_seconds,
+                                        seed=bars_seed + block * 977,
+                                        generation_tokens=generation_tokens,
+                                        max_sequence=max_sequence)
+        any_valid = any_valid or ok
+        for note in notes:
+            collected.append(pretty_midi.Note(
+                note.velocity, note.pitch,
+                note.start + block * block_seconds,
+                min(note.end + block * block_seconds, bar_seconds)))
+    return [n for n in collected if n.end > n.start], any_valid
+
+
+def generate_block(model, primer, *, seconds, seed, generation_tokens, max_sequence):
+    """Generate one block of arbitrary duration (a bar, or a slice of one)."""
+    import torch
+
+    from midi_processor.processor import decode_midi
+    from scripts.generate import generate_once
+    from scripts.run_jazz_mvp import fit_window
+    from scripts.run_resident_model_probe import validate_generated_token_block
+
+    torch.manual_seed(seed)
+    tokens, _meta = generate_once(
+        model=model, primer=primer,
+        target_length=min(max_sequence, len(primer) + generation_tokens),
+        strip_primer=True, temperature=1.0, top_k=32, top_p=0.95,
+        grammar_mask=True, target_duration_seconds=seconds, return_metadata=True,
+    )
+    valid = validate_generated_token_block(tokens, lookahead_ms=seconds * 1000,
+                                           allow_rest_bar=True)
+    if not valid["valid"]:
+        return [], 0.0, False
+    midi = fit_window(decode_midi(tokens), seconds)
+    return ([n for i in midi.instruments for n in i.notes], 0.0, True)
+
+
+def run_following(model, *, bars, bpm, seeds, generation_tokens, max_sequence, output_dir,
+                  blocks_per_bar=1):
     """Per-bar paired test: the true chord versus a permutation of the same multiset."""
     rows = []
     for seed in seeds:
         for bar in range(bars):
             true_chord = PROGRESSION[bar % len(PROGRESSION)]
             other_chord = PERMUTATION[bar % len(PERMUTATION)]
-            primer = build_primer("chord", true_chord, bpm=bpm,
-                                  conditioning_midi=None, with_prefix=False)
-            notes, _ms, ok = generate_bar(model, primer, bpm=bpm, seed=seed + bar,
-                                          generation_tokens=generation_tokens,
-                                          max_sequence=max_sequence)
+            notes, ok = generate_bar_in_blocks(
+                model, true_chord, bpm=bpm, bars_seed=seed + bar,
+                generation_tokens=generation_tokens, max_sequence=max_sequence,
+                blocks_per_bar=blocks_per_bar)
             if not ok or not notes:
                 continue
             true_fit, other_fit = fit(notes, true_chord), fit(notes, other_chord)
             shared = chord_tone_pitch_classes(true_chord) & chord_tone_pitch_classes(other_chord)
-            rows.append({"seed": seed, "bar": bar, "true_chord": true_chord,
+            rows.append({"seed": seed, "bar": bar, "blocks_per_bar": blocks_per_bar,
+                         "true_chord": true_chord,
                          "permuted_chord": other_chord, "note_count": len(notes),
                          "fit_true": true_fit, "fit_permuted": other_fit,
                          "paired_delta": true_fit - other_fit,
@@ -306,6 +374,9 @@ def main(argv=None) -> int:
     parser.add_argument("--max-sequence", type=int, default=192)
     parser.add_argument("--ablation", action="store_true")
     parser.add_argument("--following", action="store_true")
+    parser.add_argument("--blocks-per-bar", type=int, default=1,
+                        help="restate the chord this many times per bar "
+                             "(1 = downbeat only, the original behaviour)")
     parser.add_argument("--output-dir", type=Path, default=Path("outputs/chord_ablation"))
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
@@ -345,10 +416,11 @@ def main(argv=None) -> int:
             conditioning_midi=args.conditioning_midi, output_dir=args.output_dir)
     if args.following:
         report["min_notes_for_ratio"] = MIN_NOTES_FOR_RATIO
+        report["blocks_per_bar"] = args.blocks_per_bar
         report["following"] = run_following(
             model, bars=args.bars, bpm=args.bpm, seeds=seeds,
             generation_tokens=args.generation_tokens, max_sequence=args.max_sequence,
-            output_dir=args.output_dir)
+            output_dir=args.output_dir, blocks_per_bar=args.blocks_per_bar)
 
     (args.output_dir / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     print(f"\nreport: {args.output_dir / 'report.json'}")

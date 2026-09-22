@@ -68,6 +68,29 @@ def chord_guide_notes(
         return [note for instrument in midi.instruments for note in instrument.notes]
 
 
+def chord_guide_notes_for_duration(
+    chord: str, *, bpm: int, seconds: float
+) -> list[pretty_midi.Note]:
+    """The same voicing, re-timed to a block shorter than a bar.
+
+    ``chord_guide_notes`` works in whole bars because the underlying request
+    schema counts bars. Restating harmony inside a bar needs a shorter guide,
+    so take that voicing and hold it for ``seconds`` instead of re-deriving it.
+    """
+    if seconds <= 0:
+        return []
+    bar_notes = chord_guide_notes([chord], bpm=bpm, bars=1)
+    if not bar_notes:
+        return []
+    pitches = sorted({note.pitch for note in bar_notes})
+    velocity = max(n.velocity for n in bar_notes)
+    end = max(seconds * 0.85, min(seconds, 0.05))
+    return [
+        pretty_midi.Note(velocity=velocity, pitch=pitch, start=0.0, end=end)
+        for pitch in pitches
+    ]
+
+
 def build_chord_primer(
     chord_progression: Sequence[str],
     *,
