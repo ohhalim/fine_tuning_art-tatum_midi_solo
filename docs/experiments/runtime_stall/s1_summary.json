@@ -1,0 +1,445 @@
+{
+  "schema": "stall_trace_summary_v1",
+  "runs": 30,
+  "runs_with_miss": 0,
+  "fallback_total": 0,
+  "primary_over_10ms": {
+    "n": 51,
+    "counts": {
+      "system": 48,
+      "unexplained": 3
+    },
+    "top": "system",
+    "top_share": 0.9411764705882353,
+    "producer_busy_share": 0.058823529411764705
+  },
+  "secondary_over_20ms": {
+    "n": 0,
+    "counts": {},
+    "top": null,
+    "top_share": null,
+    "producer_busy_share": null
+  },
+  "mean_coverage": {
+    "gc_over_1ms": 0.0001551731657545759,
+    "inproc_gaps": 0.023774693345398317,
+    "external_gaps": 0.022004854778007742
+  },
+  "gc_max_ms": 14.55,
+  "gc_over_1ms_total": 30,
+  "verdict": {
+    "rule": ">=10 events and one category >= 2/3",
+    "decided": true,
+    "cause": "system"
+  },
+  "late_events": [
+    {
+      "run": "bpm240_seed61",
+      "bar_index": 4,
+      "lateness_ms": 10.23,
+      "target_ns": 333810100043458,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed61",
+      "bar_index": 4,
+      "lateness_ms": 10.301917,
+      "target_ns": 333810100043458,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed63",
+      "bar_index": 9,
+      "lateness_ms": 10.796,
+      "target_ns": 333855215334125,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed63",
+      "bar_index": 9,
+      "lateness_ms": 10.924416,
+      "target_ns": 333855215334125,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed63",
+      "bar_index": 9,
+      "lateness_ms": 10.964458,
+      "target_ns": 333855215334125,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed63",
+      "bar_index": 10,
+      "lateness_ms": 11.209,
+      "target_ns": 333855215334125,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed63",
+      "bar_index": 10,
+      "lateness_ms": 11.229625,
+      "target_ns": 333855215334125,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed63",
+      "bar_index": 10,
+      "lateness_ms": 11.243583,
+      "target_ns": 333855215334125,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed63",
+      "bar_index": 11,
+      "lateness_ms": 10.216916,
+      "target_ns": 333856215334125,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed68",
+      "bar_index": 9,
+      "lateness_ms": 10.483542,
+      "target_ns": 333954650571916,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed68",
+      "bar_index": 9,
+      "lateness_ms": 10.549917,
+      "target_ns": 333954650571916,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed68",
+      "bar_index": 9,
+      "lateness_ms": 10.577167,
+      "target_ns": 333954650571916,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed68",
+      "bar_index": 9,
+      "lateness_ms": 10.603667,
+      "target_ns": 333954650571916,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed68",
+      "bar_index": 9,
+      "lateness_ms": 10.630584,
+      "target_ns": 333954650571916,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed68",
+      "bar_index": 10,
+      "lateness_ms": 13.031959,
+      "target_ns": 333956150571916,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed72",
+      "bar_index": 11,
+      "lateness_ms": 10.688875,
+      "target_ns": 334036243328375,
+      "category": "unexplained",
+      "producer_busy": true
+    },
+    {
+      "run": "bpm240_seed72",
+      "bar_index": 11,
+      "lateness_ms": 10.797916,
+      "target_ns": 334036243328375,
+      "category": "unexplained",
+      "producer_busy": true
+    },
+    {
+      "run": "bpm240_seed72",
+      "bar_index": 11,
+      "lateness_ms": 10.8095,
+      "target_ns": 334036243328375,
+      "category": "unexplained",
+      "producer_busy": true
+    },
+    {
+      "run": "bpm240_seed73",
+      "bar_index": 9,
+      "lateness_ms": 10.609375,
+      "target_ns": 334055233653458,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed73",
+      "bar_index": 9,
+      "lateness_ms": 10.894458,
+      "target_ns": 334055233653458,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed73",
+      "bar_index": 10,
+      "lateness_ms": 10.965,
+      "target_ns": 334055233653458,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed73",
+      "bar_index": 10,
+      "lateness_ms": 10.975917,
+      "target_ns": 334055233653458,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed73",
+      "bar_index": 10,
+      "lateness_ms": 10.981167,
+      "target_ns": 334055233653458,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed74",
+      "bar_index": 8,
+      "lateness_ms": 10.411083,
+      "target_ns": 334074195383333,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed74",
+      "bar_index": 8,
+      "lateness_ms": 10.876458,
+      "target_ns": 334074195383333,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed74",
+      "bar_index": 8,
+      "lateness_ms": 10.938208,
+      "target_ns": 334074195383333,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed75",
+      "bar_index": 0,
+      "lateness_ms": 12.512584,
+      "target_ns": 334085712325541,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed75",
+      "bar_index": 15,
+      "lateness_ms": 10.702584,
+      "target_ns": 334101152325541,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed76",
+      "bar_index": 8,
+      "lateness_ms": 15.1475,
+      "target_ns": 334113780935333,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed76",
+      "bar_index": 14,
+      "lateness_ms": 10.297333,
+      "target_ns": 334120250935333,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed76",
+      "bar_index": 15,
+      "lateness_ms": 10.644083,
+      "target_ns": 334120250935333,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed76",
+      "bar_index": 15,
+      "lateness_ms": 10.676292,
+      "target_ns": 334120250935333,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed76",
+      "bar_index": 15,
+      "lateness_ms": 10.701125,
+      "target_ns": 334120250935333,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed76",
+      "bar_index": 15,
+      "lateness_ms": 10.725667,
+      "target_ns": 334120250935333,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed77",
+      "bar_index": 15,
+      "lateness_ms": 14.283167,
+      "target_ns": 334140817332833,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed78",
+      "bar_index": 2,
+      "lateness_ms": 14.271125,
+      "target_ns": 334148193600208,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed78",
+      "bar_index": 14,
+      "lateness_ms": 12.931,
+      "target_ns": 334159743600208,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed78",
+      "bar_index": 14,
+      "lateness_ms": 12.972208,
+      "target_ns": 334159743600208,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed78",
+      "bar_index": 14,
+      "lateness_ms": 12.997917,
+      "target_ns": 334159743600208,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed79",
+      "bar_index": 10,
+      "lateness_ms": 10.143708,
+      "target_ns": 334176212510750,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed79",
+      "bar_index": 11,
+      "lateness_ms": 10.309166,
+      "target_ns": 334176212510750,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed79",
+      "bar_index": 11,
+      "lateness_ms": 10.341291,
+      "target_ns": 334176212510750,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed79",
+      "bar_index": 11,
+      "lateness_ms": 10.364833,
+      "target_ns": 334176212510750,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed79",
+      "bar_index": 14,
+      "lateness_ms": 10.183458,
+      "target_ns": 334179392510750,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed81",
+      "bar_index": 5,
+      "lateness_ms": 10.055292,
+      "target_ns": 334210215372833,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed81",
+      "bar_index": 5,
+      "lateness_ms": 10.069875,
+      "target_ns": 334210215372833,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed81",
+      "bar_index": 5,
+      "lateness_ms": 10.075083,
+      "target_ns": 334210215372833,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed81",
+      "bar_index": 5,
+      "lateness_ms": 10.079958,
+      "target_ns": 334210215372833,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed83",
+      "bar_index": 15,
+      "lateness_ms": 16.248667,
+      "target_ns": 334261052896041,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed83",
+      "bar_index": 15,
+      "lateness_ms": 16.30025,
+      "target_ns": 334261052896041,
+      "category": "system",
+      "producer_busy": false
+    },
+    {
+      "run": "bpm240_seed83",
+      "bar_index": 15,
+      "lateness_ms": 16.306,
+      "target_ns": 334261052896041,
+      "category": "system",
+      "producer_busy": false
+    }
+  ]
+}

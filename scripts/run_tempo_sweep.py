@@ -80,9 +80,9 @@ def main(argv=None) -> int:
     for spec in args.model:
         name, ckpt = spec.split("=", 1)
         results["models"][name] = {"checkpoint": ckpt, "bpms": {}}
-        for bpm in (int(b) for b in args.bpms.split(",")):
+        for bpm in (int(b) for b in args.bpms.split(",") if b.strip()):
             runs = []
-            for seed in (int(s) for s in args.seeds.split(",")):
+            for seed in (int(s) for s in args.seeds.split(",") if s.strip()):
                 out = args.output_dir / name / f"bpm{bpm}_seed{seed}"
                 model_args = (["--fallback-only"] if ckpt == "FALLBACK" else
                               ["--checkpoint", ckpt, "--conditioning-midi", str(args.primer)])
