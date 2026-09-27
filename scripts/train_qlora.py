@@ -423,18 +423,46 @@ def train_epoch(
     return total_loss / len(dataloader)
 
 
-def evaluate(model, dataloader, loss_fn, device):
+def evaluate(model, dataloader, loss_fn, device, crop_seed: int | None = None):
+    """Mean loss over the loader.
+
+    MidiDataset crops long songs with ``random``; with ``crop_seed`` the crops
+    are the same every call, and the caller's random state is restored so the
+    training crop stream is untouched.
+    """
     model.eval()
     total_loss = 0
-    
-    with torch.no_grad():
-        for x, y in tqdm(dataloader, desc="Evaluating"):
-            x, y = x.to(device), y.to(device)
-            output = model(x)
-            loss = loss_fn(output.view(-1, output.size(-1)), y.view(-1))
-            total_loss += loss.item()
-    
+    saved_state = random.getstate() if crop_seed is not None else None
+    if crop_seed is not None:
+        random.seed(crop_seed)
+    try:
+        with torch.no_grad():
+            for x, y in tqdm(dataloader, desc="Evaluating"):
+                x, y = x.to(device), y.to(device)
+                output = model(x)
+                loss = loss_fn(output.view(-1, output.size(-1)), y.view(-1))
+                total_loss += loss.item()
+    finally:
+        if saved_state is not None:
+            random.setstate(saved_state)
+
     return total_loss / len(dataloader)
+
+
+def optimizer_updates_per_epoch(num_batches: int, gradient_accumulation: int) -> int:
+    """train_epoch steps once per ``gradient_accumulation`` batches plus a trailing partial."""
+    return math.ceil(num_batches / max(1, int(gradient_accumulation)))
+
+
+def scheduler_total_steps(num_batches: int, gradient_accumulation: int, epochs: int,
+                          mode: str = "optimizer_updates") -> int:
+    """Cosine length. ``legacy_batches`` reproduces runs before 2026-09-27, which
+    counted batches although the scheduler only steps on optimizer updates."""
+    if mode == "legacy_batches":
+        return num_batches * epochs
+    if mode == "optimizer_updates":
+        return optimizer_updates_per_epoch(num_batches, gradient_accumulation) * epochs
+    raise ValueError(f"unknown scheduler step mode: {mode}")
 
 
 def main():
@@ -477,6 +505,21 @@ def main():
     parser.add_argument("--num_workers", type=int, default=0)
     parser.add_argument("--label_smoothing", type=float, default=0.1)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--scheduler_steps",
+        choices=["optimizer_updates", "legacy_batches"],
+        default="optimizer_updates",
+        help=(
+            "Cosine T_max unit. legacy_batches reproduces D0-D4 and the first "
+            "Mehldau run, whose lr barely decayed because T_max counted batches."
+        ),
+    )
+    parser.add_argument(
+        "--val_crop_seed",
+        type=int,
+        default=0,
+        help="Seed for validation crops so val loss is comparable across epochs. -1 = random (legacy).",
+    )
     
     # Output
     parser.add_argument("--output_dir", type=str, default="./checkpoints/jazz_lora")
@@ -591,8 +634,16 @@ def main():
     # Optimizer & Scheduler
     optimizer = AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr, weight_decay=0.01)
     
-    total_steps = len(train_loader) * args.epochs
+    updates_per_epoch = optimizer_updates_per_epoch(len(train_loader), args.gradient_accumulation)
+    total_steps = scheduler_total_steps(
+        len(train_loader), args.gradient_accumulation, args.epochs, args.scheduler_steps
+    )
     scheduler = CosineAnnealingLR(optimizer, T_max=total_steps, eta_min=1e-6)
+    print(
+        f"Optimizer updates: {updates_per_epoch}/epoch, {updates_per_epoch * args.epochs} total "
+        f"({len(train_loader)} batches, accumulation {args.gradient_accumulation}); "
+        f"cosine T_max={total_steps} ({args.scheduler_steps})"
+    )
     
     # Loss
     loss_fn = SmoothCrossEntropyLoss(
@@ -615,6 +666,10 @@ def main():
         "train_full_model": bool(args.train_full_model),
         "training_mode": training_mode_name(args),
         "checkpoint": args.checkpoint,
+        "scheduler_steps": args.scheduler_steps,
+        "scheduler_t_max": int(total_steps),
+        "optimizer_updates_per_epoch": int(updates_per_epoch),
+        "val_crop_seed": None if args.val_crop_seed < 0 else int(args.val_crop_seed),
     }
     
     for epoch in range(1, args.epochs + 1):
@@ -628,7 +683,10 @@ def main():
             epoch,
             gradient_accumulation=args.gradient_accumulation,
         )
-        val_loss = evaluate(model, val_loader, loss_fn, device)
+        val_loss = evaluate(
+            model, val_loader, loss_fn, device,
+            crop_seed=None if args.val_crop_seed < 0 else args.val_crop_seed,
+        )
         
         print(f"Epoch {epoch}: Train Loss = {train_loss:.4f}, Val Loss = {val_loss:.4f}")
         
@@ -650,6 +708,7 @@ def main():
             "optimizer_state_dict": optimizer.state_dict(),
             "train_loss": train_loss,
             "val_loss": val_loss,
+            "optimizer_updates": int(updates_per_epoch * epoch),
         }, os.path.join(args.output_dir, f"checkpoint_epoch{epoch}.pt"))
     
     print(f"\n=== Training Complete ===")
