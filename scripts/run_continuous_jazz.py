@@ -282,6 +282,20 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
     return result, producer
 
 
+def summarize_lateness_ms(lateness_ns) -> dict:
+    """Distribution of scheduler dispatch lateness over every attempt, not just the tail."""
+    values = sorted(ns / 1e6 for ns in lateness_ns)
+    if not values:
+        return {"count": 0}
+
+    def pct(q):
+        return values[min(len(values) - 1, int(round(q * (len(values) - 1))))]
+
+    return {"count": len(values), "p50": pct(0.50), "p95": pct(0.95), "p99": pct(0.99),
+            "maximum": values[-1],
+            "over_5ms": sum(v > 5.0 for v in values), "over_10ms": sum(v > 10.0 for v in values)}
+
+
 def summarize_capture(result, captured, *, drain_completed):
     """Compare what the scheduler intended to send against what a separate
     CoreMIDI input actually observed.
@@ -382,6 +396,8 @@ def build_report(result, producer, *, bars, bpm, capture=None):
         "dispatch_attempt_lateness_ms": sorted(
             ns / 1e6 for ns in result.dispatch_attempt_lateness_ns
         )[-5:],
+        "dispatch_attempt_lateness_summary_ms": summarize_lateness_ms(
+            result.dispatch_attempt_lateness_ns),
         "capture": capture,
         "realtime_coperformance_verified": False,
         "musical_quality_verified": False,
