@@ -4,6 +4,8 @@
 **구현 의존성: PR #1482의 chord-primer / 런타임 플래그.** #1482 이후 develop에 통합하는 순서.
 
 `mehldau_style_verified: false` · `musical_quality_verified: false`
+
+> **2026-09-27 갱신:** 이 문서의 "효과 미확인"은 optimizer update 8회에 한정된다. update를 늘리면 일반 재즈 손실 없이 멜다우 코퍼스로 특화된다(update 128: 멜다우 CE −0.133, 일반 −0.002). `MEHLDAU_UPDATE_BUDGET_DIAG.md`, `MEHLDAU_STYLE_SHIFT.md` 참고. 들리는 스타일은 아직 미검증이다.
 **초기 청취 의견은 기록했으나 멜다우 스타일 성공을 주장하지 않는다.**
 
 ## 1. 데이터 provenance

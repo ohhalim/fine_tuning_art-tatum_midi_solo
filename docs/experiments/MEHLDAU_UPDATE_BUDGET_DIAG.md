@@ -122,8 +122,8 @@ MIDI: `outputs/mehldau_diag/update_budget_v1/gen_update{000,008,034}_seed42.mid`
 
 ## 6. 다음 실험 (각각 한 질문)
 
-1. **업데이트 예산 확장** — 같은 스크립트, `--budget-seconds` 상향. 이번 CPU 한도를 넘으므로 별도 승인이 필요하다. 질문: train CE가 어디서 포화하는가? 기준을 사전 등록한다
-2. **train_qlora 기본동작 정정** (별도 단위) — `T_max`를 optimizer update 기준으로 바꾸고, update 수를 로그와 ckpt에 기록하고, val crop을 결정적으로 만든다. D1 재현 수치에 영향을 주므로 이번 비교와 분리했다
+1. ~~업데이트 예산 확장~~ → **완료** (`MEHLDAU_STYLE_SHIFT.md` V2). MPS 512 update에서 train CE −0.199로 포화했고, update 32 이후 우도 특화 기준을 충족했다
+2. ~~train_qlora 기본동작 정정~~ → **완료** (커밋 `7db5e7df`). 기존 동작은 `--scheduler_steps legacy_batches --val_crop_seed -1`로 재현하고, D0/D1 스크립트에 명시했다
 3. **평가 민감도** — 고정 primer로 긴 연속 생성(마디 이어붙이기)을 하고, 분포 지표(pitch-class·IOI 히스토그램 거리)를 base vs adapter로 잰다. 그다음 블라인드 청취
 4. **일반화** — base가 보지 않은 자료가 필요하다(`MEHLDAU_PERSONALIZATION.md` §8). 본인 연주 녹음이 이 프로젝트 목표와 가장 잘 맞는다
 

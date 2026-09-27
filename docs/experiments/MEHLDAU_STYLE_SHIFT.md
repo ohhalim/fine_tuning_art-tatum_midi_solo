@@ -139,3 +139,38 @@ update 128까지는 일반 CE가 오히려 조금 낮다. 256부터 일반 CE가
 | 새 곡으로 일반화하는가 | **검증 불가.** held-out 멜다우 곡이 없다 |
 
 이전 판정 "뚜렷한 개인화 효과 미확인"은 **8 update라는 학습량에 한정된 결과**로 정정한다. 데이터 중복이 효과 부재의 원인이라는 해석은 이 결과와 맞지 않는다. 중복된 곡이어도 update를 늘리면 분포가 이동했다.
+
+## 배포 후보 — update 128 어댑터
+
+**선정 이유 (V2 수치만 사용):** 일반 CE 손실 없이(−0.002) 특화도가 큰 지점(−0.131)이다. val CE도 최저점(64) 근처다(2.4225 vs 최저 2.4179). 256·512는 특화도가 더 크지만 일반 CE가 오르기 시작한다.
+청취 결과로 고른 것이 아니다.
+
+| 항목 | 값 |
+|---|---|
+| 체크포인트 | `outputs/mehldau_lora_v2/u128/checkpoint_update128.pt` (gitignore) |
+| 출처 | armB ep8 + `update_budget_v2_mps512/lora_update128.pt`, `scripts/export_lora_snapshot.py`로 병합 |
+| 재로드 검증 | `load_model_with_lora` 재로드 logits 동일. 멜다우 train CE 2.50551(평가값 2.50551) |
+| 런타임 스모크 | `run_continuous_jazz.py --chord-primer --capture` 8마디 완주. model 8/8, 오류 0, 데드라인 미스 0, 생성 p50 404 ms(같은 조건 base 336 ms), 캡처 노트 이벤트 210 |
+
+런타임 스모크를 위해 메인 venv에 `requirements.txt`에 선언된 `python-rtmidi 1.5.8`을 설치했다(빠져 있었다).
+
+```sh
+FORCE_CPU=1 .venv/bin/python scripts/run_continuous_jazz.py \
+    --checkpoint outputs/mehldau_lora_v2/u128/checkpoint_update128.pt \
+    --conditioning-midi outputs/chord_ab/ii_V_I.mid --bars 8 --capture \
+    --chord-primer --chord-blocks-per-bar 2 --output-dir outputs/continuous/mehldau_v2_u128
+```
+
+## 남은 사용자 한 단계 — 블라인드 청취
+
+`outputs/mehldau_listening_v1/`에 4쌍이 있다. update 0 vs update 128이고, 같은 중립 primer에 seed 1–4를 미리 고정했다. A/B는 무작위로 배정했다(`scripts/make_blind_listening_pairs.py`, shuffle seed 2026).
+`ANSWER_SHEET.md`를 채운 뒤 `key.json`을 연다. 작성자(Claude)도 키를 열지 않았다.
+
+- 판정(사전 등록): 4쌍 중 3쌍 이상에서 update 128을 "더 멜다우 같다"고 고르면 청취 지지로 기록한다. 4쌍이라 우연(3/4 이상 확률 31%)과 구분되지 않으므로 **예비 신호로만** 쓴다
+- 반복 선율·베이스 음 반복(이전 청취 의견)이 줄었는지도 메모에 적는다
+
+## 다음 실험
+
+1. **청취 결과 반영.** 지지되면 쌍을 8–12개로 늘려 재청취한다. 기각되면 우도 특화가 들리는 차이로 이어지지 않는다고 기록하고, 조건 표현(D3/D4)이나 어댑터 위치(QKV·FFN)를 검토한다
+2. **어댑터 위치** — 현재 LoRA는 out_proj(98K 파라미터)뿐이다. 같은 update 예산에서 QKV 추가가 특화도/일반 손실 비율을 바꾸는지 본다(한 질문)
+3. **일반화** — held-out 멜다우가 없다. 본인 연주 녹음으로 같은 파이프라인을 반복하는 것이 목표 §6에 맞는다

@@ -116,3 +116,32 @@ class DiagnosticHelpersTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ExportSnapshotTest(unittest.TestCase):
+    def test_export_merges_snapshot_and_refuses_overwrite(self) -> None:
+        from scripts.export_lora_snapshot import main as export_main
+
+        base = tiny_lora_model()
+        tuned = tiny_lora_model()
+        with torch.no_grad():
+            for name, param in tuned.named_parameters():
+                if "lora_B" in name:
+                    param.normal_(0, 0.1)
+        cfg = {**TINY, "lora_r": 2, "lora_alpha": 4, "lora_dropout": 0.0}
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            torch.save({"model_config": cfg, "model_state_dict": base.state_dict()}, tmp / "base.pt")
+            torch.save({k: v for k, v in tuned.state_dict().items() if "lora_" in k}, tmp / "snap.pt")
+            out = tmp / "export" / "checkpoint_update1.pt"
+            args = ["--base", str(tmp / "base.pt"), "--snapshot", str(tmp / "snap.pt"),
+                    "--output", str(out)]
+            self.assertEqual(export_main(args), 0)
+            loaded = load_model_with_lora(lora_path=str(out.parent), checkpoint_path=str(out),
+                                          prefer_full_checkpoint=True)
+            tuned.eval()
+            x = torch.randint(0, 300, (1, 12))
+            with torch.no_grad():
+                self.assertTrue(torch.equal(tuned(x), loaded(x)))
+            with self.assertRaises(SystemExit):
+                export_main(args)
