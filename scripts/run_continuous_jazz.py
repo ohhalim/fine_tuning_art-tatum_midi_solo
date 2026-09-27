@@ -223,7 +223,7 @@ def _make_builder(*, clock, duration, generate, sub_builder):
 
 
 def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
-                start_delay_seconds=2.5, spin_window_ms=1.0,
+                start_delay_seconds=2.5, spin_window_ms=5.0,
                 clock=None, clock_ns=None, wait_until=None,
                 deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE,
                 sub_builder=None):
@@ -280,6 +280,40 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
         finally:
             port.panic()
     return result, producer
+
+
+def summarize_lateness_ms(lateness_ns) -> dict:
+    """Distribution of scheduler dispatch lateness over every attempt, not just the tail."""
+    values = sorted(ns / 1e6 for ns in lateness_ns)
+    if not values:
+        return {"count": 0}
+
+    def pct(q):
+        return values[min(len(values) - 1, int(round(q * (len(values) - 1))))]
+
+    return {"count": len(values), "p50": pct(0.50), "p95": pct(0.95), "p99": pct(0.99),
+            "maximum": values[-1],
+            "over_5ms": sum(v > 5.0 for v in values), "over_10ms": sum(v > 10.0 for v in values)}
+
+
+def summarize_deadline_misses(misses, producer_records) -> list[dict]:
+    """Each scheduler miss, and whether the producer was generating at that moment.
+
+    Both clocks are ``time.perf_counter_ns``. ``producer_busy`` is true when the
+    late window [target, dispatch start] overlaps any bar's generation interval.
+    """
+    intervals = [(r.requested_ns, r.completed_ns) for r in producer_records
+                 if getattr(r, "requested_ns", None) is not None
+                 and getattr(r, "completed_ns", None) is not None]
+    out = []
+    for m in misses:
+        busy = any(start <= m.dispatch_started_ns and end >= m.target_ns
+                   for start, end in intervals)
+        out.append({"bar_index": m.bar_index, "sequence_index": m.sequence_index,
+                    "lateness_ms": m.lateness_ns / 1e6, "message_type": m.message_type,
+                    "is_bar_start": m.is_bar_start, "is_catch_up": m.is_catch_up,
+                    "target_ns": m.target_ns, "producer_busy": busy})
+    return out
 
 
 def summarize_capture(result, captured, *, drain_completed):
@@ -362,7 +396,7 @@ def write_played_midi(result, path, *, bpm):
     return len(instrument.notes)
 
 
-def build_report(result, producer, *, bars, bpm, capture=None):
+def build_report(result, producer, *, bars, bpm, capture=None, spin_window_ms=None):
     return {
         "schema": "continuous_jazz_session_v1",
         "bpm": bpm,
@@ -382,6 +416,11 @@ def build_report(result, producer, *, bars, bpm, capture=None):
         "dispatch_attempt_lateness_ms": sorted(
             ns / 1e6 for ns in result.dispatch_attempt_lateness_ns
         )[-5:],
+        "spin_window_ms": spin_window_ms,
+        "deadline_miss_detail": summarize_deadline_misses(
+            result.scheduler_dispatch_deadline_misses, producer.records),
+        "dispatch_attempt_lateness_summary_ms": summarize_lateness_ms(
+            result.dispatch_attempt_lateness_ns),
         "capture": capture,
         "realtime_coperformance_verified": False,
         "musical_quality_verified": False,
@@ -434,6 +473,10 @@ def main(argv=None):
                         help="opt-in: state each bar's chord as notes in the primer. "
                              "Note-based steering, not learned chord conditioning; "
                              "see docs/experiments/CHORD_PRIMER_AB.md")
+    parser.add_argument("--spin-window-ms", type=float, default=5.0,
+                        help="scheduler busy-spin before each event. The wait before it "
+                             "can oversleep by a few ms; a longer spin absorbs that but "
+                             "holds the GIL longer (docs/experiments/TATUM_REALTIME_TEMPO.md)")
     args = parser.parse_args(argv)
 
     chords = [c.strip() for c in args.chords.split(",") if c.strip()]
@@ -443,6 +486,8 @@ def main(argv=None):
         parser.error("require 40..240 BPM and nonempty chords")
     if args.generation_tokens < 1 or args.max_sequence < args.generation_tokens:
         parser.error("require generation_tokens >= 1 and max_sequence >= generation_tokens")
+    if not 0.0 <= args.spin_window_ms <= 50.0:
+        parser.error("spin_window_ms must be between 0 and 50")
     if not 1 <= args.chord_blocks_per_bar <= 4:
         parser.error("chord_blocks_per_bar must be between 1 and 4")
     if args.chord_blocks_per_bar > 1 and not args.chord_primer:
@@ -559,6 +604,7 @@ def main(argv=None):
             result, producer = run_session(
                 port=port, bars=args.bars, bpm=args.bpm, chords=chords, seed=args.seed,
                 generate=generate, input_buffer=input_buffer, sub_builder=sub_builder,
+                spin_window_ms=args.spin_window_ms,
             )
             drain_completed = False
             if args.capture:
@@ -575,6 +621,7 @@ def main(argv=None):
                 else None
             )
             report = build_report(result, producer, bars=args.bars, bpm=args.bpm,
+                                  spin_window_ms=args.spin_window_ms,
                                   capture=capture_summary)
             report["input_events_received"] = input_buffer.received_count
             report["live_primer_bar_count"] = (

@@ -288,6 +288,39 @@ class SummaryTests(unittest.TestCase):
         self.assertEqual(1, summary["fallback_bar_count"])
 
 
+
+
+class DeadlineMissDetailTest(unittest.TestCase):
+    def test_producer_busy_flag(self) -> None:
+        from types import SimpleNamespace
+
+        from scripts.run_continuous_jazz import summarize_deadline_misses
+
+        def miss(target, started):
+            return SimpleNamespace(bar_index=1, sequence_index=0, lateness_ns=started - target,
+                                   message_type="note_on", is_bar_start=False,
+                                   is_catch_up=False, target_ns=target,
+                                   dispatch_started_ns=started)
+
+        records = [SimpleNamespace(requested_ns=100, completed_ns=200)]
+        out = summarize_deadline_misses([miss(150, 180), miss(300, 330)], records)
+        self.assertEqual([m["producer_busy"] for m in out], [True, False])
+        self.assertAlmostEqual(out[0]["lateness_ms"], 30 / 1e6)
+
+
+class LatenessSummaryTest(unittest.TestCase):
+    def test_summary_over_all_attempts(self) -> None:
+        from scripts.run_continuous_jazz import summarize_lateness_ms
+
+        ns = [int(v * 1e6) for v in [0.1, 0.2, 0.3, 6.0, 12.0]]
+        out = summarize_lateness_ms(ns)
+        self.assertEqual(out["count"], 5)
+        self.assertAlmostEqual(out["p50"], 0.3)
+        self.assertAlmostEqual(out["maximum"], 12.0)
+        self.assertEqual(out["over_5ms"], 2)
+        self.assertEqual(out["over_10ms"], 1)
+        self.assertEqual(summarize_lateness_ms([]), {"count": 0})
+
 if __name__ == "__main__":
     unittest.main()
 
