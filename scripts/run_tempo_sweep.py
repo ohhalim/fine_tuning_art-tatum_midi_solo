@@ -43,6 +43,7 @@ def summarize_report(report: dict) -> dict:
         "gen_ms_max": float(max(steady)) if steady else None,
         "p95_over_bar": (p95 / (bar_s * 1000)) if p95 is not None else None,
         "played_notes": report.get("played_note_count"),
+        "lateness_ms": report.get("dispatch_attempt_lateness_summary_ms"),
     }
 
 
@@ -53,7 +54,8 @@ def holds(runs: list[dict]) -> bool:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--model", action="append", required=True, metavar="NAME=CHECKPOINT")
+    ap.add_argument("--model", action="append", required=True, metavar="NAME=CHECKPOINT",
+                    help="CHECKPOINT=FALLBACK runs --fallback-only (no generation)")
     ap.add_argument("--bpms", default="128,160,200,240")
     ap.add_argument("--seeds", default="42,43,44")
     ap.add_argument("--bars", type=int, default=16)
@@ -77,10 +79,12 @@ def main(argv=None) -> int:
             runs = []
             for seed in (int(s) for s in args.seeds.split(",")):
                 out = args.output_dir / name / f"bpm{bpm}_seed{seed}"
-                cmd = [args.python, str(ROOT / "scripts/run_continuous_jazz.py"),
-                       "--checkpoint", ckpt, "--conditioning-midi", str(args.primer),
+                model_args = (["--fallback-only"] if ckpt == "FALLBACK" else
+                              ["--checkpoint", ckpt, "--conditioning-midi", str(args.primer)])
+                extra = [] if ckpt == "FALLBACK" else args.extra.split()
+                cmd = [args.python, str(ROOT / "scripts/run_continuous_jazz.py"), *model_args,
                        "--bars", str(args.bars), "--bpm", str(bpm), "--seed", str(seed),
-                       "--capture", "--output-dir", str(out), *args.extra.split()]
+                       "--capture", "--output-dir", str(out), *extra]
                 proc = subprocess.run(cmd, cwd=ROOT, env=env, capture_output=True, text=True)
                 (args.output_dir / name).mkdir(parents=True, exist_ok=True)
                 (args.output_dir / name / f"bpm{bpm}_seed{seed}.log").write_text(
@@ -94,9 +98,13 @@ def main(argv=None) -> int:
                     continue
                 row = {"seed": seed, **summarize_report(json.loads(report_path.read_text()))}
                 runs.append(row)
+                lat = row.get("lateness_ms") or {}
+                gen = (f"p50 {row['gen_ms_p50']:.0f} p95 {row['gen_ms_p95']:.0f}"
+                       if row["gen_ms_p50"] is not None else "no generation")
                 print(f"{name} {bpm} BPM seed {seed}: fallback {row['fallback_bars']} "
-                      f"miss {row['deadline_misses']} p50 {row['gen_ms_p50']:.0f} "
-                      f"p95 {row['gen_ms_p95']:.0f} / bar {row['bar_ms']:.0f} ms", flush=True)
+                      f"miss {row['deadline_misses']} {gen} / bar {row['bar_ms']:.0f} ms | "
+                      f"lateness p99 {lat.get('p99', float('nan')):.2f} max "
+                      f"{lat.get('maximum', float('nan')):.2f} ms", flush=True)
             results["models"][name]["bpms"][str(bpm)] = {"runs": runs, "holds": holds(runs)}
         held = [int(b) for b, v in results["models"][name]["bpms"].items() if v["holds"]]
         results["models"][name]["max_holding_bpm"] = max(held) if held else None
