@@ -4,7 +4,7 @@
 Pre-registered in docs/experiments/MEHLDAU_STYLE_SHIFT.md. Every clip is a
 fixed-length window so length and density are comparable:
 
-* X: middle ``clip_seconds`` of Mehldau train song i
+* X: middle ``clip_seconds`` of song i from the reference split
 * A/B: first ``clip_seconds`` of the same-seed generation from two snapshots
 
 A/B order is random; the key goes to ``key.json``.
@@ -65,6 +65,8 @@ def main(argv=None) -> int:
     ap.add_argument("--seeds", default="1,2,3,4,5,6")
     ap.add_argument("--data-dir", type=Path, default=MAIN_REPO / "data/mehldau_full")
     ap.add_argument("--clip-seconds", type=float, default=15.0)
+    ap.add_argument("--reference-split", choices=["train", "val"], default="train")
+    ap.add_argument("--artist-label", default="멜다우")
     ap.add_argument("--soundfont", type=Path, default=DEFAULT_SF2)
     ap.add_argument("--shuffle-seed", type=int, default=2027)
     ap.add_argument("--output-dir", type=Path, required=True)
@@ -80,7 +82,7 @@ def main(argv=None) -> int:
     import pretty_midi
     from scripts.style_distance import tokens_to_notes
 
-    songs = sorted((args.data_dir / "train").glob("*.npy"))
+    songs = sorted((args.data_dir / args.reference_split).glob("*.npy"))
     rng = random.Random(args.shuffle_seed)
     key = {"update_a": args.update_a, "update_b": args.update_b, "clip_seconds": args.clip_seconds,
            "eval_dir": str(args.eval_dir), "pairs": []}
@@ -93,7 +95,7 @@ def main(argv=None) -> int:
 
         sources = [args.update_a, args.update_b]
         rng.shuffle(sources)
-        entry = {"pair": i + 1, "seed": seed, "reference_song": songs[i].name,
+        entry = {"pair": i + 1, "seed": seed, "reference_song": f"{args.reference_split}/{songs[i].name}",
                  "reference_notes": len(x)}
         for label, update in zip("AB", sources):
             gen = pretty_midi.PrettyMIDI(str(args.eval_dir / f"gen_u{update:03d}_s{seed}.mid"))
@@ -108,8 +110,8 @@ def main(argv=None) -> int:
         key["pairs"].append(entry)
     (args.output_dir / "key.json").write_text(json.dumps(key, indent=2) + "\n")
 
-    lines = ["# 청취 v2 — 답안지", "",
-             "쌍마다 **X(실제 멜다우 발췌)를 먼저** 듣고, A와 B 중 **X에 더 가까운 쪽**을 고르세요.",
+    lines = ["# 청취 — 답안지", "",
+             f"쌍마다 **X(실제 {args.artist_label} 발췌)를 먼저** 듣고, A와 B 중 **X에 더 가까운 쪽**을 고르세요.",
              "음악적 선호가 아니라 X와의 유사성입니다. 모르면 '모름'. `key.json`은 다 쓴 뒤에 여세요.", "",
              "| 쌍 | X에 더 가까운 쪽 (A/B/모름) | 메모 |", "|---|---|---|"]
     lines += [f"| {p['pair']} | | |" for p in key["pairs"]]

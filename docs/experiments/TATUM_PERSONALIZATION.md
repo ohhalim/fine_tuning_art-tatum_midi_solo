@@ -50,3 +50,34 @@
 - **어댑터가 보지 않은 Tatum 곡의 CE가 train과 거의 같은 폭으로 단조 감소했다.** 되돌아옴(과적합 기록 조건)은 없다
 - 멜다우와 대조된다. 멜다우는 train −0.20 vs val(2곡) 64 이후 정체였다. Tatum은 train −0.073 vs val −0.068이다. 곡 수가 많아(110) 특정 곡 암기보다 공통 패턴을 학습하는 쪽으로 보인다(해석)
 - 일반 probe 대비 판정은 snapshot 평가 후 붙인다
+
+### T1 평가 — 보지 않은 Tatum 곡으로 특화: 기준 충족
+`outputs/tatum_diag/snapshot_eval_t1/`, 사본 `mehldau_diag/tatum_snapshot_eval_t1_report.json`.
+일반 probe는 `jazz_full/train`에서 Tatum 109곡과 멜다우 17곡을 제외한 풀에서 뽑은 100곡이다(`tatum_generic_probe_list.json`).
+
+| update | ΔCE Tatum train | **ΔCE Tatum val (미학습 12곡)** | ΔCE 일반 | **특화도(val)** | 기준 |
+|---|---|---|---|---|---|
+| 14 | −0.021 | −0.021 | −0.014 | −0.007 | 미충족 |
+| 35 | −0.032 | −0.031 | −0.015 | −0.016 | 미충족 |
+| 70 | −0.045 | −0.043 | −0.016 | −0.027 | 충족 |
+| 133 | −0.058 | −0.055 | −0.012 | −0.042 | 충족 |
+| 259 | −0.068 | −0.064 | −0.006 | −0.058 | 충족 |
+| 385 | −0.073 | −0.067 | −0.005 | −0.062 | 충족 |
+| **518** | −0.073 | **−0.068** | **−0.004** | **−0.063** | 충족 |
+
+- **update 70 이후 "보지 않은 Tatum 곡으로 특화"로 기록한다.** 일반 CE는 끝까지 update 0보다 낮다
+- 과적합 기록 없음(val이 되돌아오지 않았다)
+- 대조: 멜다우 어댑터(CPU run, update 34)는 Tatum val 특화도 +0.008이었다. 특화는 대상 데이터에 따라 달라진다
+- 탐색값: 생성 JS shift가 update 14부터 Tatum 기준 쪽으로 이동했다(CI 0 초과). 16-gram 복사율은 전부 0, 8-gram은 ≤ 0.005다
+- 멜다우와 비교: train 이득은 작고(−0.073 vs −0.199) val로 거의 전부 이전된다. 멜다우 이득은 대부분 train 16곡 적합이었다
+
+### 배포 snapshot — update 518 (사전 규칙: 일반 손실 ≤ +0.02 중 Tatum val 최저)
+| 항목 | 값 |
+|---|---|
+| 체크포인트 | `outputs/tatum_lora_v1/u518/checkpoint_update518.pt` (gitignore). 재로드 logits 동일 |
+| 런타임 스모크 | 8마디 완주, model 8/8, 오류 0, 데드라인 미스 0, 생성 p50 **778 ms**, 캡처 노트 이벤트 356 |
+
+생성 p50이 멜다우 u128(404 ms)의 약 2배다. 노트가 많아(356 vs 210) 마디당 토큰이 늘어난 것으로 보인다(미검증). 128 BPM 한 마디(1,875 ms) 안에는 든다. 템포가 빨라지면 여유가 줄어든다.
+
+### T2 청취 세트 — 사용자 청취 대기
+`outputs/tatum_listening_v1/`. X는 Tatum val 곡 앞 6곡(September Song, Yesterdays, S'posin', Boulevard Of Broken Dreams, I'm Comin' Virginia, Japanese Sandman)의 가운데 15초다. A/B는 update 0 vs 518이며 shuffle seed 2028로 배정했다. 키는 열지 않았다.
