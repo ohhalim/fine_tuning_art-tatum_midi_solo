@@ -296,6 +296,26 @@ def summarize_lateness_ms(lateness_ns) -> dict:
             "over_5ms": sum(v > 5.0 for v in values), "over_10ms": sum(v > 10.0 for v in values)}
 
 
+def summarize_deadline_misses(misses, producer_records) -> list[dict]:
+    """Each scheduler miss, and whether the producer was generating at that moment.
+
+    Both clocks are ``time.perf_counter_ns``. ``producer_busy`` is true when the
+    late window [target, dispatch start] overlaps any bar's generation interval.
+    """
+    intervals = [(r.requested_ns, r.completed_ns) for r in producer_records
+                 if getattr(r, "requested_ns", None) is not None
+                 and getattr(r, "completed_ns", None) is not None]
+    out = []
+    for m in misses:
+        busy = any(start <= m.dispatch_started_ns and end >= m.target_ns
+                   for start, end in intervals)
+        out.append({"bar_index": m.bar_index, "sequence_index": m.sequence_index,
+                    "lateness_ms": m.lateness_ns / 1e6, "message_type": m.message_type,
+                    "is_bar_start": m.is_bar_start, "is_catch_up": m.is_catch_up,
+                    "target_ns": m.target_ns, "producer_busy": busy})
+    return out
+
+
 def summarize_capture(result, captured, *, drain_completed):
     """Compare what the scheduler intended to send against what a separate
     CoreMIDI input actually observed.
@@ -397,6 +417,8 @@ def build_report(result, producer, *, bars, bpm, capture=None, spin_window_ms=No
             ns / 1e6 for ns in result.dispatch_attempt_lateness_ns
         )[-5:],
         "spin_window_ms": spin_window_ms,
+        "deadline_miss_detail": summarize_deadline_misses(
+            result.scheduler_dispatch_deadline_misses, producer.records),
         "dispatch_attempt_lateness_summary_ms": summarize_lateness_ms(
             result.dispatch_attempt_lateness_ns),
         "capture": capture,

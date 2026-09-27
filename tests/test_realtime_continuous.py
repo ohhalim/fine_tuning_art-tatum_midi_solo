@@ -290,6 +290,24 @@ class SummaryTests(unittest.TestCase):
 
 
 
+class DeadlineMissDetailTest(unittest.TestCase):
+    def test_producer_busy_flag(self) -> None:
+        from types import SimpleNamespace
+
+        from scripts.run_continuous_jazz import summarize_deadline_misses
+
+        def miss(target, started):
+            return SimpleNamespace(bar_index=1, sequence_index=0, lateness_ns=started - target,
+                                   message_type="note_on", is_bar_start=False,
+                                   is_catch_up=False, target_ns=target,
+                                   dispatch_started_ns=started)
+
+        records = [SimpleNamespace(requested_ns=100, completed_ns=200)]
+        out = summarize_deadline_misses([miss(150, 180), miss(300, 330)], records)
+        self.assertEqual([m["producer_busy"] for m in out], [True, False])
+        self.assertAlmostEqual(out[0]["lateness_ms"], 30 / 1e6)
+
+
 class LatenessSummaryTest(unittest.TestCase):
     def test_summary_over_all_attempts(self) -> None:
         from scripts.run_continuous_jazz import summarize_lateness_ms
