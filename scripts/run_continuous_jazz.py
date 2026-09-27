@@ -473,7 +473,7 @@ def main(argv=None):
                         help="opt-in: state each bar's chord as notes in the primer. "
                              "Note-based steering, not learned chord conditioning; "
                              "see docs/experiments/CHORD_PRIMER_AB.md")
-    parser.add_argument("--thread-qos", default="default",
+    parser.add_argument("--thread-qos", default="user-interactive",
                         choices=["default", "user-initiated", "user-interactive"],
                         help="macOS QoS class for the scheduler thread "
                              "(docs/experiments/RUNTIME_STALL_CAUSE.md)")

@@ -1,0 +1,592 @@
+{
+  "schema": "runtime_arm_compare_v1",
+  "baseline": {
+    "runs": 20,
+    "over_10ms_per_run": 0.4,
+    "lateness_p50_median": 0.059124499999999997,
+    "lateness_p99_median": 3.6263335,
+    "lateness_max": 36.126291,
+    "runs_with_miss": 2,
+    "fallback_total": 0,
+    "gen_p95_median": 751.4608856499999,
+    "qos_applied_runs": 0,
+    "per_run": [
+      {
+        "over_10ms": 0,
+        "p50": 0.080875,
+        "p99": 6.048333,
+        "max": 6.578666,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 617.6141668999999,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.065084,
+        "p99": 2.729,
+        "max": 3.709334,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 716.3791122999999,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.058292,
+        "p99": 1.01975,
+        "max": 3.422917,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 997.7265832999998,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.058666,
+        "p99": 7.1675,
+        "max": 7.319291,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 825.4269747999996,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.057792,
+        "p99": 4.30725,
+        "max": 8.826333,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 673.9917659999999,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.068917,
+        "p99": 4.661084,
+        "max": 6.748709,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 759.3731793999998,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.059583,
+        "p99": 5.874042,
+        "max": 9.758833,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 784.2963919,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 1,
+        "p50": 0.071291,
+        "p99": 6.336208,
+        "max": 36.126291,
+        "misses": 1,
+        "fallback": 0,
+        "gen_p95": 805.4252625,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.056209,
+        "p99": 1.9755,
+        "max": 5.188209,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 672.3460875,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.055042,
+        "p99": 1.75425,
+        "max": 5.128125,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 677.8092830999999,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.05975,
+        "p99": 3.938167,
+        "max": 6.42475,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 1096.1151667999995,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 3,
+        "p50": 0.05525,
+        "p99": 3.3145,
+        "max": 24.861542,
+        "misses": 3,
+        "fallback": 0,
+        "gen_p95": 827.2069837999999,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.0545,
+        "p99": 6.785417,
+        "max": 7.270125,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 700.5727337999999,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.06525,
+        "p99": 4.572917,
+        "max": 5.32,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 702.1396080999999,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.063708,
+        "p99": 1.294458,
+        "max": 5.721333,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 743.5485919,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 4,
+        "p50": 0.055042,
+        "p99": 3.171375,
+        "max": 17.674209,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 897.5370961,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.059583,
+        "p99": 0.935167,
+        "max": 3.747625,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 817.3406910999997,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.056042,
+        "p99": 1.282959,
+        "max": 4.719459,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 822.4538416999999,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.064334,
+        "p99": 6.603209,
+        "max": 6.698917,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 734.6673,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.053666,
+        "p99": 1.4995,
+        "max": 5.200833,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 720.6406705999996,
+        "qos": {
+          "requested": "default",
+          "applied": false,
+          "error": null
+        }
+      }
+    ]
+  },
+  "treatment": {
+    "runs": 20,
+    "over_10ms_per_run": 0.1,
+    "lateness_p50_median": 0.061104,
+    "lateness_p99_median": 2.7881039999999997,
+    "lateness_max": 10.131333,
+    "runs_with_miss": 0,
+    "fallback_total": 0,
+    "gen_p95_median": 756.20610635,
+    "qos_applied_runs": 20,
+    "per_run": [
+      {
+        "over_10ms": 0,
+        "p50": 0.091125,
+        "p99": 2.553916,
+        "max": 3.133375,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 608.1891249999999,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.06075,
+        "p99": 3.775417,
+        "max": 4.7695,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 714.2553997999997,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.053375,
+        "p99": 3.086625,
+        "max": 5.1115,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 909.9960376999998,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.061458,
+        "p99": 2.092541,
+        "max": 3.648166,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 851.4009622999997,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.061917,
+        "p99": 3.810375,
+        "max": 3.969167,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 675.1169660999999,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.075708,
+        "p99": 4.151417,
+        "max": 4.793875,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 723.8863624999999,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.063041,
+        "p99": 4.064291,
+        "max": 6.270583,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 764.7779875,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.064334,
+        "p99": 6.250417,
+        "max": 8.784792,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 759.798167,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.049417,
+        "p99": 8.436959,
+        "max": 9.192375,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 616.6416500999999,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 2,
+        "p50": 0.047792,
+        "p99": 6.437625,
+        "max": 10.131333,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 679.6159125,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.0735,
+        "p99": 2.872708,
+        "max": 5.588667,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 1103.1793580999997,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.053209,
+        "p99": 2.38225,
+        "max": 3.560625,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 821.3002000999998,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.048917,
+        "p99": 6.299167,
+        "max": 6.625334,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 714.4626957,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.063166,
+        "p99": 1.164791,
+        "max": 1.651583,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 692.2453166999999,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.063084,
+        "p99": 0.891709,
+        "max": 6.341834,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 752.6140457,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.05625,
+        "p99": 1.180959,
+        "max": 3.429167,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 864.9298001,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.054292,
+        "p99": 1.234292,
+        "max": 5.638625,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 803.9448661999999,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.052834,
+        "p99": 2.7035,
+        "max": 5.113709,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 819.6808421,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.063667,
+        "p99": 0.920792,
+        "max": 4.303292,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 707.2439497999999,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      },
+      {
+        "over_10ms": 0,
+        "p50": 0.053167,
+        "p99": 0.699458,
+        "max": 4.712042,
+        "misses": 0,
+        "fallback": 0,
+        "gen_p95": 760.9934286999996,
+        "qos": {
+          "requested": "user-interactive",
+          "applied": true,
+          "error": null
+        }
+      }
+    ]
+  },
+  "over_10ms_reduction": 0.75,
+  "gen_p95_ratio": 1.0063146609366043,
+  "adopt": true
+}
