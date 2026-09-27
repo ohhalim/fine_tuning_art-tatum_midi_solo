@@ -95,3 +95,50 @@ def distance(counts: dict[str, np.ndarray], reference: dict[str, np.ndarray],
 
 def per_feature_distance(counts, reference) -> dict[str, float]:
     return {f: js_divergence(counts[f], reference[f]) for f in FEATURES}
+
+
+def feature_vector(counts: dict[str, np.ndarray]) -> np.ndarray:
+    """Each histogram normalised to sum 1 (zeros stay zeros), concatenated."""
+    parts = []
+    for f in FEATURES:
+        c = np.asarray(counts[f], dtype=float)
+        parts.append(c / c.sum() if c.sum() > 0 else c)
+    return np.concatenate(parts)
+
+
+class LogisticModel:
+    """L2 logistic regression with class-balanced weights, full-batch gradient descent."""
+
+    def __init__(self, lam: float = 1.0, steps: int = 2000, lr: float = 0.1):
+        self.lam, self.steps, self.lr = lam, steps, lr
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> "LogisticModel":
+        self.mean = X.mean(0)
+        self.std = X.std(0) + 1e-6
+        Z = (X - self.mean) / self.std
+        w_pos = 0.5 / max(1, y.sum())
+        w_neg = 0.5 / max(1, (1 - y).sum())
+        sw = np.where(y == 1, w_pos, w_neg)
+        self.w = np.zeros(Z.shape[1])
+        self.b = 0.0
+        for _ in range(self.steps):
+            p = 1 / (1 + np.exp(-(Z @ self.w + self.b)))
+            g = sw * (p - y)
+            self.w -= self.lr * (Z.T @ g + self.lam * self.w / len(y))
+            self.b -= self.lr * g.sum()
+        return self
+
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        Z = (X - self.mean) / self.std
+        return 1 / (1 + np.exp(-(Z @ self.w + self.b)))
+
+    def to_dict(self) -> dict:
+        return {"mean": self.mean.tolist(), "std": self.std.tolist(),
+                "w": self.w.tolist(), "b": float(self.b), "lam": self.lam}
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "LogisticModel":
+        m = cls(lam=d["lam"])
+        m.mean, m.std = np.array(d["mean"]), np.array(d["std"])
+        m.w, m.b = np.array(d["w"]), float(d["b"])
+        return m
