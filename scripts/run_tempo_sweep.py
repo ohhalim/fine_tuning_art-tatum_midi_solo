@@ -44,6 +44,7 @@ def summarize_report(report: dict) -> dict:
         "p95_over_bar": (p95 / (bar_s * 1000)) if p95 is not None else None,
         "played_notes": report.get("played_note_count"),
         "lateness_ms": report.get("dispatch_attempt_lateness_summary_ms"),
+        "stall_trace": report.get("stall_trace"),
     }
 
 
