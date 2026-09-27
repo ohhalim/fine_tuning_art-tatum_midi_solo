@@ -34,8 +34,9 @@
 핵심은 **"재생하면서 다음 것을 만든다"** 입니다. 마디가 끝나고 생각하기 시작하면
 이미 늦습니다.
 
-최종 목표는 여기에 **연주자 본인의 스타일 적응**을 얹는 것입니다. 그 단계는
-아직 성공하지 못했습니다(§5).
+최종 목표는 여기에 **연주자 본인의 스타일 적응**을 얹는 것입니다. 멜다우·Art Tatum으로
+시험한 결과, 어댑터는 모델 수치상 대상 스타일로 특화됩니다(Tatum은 학습하지 않은 곡까지).
+다만 귀로 들리는 차이는 아직 확인하지 못했습니다(§5).
 
 ---
 
@@ -95,12 +96,14 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    MIDI["연주자 MIDI<br/>(예: 18곡)"] --> TOK["토큰화<br/>data/*/train, val"]
-    TOK --> TRAIN["scripts/train_qlora.py<br/>LoRA r=16"]
-    BASE["사전학습 base<br/>또는 기존 어댑터"] --> TRAIN
-    TRAIN --> CKPT["checkpoint_epoch*.pt"]
-    CKPT -.런타임에서 --checkpoint 로 선택.-> USE["위 실행 경로"]
-    CKPT --> EVAL["scripts/run_mehldau_adapter_eval.py<br/>loss·생성 특징 비교"]
+    MIDI["연주자 MIDI 폴더"] --> TOK["scripts/build_artist_dataset.py<br/>곡 단위 train/val + base 중복 manifest"]
+    TOK --> TRAIN["scripts/run_mehldau_update_budget_diag.py<br/>한 연속 run, update별 LoRA snapshot<br/>(또는 train_qlora.py)"]
+    BASE["사전학습 base (armB)"] --> TRAIN
+    TRAIN --> EVAL["scripts/eval_mehldau_snapshots.py<br/>대상 train/val CE · 일반 재즈 CE · 특화도"]
+    EVAL --> PICK["사전 규칙으로 snapshot 선정"]
+    PICK --> EXP["scripts/export_lora_snapshot.py<br/>런타임용 full checkpoint"]
+    EXP -.런타임에서 --checkpoint 로 선택.-> USE["위 실행 경로"]
+    EXP --> LISTEN["scripts/make_reference_listening.py<br/>블라인드 청취 세트"]
 ```
 
 ---
@@ -117,7 +120,8 @@ flowchart LR
 | 재생 중 다음 마디 생성 | 스케줄러를 고치지 않고 producer 를 live view 로 끼움 | ✅ 완료 |
 | 연주 입력이 생성에 반영 안 됨 | 콜백 → snapshot → primer 경로 연결 | ✅ 배선 완료 |
 | 코드 진행이 생성에 반영 안 됨 | 모델이 코드 심볼을 학습한 적 없음을 확인 → **화성을 음표로** 제시하는 primer | ⚠️ 제한적 (§4) |
-| 연주자 스타일 적응 | 멜다우 18곡으로 LoRA 학습, 두 출발점 비교 | ❌ 효과 미입증 (§5) |
+| 연주자 스타일 적응이 안 움직임 | 원인 진단: 실제 optimizer update가 **8회**였음. 한 연속 run에서 update를 늘려 비교 | ✅ 원인 규명 (§5) |
+| 연주자 스타일 개인화 | 멜다우·Art Tatum LoRA 어댑터. 모델 우도로는 특화 확인, Tatum은 미학습 곡까지 | ⚠️ 들리는지는 미확인 (§5) |
 
 ### 확인된 제약 두 가지
 
@@ -157,44 +161,65 @@ flowchart LR
 
 ### 테스트
 
-`scripts/agent_harness.sh quick` — **169 tests 통과** (본 문서 작성 시점 실행).
+`tests/` 전체 unittest — **197 tests 통과** (2026-09-27, `FORCE_CPU=1`).
 
 `demo` 의 기본 경로는 **fallback-only** 입니다. 배선 확인용이며
 **모델의 음악적 품질 근거가 아닙니다.**
 
 ---
 
-## 5. 멜다우 개인화 — 효과를 확인하지 못했습니다
+## 5. 연주자 스타일 개인화 — 모델 수치로는 특화, 들리는지는 미확인
 
-- **데이터**: 18곡 (적응 train 16 / validation 2, 곡 단위 분리)
-- **학습**: LoRA r=16, 8 epoch, seed 42. 일반 재즈 base 와 기존 Tatum-adapted(정정: 실제로는 D1 Arm D, Brad Mehldau lead 16조각 적응. Tatum 어댑터는 없음)
-  두 출발점 각각에 적용. **기존 체크포인트는 덮어쓰지 않았습니다**
-- **관측**: 평가 loss 변화 약 **−0.007 / −0.006**(각 출발점 대비).
-  생성 특징에서 뚜렷한 개인화 효과를 확인하지 못했습니다
-- **런타임**: 학습한 어댑터를 명시 선택해 기존 실행 경로에서 load·generate
-  되는 것까지 확인
+판정 기준은 모두 실행 전에 문서에 등록했고, 기준에 미달한 결과도 그대로 기록했습니다.
+공통 설정: base(armB, 2,777곡 사전학습)에 out_proj LoRA r16을 붙였고, batch 4, accumulation 4, lr 3e-4로 로컬 MPS에서 학습했습니다.
+**특화도** = (대상 곡 CE 변화) − (일반 재즈 곡 CE 변화)이며, 음수일수록 대상 쪽으로 특화된 것입니다. CE는 label smoothing 없이 쟀습니다.
 
-### 평가의 한계 (원인 규명과 구분할 것)
+### 먼저 바로잡은 것
+- **첫 멜다우 run의 "효과 없음"은 학습량 문제였습니다.** 실제 optimizer update는 64가 아니라 **8회**였습니다(16곡 / batch 4 / accumulation 4 = epoch당 1회). 저장·로드와 gradient 경로에는 결함이 없었습니다
+- `train_qlora.py`의 cosine 스케줄이 배치 수 기준이라 lr이 거의 감쇠하지 않았습니다 → optimizer update 기준으로 고쳤습니다(기존 동작은 `--scheduler_steps legacy_batches`)
+- 지금까지 "Tatum-adapted"로 불린 체크포인트(D1 Arm D)는 실제로는 **Brad Mehldau 18곡의 오른손 파트로 학습**한 것이었습니다
 
-18곡 모두 base 학습 데이터와 토큰 시퀀스가 일치하고, validation 2곡도 base
-train 에 포함됩니다. 따라서 **새 멜다우 곡에 대한 일반화는 평가할 수 없습니다.**
+### 멜다우 (18곡 → train 16 / val 2)
+| update | 멜다우 train CE | 일반 재즈 CE | 특화도 |
+|---|---|---|---|
+| 8 (첫 run) | −0.020 | −0.009 | −0.011 |
+| **128** | **−0.133** | **−0.002** | **−0.131** |
+| 512 | −0.199 | +0.025 | −0.224 |
 
-**다만 이 중복이 "적응 효과가 작은 원인" 으로 입증된 것은 아닙니다.**
-학습 설정, 업데이트 크기, 평가 지표의 민감도도 아직 확인하지 않은 후보입니다.
-독립적인 원인 검증은 하지 않았습니다.
+- 이득의 대부분은 **학습한 16곡 자체에 대한 적합**입니다(val 2곡은 update 64 이후 개선되지 않음)
+- 청취 2회(블라인드 A/B, 실제 멜다우 기준 제시형)는 모두 **지지 없음**이었습니다. 사용자 의견: "사투리 구분처럼 모호하다"
+- 생성 스타일 descriptor 지표 2종은 타당성 기준(균형 정확도 0.75)에 미달했습니다(0.734)
 
-### 사용자 초기 청취 의견
+### Art Tatum (122곡 → train 110 / val 12, 어댑터 미학습)
+| update | Tatum val CE (미학습 12곡) | 일반 재즈 CE | 특화도 |
+|---|---|---|---|
+| 70 | −0.043 | −0.016 | −0.027 |
+| 133 | −0.055 | −0.012 | −0.042 |
+| **518** | **−0.068** | **−0.004** | **−0.063** |
 
-> "느낌은 비슷하고, 베이스 음 뒤에 솔로 같은 선율이 나오고 다시 베이스 음,
-> 이것의 반복"
+- **학습 곡 이득(−0.073)이 학습하지 않은 곡으로 거의 그대로 이어집니다.** 일반 재즈 성능은 끝까지 나빠지지 않았습니다
+- 사용자가 들은 단서 "빠른 속주"를 지표로 쟀습니다. 40–120 ms 간격 비율은 실제 Tatum 0.44 / 일반 재즈 0.21이고, 생성은 원래 모델 0.33 → **Tatum 어댑터 0.43**으로 올랐습니다. 95% CI 하한이 +0.0003이라 경계선입니다
+- 청취: 6쌍 중 1쌍만 응답했습니다("pair4_B가 가장 Tatum 같다, 빠른 속주"). **판정 미완**
+- 16-gram 복사율은 두 아티스트 모두 0입니다
 
-특정 8마디 실행에서 22개 노트가 나왔고 일부 마디의 pitch 가 두 어댑터 간
-동일했습니다. **이는 그 설정에서의 관찰입니다.** "솔로가 아니다",
-"어댑터가 무효임이 입증됐다", "primer 를 바꾸면 밀도가 보장된다" 같은 결론은
-아직 근거가 없습니다. 블라인드 스타일 평가도 하지 않았습니다.
+### 해석의 한계
+- 멜다우와 Tatum 곡 **모두 base 사전학습셋에 들어 있습니다.** Tatum val은 "어댑터가 보지 않은 곡"일 뿐 base는 봤습니다. 완전히 새로운 곡에 대한 일반화는 아닙니다
+- 우도 특화는 들리는 스타일과 같지 않습니다. 들리는 차이는 아직 확인되지 않았습니다
 
-비교 파일: `outputs/mehldau_eval/{base,tatum,mehldau_from_base,mehldau_from_tatum}.wav`
-상세: [멜다우 개인화 실험](docs/experiments/MEHLDAU_PERSONALIZATION.md)
+### 런타임에서 쓰기
+| 어댑터 | 체크포인트 (gitignore) | 런타임 스모크 (8마디, CPU) |
+|---|---|---|
+| 멜다우 u128 | `outputs/mehldau_lora_v2/u128/checkpoint_update128.pt` | 8/8, 오류 0, 생성 p50 404 ms |
+| **Tatum u518** | `outputs/tatum_lora_v1/u518/checkpoint_update518.pt` | 8/8, 오류 0, 생성 p50 **778 ms** (노트가 많음, 128 BPM 한 마디 안) |
+
+```bash
+FORCE_CPU=1 .venv/bin/python scripts/run_continuous_jazz.py \
+    --checkpoint outputs/tatum_lora_v1/u518/checkpoint_update518.pt \
+    --conditioning-midi <primer.mid> --bars 8 --capture \
+    --chord-primer --chord-blocks-per-bar 2 --output-dir outputs/continuous/tatum
+```
+
+상세: [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md) · [첫 멜다우 시도](docs/experiments/MEHLDAU_PERSONALIZATION.md)
 
 ---
 
@@ -247,7 +272,10 @@ uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo
 |---|---|
 | `outputs/continuous/<run>/continuous_report.json` | 지연·손실·데드라인 계측 |
 | `outputs/continuous/<run>/played.mid` | 실제로 디스패치된 노트 |
-| `outputs/mehldau_eval/` | 어댑터 비교 MIDI·WAV·리포트 |
+| `outputs/mehldau_eval/` | 첫 멜다우 어댑터 비교 MIDI·WAV·리포트 |
+| `outputs/{mehldau,tatum}_diag/` | update별 LoRA snapshot, snapshot 평가 리포트, 생성 MIDI |
+| `outputs/{mehldau,tatum}_listening_v*/` | 블라인드 청취 WAV·답안지·키 |
+| `docs/experiments/mehldau_diag/*.json` | 위 실험의 원시 결과 사본 (저장소에 포함) |
 
 가상 포트 검증만으로는 소리가 나지 않습니다. MIDI 를 DAW 악기에 연결하거나
 `played.mid` 를 가져와 들어야 합니다. **WAV 는 사인 합성 참고음이며 음색
@@ -260,7 +288,8 @@ uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo
 - **실물 키보드·FL Studio 연주 미검증.** 위 측정의 "키보드" 는 가상 소스입니다
 - **장시간 안정성 미검증.** 8~32마디 단발 실행만 했습니다
 - **음악적 품질 미검증.** 자동 지표는 품질 판정이 아닙니다
-- **멜다우 스타일 적응 성공 미입증** (§5)
+- **들리는 스타일 개인화 미입증.** 멜다우·Tatum 모두 모델 우도로는 특화됐지만, 청취 판정은 멜다우는 지지 없음이고 Tatum은 미완입니다 (§5)
+- **새 곡 일반화 미입증.** 대상 곡이 모두 base 사전학습셋에 있습니다
 - **부하 상태 미측정.** DAW·신스 동시 구동 조건에서 재측정이 필요합니다
 
 전송 성공, 제시간 생성, 좋은 음악은 **서로 다른 기준**입니다.
@@ -270,9 +299,10 @@ uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo
 
 ## 8. 재개할 한 작업
 
-**실물 키보드와 DAW 를 연결해 한 번 들어보기.** 지금까지의 측정은 전부 가상
-포트에서 이뤄졌고, 자동 지표로는 더 나아갈 수 없는 지점에 와 있습니다.
-사람이 실제로 듣고 나서야 다음 최적화 대상을 고를 수 있습니다.
+**Tatum 어댑터를 실제로 들어보고 판정하기.**
+`outputs/tatum_listening_v1/`의 나머지 5쌍을 듣거나, 속주 구간 위주의 짧은 세트로 다시 판정합니다.
+지지되면 Tatum u518로 실물 키보드·DAW 연주를 시험합니다(생성 p50 778 ms, 연주 템포에서의 여유를 먼저 확인).
+장기적으로는 본인 연주 개인화가 목표("내가 실제로 연주에 쓴다")에 가장 가깝습니다.
 
 ---
 
@@ -282,7 +312,8 @@ uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo
 - [연속 런타임 구조](docs/phase1/CONTINUOUS_PATH.md)
 - [생성 지연 측정](docs/phase1/GENERATION_LATENCY.md) · [구간별 예산](docs/phase1/LATENCY_BUDGET.md)
 - [코드 primer 비교 실험](docs/experiments/CHORD_PRIMER_AB.md)
-- [멜다우 개인화 실험](docs/experiments/MEHLDAU_PERSONALIZATION.md)
+- [멜다우 개인화 실험 (첫 시도)](docs/experiments/MEHLDAU_PERSONALIZATION.md)
+- [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Art Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md)
 - [기존 D0–D4 연구 기록](docs/RESEARCH_SUMMARY.md)
 
 과거 Stage B 실험은 `archive/` 와 연구 문서에 보존합니다.
