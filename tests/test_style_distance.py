@@ -87,3 +87,20 @@ class SnapshotEvalHelpersTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RunDensityTest(unittest.TestCase):
+    def test_clusters_and_run_ratio(self) -> None:
+        from scripts.measure_run_density import cluster_onsets, run_stats
+
+        # chord at 0 (3 notes within 30 ms), then 80 ms run notes, then a 500 ms gap
+        starts = [0.0, 0.01, 0.02, 0.08, 0.16, 0.24, 0.74]
+        self.assertEqual(cluster_onsets(starts), [0.0, 0.08, 0.16, 0.24, 0.74])
+        stats = run_stats(starts)
+        self.assertAlmostEqual(stats["run_ratio"], 3 / 4)
+        self.assertEqual(stats["onsets"], 5)
+
+    def test_too_few_onsets(self) -> None:
+        from scripts.measure_run_density import run_stats
+
+        self.assertIsNone(run_stats([0.0])["run_ratio"])
