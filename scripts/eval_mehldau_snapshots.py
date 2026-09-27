@@ -181,8 +181,9 @@ def main(argv=None) -> int:
         rows.append(row)
         print(json.dumps({k: v for k, v in row.items() if k != "per_seed"}), flush=True)
 
-    base = next(r for r in rows if r["update"] == 0)
-    for r in rows:
+    # Deltas need update 0; without it only absolute values are reported.
+    base = next((r for r in rows if r["update"] == 0), None)
+    for r in ([] if base is None else rows):
         r["d_ce_target_train"] = r["ce_target_train"] - base["ce_target_train"]
         r["d_ce_target_val"] = r["ce_target_val"] - base["ce_target_val"]
         r["d_ce_generic"] = r["ce_generic_probe"] - base["ce_generic_probe"]
@@ -209,7 +210,7 @@ def main(argv=None) -> int:
     (args.output_dir / "generated_tokens.json").write_text(json.dumps(
         {str(k): v for k, v in generations.items()}) + "\n")
     print("\nupdate  dCE_tr   dCE_val  dCE_gen  spec_val js_shift copy16")
-    for r in rows:
+    for r in ([] if base is None else rows):
         js = r["mean_js_shift"] if r["mean_js_shift"] is not None else float("nan")
         c16 = r["mean_copy16"] if r["mean_copy16"] is not None else float("nan")
         print(f"{r['update']:>5} {r['d_ce_target_train']:+.4f} {r['d_ce_target_val']:+.4f} "
