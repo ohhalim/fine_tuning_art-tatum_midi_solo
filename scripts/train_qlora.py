@@ -163,8 +163,86 @@ class LoRALinearWeight(nn.Module):
         return torch.cat([result_q, result_k, result_v], dim=-1)
 
 
-def add_lora_to_model(model: MusicTransformer, r: int = 16, alpha: int = 32, dropout: float = 0.05):
-    """Add LoRA layers to Music Transformer attention layers"""
+LORA_TARGETS = ("out_proj", "qkv", "ffn")
+DEFAULT_LORA_TARGETS = ("out_proj",)
+_QKV_LORA_CLASSES: dict[type, type] = {}
+
+
+def _qkv_lora_class(base_cls: type) -> type:
+    """Subclass whose ``in_proj_weight`` adds a q/k/v LoRA delta.
+
+    The attention forward reads ``self.in_proj_weight``; a class-level property
+    wins over the registered Parameter, which stays in ``_parameters`` so the
+    checkpoint key and the frozen base weight are unchanged.
+    """
+    if base_cls not in _QKV_LORA_CLASSES:
+        def in_proj_weight(self):
+            base = self._parameters["in_proj_weight"]
+            delta = torch.cat([self.lora_B_q @ self.lora_A_q,
+                               self.lora_B_k @ self.lora_A_k,
+                               self.lora_B_v @ self.lora_A_v], dim=0)
+            return base + delta * self.lora_qkv_scaling
+
+        _QKV_LORA_CLASSES[base_cls] = type(f"{base_cls.__name__}QKVLoRA", (base_cls,),
+                                           {"in_proj_weight": property(in_proj_weight)})
+    return _QKV_LORA_CLASSES[base_cls]
+
+
+def enable_qkv_lora(attn: nn.Module, r: int, alpha: int) -> list[nn.Parameter]:
+    if "lora_A_q" in attn._parameters:
+        return []
+    embed_dim = attn._parameters["in_proj_weight"].shape[1]
+    params = []
+    for name in ("q", "k", "v"):
+        a = nn.Parameter(torch.zeros(r, embed_dim))
+        nn.init.kaiming_uniform_(a, a=math.sqrt(5))
+        b = nn.Parameter(torch.zeros(embed_dim, r))
+        setattr(attn, f"lora_A_{name}", a)
+        setattr(attn, f"lora_B_{name}", b)
+        params += [a, b]
+    attn.lora_qkv_scaling = alpha / r
+    attn.__class__ = _qkv_lora_class(type(attn))
+    return params
+
+
+def _encoder_layers(model: nn.Module):
+    transformer = model.transformer
+    encoder = getattr(transformer, "encoder", None) or getattr(transformer, "custom_encoder", None)
+    return [] if encoder is None else list(encoder.layers)
+
+
+def add_lora_targets(model: nn.Module, targets, r: int = 16, alpha: int = 32,
+                     dropout: float = 0.05) -> nn.ModuleList:
+    """Add LoRA for ``qkv`` and/or ``ffn`` to an already frozen model (idempotent).
+
+    Kept separate from ``add_lora_to_model`` so a base checkpoint saved with only
+    out_proj LoRA can be loaded first and the extra targets attached after.
+    """
+    unknown = set(targets) - set(LORA_TARGETS)
+    if unknown:
+        raise ValueError(f"unknown LoRA targets: {sorted(unknown)}")
+    added = nn.ModuleList()
+    for layer in _encoder_layers(model):
+        if "qkv" in targets and hasattr(layer, "self_attn"):
+            enable_qkv_lora(layer.self_attn, r, alpha)
+        if "ffn" in targets:
+            for name in ("linear1", "linear2"):
+                current = getattr(layer, name, None)
+                if isinstance(current, nn.Linear):
+                    wrapped = LoRALayer(current, r=r, alpha=alpha, dropout=dropout)
+                    setattr(layer, name, wrapped)
+                    added.append(wrapped)
+    return added
+
+
+def add_lora_to_model(model: MusicTransformer, r: int = 16, alpha: int = 32, dropout: float = 0.05,
+                      targets=DEFAULT_LORA_TARGETS):
+    """Add LoRA layers to Music Transformer attention layers.
+
+    ``targets`` defaults to out_proj only, the layout of every checkpoint before
+    2026-09-27; ``qkv`` and ``ffn`` are opt-in (docs/experiments/TATUM_LORA_TARGETS.md).
+    """
+    targets = tuple(targets)
     
     # Freeze all parameters first
     for param in model.parameters():
@@ -187,13 +265,18 @@ def add_lora_to_model(model: MusicTransformer, r: int = 16, alpha: int = 32, dro
             attn = layer.self_attn
             
             # Add LoRA to out_proj
-            if hasattr(attn, 'out_proj'):
+            if "out_proj" in targets and hasattr(attn, 'out_proj'):
                 original_out_proj = attn.out_proj
                 lora_out = LoRALayer(original_out_proj, r=r, alpha=alpha, dropout=dropout)
                 attn.out_proj = lora_out
                 lora_modules.append(lora_out)
                 print(f"  Added LoRA to layer {i} out_proj")
-    
+
+    extra = [t for t in targets if t != "out_proj"]
+    if extra:
+        lora_modules.extend(add_lora_targets(model, extra, r=r, alpha=alpha, dropout=dropout))
+        print(f"  Added LoRA targets: {extra}")
+
     # Count trainable parameters
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total_params = sum(p.numel() for p in model.parameters())
@@ -231,6 +314,7 @@ def model_config_from_args(args: argparse.Namespace) -> dict[str, Any]:
         "lora_r": int(args.lora_r),
         "lora_alpha": int(args.lora_alpha),
         "lora_dropout": float(args.lora_dropout),
+        "lora_targets": list(args.lora_targets),
     }
 
 
@@ -255,6 +339,18 @@ def state_dict_uses_lora_wrappers(state_dict: dict[str, torch.Tensor]) -> bool:
     return any("lora_" in key.lower() or ".original_layer." in key for key in state_dict)
 
 
+def lora_targets_in_state_dict(state_dict: dict[str, torch.Tensor]) -> list[str]:
+    """Which LoRA targets a saved state dict already carries."""
+    found = []
+    if any(".out_proj.lora_" in k for k in state_dict):
+        found.append("out_proj")
+    if any(".self_attn.lora_A_q" in k for k in state_dict):
+        found.append("qkv")
+    if any(".linear1.original_layer." in k for k in state_dict):
+        found.append("ffn")
+    return found
+
+
 def state_dict_is_lora_only(state_dict: dict[str, torch.Tensor]) -> bool:
     return bool(state_dict) and all("lora_" in key.lower() for key in state_dict)
 
@@ -275,6 +371,8 @@ def apply_checkpoint_model_config(args: argparse.Namespace, model_config: dict[s
         args.rpr = bool(model_config["rpr"])
     if "lora_dropout" in model_config:
         args.lora_dropout = float(model_config["lora_dropout"])
+    if "lora_targets" in model_config:
+        args.lora_targets = list(model_config["lora_targets"])
 
 
 def training_mode_name(args: argparse.Namespace) -> str:
@@ -487,6 +585,9 @@ def main():
     parser.add_argument("--lora_r", type=int, default=16, help="LoRA rank")
     parser.add_argument("--lora_alpha", type=int, default=32, help="LoRA alpha")
     parser.add_argument("--lora_dropout", type=float, default=0.05)
+    parser.add_argument("--lora_targets", nargs="+", default=list(DEFAULT_LORA_TARGETS),
+                        choices=list(LORA_TARGETS),
+                        help="out_proj (default, all existing checkpoints), qkv, ffn")
     parser.add_argument(
         "--train_full_model",
         action="store_true",
@@ -571,7 +672,12 @@ def main():
                 "Adapter/full training requires a full checkpoint or base model checkpoint; "
                 f"got LoRA-only weights: {args.checkpoint}"
             )
+        requested_targets = list(args.lora_targets)
         apply_checkpoint_model_config(args, checkpoint_model_config(checkpoint_payload))
+        # Keep what the checkpoint already has and add what was asked for.
+        args.lora_targets = list(dict.fromkeys(
+            [*lora_targets_in_state_dict(checkpoint_state_dict), *args.lora_targets,
+             *requested_targets]))
         checkpoint_uses_lora_wrappers = state_dict_uses_lora_wrappers(checkpoint_state_dict)
     
     # Initialize model
@@ -593,17 +699,28 @@ def main():
     
     # Add LoRA
     print("\n=== Adding LoRA Layers ===")
+    # A LoRA-wrapped checkpoint is loaded into the layout it was saved with;
+    # targets it lacks are attached afterwards, starting from zero delta.
+    initial_targets = (lora_targets_in_state_dict(checkpoint_state_dict) or list(DEFAULT_LORA_TARGETS)
+                       if checkpoint_state_dict is not None and checkpoint_uses_lora_wrappers
+                       else list(args.lora_targets))
     model, lora_modules = add_lora_to_model(
-        model, 
-        r=args.lora_r, 
-        alpha=args.lora_alpha, 
-        dropout=args.lora_dropout
+        model,
+        r=args.lora_r,
+        alpha=args.lora_alpha,
+        dropout=args.lora_dropout,
+        targets=initial_targets,
     )
     if checkpoint_state_dict is not None and checkpoint_uses_lora_wrappers:
         print(f"Loading LoRA-wrapped full checkpoint after LoRA: {args.checkpoint}")
         _, resized_keys = load_state_dict_with_token_resize(model, checkpoint_state_dict, strict=True)
         if resized_keys:
             print(f"Resized checkpoint token layers for current vocab: {', '.join(resized_keys)}")
+        remaining = [t for t in args.lora_targets if t not in initial_targets]
+        if remaining:
+            lora_modules.extend(add_lora_targets(model, remaining, r=args.lora_r,
+                                                 alpha=args.lora_alpha, dropout=args.lora_dropout))
+            print(f"Added LoRA targets after load: {remaining}")
     if args.train_full_model:
         print("\n=== Tiny-overfit mode: unfreezing base model parameters ===")
         unfreeze_base_model(model)

@@ -1,0 +1,142 @@
+{
+  "schema": "run_density_v1",
+  "cluster_s": 0.03,
+  "run_window_s": [
+    0.04,
+    0.12
+  ],
+  "references": {
+    "target_val": {
+      "n": 12,
+      "mean_run_ratio": 0.44181497988569146,
+      "median_run_ratio": 0.4630681818181818,
+      "mean_onsets_per_s": 7.164358120817649
+    },
+    "generic_probe": {
+      "n": 100,
+      "mean_run_ratio": 0.20732271416063358,
+      "median_run_ratio": 0.16606753812636166,
+      "mean_onsets_per_s": 5.264477379556634
+    }
+  },
+  "snapshots": {
+    "0": {
+      "per_seed": [
+        {
+          "seed": 1,
+          "run_ratio": 0.2808988764044944,
+          "onsets_per_s": 5.715953875346664,
+          "onsets": 90
+        },
+        {
+          "seed": 2,
+          "run_ratio": 0.18032786885245902,
+          "onsets_per_s": 3.8449967767351914,
+          "onsets": 123
+        },
+        {
+          "seed": 3,
+          "run_ratio": 0.325,
+          "onsets_per_s": 6.557377049180329,
+          "onsets": 121
+        },
+        {
+          "seed": 4,
+          "run_ratio": 0.2823529411764706,
+          "onsets_per_s": 5.778739184177997,
+          "onsets": 86
+        },
+        {
+          "seed": 5,
+          "run_ratio": 0.25925925925925924,
+          "onsets_per_s": 5.4635761589403975,
+          "onsets": 136
+        },
+        {
+          "seed": 6,
+          "run_ratio": 0.44166666666666665,
+          "onsets_per_s": 8.037753082660984,
+          "onsets": 121
+        },
+        {
+          "seed": 7,
+          "run_ratio": 0.47413793103448276,
+          "onsets_per_s": 8.060644346178142,
+          "onsets": 117
+        },
+        {
+          "seed": 8,
+          "run_ratio": 0.3939393939393939,
+          "onsets_per_s": 7.241895261845387,
+          "onsets": 100
+        }
+      ],
+      "mean_run_ratio": 0.32969786716665334,
+      "mean_onsets_per_s": 6.337616966883137
+    },
+    "518": {
+      "per_seed": [
+        {
+          "seed": 1,
+          "run_ratio": 0.5145631067961165,
+          "onsets_per_s": 7.984496124031008,
+          "onsets": 104
+        },
+        {
+          "seed": 2,
+          "run_ratio": 0.39285714285714285,
+          "onsets_per_s": 6.057030481809243,
+          "onsets": 113
+        },
+        {
+          "seed": 3,
+          "run_ratio": 0.28703703703703703,
+          "onsets_per_s": 4.597523219814242,
+          "onsets": 109
+        },
+        {
+          "seed": 4,
+          "run_ratio": 0.6090909090909091,
+          "onsets_per_s": 9.046728971962617,
+          "onsets": 111
+        },
+        {
+          "seed": 5,
+          "run_ratio": 0.36923076923076925,
+          "onsets_per_s": 7.06172839506173,
+          "onsets": 131
+        },
+        {
+          "seed": 6,
+          "run_ratio": 0.625,
+          "onsets_per_s": 9.264376891696276,
+          "onsets": 161
+        },
+        {
+          "seed": 7,
+          "run_ratio": 0.708029197080292,
+          "onsets_per_s": 9.72258064516129,
+          "onsets": 138
+        },
+        {
+          "seed": 8,
+          "run_ratio": 0.6453900709219859,
+          "onsets_per_s": 9.894736842105264,
+          "onsets": 142
+        }
+      ],
+      "mean_run_ratio": 0.5188997791267815,
+      "mean_onsets_per_s": 7.953650196455209
+    }
+  },
+  "diff": {
+    "from": "0",
+    "to": "518",
+    "mean_diff": 0.1892019119601282,
+    "ci95": [
+      0.11660710904106728,
+      0.2522733209545476
+    ],
+    "moved_toward_runs": true
+  }
+}

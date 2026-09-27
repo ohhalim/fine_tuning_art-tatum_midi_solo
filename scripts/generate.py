@@ -207,7 +207,13 @@ def load_model_with_lora(
         rpr=rpr,
     )
 
-    model, _ = add_lora_to_model(model, r=lora_r, alpha=lora_alpha)
+    # Build the layout the checkpoint was saved with (out_proj only unless recorded).
+    lora_targets = tuple(model_config.get("lora_targets") or ("out_proj",))
+    if full_checkpoint_state is not None:
+        from train_qlora import lora_targets_in_state_dict
+        lora_targets = tuple(dict.fromkeys(
+            [*lora_targets, *lora_targets_in_state_dict(full_checkpoint_state)]))
+    model, _ = add_lora_to_model(model, r=lora_r, alpha=lora_alpha, targets=lora_targets)
 
     if full_checkpoint_path is not None:
         _, resized_keys = load_state_dict_with_token_resize(model, full_checkpoint_state, strict=True)

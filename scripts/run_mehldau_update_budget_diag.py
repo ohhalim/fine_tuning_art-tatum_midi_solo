@@ -95,6 +95,8 @@ def main(argv=None) -> int:
     p.add_argument("--gen-seeds", default="42,100,200")
     p.add_argument("--gen-bars", type=int, default=4)
     p.add_argument("--device", choices=["cpu", "mps"], default="cpu")
+    p.add_argument("--lora-targets", default="out_proj",
+                   help="comma list of out_proj,qkv,ffn; extras are attached after the base loads")
     p.add_argument("--bpm", type=int, default=128)
     p.add_argument("--generation-tokens", type=int, default=96)
     args = p.parse_args(argv)
@@ -118,7 +120,7 @@ def main(argv=None) -> int:
     from model.music_transformer import MusicTransformer
     from utilities.constants import TOKEN_PAD, VOCAB_SIZE
     from scripts.checkpoint_utils import load_state_dict_with_token_resize
-    from scripts.train_qlora import (MidiDataset, add_lora_to_model,
+    from scripts.train_qlora import (MidiDataset, add_lora_targets, add_lora_to_model,
                                      checkpoint_model_config,
                                      checkpoint_payload_state_dict, set_seed)
 
@@ -133,6 +135,11 @@ def main(argv=None) -> int:
                                  dropout=cfg["lora_dropout"])
     load_state_dict_with_token_resize(model, state, strict=True)
     max_seq = int(cfg["max_sequence"])
+    lora_targets = [t.strip() for t in args.lora_targets.split(",") if t.strip()]
+    extra_targets = [t for t in lora_targets if t != "out_proj"]
+    if extra_targets:
+        add_lora_targets(model, extra_targets, r=cfg["lora_r"], alpha=cfg["lora_alpha"],
+                         dropout=cfg["lora_dropout"])
     model = model.to(device)
 
     train_ds = MidiDataset(str(args.data_dir), max_seq=max_seq, split="train")
@@ -315,7 +322,8 @@ def main(argv=None) -> int:
         "checkpoint": str(args.checkpoint), "data_dir": str(args.data_dir),
         "primer": str(args.primer),
         "primer_sha1": hashlib.sha1(args.primer.read_bytes()).hexdigest(),
-        "model_max_sequence": max_seq, "device": str(device),
+        "model_max_sequence": max_seq, "device": str(device), "lora_targets": lora_targets,
+        "trainable_params": sum(q.numel() for q in trainable),
         "config": {k: (str(v) if isinstance(v, Path) else v) for k, v in vars(args).items()},
         "batches_per_epoch": batches_per_epoch, "updates_per_epoch": updates_per_epoch,
         "optimizer_updates": updates, "adam_state_steps": sorted(adam_steps),
