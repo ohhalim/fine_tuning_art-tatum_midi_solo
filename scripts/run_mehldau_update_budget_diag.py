@@ -223,6 +223,7 @@ def main(argv=None) -> int:
         print(json.dumps(row), flush=True)
 
     updates, tokens_seen, train_wall = 0, 0, 0.0
+    taken = {0}
     take_snapshot(0, optimizer.param_groups[0]["lr"], 0.0, 0, None)
     stopped = "planned_epochs"
     for epoch in range(1, args.planned_epochs + 1):
@@ -244,7 +245,11 @@ def main(argv=None) -> int:
                 optimizer.zero_grad(set_to_none=True)
                 updates += 1
         train_wall += time.perf_counter() - t0
-        if updates in snapshots_wanted:
+        # Take a snapshot at the first epoch boundary at or past each wanted
+        # update count (epochs can hold several updates).
+        due = [w for w in snapshots_wanted if w <= updates and w not in taken]
+        if due:
+            taken.update(due)
             take_snapshot(updates, optimizer.param_groups[0]["lr"], train_wall, tokens_seen,
                           epoch_loss / batches_per_epoch)
         if train_wall >= args.budget_seconds:
