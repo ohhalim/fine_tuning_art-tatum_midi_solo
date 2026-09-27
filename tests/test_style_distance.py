@@ -85,10 +85,6 @@ class SnapshotEvalHelpersTest(unittest.TestCase):
         self.assertEqual(middle_chunk(np.arange(3), 4).tolist(), [0, 1, 2])
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class RunDensityTest(unittest.TestCase):
     def test_clusters_and_run_ratio(self) -> None:
         from scripts.measure_run_density import cluster_onsets, run_stats
@@ -104,3 +100,7 @@ class RunDensityTest(unittest.TestCase):
         from scripts.measure_run_density import run_stats
 
         self.assertIsNone(run_stats([0.0])["run_ratio"])
+
+
+if __name__ == "__main__":
+    unittest.main()
