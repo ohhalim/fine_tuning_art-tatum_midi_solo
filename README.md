@@ -167,7 +167,7 @@ flowchart LR
 ## 5. 멜다우 개인화 — 효과를 확인하지 못했습니다
 
 - **데이터**: 18곡 (적응 train 16 / validation 2, 곡 단위 분리)
-- **학습**: LoRA r=16, 8 epoch, seed 42. 일반 재즈 base 와 기존 Tatum-adapted
+- **학습**: LoRA r=16, 8 epoch, seed 42. 일반 재즈 base 와 기존 Tatum-adapted(정정: 실제로는 D1 Arm D, Brad Mehldau lead 16조각 적응. Tatum 어댑터는 없음)
   두 출발점 각각에 적용. **기존 체크포인트는 덮어쓰지 않았습니다**
 - **관측**: 평가 loss 변화 약 **−0.007 / −0.006**(각 출발점 대비).
   생성 특징에서 뚜렷한 개인화 효과를 확인하지 못했습니다

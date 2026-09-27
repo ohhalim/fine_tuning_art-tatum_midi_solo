@@ -52,6 +52,8 @@
 | generic base | `d0_experiment/armB_full2777/ckpt/checkpoint_epoch8.pt` |
 | Tatum-adapted | `d1_experiment/armD_lora/ckpt/checkpoint_epoch8.pt` |
 
+> **정정 2026-09-27: "Tatum-adapted"는 잘못된 이름이다.** D1 Arm D는 `data/roles/lead`로 학습했다. 이 데이터는 **Brad Mehldau 18곡의 오른손(split pitch 60) 16/2 분할**이다(`meta.json`의 `source_midi` 18개 전부 Brad Mehldau). 따라서 `from_tatum`은 "멜다우 lead로 이미 적응한 어댑터에서 이어 학습"이다. Art Tatum 전용 어댑터는 존재하지 않는다. 아래 표의 `tatum` 표기는 기록을 위해 그대로 둔다.
+
 설정: LoRA r=16 alpha=32, lr 3e-4, 8 epoch, batch 4, seed 42, max_seq **1024**
 (정정 2026-09-27: 512로 적었으나 checkpoint `model_config` 상속으로 실제 1024. gradient_accumulation 기본값 4, label smoothing 0.1),
 CPU. smoke 1 epoch 로 경로 확인 후 본 학습. best-val epoch 자동 저장.
