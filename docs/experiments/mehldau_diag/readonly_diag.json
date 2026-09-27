@@ -1,0 +1,359 @@
+{
+ "from_base_ep6_param_delta": {
+  "changed_keys": [
+   "transformer.encoder.layers.0.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.0.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.1.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.1.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.2.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.2.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.3.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.3.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.4.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.4.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.5.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.5.self_attn.out_proj.lora_B"
+  ],
+  "new_keys": [],
+  "per_layer": [
+   {
+    "layer": 0,
+    "base_W_norm": 22.505504608154297,
+    "start_lora_delta_norm": 1.066346526145935,
+    "update_norm": 0.23693472146987915,
+    "update_rel_to_Weff": 0.01051805168390274,
+    "lora_B_absmax_start": 0.0277424193918705,
+    "lora_B_absmax_end": 0.02780989557504654
+   },
+   {
+    "layer": 1,
+    "base_W_norm": 22.609905242919922,
+    "start_lora_delta_norm": 1.191397786140442,
+    "update_norm": 0.18385706841945648,
+    "update_rel_to_Weff": 0.008117007091641426,
+    "lora_B_absmax_start": 0.03350469842553139,
+    "lora_B_absmax_end": 0.03517049551010132
+   },
+   {
+    "layer": 2,
+    "base_W_norm": 23.01085662841797,
+    "start_lora_delta_norm": 1.8658937215805054,
+    "update_norm": 0.21179361641407013,
+    "update_rel_to_Weff": 0.009149229153990746,
+    "lora_B_absmax_start": 0.07511952519416809,
+    "lora_B_absmax_end": 0.07376324385404587
+   },
+   {
+    "layer": 3,
+    "base_W_norm": 23.280136108398438,
+    "start_lora_delta_norm": 2.1772854328155518,
+    "update_norm": 0.20216065645217896,
+    "update_rel_to_Weff": 0.008593417704105377,
+    "lora_B_absmax_start": 0.06738901883363724,
+    "lora_B_absmax_end": 0.06568281352519989
+   },
+   {
+    "layer": 4,
+    "base_W_norm": 22.668380737304688,
+    "start_lora_delta_norm": 1.8421530723571777,
+    "update_norm": 0.1991180181503296,
+    "update_rel_to_Weff": 0.008726881816983223,
+    "lora_B_absmax_start": 0.06693504750728607,
+    "lora_B_absmax_end": 0.06865143775939941
+   },
+   {
+    "layer": 5,
+    "base_W_norm": 22.136871337890625,
+    "start_lora_delta_norm": 1.0414698123931885,
+    "update_norm": 0.16370274126529694,
+    "update_rel_to_Weff": 0.007388712838292122,
+    "lora_B_absmax_start": 0.03590598702430725,
+    "lora_B_absmax_end": 0.03736385330557823
+   }
+  ]
+ },
+ "from_base_ep8_param_delta": {
+  "changed_keys": [
+   "transformer.encoder.layers.0.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.0.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.1.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.1.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.2.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.2.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.3.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.3.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.4.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.4.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.5.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.5.self_attn.out_proj.lora_B"
+  ],
+  "new_keys": [],
+  "per_layer": [
+   {
+    "layer": 0,
+    "base_W_norm": 22.505504608154297,
+    "start_lora_delta_norm": 1.066346526145935,
+    "update_norm": 0.3084186613559723,
+    "update_rel_to_Weff": 0.013691380620002747,
+    "lora_B_absmax_start": 0.0277424193918705,
+    "lora_B_absmax_end": 0.02810250036418438
+   },
+   {
+    "layer": 1,
+    "base_W_norm": 22.609905242919922,
+    "start_lora_delta_norm": 1.191397786140442,
+    "update_norm": 0.2359258383512497,
+    "update_rel_to_Weff": 0.010415763594210148,
+    "lora_B_absmax_start": 0.03350469842553139,
+    "lora_B_absmax_end": 0.03568023443222046
+   },
+   {
+    "layer": 2,
+    "base_W_norm": 23.01085662841797,
+    "start_lora_delta_norm": 1.8658937215805054,
+    "update_norm": 0.2662542164325714,
+    "update_rel_to_Weff": 0.011501860804855824,
+    "lora_B_absmax_start": 0.07511952519416809,
+    "lora_B_absmax_end": 0.07340512424707413
+   },
+   {
+    "layer": 3,
+    "base_W_norm": 23.280136108398438,
+    "start_lora_delta_norm": 2.1772854328155518,
+    "update_norm": 0.2553403973579407,
+    "update_rel_to_Weff": 0.01085397507995367,
+    "lora_B_absmax_start": 0.06738901883363724,
+    "lora_B_absmax_end": 0.065163254737854
+   },
+   {
+    "layer": 4,
+    "base_W_norm": 22.668380737304688,
+    "start_lora_delta_norm": 1.8421530723571777,
+    "update_norm": 0.25410962104797363,
+    "update_rel_to_Weff": 0.011137036606669426,
+    "lora_B_absmax_start": 0.06693504750728607,
+    "lora_B_absmax_end": 0.06914988905191422
+   },
+   {
+    "layer": 5,
+    "base_W_norm": 22.136871337890625,
+    "start_lora_delta_norm": 1.0414698123931885,
+    "update_norm": 0.20894576609134674,
+    "update_rel_to_Weff": 0.009430753998458385,
+    "lora_B_absmax_start": 0.03590598702430725,
+    "lora_B_absmax_end": 0.03752947598695755
+   }
+  ]
+ },
+ "from_tatum_ep6_param_delta": {
+  "changed_keys": [
+   "transformer.encoder.layers.0.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.0.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.1.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.1.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.2.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.2.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.3.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.3.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.4.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.4.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.5.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.5.self_attn.out_proj.lora_B"
+  ],
+  "new_keys": [],
+  "per_layer": [
+   {
+    "layer": 0,
+    "base_W_norm": 22.505504608154297,
+    "start_lora_delta_norm": 1.1351028680801392,
+    "update_norm": 0.23222947120666504,
+    "update_rel_to_Weff": 0.010307548567652702,
+    "lora_B_absmax_start": 0.029216723516583443,
+    "lora_B_absmax_end": 0.02970856986939907
+   },
+   {
+    "layer": 1,
+    "base_W_norm": 22.609905242919922,
+    "start_lora_delta_norm": 1.2283281087875366,
+    "update_norm": 0.20043396949768066,
+    "update_rel_to_Weff": 0.00884807389229536,
+    "lora_B_absmax_start": 0.03535246104001999,
+    "lora_B_absmax_end": 0.036949578672647476
+   },
+   {
+    "layer": 2,
+    "base_W_norm": 23.01085662841797,
+    "start_lora_delta_norm": 1.8632237911224365,
+    "update_norm": 0.2032351940870285,
+    "update_rel_to_Weff": 0.008780245669186115,
+    "lora_B_absmax_start": 0.07292980700731277,
+    "lora_B_absmax_end": 0.0716734528541565
+   },
+   {
+    "layer": 3,
+    "base_W_norm": 23.280136108398438,
+    "start_lora_delta_norm": 2.1885147094726562,
+    "update_norm": 0.19613462686538696,
+    "update_rel_to_Weff": 0.008337329141795635,
+    "lora_B_absmax_start": 0.06885282695293427,
+    "lora_B_absmax_end": 0.06716679781675339
+   },
+   {
+    "layer": 4,
+    "base_W_norm": 22.668380737304688,
+    "start_lora_delta_norm": 1.8763728141784668,
+    "update_norm": 0.2009654939174652,
+    "update_rel_to_Weff": 0.00880513060837984,
+    "lora_B_absmax_start": 0.06919000297784805,
+    "lora_B_absmax_end": 0.07088316231966019
+   },
+   {
+    "layer": 5,
+    "base_W_norm": 22.136871337890625,
+    "start_lora_delta_norm": 1.072338581085205,
+    "update_norm": 0.17244747281074524,
+    "update_rel_to_Weff": 0.007782892324030399,
+    "lora_B_absmax_start": 0.035783130675554276,
+    "lora_B_absmax_end": 0.03697054833173752
+   }
+  ]
+ },
+ "from_tatum_ep8_param_delta": {
+  "changed_keys": [
+   "transformer.encoder.layers.0.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.0.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.1.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.1.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.2.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.2.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.3.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.3.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.4.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.4.self_attn.out_proj.lora_B",
+   "transformer.encoder.layers.5.self_attn.out_proj.lora_A",
+   "transformer.encoder.layers.5.self_attn.out_proj.lora_B"
+  ],
+  "new_keys": [],
+  "per_layer": [
+   {
+    "layer": 0,
+    "base_W_norm": 22.505504608154297,
+    "start_lora_delta_norm": 1.1351028680801392,
+    "update_norm": 0.2975619435310364,
+    "update_rel_to_Weff": 0.013207342475652695,
+    "lora_B_absmax_start": 0.029216723516583443,
+    "lora_B_absmax_end": 0.03002936951816082
+   },
+   {
+    "layer": 1,
+    "base_W_norm": 22.609905242919922,
+    "start_lora_delta_norm": 1.2283281087875366,
+    "update_norm": 0.25776198506355286,
+    "update_rel_to_Weff": 0.011378795839846134,
+    "lora_B_absmax_start": 0.03535246104001999,
+    "lora_B_absmax_end": 0.03744330257177353
+   },
+   {
+    "layer": 2,
+    "base_W_norm": 23.01085662841797,
+    "start_lora_delta_norm": 1.8632237911224365,
+    "update_norm": 0.2569182515144348,
+    "update_rel_to_Weff": 0.011099481955170631,
+    "lora_B_absmax_start": 0.07292980700731277,
+    "lora_B_absmax_end": 0.07133296877145767
+   },
+   {
+    "layer": 3,
+    "base_W_norm": 23.280136108398438,
+    "start_lora_delta_norm": 2.1885147094726562,
+    "update_norm": 0.24839097261428833,
+    "update_rel_to_Weff": 0.010558651760220528,
+    "lora_B_absmax_start": 0.06885282695293427,
+    "lora_B_absmax_end": 0.06664925068616867
+   },
+   {
+    "layer": 4,
+    "base_W_norm": 22.668380737304688,
+    "start_lora_delta_norm": 1.8763728141784668,
+    "update_norm": 0.25714215636253357,
+    "update_rel_to_Weff": 0.011266463436186314,
+    "lora_B_absmax_start": 0.06919000297784805,
+    "lora_B_absmax_end": 0.07136676460504532
+   },
+   {
+    "layer": 5,
+    "base_W_norm": 22.136871337890625,
+    "start_lora_delta_norm": 1.072338581085205,
+    "update_norm": 0.22197172045707703,
+    "update_rel_to_Weff": 0.010018019005656242,
+    "lora_B_absmax_start": 0.035783130675554276,
+    "lora_B_absmax_end": 0.03751280903816223
+   }
+  ]
+ },
+ "save_load": {
+  "keys_equal": true,
+  "max_abs_diff": 0.0
+ },
+ "data": {
+  "train_songs": 16,
+  "train_tokens": [
+   4270,
+   4464,
+   1968,
+   6720,
+   10050,
+   2542,
+   1572,
+   1525,
+   3142,
+   3670,
+   3851,
+   2977,
+   2640,
+   2514,
+   5154,
+   2595
+  ],
+  "val_tokens": [
+   1031,
+   5367
+  ]
+ },
+ "from_base_ep8_logits_train": {
+  "tokens": 55808,
+  "ce_start": 2.6250330942486406,
+  "ce_adapted": 2.608828638671735,
+  "delta_ce": -0.016204455576905415,
+  "kl_start_to_adapted": 0.002456893200276915,
+  "top1_agree": 0.9531608371559633,
+  "mean_abs_logit_delta": 0.031098663225906705
+ },
+ "from_base_ep8_logits_val": {
+  "tokens": 6144,
+  "ce_start": 2.4407586455345154,
+  "ce_adapted": 2.431242028872172,
+  "delta_ce": -0.009516616662343344,
+  "kl_start_to_adapted": 0.001652725428963701,
+  "top1_agree": 0.9637044270833334,
+  "mean_abs_logit_delta": 0.02850073855370283
+ },
+ "from_tatum_ep8_logits_train": {
+  "tokens": 55808,
+  "ce_start": 2.6192739644181837,
+  "ce_adapted": 2.6032287155816314,
+  "delta_ce": -0.016045248836552332,
+  "kl_start_to_adapted": 0.0032589775830541455,
+  "top1_agree": 0.9460113245412844,
+  "mean_abs_logit_delta": 0.03576039039282077
+ },
+ "from_tatum_ep8_logits_val": {
+  "tokens": 6144,
+  "ce_start": 2.431345224380493,
+  "ce_adapted": 2.4231650630633035,
+  "delta_ce": -0.008180161317189535,
+  "kl_start_to_adapted": 0.0022209119245720408,
+  "top1_agree": 0.9567057291666666,
+  "mean_abs_logit_delta": 0.032693764039625726
+ }
+}
