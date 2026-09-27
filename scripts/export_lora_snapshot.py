@@ -30,6 +30,7 @@ def main(argv=None) -> int:
     ap.add_argument("--snapshot", type=Path, required=True)
     ap.add_argument("--output", type=Path, required=True)
     ap.add_argument("--note", default="")
+    ap.add_argument("--lora-targets", default="out_proj", help="must match the snapshot")
     args = ap.parse_args(argv)
     if args.output.exists():
         ap.error(f"refusing to overwrite {args.output}")
@@ -40,7 +41,7 @@ def main(argv=None) -> int:
     from model.music_transformer import MusicTransformer
     from scripts.checkpoint_utils import load_state_dict_with_token_resize
     from scripts.generate import load_model_with_lora
-    from scripts.train_qlora import (add_lora_to_model, checkpoint_model_config,
+    from scripts.train_qlora import (add_lora_targets, add_lora_to_model, checkpoint_model_config,
                                      checkpoint_payload_state_dict)
 
     payload = torch.load(args.base, map_location="cpu", weights_only=False)
@@ -51,6 +52,12 @@ def main(argv=None) -> int:
     model, _ = add_lora_to_model(model, r=cfg["lora_r"], alpha=cfg["lora_alpha"],
                                  dropout=cfg["lora_dropout"])
     load_state_dict_with_token_resize(model, checkpoint_payload_state_dict(payload), strict=True)
+    targets = [t.strip() for t in args.lora_targets.split(",") if t.strip()]
+    extra = [t for t in targets if t != "out_proj"]
+    if extra:
+        add_lora_targets(model, extra, r=cfg["lora_r"], alpha=cfg["lora_alpha"],
+                         dropout=cfg["lora_dropout"])
+    cfg = {**cfg, "lora_targets": targets}
     lora = torch.load(args.snapshot, map_location="cpu")
     if not lora or not all("lora_" in k for k in lora):
         ap.error("snapshot must contain only lora_ tensors")

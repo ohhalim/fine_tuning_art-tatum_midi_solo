@@ -145,3 +145,73 @@ class ExportSnapshotTest(unittest.TestCase):
                 self.assertTrue(torch.equal(tuned(x), loaded(x)))
             with self.assertRaises(SystemExit):
                 export_main(args)
+
+
+class LoraTargetsTest(unittest.TestCase):
+    def _cfg(self):
+        return {**TINY, "lora_r": 2, "lora_alpha": 4, "lora_dropout": 0.0}
+
+    def test_default_targets_unchanged(self) -> None:
+        from scripts.train_qlora import lora_targets_in_state_dict
+
+        model = tiny_lora_model()
+        self.assertEqual(lora_targets_in_state_dict(model.state_dict()), ["out_proj"])
+        trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        self.assertEqual(trainable, 2 * 16 * 2)  # one layer, out_proj A+B at r=2, d=16
+
+    def test_qkv_and_ffn_start_at_zero_delta_and_keep_base_keys(self) -> None:
+        from scripts.train_qlora import add_lora_targets, lora_targets_in_state_dict
+
+        model = tiny_lora_model()
+        model.eval()
+        x = torch.randint(0, 300, (1, 12))
+        with torch.no_grad():
+            before = model(x)
+        add_lora_targets(model, ["qkv", "ffn"], r=2, alpha=4, dropout=0.0)
+        model.eval()
+        with torch.no_grad():
+            after = model(x)
+        self.assertTrue(torch.allclose(before, after, atol=1e-6))
+        keys = model.state_dict().keys()
+        self.assertIn("transformer.encoder.layers.0.self_attn.in_proj_weight", keys)
+        self.assertEqual(lora_targets_in_state_dict(model.state_dict()), ["out_proj", "qkv", "ffn"])
+        new = {k for k, p in model.named_parameters() if p.requires_grad}
+        self.assertTrue(all("lora_" in k for k in new))
+        self.assertTrue(any("lora_A_q" in k for k in new))
+        self.assertTrue(any("linear1.lora_A" in k for k in new))
+
+    def test_qkv_lora_changes_output_and_gets_gradient(self) -> None:
+        from scripts.train_qlora import add_lora_targets
+
+        model = tiny_lora_model()
+        add_lora_targets(model, ["qkv"], r=2, alpha=4)
+        attn = model.transformer.encoder.layers[0].self_attn
+        with torch.no_grad():
+            attn.lora_B_v.normal_(0, 0.5)
+        model.train()
+        out = model(torch.randint(0, 300, (1, 12)))
+        out.sum().backward()
+        self.assertIsNotNone(attn.lora_A_v.grad)
+        self.assertIsNone(attn._parameters["in_proj_weight"].grad)
+
+    def test_extended_checkpoint_reloads_identically(self) -> None:
+        from scripts.train_qlora import add_lora_targets
+
+        model = tiny_lora_model()
+        add_lora_targets(model, ["qkv", "ffn"], r=2, alpha=4, dropout=0.0)
+        with torch.no_grad():
+            for name, param in model.named_parameters():
+                if "lora_B" in name:
+                    param.normal_(0, 0.1)
+        model.eval()
+        x = torch.randint(0, 300, (1, 12))
+        with torch.no_grad():
+            expected = model(x)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "checkpoint_epoch1.pt"
+            torch.save({"model_config": {**self._cfg(), "lora_targets": ["out_proj", "qkv", "ffn"]},
+                        "model_state_dict": model.state_dict()}, path)
+            loaded = load_model_with_lora(lora_path=tmp, checkpoint_path=str(path),
+                                          prefer_full_checkpoint=True)
+        with torch.no_grad():
+            self.assertTrue(torch.equal(expected, loaded(x)))

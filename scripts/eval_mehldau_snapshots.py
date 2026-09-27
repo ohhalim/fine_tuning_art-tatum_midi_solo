@@ -63,6 +63,8 @@ def main(argv=None) -> int:
     ap.add_argument("--classifier", type=Path, default=None,
                     help="optional V1b-style model json (exploratory P(target))")
     ap.add_argument("--target-name", default="mehldau")
+    ap.add_argument("--lora-targets", default="out_proj", help="must match the snapshots")
+    ap.add_argument("--no-generate", action="store_true", help="likelihood only")
     ap.add_argument("--primer", type=Path, required=True)
     ap.add_argument("--seeds", default="1,2,3,4,5,6,7,8")
     ap.add_argument("--gen-tokens", type=int, default=768)
@@ -86,7 +88,7 @@ def main(argv=None) -> int:
     from scripts.run_mehldau_update_budget_diag import fixed_crops
     from scripts.style_distance import (LogisticModel, distance, feature_counts, feature_vector,
                                         pool, tokens_to_notes)
-    from scripts.train_qlora import (add_lora_to_model, checkpoint_model_config,
+    from scripts.train_qlora import (add_lora_targets, add_lora_to_model, checkpoint_model_config,
                                      checkpoint_payload_state_dict)
     from scripts.validate_style_distance import load, middle_chunk
 
@@ -98,6 +100,10 @@ def main(argv=None) -> int:
     model, _ = add_lora_to_model(model, r=cfg["lora_r"], alpha=cfg["lora_alpha"],
                                  dropout=cfg["lora_dropout"])
     load_state_dict_with_token_resize(model, checkpoint_payload_state_dict(payload), strict=True)
+    extra_targets = [t for t in args.lora_targets.split(",") if t.strip() and t != "out_proj"]
+    if extra_targets:
+        add_lora_targets(model, extra_targets, r=cfg["lora_r"], alpha=cfg["lora_alpha"],
+                         dropout=cfg["lora_dropout"])
     model = model.to(device)
     max_seq = int(cfg["max_sequence"])
 
@@ -148,7 +154,7 @@ def main(argv=None) -> int:
                "ce_target_val": ce(target_val_crops),
                "ce_generic_probe": ce(generic_crops)}
         gens, per_seed = [], []
-        for seed in seeds:
+        for seed in ([] if args.no_generate else seeds):
             torch.manual_seed(seed)
             tokens, _ = generate_once(model=model, primer=primer,
                                       target_length=min(max_seq, len(primer) + args.gen_tokens),
@@ -186,7 +192,7 @@ def main(argv=None) -> int:
             r[f"specialised_{split}_without_big_generic_loss"] = (
                 r[f"specialisation_{split}"] <= -0.02 and r["d_ce_generic"] <= 0.05)
         for k in ("js_shift", "p_target"):
-            if all(s[k] is not None for s in r["per_seed"] + base["per_seed"]):
+            if r["per_seed"] and all(s[k] is not None for s in r["per_seed"] + base["per_seed"]):
                 r[f"{k}_diff_ci95_vs_u0"] = bootstrap_diff([s[k] for s in base["per_seed"]],
                                                            [s[k] for s in r["per_seed"]])
     report = {"schema": "snapshot_eval_v2", "checkpoint": str(args.checkpoint),
@@ -204,9 +210,10 @@ def main(argv=None) -> int:
         {str(k): v for k, v in generations.items()}) + "\n")
     print("\nupdate  dCE_tr   dCE_val  dCE_gen  spec_val js_shift copy16")
     for r in rows:
+        js = r["mean_js_shift"] if r["mean_js_shift"] is not None else float("nan")
+        c16 = r["mean_copy16"] if r["mean_copy16"] is not None else float("nan")
         print(f"{r['update']:>5} {r['d_ce_target_train']:+.4f} {r['d_ce_target_val']:+.4f} "
-              f"{r['d_ce_generic']:+.4f} {r['specialisation_val']:+.4f} {r['mean_js_shift']:+.4f} "
-              f"{r['mean_copy16'] if r['mean_copy16'] is not None else float('nan'):.3f}")
+              f"{r['d_ce_generic']:+.4f} {r['specialisation_val']:+.4f} {js:+.4f} {c16:.3f}")
     return 0
 
 
