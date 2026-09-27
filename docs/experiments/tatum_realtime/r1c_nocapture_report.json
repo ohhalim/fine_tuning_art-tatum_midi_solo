@@ -1,0 +1,102 @@
+{
+  "schema": "tempo_sweep_v1",
+  "bars": 16,
+  "extra": "--chord-primer --chord-blocks-per-bar 2",
+  "capture": false,
+  "primer": "outputs/chord_ab/ii_V_I.mid",
+  "force_cpu": "1",
+  "models": {
+    "fallback_nocap": {
+      "checkpoint": "FALLBACK",
+      "bpms": {
+        "200": {
+          "runs": [
+            {
+              "seed": 42,
+              "bpm": 200,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 0,
+              "fallback_bars": 16,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1200.0,
+              "gen_ms_bar0": null,
+              "gen_ms_p50": null,
+              "gen_ms_p95": null,
+              "gen_ms_max": null,
+              "p95_over_bar": null,
+              "played_notes": 122,
+              "lateness_ms": {
+                "count": 244,
+                "p50": 2.620472,
+                "p95": 4.855161,
+                "p99": 8.787981,
+                "maximum": 14.936395,
+                "over_5ms": 11,
+                "over_10ms": 2
+              }
+            },
+            {
+              "seed": 43,
+              "bpm": 200,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 0,
+              "fallback_bars": 16,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1200.0,
+              "gen_ms_bar0": null,
+              "gen_ms_p50": null,
+              "gen_ms_p95": null,
+              "gen_ms_max": null,
+              "p95_over_bar": null,
+              "played_notes": 126,
+              "lateness_ms": {
+                "count": 252,
+                "p50": 2.59875,
+                "p95": 4.693417,
+                "p99": 6.787417,
+                "maximum": 14.895125,
+                "over_5ms": 11,
+                "over_10ms": 2
+              }
+            },
+            {
+              "seed": 44,
+              "bpm": 200,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 0,
+              "fallback_bars": 16,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1200.0,
+              "gen_ms_bar0": null,
+              "gen_ms_p50": null,
+              "gen_ms_p95": null,
+              "gen_ms_max": null,
+              "p95_over_bar": null,
+              "played_notes": 127,
+              "lateness_ms": {
+                "count": 254,
+                "p50": 2.36944,
+                "p95": 4.682583,
+                "p99": 10.049655,
+                "maximum": 14.223623,
+                "over_5ms": 7,
+                "over_10ms": 4
+              }
+            }
+          ],
+          "holds": false
+        }
+      },
+      "max_holding_bpm": null
+    }
+  }
+}

@@ -376,7 +376,7 @@ def write_played_midi(result, path, *, bpm):
     return len(instrument.notes)
 
 
-def build_report(result, producer, *, bars, bpm, capture=None):
+def build_report(result, producer, *, bars, bpm, capture=None, spin_window_ms=None):
     return {
         "schema": "continuous_jazz_session_v1",
         "bpm": bpm,
@@ -396,6 +396,7 @@ def build_report(result, producer, *, bars, bpm, capture=None):
         "dispatch_attempt_lateness_ms": sorted(
             ns / 1e6 for ns in result.dispatch_attempt_lateness_ns
         )[-5:],
+        "spin_window_ms": spin_window_ms,
         "dispatch_attempt_lateness_summary_ms": summarize_lateness_ms(
             result.dispatch_attempt_lateness_ns),
         "capture": capture,
@@ -450,6 +451,10 @@ def main(argv=None):
                         help="opt-in: state each bar's chord as notes in the primer. "
                              "Note-based steering, not learned chord conditioning; "
                              "see docs/experiments/CHORD_PRIMER_AB.md")
+    parser.add_argument("--spin-window-ms", type=float, default=1.0,
+                        help="scheduler busy-spin before each event. The wait before it "
+                             "can oversleep by a few ms; a longer spin absorbs that but "
+                             "holds the GIL longer (docs/experiments/TATUM_REALTIME_TEMPO.md)")
     args = parser.parse_args(argv)
 
     chords = [c.strip() for c in args.chords.split(",") if c.strip()]
@@ -459,6 +464,8 @@ def main(argv=None):
         parser.error("require 40..240 BPM and nonempty chords")
     if args.generation_tokens < 1 or args.max_sequence < args.generation_tokens:
         parser.error("require generation_tokens >= 1 and max_sequence >= generation_tokens")
+    if not 0.0 <= args.spin_window_ms <= 50.0:
+        parser.error("spin_window_ms must be between 0 and 50")
     if not 1 <= args.chord_blocks_per_bar <= 4:
         parser.error("chord_blocks_per_bar must be between 1 and 4")
     if args.chord_blocks_per_bar > 1 and not args.chord_primer:
@@ -575,6 +582,7 @@ def main(argv=None):
             result, producer = run_session(
                 port=port, bars=args.bars, bpm=args.bpm, chords=chords, seed=args.seed,
                 generate=generate, input_buffer=input_buffer, sub_builder=sub_builder,
+                spin_window_ms=args.spin_window_ms,
             )
             drain_completed = False
             if args.capture:
@@ -591,6 +599,7 @@ def main(argv=None):
                 else None
             )
             report = build_report(result, producer, bars=args.bars, bpm=args.bpm,
+                                  spin_window_ms=args.spin_window_ms,
                                   capture=capture_summary)
             report["input_events_received"] = input_buffer.received_count
             report["live_primer_bar_count"] = (

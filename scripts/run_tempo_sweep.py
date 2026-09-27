@@ -61,6 +61,7 @@ def main(argv=None) -> int:
     ap.add_argument("--bars", type=int, default=16)
     ap.add_argument("--primer", type=Path, required=True)
     ap.add_argument("--python", default=sys.executable)
+    ap.add_argument("--common", default="", help="flags added to every run, fallback included")
     ap.add_argument("--no-capture", action="store_true",
                     help="omit --capture (scheduler lateness is still measured internally)")
     ap.add_argument("--extra", default="--chord-primer --chord-blocks-per-bar 2",
@@ -73,7 +74,7 @@ def main(argv=None) -> int:
 
     env = {**os.environ, "FORCE_CPU": os.environ.get("FORCE_CPU", "1")}
     results: dict = {"schema": "tempo_sweep_v1", "bars": args.bars, "extra": args.extra,
-                     "capture": not args.no_capture,
+                     "capture": not args.no_capture, "common": args.common,
                      "primer": str(args.primer), "force_cpu": env["FORCE_CPU"], "models": {}}
     for spec in args.model:
         name, ckpt = spec.split("=", 1)
@@ -88,7 +89,7 @@ def main(argv=None) -> int:
                 cmd = [args.python, str(ROOT / "scripts/run_continuous_jazz.py"), *model_args,
                        "--bars", str(args.bars), "--bpm", str(bpm), "--seed", str(seed),
                        *([] if args.no_capture else ["--capture"]),
-                       "--output-dir", str(out), *extra]
+                       "--output-dir", str(out), *extra, *args.common.split()]
                 proc = subprocess.run(cmd, cwd=ROOT, env=env, capture_output=True, text=True)
                 (args.output_dir / name).mkdir(parents=True, exist_ok=True)
                 (args.output_dir / name / f"bpm{bpm}_seed{seed}.log").write_text(
