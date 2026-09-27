@@ -65,7 +65,7 @@ def token_identity(a, b) -> float:
 
 
 def lora_state(model):
-    return {k: v.detach().clone() for k, v in model.state_dict().items() if "lora_" in k}
+    return {k: v.detach().cpu().clone() for k, v in model.state_dict().items() if "lora_" in k}
 
 
 def main(argv=None) -> int:
@@ -94,6 +94,7 @@ def main(argv=None) -> int:
     p.add_argument("--eval-crops-per-train-song", type=int, default=2)
     p.add_argument("--gen-seeds", default="42,100,200")
     p.add_argument("--gen-bars", type=int, default=4)
+    p.add_argument("--device", choices=["cpu", "mps"], default="cpu")
     p.add_argument("--bpm", type=int, default=128)
     p.add_argument("--generation-tokens", type=int, default=96)
     args = p.parse_args(argv)
@@ -108,8 +109,11 @@ def main(argv=None) -> int:
     from torch.optim.lr_scheduler import CosineAnnealingLR
     from torch.utils.data import DataLoader
 
-    from utilities.device import use_cuda
-    use_cuda(False)
+    from utilities.device import get_device, use_cuda
+    use_cuda(args.device == "mps")
+    device = get_device()
+    if device.type != args.device:
+        p.error(f"--device {args.device} requested but got {device}")
     from model.loss import SmoothCrossEntropyLoss
     from model.music_transformer import MusicTransformer
     from utilities.constants import TOKEN_PAD, VOCAB_SIZE
@@ -129,6 +133,7 @@ def main(argv=None) -> int:
                                  dropout=cfg["lora_dropout"])
     load_state_dict_with_token_resize(model, state, strict=True)
     max_seq = int(cfg["max_sequence"])
+    model = model.to(device)
 
     train_ds = MidiDataset(str(args.data_dir), max_seq=max_seq, split="train")
     loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, num_workers=0)
@@ -151,8 +156,8 @@ def main(argv=None) -> int:
         total, n = 0.0, 0
         with torch.no_grad():
             for c in crops:
-                x = torch.tensor(c[:-1]).unsqueeze(0)
-                y = torch.tensor(c[1:])
+                x = torch.tensor(c[:-1]).unsqueeze(0).to(device)
+                y = torch.tensor(c[1:]).to(device)
                 logits = model(x)[0]
                 keep = y != TOKEN_PAD
                 total += F.cross_entropy(logits[keep], y[keep], reduction="sum").item()
@@ -167,8 +172,8 @@ def main(argv=None) -> int:
         for i, t in enumerate(songs):
             t = torch.from_numpy(t[:max_seq]).long()
             batch[i, : len(t)] = t
-        x, y = batch[:, :-1], batch[:, 1:]
-        fixed = [np.concatenate([x[i].numpy(), y[i, -1:].numpy()]) for i in range(len(songs))]
+        x, y = batch[:, :-1].to(device), batch[:, 1:].to(device)
+        fixed = [np.concatenate([x[i].cpu().numpy(), y[i, -1:].cpu().numpy()]) for i in range(len(songs))]
         opt = AdamW(trainable, lr=args.lr, weight_decay=0.01)
         rows, t0 = [], time.perf_counter()
         ce0, n_tok = eval_ce(fixed)
@@ -226,6 +231,7 @@ def main(argv=None) -> int:
         optimizer.zero_grad(set_to_none=True)
         epoch_loss = 0.0
         for bi, (x, y) in enumerate(loader):
+            x, y = x.to(device), y.to(device)
             out = model(x)
             raw = loss_fn(out.view(-1, out.size(-1)), y.view(-1))
             (raw / args.gradient_accumulation).backward()
@@ -304,7 +310,7 @@ def main(argv=None) -> int:
         "checkpoint": str(args.checkpoint), "data_dir": str(args.data_dir),
         "primer": str(args.primer),
         "primer_sha1": hashlib.sha1(args.primer.read_bytes()).hexdigest(),
-        "model_max_sequence": max_seq,
+        "model_max_sequence": max_seq, "device": str(device),
         "config": {k: (str(v) if isinstance(v, Path) else v) for k, v in vars(args).items()},
         "batches_per_epoch": batches_per_epoch, "updates_per_epoch": updates_per_epoch,
         "optimizer_updates": updates, "adam_state_steps": sorted(adam_steps),
