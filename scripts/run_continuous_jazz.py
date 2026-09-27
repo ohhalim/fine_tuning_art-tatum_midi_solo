@@ -473,6 +473,13 @@ def main(argv=None):
                         help="opt-in: state each bar's chord as notes in the primer. "
                              "Note-based steering, not learned chord conditioning; "
                              "see docs/experiments/CHORD_PRIMER_AB.md")
+    parser.add_argument("--thread-qos", default="user-interactive",
+                        choices=["default", "user-initiated", "user-interactive"],
+                        help="macOS QoS class for the scheduler thread "
+                             "(docs/experiments/RUNTIME_STALL_CAUSE.md)")
+    parser.add_argument("--stall-trace", action="store_true",
+                        help="record GC pauses and in-/out-of-process heartbeat gaps and "
+                             "attribute dispatches >10 ms late (docs/experiments/RUNTIME_STALL_CAUSE.md)")
     parser.add_argument("--spin-window-ms", type=float, default=5.0,
                         help="scheduler busy-spin before each event. The wait before it "
                              "can oversleep by a few ms; a longer spin absorbs that but "
@@ -601,11 +608,24 @@ def main(argv=None):
                     return make_sub_block_builder(
                         clock=clock, duration=duration, generate_sub=generate_sub,
                         blocks_per_bar=args.chord_blocks_per_bar)
-            result, producer = run_session(
-                port=port, bars=args.bars, bpm=args.bpm, chords=chords, seed=args.seed,
-                generate=generate, input_buffer=input_buffer, sub_builder=sub_builder,
-                spin_window_ms=args.spin_window_ms,
-            )
+            qos_result = None
+            if args.thread_qos != "default":
+                # The scheduler runs on this (main) thread inside run_session.
+                from inference.realtime.thread_qos import set_current_thread_qos
+                qos_result = set_current_thread_qos(args.thread_qos)
+            tracer = None
+            if args.stall_trace:
+                from inference.realtime.stall_trace import StallTracer
+                tracer = StallTracer().start()
+            try:
+                result, producer = run_session(
+                    port=port, bars=args.bars, bpm=args.bpm, chords=chords, seed=args.seed,
+                    generate=generate, input_buffer=input_buffer, sub_builder=sub_builder,
+                    spin_window_ms=args.spin_window_ms,
+                )
+            finally:
+                if tracer is not None:
+                    tracer.stop()
             drain_completed = False
             if args.capture:
                 # Let in-flight packets land before tearing the port down.
@@ -623,6 +643,19 @@ def main(argv=None):
             report = build_report(result, producer, bars=args.bars, bpm=args.bpm,
                                   spin_window_ms=args.spin_window_ms,
                                   capture=capture_summary)
+            if tracer is not None:
+                from inference.realtime.stall_trace import classify_late_events, summarize_trace
+                producer_intervals = [
+                    (r.requested_ns, r.completed_ns) for r in producer.records
+                    if getattr(r, "requested_ns", None) is not None
+                    and getattr(r, "completed_ns", None) is not None]
+                late = classify_late_events(
+                    result.records, threshold_ns=10_000_000,
+                    gc_intervals=tracer.gc_intervals, inproc_gaps=tracer.inproc_gaps,
+                    external_gaps=tracer.external_gaps, producer_intervals=producer_intervals)
+                report["stall_trace"] = summarize_trace(tracer, late)
+            report["thread_qos"] = qos_result or {"requested": "default", "applied": False,
+                                                  "error": None}
             report["input_events_received"] = input_buffer.received_count
             report["live_primer_bar_count"] = (
                 sum(1 for x in live_primer_bars if x) if not args.fallback_only else 0

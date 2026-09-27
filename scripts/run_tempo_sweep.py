@@ -44,6 +44,7 @@ def summarize_report(report: dict) -> dict:
         "p95_over_bar": (p95 / (bar_s * 1000)) if p95 is not None else None,
         "played_notes": report.get("played_note_count"),
         "lateness_ms": report.get("dispatch_attempt_lateness_summary_ms"),
+        "stall_trace": report.get("stall_trace"),
     }
 
 
@@ -79,9 +80,9 @@ def main(argv=None) -> int:
     for spec in args.model:
         name, ckpt = spec.split("=", 1)
         results["models"][name] = {"checkpoint": ckpt, "bpms": {}}
-        for bpm in (int(b) for b in args.bpms.split(",")):
+        for bpm in (int(b) for b in args.bpms.split(",") if b.strip()):
             runs = []
-            for seed in (int(s) for s in args.seeds.split(",")):
+            for seed in (int(s) for s in args.seeds.split(",") if s.strip()):
                 out = args.output_dir / name / f"bpm{bpm}_seed{seed}"
                 model_args = (["--fallback-only"] if ckpt == "FALLBACK" else
                               ["--checkpoint", ckpt, "--conditioning-midi", str(args.primer)])

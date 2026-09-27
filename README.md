@@ -212,7 +212,7 @@ flowchart LR
 | 멜다우 u128 | `outputs/mehldau_lora_v2/u128/checkpoint_update128.pt` | 8/8, 오류 0, 생성 p50 404 ms |
 | **Tatum u518** | `outputs/tatum_lora_v1/u518/checkpoint_update518.pt` | 8/8, 오류 0, 생성 p50 **778 ms** (노트가 많음, 128 BPM 한 마디 안) |
 
-**템포별 실시간 성립 (이슈 #1488, 가상 포트·CPU):** Tatum u518은 128–240 BPM 전 구간에서 fallback 0이다(생성이 마디를 따라간다). 스케줄러 spin window 기본값을 1 → 5 ms로 바꿔 디스패치 지각 중앙값을 약 2.5 ms에서 0.1 ms 안팎으로 줄였다. 240 BPM에서 드문 멈춤(최대 131 ms, 13회 중 1회)이 남아 있다. 상세: [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md)
+**템포별 실시간 성립 (이슈 #1488, 가상 포트·CPU):** Tatum u518은 128–240 BPM 전 구간에서 fallback 0이다(생성이 마디를 따라간다). 스케줄러 spin window 기본값을 1 → 5 ms로 바꿔 디스패치 지각 중앙값을 약 2.5 ms에서 0.1 ms 안팎으로 줄였다. 240 BPM에서 드문 멈춤(최대 131 ms)이 남아 있었다. 원인은 macOS의 시스템 수준 기상 지연이었고(GC 아님), 스케줄러 스레드 QoS를 `USER_INTERACTIVE`로 올려 10 ms 초과 지각을 75% 줄였다(최대 36 → 10 ms, 미스가 난 실행 2/20 → 0/20). 상세: [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md) · [멈춤 원인](docs/experiments/RUNTIME_STALL_CAUSE.md)
 
 ```bash
 FORCE_CPU=1 .venv/bin/python scripts/run_continuous_jazz.py \
@@ -315,7 +315,7 @@ uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo
 - [생성 지연 측정](docs/phase1/GENERATION_LATENCY.md) · [구간별 예산](docs/phase1/LATENCY_BUDGET.md)
 - [코드 primer 비교 실험](docs/experiments/CHORD_PRIMER_AB.md)
 - [멜다우 개인화 실험 (첫 시도)](docs/experiments/MEHLDAU_PERSONALIZATION.md)
-- [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Art Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md) · [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md)
+- [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Art Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md) · [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md) · [런타임 멈춤 원인](docs/experiments/RUNTIME_STALL_CAUSE.md)
 - [기존 D0–D4 연구 기록](docs/RESEARCH_SUMMARY.md)
 
 과거 Stage B 실험은 `archive/` 와 연구 문서에 보존합니다.
