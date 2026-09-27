@@ -223,7 +223,7 @@ def _make_builder(*, clock, duration, generate, sub_builder):
 
 
 def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
-                start_delay_seconds=2.5, spin_window_ms=1.0,
+                start_delay_seconds=2.5, spin_window_ms=5.0,
                 clock=None, clock_ns=None, wait_until=None,
                 deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE,
                 sub_builder=None):
@@ -451,7 +451,7 @@ def main(argv=None):
                         help="opt-in: state each bar's chord as notes in the primer. "
                              "Note-based steering, not learned chord conditioning; "
                              "see docs/experiments/CHORD_PRIMER_AB.md")
-    parser.add_argument("--spin-window-ms", type=float, default=1.0,
+    parser.add_argument("--spin-window-ms", type=float, default=5.0,
                         help="scheduler busy-spin before each event. The wait before it "
                              "can oversleep by a few ms; a longer spin absorbs that but "
                              "holds the GIL longer (docs/experiments/TATUM_REALTIME_TEMPO.md)")
