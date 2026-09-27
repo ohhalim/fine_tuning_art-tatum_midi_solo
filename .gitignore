@@ -39,3 +39,4 @@ __pycache__/
 # generated tokenized data / local PR drafts
 data/jazz_full/
 .git-pr-drafts/
+data/tatum_full/

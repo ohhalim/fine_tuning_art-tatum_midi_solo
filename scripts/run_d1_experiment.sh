@@ -90,7 +90,8 @@ train_arm () {
     --epochs "${epochs}" \
     --batch_size "${BATCH_SIZE}" \
     --lr "${lr}" \
-    --seed "${SEED}"
+    --seed "${SEED}" \
+    --scheduler_steps legacy_batches --val_crop_seed -1  # reproduce recorded D0/D1 runs
 }
 
 gen_arm () {

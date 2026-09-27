@@ -4,6 +4,8 @@
 **구현 의존성: PR #1482의 chord-primer / 런타임 플래그.** #1482 이후 develop에 통합하는 순서.
 
 `mehldau_style_verified: false` · `musical_quality_verified: false`
+
+> **2026-09-27 갱신:** 이 문서의 "효과 미확인"은 optimizer update 8회에 한정된다. update를 늘리면 일반 재즈 손실 없이 멜다우 코퍼스로 특화된다(update 128: 멜다우 CE −0.133, 일반 −0.002). `MEHLDAU_UPDATE_BUDGET_DIAG.md`, `MEHLDAU_STYLE_SHIFT.md` 참고. 들리는 스타일은 아직 미검증이다.
 **초기 청취 의견은 기록했으나 멜다우 스타일 성공을 주장하지 않는다.**
 
 ## 1. 데이터 provenance
@@ -50,7 +52,10 @@
 | generic base | `d0_experiment/armB_full2777/ckpt/checkpoint_epoch8.pt` |
 | Tatum-adapted | `d1_experiment/armD_lora/ckpt/checkpoint_epoch8.pt` |
 
-설정: LoRA r=16 alpha=32, lr 3e-4, 8 epoch, batch 4, seed 42, max_seq 512,
+> **정정 2026-09-27: "Tatum-adapted"는 잘못된 이름이다.** D1 Arm D는 `data/roles/lead`로 학습했다. 이 데이터는 **Brad Mehldau 18곡의 오른손(split pitch 60) 16/2 분할**이다(`meta.json`의 `source_midi` 18개 전부 Brad Mehldau). 따라서 `from_tatum`은 "멜다우 lead로 이미 적응한 어댑터에서 이어 학습"이다. Art Tatum 전용 어댑터는 존재하지 않는다. 아래 표의 `tatum` 표기는 기록을 위해 그대로 둔다.
+
+설정: LoRA r=16 alpha=32, lr 3e-4, 8 epoch, batch 4, seed 42, max_seq **1024**
+(정정 2026-09-27: 512로 적었으나 checkpoint `model_config` 상속으로 실제 1024. gradient_accumulation 기본값 4, label smoothing 0.1),
 CPU. smoke 1 epoch 로 경로 확인 후 본 학습. best-val epoch 자동 저장.
 
 ### 학습 loss — 거의 평평하다
@@ -60,7 +65,8 @@ from_base    train 3.281 -> 3.309   val 3.084 ~ 3.171 (무추세, best 3.073 @ep
 from_tatum   train 3.274 -> 3.302   val 3.066 ~ 3.164 (무추세, best 3.066 @epoch6)
 ```
 
-train loss 가 **오히려 조금 올랐다.** 8 epoch × 8 step = 64 step 이고
+train loss 가 **오히려 조금 올랐다.** 실제 optimizer update 는 **8회**다
+(정정 2026-09-27: 64 step으로 적었으나 16곡/batch 4 = 4배치, accumulation 4 → epoch당 1회. checkpoint optimizer state step=8로 확인. 진단은 `MEHLDAU_UPDATE_BUDGET_DIAG.md`). 그리고
 학습 파라미터는 98,304 (0.72%) 다. 그리고 두 출발점의 곡선이 거의 같다.
 
 ## 4. 평가 — 네 측정이 모두 같은 방향
@@ -90,7 +96,7 @@ range / pc는 음표가 2개 이상인 take별 값의 중앙값, IOI는 take 내
 이번 학습·생성 표본에서 loss 변화는 작고, 집계 descriptor만으로 스타일 적응을 입증하지 못했다.
 베이스 데이터 중복은 독립 검증을 방해하지만 **효과가 작은 원인으로 확정할 수 없다**.
 이미 학습한 곡도 재가중·적응 학습으로 분포가 바뀔 수 있다. 학습률, 업데이트 크기,
-64 step의 학습량, 조건 primer, 평가 민감도는 추가 확인 대상이다.
+8회 optimizer update의 학습량, 조건 primer, 평가 민감도는 추가 확인 대상이다.
 
 8-token exact match 0은 이 표본의 해당 검사에서 일치가 없었다는 뜻이다.
 이조·리듬 변형·긴 음악 프레이즈 복사까지 배제하지 않는다.

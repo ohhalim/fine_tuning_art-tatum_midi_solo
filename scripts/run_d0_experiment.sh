@@ -102,7 +102,8 @@ train_arm () {
     --batch_size "${BATCH_SIZE}" \
     --max_sequence "${MAX_SEQ}" \
     --lr "${LR}" \
-    --gradient_accumulation "${GRAD_ACCUM}"
+    --gradient_accumulation "${GRAD_ACCUM}" \
+    --scheduler_steps legacy_batches --val_crop_seed -1  # reproduce recorded D0/D1 runs
 }
 
 # ---- 공통 생성 함수 ---------------------------------------------------------

@@ -1,0 +1,51 @@
+{
+  "schema": "mehldau_fixed_batch_overfit_v1",
+  "interpretation": "path check only; not a style or generalisation result",
+  "checkpoint": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/outputs/d0_experiment/armB_full2777/ckpt/checkpoint_epoch8.pt",
+  "batch_songs": 4,
+  "tokens_per_eval": 4092,
+  "lr": 0.0003,
+  "accumulation": 1,
+  "label_smoothing_train": 0.1,
+  "curve": [
+    {
+      "update": 0,
+      "fixed_batch_ce": 2.6407746942395223,
+      "wall_s": 0.0
+    },
+    {
+      "update": 4,
+      "fixed_batch_ce": 2.621005687545821,
+      "wall_s": 10.3
+    },
+    {
+      "update": 8,
+      "fixed_batch_ce": 2.6030827705927724,
+      "wall_s": 20.0
+    },
+    {
+      "update": 12,
+      "fixed_batch_ce": 2.5856055355724585,
+      "wall_s": 29.4
+    },
+    {
+      "update": 16,
+      "fixed_batch_ce": 2.568578755517626,
+      "wall_s": 38.9
+    },
+    {
+      "update": 20,
+      "fixed_batch_ce": 2.5524108827055842,
+      "wall_s": 48.3
+    },
+    {
+      "update": 24,
+      "fixed_batch_ce": 2.5366877372197276,
+      "wall_s": 57.6
+    }
+  ],
+  "val_ce_after": 2.4237358967463174,
+  "adam_state_steps": [
+    24
+  ]
+}

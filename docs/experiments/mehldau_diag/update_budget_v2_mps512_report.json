@@ -1,0 +1,149 @@
+{
+  "schema": "mehldau_update_budget_diag_v1",
+  "question": "does the adapter's effect grow with optimizer updates inside one run?",
+  "checkpoint": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/outputs/d0_experiment/armB_full2777/ckpt/checkpoint_epoch8.pt",
+  "data_dir": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full",
+  "primer": "outputs/chord_ab/ii_V_I.mid",
+  "primer_sha1": "06531ce95de21d87ec74744801cedd77fa644521",
+  "model_max_sequence": 1024,
+  "device": "mps",
+  "config": {
+    "checkpoint": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/outputs/d0_experiment/armB_full2777/ckpt/checkpoint_epoch8.pt",
+    "data_dir": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full",
+    "primer": "outputs/chord_ab/ii_V_I.mid",
+    "mode": "budget",
+    "overfit_updates": 24,
+    "output_dir": "outputs/mehldau_diag/update_budget_v2_mps512",
+    "budget_seconds": 3000.0,
+    "planned_epochs": 512,
+    "snapshot_updates": "0,8,32,64,128,256,384,512",
+    "batch_size": 4,
+    "gradient_accumulation": 4,
+    "lr": 0.0003,
+    "label_smoothing": 0.1,
+    "seed": 42,
+    "eval_length": 512,
+    "eval_crops_per_train_song": 2,
+    "gen_seeds": "42,100,200",
+    "gen_bars": 4,
+    "device": "mps",
+    "bpm": 128,
+    "generation_tokens": 96
+  },
+  "batches_per_epoch": 4,
+  "updates_per_epoch": 1,
+  "optimizer_updates": 512,
+  "adam_state_steps": [
+    512
+  ],
+  "train_wall_s": 780.2,
+  "stopped_by": "planned_epochs",
+  "train_tokens_seen": 8380416,
+  "curve": [
+    {
+      "update": 0,
+      "lr": 0.0003,
+      "train_wall_s": 0.0,
+      "train_tokens_seen": 0,
+      "train_loss_ls_dropout_last_epoch": null,
+      "eval_train_ce": 2.638553209602833,
+      "eval_train_tokens": 16384,
+      "eval_val_ce": 2.4407585660616555,
+      "eval_val_tokens": 6144
+    },
+    {
+      "update": 8,
+      "lr": 0.00029981992070267333,
+      "train_wall_s": 12.3,
+      "train_tokens_seen": 130944,
+      "train_loss_ls_dropout_last_epoch": 3.3203007578849792,
+      "eval_train_ce": 2.6187734827399254,
+      "eval_train_tokens": 16384,
+      "eval_val_ce": 2.431087096532186,
+      "eval_val_tokens": 6144
+    },
+    {
+      "update": 32,
+      "lr": 0.00029712739942028304,
+      "train_wall_s": 48.2,
+      "train_tokens_seen": 523776,
+      "train_loss_ls_dropout_last_epoch": 3.2709152698516846,
+      "eval_train_ce": 2.5828088596463203,
+      "eval_train_tokens": 16384,
+      "eval_val_ce": 2.4221054116884866,
+      "eval_val_tokens": 6144
+    },
+    {
+      "update": 64,
+      "lr": 0.00028861999011043775,
+      "train_wall_s": 96.1,
+      "train_tokens_seen": 1047552,
+      "train_loss_ls_dropout_last_epoch": 3.2591437101364136,
+      "eval_train_ce": 2.549834579229355,
+      "eval_train_tokens": 16384,
+      "eval_val_ce": 2.417884886264801,
+      "eval_val_tokens": 6144
+    },
+    {
+      "update": 128,
+      "lr": 0.00025621246378738926,
+      "train_wall_s": 200.9,
+      "train_tokens_seen": 2095104,
+      "train_loss_ls_dropout_last_epoch": 3.209074914455414,
+      "eval_train_ce": 2.50550926476717,
+      "eval_train_tokens": 16384,
+      "eval_val_ce": 2.422524650891622,
+      "eval_val_tokens": 6144
+    },
+    {
+      "update": 256,
+      "lr": 0.00015050000000000024,
+      "train_wall_s": 393.6,
+      "train_tokens_seen": 4190208,
+      "train_loss_ls_dropout_last_epoch": 3.202428460121155,
+      "eval_train_ce": 2.458939228206873,
+      "eval_train_tokens": 16384,
+      "eval_val_ce": 2.431920309861501,
+      "eval_val_tokens": 6144
+    },
+    {
+      "update": 384,
+      "lr": 4.478753621261121e-05,
+      "train_wall_s": 586.4,
+      "train_tokens_seen": 6285312,
+      "train_loss_ls_dropout_last_epoch": 3.1416605710983276,
+      "eval_train_ce": 2.442376434803009,
+      "eval_train_tokens": 16384,
+      "eval_val_ce": 2.4379998246828714,
+      "eval_val_tokens": 6144
+    },
+    {
+      "update": 512,
+      "lr": 1e-06,
+      "train_wall_s": 780.2,
+      "train_tokens_seen": 8380416,
+      "train_loss_ls_dropout_last_epoch": 3.1369075179100037,
+      "eval_train_ce": 2.439823664724827,
+      "eval_train_tokens": 16384,
+      "eval_val_ce": 2.438847303390503,
+      "eval_val_tokens": 6144
+    }
+  ],
+  "generation_identity": {
+    "0_vs_8": {
+      "mean_token_identity": 0.5525819046866434,
+      "exact_take_matches": 3,
+      "takes": 12,
+      "mean_tokens_per_take": 77.66666666666667
+    },
+    "0_vs_512": {
+      "mean_token_identity": 0.13503342860287257,
+      "exact_take_matches": 0,
+      "takes": 12,
+      "mean_tokens_per_take": 64.33333333333333
+    }
+  },
+  "val_songs_in_base_pretrain": true,
+  "mehldau_style_verified": false,
+  "musical_quality_verified": false
+}

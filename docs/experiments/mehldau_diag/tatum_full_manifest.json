@@ -1,0 +1,993 @@
+{
+  "schema": "artist_dataset_v1",
+  "artist_dir": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/midi_dataset/midi/studio/Art Tatum",
+  "encoder": "archive/scripts/preprocess_jazz.py:process_midi_file",
+  "val_fraction": 0.1,
+  "seed": 42,
+  "skipped": [],
+  "songs": [
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/Come Rain Or Come Shine.midi",
+      "split": "train",
+      "file": "train/00000.npy",
+      "tokens": 8734,
+      "sha1": "2fdd1a4497206f43e902ba1ae37571984f26119b",
+      "in_jazz_full": "val/00066.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/Elegy.midi",
+      "split": "train",
+      "file": "train/00001.npy",
+      "tokens": 10375,
+      "sha1": "9a9e4f244a685e064d638ae4c3a7175e6e3a5cb5",
+      "in_jazz_full": "train/02244.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/Gone With The Wind.midi",
+      "split": "train",
+      "file": "train/00002.npy",
+      "tokens": 7081,
+      "sha1": "40659c26fbad43f359b4c454d64a170b6d9d8e2a",
+      "in_jazz_full": "train/01447.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/Heat Wave.midi",
+      "split": "train",
+      "file": "train/00003.npy",
+      "tokens": 8486,
+      "sha1": "9ef9496b1da3e0e39cfacd94a223d581c095757d",
+      "in_jazz_full": "train/00601.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/I Didn't Know What Time It Was.midi",
+      "split": "train",
+      "file": "train/00004.npy",
+      "tokens": 8245,
+      "sha1": "01dca735a3c11b6f9a740b170fc464735d981c5c",
+      "in_jazz_full": "train/01922.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/I Don't Stand A Ghost Of A Chance With You.midi",
+      "split": "train",
+      "file": "train/00005.npy",
+      "tokens": 7920,
+      "sha1": "e3a4540927d883d8327fa41f84ce14c8d3ed7541",
+      "in_jazz_full": "train/01429.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/I'll See You In My Dreams.midi",
+      "split": "train",
+      "file": "train/00006.npy",
+      "tokens": 9734,
+      "sha1": "1a69a081ce5762b6def1914af3beb5e90bff8fad",
+      "in_jazz_full": "train/00561.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/Lover Come Back To Me.midi",
+      "split": "train",
+      "file": "train/00007.npy",
+      "tokens": 12745,
+      "sha1": "3d8f317ef3b6f5d303d0733aa2b2067a3f8c4a07",
+      "in_jazz_full": "train/00915.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/Please Be Kind.midi",
+      "split": "train",
+      "file": "train/00008.npy",
+      "tokens": 12320,
+      "sha1": "76c28daf5c9ef58434448693b5f73a57c3c7f65b",
+      "in_jazz_full": "train/01760.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/September Song.midi",
+      "split": "val",
+      "file": "val/00000.npy",
+      "tokens": 8356,
+      "sha1": "1a260b2b49d17e55e458dd71872431043b6d7a2e",
+      "in_jazz_full": "train/01455.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/Tea For Two.midi",
+      "split": "train",
+      "file": "train/00009.npy",
+      "tokens": 10434,
+      "sha1": "7140bddcf042fc1b0e0ccb841b6457b345de14ea",
+      "in_jazz_full": "train/01040.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/The Very Thought Of You.midi",
+      "split": "train",
+      "file": "train/00010.npy",
+      "tokens": 8414,
+      "sha1": "282d36f82072a141b39f64184d0a5719d6707224",
+      "in_jazz_full": "train/01617.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/There Will Never Be Another You.midi",
+      "split": "train",
+      "file": "train/00011.npy",
+      "tokens": 10909,
+      "sha1": "4240388ffdd9d0b72351c8e7366e776d7479b82a",
+      "in_jazz_full": "train/00505.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/This Can't Be Love.midi",
+      "split": "train",
+      "file": "train/00012.npy",
+      "tokens": 7840,
+      "sha1": "5cbfdf870c1b4d55a863f7c8eb2ad3f60d5a2155",
+      "in_jazz_full": "train/01809.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 2/Would You Like To Take A Walk.midi",
+      "split": "train",
+      "file": "train/00013.npy",
+      "tokens": 9594,
+      "sha1": "ea62fd588d37e2fdf727ad43f52bb09df4d74ba0",
+      "in_jazz_full": "train/00848.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/After You've Gone.midi",
+      "split": "train",
+      "file": "train/00014.npy",
+      "tokens": 10706,
+      "sha1": "1916fdccbf2c4620db34c0e9165a31991ed9b78a",
+      "in_jazz_full": "train/02319.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/All The Things You Are.midi",
+      "split": "train",
+      "file": "train/00015.npy",
+      "tokens": 13999,
+      "sha1": "4864b1692f61c332d0d8a6c7e276be3922fa8038",
+      "in_jazz_full": "train/02220.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/Begin The Beguine.midi",
+      "split": "train",
+      "file": "train/00016.npy",
+      "tokens": 8325,
+      "sha1": "03c5193ad3fd1008f0950c122ade558cbdbb00c1",
+      "in_jazz_full": "train/00275.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/Crazy Rhythm.midi",
+      "split": "train",
+      "file": "train/00017.npy",
+      "tokens": 8858,
+      "sha1": "b0f74b785a4989f7af2ec81ae3c6bab613ee716e",
+      "in_jazz_full": "train/00936.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/Deep Purple.midi",
+      "split": "train",
+      "file": "train/00018.npy",
+      "tokens": 10237,
+      "sha1": "79715b6db47ea69b662b8642e237ab8ca988d016",
+      "in_jazz_full": "val/00006.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/Dixieland Band.midi",
+      "split": "train",
+      "file": "train/00019.npy",
+      "tokens": 7839,
+      "sha1": "f2c485c0424f3ec99dd4741e0ad1de23a69e660a",
+      "in_jazz_full": "train/00935.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/I Can't Give You Anything But Love.midi",
+      "split": "train",
+      "file": "train/00020.npy",
+      "tokens": 7633,
+      "sha1": "77cead959311c38943d29d90dde1f2d1dca720bb",
+      "in_jazz_full": "train/00176.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/I Surrender, Dear.midi",
+      "split": "train",
+      "file": "train/00021.npy",
+      "tokens": 7925,
+      "sha1": "c60343a972c733db6f12fe85bfdeefad31f7f906",
+      "in_jazz_full": "train/01297.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/If You Hadn't Gone Away.midi",
+      "split": "train",
+      "file": "train/00022.npy",
+      "tokens": 9524,
+      "sha1": "9b69fbebe6c782c140fed6f22898507600c993ed",
+      "in_jazz_full": "train/01729.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/Indiana (Back Home Again In Indiana).midi",
+      "split": "train",
+      "file": "train/00023.npy",
+      "tokens": 9186,
+      "sha1": "5903c3c97e59ca4ecd231a298d4d2072f1a4cec9",
+      "in_jazz_full": "val/00118.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/Jitterbug Waltz.midi",
+      "split": "train",
+      "file": "train/00024.npy",
+      "tokens": 7855,
+      "sha1": "eeb2893432ee5e07aa938686638c3f1ab80c90ee",
+      "in_jazz_full": "train/01578.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/Love Me Or Leave Me.midi",
+      "split": "train",
+      "file": "train/00025.npy",
+      "tokens": 6944,
+      "sha1": "890217b047de88e40abfd50dd93baba88731c4ea",
+      "in_jazz_full": "train/01072.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/Prisoner Of Love.midi",
+      "split": "train",
+      "file": "train/00026.npy",
+      "tokens": 9628,
+      "sha1": "8cee3084fda8ac9145c6e8644194a97c7ee118ad",
+      "in_jazz_full": "train/00735.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/Tenderly.midi",
+      "split": "train",
+      "file": "train/00027.npy",
+      "tokens": 10916,
+      "sha1": "ab8528166d1700fae3ff42c33447fd28dc030ce2",
+      "in_jazz_full": "train/01699.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/When Your Lover Has Gone.midi",
+      "split": "train",
+      "file": "train/00028.npy",
+      "tokens": 8281,
+      "sha1": "bc7fff3dc67317d780d26f73c90a8aae22cfe5ef",
+      "in_jazz_full": "train/02055.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 3/Yesterdays.midi",
+      "split": "val",
+      "file": "val/00001.npy",
+      "tokens": 8666,
+      "sha1": "7840bfa9a6cb471bcb4ace92be0538ec54cbe989",
+      "in_jazz_full": "val/00016.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/Aunt Hagar's Blues.midi",
+      "split": "train",
+      "file": "train/00029.npy",
+      "tokens": 10910,
+      "sha1": "c565e371f19eb77b92e7cc3227cc47e86706b46a",
+      "in_jazz_full": "train/01814.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/I Hadn't Anyone Till You.midi",
+      "split": "train",
+      "file": "train/00030.npy",
+      "tokens": 6947,
+      "sha1": "f8be1599116713af41420629de5b3f2e01e3a411",
+      "in_jazz_full": "val/00037.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/I Only Have Eyes For You.midi",
+      "split": "train",
+      "file": "train/00031.npy",
+      "tokens": 7005,
+      "sha1": "af27d541f59b18efce09b07799852f521ae24376",
+      "in_jazz_full": "train/01392.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/I'll See You Again.midi",
+      "split": "train",
+      "file": "train/00032.npy",
+      "tokens": 10161,
+      "sha1": "4aaa8d30f432fb80efe5cb41d652e39881e87714",
+      "in_jazz_full": "train/01464.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/I've Got The World On A String.midi",
+      "split": "train",
+      "file": "train/00033.npy",
+      "tokens": 8014,
+      "sha1": "49bbda3775b77c658199c2e4a9f3d43239af9b71",
+      "in_jazz_full": "train/02450.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/If You Hadn't Gone Away.midi",
+      "split": "train",
+      "file": "train/00034.npy",
+      "tokens": 9543,
+      "sha1": "f8234fd157b741f15ac140aad5b1dd26058a4a19",
+      "in_jazz_full": "val/00245.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/Ill Wind.midi",
+      "split": "train",
+      "file": "train/00035.npy",
+      "tokens": 10870,
+      "sha1": "26fe9042e60aa4b891ad4d5f125456b89802691f",
+      "in_jazz_full": "train/01306.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/Isn't This A Lovely Day.midi",
+      "split": "train",
+      "file": "train/00036.npy",
+      "tokens": 8570,
+      "sha1": "91f5345be0080e6f3c7d75afc217c233f09c3a03",
+      "in_jazz_full": "train/01065.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/Mean To Me.midi",
+      "split": "train",
+      "file": "train/00037.npy",
+      "tokens": 6537,
+      "sha1": "7727f5633535dc1b405ec7c575275684af1932ce",
+      "in_jazz_full": "train/00825.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/Stardust.midi",
+      "split": "train",
+      "file": "train/00038.npy",
+      "tokens": 11138,
+      "sha1": "da450f0fde42a35c30ade9c1100d7f3eb38b0bca",
+      "in_jazz_full": "train/00063.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/The Man I Love.midi",
+      "split": "train",
+      "file": "train/00039.npy",
+      "tokens": 10625,
+      "sha1": "311b434838748cde7c8f22bd152df65d14740637",
+      "in_jazz_full": "train/00709.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/They Can't Take That Away From Me.midi",
+      "split": "train",
+      "file": "train/00040.npy",
+      "tokens": 9893,
+      "sha1": "37c95ae69626833842923e3d58f1c5650565da23",
+      "in_jazz_full": "train/00645.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/What's New.midi",
+      "split": "train",
+      "file": "train/00041.npy",
+      "tokens": 8650,
+      "sha1": "4f6bffef852b07501afac503e6857c1bde701874",
+      "in_jazz_full": "train/01184.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/Without A Song.midi",
+      "split": "train",
+      "file": "train/00042.npy",
+      "tokens": 11022,
+      "sha1": "ca6489b3bc5e114fdecff1fcbb0ebefda79b76b2",
+      "in_jazz_full": "train/00016.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 4/You're Mine You.midi",
+      "split": "train",
+      "file": "train/00043.npy",
+      "tokens": 9714,
+      "sha1": "67cd700a6d9e0905b5ab784aee45001c1a9bceba",
+      "in_jazz_full": "train/00059.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/Blue Moon.midi",
+      "split": "train",
+      "file": "train/00044.npy",
+      "tokens": 11252,
+      "sha1": "003b43acc93ad034be0a588c9fad05f8f8ed2584",
+      "in_jazz_full": "train/01350.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/Don't Worry 'Bout Me.midi",
+      "split": "train",
+      "file": "train/00045.npy",
+      "tokens": 8743,
+      "sha1": "1a7d81baf87ddf76cbf0973aa2b26c13a4853c5d",
+      "in_jazz_full": "train/00481.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/Fine And Dandy.midi",
+      "split": "train",
+      "file": "train/00046.npy",
+      "tokens": 8990,
+      "sha1": "4b126e4a9fbc12a660f4df7e17d4aa6a5b55549c",
+      "in_jazz_full": "train/00460.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/I Cover The Waterfront.midi",
+      "split": "train",
+      "file": "train/00047.npy",
+      "tokens": 9840,
+      "sha1": "fad0bccbc02bcf164367cee9b7a2d7877ed2e5f6",
+      "in_jazz_full": "val/00132.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/I Gotta Right To Sing The Blues.midi",
+      "split": "train",
+      "file": "train/00048.npy",
+      "tokens": 8564,
+      "sha1": "3cab789305b73a4f1d5a6f1063569438f195f099",
+      "in_jazz_full": "train/01226.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/Louise.midi",
+      "split": "train",
+      "file": "train/00049.npy",
+      "tokens": 9824,
+      "sha1": "d384e1aab54c06aff48320ace2a1fd2d6496e5d5",
+      "in_jazz_full": "train/00120.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/Lullaby In Rhythm.midi",
+      "split": "train",
+      "file": "train/00050.npy",
+      "tokens": 9068,
+      "sha1": "a9fd81c1e89e4681f50c60ed5363ff3e389f68bf",
+      "in_jazz_full": "train/00940.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/Makin' Whoopee.midi",
+      "split": "train",
+      "file": "train/00051.npy",
+      "tokens": 8343,
+      "sha1": "45c7a1206c23b7e698e331b3b48fa9bbb768db6c",
+      "in_jazz_full": "train/02382.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/Memories Of You.midi",
+      "split": "train",
+      "file": "train/00052.npy",
+      "tokens": 10913,
+      "sha1": "9ddfbcb6d18ae9a36b5d8412981ba7175f4ca981",
+      "in_jazz_full": "train/01006.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/S'posin'.midi",
+      "split": "val",
+      "file": "val/00002.npy",
+      "tokens": 8941,
+      "sha1": "eb937fdc08568dc2cba333c18c8cb05f7771b590",
+      "in_jazz_full": "val/00009.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/Stars Fell On Alabama.midi",
+      "split": "train",
+      "file": "train/00053.npy",
+      "tokens": 9871,
+      "sha1": "0214f931d402d4be7c7bb9dd44835b2827a17baa",
+      "in_jazz_full": "train/01402.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/Stompin' At The Savoy.midi",
+      "split": "train",
+      "file": "train/00054.npy",
+      "tokens": 8739,
+      "sha1": "6b3b1b1d17353a16226772a12a7449041b987dc7",
+      "in_jazz_full": "train/01709.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/That Old Feeling.midi",
+      "split": "train",
+      "file": "train/00055.npy",
+      "tokens": 9077,
+      "sha1": "0f5427abeb5a235c4de067170e591f58ddd26c04",
+      "in_jazz_full": "train/00960.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/The Moon Is Low.midi",
+      "split": "train",
+      "file": "train/00056.npy",
+      "tokens": 8945,
+      "sha1": "6fc5616e561bcf4ab78b38d309133506037bec4f",
+      "in_jazz_full": "train/00393.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 5/You're Driving Me Crazy.midi",
+      "split": "train",
+      "file": "train/00057.npy",
+      "tokens": 7003,
+      "sha1": "d8e4002a414c0e6b13504004e797cd834a09b442",
+      "in_jazz_full": "train/02175.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/Ain't Misbehavin'.midi",
+      "split": "train",
+      "file": "train/00058.npy",
+      "tokens": 7455,
+      "sha1": "b6e7a96fe5d8f8afb489d2d0319381949f5e254a",
+      "in_jazz_full": "train/01662.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/Boulevard Of Broken Dreams.midi",
+      "split": "val",
+      "file": "val/00003.npy",
+      "tokens": 12597,
+      "sha1": "1e57c057623e6ff8ee651f55cce8d97ebfe9ac48",
+      "in_jazz_full": "train/01035.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/Cherokee.midi",
+      "split": "train",
+      "file": "train/00059.npy",
+      "tokens": 10096,
+      "sha1": "4b1a713028e94719ffc755873d4beacb777c176f",
+      "in_jazz_full": "train/00501.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/Danny Boy.midi",
+      "split": "train",
+      "file": "train/00060.npy",
+      "tokens": 7914,
+      "sha1": "cd54fbb970bfb02d43d931b03db9bbf797b303df",
+      "in_jazz_full": "train/02047.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/Do Nothing Till You Hear From Me.midi",
+      "split": "train",
+      "file": "train/00061.npy",
+      "tokens": 10621,
+      "sha1": "17a6ed571c678d526c8665d3babf73c370a11f94",
+      "in_jazz_full": "train/00142.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/Happy Feet.midi",
+      "split": "train",
+      "file": "train/00062.npy",
+      "tokens": 8038,
+      "sha1": "f656a264d2d646d10f1173c7ef3b849322e6ee55",
+      "in_jazz_full": "train/00981.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/I'm Comin' Virginia.midi",
+      "split": "val",
+      "file": "val/00004.npy",
+      "tokens": 7148,
+      "sha1": "8e1c8d3d38435534617e08d2608b9ff52e21a1fa",
+      "in_jazz_full": "train/01140.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/I've Got A Crush On You.midi",
+      "split": "train",
+      "file": "train/00063.npy",
+      "tokens": 7193,
+      "sha1": "204785f4471e5d91e236ba028ceb4e1371720bab",
+      "in_jazz_full": "train/00014.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/Just Like A Butterfly That's Caught In The Rain.midi",
+      "split": "train",
+      "file": "train/00064.npy",
+      "tokens": 7968,
+      "sha1": "1ed188356ca33a81e38ac5f1560eba9e9e207521",
+      "in_jazz_full": "train/02021.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/Night And Day.midi",
+      "split": "train",
+      "file": "train/00065.npy",
+      "tokens": 9092,
+      "sha1": "11ba0c3646872f91514a107a8c9b92040042241e",
+      "in_jazz_full": "train/01180.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/Over The Rainbow.midi",
+      "split": "train",
+      "file": "train/00066.npy",
+      "tokens": 8618,
+      "sha1": "49892ae265441350338634e7ec5741e69928b4dc",
+      "in_jazz_full": "train/00443.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/Someone To Watch Over Me.midi",
+      "split": "train",
+      "file": "train/00067.npy",
+      "tokens": 8776,
+      "sha1": "358994914112f23cfda67bc1981bd0fe171ff503",
+      "in_jazz_full": "train/00439.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/The Way You Look Tonight.midi",
+      "split": "train",
+      "file": "train/00068.npy",
+      "tokens": 13203,
+      "sha1": "21971a3139f157f5030424100d98cb93cc20fafd",
+      "in_jazz_full": "train/01004.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/There's A Small Hotel.midi",
+      "split": "train",
+      "file": "train/00069.npy",
+      "tokens": 10132,
+      "sha1": "fd4cd8ac831d94e58fba3a7f56c4fdd408a238f2",
+      "in_jazz_full": "train/02234.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 6/You're Blase.midi",
+      "split": "train",
+      "file": "train/00070.npy",
+      "tokens": 9247,
+      "sha1": "28f4e62d132033418b848e4e3024ee9631439a5d",
+      "in_jazz_full": "train/01553.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Dancing In The Dark.midi",
+      "split": "train",
+      "file": "train/00071.npy",
+      "tokens": 9180,
+      "sha1": "8140f8c034aa64bc5447d51cf0c4e2d14f8f4008",
+      "in_jazz_full": "train/02090.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Humoresque.midi",
+      "split": "train",
+      "file": "train/00072.npy",
+      "tokens": 10828,
+      "sha1": "8840c2bcaaf879cb9a17504b27fcc95f9cea4615",
+      "in_jazz_full": "train/00879.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Isn't It Romantic.midi",
+      "split": "train",
+      "file": "train/00073.npy",
+      "tokens": 10078,
+      "sha1": "4500dd373a76f0511c27d99f10b305afd893bbfe",
+      "in_jazz_full": "train/01355.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Japanese Sandman.midi",
+      "split": "val",
+      "file": "val/00005.npy",
+      "tokens": 7949,
+      "sha1": "552193d3d9329a23fc2073ab2f28152b320126f0",
+      "in_jazz_full": "train/02056.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Judy.midi",
+      "split": "train",
+      "file": "train/00074.npy",
+      "tokens": 8879,
+      "sha1": "635f7a1fa745b4a4c1349c4ff0498502bb0777b8",
+      "in_jazz_full": "train/00346.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Mighty Like A Rose.midi",
+      "split": "train",
+      "file": "train/00075.npy",
+      "tokens": 13779,
+      "sha1": "776c749e0dfff4413d0ad0eace4b475ada355226",
+      "in_jazz_full": "train/00055.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Moon Song.midi",
+      "split": "train",
+      "file": "train/00076.npy",
+      "tokens": 10297,
+      "sha1": "0bc91eac1c1f98222f02153e0f8be8e5e82b2c75",
+      "in_jazz_full": "train/00033.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Moonlight On The Ganges.midi",
+      "split": "train",
+      "file": "train/00077.npy",
+      "tokens": 6086,
+      "sha1": "66c64ec6c68a49fa3ba289d0859cb11ba1945d01",
+      "in_jazz_full": "train/01813.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Out Of Nowhere.midi",
+      "split": "train",
+      "file": "train/00078.npy",
+      "tokens": 9382,
+      "sha1": "887b50f3915f8a8588cd7de11aa0cf4ef2cd29dd",
+      "in_jazz_full": "train/00534.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Smoke Gets In Your Eyes.midi",
+      "split": "val",
+      "file": "val/00006.npy",
+      "tokens": 8631,
+      "sha1": "0cba9adf6a51f933b4cd438626fced7e853c06bd",
+      "in_jazz_full": "train/01091.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/So Beats My Heart For You.midi",
+      "split": "train",
+      "file": "train/00079.npy",
+      "tokens": 12124,
+      "sha1": "88f04638ca3b6123d114995e3c7b26e0a81f566a",
+      "in_jazz_full": "train/00646.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Somebody Loves Me.midi",
+      "split": "train",
+      "file": "train/00080.npy",
+      "tokens": 9276,
+      "sha1": "43420cdd9cff0834d23aa6da195bea36757d8a0a",
+      "in_jazz_full": "train/01907.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Taboo.midi",
+      "split": "train",
+      "file": "train/00081.npy",
+      "tokens": 9549,
+      "sha1": "480cc23cb542c6d3d49374eb4a87eb0bdec0fde5",
+      "in_jazz_full": "val/00192.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/What Does It Take.midi",
+      "split": "train",
+      "file": "train/00082.npy",
+      "tokens": 8833,
+      "sha1": "079c7c3005bbb9b43157adc62c4a39562754ffff",
+      "in_jazz_full": "train/01255.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Where Or When.midi",
+      "split": "train",
+      "file": "train/00083.npy",
+      "tokens": 12373,
+      "sha1": "bd5e80f778e0a8af5b38e828381ac6a3dae91c07",
+      "in_jazz_full": "train/01779.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Vol. 7/Wrap Your Troubles In Dreams.midi",
+      "split": "train",
+      "file": "train/00084.npy",
+      "tokens": 7911,
+      "sha1": "4eab1115edf68f33b1e925afce5ff2548b19037d",
+      "in_jazz_full": "train/02351.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Blue Lou.midi",
+      "split": "train",
+      "file": "train/00085.npy",
+      "tokens": 7999,
+      "sha1": "2bb746f84ef8dbfc3d5771b12df02918245b9e04",
+      "in_jazz_full": "train/00771.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Body And Soul.midi",
+      "split": "train",
+      "file": "train/00086.npy",
+      "tokens": 12303,
+      "sha1": "72ea7b441c844a9da4ed5abcc788063430f7709b",
+      "in_jazz_full": "val/00145.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Embraceable You.midi",
+      "split": "train",
+      "file": "train/00087.npy",
+      "tokens": 9280,
+      "sha1": "95af3f40db34f8a6102d4026576a898c0cfb26fd",
+      "in_jazz_full": "train/00400.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Everything I Have Is Yours.midi",
+      "split": "train",
+      "file": "train/00088.npy",
+      "tokens": 13389,
+      "sha1": "889db473c502d9561cc0291f8840c5e73e301ec9",
+      "in_jazz_full": "train/02285.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Have You Met Miss Jones.midi",
+      "split": "train",
+      "file": "train/00089.npy",
+      "tokens": 10945,
+      "sha1": "9672d5a11979c49ce96bd0267a1daeb751fbaa3a",
+      "in_jazz_full": "train/00543.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/I'm In The Mood For Love.midi",
+      "split": "train",
+      "file": "train/00090.npy",
+      "tokens": 9939,
+      "sha1": "767c4dadd208dba89c97de117208ddd449e7ac8c",
+      "in_jazz_full": "val/00202.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/It's Only A Paper Moon.midi",
+      "split": "val",
+      "file": "val/00007.npy",
+      "tokens": 7667,
+      "sha1": "c7555c31dbdbe6a5765b8d2137832c3bf96f1fda",
+      "in_jazz_full": "train/01866.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Just A-Sittin' And A-Rockin'.midi",
+      "split": "val",
+      "file": "val/00008.npy",
+      "tokens": 9447,
+      "sha1": "f5727dbd228c6981b6b4c105b3ff451ac7032fb7",
+      "in_jazz_full": "train/01327.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Love For Sale.midi",
+      "split": "train",
+      "file": "train/00091.npy",
+      "tokens": 12244,
+      "sha1": "0c02d457b9395c1dc86d6844b00a71e813184c92",
+      "in_jazz_full": "train/01837.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Moon Glow.midi",
+      "split": "train",
+      "file": "train/00092.npy",
+      "tokens": 8368,
+      "sha1": "9eebfcb65ee28a4a06e3433022cf2537b26499e2",
+      "in_jazz_full": "val/00174.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/My Last Affair.midi",
+      "split": "train",
+      "file": "train/00093.npy",
+      "tokens": 6054,
+      "sha1": "857a0d26c672d278e4fb0241ae734e5c030ff2fa",
+      "in_jazz_full": "train/00290.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Sophisticated Lady.midi",
+      "split": "train",
+      "file": "train/00094.npy",
+      "tokens": 8160,
+      "sha1": "7499c272ac5137fd4e09450a72905aafff02bc16",
+      "in_jazz_full": "val/00091.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Stay As Sweet As You Are.midi",
+      "split": "train",
+      "file": "train/00095.npy",
+      "tokens": 11975,
+      "sha1": "d5637cb3e249847b22297b8232a5cf07ae38606b",
+      "in_jazz_full": "train/00900.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Too Marvelous For Words.midi",
+      "split": "train",
+      "file": "train/00096.npy",
+      "tokens": 8967,
+      "sha1": "29ee2d569b8c21871c0423572bf7e2a1d8eabd73",
+      "in_jazz_full": "train/00976.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/Willow Weep For Me.midi",
+      "split": "train",
+      "file": "train/00097.npy",
+      "tokens": 10768,
+      "sha1": "d2f334b83eef08422bdd3746f12a2bcf06dad123",
+      "in_jazz_full": "train/00334.npy"
+    },
+    {
+      "source": "The Art Tatum Solo Masterpieces, Volume 1/You Took Advantage Of Me.midi",
+      "split": "train",
+      "file": "train/00098.npy",
+      "tokens": 7943,
+      "sha1": "ecd29649ab19344915b780a04954e07b826fcbf3",
+      "in_jazz_full": "train/02495.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Aunt Hagar's Blues.midi",
+      "split": "train",
+      "file": "train/00099.npy",
+      "tokens": 5488,
+      "sha1": "6532bbab6bcd190a786856b3e4b3799cfb463212",
+      "in_jazz_full": "train/01353.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Dardanella.midi",
+      "split": "train",
+      "file": "train/00100.npy",
+      "tokens": 8607,
+      "sha1": "b7923cc60a79fd857042080be698018d9ea927af",
+      "in_jazz_full": "train/01434.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Don't Blame Me.midi",
+      "split": "train",
+      "file": "train/00101.npy",
+      "tokens": 6428,
+      "sha1": "0fa10d8d655eb5a6c6fe7a3482722497b7b3a2bb",
+      "in_jazz_full": "train/02273.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/I Cover The Waterfront.midi",
+      "split": "val",
+      "file": "val/00009.npy",
+      "tokens": 5859,
+      "sha1": "e2cf2f83d46afe4d196ad5c790e1fc29cc371c80",
+      "in_jazz_full": "train/00700.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Melody In F, Opus 3, No. 1.midi",
+      "split": "train",
+      "file": "train/00102.npy",
+      "tokens": 13298,
+      "sha1": "7c184337888d415e6ab3718c85a863aee262ab9d",
+      "in_jazz_full": "train/02048.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Nice Work If You Can Get It.midi",
+      "split": "train",
+      "file": "train/00103.npy",
+      "tokens": 7270,
+      "sha1": "7eae456d3de8b0b154e89942d4cf08131d3aab4e",
+      "in_jazz_full": "train/01558.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Out Of Nowhere.midi",
+      "split": "train",
+      "file": "train/00104.npy",
+      "tokens": 10392,
+      "sha1": "e2893b058abc06596ea4710091a66f6eb88b619d",
+      "in_jazz_full": "train/01457.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/September Song.midi",
+      "split": "train",
+      "file": "train/00105.npy",
+      "tokens": 9512,
+      "sha1": "f9cf193300d282fc712aa50ef19d88b197e69a5a",
+      "in_jazz_full": "train/00907.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Somebody Loves Me.midi",
+      "split": "val",
+      "file": "val/00010.npy",
+      "tokens": 7369,
+      "sha1": "ced0073237362783bf6dfc45cccb968e87dbf385",
+      "in_jazz_full": "train/00440.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Someone To Watch Over Me.midi",
+      "split": "train",
+      "file": "train/00106.npy",
+      "tokens": 7466,
+      "sha1": "2febd599b147d50f4b3e5b1505ec7011f564c5b1",
+      "in_jazz_full": "train/00964.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Sweet Lorraine.midi",
+      "split": "train",
+      "file": "train/00107.npy",
+      "tokens": 7588,
+      "sha1": "0d465ba4f6250b91e51f5d0b3498241a88998f37",
+      "in_jazz_full": "train/02160.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Tea For Two.midi",
+      "split": "train",
+      "file": "train/00108.npy",
+      "tokens": 12625,
+      "sha1": "440a81893bfe312974b7c86e1f31f75546b473b8",
+      "in_jazz_full": "train/01303.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Time On My Hands (You In My Arms).midi",
+      "split": "train",
+      "file": "train/00109.npy",
+      "tokens": 6923,
+      "sha1": "e8ebc0b0dea5785fbf7a2ceda4261f6d7b26dc3e",
+      "in_jazz_full": "train/00456.npy"
+    },
+    {
+      "source": "The Complete Capitol Recordings (Vol. One)/Willow Weep For Me.midi",
+      "split": "val",
+      "file": "val/00011.npy",
+      "tokens": 7071,
+      "sha1": "a5dc9451823855c9ecb2fe4cb1916bceb0bd5c3a",
+      "in_jazz_full": "train/02001.npy"
+    }
+  ],
+  "summary": {
+    "songs": 122,
+    "train": 110,
+    "val": 12,
+    "in_jazz_full": 122,
+    "max_token": 377
+  }
+}
