@@ -63,7 +63,9 @@ def main(argv=None) -> int:
     ap.add_argument("--classifier", type=Path, default=None,
                     help="optional V1b-style model json (exploratory P(target))")
     ap.add_argument("--target-name", default="mehldau")
-    ap.add_argument("--lora-targets", default="out_proj", help="must match the snapshots")
+    ap.add_argument("--lora-targets", default=None,
+                    help="optional check; targets are inferred from the snapshots and a "
+                         "mismatch with this list is an error")
     ap.add_argument("--no-generate", action="store_true", help="likelihood only")
     ap.add_argument("--primer", type=Path, required=True)
     ap.add_argument("--seeds", default="1,2,3,4,5,6,7,8")
@@ -80,30 +82,33 @@ def main(argv=None) -> int:
     from utilities.device import get_device, use_cuda
     use_cuda(args.device == "mps")
     device = get_device()
-    from model.music_transformer import MusicTransformer
     from utilities.constants import TOKEN_PAD
     from midi_processor.processor import decode_midi
-    from scripts.checkpoint_utils import load_state_dict_with_token_resize
     from scripts.generate import build_primer, generate_once
     from scripts.run_mehldau_update_budget_diag import fixed_crops
     from scripts.style_distance import (LogisticModel, distance, feature_counts, feature_vector,
                                         pool, tokens_to_notes)
-    from scripts.train_qlora import (add_lora_targets, add_lora_to_model, checkpoint_model_config,
-                                     checkpoint_payload_state_dict)
+    from scripts.train_qlora import (build_lora_model_from_state, checkpoint_model_config,
+                                     checkpoint_payload_state_dict, load_lora_snapshot,
+                                     lora_targets_in_state_dict)
     from scripts.validate_style_distance import load, middle_chunk
 
     payload = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
     cfg = checkpoint_model_config(payload)
-    model = MusicTransformer(n_layers=cfg["n_layers"], num_heads=cfg["num_heads"],
-                             d_model=cfg["d_model"], dim_feedforward=cfg["dim_feedforward"],
-                             max_sequence=cfg["max_sequence"], rpr=cfg["rpr"])
-    model, _ = add_lora_to_model(model, r=cfg["lora_r"], alpha=cfg["lora_alpha"],
-                                 dropout=cfg["lora_dropout"])
-    load_state_dict_with_token_resize(model, checkpoint_payload_state_dict(payload), strict=True)
-    extra_targets = [t for t in args.lora_targets.split(",") if t.strip() and t != "out_proj"]
-    if extra_targets:
-        add_lora_targets(model, extra_targets, r=cfg["lora_r"], alpha=cfg["lora_alpha"],
-                         dropout=cfg["lora_dropout"])
+    files = sorted(args.snapshot_dir.glob("lora_update*.pt"),
+                   key=lambda f: int(re.search(r"(\d+)", f.stem).group(1)))
+    if args.updates:
+        wanted = {int(u) for u in args.updates.split(",")}
+        files = [f for f in files if int(re.search(r"(\d+)", f.stem).group(1)) in wanted]
+    if not files:
+        ap.error(f"no lora_update*.pt snapshots in {args.snapshot_dir}")
+    snapshot_targets = lora_targets_in_state_dict(torch.load(files[0], map_location="cpu"))
+    if args.lora_targets is not None:
+        declared = [t.strip() for t in args.lora_targets.split(",") if t.strip()]
+        if sorted(declared) != sorted(snapshot_targets):
+            ap.error(f"--lora-targets {declared} does not match snapshot targets {snapshot_targets}")
+    model, lora_targets = build_lora_model_from_state(
+        cfg, checkpoint_payload_state_dict(payload), extra_targets=snapshot_targets)
     model = model.to(device)
     max_seq = int(cfg["max_sequence"])
 
@@ -139,16 +144,11 @@ def main(argv=None) -> int:
                           append_sep_token=True, control_format="control_v1",
                           role="lead", tempo_bpm=128)
     seeds = [int(s) for s in args.seeds.split(",") if s.strip()]
-    files = sorted(args.snapshot_dir.glob("lora_update*.pt"),
-                   key=lambda f: int(re.search(r"(\d+)", f.stem).group(1)))
-    if args.updates:
-        wanted = {int(u) for u in args.updates.split(",")}
-        files = [f for f in files if int(re.search(r"(\d+)", f.stem).group(1)) in wanted]
 
     rows, generations = [], {}
     for f in files:
         update = int(re.search(r"(\d+)", f.stem).group(1))
-        model.load_state_dict(torch.load(f, map_location="cpu"), strict=False)
+        load_lora_snapshot(model, torch.load(f, map_location="cpu"))
         t0 = time.perf_counter()
         row = {"update": update, "ce_target_train": ce(target_train_crops),
                "ce_target_val": ce(target_val_crops),
@@ -200,6 +200,7 @@ def main(argv=None) -> int:
               "snapshot_dir": str(args.snapshot_dir), "primer": str(args.primer),
               "seeds": seeds, "gen_tokens": args.gen_tokens, "device": str(device),
               "target_name": args.target_name, "data_dir": str(args.data_dir),
+              "lora_targets": lora_targets,
               "validity_json": str(args.validity_json),
               "n_target_train_crops": len(target_train_crops), "n_target_val_crops": len(target_val_crops),
               "n_generic_crops": len(generic_crops),

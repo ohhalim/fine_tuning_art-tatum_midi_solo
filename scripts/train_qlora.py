@@ -346,9 +346,58 @@ def lora_targets_in_state_dict(state_dict: dict[str, torch.Tensor]) -> list[str]
         found.append("out_proj")
     if any(".self_attn.lora_A_q" in k for k in state_dict):
         found.append("qkv")
-    if any(".linear1.original_layer." in k for k in state_dict):
+    if any(".linear1.original_layer." in k or ".linear1.lora_" in k for k in state_dict):
         found.append("ffn")
     return found
+
+
+def build_lora_model_from_state(model_config: dict[str, Any], state_dict: dict[str, torch.Tensor],
+                                extra_targets=()) -> tuple[nn.Module, list[str]]:
+    """Rebuild the layout a checkpoint was saved with, load it strictly, then attach extras.
+
+    A plain base (no LoRA wrappers) is loaded before any LoRA is added; a
+    LoRA-wrapped checkpoint is loaded into its own saved targets. Only targets
+    it does not already carry are attached afterwards, starting from zero delta.
+    """
+    model = MusicTransformer(
+        n_layers=int(model_config["n_layers"]), num_heads=int(model_config["num_heads"]),
+        d_model=int(model_config["d_model"]), dim_feedforward=int(model_config["dim_feedforward"]),
+        max_sequence=int(model_config["max_sequence"]), rpr=bool(model_config["rpr"]))
+    r, alpha = int(model_config["lora_r"]), int(model_config["lora_alpha"])
+    dropout = float(model_config.get("lora_dropout", 0.05))
+    requested = list(dict.fromkeys(extra_targets))
+    if state_dict_uses_lora_wrappers(state_dict):
+        saved = lora_targets_in_state_dict(state_dict) or list(DEFAULT_LORA_TARGETS)
+        model, _ = add_lora_to_model(model, r=r, alpha=alpha, dropout=dropout, targets=saved)
+        load_state_dict_with_token_resize(model, state_dict, strict=True)
+        remaining = [t for t in requested if t not in saved]
+        if remaining:
+            add_lora_targets(model, remaining, r=r, alpha=alpha, dropout=dropout)
+        targets = list(dict.fromkeys([*saved, *remaining]))
+    else:
+        load_state_dict_with_token_resize(model, state_dict, strict=True)
+        targets = requested or list(DEFAULT_LORA_TARGETS)
+        model, _ = add_lora_to_model(model, r=r, alpha=alpha, dropout=dropout, targets=targets)
+    return model, targets
+
+
+def load_lora_snapshot(model: nn.Module, snapshot: dict[str, torch.Tensor]) -> list[str]:
+    """Load a LoRA-only snapshot, failing closed on any key mismatch.
+
+    ``load_state_dict(strict=False)`` alone would silently drop snapshot keys
+    the model has no slot for (e.g. QKV tensors into an out_proj-only model)
+    and leave model LoRA tensors the snapshot does not cover untouched.
+    """
+    if not snapshot or not all("lora_" in k for k in snapshot):
+        raise ValueError("snapshot must contain only lora_ tensors")
+    model_keys = {k for k in model.state_dict() if "lora_" in k}
+    snap_keys = set(snapshot)
+    missing, extra = sorted(model_keys - snap_keys), sorted(snap_keys - model_keys)
+    if missing or extra:
+        raise ValueError(f"LoRA snapshot/model mismatch: missing {len(missing)} {missing[:3]}, "
+                         f"unexpected {len(extra)} {extra[:3]}")
+    model.load_state_dict(snapshot, strict=False)
+    return lora_targets_in_state_dict(snapshot)
 
 
 def state_dict_is_lora_only(state_dict: dict[str, torch.Tensor]) -> bool:
