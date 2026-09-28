@@ -594,6 +594,9 @@ def main(argv=None):
                         help="print one line of block metrics (adapter, notes, pitch, chord-tone "
                              "ratio, input notes) as each block is generated; they are always "
                              "saved in the report as block_metrics (docs/experiments/LIVE_METRICS.md)")
+    parser.add_argument("--block-metrics", action=argparse.BooleanOptionalAction, default=True,
+                        help="record per-block metrics in the report (on by default); "
+                             "--no-block-metrics turns the in-loop measurement off")
     parser.add_argument("--adapter-name", default="primary",
                         help="name of the --checkpoint adapter in --adapter-schedule")
     parser.add_argument("--swap-adapter", action="append", default=[], metavar="NAME=CHECKPOINT",
@@ -689,6 +692,8 @@ def main(argv=None):
         parser.error("--chord-blocks-per-bar needs --chord-primer")
     if args.half_bar_blocks and not (args.chord_primer and args.chord_blocks_per_bar == 2):
         parser.error("--half-bar-blocks needs --chord-primer --chord-blocks-per-bar 2")
+    if args.live_metrics and not args.block_metrics:
+        parser.error("--live-metrics needs --block-metrics")
     if args.half_bar_blocks and args.fallback_only:
         parser.error("--half-bar-blocks needs a model; drop --fallback-only")
     swap_specs = {}
@@ -887,7 +892,7 @@ def main(argv=None):
                         clock=clock, duration=duration, generate_sub=generate_sub,
                         blocks_per_bar=args.chord_blocks_per_bar)
             metrics_by_block: dict[int, dict] = {}
-            if not args.fallback_only:
+            if not args.fallback_only and args.block_metrics:
                 def record_metrics(block, input_events):
                     b = block.bar_index
                     bar = b // 2 if args.half_bar_blocks else b
@@ -1010,7 +1015,8 @@ def main(argv=None):
                     played = merge_half_bars(played, half_seconds=120.0 / args.bpm)
                 report["played_bars"] = played
             # Blocks served from fallback have no entry (None).
-            report["block_metrics"] = [metrics_by_block.get(i) for i in range(blocks)]
+            report["block_metrics"] = ([metrics_by_block.get(i) for i in range(blocks)]
+                                       if args.block_metrics else None)
             report["played_note_count"] = write_played_midi(
                 result, args.output_dir / "played.mid", bpm=args.bpm
             )
