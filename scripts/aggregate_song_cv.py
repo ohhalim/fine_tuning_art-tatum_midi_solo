@@ -2,7 +2,8 @@
 """C1: pick the update budget from song-level CV (docs/experiments/MEHLDAU_CLEAN_BASE.md).
 
 Among updates whose fold-mean dCE_generic <= +0.02, pick the lowest fold-mean
-specialisation on the held-out songs. Also evaluates completion criterion 1.
+specialisation on the held-out songs. Criterion 1 also needs the held-out CE
+itself to drop (fold mean < 0).
 """
 from __future__ import annotations
 
@@ -28,7 +29,10 @@ def aggregate(fold_reports: list[dict]) -> dict:
                       "folds_negative": sum(s < 0 for s in specs), "per_fold": specs})
     eligible = [t for t in table if t["mean_d_ce_generic"] <= GENERIC_LIMIT]
     chosen = min(eligible, key=lambda t: t["mean_specialisation"]) if eligible else None
+    # Specialisation alone can pass while the target CE itself gets worse (the
+    # generic CE just rose more); the target CE must drop too.
     criterion = bool(chosen and chosen["mean_specialisation"] <= SPEC_TARGET
+                     and chosen["mean_d_ce_heldout"] < 0
                      and chosen["folds_negative"] >= len(fold_reports) - 1)
     return {"table": table, "chosen": chosen, "criterion1_met": criterion}
 

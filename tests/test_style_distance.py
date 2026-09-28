@@ -153,6 +153,17 @@ class SongCvTest(unittest.TestCase):
         self.assertAlmostEqual(out["chosen"]["mean_specialisation"], -0.02)
         self.assertTrue(out["criterion1_met"])              # 3 of 4 folds negative
 
+    def test_criterion_needs_target_ce_drop(self) -> None:
+        from scripts.aggregate_song_cv import aggregate
+
+        # specialisation -0.03 only because generic CE rose; held-out CE got worse
+        rows = [{"update": 0, "specialisation_val": 0, "d_ce_target_val": 0, "d_ce_generic": 0},
+                {"update": 32, "specialisation_val": -0.03, "d_ce_target_val": 0.005,
+                 "d_ce_generic": 0.015}]
+        out = aggregate([{"rows": rows}] * 4)
+        self.assertEqual(out["chosen"]["update"], 32)
+        self.assertFalse(out["criterion1_met"])
+
 
 if __name__ == "__main__":
     unittest.main()
