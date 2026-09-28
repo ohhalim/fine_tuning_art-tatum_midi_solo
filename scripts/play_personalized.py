@@ -9,8 +9,8 @@ Presets (docs/PERSONALIZATION_STATUS.md):
   base     the common base with no artist adapter, for comparison
 
 Everything else is the normal runtime (``run_continuous_jazz.py``) with its
-current defaults: chord primer with two sub-blocks per bar, KV cache, merged
-LoRA, late fetch. Extra runtime flags can follow ``--``. No quality or style
+current defaults (KV cache, merged LoRA, late fetch, start budget) plus the
+chord primer with two sub-blocks per bar as half-bar scheduler blocks. Extra runtime flags can follow ``--``. No quality or style
 claim: nobody has listened.
 """
 from __future__ import annotations
@@ -44,6 +44,9 @@ def build_command(preset: str, *, bars: int, bpm: int, chords: str, seed: int, o
            "--checkpoint", ckpt("tatum" if preset == "swap" else preset),
            "--conditioning-midi", str(root / PRIMER),
            "--chord-primer", "--chord-blocks-per-bar", "2",
+           # Half-bar scheduler blocks: input and adapter choice land about
+           # 0.9 s after they arrive instead of 1.8 s (docs/experiments/HALF_BAR_BLOCKS.md).
+           "--half-bar-blocks",
            "--chords", chords, "--bars", str(bars), "--bpm", str(bpm), "--seed", str(seed),
            "--output-dir", str(output_dir)]
     if preset == "swap":
