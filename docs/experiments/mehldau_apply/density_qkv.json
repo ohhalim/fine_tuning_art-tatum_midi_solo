@@ -1,0 +1,94 @@
+{
+  "schema": "run_density_v1",
+  "cluster_s": 0.03,
+  "run_window_s": [
+    0.04,
+    0.12
+  ],
+  "references": {
+    "target_val": {
+      "n": 2,
+      "mean_run_ratio": 0.06269230769230769,
+      "median_run_ratio": 0.06269230769230769,
+      "mean_onsets_per_s": 4.103341955874019
+    },
+    "generic_probe": {
+      "n": 100,
+      "mean_run_ratio": 0.22445284376785044,
+      "median_run_ratio": 0.20103626943005182,
+      "mean_onsets_per_s": 5.555222334215947
+    }
+  },
+  "snapshots": {
+    "0": {
+      "per_seed": [
+        {
+          "seed": 1,
+          "run_ratio": 0.2808988764044944,
+          "onsets_per_s": 5.715953875346664,
+          "onsets": 90
+        },
+        {
+          "seed": 2,
+          "run_ratio": 0.18032786885245902,
+          "onsets_per_s": 3.8449967767351914,
+          "onsets": 123
+        },
+        {
+          "seed": 3,
+          "run_ratio": 0.325,
+          "onsets_per_s": 6.557377049180329,
+          "onsets": 121
+        },
+        {
+          "seed": 4,
+          "run_ratio": 0.2823529411764706,
+          "onsets_per_s": 5.778739184177997,
+          "onsets": 86
+        }
+      ],
+      "mean_run_ratio": 0.267144921608356,
+      "mean_onsets_per_s": 5.4742667213600456
+    },
+    "32": {
+      "per_seed": [
+        {
+          "seed": 1,
+          "run_ratio": 0.4012738853503185,
+          "onsets_per_s": 7.558813874603349,
+          "onsets": 158
+        },
+        {
+          "seed": 2,
+          "run_ratio": 0.06993006993006994,
+          "onsets_per_s": 5.267034990791897,
+          "onsets": 144
+        },
+        {
+          "seed": 3,
+          "run_ratio": 0.33783783783783783,
+          "onsets_per_s": 6.788990825688074,
+          "onsets": 149
+        },
+        {
+          "seed": 4,
+          "run_ratio": 0.4368932038834951,
+          "onsets_per_s": 8.059754579406011,
+          "onsets": 104
+        }
+      ],
+      "mean_run_ratio": 0.3114837492504304,
+      "mean_onsets_per_s": 6.918648567622332
+    }
+  },
+  "diff": {
+    "from": "0",
+    "to": "32",
+    "mean_diff": 0.04433882764207436,
+    "ci95": [
+      -0.05270459695533579,
+      0.1374576358264243
+    ],
+    "moved_toward_runs": false
+  }
+}

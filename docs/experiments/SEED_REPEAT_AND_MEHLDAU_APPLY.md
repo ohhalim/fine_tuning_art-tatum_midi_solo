@@ -69,3 +69,32 @@
 - 차이 = −0.003 > −0.01 → **"타깃 확장이 멜다우에서도 특화를 키운다"는 지지되지 않는다. 멜다우 배포 후보는 out_proj u64로 유지한다**
 - 해석: QKV는 train 16곡을 빠르게 외운다(train −0.353). 반면 val 2곡은 update 32 이후 나빠지고 update 128부터는 base보다 나쁘다. 일반 CE도 update 128에 +0.033으로 허용치를 넘는다. Tatum(학습 110곡)에서 검증된 용량 확장이 **16곡 데이터에서는 과적합으로 상쇄**됐다(추정. 데이터 크기를 통제한 비교는 하지 않았다)
 - 한계: 멜다우 val은 2곡(6,144토큰)이고 base가 본 곡이다
+
+### M-A1 산출물 — 비교 MIDI와 리포트 (청취 없음)
+리포트: `outputs/mehldau_apply/mehldau_apply_report.json`(사본 `docs/experiments/mehldau_apply/`)
+
+| | base (update 0) | 멜다우 out_proj u64 | 멜다우 QKV u32 |
+|---|---|---|---|
+| 생성 문법 유효성 (seed 1–4, 768토큰) | 4/4 | 4/4 | 4/4 |
+| 평균 노트 수 | 211 | 188 | 191 |
+| 8-gram 복사(멜다우 train 대비) | 0.0003 | 0 | 0 |
+| 16-gram 복사 최대 | 0 | 0 | 0 |
+| 런타임 128 BPM 8마디: 완주 / fallback / 미스 | 8/8, 0, 0 | 8/8, 0, 0 | 8/8, 0, 0 |
+| 런타임 생성 p50 | 365 ms | 355 ms | 596 ms |
+| 속주 런 비율(탐색) | 0.267 | 0.271 | 0.311 |
+
+- 속주 런 비율의 기준값은 멜다우 val **0.063**, 일반 재즈 0.224다. 두 어댑터 모두 base 대비 변화가 유의하지 않다(CI가 0 포함). QKV는 오히려 멜다우와 반대 방향이다. 이 지표는 Tatum용이고, 멜다우 스타일 지표로 검증되지 않았다
+- 비교 MIDI 15개(`outputs/mehldau_apply/compare_midi/`)
+  - `base_seed{1-4}.mid`, `mehldau_outproj_u64_seed{1-4}.mid`, `mehldau_qkv_u32_seed{1-4}.mid`: 같은 primer·seed끼리 비교
+  - `runtime128_{base,outproj_u64,qkv_u32}.mid`: 실시간 경로에서 재생된 8마디
+- 배포 체크포인트(gitignore): `outputs/mehldau_apply/export_outproj_u64/checkpoint_update64.pt`(후보), `export_qkv_u32/checkpoint_update32.pt`(비교용)
+
+## 결론 — 이슈 #1495
+| 질문 | 결과 |
+|---|---|
+| Tatum에서 QKV 확장의 이득이 seed에 강건한가 | **예.** 세 seed 모두 −0.037, 일반 손실 +0.001 |
+| 같은 방법이 멜다우에서도 특화를 키우는가 | **아니다(기준 미달).** 차이 −0.003. 16곡에서는 QKV가 빨리 과적합한다 |
+| 멜다우 배포 후보 | **out_proj u64**(val −0.023, 일반 −0.012, 특화도 −0.011). 생성 유효성 100%, 복사 0, 128 BPM 실시간 8/8 |
+
+한계: 청취 없음(`musical_quality_verified`, `style_verified` = false). 멜다우는 base 사전학습셋에 들어 있고 val이 2곡뿐이다. 멜다우 스타일을 가르는 객관 지표는 앞선 V1/V1b에서 타당성 기준에 미달했다.
+다음 후보: 멜다우 데이터 규모 문제는 본인 연주 녹음이나 base 재학습(멜다우 제외) 없이는 풀기 어렵다.
