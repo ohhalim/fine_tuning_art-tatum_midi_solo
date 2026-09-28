@@ -510,6 +510,16 @@ def main(argv=None):
                         help="fold LoRA deltas into the base weights before playing: identical "
                              "tokens, about 50%% lower p50 on the Tatum final adapter "
                              "(docs/experiments/LORA_MERGE.md); --no-merge-lora for the old path")
+    parser.add_argument("--adapter-name", default="primary",
+                        help="name of the --checkpoint adapter in --adapter-schedule")
+    parser.add_argument("--swap-adapter", action="append", default=[], metavar="NAME=CHECKPOINT",
+                        help="another adapter on the same base, swapped in at bar starts "
+                             "(docs/experiments/ADAPTER_SWAP.md); needs --adapter-schedule")
+    parser.add_argument("--adapter-schedule", default=None,
+                        help='bars per adapter, cycled: e.g. "tatum:4,mehldau:4"')
+    parser.add_argument("--allow-different-bases", action="store_true",
+                        help="let --swap-adapter checkpoints come from different bases; a swap "
+                             "then copies the whole model instead of the LoRA-touched weights")
     parser.add_argument("--context-carry-tokens", type=int, default=0,
                         help="with --chord-primer: prepend the last N tokens of the previous "
                              "valid block to each block's primer (0 = off, the previous behaviour)")
@@ -548,6 +558,20 @@ def main(argv=None):
         parser.error("chord primer (48) + context carry + generation tokens exceeds --max-sequence")
     if args.chord_blocks_per_bar > 1 and not args.chord_primer:
         parser.error("--chord-blocks-per-bar needs --chord-primer")
+    swap_specs = {}
+    for spec in args.swap_adapter:
+        name, sep, path = spec.partition("=")
+        if not sep or not name or not path:
+            parser.error("--swap-adapter takes NAME=CHECKPOINT")
+        if name in swap_specs or name == args.adapter_name:
+            parser.error(f"duplicate adapter name {name!r}")
+        swap_specs[name] = Path(path)
+    if bool(swap_specs) != bool(args.adapter_schedule):
+        parser.error("--swap-adapter and --adapter-schedule go together")
+    if swap_specs and not args.merge_lora:
+        parser.error("adapter swapping works on merged weights; drop --no-merge-lora")
+    if swap_specs and args.fallback_only:
+        parser.error("--swap-adapter needs a model; drop --fallback-only")
 
     generate = None
     live_primer_bars: list[bool] = []
@@ -565,6 +589,30 @@ def main(argv=None):
         if args.merge_lora:
             from scripts.train_qlora import merge_lora_for_inference
             merge_lora_for_inference(model)
+        bank = schedule = None
+        if swap_specs:
+            from scripts.adapter_bank import AdapterBank, parse_schedule
+            models = {args.adapter_name: model}
+            for name, path in swap_specs.items():
+                other = load_model_with_lora(
+                    lora_path=str(path.parent), checkpoint_path=str(path),
+                    prefer_full_checkpoint=True, max_sequence=args.max_sequence,
+                )
+                merge_lora_for_inference(other)
+                models[name] = other
+            bank = AdapterBank(models, allow_different_bases=args.allow_different_bases)
+            del models
+            schedule = parse_schedule(args.adapter_schedule, bank.names)
+        adapter_per_bar: dict[int, str] = {}
+
+        def select_adapter(bar_index):
+            """Swap at bar starts only, on the producer thread, between generations."""
+            if bank is None:
+                return
+            from scripts.adapter_bank import adapter_for_bar
+            name = adapter_for_bar(schedule, bar_index)
+            bank.select(name)
+            adapter_per_bar[bar_index] = name
         base_primer = build_primer(
             conditioning_midi=str(args.conditioning_midi), primer_max_tokens=32,
             append_sep_token=True, control_format="control_v1", role="lead",
@@ -581,6 +629,8 @@ def main(argv=None):
                 truncate_tokens_preserving_velocity,
             )
 
+            if sub_index == 0:
+                select_adapter(bar_index)
             chord = chords[bar_index % len(chords)]
             notes = list(chord_guide_notes_for_duration(chord, bpm=args.bpm,
                                                         seconds=sub_duration))
@@ -611,6 +661,7 @@ def main(argv=None):
             return tokens_out
 
         def generate(bar_index, input_events):
+            select_adapter(bar_index)
             if args.chord_primer:
                 primer, used_input, used_chord = build_chord_live_primer(
                     input_events, chords[bar_index % len(chords)], bpm=args.bpm,
@@ -727,6 +778,19 @@ def main(argv=None):
             report["chord_blocks_per_bar"] = args.chord_blocks_per_bar
             report["kv_cache"] = bool(args.kv_cache)
             report["merge_lora"] = bool(args.merge_lora)
+            if not args.fallback_only and bank is not None:
+                swaps = sorted(bank.swap_ms)
+                report["adapter_swap"] = {
+                    "adapters": {args.adapter_name: str(args.checkpoint),
+                                 **{n: str(p) for n, p in swap_specs.items()}},
+                    "schedule": args.adapter_schedule,
+                    "per_bar": [adapter_per_bar.get(i) for i in range(args.bars)],
+                    "shared_base": bank.shared_base,
+                    "swap_keys": len(bank.swap_keys),
+                    "swaps": len(swaps),
+                    "swap_ms_p50": swaps[len(swaps) // 2] if swaps else None,
+                    "swap_ms_max": swaps[-1] if swaps else None,
+                }
             report["chords"] = chords
             report["context_carry_tokens"] = args.context_carry_tokens
             report["context_carry_position"] = args.context_carry_position

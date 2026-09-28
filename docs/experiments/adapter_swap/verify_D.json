@@ -1,0 +1,20 @@
+{
+  "schema": "adapter_swap_verify_v1",
+  "adapters": {
+    "tatum": "outputs/final_tatum/export/checkpoint_update518.pt",
+    "mehldau1497": "outputs/clean_base/c2_export/checkpoint_update128.pt"
+  },
+  "shared_base": false,
+  "swap_keys": 83,
+  "swap_key_examples": [
+    "Wout.bias",
+    "Wout.weight",
+    "embedding.weight",
+    "transformer.encoder.layers.0.linear1.bias"
+  ],
+  "swaps": 20,
+  "swap_ms_p50": 1.9731454958673567,
+  "swap_ms_max": 3.6457080277614295,
+  "logits_max_abs_diff": 0.0,
+  "logits_ok": true
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "adapter_swap_verify_v1",
+  "adapters": {
+    "tatum": "outputs/final_tatum/export/checkpoint_update518.pt",
+    "mehldau": "outputs/tvm/export_mehldau/checkpoint_update128.pt"
+  },
+  "shared_base": true,
+  "swap_keys": 12,
+  "swap_key_examples": [
+    "transformer.encoder.layers.0.self_attn.in_proj_weight",
+    "transformer.encoder.layers.0.self_attn.out_proj.weight",
+    "transformer.encoder.layers.1.self_attn.in_proj_weight",
+    "transformer.encoder.layers.1.self_attn.out_proj.weight"
+  ],
+  "swaps": 20,
+  "swap_ms_p50": 0.8260419999714941,
+  "swap_ms_max": 0.9730839519761503,
+  "logits_max_abs_diff": 0.0,
+  "logits_ok": true,
+  "foreign_refused": true,
+  "foreign_error": "adapters do not share a base: 59 non-LoRA tensors differ, e.g. ['Wout.bias', 'Wout.weight', 'embedding.weight']"
+}
