@@ -1,0 +1,26 @@
+{
+  "carry0_base": {
+    "within_median": 6.0,
+    "boundary_median": 11
+  },
+  "carry0_tatum": {
+    "within_median": 6,
+    "boundary_median": 14
+  },
+  "carry0_mehldau": {
+    "within_median": 7.0,
+    "boundary_median": 15
+  },
+  "carry32_base": {
+    "within_median": 7.0,
+    "boundary_median": 7
+  },
+  "carry32_tatum": {
+    "within_median": 5.0,
+    "boundary_median": 13
+  },
+  "carry32_mehldau": {
+    "within_median": 7.0,
+    "boundary_median": 13
+  }
+}

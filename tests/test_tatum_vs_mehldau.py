@@ -237,5 +237,26 @@ class CvCrossBootstrapTest(unittest.TestCase):
                            {"own": np.zeros(5), "other": np.zeros(3), "generic": g})
 
 
+class PlayedBarsAnalysisTest(unittest.TestCase):
+    def test_silence_repeats_reuse_and_jumps(self) -> None:
+        from scripts.analyze_played_bars import bar_features, max_silence
+
+        self.assertAlmostEqual(max_silence([[60, 0.0, 0.5], [62, 1.2, 1.5]], 2.0), 0.7)
+        self.assertAlmostEqual(max_silence([], 2.0), 2.0)
+        bars = [{"notes": [[60, 0.0, .4], [62, .5, .9], [64, 1.0, 1.4], [65, 1.5, 1.9]]},
+                {"notes": [[60, 0.0, .4], [62, .5, .9], [64, 1.0, 1.4], [65, 1.5, 1.9]]},  # exact repeat
+                {"notes": [[62, 0.0, .4], [64, .5, .9], [66, 1.0, 1.4], [67, 1.5, 1.9]]},  # transposed
+                {"notes": [[70, 0.0, 0.3]]},                                                # long gap
+                {"notes": []}]                                                              # empty
+        out = bar_features(bars, 2.0)
+        self.assertEqual(out["exact_repeat_bars"], 1)
+        self.assertEqual(out["transposed_repeat_bars"], 1)
+        self.assertEqual(out["empty_bars"], 1)
+        self.assertEqual(out["half_bar_gap_bars"], 2)      # bar 3 (1.7 s silent) and the empty bar
+        self.assertEqual(out["boundary_jump_max"], 5)       # 65->70 across bars 2->3
+        # bars with < 4 notes have no 4-grams and are left out of the mean
+        self.assertAlmostEqual(out["cross_bar_4gram_reuse_mean"], (1.0 + 0.0) / 2)
+
+
 if __name__ == "__main__":
     unittest.main()
