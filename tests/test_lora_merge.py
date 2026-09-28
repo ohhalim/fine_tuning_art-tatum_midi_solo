@@ -78,6 +78,28 @@ class LoraMergeTest(unittest.TestCase):
             self.assertEqual(merge_lora_for_inference(model), {"linear": 0, "qkv": 0})
             self.assertTrue(torch.equal(before, model(x)))
 
+    def test_wrappers_from_the_top_level_module_are_merged(self) -> None:
+        # scripts/generate.py imports this file as ``train_qlora``, so checkpoints
+        # loaded through it carry that module's LoRALayer class (#1520).
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import train_qlora as top_level
+        self.assertIsNot(top_level.LoRALayer, sys.modules["scripts.train_qlora"].LoRALayer)
+        torch.manual_seed(0)
+        model = MusicTransformer(**TINY)
+        model, _ = top_level.add_lora_to_model(model, r=2, alpha=4, dropout=0.0,
+                                               targets=("out_proj", "qkv", "ffn"))
+        with torch.no_grad():
+            for name, p in model.named_parameters():
+                if "lora_B" in name:
+                    p.normal_(0, 0.2)
+        model.eval()
+        x = torch.randint(0, 388, (1, 30))
+        with torch.no_grad():
+            before = model(x)
+            self.assertEqual(merge_lora_for_inference(model), {"linear": 6, "qkv": 2})
+            self.assertLess((before - model(x)).abs().max().item(), 1e-5)
+        self.assertFalse(any("lora_" in k for k in model.state_dict()))
+
 
 class RuntimeDefaultTest(unittest.TestCase):
     def test_runtime_merges_by_default_with_opt_out(self) -> None:

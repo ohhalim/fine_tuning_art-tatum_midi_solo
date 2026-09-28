@@ -55,7 +55,8 @@ def main(argv=None) -> int:
                                      prefer_full_checkpoint=True)
             return m.eval()
         plain, merged_model = fresh(), fresh()
-        merge_lora_for_inference(merged_model)
+        folded = merge_lora_for_inference(merged_model)
+        left = sum("lora_" in k for k in merged_model.state_dict())
         maxdiff = 0.0
         with torch.no_grad():
             for seq in seqs:
@@ -86,7 +87,8 @@ def main(argv=None) -> int:
                     identical += 1
                 else:
                     mismatches.append({"seed": seed, "chord": ci})
-        out["models"][name] = {"logits_max_abs_diff": maxdiff, "logits_ok": maxdiff < 1e-4,
+        out["models"][name] = {"folded": folded, "lora_tensors_left": left,
+                               "logits_max_abs_diff": maxdiff, "logits_ok": maxdiff < 1e-4,
                                "blocks": total, "identical_blocks": identical,
                                "tokens_ok": identical == total, "mismatches": mismatches,
                                "wall_s_unmerged": t_full, "wall_s_merged": t_cache,

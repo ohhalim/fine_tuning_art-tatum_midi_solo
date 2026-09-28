@@ -219,8 +219,19 @@ def merge_lora_for_inference(model: nn.Module) -> dict:
     W + scale * B @ A; QKV LoRA is added into the ``in_proj_weight`` Parameter and
     the q/k/v LoRA parameters and property subclass are removed. The forward pass
     then does no per-call delta arithmetic. Not reversible; do not train afterwards.
+
+    Wrappers are recognised by shape, not by ``isinstance``: this file is imported
+    both as ``train_qlora`` (scripts/generate.py) and ``scripts.train_qlora``, which
+    gives two distinct ``LoRALayer`` classes (#1520). Any ``lora_`` tensor left
+    afterwards is an error.
     """
     merged = {"linear": 0, "qkv": 0}
+
+    def is_lora_linear(module: nn.Module) -> bool:
+        return (isinstance(getattr(module, "original_layer", None), nn.Linear)
+                and isinstance(getattr(module, "lora_A", None), torch.Tensor)
+                and isinstance(getattr(module, "lora_B", None), torch.Tensor)
+                and hasattr(module, "scaling"))
 
     def fold(layer: "LoRALayer") -> nn.Linear:
         base = layer.original_layer
@@ -234,7 +245,7 @@ def merge_lora_for_inference(model: nn.Module) -> dict:
 
     for module in list(model.modules()):
         for name, child in list(module.named_children()):
-            if isinstance(child, LoRALayer):
+            if is_lora_linear(child):
                 setattr(module, name, fold(child))
                 merged["linear"] += 1
     for layer in _encoder_layers(model):
@@ -249,6 +260,9 @@ def merge_lora_for_inference(model: nn.Module) -> dict:
             del attn._parameters[f"lora_B_{n}"]
         attn.__class__ = attn.__class__.__mro__[1]    # drop the property subclass
         merged["qkv"] += 1
+    left = [k for k in model.state_dict() if "lora_" in k]
+    if left:
+        raise RuntimeError(f"LoRA tensors left after merging: {len(left)}, e.g. {left[:3]}")
     return merged
 
 
