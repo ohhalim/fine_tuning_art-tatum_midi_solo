@@ -506,6 +506,9 @@ def main(argv=None):
     parser.add_argument("--context-carry-tokens", type=int, default=0,
                         help="with --chord-primer: prepend the last N tokens of the previous "
                              "valid block to each block's primer (0 = off, the previous behaviour)")
+    parser.add_argument("--context-carry-position", choices=["before", "after"], default="before",
+                        help="where the carried tail goes: before the chord statement (default) "
+                             "or after it, right before generation")
     parser.add_argument("--thread-qos", default="user-interactive",
                         choices=["default", "user-initiated", "user-interactive"],
                         help="macOS QoS class for the scheduler thread "
@@ -581,7 +584,8 @@ def main(argv=None):
             # front of this block's chord statement, so the model continues the
             # line instead of starting every half bar from scratch.
             carried = carry_tokens(context_carry["tokens"], args.context_carry_tokens)
-            primer = torch.tensor((carried + tokens) or [60], dtype=torch.long)
+            ordered = (tokens + carried) if args.context_carry_position == "after" else (carried + tokens)
+            primer = torch.tensor(ordered or [60], dtype=torch.long)
             chord_primer_bars.append(bool(notes))
             torch.manual_seed(args.seed + bar_index * 13 + sub_index * 977)
             tokens_out, _meta = generate_once(
@@ -711,6 +715,7 @@ def main(argv=None):
             report["chord_primer_enabled"] = bool(args.chord_primer)
             report["chord_blocks_per_bar"] = args.chord_blocks_per_bar
             report["context_carry_tokens"] = args.context_carry_tokens
+            report["context_carry_position"] = args.context_carry_position
             report["chord_primer_bar_count"] = sum(1 for x in chord_primer_bars if x)
             # Note-based steering only. The model has no chord token, and no
             # human has judged whether the result sounds harmonically right.
