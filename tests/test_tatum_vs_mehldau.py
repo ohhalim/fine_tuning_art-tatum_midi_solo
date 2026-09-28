@@ -178,5 +178,64 @@ class ReviewFixesTest(unittest.TestCase):
         self.assertLess(text.index("tvm_check_budgets.sh"), text.index("scripts/eval_cross_artist.py"))
 
 
+class CvCrossBootstrapTest(unittest.TestCase):
+    def test_same_songs_share_indices_across_roles(self) -> None:
+        from scripts.eval_cv_cross import bootstrap_rank
+
+        x = np.random.default_rng(0).normal(-0.03, 0.05, 16)   # effect per Tatum song
+        z = np.zeros(16)
+        g = np.random.default_rng(1).normal(-0.02, 0.01, 100)
+        # Tatum adapter gains x on Tatum songs; Mehldau adapter loses x on the same
+        # songs. With shared Tatum indices, D_specif = mean(x) - mean(x) = 0 exactly.
+        t = {"own": x, "other": z, "generic": g}
+        m = {"own": z, "other": -x, "generic": g}
+        lo, hi = bootstrap_rank(t, m, iters=300)["D_specif_ci95"]
+        self.assertAlmostEqual(lo, 0.0, places=12)
+        self.assertAlmostEqual(hi, 0.0, places=12)
+
+    def test_generic_songs_paired_between_adapters(self) -> None:
+        from scripts.eval_cv_cross import bootstrap_rank
+
+        g = np.random.default_rng(2).normal(0.0, 0.5, 100)     # large, shared generic noise
+        c = np.full(16, -0.04)
+        t = {"own": c, "other": np.zeros(16), "generic": g}
+        m = {"own": c, "other": np.zeros(16), "generic": g}
+        lo, hi = bootstrap_rank(t, m, iters=300)["D_spec_ci95"]
+        self.assertAlmostEqual(lo, 0.0, places=12)
+        self.assertAlmostEqual(hi, 0.0, places=12)
+
+    def test_direction_labels_are_exploratory(self) -> None:
+        from scripts.eval_cv_cross import bootstrap_rank
+
+        g = np.zeros(10)
+        t = {"own": np.full(4, -0.10), "other": np.full(4, 0.0), "generic": g}
+        m = {"own": np.full(4, -0.01), "other": np.full(4, 0.0), "generic": g}
+        out = bootstrap_rank(t, m, iters=100)
+        self.assertEqual(out["D_spec_direction"], "tatum_larger_exploratory")
+
+    def test_spearman_handles_ties(self) -> None:
+        from scripts.eval_cv_cross import average_ranks, spearman
+
+        self.assertEqual(average_ranks([3, 1, 3, 2]).tolist(), [3.5, 1.0, 3.5, 2.0])
+        self.assertAlmostEqual(spearman([1, 2, 2, 3], [10, 20, 20, 30]), 1.0)
+
+    def test_held_out_exactly_once(self) -> None:
+        from scripts.eval_cv_cross import check_held_out_once
+
+        check_held_out_once({0: {"a", "b"}, 1: {"c", "d"}}, ["a", "b", "c", "d"])
+        with self.assertRaises(ValueError):
+            check_held_out_once({0: {"a", "b"}, 1: {"b", "c"}}, ["a", "b", "c", "d"])  # b twice, d never
+        with self.assertRaises(ValueError):
+            check_held_out_once({0: {"a", "x"}}, ["a"])
+
+    def test_mismatched_song_sets_rejected(self) -> None:
+        from scripts.eval_cv_cross import bootstrap_rank
+
+        g = np.zeros(3)
+        with self.assertRaises(ValueError):
+            bootstrap_rank({"own": np.zeros(4), "other": np.zeros(5), "generic": g},
+                           {"own": np.zeros(5), "other": np.zeros(3), "generic": g})
+
+
 if __name__ == "__main__":
     unittest.main()
