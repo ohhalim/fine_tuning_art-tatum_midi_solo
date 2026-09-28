@@ -121,11 +121,17 @@ class BarBlockProducer:
         input_buffer: MidiInputSnapshotBuffer | None = None,
         clock_ns: Callable[[], int] = time.perf_counter_ns,
         max_lead_bars: int = 1,
+        steady_lead_bars: int | None = None,
     ) -> None:
+        """``steady_lead_bars`` replaces ``max_lead_bars`` once playback has asked
+        for its first bar: warm-up can build two bars ahead while steady state
+        stays one bar ahead (docs/experiments/GENERATION_LEAD.md)."""
         if bar_count <= 0:
             raise ValueError("bar_count must be positive")
         if max_lead_bars < 1:
             raise ValueError("max_lead_bars must be at least 1")
+        if steady_lead_bars is not None and steady_lead_bars < 1:
+            raise ValueError("steady_lead_bars must be at least 1")
         missing = [i for i in range(bar_count) if i not in fallback_blocks]
         if missing:
             raise ValueError(f"fallback block missing for bars: {missing}")
@@ -136,6 +142,7 @@ class BarBlockProducer:
         self._input_buffer = input_buffer
         self._clock_ns = clock_ns
         self._max_lead_bars = max_lead_bars
+        self._steady_lead_bars = steady_lead_bars if steady_lead_bars is not None else max_lead_bars
 
         self._ready: dict[int, ScheduledMidiBlock] = {}
         self._records: dict[int, BarProductionRecord] = {}
@@ -225,7 +232,7 @@ class BarBlockProducer:
             with self._cv:
                 while (
                     not self._stop.is_set()
-                    and bar_index > self._consumed_watermark + self._max_lead_bars
+                    and bar_index > self._consumed_watermark + self._lead_bars()
                 ):
                     self._cv.wait(timeout=0.05)
                 if self._stop.is_set():
@@ -234,6 +241,9 @@ class BarBlockProducer:
                     # Playback already passed this bar; nothing to produce.
                     continue
             self._produce(bar_index)
+
+    def _lead_bars(self) -> int:
+        return self._max_lead_bars if self._consumed_watermark < 0 else self._steady_lead_bars
 
     def _produce(self, bar_index: int) -> None:
         requested_ns = self._clock_ns()

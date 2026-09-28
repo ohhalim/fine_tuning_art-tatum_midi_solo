@@ -330,7 +330,14 @@ class OneBarMidiScheduler:
         spin_window_ms: float = DEFAULT_SPIN_WINDOW_MS,
         deadline_threshold_ms: float = DEFAULT_DEADLINE_THRESHOLD_MS,
         deadline_policy: str = DEADLINE_POLICY_ABORT_ON_FIRST_MISS,
+        fetch_margin_ms: float | None = None,
     ) -> None:
+        """``fetch_margin_ms``: None asks for bar b+1 at bar b's downbeat (one bar
+        ahead). A number asks for bar b only ``fetch_margin_ms`` before its own
+        downbeat, which lets the producer start each bar later and so hear more
+        recent input (docs/experiments/GENERATION_LEAD.md)."""
+        if fetch_margin_ms is not None and fetch_margin_ms < 0:
+            raise ValueError("fetch_margin_ms must not be negative")
         if spin_window_ms < 0:
             raise ValueError("spin_window_ms must not be negative")
         if deadline_threshold_ms <= 0:
@@ -343,6 +350,8 @@ class OneBarMidiScheduler:
         self._stop = Event()
         self._deadline_threshold_ns = round(deadline_threshold_ms * 1_000_000)
         self._deadline_policy = deadline_policy
+        self._fetch_margin_ns = (None if fetch_margin_ms is None
+                                 else round(fetch_margin_ms * 1_000_000))
         self._watchdog_trigger_reason: str | None = None
         self._wait_until = wait_until or (
             lambda target_ns, stop: wait_until_ns(
@@ -389,15 +398,27 @@ class OneBarMidiScheduler:
             enqueued_block_count += 1
             queue_depth_max = 1
 
+        late_fetch = self._fetch_margin_ns is not None
         for bar_index in range(expected_bar_count):
             target_bar_start_ns = self._clock.bar_start_ns(bar_index)
+            if late_fetch and bar_index not in queue:
+                self._wait_until(target_bar_start_ns - self._fetch_margin_ns, self._stop)
+                if self._stop.is_set():
+                    break
+                fetched = blocks.get(bar_index)
+                if fetched is not None:
+                    enqueued_ns = self._clock_ns()
+                    queue[bar_index] = fetched
+                    enqueued_block_count += 1
+                    enqueue_lead_time_ns.append(max(0, fetched.target_start_ns - enqueued_ns))
+                    queue_depth_max = max(queue_depth_max, len(queue))
             self._wait_until(target_bar_start_ns, self._stop)
             if self._stop.is_set():
                 break
 
             block = queue.pop(bar_index, None)
             next_bar_index = bar_index + 1
-            if next_bar_index < expected_bar_count:
+            if not late_fetch and next_bar_index < expected_bar_count:
                 next_block = blocks.get(next_bar_index)
                 if next_block is not None:
                     enqueued_ns = self._clock_ns()

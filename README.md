@@ -215,6 +215,10 @@ flowchart LR
 | **멜다우 개인화 (완료 판정)** | `outputs/clean_base/c2_export/checkpoint_update128.pt` | **멜다우 미학습 base** + out_proj LoRA 128 update. 미학습 멜다우 곡 CE −0.046(4-fold 4/4), 재사용 holdout 2곡 −0.047·특화도 −0.021, 복사 0, 128 BPM 8/8. 가능도 수준 완료, 청취 미검증(#1497). 학습량 확장 CV(64–384, #1511)에서도 held-out 개선이 64–128에서 포화해 이 모델을 유지. 공통 base 멜다우보다 절대 CE가 0.028 낮아(16/16곡) base 통합도 하지 않음(#1517) |
 | **Tatum vs 멜다우 비교용 (공통 base)** | `outputs/tvm/export_{tatum,mehldau}/checkpoint_update128.pt` | 두 연주자 모두 제외한 공통 base + 같은 out_proj LoRA·16곡·128 update. 둘 다 자기 연주자 미학습 곡 개선·일반 대비 특화(3×3 교차 평가). 우열은 가중 방식에 따라 뒤집혀 미확정(멜다우 holdout 2곡). 128 BPM 8/8(#1499) |
 
+**연주 중 전환과 입력 반영 지연 (#1525, #1526):**
+- `--adapter-control program`(또는 `cc:N`)과 `--input-port`로 키보드 프리셋 버튼에서 어댑터를 고른다
+- 늦은 fetch(`--fetch-margin-ms 50`, 기본값)로 생성 선행을 3마디에서 1마디로 줄였다. 입력이 반영되기까지 4마디(약 7.5초)에서 2마디(약 2.3–3.7초, 128 BPM)가 됐다. 생성 내용은 240/240마디 동일하다
+
 **최종 두 모델 템포 (#1523):** Tatum 완성과 멜다우 #1497 모두 128–240 BPM 24회에서 fallback 0, 미스 0이었다. 생성 p95는 마디의 최대 29%다.
 
 **한 세션에서 Tatum↔멜다우 전환 (#1519):** `--swap-adapter mehldau=<ckpt> --adapter-schedule tatum:4,mehldau:4`. 마디 시작에서 병합된 어댑터 가중치를 바꿔 끼운다. 같은 base면 LoRA가 건드린 12개 텐서만 복사하고, 다른 base면 `--allow-different-bases`로 전체를 복사한다. 스왑 세션의 마디는 단독 세션과 48/48 동일하고, fallback 0, 스왑 최대 20 ms 이하였다.
@@ -326,7 +330,7 @@ uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo
 - [생성 지연 측정](docs/phase1/GENERATION_LATENCY.md) · [구간별 예산](docs/phase1/LATENCY_BUDGET.md)
 - [코드 primer 비교 실험](docs/experiments/CHORD_PRIMER_AB.md)
 - [멜다우 개인화 실험 (첫 시도)](docs/experiments/MEHLDAU_PERSONALIZATION.md)
-- [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Art Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md) · [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md) · [런타임 멈춤 원인](docs/experiments/RUNTIME_STALL_CAUSE.md) · [Tatum LoRA 타깃](docs/experiments/TATUM_LORA_TARGETS.md) · [seed 반복·멜다우 적용](docs/experiments/SEED_REPEAT_AND_MEHLDAU_APPLY.md) · [멜다우 개인화 완료](docs/experiments/MEHLDAU_CLEAN_BASE.md) · [Tatum vs 멜다우 비교](docs/experiments/TATUM_VS_MEHLDAU.md) · [16마디 실사용 점검](docs/experiments/USAGE_PATH_16BAR.md) · [KV 캐시](docs/experiments/KV_CACHE.md) · [Tatum 완성 모델](docs/experiments/FINAL_TATUM.md) · [LoRA 병합](docs/experiments/LORA_MERGE.md) · [멜다우 학습량 확장](docs/experiments/FINAL_MEHLDAU.md) · [공통 base 판정](docs/experiments/SHARED_BASE.md) · [어댑터 스왑](docs/experiments/ADAPTER_SWAP.md) · [최종 모델 템포](docs/experiments/FINAL_TEMPO.md)
+- [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Art Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md) · [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md) · [런타임 멈춤 원인](docs/experiments/RUNTIME_STALL_CAUSE.md) · [Tatum LoRA 타깃](docs/experiments/TATUM_LORA_TARGETS.md) · [seed 반복·멜다우 적용](docs/experiments/SEED_REPEAT_AND_MEHLDAU_APPLY.md) · [멜다우 개인화 완료](docs/experiments/MEHLDAU_CLEAN_BASE.md) · [Tatum vs 멜다우 비교](docs/experiments/TATUM_VS_MEHLDAU.md) · [16마디 실사용 점검](docs/experiments/USAGE_PATH_16BAR.md) · [KV 캐시](docs/experiments/KV_CACHE.md) · [Tatum 완성 모델](docs/experiments/FINAL_TATUM.md) · [LoRA 병합](docs/experiments/LORA_MERGE.md) · [멜다우 학습량 확장](docs/experiments/FINAL_MEHLDAU.md) · [공통 base 판정](docs/experiments/SHARED_BASE.md) · [어댑터 스왑](docs/experiments/ADAPTER_SWAP.md) · [최종 모델 템포](docs/experiments/FINAL_TEMPO.md) · [라이브 어댑터 선택](docs/experiments/ADAPTER_LIVE_SELECT.md) · [생성 선행 단축](docs/experiments/GENERATION_LEAD.md)
 - [기존 D0–D4 연구 기록](docs/RESEARCH_SUMMARY.md)
 
 과거 Stage B 실험은 `archive/` 와 연구 문서에 보존합니다.

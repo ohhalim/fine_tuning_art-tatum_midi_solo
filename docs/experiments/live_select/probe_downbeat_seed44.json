@@ -1,0 +1,86 @@
+{
+  "schema": "live_select_probe_v1",
+  "command": [
+    "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/.venv/bin/python",
+    "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/scripts/run_continuous_jazz.py",
+    "--checkpoint",
+    "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/outputs/final_tatum/export/checkpoint_update518.pt",
+    "--adapter-name",
+    "tatum",
+    "--swap-adapter",
+    "mehldau=/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/outputs/tvm/export_mehldau/checkpoint_update128.pt",
+    "--conditioning-midi",
+    "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/outputs/chord_ab/ii_V_I.mid",
+    "--chord-primer",
+    "--chord-blocks-per-bar",
+    "2",
+    "--chords",
+    "Dm7,G7,Cmaj7,A7",
+    "--bars",
+    "16",
+    "--bpm",
+    "128",
+    "--seed",
+    "44",
+    "--capture",
+    "--input-port",
+    "AdapterSelectProbe",
+    "--adapter-control",
+    "program",
+    "--output-dir",
+    "outputs/live_select/seed44"
+  ],
+  "exit_code": 0,
+  "sent": [
+    {
+      "at_s": 12.005,
+      "value": 1
+    },
+    {
+      "at_s": 20.007,
+      "value": 0
+    },
+    {
+      "at_s": 28.001,
+      "value": 1
+    }
+  ],
+  "per_bar": [
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "mehldau",
+    "mehldau",
+    "mehldau",
+    "mehldau",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum"
+  ],
+  "switches": [
+    {
+      "received_ms_from_start": 8432.219709,
+      "value": 1,
+      "selected": "mehldau",
+      "arrived_bar": 4,
+      "applied_bar": 8,
+      "latency_bars": 4
+    },
+    {
+      "received_ms_from_start": 16433.655917,
+      "value": 0,
+      "selected": "tatum",
+      "arrived_bar": 8,
+      "applied_bar": 12,
+      "latency_bars": 4
+    }
+  ],
+  "fallback_bars": 0,
+  "deadline_misses": 0
+}

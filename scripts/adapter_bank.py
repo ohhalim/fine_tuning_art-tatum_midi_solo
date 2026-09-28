@@ -104,3 +104,54 @@ def adapter_for_bar(schedule: list[tuple[str, int]], bar_index: int) -> str:
             return name
         pos -= n
     raise AssertionError("unreachable")
+
+
+class LiveAdapterSelector:
+    """Choose the adapter from the player's input: Program Change or one CC.
+
+    ``control`` is ``"program"`` (program p selects the p-th adapter; programs
+    past the last adapter are ignored) or ``"cc:N"`` (CC number N; the 0-127
+    value range is split evenly across the adapters). The choice persists until
+    the next selector message, even after the input window forgets it. Runs on
+    the producer thread with the snapshot the producer already took.
+    """
+
+    def __init__(self, names, control: str, initial: str | None = None):
+        self.names = list(names)
+        if not self.names:
+            raise ValueError("need at least one adapter")
+        if control == "program":
+            self.kind, self.cc = "program", None
+        elif control.startswith("cc:"):
+            self.kind, self.cc = "cc", int(control[3:])
+            if not 0 <= self.cc <= 127:
+                raise ValueError("cc number must be 0..127")
+        else:
+            raise ValueError('control must be "program" or "cc:N"')
+        self.current = initial if initial is not None else self.names[0]
+        if self.current not in self.names:
+            raise ValueError(f"unknown initial adapter {self.current!r}")
+        self._last_ns = -1
+        self.events: list[dict] = []
+
+    def _pick(self, message):
+        if self.kind == "program" and message.type == "program_change":
+            return message.program, (self.names[message.program]
+                                     if message.program < len(self.names) else None)
+        if self.kind == "cc" and message.type == "control_change" and message.control == self.cc:
+            return message.value, self.names[min(message.value * len(self.names) // 128,
+                                                 len(self.names) - 1)]
+        return None, None
+
+    def update(self, events) -> str:
+        for e in events:
+            if e.received_ns <= self._last_ns:
+                continue
+            self._last_ns = e.received_ns
+            value, name = self._pick(e.message)
+            if value is None:
+                continue
+            self.events.append({"received_ns": e.received_ns, "value": value, "selected": name})
+            if name is not None:
+                self.current = name
+        return self.current

@@ -16,7 +16,7 @@ from utilities.device import use_cuda
 use_cuda(False)
 
 from model.music_transformer import MusicTransformer
-from scripts.adapter_bank import AdapterBank, adapter_for_bar, parse_schedule
+from scripts.adapter_bank import AdapterBank, LiveAdapterSelector, adapter_for_bar, parse_schedule
 from scripts.train_qlora import add_lora_to_model, merge_lora_for_inference
 
 TINY = dict(n_layers=2, num_heads=2, d_model=16, dim_feedforward=32, max_sequence=48, rpr=True)
@@ -88,6 +88,38 @@ class AdapterBankTest(unittest.TestCase):
             parse_schedule("bill:4", ["tatum"])
 
 
+class LiveSelectorTest(unittest.TestCase):
+    def _ev(self, ns, msg):
+        from inference.realtime.continuous import TimedInputMessage
+        return TimedInputMessage(received_ns=ns, message=msg)
+
+    def test_program_change_selects_and_persists(self) -> None:
+        import mido
+        sel = LiveAdapterSelector(["tatum", "mehldau"], "program")
+        notes = [self._ev(1, mido.Message("note_on", note=60, velocity=90))]
+        self.assertEqual(sel.update(notes), "tatum")
+        window = notes + [self._ev(2, mido.Message("program_change", program=1))]
+        self.assertEqual(sel.update(window), "mehldau")
+        self.assertEqual(sel.update(window), "mehldau")   # same snapshot again: no double count
+        self.assertEqual(sel.update([]), "mehldau")        # window forgot it: choice persists
+        self.assertEqual(sel.update([self._ev(3, mido.Message("program_change", program=7))]), "mehldau")
+        self.assertEqual(sel.update([self._ev(4, mido.Message("program_change", program=0))]), "tatum")
+        self.assertEqual([e["selected"] for e in sel.events], ["mehldau", None, "tatum"])
+
+    def test_cc_value_bins(self) -> None:
+        import mido
+        sel = LiveAdapterSelector(["a", "b", "c"], "cc:20")
+        pick = lambda ns, cc, v: sel.update([self._ev(ns, mido.Message("control_change", control=cc, value=v))])
+        self.assertEqual(pick(1, 20, 0), "a")
+        self.assertEqual(pick(2, 20, 50), "b")
+        self.assertEqual(pick(3, 21, 127), "b")   # other CC ignored
+        self.assertEqual(pick(4, 20, 127), "c")
+
+    def test_bad_control(self) -> None:
+        with self.assertRaises(ValueError):
+            LiveAdapterSelector(["a"], "pitchbend")
+
+
 class RuntimeFlagsTest(unittest.TestCase):
     def _error(self, *extra):
         import tempfile
@@ -102,6 +134,12 @@ class RuntimeFlagsTest(unittest.TestCase):
         self.assertEqual(self._error("--swap-adapter", "m=y.pt", "--adapter-schedule", "primary:4,m:4",
                                      "--no-merge-lora"), 2)
         self.assertEqual(self._error("--swap-adapter", "primary=y.pt", "--adapter-schedule", "primary:4"), 2)
+
+    def test_live_control_needs_input_port_and_excludes_schedule(self) -> None:
+        self.assertEqual(self._error("--swap-adapter", "m=y.pt", "--adapter-control", "program"), 2)
+        self.assertEqual(self._error("--swap-adapter", "m=y.pt", "--adapter-control", "program",
+                                     "--adapter-schedule", "primary:4,m:4", "--input-port", "X"), 2)
+        self.assertEqual(self._error("--adapter-control", "program", "--input-port", "X"), 2)
 
 
 if __name__ == "__main__":
