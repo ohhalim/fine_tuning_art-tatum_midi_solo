@@ -122,10 +122,16 @@ class BarBlockProducer:
         clock_ns: Callable[[], int] = time.perf_counter_ns,
         max_lead_bars: int = 1,
         steady_lead_bars: int | None = None,
+        start_not_before_ns: Callable[[int], int] | None = None,
     ) -> None:
         """``steady_lead_bars`` replaces ``max_lead_bars`` once playback has asked
         for its first bar: warm-up can build two bars ahead while steady state
-        stays one bar ahead (docs/experiments/GENERATION_LEAD.md)."""
+        stays one bar ahead (docs/experiments/GENERATION_LEAD.md).
+
+        ``start_not_before_ns(bar_index)`` (optional) holds back the start of a
+        steady-state bar until that clock time, so the snapshot it conditions on
+        is as recent as the generation budget allows (docs/experiments/START_BUDGET.md).
+        Warm-up bars 0 and 1 are never held."""
         if bar_count <= 0:
             raise ValueError("bar_count must be positive")
         if max_lead_bars < 1:
@@ -143,6 +149,7 @@ class BarBlockProducer:
         self._clock_ns = clock_ns
         self._max_lead_bars = max_lead_bars
         self._steady_lead_bars = steady_lead_bars if steady_lead_bars is not None else max_lead_bars
+        self._start_not_before_ns = start_not_before_ns
 
         self._ready: dict[int, ScheduledMidiBlock] = {}
         self._records: dict[int, BarProductionRecord] = {}
@@ -240,6 +247,17 @@ class BarBlockProducer:
                 if bar_index <= self._consumed_watermark:
                     # Playback already passed this bar; nothing to produce.
                     continue
+                if self._start_not_before_ns is not None and bar_index >= 2:
+                    not_before = self._start_not_before_ns(bar_index)
+                    while not self._stop.is_set() and bar_index > self._consumed_watermark:
+                        remaining_s = (not_before - self._clock_ns()) / 1e9
+                        if remaining_s <= 0:
+                            break
+                        self._cv.wait(timeout=min(0.05, remaining_s))
+                    if self._stop.is_set():
+                        return
+                    if bar_index <= self._consumed_watermark:
+                        continue
             self._produce(bar_index)
 
     def _lead_bars(self) -> int:

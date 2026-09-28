@@ -114,7 +114,66 @@ class SteadyLeadProducerTest(unittest.TestCase):
             self.assertEqual(built, [0, 1, 2])
 
 
+class StartBudgetTest(unittest.TestCase):
+    def test_steady_bars_wait_for_their_start_time_warmup_does_not(self) -> None:
+        clock = MonotonicBarClock(bpm=120, beats_per_bar=4, start_ns=0)
+        fallbacks = build_deterministic_blocks(clock=clock, bar_count=4)
+        now = {"ns": 0}
+        started = []
+
+        def build(bar_index, events):
+            started.append((bar_index, now["ns"]))
+            return fallbacks[bar_index]
+
+        producer = BarBlockProducer(bar_count=4, fallback_blocks=fallbacks, build_block=build,
+                                    clock=clock, clock_ns=lambda: now["ns"], max_lead_bars=2,
+                                    steady_lead_bars=1,
+                                    start_not_before_ns=lambda b: 1_000_000_000 * b)
+        with producer:
+            deadline = time.monotonic() + 2
+            while len(started) < 2 and time.monotonic() < deadline:
+                time.sleep(0.005)
+            self.assertEqual([b for b, _ in started], [0, 1])   # warm-up is not held
+            producer.get(0)
+            producer.get(1)
+            time.sleep(0.15)
+            self.assertEqual(len(started), 2)                   # bar 2 held until t = 2 s
+            now["ns"] = 2_000_000_000
+            deadline = time.monotonic() + 2
+            while len(started) < 3 and time.monotonic() < deadline:
+                time.sleep(0.005)
+            self.assertEqual(started[2], (2, 2_000_000_000))
+
+    def test_cli_needs_late_fetch_and_a_sane_fraction(self) -> None:
+        import tempfile
+        from scripts.run_continuous_jazz import main
+        for extra in (["--fetch-margin-ms", "off", "--start-budget-bars", "0.5"],
+                      ["--start-budget-bars", "1.5"]):
+            with tempfile.TemporaryDirectory() as d, self.assertRaises(SystemExit):
+                main(["--output-dir", d, "--fallback-only", *extra])
+
+
 class RuntimeDefaultTest(unittest.TestCase):
+    def test_start_budget_defaults_to_half_a_bar_only_with_late_fetch(self) -> None:
+        import tempfile
+        from unittest import mock
+        import scripts.run_continuous_jazz as module
+        seen = {}
+
+        def fake_run_session(**kw):
+            seen.update(kw)
+            raise SystemExit(0)
+
+        for extra, want in (([], 0.5), (["--start-budget-bars", "off"], None),
+                            (["--fetch-margin-ms", "off"], None),
+                            (["--start-budget-bars", "0.3"], 0.3)):
+            seen.clear()
+            with tempfile.TemporaryDirectory() as d, \
+                    mock.patch.object(module, "run_session", fake_run_session), \
+                    mock.patch("mido.open_output"), self.assertRaises(SystemExit):
+                module.main(["--output-dir", d, "--fallback-only", *extra])
+            self.assertEqual(seen.get("start_budget_bars"), want, extra)
+
     def test_late_fetch_is_the_default_with_an_off_switch(self) -> None:
         from pathlib import Path
         from scripts.run_continuous_jazz import _fetch_margin
