@@ -1,0 +1,53 @@
+{
+  "schema": "lora_merge_verify_v1",
+  "models": {
+    "tatum_final": {
+      "folded": {
+        "linear": 6,
+        "qkv": 6
+      },
+      "lora_tensors_left": 0,
+      "logits_max_abs_diff": 0.0,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_unmerged": 10.418148416967597,
+      "wall_s_merged": 4.947600296756718,
+      "speedup": 2.105697265762751
+    },
+    "tatum16": {
+      "folded": {
+        "linear": 6,
+        "qkv": 0
+      },
+      "lora_tensors_left": 0,
+      "logits_max_abs_diff": 0.0,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_unmerged": 5.286348167050164,
+      "wall_s_merged": 4.047988792939577,
+      "speedup": 1.3059196646666882
+    },
+    "mehldau16": {
+      "folded": {
+        "linear": 6,
+        "qkv": 0
+      },
+      "lora_tensors_left": 0,
+      "logits_max_abs_diff": 0.0,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_unmerged": 3.833360710123088,
+      "wall_s_merged": 2.921351123950444,
+      "speedup": 1.3121875965869396
+    }
+  }
+}
