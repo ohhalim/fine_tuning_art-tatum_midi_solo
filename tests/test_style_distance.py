@@ -116,5 +116,18 @@ class FreeGenerationValidityTest(unittest.TestCase):
         self.assertFalse(free_generation_validity([shift, shift])["grammar_valid"])
 
 
+class MehldauApplySelectTest(unittest.TestCase):
+    def test_lowest_val_within_generic_limit(self) -> None:
+        from scripts.make_mehldau_apply_report import select
+
+        rows = [{"update": 0, "d_ce_target_val": 0.0, "d_ce_generic": 0.0},
+                {"update": 64, "d_ce_target_val": -0.02, "d_ce_generic": 0.01},
+                {"update": 128, "d_ce_target_val": -0.03, "d_ce_generic": 0.021},
+                {"update": 32, "d_ce_target_val": -0.01, "d_ce_generic": -0.01}]
+        self.assertEqual(select({"rows": rows})["update"], 64)
+        with self.assertRaises(ValueError):
+            select({"rows": [{"update": 8, "d_ce_target_val": -1, "d_ce_generic": 0.5}]})
+
+
 if __name__ == "__main__":
     unittest.main()
