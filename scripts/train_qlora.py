@@ -211,6 +211,47 @@ def _encoder_layers(model: nn.Module):
     return [] if encoder is None else list(encoder.layers)
 
 
+@torch.no_grad()
+def merge_lora_for_inference(model: nn.Module) -> dict:
+    """Fold every LoRA delta into its base weight, in place, for inference only.
+
+    out_proj / FFN ``LoRALayer`` wrappers become plain ``nn.Linear`` layers holding
+    W + scale * B @ A; QKV LoRA is added into the ``in_proj_weight`` Parameter and
+    the q/k/v LoRA parameters and property subclass are removed. The forward pass
+    then does no per-call delta arithmetic. Not reversible; do not train afterwards.
+    """
+    merged = {"linear": 0, "qkv": 0}
+
+    def fold(layer: "LoRALayer") -> nn.Linear:
+        base = layer.original_layer
+        out = nn.Linear(base.in_features, base.out_features, bias=base.bias is not None,
+                        device=base.weight.device, dtype=base.weight.dtype)
+        out.weight.copy_(base.weight + (layer.lora_B @ layer.lora_A) * layer.scaling)
+        if base.bias is not None:
+            out.bias.copy_(base.bias)
+        out.requires_grad_(False)
+        return out
+
+    for module in list(model.modules()):
+        for name, child in list(module.named_children()):
+            if isinstance(child, LoRALayer):
+                setattr(module, name, fold(child))
+                merged["linear"] += 1
+    for layer in _encoder_layers(model):
+        attn = getattr(layer, "self_attn", None)
+        if attn is None or "lora_A_q" not in attn._parameters:
+            continue
+        delta = torch.cat([attn.lora_B_q @ attn.lora_A_q, attn.lora_B_k @ attn.lora_A_k,
+                           attn.lora_B_v @ attn.lora_A_v], dim=0) * attn.lora_qkv_scaling
+        attn._parameters["in_proj_weight"].add_(delta)
+        for n in ("q", "k", "v"):
+            del attn._parameters[f"lora_A_{n}"]
+            del attn._parameters[f"lora_B_{n}"]
+        attn.__class__ = attn.__class__.__mro__[1]    # drop the property subclass
+        merged["qkv"] += 1
+    return merged
+
+
 def add_lora_targets(model: nn.Module, targets, r: int = 16, alpha: int = 32,
                      dropout: float = 0.05) -> nn.ModuleList:
     """Add LoRA for ``qkv`` and/or ``ffn`` to an already frozen model (idempotent).
