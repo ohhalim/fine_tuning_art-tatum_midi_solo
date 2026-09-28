@@ -506,6 +506,9 @@ def main(argv=None):
     parser.add_argument("--kv-cache", action=argparse.BooleanOptionalAction, default=True,
                         help="KV-cached generation: identical tokens, about half the generation "
                              "time (docs/experiments/KV_CACHE.md); --no-kv-cache for the old path")
+    parser.add_argument("--chord-primer-tokens", type=int, default=48,
+                        help="with --chord-primer and sub-blocks: max tokens of the chord "
+                             "statement per block (48 = previous behaviour)")
     parser.add_argument("--context-carry-tokens", type=int, default=0,
                         help="with --chord-primer: prepend the last N tokens of the previous "
                              "valid block to each block's primer (0 = off, the previous behaviour)")
@@ -540,8 +543,11 @@ def main(argv=None):
         parser.error("context_carry_tokens must be >= 0")
     if args.context_carry_tokens and not args.chord_primer:
         parser.error("--context-carry-tokens needs --chord-primer")
-    if args.chord_primer and 48 + args.context_carry_tokens + args.generation_tokens > args.max_sequence:
-        parser.error("chord primer (48) + context carry + generation tokens exceeds --max-sequence")
+    if args.chord_primer_tokens < 1:
+        parser.error("chord_primer_tokens must be >= 1")
+    if args.chord_primer and (args.chord_primer_tokens + args.context_carry_tokens
+                              + args.generation_tokens > args.max_sequence):
+        parser.error("chord primer + context carry + generation tokens exceeds --max-sequence")
     if args.chord_blocks_per_bar > 1 and not args.chord_primer:
         parser.error("--chord-blocks-per-bar needs --chord-primer")
 
@@ -582,7 +588,8 @@ def main(argv=None):
             if sub_index == 0:
                 notes.extend(input_events_to_notes(input_events))
             notes.sort(key=lambda note: (note.start, note.pitch))
-            tokens = truncate_tokens_preserving_velocity(encode_notes_simple(notes), 48)
+            tokens = truncate_tokens_preserving_velocity(encode_notes_simple(notes),
+                                                         args.chord_primer_tokens)
             # Opt-in context carry: the tail of the previous valid block goes in
             # front of this block's chord statement, so the model continues the
             # line instead of starting every half bar from scratch.
@@ -720,6 +727,7 @@ def main(argv=None):
             report["chord_blocks_per_bar"] = args.chord_blocks_per_bar
             report["kv_cache"] = bool(args.kv_cache)
             report["chords"] = chords
+            report["chord_primer_tokens"] = args.chord_primer_tokens
             report["context_carry_tokens"] = args.context_carry_tokens
             report["context_carry_position"] = args.context_carry_position
             report["chord_primer_bar_count"] = sum(1 for x in chord_primer_bars if x)

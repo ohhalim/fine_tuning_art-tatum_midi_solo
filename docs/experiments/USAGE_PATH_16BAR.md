@@ -122,3 +122,16 @@
   - 속도 문제(KV 캐시 없음, 토큰마다 전체 재계산)가 먼저다
 - 옵션 기본값은 그대로다(`--context-carry-tokens 0`, `--context-carry-position before`)
 - MIDI 9개: `outputs/usage16_v2/compare_midi/chord_carry32_after_{base,tatum,mehldau}_seed{42,43,44}.mid`
+
+## 8. 문맥 연결 3차 — 짧은 코드 primer + 생성 직전 문맥 (사전 등록, 실행 전)
+- 배경: §7(after 순서)에서 base·Tatum은 경계 도약이 절반으로 줄었다. 멜다우는 변화가 없었고 지연이 기준을 넘었다. KV 캐시(#1507, 출력 동일, p95 −51~−56%)로 지연 여유가 생겼다
+- 가설: 코드 primer(최대 48토큰)가 길어서 직전 문맥의 영향을 희석한다. 코드 음 표현을 짧게 하면 멜다우에서도 문맥이 이어질 것이다
+- **변경(opt-in):** `--chord-primer-tokens K`(기본 48 = 기존 동작). 이번 변형은 **K=16, `--context-carry-tokens 32 --context-carry-position after`**
+- 조건: 코드 primer 모드, 3 모델(공통 base, Tatum16, 멜다우16 — #1499 쌍) × seed 42/43/44 × 16마디, 128 BPM, KV 캐시 기본
+- 기준선: 문맥 연결 없음 + K=48 + KV 캐시(`outputs/kv_cache/runtime16`, 캐시 없는 실행과 출력 동일)
+- **판정(모두 충족):**
+  1. 세 모델 모두 경계 도약 중앙값 25% 이상 감소
+  2. 마디 안 중앙값 ±1 이내
+  3. fallback 0, 생성 p95 1.2배 이하(기준선 대비)
+  4. **코드톤 비율 하락 0.05 이하**(짧은 코드 primer가 화성 추종을 무너뜨리지 않는지 확인)
+- 통과하면 코드 primer 모드의 권장 설정으로 문서화한다(기본값 변경은 별도로 판단). 실패하면 원인을 기록하고 문맥 연결 시험을 닫는다
