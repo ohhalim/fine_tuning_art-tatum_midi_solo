@@ -136,10 +136,46 @@ class ReviewFixesTest(unittest.TestCase):
         self.assertEqual(summary["pitch_range"], 7)          # from the valid second sample
         self.assertIn("ioi_median_ms", summary)
 
-    def test_pipeline_stops_when_a_budget_is_missing(self) -> None:
+    def _check(self, budget_lines):
+        import subprocess
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            budget = tmp / "chosen_budgets.txt"
+            if budget_lines is not None:
+                budget.write_text("".join(f"{line}\n" for line in budget_lines))
+            proc = subprocess.run(["bash", str(ROOT / "scripts" / "tvm_check_budgets.sh"),
+                                   str(budget), str(tmp)], capture_output=True, text=True)
+            failed = tmp / "adaptation_failed.txt"
+            return proc, failed.read_text() if failed.exists() else None
+
+    def test_budget_check_both_present(self) -> None:
+        proc, failed = self._check(["tatum 128", "mehldau 64"])
+        self.assertEqual(proc.returncode, 0)
+        self.assertEqual(proc.stdout.split(), ["128", "64"])
+        self.assertIsNone(failed)
+
+    def test_budget_check_one_missing(self) -> None:
+        proc, failed = self._check(["tatum 128"])
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("ADAPTATION_FAILED tatum='128' mehldau=''", failed)
+
+    def test_budget_check_both_missing_empty_file(self) -> None:
+        proc, failed = self._check([])
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("ADAPTATION_FAILED tatum='' mehldau=''", failed)
+
+    def test_budget_check_file_absent(self) -> None:
+        proc, failed = self._check(None)
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("ADAPTATION_FAILED", failed)
+        self.assertNotIn("awk", proc.stderr)
+
+    def test_pipeline_initialises_budget_file_and_uses_check(self) -> None:
         text = (ROOT / "scripts" / "run_tvm_pipeline.sh").read_text()
-        self.assertIn("ADAPTATION_FAILED", text)
-        self.assertLess(text.index("ADAPTATION_FAILED"), text.index("scripts/eval_cross_artist.py"))
+        self.assertLess(text.index(': > "$O/chosen_budgets.txt"'), text.index("for artist in tatum mehldau; do\n  B="))
+        self.assertLess(text.index("tvm_check_budgets.sh"), text.index("scripts/eval_cross_artist.py"))
 
 
 if __name__ == "__main__":
