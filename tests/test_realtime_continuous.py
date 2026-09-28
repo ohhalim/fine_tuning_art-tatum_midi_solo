@@ -308,6 +308,20 @@ class DeadlineMissDetailTest(unittest.TestCase):
         self.assertAlmostEqual(out[0]["lateness_ms"], 30 / 1e6)
 
 
+class ContextCarryTest(unittest.TestCase):
+    def test_off_and_tail_with_velocity(self) -> None:
+        from scripts.run_continuous_jazz import carry_tokens
+
+        prev = [372, 60, 280, 188, 64, 280, 192]      # velocity once, then two notes
+        self.assertEqual(carry_tokens(prev, 0), [])
+        self.assertEqual(carry_tokens([], 32), [])
+        tail = carry_tokens(prev, 3)
+        # N counts the restored velocity token too: velocity + last two tokens
+        self.assertEqual(tail, [372, 280, 192])
+        self.assertLessEqual(len(carry_tokens(prev, 4)), 4)
+        self.assertEqual(carry_tokens(prev, 32), prev)
+
+
 class PlayedBarNotesTest(unittest.TestCase):
     def test_notes_are_timed_from_their_bar_start(self) -> None:
         from types import SimpleNamespace

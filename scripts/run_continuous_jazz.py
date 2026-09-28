@@ -303,6 +303,15 @@ def played_bar_notes(result, clock, bars: int) -> list[dict]:
     return [{"bar": b, "notes": sorted(n, key=lambda x: (x[1], x[0]))} for b, n in enumerate(per_bar)]
 
 
+def carry_tokens(previous, n: int) -> list[int]:
+    """Last ``n`` tokens of the previous block with its velocity state kept (0 = off)."""
+    if n <= 0 or not previous:
+        return []
+    from scripts.generate import truncate_tokens_preserving_velocity
+
+    return truncate_tokens_preserving_velocity(previous, n)
+
+
 def summarize_lateness_ms(lateness_ns) -> dict:
     """Distribution of scheduler dispatch lateness over every attempt, not just the tail."""
     values = sorted(ns / 1e6 for ns in lateness_ns)
@@ -494,6 +503,9 @@ def main(argv=None):
                         help="opt-in: state each bar's chord as notes in the primer. "
                              "Note-based steering, not learned chord conditioning; "
                              "see docs/experiments/CHORD_PRIMER_AB.md")
+    parser.add_argument("--context-carry-tokens", type=int, default=0,
+                        help="with --chord-primer: prepend the last N tokens of the previous "
+                             "valid block to each block's primer (0 = off, the previous behaviour)")
     parser.add_argument("--thread-qos", default="user-interactive",
                         choices=["default", "user-initiated", "user-interactive"],
                         help="macOS QoS class for the scheduler thread "
@@ -518,6 +530,12 @@ def main(argv=None):
         parser.error("spin_window_ms must be between 0 and 50")
     if not 1 <= args.chord_blocks_per_bar <= 4:
         parser.error("chord_blocks_per_bar must be between 1 and 4")
+    if args.context_carry_tokens < 0:
+        parser.error("context_carry_tokens must be >= 0")
+    if args.context_carry_tokens and not args.chord_primer:
+        parser.error("--context-carry-tokens needs --chord-primer")
+    if args.chord_primer and 48 + args.context_carry_tokens + args.generation_tokens > args.max_sequence:
+        parser.error("chord primer (48) + context carry + generation tokens exceeds --max-sequence")
     if args.chord_blocks_per_bar > 1 and not args.chord_primer:
         parser.error("--chord-blocks-per-bar needs --chord-primer")
 
@@ -540,6 +558,8 @@ def main(argv=None):
             tempo_bpm=args.bpm,
         )
 
+        context_carry = {"tokens": []}
+
         def generate_sub(bar_index, sub_index, input_events, sub_duration):
             """One sub-block: harmony restated, then continue."""
             from inference.control.chord_primer import chord_guide_notes_for_duration
@@ -557,7 +577,11 @@ def main(argv=None):
                 notes.extend(input_events_to_notes(input_events))
             notes.sort(key=lambda note: (note.start, note.pitch))
             tokens = truncate_tokens_preserving_velocity(encode_notes_simple(notes), 48)
-            primer = torch.tensor(tokens or [60], dtype=torch.long)
+            # Opt-in context carry: the tail of the previous valid block goes in
+            # front of this block's chord statement, so the model continues the
+            # line instead of starting every half bar from scratch.
+            carried = carry_tokens(context_carry["tokens"], args.context_carry_tokens)
+            primer = torch.tensor((carried + tokens) or [60], dtype=torch.long)
             chord_primer_bars.append(bool(notes))
             torch.manual_seed(args.seed + bar_index * 13 + sub_index * 977)
             tokens_out, _meta = generate_once(
@@ -567,6 +591,9 @@ def main(argv=None):
                 grammar_mask=True, target_duration_seconds=sub_duration,
                 return_metadata=True,
             )
+            if args.context_carry_tokens > 0 and validate_generated_token_block(
+                    tokens_out, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]:
+                context_carry["tokens"] = [int(t) for t in tokens_out]
             return tokens_out
 
         def generate(bar_index, input_events):
@@ -683,6 +710,7 @@ def main(argv=None):
             )
             report["chord_primer_enabled"] = bool(args.chord_primer)
             report["chord_blocks_per_bar"] = args.chord_blocks_per_bar
+            report["context_carry_tokens"] = args.context_carry_tokens
             report["chord_primer_bar_count"] = sum(1 for x in chord_primer_bars if x)
             # Note-based steering only. The model has no chord token, and no
             # human has judged whether the result sounds harmonically right.
