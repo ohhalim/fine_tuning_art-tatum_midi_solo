@@ -1,0 +1,34 @@
+# LoRA 타깃 seed 반복 + 멜다우 적용 — 사전 등록
+
+작성 2026-09-28. 이슈 #1495, 브랜치 `exp/issue-1495-seed-repeat-mehldau`.
+선행: `TATUM_LORA_TARGETS.md`(단일 seed: B 특화도 −0.111 vs A −0.063), PR #1494(로딩 fail-closed).
+
+`musical_quality_verified: false` · `style_verified: false` · **청취는 완료 조건이 아니다**
+
+**이 절은 실행 전에 작성했다.**
+
+## M-S1 — B > A가 seed에 관계없이 유지되는가 (Tatum, 방법 검증)
+- 팔: A = out_proj, B = out_proj + QKV. seed 42 / 43 / 44(학습 crop 순서, 셔플, LoRA 초기화가 달라진다)
+- **작은 고정 예산:** 모든 run이 259 update(epoch당 7 update × 37 epoch, cosine 259)다. seed 42도 이 설정으로 새로 돈다. 기존 518 run과는 다른 설정이다
+- 공통: armB ep8 시작, r16, lr 3e-4, batch 4, accumulation 4, LS 0.1, MPS, `data/tatum_full`, snapshot 0 / 259
+- 측정(최종 snapshot)
+  1. 특화도(val) = ΔCE_Tatum_val − ΔCE_일반
+  2. ΔCE_일반
+  3. **생성 유효성:** seed 1–4 × 512토큰 생성. 노트가 1개 이상이고 `validate_generated_token_block`을 통과한 비율
+  4. **복사:** 생성 16-gram이 Tatum train 곡에 그대로 있는 비율
+  5. **지연:** 내보낸 체크포인트로 240 BPM 8마디 런타임 1회. 생성 p95, fallback
+- **판정: 세 seed 모두에서 B의 특화도가 A보다 낮고(더 특화), 쌍별 차이 평균이 −0.01 이하이며, B의 ΔCE_일반 평균이 +0.02 이하면 "B > A는 seed에 강건"으로 기록한다**
+- 보조 경고(판정과 별개로 기록): 생성 유효성 < 100%, 16-gram 복사 > 0.10, fallback > 0
+
+## M-A1 — 검증된 경로를 멜다우에 적용
+- **타깃 선택(사전 규칙):** M-S1이 "강건"이면 QKV(B 구성), 아니면 out_proj만 쓴다
+- 학습: 기존 멜다우 V2와 같은 설정이다(armB 시작, `data/mehldau_full` train 16곡, batch 4, accumulation 4, lr 3e-4, cosine 512 update, seed 42, MPS). snapshot 0 / 32 / 64 / 128 / 256 / 512
+- 비교 대상: 기존 V2 out_proj run(`outputs/mehldau_diag/update_budget_v2_mps512`). 두 run 모두 같은 평가 스크립트로 CE를 다시 잰다(val 포함)
+- 평가: ΔCE_멜다우 train, **ΔCE_멜다우 val(2곡, base가 본 곡)**, ΔCE_일반(V1 probe 100곡, 멜다우 제외)
+- **snapshot 선정 규칙(각 run):** ΔCE_일반 ≤ +0.02인 snapshot 중 ΔCE_멜다우 val이 가장 낮은 것
+- **비교 판정:** 선정 snapshot끼리 비교해, 선택 타깃 run의 특화도(val)가 out_proj보다 0.01 이상 낮으면 "타깃 확장이 멜다우에서도 특화를 키운다"로 기록한다. 그 run을 멜다우 배포 후보로 삼는다
+- 산출물(청취 없이 만든다)
+  - base / 멜다우 out_proj 선정본 / 멜다우 선택 타깃 선정본의 비교 MIDI. 중립 primer에서 seed 1–4 × 768토큰, 같은 seed끼리 비교
+  - 런타임 8마디 `played.mid`(128 BPM)
+  - 리포트: CE 표, 복사율(8/16-gram, 멜다우 train 대비), 생성 유효성, 속주 밀도(탐색), 지연
+- 한계(사전 기재): 멜다우 18곡은 전부 base 사전학습셋에 있고, val은 2곡이다. 새 곡 일반화와 들리는 스타일은 주장하지 않는다
