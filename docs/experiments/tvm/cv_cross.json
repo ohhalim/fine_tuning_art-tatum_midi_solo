@@ -91,7 +91,7 @@
           "generic_gain": -0.022005486821436278
         }
       ],
-      "own_gain_vs_tokens_spearman": 0.008823529411764706
+      "own_gain_vs_tokens_spearman": -0.056466650336701445
     },
     "mehldau": {
       "self_gain": -0.04721953969930717,
@@ -178,7 +178,7 @@
           "generic_gain": -0.011781188795033919
         }
       ],
-      "own_gain_vs_tokens_spearman": 0.45294117647058824
+      "own_gain_vs_tokens_spearman": 0.48225696336236
     }
   },
   "ranking": {
@@ -209,5 +209,6 @@
     ],
     "D_spec_direction": "difference_not_confirmed",
     "D_specif_direction": "difference_not_confirmed"
-  }
+  },
+  "spearman_note": "tie-aware average ranks (recomputed after #1502 review; per-song CE unchanged)"
 }

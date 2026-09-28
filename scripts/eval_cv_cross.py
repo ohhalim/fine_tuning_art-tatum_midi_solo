@@ -24,6 +24,38 @@ import numpy as np
 MAIN = Path("/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo")
 
 
+def average_ranks(x) -> np.ndarray:
+    """Ranks with ties given the mean of their positions (1-based)."""
+    x = np.asarray(x, dtype=float)
+    order = np.argsort(x, kind="mergesort")
+    ranks = np.empty(len(x))
+    i = 0
+    while i < len(x):
+        j = i
+        while j + 1 < len(x) and x[order[j + 1]] == x[order[i]]:
+            j += 1
+        ranks[order[i:j + 1]] = (i + j) / 2 + 1
+        i = j + 1
+    return ranks
+
+
+def spearman(a, b) -> float:
+    return float(np.corrcoef(average_ranks(a), average_ranks(b))[0, 1])
+
+
+def check_held_out_once(held_out: dict[int, set], songs: list[str]) -> None:
+    """Every song must be held out by exactly one fold (and no unknown songs)."""
+    counts = {n: 0 for n in songs}
+    for names in held_out.values():
+        for n in names:
+            if n not in counts:
+                raise ValueError(f"held-out song not in the training set: {n}")
+            counts[n] += 1
+    bad = {n: c for n, c in counts.items() if c != 1}
+    if bad:
+        raise ValueError(f"songs not held out exactly once: {bad}")
+
+
 def indices(own: np.ndarray, other: np.ndarray, generic: np.ndarray) -> dict:
     return {"self_gain": float(own.mean()), "self_gain_negative": bool(own.mean() < 0),
             "specialisation": float(own.mean() - generic.mean()),
@@ -103,7 +135,9 @@ def main(argv=None) -> int:
         prefix, folds_json, train_dir = rest.split(",")
         folds = json.loads(Path(folds_json).read_text())["held_out"]
         songs = sorted(Path(train_dir).glob("*.npy"))
-        artists[name] = {"prefix": prefix, "held_out": {int(k): set(v) for k, v in folds.items()},
+        held_out = {int(k): set(v) for k, v in folds.items()}
+        check_held_out_once(held_out, [f.name for f in songs])
+        artists[name] = {"prefix": prefix, "held_out": held_out,
                          "songs": [(f.name, song_crops(load(f), False)) for f in songs]}
     if set(artists) != {"tatum", "mehldau"}:
         ap.error("need --artist tatum=... and --artist mehldau=...")
@@ -182,9 +216,7 @@ def main(argv=None) -> int:
                              "n_other": len(v["other"]), "n_generic": len(v["generic"]),
                              "folds": fold_rows[a],
                              # exploratory: does the per-song gain depend on song length?
-                             "own_gain_vs_tokens_spearman": float(
-                                 np.corrcoef(np.argsort(np.argsort(v["own"])),
-                                             np.argsort(np.argsort(v["own_tokens"])))[0, 1])}
+                             "own_gain_vs_tokens_spearman": spearman(v["own"], v["own_tokens"])}
     out["ranking"] = bootstrap_rank(per["tatum"], per["mehldau"])
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(out, indent=2) + "\n")
