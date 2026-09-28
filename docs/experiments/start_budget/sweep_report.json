@@ -1,0 +1,379 @@
+{
+  "schema": "tempo_sweep_v1",
+  "bars": 16,
+  "extra": "--chord-primer --chord-blocks-per-bar 2 --chords Dm7,G7,Cmaj7,A7 --start-budget-bars 0.5",
+  "capture": true,
+  "common": "",
+  "primer": "outputs/chord_ab/ii_V_I.mid",
+  "force_cpu": "1",
+  "models": {
+    "tatum_final": {
+      "checkpoint": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/outputs/final_tatum/export/checkpoint_update518.pt",
+      "bpms": {
+        "128": {
+          "runs": [
+            {
+              "seed": 42,
+              "bpm": 128,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 3,
+              "bar_ms": 1875.0,
+              "gen_ms_bar0": 357.802417,
+              "gen_ms_p50": 320.974375,
+              "gen_ms_p95": 475.2272787,
+              "gen_ms_max": 485.904875,
+              "p95_over_bar": 0.25345454864,
+              "played_notes": 387,
+              "lateness_ms": {
+                "count": 774,
+                "p50": 2.889125,
+                "p95": 5.305042,
+                "p99": 7.285458,
+                "maximum": 23.910542,
+                "over_5ms": 226,
+                "over_10ms": 3
+              },
+              "stall_trace": null
+            },
+            {
+              "seed": 43,
+              "bpm": 128,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 2,
+              "bar_ms": 1875.0,
+              "gen_ms_bar0": 395.63375,
+              "gen_ms_p50": 305.56475,
+              "gen_ms_p95": 449.8546042999999,
+              "gen_ms_max": 542.957083,
+              "p95_over_bar": 0.23992245562666661,
+              "played_notes": 398,
+              "lateness_ms": {
+                "count": 796,
+                "p50": 2.267792,
+                "p95": 5.207,
+                "p99": 5.618667,
+                "maximum": 43.642542,
+                "over_5ms": 233,
+                "over_10ms": 3
+              },
+              "stall_trace": null
+            },
+            {
+              "seed": 44,
+              "bpm": 128,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1875.0,
+              "gen_ms_bar0": 226.288917,
+              "gen_ms_p50": 336.825958,
+              "gen_ms_p95": 470.0727416999999,
+              "gen_ms_max": 529.856416,
+              "p95_over_bar": 0.25070546223999995,
+              "played_notes": 385,
+              "lateness_ms": {
+                "count": 770,
+                "p50": 2.793166,
+                "p95": 5.274333,
+                "p99": 5.577625,
+                "maximum": 10.556625,
+                "over_5ms": 239,
+                "over_10ms": 3
+              },
+              "stall_trace": null
+            }
+          ],
+          "holds": false
+        },
+        "240": {
+          "runs": [
+            {
+              "seed": 42,
+              "bpm": 240,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1000.0,
+              "gen_ms_bar0": 278.956667,
+              "gen_ms_p50": 176.193417,
+              "gen_ms_p95": 267.80205,
+              "gen_ms_max": 280.499,
+              "p95_over_bar": 0.26780205,
+              "played_notes": 227,
+              "lateness_ms": {
+                "count": 454,
+                "p50": 2.768625,
+                "p95": 5.232292,
+                "p99": 5.496167,
+                "maximum": 5.658917,
+                "over_5ms": 156,
+                "over_10ms": 0
+              },
+              "stall_trace": null
+            },
+            {
+              "seed": 43,
+              "bpm": 240,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1000.0,
+              "gen_ms_bar0": 226.026041,
+              "gen_ms_p50": 186.483833,
+              "gen_ms_p95": 271.97128739999994,
+              "gen_ms_max": 305.105583,
+              "p95_over_bar": 0.27197128739999993,
+              "played_notes": 228,
+              "lateness_ms": {
+                "count": 456,
+                "p50": 2.949125,
+                "p95": 5.30125,
+                "p99": 6.056709,
+                "maximum": 6.577209,
+                "over_5ms": 143,
+                "over_10ms": 0
+              },
+              "stall_trace": null
+            },
+            {
+              "seed": 44,
+              "bpm": 240,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1000.0,
+              "gen_ms_bar0": 132.476625,
+              "gen_ms_p50": 196.419916,
+              "gen_ms_p95": 280.1596421,
+              "gen_ms_max": 284.743709,
+              "p95_over_bar": 0.2801596421,
+              "played_notes": 215,
+              "lateness_ms": {
+                "count": 430,
+                "p50": 3.093417,
+                "p95": 5.311333,
+                "p99": 5.672083,
+                "maximum": 5.815917,
+                "over_5ms": 119,
+                "over_10ms": 0
+              },
+              "stall_trace": null
+            }
+          ],
+          "holds": true
+        }
+      },
+      "max_holding_bpm": 240
+    },
+    "mehldau1497": {
+      "checkpoint": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/outputs/clean_base/c2_export/checkpoint_update128.pt",
+      "bpms": {
+        "128": {
+          "runs": [
+            {
+              "seed": 42,
+              "bpm": 128,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1875.0,
+              "gen_ms_bar0": 192.087291,
+              "gen_ms_p50": 175.469625,
+              "gen_ms_p95": 346.89037929999995,
+              "gen_ms_max": 390.744708,
+              "p95_over_bar": 0.1850082022933333,
+              "played_notes": 250,
+              "lateness_ms": {
+                "count": 500,
+                "p50": 2.728208,
+                "p95": 5.447458,
+                "p99": 12.980541,
+                "maximum": 13.222708,
+                "over_5ms": 158,
+                "over_10ms": 7
+              },
+              "stall_trace": null
+            },
+            {
+              "seed": 43,
+              "bpm": 128,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1875.0,
+              "gen_ms_bar0": 200.79475,
+              "gen_ms_p50": 223.819542,
+              "gen_ms_p95": 394.9810873999998,
+              "gen_ms_max": 539.500083,
+              "p95_over_bar": 0.21065657994666656,
+              "played_notes": 275,
+              "lateness_ms": {
+                "count": 550,
+                "p50": 2.978875,
+                "p95": 5.382875,
+                "p99": 7.902791,
+                "maximum": 15.385041,
+                "over_5ms": 175,
+                "over_10ms": 2
+              },
+              "stall_trace": null
+            },
+            {
+              "seed": 44,
+              "bpm": 128,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1875.0,
+              "gen_ms_bar0": 162.114209,
+              "gen_ms_p50": 222.639125,
+              "gen_ms_p95": 314.1179788,
+              "gen_ms_max": 324.572042,
+              "p95_over_bar": 0.16752958869333334,
+              "played_notes": 276,
+              "lateness_ms": {
+                "count": 552,
+                "p50": 2.791625,
+                "p95": 5.352792,
+                "p99": 5.608875,
+                "maximum": 7.251042,
+                "over_5ms": 178,
+                "over_10ms": 0
+              },
+              "stall_trace": null
+            }
+          ],
+          "holds": true
+        },
+        "240": {
+          "runs": [
+            {
+              "seed": 42,
+              "bpm": 240,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1000.0,
+              "gen_ms_bar0": 116.812208,
+              "gen_ms_p50": 90.970792,
+              "gen_ms_p95": 233.00322519999995,
+              "gen_ms_max": 264.002084,
+              "p95_over_bar": 0.23300322519999994,
+              "played_notes": 136,
+              "lateness_ms": {
+                "count": 272,
+                "p50": 3.543125,
+                "p95": 5.343083,
+                "p99": 5.69325,
+                "maximum": 6.288667,
+                "over_5ms": 101,
+                "over_10ms": 0
+              },
+              "stall_trace": null
+            },
+            {
+              "seed": 43,
+              "bpm": 240,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1000.0,
+              "gen_ms_bar0": 77.242458,
+              "gen_ms_p50": 150.101334,
+              "gen_ms_p95": 201.70123309999997,
+              "gen_ms_max": 217.490375,
+              "p95_over_bar": 0.20170123309999996,
+              "played_notes": 147,
+              "lateness_ms": {
+                "count": 294,
+                "p50": 2.687583,
+                "p95": 5.499375,
+                "p99": 5.781125,
+                "maximum": 6.478875,
+                "over_5ms": 94,
+                "over_10ms": 0
+              },
+              "stall_trace": null
+            },
+            {
+              "seed": 44,
+              "bpm": 240,
+              "run_completed": true,
+              "completed_bars": 16,
+              "model_bars": 16,
+              "fallback_bars": 0,
+              "errors": 0,
+              "discarded_late": 0,
+              "deadline_misses": 0,
+              "bar_ms": 1000.0,
+              "gen_ms_bar0": 132.412208,
+              "gen_ms_p50": 160.524084,
+              "gen_ms_p95": 229.04380789999996,
+              "gen_ms_max": 259.991916,
+              "p95_over_bar": 0.22904380789999995,
+              "played_notes": 171,
+              "lateness_ms": {
+                "count": 342,
+                "p50": 2.60325,
+                "p95": 5.191333,
+                "p99": 5.30425,
+                "maximum": 5.401958,
+                "over_5ms": 130,
+                "over_10ms": 0
+              },
+              "stall_trace": null
+            }
+          ],
+          "holds": true
+        }
+      },
+      "max_holding_bpm": 240
+    }
+  }
+}
