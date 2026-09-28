@@ -258,5 +258,17 @@ class PlayedBarsAnalysisTest(unittest.TestCase):
         self.assertAlmostEqual(out["cross_bar_4gram_reuse_mean"], (1.0 + 0.0) / 2)
 
 
+class SelectByValTest(unittest.TestCase):
+    def test_lowest_val_within_generic_limit(self) -> None:
+        from scripts.select_by_val import choose
+
+        rows = [{"update": 0, "d_ce_target_val": 0.0, "d_ce_generic": 0.0},
+                {"update": 70, "d_ce_target_val": -0.03, "d_ce_generic": -0.01},
+                {"update": 259, "d_ce_target_val": -0.06, "d_ce_generic": 0.03},
+                {"update": 133, "d_ce_target_val": -0.05, "d_ce_generic": 0.01}]
+        self.assertEqual(choose({"rows": rows})["update"], 133)
+        self.assertIsNone(choose({"rows": rows[:1]}))
+
+
 if __name__ == "__main__":
     unittest.main()
