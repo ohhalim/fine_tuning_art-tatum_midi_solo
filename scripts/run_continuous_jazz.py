@@ -226,7 +226,7 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
                 start_delay_seconds=2.5, spin_window_ms=5.0,
                 clock=None, clock_ns=None, wait_until=None,
                 deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE,
-                sub_builder=None, fetch_margin_ms=None):
+                sub_builder=None, fetch_margin_ms=None, start_budget_bars=None):
     """Play ``bars`` bars, producing one bar ahead.
 
     ``clock``/``clock_ns``/``wait_until`` exist so tests can drive the run off a
@@ -250,6 +250,12 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
         # With a late fetch, steady state builds only the next bar, from the
         # newest input (docs/experiments/GENERATION_LEAD.md).
         steady_lead_bars=1 if fetch_margin_ms is not None else None,
+        # Optional: hold each steady-state bar back so it starts only
+        # `start_budget_bars` before its fetch (docs/experiments/START_BUDGET.md).
+        start_not_before_ns=(
+            None if start_budget_bars is None or fetch_margin_ms is None
+            else (lambda b: clock.bar_start_ns(b) - round(fetch_margin_ms * 1e6)
+                  - round(start_budget_bars * clock.bar_duration_ns))),
         build_block=_make_builder(clock=clock, duration=duration, generate=generate,
                                   sub_builder=sub_builder),
     )
@@ -550,6 +556,11 @@ def main(argv=None):
                              "and keep one bar of lead, so input reaches the output two bars "
                              "sooner (docs/experiments/GENERATION_LEAD.md); 'off' restores the "
                              "old one-bar-ahead fetch with two bars of lead")
+    parser.add_argument("--start-budget-bars", type=float, default=None,
+                        help="with late fetch: start generating each bar only this fraction of "
+                             "a bar before it is fetched, so it hears more recent input "
+                             "(docs/experiments/START_BUDGET.md). Default: start right after "
+                             "the previous fetch")
     parser.add_argument("--spin-window-ms", type=float, default=5.0,
                         help="scheduler busy-spin before each event. The wait before it "
                              "can oversleep by a few ms; a longer spin absorbs that but "
@@ -567,6 +578,11 @@ def main(argv=None):
         parser.error("spin_window_ms must be between 0 and 50")
     if args.fetch_margin_ms is not None and not 0.0 <= args.fetch_margin_ms <= 500.0:
         parser.error("fetch_margin_ms must be between 0 and 500")
+    if args.start_budget_bars is not None:
+        if args.fetch_margin_ms is None:
+            parser.error("--start-budget-bars needs the late fetch (drop --fetch-margin-ms off)")
+        if not 0.1 <= args.start_budget_bars <= 0.95:
+            parser.error("start_budget_bars must be between 0.1 and 0.95")
     if not 1 <= args.chord_blocks_per_bar <= 4:
         parser.error("chord_blocks_per_bar must be between 1 and 4")
     if args.context_carry_tokens < 0:
@@ -768,6 +784,7 @@ def main(argv=None):
                     port=port, bars=args.bars, bpm=args.bpm, chords=chords, seed=args.seed,
                     generate=generate, input_buffer=input_buffer, sub_builder=sub_builder,
                     spin_window_ms=args.spin_window_ms, fetch_margin_ms=args.fetch_margin_ms,
+                    start_budget_bars=args.start_budget_bars,
                 )
             finally:
                 if tracer is not None:
@@ -811,6 +828,7 @@ def main(argv=None):
             report["kv_cache"] = bool(args.kv_cache)
             report["merge_lora"] = bool(args.merge_lora)
             report["fetch_margin_ms"] = args.fetch_margin_ms
+            report["start_budget_bars"] = args.start_budget_bars
             if not args.fallback_only and bank is not None:
                 swaps = sorted(bank.swap_ms)
                 report["adapter_swap"] = {

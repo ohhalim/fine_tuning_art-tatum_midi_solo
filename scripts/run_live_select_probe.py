@@ -33,7 +33,10 @@ def switch_latencies(report: dict) -> list[dict]:
             applied = next((b for b in range(max(arrived, 0), len(per_bar))
                             if per_bar[b] == e["selected"]), None)
         rows.append({**e, "arrived_bar": arrived, "applied_bar": applied,
-                     "latency_bars": None if applied is None else applied - arrived})
+                     "latency_bars": None if applied is None else applied - arrived,
+                     # arrival -> downbeat of the first bar that plays the choice
+                     "latency_ms": None if applied is None
+                     else applied * bar_ms - e["received_ms_from_start"]})
     return rows
 
 
