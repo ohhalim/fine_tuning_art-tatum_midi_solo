@@ -475,6 +475,10 @@ def _resolve_capture_name(mido_module, virtual_port):
     return matches[0]
 
 
+def _fetch_margin(text: str) -> float | None:
+    return None if text.lower() in ("off", "none") else float(text)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checkpoint", type=Path)
@@ -541,10 +545,11 @@ def main(argv=None):
     parser.add_argument("--stall-trace", action="store_true",
                         help="record GC pauses and in-/out-of-process heartbeat gaps and "
                              "attribute dispatches >10 ms late (docs/experiments/RUNTIME_STALL_CAUSE.md)")
-    parser.add_argument("--fetch-margin-ms", type=float, default=None,
+    parser.add_argument("--fetch-margin-ms", type=_fetch_margin, default=50.0,
                         help="ask the producer for each bar only this long before its downbeat "
-                             "and keep one bar of lead: input reaches the output about two bars "
-                             "sooner (docs/experiments/GENERATION_LEAD.md). Default: one bar ahead")
+                             "and keep one bar of lead, so input reaches the output two bars "
+                             "sooner (docs/experiments/GENERATION_LEAD.md); 'off' restores the "
+                             "old one-bar-ahead fetch with two bars of lead")
     parser.add_argument("--spin-window-ms", type=float, default=5.0,
                         help="scheduler busy-spin before each event. The wait before it "
                              "can oversleep by a few ms; a longer spin absorbs that but "

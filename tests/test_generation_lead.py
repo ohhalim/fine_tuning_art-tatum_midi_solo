@@ -114,5 +114,15 @@ class SteadyLeadProducerTest(unittest.TestCase):
             self.assertEqual(built, [0, 1, 2])
 
 
+class RuntimeDefaultTest(unittest.TestCase):
+    def test_late_fetch_is_the_default_with_an_off_switch(self) -> None:
+        from pathlib import Path
+        from scripts.run_continuous_jazz import _fetch_margin
+        text = (Path(__file__).resolve().parents[1] / "scripts" / "run_continuous_jazz.py").read_text()
+        self.assertIn('"--fetch-margin-ms", type=_fetch_margin, default=50.0', text)
+        self.assertIsNone(_fetch_margin("off"))
+        self.assertEqual(_fetch_margin("20"), 20.0)
+
+
 if __name__ == "__main__":
     unittest.main()

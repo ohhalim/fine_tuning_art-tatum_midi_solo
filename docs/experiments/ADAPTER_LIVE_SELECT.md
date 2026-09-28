@@ -52,3 +52,18 @@
   - 그래서 마디 k 다운비트에 마디 k+3의 생성이 시작된다. 입력 스냅샷도 그때 찍힌다
   - 리포트의 `input_to_bar_start_ms`가 6.1–8.4초였다. **연주자의 입력 음도 같은 지연을 겪는다.** 어댑터 선택만의 문제가 아니다
 - 사전 등록대로 이 상태로는 합치지 않는다. 생성 선행을 줄이는 문제는 한 질문으로 따로 다룬다(#1526, `docs/experiments/GENERATION_LEAD.md`). 그 결과로 기준 2를 다시 잰다
+
+## 2차 결과 (늦은 fetch 기본값, #1526) — **기준 1–5 모두 충족, 합친다**
+원시값: `docs/experiments/live_select/probe_latefetch_seed{42,43,44}.json`.
+- 기준 2: 세 실행 모두 PC 3개가 **전부 기록**됐다. 적용 지연은 전부 **2마디**다(4→6, 8→10, 13→15)
+- 기준 3: 마디별 어댑터가 직전에 적용된 메시지와 일치한다(TTTTTT MMMM TTTTT M)
+- 기준 4: fallback 0, 미스 0
+- 기준 5: 연주 마디가 단독 실행과 **48/48** 같다
+- 사용 예
+  ```bash
+  python scripts/run_continuous_jazz.py --input-port "<키보드 포트>" \
+    --checkpoint outputs/final_tatum/export/checkpoint_update518.pt --adapter-name tatum \
+    --swap-adapter mehldau=outputs/clean_base/c2_export/checkpoint_update128.pt --allow-different-bases \
+    --adapter-control program --conditioning-midi outputs/chord_ab/ii_V_I.mid --chord-primer --chord-blocks-per-bar 2
+  ```
+  이 설정에서 키보드 프리셋 버튼(PC 0 = Tatum, PC 1 = 멜다우)으로 전환한다. 실물 키보드로는 검증하지 않았다(`external_keyboard_verified: false`)
