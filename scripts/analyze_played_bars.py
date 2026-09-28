@@ -28,6 +28,25 @@ def max_silence(notes, bar_s: float) -> float:
     return max(longest, bar_s - cursor)
 
 
+def chord_tone_ratio(played_bars, chords: list[str]) -> float | None:
+    """Share of played notes whose pitch class is in the bar's chord (chords cycle per bar)."""
+    import sys
+    from pathlib import Path as _P
+    root = _P(__file__).resolve().parents[1]
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+    from inference.app.fallback import parse_chord
+
+    hits = total = 0
+    for b in played_bars:
+        root_pc, intervals = parse_chord(chords[b["bar"] % len(chords)])
+        pcs = {(root_pc + i) % 12 for i in intervals}
+        for pitch, _, _ in b["notes"]:
+            total += 1
+            hits += (pitch % 12) in pcs
+    return hits / total if total else None
+
+
 def bar_features(played_bars, bar_s: float) -> dict:
     seqs = [[p for p, _, _ in b["notes"]] for b in played_bars]
     empty = sum(1 for s in seqs if not s)
@@ -60,7 +79,7 @@ def bar_features(played_bars, bar_s: float) -> dict:
             "bar_mean_pitch_sd": float(np.std(means)) if means else None}
 
 
-def run_row(report: dict) -> dict:
+def run_row(report: dict, default_chords: list[str] | None = None) -> dict:
     prod = report["production"]
     bar_s = 240.0 / report["bpm"]
     steady = [b["generation_ms"] for b in report["bars_detail"]
@@ -75,14 +94,20 @@ def run_row(report: dict) -> dict:
            "played_notes": report.get("played_note_count")}
     if "played_bars" in report:
         row.update(bar_features(report["played_bars"], bar_s))
+        chords = report.get("chords") or default_chords
+        if chords:
+            row["chord_tone_ratio"] = chord_tone_ratio(report["played_bars"], chords)
     return row
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--sweep", type=Path, action="append", required=True, metavar="MODE=DIR")
+    ap.add_argument("--chords", default=None,
+                    help="comma list used when a report does not record its chords")
     ap.add_argument("--output", type=Path, required=True)
     args = ap.parse_args(argv)
+    default_chords = [c.strip() for c in args.chords.split(",")] if args.chords else None
     out = {"schema": "played_bars_v1", "musical_quality_verified": False, "style_verified": False,
            "listening_done": False, "runs": []}
     for spec in args.sweep:
@@ -91,7 +116,7 @@ def main(argv=None) -> int:
             model = rep.parent.parent.name
             seed = int(rep.parent.name.split("seed")[-1])
             out["runs"].append({"mode": mode, "model": model, "seed": seed,
-                                **run_row(json.loads(rep.read_text()))})
+                                **run_row(json.loads(rep.read_text()), default_chords)})
     agg = {}
     for r in out["runs"]:
         agg.setdefault((r["mode"], r["model"]), []).append(r)
@@ -105,7 +130,8 @@ def main(argv=None) -> int:
                                                        "gen_ms_max", "empty_bars", "half_bar_gap_bars",
                                                        "exact_repeat_bars", "transposed_repeat_bars",
                                                        "cross_bar_4gram_reuse_mean", "boundary_jump_median",
-                                                       "bar_mean_pitch_sd", "played_notes")},
+                                                       "bar_mean_pitch_sd", "played_notes",
+                                                       "chord_tone_ratio")},
                                "errors": sum(r["errors"] for r in rows),
                                "deadline_misses": sum(r["deadline_misses"] for r in rows)})
     args.output.parent.mkdir(parents=True, exist_ok=True)

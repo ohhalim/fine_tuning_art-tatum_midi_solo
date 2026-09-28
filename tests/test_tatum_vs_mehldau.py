@@ -270,5 +270,15 @@ class SelectByValTest(unittest.TestCase):
         self.assertIsNone(choose({"rows": rows[:1]}))
 
 
+class ChordToneRatioTest(unittest.TestCase):
+    def test_cycles_chords_per_bar(self) -> None:
+        from scripts.analyze_played_bars import chord_tone_ratio
+
+        bars = [{"bar": 0, "notes": [[62, 0, .1], [65, .1, .2], [61, .2, .3]]},   # Dm7: D F in, C# out
+                {"bar": 1, "notes": [[67, 0, .1], [71, .1, .2]]}]                 # G7: G B in
+        self.assertAlmostEqual(chord_tone_ratio(bars, ["Dm7", "G7"]), 4 / 5)
+        self.assertIsNone(chord_tone_ratio([{"bar": 0, "notes": []}], ["C"]))
+
+
 if __name__ == "__main__":
     unittest.main()
