@@ -69,6 +69,21 @@ class LoraMergeTest(unittest.TestCase):
             outs.append(row)
         self.assertEqual(outs[0], outs[1])
 
+    def test_plain_model_is_a_no_op(self) -> None:
+        torch.manual_seed(0)
+        model = MusicTransformer(**TINY).eval()
+        x = torch.randint(0, 388, (1, 20))
+        with torch.no_grad():
+            before = model(x)
+            self.assertEqual(merge_lora_for_inference(model), {"linear": 0, "qkv": 0})
+            self.assertTrue(torch.equal(before, model(x)))
+
+
+class RuntimeDefaultTest(unittest.TestCase):
+    def test_runtime_merges_by_default_with_opt_out(self) -> None:
+        text = (ROOT / "scripts" / "run_continuous_jazz.py").read_text()
+        self.assertIn('"--merge-lora", action=argparse.BooleanOptionalAction, default=True', text)
+
 
 if __name__ == "__main__":
     unittest.main()
