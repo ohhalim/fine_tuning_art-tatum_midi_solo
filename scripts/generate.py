@@ -377,6 +377,7 @@ def generate_once(
     grammar_mask: bool = False,
     target_duration_seconds: float | None = None,
     return_metadata: bool = False,
+    use_kv_cache: bool = False,
 ) -> List[int] | tuple[List[int], dict[str, object]]:
     device = get_device()
     primer = primer.to(device)
@@ -397,6 +398,7 @@ def generate_once(
             grammar_mask=grammar_mask,
             target_duration_steps=target_duration_steps,
             return_metadata=return_metadata,
+            use_kv_cache=use_kv_cache,
         )
 
     if return_metadata:

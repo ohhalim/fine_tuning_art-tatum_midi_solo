@@ -192,6 +192,68 @@ class MusicTransformer(nn.Module):
         # They are trained to predict the next note in sequence (we don't need the last one)
         return y
 
+    # KV-cached incremental forward (generation only)
+    def supports_kv_cache(self):
+        return bool(self.rpr) and hasattr(self.transformer, "encoder") and \
+            isinstance(self.transformer.encoder, TransformerEncoderRPR)
+
+    def forward_cached(self, tokens, cache):
+        """
+        Run ``tokens`` (shape (n,), the next n positions) through the model using and
+        extending ``cache``; returns logits of shape (n, vocab).
+
+        Equivalent to ``forward`` on the full prefix with the causal mask: every
+        layer's output at position j depends only on inputs <= j, so per-layer K/V
+        of earlier positions can be reused. The skew relative-position term of the
+        full computation equals q_i . Er[len_e - 1 - (i - j)] for j <= i, computed
+        here by gathering q . Er^T at the relative distances. Eval mode only
+        (dropout off); batch size 1.
+        """
+        import torch.nn.functional as F
+
+        assert not self.training, "forward_cached is for generation (eval mode)"
+        start = cache.setdefault("length", 0)
+        n = int(tokens.shape[0])
+        positions = torch.arange(start, start + n, device=tokens.device)
+        x = self.embedding(tokens.unsqueeze(0)).permute(1, 0, 2)          # (n, 1, d)
+        x = x + self.positional_encoding.pe[start:start + n, :]
+        x = x[:, 0, :]                                                    # (n, d)
+        layers = cache.setdefault("layers", [dict() for _ in self.transformer.encoder.layers])
+        total = start + n
+        key_pos = torch.arange(total, device=tokens.device)
+        dist = positions.unsqueeze(1) - key_pos.unsqueeze(0)               # (n, total)
+        future = dist < 0
+        for layer, lc in zip(self.transformer.encoder.layers, layers):
+            attn = layer.self_attn
+            heads, hd = attn.num_heads, attn.head_dim
+            q, k, v = F.linear(x, attn.in_proj_weight, attn.in_proj_bias).chunk(3, dim=-1)
+            q = q * (float(hd) ** -0.5)
+            q = q.view(n, heads, hd).transpose(0, 1)                      # (h, n, hd)
+            k = k.view(n, heads, hd).transpose(0, 1)
+            v = v.view(n, heads, hd).transpose(0, 1)
+            if "k" in lc:
+                k = torch.cat([lc["k"], k], dim=1)
+                v = torch.cat([lc["v"], v], dim=1)
+            lc["k"], lc["v"] = k, v                                       # (h, total, hd)
+            logits = torch.bmm(q, k.transpose(1, 2))                      # (h, n, total)
+            if attn.Er is not None:
+                len_e = attn.Er.shape[0]
+                qe = torch.matmul(q, attn.Er.t())                         # (h, n, len_e)
+                idx = (len_e - 1 - dist.clamp(min=0)).clamp(min=0)
+                rel = torch.gather(qe, 2, idx.unsqueeze(0).expand(heads, -1, -1))
+                logits = logits + rel.masked_fill(future.unsqueeze(0), 0.0)
+            logits = logits.masked_fill(future.unsqueeze(0), float("-inf"))
+            weights = torch.softmax(logits, dim=-1)
+            out = torch.bmm(weights, v).transpose(0, 1).reshape(n, heads * hd)
+            out = F.linear(out, attn.out_proj.weight, attn.out_proj.bias)
+            x = layer.norm1(x + out)
+            ff = layer.linear2(F.relu(layer.linear1(x)))
+            x = layer.norm2(x + ff)
+        if self.transformer.encoder.norm is not None:
+            x = self.transformer.encoder.norm(x)
+        cache["length"] = total
+        return self.Wout(x)
+
     # generate
     def generate(
         self,
@@ -206,6 +268,7 @@ class MusicTransformer(nn.Module):
         grammar_mask=False,
         target_duration_steps=None,
         return_metadata=False,
+        use_kv_cache=False,
     ):
         """
         ----------
@@ -246,12 +309,22 @@ class MusicTransformer(nn.Module):
             for tok in primer.flatten().tolist():
                 _grammar_update_active_pitches(active_pitches, int(tok))
 
+        use_cache = bool(use_kv_cache) and beam == 0 and gen_seq.shape[0] == 1 and self.supports_kv_cache()
+        kv_cache = {}
+        cached_logits = None
         cur_i = num_primer
         while(cur_i < target_seq_length):
             # gen_seq_batch     = gen_seq.clone()
-            logits = self.forward(gen_seq[..., :cur_i])[..., :sample_vocab_size]
+            if use_cache:
+                # Feed only positions not seen yet; the logits of the last one are
+                # the next-token distribution, exactly as forward()[:, cur_i - 1].
+                done = kv_cache.get("length", 0)
+                cached_logits = self.forward_cached(gen_seq[0, done:cur_i], kv_cache)
+                token_logits = cached_logits[-1:, :sample_vocab_size]
+            else:
+                logits = self.forward(gen_seq[..., :cur_i])[..., :sample_vocab_size]
+                token_logits = logits[:, cur_i - 1, :]
             model_forward_step_count += 1
-            token_logits = logits[:, cur_i - 1, :]
             if grammar_mask:
                 token_logits = _apply_grammar_mask(token_logits, active_pitches)
             token_probs = _sample_probs_from_logits(

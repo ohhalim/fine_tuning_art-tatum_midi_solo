@@ -503,6 +503,9 @@ def main(argv=None):
                         help="opt-in: state each bar's chord as notes in the primer. "
                              "Note-based steering, not learned chord conditioning; "
                              "see docs/experiments/CHORD_PRIMER_AB.md")
+    parser.add_argument("--kv-cache", action=argparse.BooleanOptionalAction, default=True,
+                        help="KV-cached generation: identical tokens, about half the generation "
+                             "time (docs/experiments/KV_CACHE.md); --no-kv-cache for the old path")
     parser.add_argument("--context-carry-tokens", type=int, default=0,
                         help="with --chord-primer: prepend the last N tokens of the previous "
                              "valid block to each block's primer (0 = off, the previous behaviour)")
@@ -593,7 +596,7 @@ def main(argv=None):
                 target_length=min(args.max_sequence, len(primer) + args.generation_tokens),
                 strip_primer=True, temperature=1.0, top_k=32, top_p=0.95,
                 grammar_mask=True, target_duration_seconds=sub_duration,
-                return_metadata=True,
+                return_metadata=True, use_kv_cache=args.kv_cache,
             )
             if args.context_carry_tokens > 0 and validate_generated_token_block(
                     tokens_out, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]:
@@ -621,6 +624,7 @@ def main(argv=None):
                 model=model, primer=primer, target_length=target_length, strip_primer=True,
                 temperature=1.0, top_k=32, top_p=0.95, grammar_mask=True,
                 target_duration_seconds=240.0 / args.bpm, return_metadata=True,
+                use_kv_cache=args.kv_cache,
             )
     # --fallback-only leaves `generate` as None: a deliberate mode, so the
     # producer records it as fallback_disabled rather than a generation error.
@@ -714,6 +718,7 @@ def main(argv=None):
             )
             report["chord_primer_enabled"] = bool(args.chord_primer)
             report["chord_blocks_per_bar"] = args.chord_blocks_per_bar
+            report["kv_cache"] = bool(args.kv_cache)
             report["context_carry_tokens"] = args.context_carry_tokens
             report["context_carry_position"] = args.context_carry_position
             report["chord_primer_bar_count"] = sum(1 for x in chord_primer_bars if x)
