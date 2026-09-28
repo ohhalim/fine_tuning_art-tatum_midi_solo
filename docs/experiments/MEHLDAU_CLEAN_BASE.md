@@ -1,0 +1,34 @@
+# 멜다우 개인화 완료 — 멜다우 제외 base + 곡 단위 CV (사전 등록)
+
+작성 2026-09-28. 이슈 #1497, 브랜치 `exp/issue-1497-mehldau-clean-base`.
+사용자 지시: 청취 없이 자율 진행, 판단은 아스트라와, 목표는 "개인화 완료".
+
+`musical_quality_verified: false` · `style_verified: false` · 청취 없음
+
+**이 절은 실행 전에 작성했다.**
+
+## 왜 필요한가
+지금까지의 멜다우 수치는 모두 **base(armB)가 멜다우 18곡을 이미 본 상태**에서 쟀다. "처음 보는 멜다우 곡에서도 멜다우 쪽으로 예측하는가"는 한 번도 재지 못했다. 멜다우를 뺀 base를 다시 만들어 이 한계를 없앤다.
+
+## C0 — 멜다우 제외 base
+- 데이터: `data/jazz_full`(train 2,499 / val 278)에서 멜다우 18곡(토큰 해시 일치: train 17, val 1)을 뺀다 → `data/jazz_full_nomehldau`
+- 학습: **armB 레시피 그대로**. 무작위 초기화, `--train_full_model`, 8 epoch, batch 4, accumulation 4, lr 3e-4, LS 0.1, seed 42, max_seq 1024. armB와 같게 하려고 `--scheduler_steps legacy_batches --val_crop_seed -1`을 쓴다. MPS, 새 출력 디렉터리(원본 불변)
+- **게이트:** 일반 probe 100곡(V1, 멜다우 제외) CE가 armB 대비 +0.05 이내. 벗어나면 이후 결과를 "base 품질 차이"로 기록하고 해석을 제한한다
+- 확인: 새 base의 멜다우 CE가 armB보다 높아야 한다(멜다우를 보지 않았다는 방증)
+
+## C1 — 곡 단위 CV로 예산 선택
+- 새 base에 out_proj LoRA(r16, lr 3e-4, batch 4, accumulation 4, LS 0.1)를 붙인다. 멜다우 16곡에서는 QKV가 과적합함을 M-A1에서 확인했으므로 쓰지 않는다
+- `data/mehldau_full/train` 16곡을 곡 단위 4-fold로 나눈다(fold당 held-out 4곡, 학습 12곡, seed 0). 원래 val 2곡은 **C1에 쓰지 않는다**
+- fold마다 update 16 / 32 / 64 / 128 snapshot을 평가한다
+  - 특화도 = ΔCE_held-out 멜다우 − ΔCE_일반
+  - 기준점은 update 0(새 base + 0 delta)이다
+- **예산 선택:** fold 평균 ΔCE_일반 ≤ +0.02인 update 중 fold 평균 특화도가 가장 낮은 것
+
+## C2 — 최종 어댑터와 완료 판정
+- 학습: 새 base + out_proj, 16곡 전부, C1에서 고른 예산(같은 cosine 길이)
+- **완료 기준(모두 충족해야 "가능도 수준 개인화 완료"):**
+  1. C1 선택 예산에서 CV 평균 특화도 ≤ −0.02, 평균 ΔCE_일반 ≤ +0.02, 4 fold 중 3개 이상에서 특화도 < 0
+  2. 선택에 쓰지 않은 **원래 val 2곡**(base·어댑터·선택 모두 미사용)에서 특화도 ≤ −0.01
+  3. 생성 문법 유효성 100%(seed 1–4, 768토큰), 16-gram 복사(멜다우 train 대비) ≤ 0.10, 128 BPM 런타임 8/8·fallback 0
+- 충족하면 체크포인트, 비교 MIDI, 리포트, README를 반영하고 **"가능도 수준 개인화 완료, 청취 미검증"**으로 선언한다
+- 미충족이면 실패로 기록한다. 멜다우 후보는 기존 armB 위 out_proj u64를 유지하고 원인을 기록한다
