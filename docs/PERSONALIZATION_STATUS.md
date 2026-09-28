@@ -62,6 +62,8 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
 | CPU 부하 여유 (Tatum 완성, 반 마디 블록) | 바쁜 프로세스 2·4개: 128/240 BPM 성립. 8개(성능 코어 전부): 생성이 2.5–3배 느려짐. fallback은 고정 예산 22%, 적응형 4%, 예산 off 1.6% | [LOAD_MARGIN](experiments/LOAD_MARGIN.md), [ADAPTIVE_BUDGET](experiments/ADAPTIVE_BUDGET.md) |
 | 키보드 전환 | Program Change/CC, 모든 메시지 적용(9/9, 15/15, 15/15). 반 마디 블록에서 도착 → 적용 블록 시작 평균 0.9 s | [ADAPTER_LIVE_SELECT](experiments/ADAPTER_LIVE_SELECT.md), [HALF_BAR_BLOCKS](experiments/HALF_BAR_BLOCKS.md) |
 
+주의: 음 입력(#1538)과 음역 따라가기(#1542)는 코드 토큰 예약(#1553) **이전** primer 구성으로 쟀다. 이전 구성은 입력 음과 코드 음을 시간순으로 섞었다. 지금 기본값은 입력 다음에 코드 진술을 놓는다. 입력이 없는 경우의 결과(동일성, 지연)는 그대로다. 입력이 있을 때의 따라가기 수치는 새 구성에서 다시 재야 한다.
+
 ## 4. 쇼케이스 MIDI
 
 `bash scripts/make_showcase.sh`(PY, OUT 지정)로 만든다. 모든 변형에서 primer·코드·seed·길이가 같다. 현재 세트는 `outputs/showcase_v1/midi/`에 있고, 요약은 [showcase_v1_summary.json](experiments/showcase_v1_summary.json)이다.
