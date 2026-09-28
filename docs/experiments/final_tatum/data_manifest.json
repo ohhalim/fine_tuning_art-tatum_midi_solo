@@ -1,0 +1,19 @@
+{
+  "train": "data/tatum_full/train minus holdout_tatum_fresh12",
+  "train_songs": 98,
+  "val": "data/tatum_full/val (val12, selection only)",
+  "excluded_fresh12": [
+    "00009.npy",
+    "00013.npy",
+    "00016.npy",
+    "00018.npy",
+    "00028.npy",
+    "00035.npy",
+    "00056.npy",
+    "00068.npy",
+    "00071.npy",
+    "00075.npy",
+    "00084.npy",
+    "00095.npy"
+  ]
+}

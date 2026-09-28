@@ -211,6 +211,7 @@ flowchart LR
 |---|---|---|
 | 멜다우 u128 | `outputs/mehldau_lora_v2/u128/checkpoint_update128.pt` | 8/8, 오류 0, 생성 p50 404 ms |
 | 멜다우 u64 (이전 후보, armB 위) | `outputs/mehldau_apply/export_outproj_u64/checkpoint_update64.pt` | 128 BPM 8/8, fallback 0, 생성 p50 355 ms. val 2곡 기준 사전 규칙으로 선정(val −0.023, 일반 −0.012). QKV 확장은 16곡에서 과적합해 기준 미달(#1495) |
+| **Tatum 완성 모델 (기본)** | `outputs/final_tatum/export/checkpoint_update518.pt` | 공통 base(Tatum·멜다우 미학습) + out_proj+QKV, Tatum 98곡, val12로 선택. **미학습 Tatum fresh12 CE −0.126**(16곡 모델의 2.3배), 일반 재즈 +0.009, 멜다우 곡 +0.052(Tatum 특이적). 복사 0, 128 BPM 16마디 fallback 0(#1509) |
 | **멜다우 개인화 (완료 판정)** | `outputs/clean_base/c2_export/checkpoint_update128.pt` | **멜다우 미학습 base** + out_proj LoRA 128 update. 미학습 멜다우 곡 CE −0.046(4-fold 4/4), 재사용 holdout 2곡 −0.047·특화도 −0.021, 복사 0, 128 BPM 8/8. 가능도 수준 완료, 청취 미검증(#1497) |
 | **Tatum vs 멜다우 비교용 (공통 base)** | `outputs/tvm/export_{tatum,mehldau}/checkpoint_update128.pt` | 두 연주자 모두 제외한 공통 base + 같은 out_proj LoRA·16곡·128 update. 둘 다 자기 연주자 미학습 곡 개선·일반 대비 특화(3×3 교차 평가). 우열은 가중 방식에 따라 뒤집혀 미확정(멜다우 holdout 2곡). 128 BPM 8/8(#1499) |
 
@@ -321,7 +322,7 @@ uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo
 - [생성 지연 측정](docs/phase1/GENERATION_LATENCY.md) · [구간별 예산](docs/phase1/LATENCY_BUDGET.md)
 - [코드 primer 비교 실험](docs/experiments/CHORD_PRIMER_AB.md)
 - [멜다우 개인화 실험 (첫 시도)](docs/experiments/MEHLDAU_PERSONALIZATION.md)
-- [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Art Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md) · [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md) · [런타임 멈춤 원인](docs/experiments/RUNTIME_STALL_CAUSE.md) · [Tatum LoRA 타깃](docs/experiments/TATUM_LORA_TARGETS.md) · [seed 반복·멜다우 적용](docs/experiments/SEED_REPEAT_AND_MEHLDAU_APPLY.md) · [멜다우 개인화 완료](docs/experiments/MEHLDAU_CLEAN_BASE.md) · [Tatum vs 멜다우 비교](docs/experiments/TATUM_VS_MEHLDAU.md) · [16마디 실사용 점검](docs/experiments/USAGE_PATH_16BAR.md) · [KV 캐시](docs/experiments/KV_CACHE.md)
+- [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Art Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md) · [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md) · [런타임 멈춤 원인](docs/experiments/RUNTIME_STALL_CAUSE.md) · [Tatum LoRA 타깃](docs/experiments/TATUM_LORA_TARGETS.md) · [seed 반복·멜다우 적용](docs/experiments/SEED_REPEAT_AND_MEHLDAU_APPLY.md) · [멜다우 개인화 완료](docs/experiments/MEHLDAU_CLEAN_BASE.md) · [Tatum vs 멜다우 비교](docs/experiments/TATUM_VS_MEHLDAU.md) · [16마디 실사용 점검](docs/experiments/USAGE_PATH_16BAR.md) · [KV 캐시](docs/experiments/KV_CACHE.md) · [Tatum 완성 모델](docs/experiments/FINAL_TATUM.md)
 - [기존 D0–D4 연구 기록](docs/RESEARCH_SUMMARY.md)
 
 과거 Stage B 실험은 `archive/` 와 연구 문서에 보존합니다.
