@@ -34,6 +34,7 @@ python scripts/play_personalized.py --preset swap
 python scripts/play_personalized.py --preset swap --live-select --input-port "<키보드 입력 포트>"
 # 옵션: --bpm 200 --chords "F7,Bb7,F7,C7" --bars 12 --seed 7 --capture, 실제 명령만 보기 --dry-run
 ```
+- 코드 primer 없는 기본 모드를 직접 쓸 때는 `--generation-tokens 192 --max-sequence 256`을 준다. 96토큰이면 Tatum 마디의 37.5%가 fallback된다([PLAIN_BUDGET](experiments/PLAIN_BUDGET.md))
 - 출력은 가상 MIDI 포트 `ContinuousJazz`로 나간다(DAW에서 받으면 된다). 연주 기록은 `outputs/play/<preset>_seed<seed>/`(`played.mid`, `continuous_report.json`)에 남는다
 - 런타임 기본값
   - 코드 primer, 마디당 2 sub-block
