@@ -33,16 +33,17 @@ python scripts/play_personalized.py --preset swap
 # 키보드 프리셋 버튼으로 전환 (PC 0 = Tatum, PC 1 = 멜다우)
 python scripts/play_personalized.py --preset swap --live-select --input-port "<키보드 입력 포트>"
 # 옵션: --bpm 200 --chords "F7,Bb7,F7,C7" --bars 12 --seed 7 --capture, 실제 명령만 보기 --dry-run
-# 연주 중 블록 지표 보기(어댑터·음 수·음높이·코드톤·입력): ... -- --live-metrics
+# 연주 중 블록 지표 보기(어댑터·음 수·음높이·코드톤·보이싱·입력): ... -- --live-metrics
+# CPU를 많이 쓰는 환경(DAW 등)에서 fallback이 나면: ... -- --start-budget-bars off
 ```
 - 코드 primer 없는 기본 모드를 직접 쓸 때는 `--generation-tokens 192 --max-sequence 256`을 준다. 96토큰이면 Tatum 마디의 37.5%가 fallback된다([PLAIN_BUDGET](experiments/PLAIN_BUDGET.md))
 - 출력은 가상 MIDI 포트 `ContinuousJazz`로 나간다(DAW에서 받으면 된다). 연주 기록은 `outputs/play/<preset>_seed<seed>/`(`played.mid`, `continuous_report.json`)에 남는다
 - 런타임 기본값
-  - 코드 primer, 마디당 2 sub-block
+  - 프리셋: 코드 primer, 마디당 2 sub-block을 반 마디 스케줄러 블록으로(#1532)
   - KV 캐시(#1507)
   - LoRA 병합(#1512, #1520)
   - 늦은 fetch 50 ms(#1526), 생성 시작 예산 0.5블록(#1530)
-  - 프리셋 실행기는 반 마디 스케줄러 블록도 쓴다(#1532)
+  - 루프 안 블록 지표 기록(#1544, #1546)
   - 스케줄러 spin 5 ms, QoS user-interactive
 
 ## 3. 실시간 성능 (가상 포트, M1 Max CPU)
@@ -57,7 +58,7 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
 | 입력 음역 따라가기 (탐색) | 높은/낮은 음역 구절을 입력하면 출력 평균 음높이가 6개 비교 중 5개에서 그 방향으로 이동(+2.8 ~ +8.1 / −1.5 ~ −8.2 반음) | [INPUT_REGISTER_FOLLOW](experiments/INPUT_REGISTER_FOLLOW.md) |
 | 루프 안 지표 | 블록마다 어댑터·음 수·음높이·코드톤·입력·보이싱 수·어댑터별 누적 고유 보이싱을 기록(`block_metrics`, 기본 on). 오프라인 계산과 일치(288/288, 96/96), 실시간 영향 없음 | [LIVE_METRICS](experiments/LIVE_METRICS.md), [LIVE_DIVERSITY](experiments/LIVE_DIVERSITY.md) |
 | CPU 부하 여유 (Tatum 완성, 반 마디 블록) | 바쁜 프로세스 2·4개: 128/240 BPM 성립. 8개(성능 코어 전부): 생성이 2.5–3배 느려짐. fallback은 고정 예산 22%, 적응형 4%, 예산 off 1.6% | [LOAD_MARGIN](experiments/LOAD_MARGIN.md), [ADAPTIVE_BUDGET](experiments/ADAPTIVE_BUDGET.md) |
-| 키보드 전환 | Program Change/CC, 모든 메시지 적용(9/9, 15/15), 적용까지 1–2마디 | [ADAPTER_LIVE_SELECT](experiments/ADAPTER_LIVE_SELECT.md), [START_BUDGET](experiments/START_BUDGET.md) |
+| 키보드 전환 | Program Change/CC, 모든 메시지 적용(9/9, 15/15, 15/15). 반 마디 블록에서 도착 → 적용 블록 시작 평균 0.9 s | [ADAPTER_LIVE_SELECT](experiments/ADAPTER_LIVE_SELECT.md), [HALF_BAR_BLOCKS](experiments/HALF_BAR_BLOCKS.md) |
 
 ## 4. 쇼케이스 MIDI
 
@@ -93,12 +94,19 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
 - **두 최선 모델의 base가 다르다.** 공통 base 멜다우는 절대 CE가 0.028 나빠(16/16곡) 통합하지 않았다([SHARED_BASE](experiments/SHARED_BASE.md)). 스왑 프리셋은 전체 모델을 복사한다
 - **멜다우는 자료 한계다.** 학습량을 64–384로 넓혀도 held-out 개선은 64–128에서 포화했다([FINAL_MEHLDAU](experiments/FINAL_MEHLDAU.md)). 16곡 중 15곡이 한 앨범이다
 - **화성 추종은 음표 기반 primer다.** 학습된 코드 조건이 아니다. 마디 간 문맥 연결은 3차례 모두 기준 미달이었다(경계는 매끄러워지지만 코드톤 비율이 −0.11 ~ −0.20). 시험을 닫았다([USAGE_PATH_16BAR](experiments/USAGE_PATH_16BAR.md) §6–8)
-- **입력 반영 지연은 프리셋 기준 평균 0.9초(128 BPM, PC 메시지)다.** jam_bot의 멜로디 조건 목표 800 ms에 가깝다. 반주 100 ms 목표와는 여전히 차원이 다르다. 연주 음 입력의 체감 지연은 재지 않았다
-- 이 세션에서 내가 낸 오류 두 건(모두 문서에 정정했다)
-  1. LoRA 병합이 out_proj를 놓쳤다(#1520)
-  2. 문맥 연결 3차 사전 등록이 실제 primer 길이를 확인하지 않았다(#1513)
+- **입력 반영 지연**
+  - 프리셋 기준 PC 메시지는 평균 0.9초(128 BPM)다
+  - 음 입력은 스냅샷의 최신 음에서 블록 시작까지 0.52–0.55초다(#1538)
+  - jam_bot의 멜로디 조건 목표 800 ms 근처다. 반주 100 ms 목표와는 여전히 차원이 다르다
+  - 체감 지연(귀로 듣는 반응)은 재지 않았다
+- 2026-09-29 세션에서 내가 낸 오류(모두 해당 문서에 정정했다)
+  1. LoRA 병합이 out_proj를 놓쳤다. 출력은 맞았지만 설명과 속도 해석이 틀렸다(#1520에서 수정)
+  2. 문맥 연결 3차 사전 등록이 실제 primer 길이(10토큰)를 확인하지 않았다(#1513)
+  3. 부하 측정 스크립트의 `seq 1 0` 때문에 "부하 0"이 실제로는 부하 2였다(#1534)
+  4. 라이브 선택 사전 등록이 producer 선행을 1마디로 잘못 가정했다. 실제로는 3마디였고, 그 원인을 #1526에서 고쳤다(#1525)
 
 ## 7. 다음 후보 (각각 한 질문)
-1. 실제 연주 음 입력으로 반영 지연 측정(현재는 PC 메시지로만 쟀다). 필요하면 더 작은 블록(1박)도 시험한다
-2. 실물 키보드 + DAW 부하에서 성립 템포와 전환 재측정
-3. 청취: 사용자가 원할 때만. 쇼케이스 세트가 준비돼 있다
+1. 실물 키보드 + DAW 부하에서 성립 템포·전환·입력 반영 재측정(지금까지는 가상 포트와 합성 부하만 썼다)
+2. 입력 따라가기 지표 확장: 음역 외에 리듬 밀도, 동기 모방, 화성. 필요하면 더 작은 블록(1박)도 시험한다
+3. 무거운 부하에서 fallback 0을 만드는 예산 규칙(적응형은 22% → 4%까지 줄였고 기준 3% 이하에는 미달)
+4. 청취: 사용자가 원할 때만. 쇼케이스 세트가 준비돼 있다
