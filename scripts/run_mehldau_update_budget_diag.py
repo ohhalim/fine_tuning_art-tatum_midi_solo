@@ -117,10 +117,8 @@ def main(argv=None) -> int:
     if device.type != args.device:
         p.error(f"--device {args.device} requested but got {device}")
     from model.loss import SmoothCrossEntropyLoss
-    from model.music_transformer import MusicTransformer
     from utilities.constants import TOKEN_PAD, VOCAB_SIZE
-    from scripts.checkpoint_utils import load_state_dict_with_token_resize
-    from scripts.train_qlora import (MidiDataset, add_lora_targets, add_lora_to_model,
+    from scripts.train_qlora import (MidiDataset, build_lora_model_from_state,
                                      checkpoint_model_config,
                                      checkpoint_payload_state_dict, set_seed)
 
@@ -128,18 +126,10 @@ def main(argv=None) -> int:
     payload = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
     state = checkpoint_payload_state_dict(payload)
     cfg = checkpoint_model_config(payload)
-    model = MusicTransformer(n_layers=cfg["n_layers"], num_heads=cfg["num_heads"],
-                             d_model=cfg["d_model"], dim_feedforward=cfg["dim_feedforward"],
-                             max_sequence=cfg["max_sequence"], rpr=cfg["rpr"])
-    model, _ = add_lora_to_model(model, r=cfg["lora_r"], alpha=cfg["lora_alpha"],
-                                 dropout=cfg["lora_dropout"])
-    load_state_dict_with_token_resize(model, state, strict=True)
+    requested_targets = [t.strip() for t in args.lora_targets.split(",") if t.strip()]
+    # The base's saved LoRA layout is restored first; only missing targets are added.
+    model, lora_targets = build_lora_model_from_state(cfg, state, extra_targets=requested_targets)
     max_seq = int(cfg["max_sequence"])
-    lora_targets = [t.strip() for t in args.lora_targets.split(",") if t.strip()]
-    extra_targets = [t for t in lora_targets if t != "out_proj"]
-    if extra_targets:
-        add_lora_targets(model, extra_targets, r=cfg["lora_r"], alpha=cfg["lora_alpha"],
-                         dropout=cfg["lora_dropout"])
     model = model.to(device)
 
     train_ds = MidiDataset(str(args.data_dir), max_seq=max_seq, split="train")

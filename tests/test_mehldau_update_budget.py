@@ -215,3 +215,116 @@ class LoraTargetsTest(unittest.TestCase):
                                           prefer_full_checkpoint=True)
         with torch.no_grad():
             self.assertTrue(torch.equal(expected, loaded(x)))
+
+
+class LoraLoadingFailClosedTest(unittest.TestCase):
+    """Review H1/M1: snapshot keys must never be dropped silently, and a base that
+    already carries QKV must be usable as a base."""
+
+    CFG = {**TINY, "lora_r": 2, "lora_alpha": 4, "lora_dropout": 0.0}
+
+    def _qkv_model(self, seed=0):
+        from scripts.train_qlora import add_lora_to_model
+
+        torch.manual_seed(seed)
+        model = MusicTransformer(**TINY)
+        model, _ = add_lora_to_model(model, r=2, alpha=4, dropout=0.0, targets=("out_proj", "qkv"))
+        with torch.no_grad():
+            for name, param in model.named_parameters():
+                if "lora_B" in name:
+                    param.normal_(0, 0.1)
+        return model.eval()
+
+    @staticmethod
+    def _lora(model):
+        return {k: v.clone() for k, v in model.state_dict().items() if "lora_" in k}
+
+    def test_qkv_snapshot_into_out_proj_model_is_rejected(self) -> None:
+        from scripts.train_qlora import load_lora_snapshot
+
+        out_proj_only = tiny_lora_model()
+        with self.assertRaises(ValueError) as ctx:
+            load_lora_snapshot(out_proj_only, self._lora(self._qkv_model()))
+        self.assertIn("unexpected 6", str(ctx.exception))
+
+    def test_partial_snapshot_is_rejected(self) -> None:
+        from scripts.train_qlora import load_lora_snapshot
+
+        model = self._qkv_model()
+        partial = {k: v for k, v in self._lora(model).items() if "lora_A_q" not in k}
+        with self.assertRaises(ValueError) as ctx:
+            load_lora_snapshot(self._qkv_model(seed=1), partial)
+        self.assertIn("missing 1", str(ctx.exception))
+
+    def test_targets_inferred_from_snapshot_restore_exact_logits(self) -> None:
+        from scripts.train_qlora import (build_lora_model_from_state, load_lora_snapshot,
+                                         lora_targets_in_state_dict)
+
+        trained = self._qkv_model()
+        snapshot = self._lora(trained)
+        targets = lora_targets_in_state_dict(snapshot)
+        self.assertEqual(targets, ["out_proj", "qkv"])
+        # base = the out_proj-only layout every existing base checkpoint has
+        base = tiny_lora_model()
+        base_state = {k: v for k, v in trained.state_dict().items() if "lora_" not in k
+                      or ".out_proj." in k}
+        base_state.update({k: v for k, v in base.state_dict().items() if ".out_proj.lora_" in k})
+        model, built = build_lora_model_from_state(self.CFG, base_state, extra_targets=targets)
+        self.assertEqual(built, ["out_proj", "qkv"])
+        load_lora_snapshot(model, snapshot)
+        model.eval()
+        x = torch.randint(0, 300, (1, 12))
+        with torch.no_grad():
+            self.assertTrue(torch.equal(trained(x), model(x)))
+
+    def test_qkv_base_can_be_reused_with_extra_target(self) -> None:
+        from scripts.train_qlora import build_lora_model_from_state, lora_targets_in_state_dict
+
+        b_full = self._qkv_model().state_dict()
+        model, targets = build_lora_model_from_state(self.CFG, b_full, extra_targets=["ffn"])
+        self.assertEqual(targets, ["out_proj", "qkv", "ffn"])
+        self.assertEqual(lora_targets_in_state_dict(model.state_dict()), ["out_proj", "qkv", "ffn"])
+        # every carried-over tensor is kept exactly; wrapping FFN renames
+        # linear{1,2}.weight/bias to linear{1,2}.original_layer.*
+        new_state = model.state_dict()
+        for k, v in b_full.items():
+            key = k
+            for lin in (".linear1.", ".linear2."):
+                if lin in k and "original_layer" not in k:
+                    key = k.replace(lin, lin + "original_layer.")
+            self.assertTrue(torch.equal(new_state[key], v), k)
+
+    def test_plain_base_gets_default_out_proj(self) -> None:
+        from scripts.train_qlora import build_lora_model_from_state
+
+        torch.manual_seed(0)
+        plain = MusicTransformer(**TINY).state_dict()
+        model, targets = build_lora_model_from_state(self.CFG, plain)
+        self.assertEqual(targets, ["out_proj"])
+        trainable = {k for k, p in model.named_parameters() if p.requires_grad}
+        self.assertTrue(trainable and all(".out_proj.lora_" in k for k in trainable))
+
+    def test_export_infers_targets_and_rejects_wrong_declaration(self) -> None:
+        from scripts.export_lora_snapshot import main as export_main
+
+        trained = self._qkv_model()
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            # base that already carries QKV (the M1 case) plus a matching snapshot
+            torch.save({"model_config": self.CFG, "model_state_dict": trained.state_dict()},
+                       tmp / "b_base.pt")
+            torch.save(self._lora(trained), tmp / "snap.pt")
+            out = tmp / "export" / "checkpoint_update1.pt"
+            args = ["--base", str(tmp / "b_base.pt"), "--snapshot", str(tmp / "snap.pt"),
+                    "--output", str(out)]
+            self.assertEqual(export_main(args), 0)
+            saved = torch.load(out, map_location="cpu", weights_only=False)
+            self.assertEqual(saved["model_config"]["lora_targets"], ["out_proj", "qkv"])
+            loaded = load_model_with_lora(lora_path=str(out.parent), checkpoint_path=str(out),
+                                          prefer_full_checkpoint=True)
+            x = torch.randint(0, 300, (1, 12))
+            with torch.no_grad():
+                self.assertTrue(torch.equal(trained(x), loaded(x)))
+            with self.assertRaises(SystemExit):
+                export_main(["--base", str(tmp / "b_base.pt"), "--snapshot", str(tmp / "snap.pt"),
+                             "--output", str(tmp / "other.pt"), "--lora-targets", "out_proj"])

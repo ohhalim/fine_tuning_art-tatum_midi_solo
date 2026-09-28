@@ -1,0 +1,72 @@
+{
+  "schema": "snapshot_eval_v2",
+  "checkpoint": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/outputs/d0_experiment/armB_full2777/ckpt/checkpoint_epoch8.pt",
+  "snapshot_dir": "outputs/tatum_diag/update_budget_t1",
+  "primer": "outputs/chord_ab/ii_V_I.mid",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "gen_tokens": 768,
+  "device": "mps",
+  "target_name": "tatum",
+  "data_dir": "data/tatum_full",
+  "lora_targets": [
+    "out_proj"
+  ],
+  "validity_json": "outputs/tatum_diag/generic_probe_list.json",
+  "n_target_train_crops": 220,
+  "n_target_val_crops": 187,
+  "n_generic_crops": 100,
+  "descriptor_metrics_validity_passed": false,
+  "style_verified": false,
+  "musical_quality_verified": false,
+  "rows": [
+    {
+      "update": 0,
+      "ce_target_train": 2.569154697114771,
+      "ce_target_val": 2.5121582268393614,
+      "ce_generic_probe": 2.571102925093735,
+      "per_seed": [],
+      "mean_js_shift": null,
+      "mean_p_target": null,
+      "mean_copy8": null,
+      "mean_copy16": null,
+      "mean_notes": null,
+      "wall_s": 20.5,
+      "d_ce_target_train": 0.0,
+      "d_ce_target_val": 0.0,
+      "d_ce_generic": 0.0,
+      "specialisation_train": 0.0,
+      "specialisation_val": 0.0,
+      "specialised_train_without_big_generic_loss": false,
+      "specialised_val_without_big_generic_loss": false
+    },
+    {
+      "update": 518,
+      "ce_target_train": 2.496072350848805,
+      "ce_target_val": 2.444486153317008,
+      "ce_generic_probe": 2.566741864137975,
+      "per_seed": [],
+      "mean_js_shift": null,
+      "mean_p_target": null,
+      "mean_copy8": null,
+      "mean_copy16": null,
+      "mean_notes": null,
+      "wall_s": 20.1,
+      "d_ce_target_train": -0.07308234626596599,
+      "d_ce_target_val": -0.06767207352235349,
+      "d_ce_generic": -0.004361060955760276,
+      "specialisation_train": -0.06872128531020572,
+      "specialisation_val": -0.06331101256659322,
+      "specialised_train_without_big_generic_loss": true,
+      "specialised_val_without_big_generic_loss": true
+    }
+  ]
+}

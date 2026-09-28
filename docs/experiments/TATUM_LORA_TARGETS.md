@@ -84,3 +84,21 @@ B는 실제 Tatum 값을 **넘어섰다**. "Tatum보다 더 속주"일 수 있�
 - 단일 seed(42) 학습이다. 팔 간 차이(0.048)가 seed 편차보다 큰지는 검증하지 않았다
 - Tatum 곡은 base 사전학습셋에 있다. 들리는 스타일은 미검증이다
 - 일반 CE 허용치(+0.02)는 임의 기준이다
+
+## 후속 수정 — LoRA 로딩 fail-closed (Codex 리뷰 H1/M1)
+브랜치 `fix/lora-target-loading`. 현재 코드에서 먼저 재현했다(tiny 모델).
+- **H1:** `eval_mehldau_snapshots.py`가 snapshot을 `strict=False`로 로드했다. `--lora-targets`를 생략하면(기본 out_proj) QKV snapshot의 키 **6개가 조용히 무시**됐다
+- **M1:** 학습·평가·내보내기 스크립트가 out_proj 기본 구조에 base를 strict 로드한 뒤 확장했다. QKV를 포함한 B 체크포인트는 base로 쓸 수 없었다(`strict load` 실패)
+
+수정 (`scripts/train_qlora.py`):
+- `build_lora_model_from_state`: base의 저장 구조를 먼저 복원해 strict 로드하고, 요청한 타깃 중 없는 것만 붙인다
+- `load_lora_snapshot`: 모델과 snapshot의 LoRA 키가 정확히 일치하지 않으면(누락 또는 초과) `ValueError`로 멈춘다
+- `lora_targets_in_state_dict`: LoRA만 담긴 snapshot에서도 FFN을 인식하도록 고쳤다
+
+세 스크립트가 이 두 함수를 쓴다. 평가·내보내기는 snapshot에서 타깃을 추론하고, `--lora-targets`는 검증용 선택 옵션이 됐다(불일치하면 오류). 평가 리포트에 `lora_targets`를 기록한다.
+LoRA가 적용된 base의 RNG 소비 순서(생성 → out_proj LoRA → 로드 → 추가 타깃)는 기존과 같다.
+
+**과거 수치 영향: 없음.** 당시 B/C 평가는 `--lora-targets`를 올바르게 명시했다. 새 로더(자동 추론)로 A/B/C의 update 0과 518을 재평가하니 CE가 이전 리포트와 **차이 0.00e+00**으로 같았다(`docs/experiments/lora_fix_recheck/`).
+실제 CLI에서 B snapshot에 `--lora-targets out_proj`를 주면 불일치 오류로 멈춘다.
+
+검증: 회귀 테스트 6개 추가(QKV→out_proj 거부, 부분 snapshot 거부, 추론 복원 logits 동일, QKV base 재사용과 FFN 추가, plain base 기본값, export 추론과 잘못된 선언 거부). `agent_harness.sh quick` 213 tests OK, `demo` 통과.

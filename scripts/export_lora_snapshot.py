@@ -30,7 +30,8 @@ def main(argv=None) -> int:
     ap.add_argument("--snapshot", type=Path, required=True)
     ap.add_argument("--output", type=Path, required=True)
     ap.add_argument("--note", default="")
-    ap.add_argument("--lora-targets", default="out_proj", help="must match the snapshot")
+    ap.add_argument("--lora-targets", default=None,
+                    help="optional check; targets are inferred from the snapshot")
     args = ap.parse_args(argv)
     if args.output.exists():
         ap.error(f"refusing to overwrite {args.output}")
@@ -38,33 +39,28 @@ def main(argv=None) -> int:
     import torch
     from utilities.device import use_cuda
     use_cuda(False)
-    from model.music_transformer import MusicTransformer
-    from scripts.checkpoint_utils import load_state_dict_with_token_resize
     from scripts.generate import load_model_with_lora
-    from scripts.train_qlora import (add_lora_targets, add_lora_to_model, checkpoint_model_config,
-                                     checkpoint_payload_state_dict)
+    from scripts.train_qlora import (build_lora_model_from_state, checkpoint_model_config,
+                                     checkpoint_payload_state_dict, load_lora_snapshot,
+                                     lora_targets_in_state_dict)
 
     payload = torch.load(args.base, map_location="cpu", weights_only=False)
     cfg = checkpoint_model_config(payload)
-    model = MusicTransformer(n_layers=cfg["n_layers"], num_heads=cfg["num_heads"],
-                             d_model=cfg["d_model"], dim_feedforward=cfg["dim_feedforward"],
-                             max_sequence=cfg["max_sequence"], rpr=cfg["rpr"])
-    model, _ = add_lora_to_model(model, r=cfg["lora_r"], alpha=cfg["lora_alpha"],
-                                 dropout=cfg["lora_dropout"])
-    load_state_dict_with_token_resize(model, checkpoint_payload_state_dict(payload), strict=True)
-    targets = [t.strip() for t in args.lora_targets.split(",") if t.strip()]
-    extra = [t for t in targets if t != "out_proj"]
-    if extra:
-        add_lora_targets(model, extra, r=cfg["lora_r"], alpha=cfg["lora_alpha"],
-                         dropout=cfg["lora_dropout"])
-    cfg = {**cfg, "lora_targets": targets}
     lora = torch.load(args.snapshot, map_location="cpu")
     if not lora or not all("lora_" in k for k in lora):
         ap.error("snapshot must contain only lora_ tensors")
-    missing = set(lora) - set(model.state_dict())
-    if missing:
-        ap.error(f"snapshot keys not in model: {sorted(missing)[:3]}")
-    model.load_state_dict(lora, strict=False)
+    snapshot_targets = lora_targets_in_state_dict(lora)
+    if args.lora_targets is not None:
+        declared = [t.strip() for t in args.lora_targets.split(",") if t.strip()]
+        if sorted(declared) != sorted(snapshot_targets):
+            ap.error(f"--lora-targets {declared} does not match snapshot targets {snapshot_targets}")
+    model, targets = build_lora_model_from_state(
+        cfg, checkpoint_payload_state_dict(payload), extra_targets=snapshot_targets)
+    try:
+        load_lora_snapshot(model, lora)
+    except ValueError as exc:
+        ap.error(str(exc))
+    cfg = {**cfg, "lora_targets": targets}
     model.eval()
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
