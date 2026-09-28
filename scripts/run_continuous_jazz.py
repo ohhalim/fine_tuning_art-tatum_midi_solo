@@ -213,6 +213,42 @@ def make_block_builder(*, clock, duration, generate):
     return build
 
 
+def block_metrics(block, *, chord: str, adapter: str | None, input_events) -> dict:
+    """Per-block observations taken on the producer thread right after a model
+    block is built (docs/experiments/LIVE_METRICS.md). Not a quality measure."""
+    from inference.app.fallback import parse_chord
+
+    pitches = [e.message.note for e in block.events
+               if e.message.type == "note_on" and e.message.velocity > 0]
+    root, intervals = parse_chord(chord)
+    pcs = {(root + i) % 12 for i in intervals}
+    played_in = [e.message.note for e in input_events
+                 if e.message.type == "note_on" and e.message.velocity > 0]
+    return {
+        "block": block.bar_index, "adapter": adapter, "chord": chord, "notes": len(pitches),
+        "pitch_mean": round(sum(pitches) / len(pitches), 2) if pitches else None,
+        "pitch_min": min(pitches) if pitches else None,
+        "pitch_max": max(pitches) if pitches else None,
+        "chord_tone_ratio": (round(sum((p % 12) in pcs for p in pitches) / len(pitches), 4)
+                             if pitches else None),
+        "input_notes": len(played_in),
+        "input_pitch_mean": round(sum(played_in) / len(played_in), 2) if played_in else None,
+    }
+
+
+def with_block_metrics(factory, *, record):
+    """Wrap a builder factory so every model block also reports ``block_metrics``."""
+    def make(*, clock, duration):
+        build = factory(clock=clock, duration=duration)
+
+        def build_and_measure(block_index, input_events):
+            block = build(block_index, input_events)
+            record(block, input_events)
+            return block
+        return build_and_measure
+    return make
+
+
 def _make_builder(*, clock, duration, generate, sub_builder):
     """Pick the producer callback: sub-blocks, one bar, or generation disabled."""
     if sub_builder is not None:
@@ -554,6 +590,10 @@ def main(argv=None):
                         help="with --chord-primer --chord-blocks-per-bar 2: hand each half bar to "
                              "the scheduler as its own block, so late fetch, start budget, input "
                              "and adapter choice work per half bar (docs/experiments/HALF_BAR_BLOCKS.md)")
+    parser.add_argument("--live-metrics", action="store_true",
+                        help="print one line of block metrics (adapter, notes, pitch, chord-tone "
+                             "ratio, input notes) as each block is generated; they are always "
+                             "saved in the report as block_metrics (docs/experiments/LIVE_METRICS.md)")
     parser.add_argument("--adapter-name", default="primary",
                         help="name of the --checkpoint adapter in --adapter-schedule")
     parser.add_argument("--swap-adapter", action="append", default=[], metavar="NAME=CHECKPOINT",
@@ -846,6 +886,25 @@ def main(argv=None):
                     return make_sub_block_builder(
                         clock=clock, duration=duration, generate_sub=generate_sub,
                         blocks_per_bar=args.chord_blocks_per_bar)
+            metrics_by_block: dict[int, dict] = {}
+            if not args.fallback_only:
+                def record_metrics(block, input_events):
+                    b = block.bar_index
+                    bar = b // 2 if args.half_bar_blocks else b
+                    m = block_metrics(block, chord=chords[bar % len(chords)],
+                                      adapter=adapter_per_bar.get(b, None if bank else args.adapter_name),
+                                      input_events=input_events)
+                    metrics_by_block[b] = m
+                    if args.live_metrics:
+                        print(f"block {b:3d} {m['adapter'] or '-':>8} notes {m['notes']:3d} "
+                              f"pitch {m['pitch_mean'] if m['pitch_mean'] is not None else '-':>6} "
+                              f"chord-tone {m['chord_tone_ratio'] if m['chord_tone_ratio'] is not None else '-':>6} "
+                              f"input {m['input_notes']}", flush=True)
+
+                base_factory = sub_builder or (
+                    lambda *, clock, duration: make_block_builder(
+                        clock=clock, duration=duration, generate=generate))
+                sub_builder = with_block_metrics(base_factory, record=record_metrics)
             qos_result = None
             if args.thread_qos != "default":
                 # The scheduler runs on this (main) thread inside run_session.
@@ -950,6 +1009,8 @@ def main(argv=None):
                 if args.half_bar_blocks:
                     played = merge_half_bars(played, half_seconds=120.0 / args.bpm)
                 report["played_bars"] = played
+            # Blocks served from fallback have no entry (None).
+            report["block_metrics"] = [metrics_by_block.get(i) for i in range(blocks)]
             report["played_note_count"] = write_played_midi(
                 result, args.output_dir / "played.mid", bpm=args.bpm
             )
