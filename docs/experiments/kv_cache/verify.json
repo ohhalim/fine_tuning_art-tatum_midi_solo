@@ -1,0 +1,38 @@
+{
+  "schema": "kv_cache_verify_v1",
+  "models": {
+    "base": {
+      "logits_max_abs_diff": 1.0013580322265625e-05,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_full": 6.492648706189357,
+      "wall_s_cache": 3.5855724969296716,
+      "speedup": 1.810770445096011
+    },
+    "tatum": {
+      "logits_max_abs_diff": 1.0728836059570312e-05,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_full": 11.07972782786237,
+      "wall_s_cache": 5.631533499225043,
+      "speedup": 1.9674441836112768
+    },
+    "mehldau": {
+      "logits_max_abs_diff": 1.33514404296875e-05,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_full": 7.712255085003562,
+      "wall_s_cache": 4.063161791127641,
+      "speedup": 1.8980920478835268
+    }
+  }
+}

@@ -79,5 +79,11 @@ class CachedGenerateTest(unittest.TestCase):
         self.assertFalse(model.supports_kv_cache())
 
 
+class RuntimeDefaultTest(unittest.TestCase):
+    def test_runtime_defaults_to_kv_cache_with_opt_out(self) -> None:
+        text = (ROOT / "scripts" / "run_continuous_jazz.py").read_text()
+        self.assertIn('"--kv-cache", action=argparse.BooleanOptionalAction, default=True', text)
+
+
 if __name__ == "__main__":
     unittest.main()

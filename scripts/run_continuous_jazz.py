@@ -503,9 +503,9 @@ def main(argv=None):
                         help="opt-in: state each bar's chord as notes in the primer. "
                              "Note-based steering, not learned chord conditioning; "
                              "see docs/experiments/CHORD_PRIMER_AB.md")
-    parser.add_argument("--kv-cache", action=argparse.BooleanOptionalAction, default=False,
-                        help="KV-cached generation (identical tokens, faster; "
-                             "docs/experiments/KV_CACHE.md)")
+    parser.add_argument("--kv-cache", action=argparse.BooleanOptionalAction, default=True,
+                        help="KV-cached generation: identical tokens, about half the generation "
+                             "time (docs/experiments/KV_CACHE.md); --no-kv-cache for the old path")
     parser.add_argument("--context-carry-tokens", type=int, default=0,
                         help="with --chord-primer: prepend the last N tokens of the previous "
                              "valid block to each block's primer (0 = off, the previous behaviour)")
