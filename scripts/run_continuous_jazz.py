@@ -508,7 +508,7 @@ def main(argv=None):
                              "time (docs/experiments/KV_CACHE.md); --no-kv-cache for the old path")
     parser.add_argument("--merge-lora", action=argparse.BooleanOptionalAction, default=True,
                         help="fold LoRA deltas into the base weights before playing: identical "
-                             "tokens, about 35%% lower p50 on the Tatum final adapter "
+                             "tokens, about 50%% lower p50 on the Tatum final adapter "
                              "(docs/experiments/LORA_MERGE.md); --no-merge-lora for the old path")
     parser.add_argument("--context-carry-tokens", type=int, default=0,
                         help="with --chord-primer: prepend the last N tokens of the previous "
