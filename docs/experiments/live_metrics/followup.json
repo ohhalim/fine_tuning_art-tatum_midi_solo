@@ -1,0 +1,125 @@
+{
+  "schema": "live_metrics_followup_v1",
+  "runs": [
+    {
+      "arm": "A",
+      "seed": 42,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": false,
+      "lateness_max_ms": 7.548417
+    },
+    {
+      "arm": "B",
+      "seed": 42,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": true,
+      "lateness_max_ms": 7.003167
+    },
+    {
+      "arm": "A",
+      "seed": 43,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": false,
+      "lateness_max_ms": 18.698958
+    },
+    {
+      "arm": "B",
+      "seed": 43,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": true,
+      "lateness_max_ms": 9.27
+    },
+    {
+      "arm": "A",
+      "seed": 44,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": false,
+      "lateness_max_ms": 11.055916
+    },
+    {
+      "arm": "B",
+      "seed": 44,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": true,
+      "lateness_max_ms": 6.397583
+    },
+    {
+      "arm": "A",
+      "seed": 45,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": false,
+      "lateness_max_ms": 12.384959
+    },
+    {
+      "arm": "B",
+      "seed": 45,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": true,
+      "lateness_max_ms": 10.022
+    },
+    {
+      "arm": "A",
+      "seed": 46,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": false,
+      "lateness_max_ms": 17.746417
+    },
+    {
+      "arm": "B",
+      "seed": 46,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": true,
+      "lateness_max_ms": 9.541625
+    },
+    {
+      "arm": "A",
+      "seed": 47,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": false,
+      "lateness_max_ms": 8.732417
+    },
+    {
+      "arm": "B",
+      "seed": 47,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "block_metrics_on": true,
+      "lateness_max_ms": 7.620625
+    }
+  ],
+  "totals": {
+    "A": [
+      0,
+      0,
+      0
+    ],
+    "B": [
+      0,
+      0,
+      0
+    ]
+  }
+}

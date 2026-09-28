@@ -38,3 +38,20 @@
 - 스위치 `--block-metrics/--no-block-metrics`(기본 on)를 추가했다
 - 조건: Tatum 완성, 반 마디 블록, 128 BPM, 16마디. A(`--no-block-metrics`)와 B(기본, 지표 on)를 seed 42–47에서 교대로 12회 실행한다
 - **판정(모두 충족하면 기본 on으로 합친다):** 12회 모두 fallback 0, B의 미스 합 ≤ A의 미스 합, B에서 `producer_busy: true`인 미스 0. 1회만 실행한다
+
+### 후속 결과 — 기준 충족, **블록 지표 기본 on으로 합침**
+원시값: `docs/experiments/live_metrics/followup.json`.
+
+| arm | 실행 | 미스 | producer_busy 미스 | fallback | 지각 최대 ms (seed 42–47) |
+|---|---|---|---|---|---|
+| A (`--no-block-metrics`) | 6 | 0 | 0 | 0 | 7.5 / 18.7 / 11.1 / 12.4 / 17.7 / 8.7 |
+| B (지표 on) | 6 | **0** | 0 | 0 | 7.0 / 9.3 / 6.4 / 10.0 / 9.5 / 7.6 |
+
+- 1차의 첫 블록 미스는 재현되지 않았다
+- 사용법
+  - 모든 실행의 리포트에 `block_metrics`가 남는다
+  - 연주 중에 보려면 `--live-metrics`를 쓴다. 한 줄 예: `block  8  mehldau notes  15 pitch  57.53 chord-tone    0.8 input 0`
+- 층 2의 세 차별점이 모두 런타임 안에서 동작한다
+  1. base + 어댑터 스왑(#1519)
+  2. 재학습 없는 조건 교체: 코드 primer + 키보드 전환(#1525)
+  3. 루프 안 지표(이번)
