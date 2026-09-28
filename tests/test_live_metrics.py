@@ -7,7 +7,7 @@ from mido import Message
 
 from inference.realtime.continuous import TimedInputMessage
 from inference.realtime.scheduler import ScheduledMidiBlock, ScheduledMidiEvent
-from scripts.run_continuous_jazz import block_metrics, with_block_metrics
+from scripts.run_continuous_jazz import VoicingPool, block_metrics, block_voicings, with_block_metrics
 
 
 def block(pitches, index=3):
@@ -42,6 +42,26 @@ class BlockMetricsTest(unittest.TestCase):
         build = factory(clock=None, duration=1.0)
         self.assertIs(build(3, ()), b)
         self.assertEqual(seen, [(3, ())])
+
+
+class VoicingTest(unittest.TestCase):
+    def test_block_voicings_match_d1_grouping(self) -> None:
+        # onsets 0, 10 ns (same voicing), then 60 ms later a new one
+        b = ScheduledMidiBlock(bar_index=0, target_start_ns=0, events=(
+            ScheduledMidiEvent(sequence_index=0, bar_index=0, target_ns=0, message=Message("note_on", note=60, velocity=80)),
+            ScheduledMidiEvent(sequence_index=1, bar_index=0, target_ns=10, message=Message("note_on", note=64, velocity=80)),
+            ScheduledMidiEvent(sequence_index=2, bar_index=0, target_ns=60_000_000, message=Message("note_on", note=67, velocity=80)),
+        ))
+        self.assertEqual(block_voicings(b), [frozenset({0, 4}), frozenset({7})])
+
+    def test_pool_counts_unique_per_adapter(self) -> None:
+        pool = VoicingPool()
+        a = pool.add("tatum", [frozenset({0, 4}), frozenset({7})])
+        self.assertEqual((a["voicings"], a["unique_voicings_so_far"]), (2, 2))
+        b = pool.add("tatum", [frozenset({0, 4})])
+        self.assertEqual((b["unique_voicings_so_far"], b["distinct_voicing_ratio_so_far"]), (2, round(2 / 3, 4)))
+        c = pool.add("mehldau", [frozenset({0, 4})])
+        self.assertEqual(c["unique_voicings_so_far"], 1)
 
 
 if __name__ == "__main__":
