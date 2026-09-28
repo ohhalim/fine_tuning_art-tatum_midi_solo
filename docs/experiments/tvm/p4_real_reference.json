@@ -1,12 +1,13 @@
 {
-  "schema": "real_holdout_descriptors_v1",
+  "schema": "real_holdout_descriptors_v2",
   "chunk": "middle 768 tokens",
   "sets": {
     "real_tatum_fresh12": {
       "notes": 201.75,
       "pitch_range": 57.666666666666664,
       "ioi_median_ms": 143.33333333333334,
-      "chord_onset_share": 0.4244692740586641,
+      "chord_onset_share": 0.3896898286560322,
+      "simultaneous_note_share": 0.4244692740586641,
       "run_ratio": 0.3559003960908745,
       "onsets_per_s": 6.433706541285857
     },
@@ -14,7 +15,8 @@
       "notes": 191,
       "pitch_range": 44,
       "ioi_median_ms": 225.0,
-      "chord_onset_share": 0.3316291470822682,
+      "chord_onset_share": 0.3732542128385024,
+      "simultaneous_note_share": 0.3316291470822682,
       "run_ratio": 0.051666666666666666,
       "onsets_per_s": 4.103053757911789
     }

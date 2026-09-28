@@ -18,9 +18,22 @@ for p in (ROOT, ROOT / "music_transformer", ROOT / "music_transformer" / "third_
     sys.path.insert(0, str(p))
 
 
+def cluster_sizes(starts, window_s: float) -> list[int]:
+    """Notes per onset cluster, clustered like ``measure_run_density.cluster_onsets``
+    (a new cluster starts once a note is ``window_s`` or more after the cluster's first onset)."""
+    sizes, first = [], None
+    for s in sorted(starts):
+        if first is None or s - first >= window_s:
+            sizes.append(1)
+            first = s
+        else:
+            sizes[-1] += 1
+    return sizes
+
+
 def describe_tokens(tokens, train_sets: dict[str, set]) -> dict:
     from scripts.eval_mehldau_snapshots import copy_rate, free_generation_validity
-    from scripts.measure_run_density import cluster_onsets, run_stats
+    from scripts.measure_run_density import CLUSTER_S, cluster_onsets, run_stats
     from scripts.style_distance import tokens_to_notes
 
     v = free_generation_validity(tokens)
@@ -30,6 +43,7 @@ def describe_tokens(tokens, train_sets: dict[str, set]) -> dict:
     gaps = [b - a for a, b in zip(onsets, onsets[1:])]
     pitches = [n.pitch for n in notes]
     rs = run_stats(starts)
+    sizes = cluster_sizes(starts, CLUSTER_S)
     return {
         **v, "empty": len(notes) == 0,
         **{f"copy16_{k}": copy_rate(tokens, s, 16) for k, s in train_sets.items()},
@@ -37,7 +51,11 @@ def describe_tokens(tokens, train_sets: dict[str, set]) -> dict:
         "pitch_min": min(pitches) if pitches else None, "pitch_max": max(pitches) if pitches else None,
         "pitch_range": (max(pitches) - min(pitches)) if pitches else None,
         "ioi_median_ms": round(statistics.median(gaps) * 1000, 1) if gaps else None,
-        "chord_onset_share": (1 - len(onsets) / len(starts)) if starts else None,
+        # share of onset clusters holding 2+ notes (a chord onset)
+        "chord_onset_share": (sum(n >= 2 for n in sizes) / len(sizes)) if sizes else None,
+        # share of notes that join an earlier onset's cluster (was mislabelled
+        # chord_onset_share before the #1500 review)
+        "simultaneous_note_share": (1 - len(onsets) / len(starts)) if starts else None,
         "run_ratio": rs["run_ratio"], "onsets_per_s": rs["onsets_per_s"],
     }
 
@@ -65,7 +83,10 @@ def main(argv=None) -> int:
         path, update = rest.rsplit(":", 1)
         seqs = json.loads(Path(path).read_text())[update]
         rows = [describe_tokens(t, train_sets) for t in seqs]
-        numeric = [k for k in rows[0] if isinstance(rows[0][k], (int, float)) and not isinstance(rows[0][k], bool)]
+        # Keys from every row: an empty first sample (None stats) must not drop
+        # the statistics of the valid samples after it.
+        numeric = sorted({k for r in rows for k, v in r.items()
+                          if isinstance(v, (int, float)) and not isinstance(v, bool)})
         summary = {k: statistics.mean(r[k] for r in rows if r[k] is not None)
                    for k in numeric if any(r[k] is not None for r in rows)}
         summary["grammar_valid"] = sum(r["grammar_valid"] for r in rows)

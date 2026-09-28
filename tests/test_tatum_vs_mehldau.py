@@ -101,5 +101,46 @@ class CvSelectionRulesTest(unittest.TestCase):
         self.assertEqual(aggregate(folds, require_target_drop=True)["chosen"]["update"], 32)
 
 
+class ReviewFixesTest(unittest.TestCase):
+    """PR #1500 review: chord metric naming, empty first sample, missing budget."""
+
+    def test_chord_onset_share_counts_clusters(self) -> None:
+        from scripts.describe_generations import cluster_sizes, describe_tokens
+
+        self.assertEqual(cluster_sizes([0.0, 0.01, 0.02, 0.5, 1.0, 1.01], 0.03), [3, 1, 2])
+        vel, s20, s1 = 372, 256 + 20, 256 + 0   # time shift 256+k = (k+1) x 10 ms
+        # chord of 3 notes (10 ms apart, all within 30 ms), then 2 single notes
+        toks = [vel, 60, s1, 64, s1, 67, s20, 128 + 60, 128 + 64, 128 + 67,
+                vel, 72, s20, 128 + 72, vel, 74, s20, 128 + 74]
+        out = describe_tokens(toks, {})
+        self.assertAlmostEqual(out["chord_onset_share"], 1 / 3)          # 1 of 3 clusters
+        self.assertAlmostEqual(out["simultaneous_note_share"], 2 / 5)    # 2 of 5 notes joined
+
+    def test_empty_first_sample_keeps_later_statistics(self) -> None:
+        import json
+        import tempfile
+
+        from scripts.describe_generations import main
+
+        vel, s20 = 372, 256 + 20
+        good = [vel, 60, s20, 128 + 60, vel, 67, s20, 128 + 67]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            (tmp / "t.json").write_text(json.dumps({"5": [[s20, s20], good]}))
+            (tmp / "train").mkdir()
+            np.save(tmp / "train" / "a.npy", np.array(good))
+            main(["--model", f"m={tmp / 't.json'}:5", "--train-set", f"x={tmp / 'train'}",
+                  "--output", str(tmp / "o.json")])
+            summary = json.loads((tmp / "o.json").read_text())["models"]["m"]["summary"]
+        self.assertEqual(summary["empty"], 1)
+        self.assertEqual(summary["pitch_range"], 7)          # from the valid second sample
+        self.assertIn("ioi_median_ms", summary)
+
+    def test_pipeline_stops_when_a_budget_is_missing(self) -> None:
+        text = (ROOT / "scripts" / "run_tvm_pipeline.sh").read_text()
+        self.assertIn("ADAPTATION_FAILED", text)
+        self.assertLess(text.index("ADAPTATION_FAILED"), text.index("scripts/eval_cross_artist.py"))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -56,6 +56,11 @@ echo P2_DONE
 
 # P3 3x3
 BT=$(awk '$1=="tatum"{print $2}' "$O/chosen_budgets.txt"); BM=$(awk '$1=="mehldau"{print $2}' "$O/chosen_budgets.txt")
+if [ -z "$BT" ] || [ -z "$BM" ]; then
+  # A pre-registered adaptation failure: report it instead of reading a checkpoint that was never made.
+  echo "ADAPTATION_FAILED tatum='${BT}' mehldau='${BM}' -> 3x3/generation skipped" | tee "$O/adaptation_failed.txt"
+  exit 2
+fi
 "$PY" scripts/eval_cross_artist.py --model base="$BASE" \
   --model tatum_adapter="$O/export_tatum/checkpoint_update$BT.pt" \
   --model mehldau_adapter="$O/export_mehldau/checkpoint_update$BM.pt" \
