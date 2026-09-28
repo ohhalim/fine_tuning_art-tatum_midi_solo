@@ -21,6 +21,7 @@ class PresetTest(unittest.TestCase):
             self.assertEqual(c[c.index("--checkpoint") + 1], str(ROOT / CHECKPOINTS[preset]))
             self.assertNotIn("--swap-adapter", c)
             self.assertIn("--chord-primer", c)
+            self.assertIn("--half-bar-blocks", c)
 
     def test_swap_schedule_and_live_select(self) -> None:
         c = cmd("swap")

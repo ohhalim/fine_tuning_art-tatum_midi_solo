@@ -24,7 +24,8 @@ def switch_latencies(report: dict) -> list[dict]:
     """Bars from arrival to the first bar that plays the chosen adapter."""
     swap = report["adapter_swap"]
     per_bar = swap["per_bar"]
-    bar_ms = 240_000.0 / report["bpm"]
+    # A "bar" here is a scheduler block: half a bar with --half-bar-blocks.
+    bar_ms = 60_000.0 / report["bpm"] * report.get("block_beats", 4)
     rows = []
     for e in swap.get("control_events", []):
         arrived = math.floor(e["received_ms_from_start"] / bar_ms)

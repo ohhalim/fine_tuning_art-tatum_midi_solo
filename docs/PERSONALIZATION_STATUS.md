@@ -39,7 +39,8 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
   - 코드 primer, 마디당 2 sub-block
   - KV 캐시(#1507)
   - LoRA 병합(#1512, #1520)
-  - 늦은 fetch 50 ms(#1526), 생성 시작 예산 0.5마디(#1530)
+  - 늦은 fetch 50 ms(#1526), 생성 시작 예산 0.5블록(#1530)
+  - 프리셋 실행기는 반 마디 스케줄러 블록도 쓴다(#1532)
   - 스케줄러 spin 5 ms, QoS user-interactive
 
 ## 3. 실시간 성능 (가상 포트, M1 Max CPU)
@@ -49,7 +50,7 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
 | 성립 템포 | 두 모델 모두 128/160/200/240 BPM, 24/24회 fallback 0·미스 0. 생성 p95는 마디의 최대 29% | [FINAL_TEMPO](experiments/FINAL_TEMPO.md) |
 | Tatum 완성 생성 p50 | 690 ms(초기) → 625(KV 캐시) → **307 ms**(LoRA 병합) | [KV_CACHE](experiments/KV_CACHE.md), [LORA_MERGE](experiments/LORA_MERGE.md) |
 | 어댑터 스왑 | 같은 base 0.8 ms, 다른 base 2–20 ms. 스왑 세션 마디가 단독 세션과 48/48 동일 | [ADAPTER_SWAP](experiments/ADAPTER_SWAP.md) |
-| 입력 → 반영 (도착에서 반영 마디 시작까지, 128 BPM) | 약 7.5 s → 2.7 s(늦은 fetch) → **평균 1.8 s, 1.3–2.4 s**(생성 시작 예산 0.5마디) | [GENERATION_LEAD](experiments/GENERATION_LEAD.md), [START_BUDGET](experiments/START_BUDGET.md) |
+| 입력 → 반영 (도착에서 반영 블록 시작까지, 128 BPM, PC 기준) | 약 7.5 s → 2.7 s(늦은 fetch) → 1.8 s(시작 예산) → **평균 0.9 s, 0.5–1.3 s**(반 마디 블록, 프리셋 기본) | [GENERATION_LEAD](experiments/GENERATION_LEAD.md), [START_BUDGET](experiments/START_BUDGET.md), [HALF_BAR_BLOCKS](experiments/HALF_BAR_BLOCKS.md) |
 | 키보드 전환 | Program Change/CC, 모든 메시지 적용(9/9, 15/15), 적용까지 1–2마디 | [ADAPTER_LIVE_SELECT](experiments/ADAPTER_LIVE_SELECT.md), [START_BUDGET](experiments/START_BUDGET.md) |
 
 ## 4. 쇼케이스 MIDI
@@ -86,12 +87,12 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
 - **두 최선 모델의 base가 다르다.** 공통 base 멜다우는 절대 CE가 0.028 나빠(16/16곡) 통합하지 않았다([SHARED_BASE](experiments/SHARED_BASE.md)). 스왑 프리셋은 전체 모델을 복사한다
 - **멜다우는 자료 한계다.** 학습량을 64–384로 넓혀도 held-out 개선은 64–128에서 포화했다([FINAL_MEHLDAU](experiments/FINAL_MEHLDAU.md)). 16곡 중 15곡이 한 앨범이다
 - **화성 추종은 음표 기반 primer다.** 학습된 코드 조건이 아니다. 마디 간 문맥 연결은 3차례 모두 기준 미달이었다(경계는 매끄러워지지만 코드톤 비율이 −0.11 ~ −0.20). 시험을 닫았다([USAGE_PATH_16BAR](experiments/USAGE_PATH_16BAR.md) §6–8)
-- **입력 반영 지연이 평균 1.8초(128 BPM)다.** jam_bot 목표(반주 100 ms, 멜로디 조건 800 ms)와는 여전히 차원이 다르다. 마디 단위 블록 구조가 하한을 정한다
+- **입력 반영 지연은 프리셋 기준 평균 0.9초(128 BPM, PC 메시지)다.** jam_bot의 멜로디 조건 목표 800 ms에 가깝다. 반주 100 ms 목표와는 여전히 차원이 다르다. 연주 음 입력의 체감 지연은 재지 않았다
 - 이 세션에서 내가 낸 오류 두 건(모두 문서에 정정했다)
   1. LoRA 병합이 out_proj를 놓쳤다(#1520)
   2. 문맥 연결 3차 사전 등록이 실제 primer 길이를 확인하지 않았다(#1513)
 
 ## 7. 다음 후보 (각각 한 질문)
-1. 입력 반영을 마디 단위보다 작게: sub-block(반 마디) 단위로 스케줄러 블록을 쪼개기. 생성 시작 예산은 이미 적용했다(#1530)
+1. 실제 연주 음 입력으로 반영 지연 측정(현재는 PC 메시지로만 쟀다). 필요하면 더 작은 블록(1박)도 시험한다
 2. 실물 키보드 + DAW 부하에서 성립 템포와 전환 재측정
 3. 청취: 사용자가 원할 때만. 쇼케이스 세트가 준비돼 있다

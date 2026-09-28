@@ -221,6 +221,7 @@ flowchart LR
 - `--adapter-control program`(또는 `cc:N`)과 `--input-port`로 키보드 프리셋 버튼에서 어댑터를 고른다
 - 늦은 fetch(`--fetch-margin-ms 50`, 기본값)로 생성 선행을 3마디에서 1마디로 줄였다. 입력이 반영되기까지 4마디(약 7.5초)에서 2마디(약 2.3–3.7초, 128 BPM)가 됐다. 생성 내용은 240/240마디 동일하다
 - 생성 시작 예산(`--start-budget-bars auto` = 0.5마디, #1530)으로 입력 도착에서 반영 마디 시작까지 평균 2.7초에서 **1.8초**(1.3–2.4초)로 더 줄었다. 생성 내용은 288/288마디 동일하다
+- 반 마디 스케줄러 블록(`--half-bar-blocks`, #1532)으로 평균 **0.9초**(0.5–1.3초)가 됐다. 프리셋 실행기는 이 모드를 쓴다. 생성 내용은 288/288 단위 동일하다
 
 **최종 두 모델 템포 (#1523):** Tatum 완성과 멜다우 #1497 모두 128–240 BPM 24회에서 fallback 0, 미스 0이었다. 생성 p95는 마디의 최대 29%다.
 
@@ -333,7 +334,7 @@ uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo
 - [생성 지연 측정](docs/phase1/GENERATION_LATENCY.md) · [구간별 예산](docs/phase1/LATENCY_BUDGET.md)
 - [코드 primer 비교 실험](docs/experiments/CHORD_PRIMER_AB.md)
 - [멜다우 개인화 실험 (첫 시도)](docs/experiments/MEHLDAU_PERSONALIZATION.md)
-- [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Art Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md) · [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md) · [런타임 멈춤 원인](docs/experiments/RUNTIME_STALL_CAUSE.md) · [Tatum LoRA 타깃](docs/experiments/TATUM_LORA_TARGETS.md) · [seed 반복·멜다우 적용](docs/experiments/SEED_REPEAT_AND_MEHLDAU_APPLY.md) · [멜다우 개인화 완료](docs/experiments/MEHLDAU_CLEAN_BASE.md) · [Tatum vs 멜다우 비교](docs/experiments/TATUM_VS_MEHLDAU.md) · [16마디 실사용 점검](docs/experiments/USAGE_PATH_16BAR.md) · [KV 캐시](docs/experiments/KV_CACHE.md) · [Tatum 완성 모델](docs/experiments/FINAL_TATUM.md) · [LoRA 병합](docs/experiments/LORA_MERGE.md) · [멜다우 학습량 확장](docs/experiments/FINAL_MEHLDAU.md) · [공통 base 판정](docs/experiments/SHARED_BASE.md) · [어댑터 스왑](docs/experiments/ADAPTER_SWAP.md) · [최종 모델 템포](docs/experiments/FINAL_TEMPO.md) · [라이브 어댑터 선택](docs/experiments/ADAPTER_LIVE_SELECT.md) · [생성 선행 단축](docs/experiments/GENERATION_LEAD.md) · [생성 시작 예산](docs/experiments/START_BUDGET.md)
+- [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Art Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md) · [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md) · [런타임 멈춤 원인](docs/experiments/RUNTIME_STALL_CAUSE.md) · [Tatum LoRA 타깃](docs/experiments/TATUM_LORA_TARGETS.md) · [seed 반복·멜다우 적용](docs/experiments/SEED_REPEAT_AND_MEHLDAU_APPLY.md) · [멜다우 개인화 완료](docs/experiments/MEHLDAU_CLEAN_BASE.md) · [Tatum vs 멜다우 비교](docs/experiments/TATUM_VS_MEHLDAU.md) · [16마디 실사용 점검](docs/experiments/USAGE_PATH_16BAR.md) · [KV 캐시](docs/experiments/KV_CACHE.md) · [Tatum 완성 모델](docs/experiments/FINAL_TATUM.md) · [LoRA 병합](docs/experiments/LORA_MERGE.md) · [멜다우 학습량 확장](docs/experiments/FINAL_MEHLDAU.md) · [공통 base 판정](docs/experiments/SHARED_BASE.md) · [어댑터 스왑](docs/experiments/ADAPTER_SWAP.md) · [최종 모델 템포](docs/experiments/FINAL_TEMPO.md) · [라이브 어댑터 선택](docs/experiments/ADAPTER_LIVE_SELECT.md) · [생성 선행 단축](docs/experiments/GENERATION_LEAD.md) · [생성 시작 예산](docs/experiments/START_BUDGET.md) · [반 마디 블록](docs/experiments/HALF_BAR_BLOCKS.md)
 - [기존 D0–D4 연구 기록](docs/RESEARCH_SUMMARY.md)
 
 과거 Stage B 실험은 `archive/` 와 연구 문서에 보존합니다.
