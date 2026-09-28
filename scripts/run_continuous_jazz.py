@@ -226,7 +226,7 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
                 start_delay_seconds=2.5, spin_window_ms=5.0,
                 clock=None, clock_ns=None, wait_until=None,
                 deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE,
-                sub_builder=None):
+                sub_builder=None, fetch_margin_ms=None):
     """Play ``bars`` bars, producing one bar ahead.
 
     ``clock``/``clock_ns``/``wait_until`` exist so tests can drive the run off a
@@ -247,6 +247,9 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
         # bar 1 unable to begin until playback is already underway.
         bar_count=bars, fallback_blocks=fallbacks, clock=clock, input_buffer=input_buffer,
         max_lead_bars=2,
+        # With a late fetch, steady state builds only the next bar, from the
+        # newest input (docs/experiments/GENERATION_LEAD.md).
+        steady_lead_bars=1 if fetch_margin_ms is not None else None,
         build_block=_make_builder(clock=clock, duration=duration, generate=generate,
                                   sub_builder=sub_builder),
     )
@@ -254,7 +257,7 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
     # abort_on_first_miss to make timing failures loud; a live instrument wants
     # the miss recorded and the music continued.
     scheduler_kwargs = {"sink": port, "clock": clock, "spin_window_ms": spin_window_ms,
-                        "deadline_policy": deadline_policy}
+                        "deadline_policy": deadline_policy, "fetch_margin_ms": fetch_margin_ms}
     if clock_ns is not None:
         scheduler_kwargs["clock_ns"] = clock_ns
     if wait_until is not None:
@@ -538,6 +541,10 @@ def main(argv=None):
     parser.add_argument("--stall-trace", action="store_true",
                         help="record GC pauses and in-/out-of-process heartbeat gaps and "
                              "attribute dispatches >10 ms late (docs/experiments/RUNTIME_STALL_CAUSE.md)")
+    parser.add_argument("--fetch-margin-ms", type=float, default=None,
+                        help="ask the producer for each bar only this long before its downbeat "
+                             "and keep one bar of lead: input reaches the output about two bars "
+                             "sooner (docs/experiments/GENERATION_LEAD.md). Default: one bar ahead")
     parser.add_argument("--spin-window-ms", type=float, default=5.0,
                         help="scheduler busy-spin before each event. The wait before it "
                              "can oversleep by a few ms; a longer spin absorbs that but "
@@ -553,6 +560,8 @@ def main(argv=None):
         parser.error("require generation_tokens >= 1 and max_sequence >= generation_tokens")
     if not 0.0 <= args.spin_window_ms <= 50.0:
         parser.error("spin_window_ms must be between 0 and 50")
+    if args.fetch_margin_ms is not None and not 0.0 <= args.fetch_margin_ms <= 500.0:
+        parser.error("fetch_margin_ms must be between 0 and 500")
     if not 1 <= args.chord_blocks_per_bar <= 4:
         parser.error("chord_blocks_per_bar must be between 1 and 4")
     if args.context_carry_tokens < 0:
@@ -753,7 +762,7 @@ def main(argv=None):
                 result, producer = run_session(
                     port=port, bars=args.bars, bpm=args.bpm, chords=chords, seed=args.seed,
                     generate=generate, input_buffer=input_buffer, sub_builder=sub_builder,
-                    spin_window_ms=args.spin_window_ms,
+                    spin_window_ms=args.spin_window_ms, fetch_margin_ms=args.fetch_margin_ms,
                 )
             finally:
                 if tracer is not None:
@@ -796,6 +805,7 @@ def main(argv=None):
             report["chord_blocks_per_bar"] = args.chord_blocks_per_bar
             report["kv_cache"] = bool(args.kv_cache)
             report["merge_lora"] = bool(args.merge_lora)
+            report["fetch_margin_ms"] = args.fetch_margin_ms
             if not args.fallback_only and bank is not None:
                 swaps = sorted(bank.swap_ms)
                 report["adapter_swap"] = {
