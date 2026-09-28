@@ -44,3 +44,16 @@
 `docs/experiments/mehldau_clean_base/leak_check.json`
 - 새 base 학습셋 2,759곡(train 2,482 + val 277)과 멜다우 18곡의 교집합은 **0**이다. 원래 `jazz_full`에는 18곡이 모두 있었다
 - 무작위 초기화: `train_qlora.py --train_full_model`을 `--checkpoint` 없이 실행했다. 로그에 체크포인트 로드가 없고, epoch 1 train loss는 4.70이다(armB 최종값 3.29)
+
+## C0 결과 — 멜다우 제외 base, 게이트 통과
+`outputs/clean_base/nomehldau_full/checkpoint_epoch8.pt`(gitignore, 원본 armB 불변). 학습 8 epoch, 1,248 update, MPS 약 2시간. 최종 train 3.281 / val 3.187이고, armB는 3.285 / 3.193이다.
+같은 crop으로 쟀다(`docs/experiments/mehldau_clean_base/c0_gate.json`).
+
+| CE (LS 없음) | armB (멜다우 봄) | **새 base (멜다우 안 봄)** | 차이 |
+|---|---|---|---|
+| 일반 재즈 probe 100곡 | 2.5906 | 2.5992 | **+0.009** (게이트 +0.05 이내 → 통과) |
+| 멜다우 train 16곡 | 2.6386 | 2.6782 | +0.040 |
+| 멜다우 val 2곡 | 2.4408 | 2.4858 | +0.045 |
+
+- 멜다우 CE만 약 0.04 높다. 새 base가 멜다우를 보지 않았다는 방증이다
+- 이 0.04는 armB가 사전학습에서 멜다우 곡을 본 덕에 얻은 이득의 크기다. 이후 어댑터 효과를 해석할 때 기준으로 쓴다
