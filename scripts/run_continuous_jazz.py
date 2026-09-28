@@ -622,7 +622,7 @@ def main(argv=None):
                         help="record per-block metrics in the report (on by default); "
                              "--no-block-metrics turns the in-loop measurement off")
     parser.add_argument("--reserve-chord-tokens", action=argparse.BooleanOptionalAction,
-                        default=False,
+                        default=True,
                         help="with --chord-primer and live input: keep the full chord statement "
                              "right before generation and fill the rest of the 48-token primer "
                              "with the newest input (docs/experiments/RESERVE_CHORD_TOKENS.md)")

@@ -1,0 +1,66 @@
+{
+  "schema": "reserve_chord_v1",
+  "hits": 3,
+  "rows": [
+    {
+      "seed": 42,
+      "input_blocks": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "chord_tone_new": 0.554,
+      "chord_tone_old": 0.472,
+      "higher": true,
+      "notes_new": 74,
+      "notes_old": 72,
+      "no_input_identical": "25/25",
+      "fallback": 0,
+      "misses": 0
+    },
+    {
+      "seed": 43,
+      "input_blocks": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "chord_tone_new": 0.495,
+      "chord_tone_old": 0.453,
+      "higher": true,
+      "notes_new": 93,
+      "notes_old": 64,
+      "no_input_identical": "25/25",
+      "fallback": 0,
+      "misses": 0
+    },
+    {
+      "seed": 44,
+      "input_blocks": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "chord_tone_new": 0.613,
+      "chord_tone_old": 0.392,
+      "higher": true,
+      "notes_new": 62,
+      "notes_old": 51,
+      "no_input_identical": "25/25",
+      "fallback": 0,
+      "misses": 0
+    }
+  ]
+}

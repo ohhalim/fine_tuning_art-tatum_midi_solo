@@ -44,6 +44,7 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
   - LoRA 병합(#1512, #1520)
   - 늦은 fetch 50 ms(#1526), 생성 시작 예산 0.5블록(#1530)
   - 루프 안 블록 지표 기록(#1544, #1546)
+  - 입력이 있어도 코드 진술을 primer에 보존(#1553)
   - 스케줄러 spin 5 ms, QoS user-interactive
 
 ## 3. 실시간 성능 (가상 포트, M1 Max CPU)
@@ -56,7 +57,7 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
 | 입력 → 반영 (도착에서 반영 블록 시작까지, 128 BPM, PC 기준) | 약 7.5 s → 2.7 s(늦은 fetch) → 1.8 s(시작 예산) → **평균 0.9 s, 0.5–1.3 s**(반 마디 블록, 프리셋 기본) | [GENERATION_LEAD](experiments/GENERATION_LEAD.md), [START_BUDGET](experiments/START_BUDGET.md), [HALF_BAR_BLOCKS](experiments/HALF_BAR_BLOCKS.md) |
 | 키보드 음 입력 | 반 마디 블록에서 입력이 든 블록만 달라지고(입력 없는 블록은 26/26 동일) 4초 창이 지나면 원래대로 돌아온다. 최신 입력 → 블록 시작 0.52–0.55 s | [NOTE_INPUT_HALF_BAR](experiments/NOTE_INPUT_HALF_BAR.md) |
 | 입력 음역 따라가기 (탐색) | 높은/낮은 음역 구절을 입력하면 출력 평균 음높이가 6개 비교 중 5개에서 그 방향으로 이동(+2.8 ~ +8.1 / −1.5 ~ −8.2 반음) | [INPUT_REGISTER_FOLLOW](experiments/INPUT_REGISTER_FOLLOW.md) |
-| 입력 밀도 따라가기 (탐색) | 16분음표 16개 입력 시 출력 음 수가 3/3 seed에서 **줄었다**(−15 ~ −30%). 따라간다는 근거 없음. 오프라인 재구성에서 이때 **코드 진술이 primer에서 전부 잘려 나감**을 확인(#1553) | [INPUT_DENSITY_FOLLOW](experiments/INPUT_DENSITY_FOLLOW.md) |
+| 입력 밀도 따라가기 (탐색) | 16분음표 16개 입력 시 출력 음 수가 3/3 seed에서 **줄었다**(−15 ~ −30%). 따라간다는 근거 없음. 원인으로 코드 진술이 primer에서 잘려 나감을 확인했다. **코드 토큰 예약(#1553, 기본 on)**으로 입력 블록 코드톤 비율이 3/3 상승(0.39–0.47 → 0.50–0.61)했고 음 수도 회복됐다 | [INPUT_DENSITY_FOLLOW](experiments/INPUT_DENSITY_FOLLOW.md), [RESERVE_CHORD_TOKENS](experiments/RESERVE_CHORD_TOKENS.md) |
 | 루프 안 지표 | 블록마다 어댑터·음 수·음높이·코드톤·입력·보이싱 수·어댑터별 누적 고유 보이싱을 기록(`block_metrics`, 기본 on). 오프라인 계산과 일치(288/288, 96/96), 실시간 영향 없음 | [LIVE_METRICS](experiments/LIVE_METRICS.md), [LIVE_DIVERSITY](experiments/LIVE_DIVERSITY.md) |
 | CPU 부하 여유 (Tatum 완성, 반 마디 블록) | 바쁜 프로세스 2·4개: 128/240 BPM 성립. 8개(성능 코어 전부): 생성이 2.5–3배 느려짐. fallback은 고정 예산 22%, 적응형 4%, 예산 off 1.6% | [LOAD_MARGIN](experiments/LOAD_MARGIN.md), [ADAPTIVE_BUDGET](experiments/ADAPTIVE_BUDGET.md) |
 | 키보드 전환 | Program Change/CC, 모든 메시지 적용(9/9, 15/15, 15/15). 반 마디 블록에서 도착 → 적용 블록 시작 평균 0.9 s | [ADAPTER_LIVE_SELECT](experiments/ADAPTER_LIVE_SELECT.md), [HALF_BAR_BLOCKS](experiments/HALF_BAR_BLOCKS.md) |
@@ -108,6 +109,6 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
 
 ## 7. 다음 후보 (각각 한 질문)
 1. 실물 키보드 + DAW 부하에서 성립 템포·전환·입력 반영 재측정(지금까지는 가상 포트와 합성 부하만 썼다)
-2. **촘촘한 입력에서 코드 진술이 primer에서 잘려 나가는 문제**(#1553): 입력 음 16개면 코드 guide 음이 0/4만 남는다. 코드 토큰을 예약하는 처방을 사전 등록해 시험한다. 그 뒤에 동기 모방·화성 따라가기 지표를 더한다
+2. 입력 따라가기 지표 확장: 동기 모방, 화성, 다양한 입력 패턴(촘촘한 입력의 코드 진술 잘림은 #1553에서 고쳤다)
 3. 무거운 부하에서 fallback 0을 만드는 예산 규칙(적응형은 22% → 4%까지 줄였고 기준 3% 이하에는 미달)
 4. 청취: 사용자가 원할 때만. 쇼케이스 세트가 준비돼 있다
