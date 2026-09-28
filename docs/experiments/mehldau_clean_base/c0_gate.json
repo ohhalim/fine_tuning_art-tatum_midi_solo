@@ -1,0 +1,18 @@
+{
+  "schema": "base_ce_compare_v1",
+  "target_dir": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full",
+  "models": {
+    "armB": {
+      "checkpoint": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/outputs/d0_experiment/armB_full2777/ckpt/checkpoint_epoch8.pt",
+      "target_train": 2.638553209602833,
+      "target_val": 2.4407585660616555,
+      "generic_probe": 2.5905860022218357
+    },
+    "clean": {
+      "checkpoint": "outputs/clean_base/nomehldau_full/checkpoint_epoch8.pt",
+      "target_train": 2.6782418116927147,
+      "target_val": 2.4858144521713257,
+      "generic_probe": 2.5991976014700513
+    }
+  }
+}

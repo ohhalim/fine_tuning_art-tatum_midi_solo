@@ -1,0 +1,46 @@
+{
+  "schema": "mehldau_personalization_complete_v1",
+  "declaration": "likelihood-level Mehldau personalization complete; listening not done",
+  "musical_quality_verified": false,
+  "style_verified": false,
+  "listening_done": false,
+  "base": {
+    "checkpoint": "outputs/clean_base/nomehldau_full/checkpoint_epoch8.pt",
+    "leak_intersection": 0,
+    "random_init": true,
+    "c0_generic_diff_vs_armB": 0.00861159924821564
+  },
+  "adapter": {
+    "checkpoint": "outputs/clean_base/c2_export/checkpoint_update128.pt",
+    "lora_targets": [
+      "out_proj"
+    ],
+    "updates": 128,
+    "train_songs": 16
+  },
+  "criterion1_cv": {
+    "chosen_update": 128,
+    "mean_specialisation": -0.022267524904895808,
+    "mean_d_ce_heldout": -0.04598878132499562,
+    "mean_d_ce_generic": -0.023721256420099812,
+    "folds_negative": 4,
+    "met": true
+  },
+  "criterion2_reused_holdout_val2": {
+    "d_ce_val": -0.04672926664352417,
+    "specialisation": -0.02111436277115164,
+    "met": true
+  },
+  "criterion3": {
+    "grammar_valid": "4/4",
+    "copy16_max": 0,
+    "runtime128": {
+      "completed": 8,
+      "fallback": 0,
+      "misses": 0,
+      "gen_ms_p50": 435.3505
+    },
+    "met": true
+  },
+  "complete": true
+}

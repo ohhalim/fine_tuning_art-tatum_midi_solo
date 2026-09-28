@@ -129,5 +129,41 @@ class MehldauApplySelectTest(unittest.TestCase):
             select({"rows": [{"update": 8, "d_ce_target_val": -1, "d_ce_generic": 0.5}]})
 
 
+class SongCvTest(unittest.TestCase):
+    def test_fold_assignment_is_balanced_and_deterministic(self) -> None:
+        from scripts.make_song_folds import fold_assignment
+
+        names = [f"{i:05d}.npy" for i in range(16)]
+        a = fold_assignment(names, 4, 0)
+        self.assertEqual(a, fold_assignment(list(reversed(names)), 4, 0))
+        self.assertEqual(sorted(list(a.values()).count(k) for k in range(4)), [4, 4, 4, 4])
+
+    def test_budget_choice_and_criterion(self) -> None:
+        from scripts.aggregate_song_cv import aggregate
+
+        def rep(spec32, gen32, spec64, gen64):
+            return {"rows": [{"update": 0, "specialisation_val": 0, "d_ce_target_val": 0, "d_ce_generic": 0},
+                             {"update": 32, "specialisation_val": spec32, "d_ce_target_val": spec32,
+                              "d_ce_generic": gen32},
+                             {"update": 64, "specialisation_val": spec64, "d_ce_target_val": spec64,
+                              "d_ce_generic": gen64}]}
+        folds = [rep(-0.03, 0.0, -0.05, 0.03)] * 3 + [rep(0.01, 0.0, -0.05, 0.03)]
+        out = aggregate(folds)
+        self.assertEqual(out["chosen"]["update"], 32)       # 64 fails the generic limit
+        self.assertAlmostEqual(out["chosen"]["mean_specialisation"], -0.02)
+        self.assertTrue(out["criterion1_met"])              # 3 of 4 folds negative
+
+    def test_criterion_needs_target_ce_drop(self) -> None:
+        from scripts.aggregate_song_cv import aggregate
+
+        # specialisation -0.03 only because generic CE rose; held-out CE got worse
+        rows = [{"update": 0, "specialisation_val": 0, "d_ce_target_val": 0, "d_ce_generic": 0},
+                {"update": 32, "specialisation_val": -0.03, "d_ce_target_val": 0.005,
+                 "d_ce_generic": 0.015}]
+        out = aggregate([{"rows": rows}] * 4)
+        self.assertEqual(out["chosen"]["update"], 32)
+        self.assertFalse(out["criterion1_met"])
+
+
 if __name__ == "__main__":
     unittest.main()

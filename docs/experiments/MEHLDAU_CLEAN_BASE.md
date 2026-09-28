@@ -1,0 +1,115 @@
+# 멜다우 개인화 완료 — 멜다우 제외 base + 곡 단위 CV (사전 등록)
+
+작성 2026-09-28. 이슈 #1497, 브랜치 `exp/issue-1497-mehldau-clean-base`.
+사용자 지시: 청취 없이 자율 진행, 판단은 아스트라와, 목표는 "개인화 완료".
+
+`musical_quality_verified: false` · `style_verified: false` · 청취 없음
+
+**이 절은 실행 전에 작성했다.**
+
+## 왜 필요한가
+지금까지의 멜다우 수치는 모두 **base(armB)가 멜다우 18곡을 이미 본 상태**에서 쟀다. "처음 보는 멜다우 곡에서도 멜다우 쪽으로 예측하는가"는 한 번도 재지 못했다. 멜다우를 뺀 base를 다시 만들어 이 한계를 없앤다.
+
+## C0 — 멜다우 제외 base
+- 데이터: `data/jazz_full`(train 2,499 / val 278)에서 멜다우 18곡(토큰 해시 일치: train 17, val 1)을 뺀다 → `data/jazz_full_nomehldau`
+- 학습: **armB 레시피 그대로**. 무작위 초기화, `--train_full_model`, 8 epoch, batch 4, accumulation 4, lr 3e-4, LS 0.1, seed 42, max_seq 1024. armB와 같게 하려고 `--scheduler_steps legacy_batches --val_crop_seed -1`을 쓴다. MPS, 새 출력 디렉터리(원본 불변)
+- **게이트:** 일반 probe 100곡(V1, 멜다우 제외) CE가 armB 대비 +0.05 이내. 벗어나면 이후 결과를 "base 품질 차이"로 기록하고 해석을 제한한다
+- 확인: 새 base의 멜다우 CE가 armB보다 높아야 한다(멜다우를 보지 않았다는 방증)
+
+## C1 — 곡 단위 CV로 예산 선택
+- 새 base에 out_proj LoRA(r16, lr 3e-4, batch 4, accumulation 4, LS 0.1)를 붙인다. 멜다우 16곡에서는 QKV가 과적합함을 M-A1에서 확인했으므로 쓰지 않는다
+- `data/mehldau_full/train` 16곡을 곡 단위 4-fold로 나눈다(fold당 held-out 4곡, 학습 12곡, seed 0). 원래 val 2곡은 **C1에 쓰지 않는다**
+- fold마다 update 16 / 32 / 64 / 128 snapshot을 평가한다
+  - 특화도 = ΔCE_held-out 멜다우 − ΔCE_일반
+  - 기준점은 update 0(새 base + 0 delta)이다
+- **예산 선택:** fold 평균 ΔCE_일반 ≤ +0.02인 update 중 fold 평균 특화도가 가장 낮은 것
+
+## C2 — 최종 어댑터와 완료 판정
+- 학습: 새 base + out_proj, 16곡 전부, C1에서 고른 예산(같은 cosine 길이)
+- **완료 기준(모두 충족해야 "가능도 수준 개인화 완료"):**
+  1. C1 선택 예산에서 CV 평균 특화도 ≤ −0.02, 평균 ΔCE_일반 ≤ +0.02, 4 fold 중 3개 이상에서 특화도 < 0
+  2. 선택에 쓰지 않은 **원래 val 2곡**(base·어댑터·선택 모두 미사용)에서 특화도 ≤ −0.01
+  3. 생성 문법 유효성 100%(seed 1–4, 768토큰), 16-gram 복사(멜다우 train 대비) ≤ 0.10, 128 BPM 런타임 8/8·fallback 0
+- 충족하면 체크포인트, 비교 MIDI, 리포트, README를 반영하고 **"가능도 수준 개인화 완료, 청취 미검증"**으로 선언한다
+- 미충족이면 실패로 기록한다. 멜다우 후보는 기존 armB 위 out_proj u64를 유지하고 원인을 기록한다
+
+## 판정 보완 (아스트라·사용자 승인, 2026-09-28, C1 결과 전 추가)
+1. **대상 CE 자체의 감소를 필수로 한다.** 특화도만으로는 통과할 수 없다
+   - C1: 선택된 예산에서 fold 평균 ΔCE_held-out < 0
+   - C2: 원래 val 2곡에서 ΔCE_val < 0
+2. **원래 val 2곡은 "재사용 holdout"이다.** 이전 실험(V2, M-A1)의 snapshot 선정에 이미 쓰였다. 새 base와 새 어댑터, C1 예산 선택에는 쓰이지 않지만 완전히 새로운 검증셋은 아니다
+3. **누출 배제는 두 가지로 확인한다:** 새 base 학습셋과 멜다우 곡의 토큰 해시 교집합 0, base의 무작위 초기화
+
+### 누출 배제 확인 (C0 학습 중 측정)
+`docs/experiments/mehldau_clean_base/leak_check.json`
+- 새 base 학습셋 2,759곡(train 2,482 + val 277)과 멜다우 18곡의 교집합은 **0**이다. 원래 `jazz_full`에는 18곡이 모두 있었다
+- 무작위 초기화: `train_qlora.py --train_full_model`을 `--checkpoint` 없이 실행했다. 로그에 체크포인트 로드가 없고, epoch 1 train loss는 4.70이다(armB 최종값 3.29)
+
+## C0 결과 — 멜다우 제외 base, 게이트 통과
+`outputs/clean_base/nomehldau_full/checkpoint_epoch8.pt`(gitignore, 원본 armB 불변). 학습 8 epoch, 1,248 update, MPS 약 2시간. 최종 train 3.281 / val 3.187이고, armB는 3.285 / 3.193이다.
+같은 crop으로 쟀다(`docs/experiments/mehldau_clean_base/c0_gate.json`).
+
+| CE (LS 없음) | armB (멜다우 봄) | **새 base (멜다우 안 봄)** | 차이 |
+|---|---|---|---|
+| 일반 재즈 probe 100곡 | 2.5906 | 2.5992 | **+0.009** (게이트 +0.05 이내 → 통과) |
+| 멜다우 train 16곡 | 2.6386 | 2.6782 | +0.040 |
+| 멜다우 val 2곡 | 2.4408 | 2.4858 | +0.045 |
+
+- 멜다우 CE만 약 0.04 높다. 새 base가 멜다우를 보지 않았다는 방증이다
+- 이 0.04는 armB가 사전학습에서 멜다우 곡을 본 덕에 얻은 이득의 크기다. 이후 어댑터 효과를 해석할 때 기준으로 쓴다
+
+## C1 결과 — 미학습 멜다우 곡으로 특화, 완료 기준 1 충족
+새 base에 out_proj LoRA를 붙였다. 16곡을 4-fold(held-out 4곡)로 나눴고, cosine 128이다. 집계는 `docs/experiments/mehldau_clean_base/c1_cv.json`에 있다.
+
+| update | fold 평균 ΔCE held-out | ΔCE 일반 | **특화도** | fold별 특화도 (0/1/2/3) | 음수 fold |
+|---|---|---|---|---|---|
+| 16 | −0.029 | −0.021 | −0.008 | −0.014 / −0.007 / −0.007 / −0.006 | 4/4 |
+| 32 | −0.039 | −0.026 | −0.014 | −0.022 / −0.012 / −0.011 / −0.010 | 4/4 |
+| 64 | −0.044 | −0.025 | −0.020 | −0.027 / −0.019 / −0.017 / −0.015 | 4/4 |
+| **128** | **−0.046** | **−0.024** | **−0.022** | −0.030 / −0.022 / −0.020 / −0.017 | **4/4** |
+
+- **예산 선택(사전 규칙):** 일반 ≤ +0.02를 만족하는 update(전부) 중 특화도가 최저인 **128**
+- **기준 1:** 특화도 −0.022 ≤ −0.02 ✓, held-out CE 자체 −0.046 < 0 ✓, 음수 fold 4/4 ✓, 일반 −0.024 ≤ +0.02 ✓ → **충족**
+- 해석
+  - base가 한 번도 보지 않은 멜다우 곡의 CE가 **모든 fold에서** 내려갔다. 이것이 이 과제에서 "처음 보는 멜다우 곡에 대한 적응"을 보인 첫 증거다
+  - held-out 이득(−0.046)은 armB가 사전학습으로 멜다우를 본 덕에 얻은 이득(약 0.04)과 비슷한 크기다
+- 주의
+  - 일반 재즈 CE도 −0.024 내려갔다. 이득의 절반 이상은 "재즈 전반"에 대한 적응이고, 멜다우 고유분(특화도)은 −0.022다
+  - 특화도는 기준을 겨우 넘었다
+  - 128은 시험 범위의 끝값이라 더 긴 예산이 더 나을 수 있다(결과를 본 뒤 예산을 늘리지는 않는다)
+
+## C2 결과 — 완료 기준 전부 충족 → **가능도 수준 멜다우 개인화 완료 (청취 미검증)**
+최종 어댑터는 새 base(멜다우 미학습)에 out_proj LoRA를 붙여 멜다우 train 16곡으로 **128 update** 학습했다(cosine 128, seed 42).
+판정 리포트: `docs/experiments/mehldau_clean_base/personalization_report.json`
+
+| 기준 | 값 | 판정 |
+|---|---|---|
+| 1. CV(미학습 곡, 4-fold) | 특화도 −0.022, held-out CE −0.046, 일반 −0.024, 음수 fold 4/4 | ✓ |
+| 2. 원래 val 2곡(재사용 holdout: 새 base·어댑터·예산 선택에 미사용) | **ΔCE_val −0.047**(< 0), **특화도 −0.021**(≤ −0.01), 일반 −0.026 | ✓ |
+| 3. 생성 문법 유효성 (seed 1–4, 768토큰) | 4/4 | ✓ |
+| 3. 16-gram 복사 (멜다우 train 대비) | 최대 0(8-gram도 0) | ✓ |
+| 3. 런타임 128 BPM 8마디 | 8/8, fallback 0, 미스 0, 생성 p50 435 ms | ✓ |
+
+재로드 검증: 내보낸 체크포인트를 `load_model_with_lora`로 다시 불러오면 logits가 동일하다.
+
+### 쓰는 법
+```sh
+FORCE_CPU=1 .venv/bin/python scripts/run_continuous_jazz.py \
+    --checkpoint outputs/clean_base/c2_export/checkpoint_update128.pt \
+    --conditioning-midi <primer.mid> --bars 8 --bpm 128 --capture \
+    --chord-primer --chord-blocks-per-bar 2 --output-dir outputs/continuous/mehldau
+```
+- 체크포인트(gitignore): `outputs/clean_base/c2_export/checkpoint_update128.pt`
+- 비교 MIDI 10개(`outputs/clean_base/compare_midi/`)
+  - `clean_base_seed{1-4}.mid` vs `mehldau_personalized_seed{1-4}.mid`: 같은 primer·seed끼리 비교
+  - `runtime128_{clean_base,mehldau_personalized}.mid`: 실시간 경로에서 재생된 8마디
+
+### 이 "완료"가 뜻하는 것과 뜻하지 않는 것
+- **뜻하는 것:** 멜다우를 한 번도 보지 않은 모델이 멜다우 16곡으로 적응한 뒤, **처음 보는 멜다우 곡**을 더 잘 예측한다. 그 이득 중 재즈 전반 적응을 뺀 멜다우 고유분이 −0.02 수준이고, 곡을 복사하지 않으며, 실시간으로 동작한다
+- **뜻하지 않는 것:** "멜다우처럼 들린다"(청취 없음), 음악적 품질(`musical_quality_verified: false`, `style_verified: false`)
+- 한계
+  - 멜다우 학습 데이터는 16곡이다
+  - val 2곡은 재사용 holdout이다
+  - 멜다우 스타일을 가르는 생성 지표는 V1/V1b에서 타당성 기준에 미달했다
+  - 128은 시험 범위의 끝값이다
+- 이전 후보(armB + out_proj u64)와의 차이: armB는 멜다우를 이미 봐서 미학습 곡 효과를 잴 수 없었다. 새 후보는 그 측정이 가능한 구성이다
