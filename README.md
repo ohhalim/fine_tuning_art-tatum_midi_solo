@@ -34,6 +34,8 @@
 핵심은 **"재생하면서 다음 것을 만든다"** 입니다. 마디가 끝나고 생각하기 시작하면
 이미 늦습니다.
 
+> **개인화 현황 한 장 요약:** [docs/PERSONALIZATION_STATUS.md](docs/PERSONALIZATION_STATUS.md). 바로 연주: `python scripts/play_personalized.py --preset tatum|mehldau|swap`
+
 최종 목표는 여기에 **연주자 스타일 적응**을 얹는 것입니다. 멜다우는 **가능도 수준 개인화 완료**(멜다우를 한 번도 안 본 base에서 처음 보는 멜다우 곡 예측이 개선, 청취 미검증, #1497). 멜다우·Art Tatum으로
 시험한 결과, 어댑터는 모델 수치상 대상 스타일로 특화됩니다(Tatum은 학습하지 않은 곡까지).
 다만 귀로 들리는 차이는 아직 확인하지 못했습니다(§5).
