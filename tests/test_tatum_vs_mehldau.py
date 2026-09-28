@@ -258,5 +258,27 @@ class PlayedBarsAnalysisTest(unittest.TestCase):
         self.assertAlmostEqual(out["cross_bar_4gram_reuse_mean"], (1.0 + 0.0) / 2)
 
 
+class SelectByValTest(unittest.TestCase):
+    def test_lowest_val_within_generic_limit(self) -> None:
+        from scripts.select_by_val import choose
+
+        rows = [{"update": 0, "d_ce_target_val": 0.0, "d_ce_generic": 0.0},
+                {"update": 70, "d_ce_target_val": -0.03, "d_ce_generic": -0.01},
+                {"update": 259, "d_ce_target_val": -0.06, "d_ce_generic": 0.03},
+                {"update": 133, "d_ce_target_val": -0.05, "d_ce_generic": 0.01}]
+        self.assertEqual(choose({"rows": rows})["update"], 133)
+        self.assertIsNone(choose({"rows": rows[:1]}))
+
+
+class ChordToneRatioTest(unittest.TestCase):
+    def test_cycles_chords_per_bar(self) -> None:
+        from scripts.analyze_played_bars import chord_tone_ratio
+
+        bars = [{"bar": 0, "notes": [[62, 0, .1], [65, .1, .2], [61, .2, .3]]},   # Dm7: D F in, C# out
+                {"bar": 1, "notes": [[67, 0, .1], [71, .1, .2]]}]                 # G7: G B in
+        self.assertAlmostEqual(chord_tone_ratio(bars, ["Dm7", "G7"]), 4 / 5)
+        self.assertIsNone(chord_tone_ratio([{"bar": 0, "notes": []}], ["C"]))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -719,6 +719,7 @@ def main(argv=None):
             report["chord_primer_enabled"] = bool(args.chord_primer)
             report["chord_blocks_per_bar"] = args.chord_blocks_per_bar
             report["kv_cache"] = bool(args.kv_cache)
+            report["chords"] = chords
             report["context_carry_tokens"] = args.context_carry_tokens
             report["context_carry_position"] = args.context_carry_position
             report["chord_primer_bar_count"] = sum(1 for x in chord_primer_bars if x)
