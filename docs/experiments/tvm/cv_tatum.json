@@ -1,0 +1,81 @@
+{
+  "schema": "song_cv_v1",
+  "generic_limit": 0.02,
+  "spec_target": -0.02,
+  "require_target_drop": true,
+  "tie_tolerance": 0.001,
+  "fold_reports": [
+    "outputs/tvm/cv_eval_tatum_fold0/report.json",
+    "outputs/tvm/cv_eval_tatum_fold1/report.json",
+    "outputs/tvm/cv_eval_tatum_fold2/report.json",
+    "outputs/tvm/cv_eval_tatum_fold3/report.json"
+  ],
+  "table": [
+    {
+      "update": 16,
+      "mean_specialisation": -0.019952027705881226,
+      "mean_d_ce_heldout": -0.038008767151356926,
+      "mean_d_ce_generic": -0.0180567394454757,
+      "folds_negative": 4,
+      "per_fold": [
+        -0.013696126712361423,
+        -0.02162395772144432,
+        -0.019096346245220275,
+        -0.025391680144498885
+      ]
+    },
+    {
+      "update": 32,
+      "mean_specialisation": -0.028787962489628782,
+      "mean_d_ce_heldout": -0.04900663660927884,
+      "mean_d_ce_generic": -0.02021867411965006,
+      "folds_negative": 4,
+      "per_fold": [
+        -0.020635681223993174,
+        -0.03024636408367387,
+        -0.027752355763095427,
+        -0.03651744888775266
+      ]
+    },
+    {
+      "update": 64,
+      "mean_specialisation": -0.036964799156284034,
+      "mean_d_ce_heldout": -0.058856934775055936,
+      "mean_d_ce_generic": -0.021892135618771902,
+      "folds_negative": 4,
+      "per_fold": [
+        -0.02814384273742121,
+        -0.03872279976231008,
+        -0.03703185697550637,
+        -0.043960697149898476
+      ]
+    },
+    {
+      "update": 128,
+      "mean_specialisation": -0.04131918446609473,
+      "mean_d_ce_heldout": -0.06229818074317428,
+      "mean_d_ce_generic": -0.020978996277079554,
+      "folds_negative": 4,
+      "per_fold": [
+        -0.032029440897114014,
+        -0.043327748848285275,
+        -0.04125159953820745,
+        -0.04866794858077217
+      ]
+    }
+  ],
+  "chosen": {
+    "update": 128,
+    "mean_specialisation": -0.04131918446609473,
+    "mean_d_ce_heldout": -0.06229818074317428,
+    "mean_d_ce_generic": -0.020978996277079554,
+    "folds_negative": 4,
+    "per_fold": [
+      -0.032029440897114014,
+      -0.043327748848285275,
+      -0.04125159953820745,
+      -0.04866794858077217
+    ]
+  },
+  "criterion1_met": true
+}

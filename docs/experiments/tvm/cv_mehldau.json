@@ -1,0 +1,81 @@
+{
+  "schema": "song_cv_v1",
+  "generic_limit": 0.02,
+  "spec_target": -0.02,
+  "require_target_drop": true,
+  "tie_tolerance": 0.001,
+  "fold_reports": [
+    "outputs/tvm/cv_eval_mehldau_fold0/report.json",
+    "outputs/tvm/cv_eval_mehldau_fold1/report.json",
+    "outputs/tvm/cv_eval_mehldau_fold2/report.json",
+    "outputs/tvm/cv_eval_mehldau_fold3/report.json"
+  ],
+  "table": [
+    {
+      "update": 16,
+      "mean_specialisation": -0.009831124016933313,
+      "mean_d_ce_heldout": -0.02762470551606422,
+      "mean_d_ce_generic": -0.017793581499130906,
+      "folds_negative": 4,
+      "per_fold": [
+        -0.00992182367237282,
+        -0.01096375344800471,
+        -0.013432205111557405,
+        -0.005006713835798315
+      ]
+    },
+    {
+      "update": 32,
+      "mean_specialisation": -0.015854242868649338,
+      "mean_d_ce_heldout": -0.034953118011341155,
+      "mean_d_ce_generic": -0.019098875142691818,
+      "folds_negative": 4,
+      "per_fold": [
+        -0.015408742177196011,
+        -0.01936817401043367,
+        -0.019098921769594046,
+        -0.009541133517373623
+      ]
+    },
+    {
+      "update": 64,
+      "mean_specialisation": -0.02374409200340355,
+      "mean_d_ce_heldout": -0.040184077524912265,
+      "mean_d_ce_generic": -0.016439985521508715,
+      "folds_negative": 4,
+      "per_fold": [
+        -0.023635479162417372,
+        -0.028836189056897332,
+        -0.02696607496174419,
+        -0.015538624832555303
+      ]
+    },
+    {
+      "update": 128,
+      "mean_specialisation": -0.026590687624911125,
+      "mean_d_ce_heldout": -0.041300469394096484,
+      "mean_d_ce_generic": -0.01470978176918536,
+      "folds_negative": 4,
+      "per_fold": [
+        -0.026358330676533814,
+        -0.032210758760580216,
+        -0.030128892866573942,
+        -0.017664768195956526
+      ]
+    }
+  ],
+  "chosen": {
+    "update": 128,
+    "mean_specialisation": -0.026590687624911125,
+    "mean_d_ce_heldout": -0.041300469394096484,
+    "mean_d_ce_generic": -0.01470978176918536,
+    "folds_negative": 4,
+    "per_fold": [
+      -0.026358330676533814,
+      -0.032210758760580216,
+      -0.030128892866573942,
+      -0.017664768195956526
+    ]
+  },
+  "criterion1_met": true
+}
