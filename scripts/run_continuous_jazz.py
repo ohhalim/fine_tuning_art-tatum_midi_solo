@@ -828,7 +828,10 @@ def main(argv=None):
             # later sub-block would be conditioning on input it already used.
             # A half-bar block has its own, newer snapshot, so it folds its input in.
             played = input_events_to_notes(input_events) if fresh_block else []
-            if args.reserve_chord_tokens and played:
+            merged = sorted(notes + played, key=lambda note: (note.start, note.pitch))
+            # Reserve only when the 48-token cut would drop the chord statement;
+            # below that the time-merged primer keeps both (#1553 re-measure).
+            if args.reserve_chord_tokens and played and len(encode_notes_simple(merged)) > 48:
                 # Dense input used to push the chord statement out of the 48-token
                 # window (docs/experiments/RESERVE_CHORD_TOKENS.md): keep the whole
                 # chord statement next to generation and give the input what is left.

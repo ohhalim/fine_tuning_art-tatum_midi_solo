@@ -1,0 +1,73 @@
+{
+  "schema": "register_follow_v2",
+  "after": "#1553",
+  "hits": 2,
+  "rows": [
+    {
+      "register": "high",
+      "seed": 42,
+      "shift": -2.01,
+      "expected": false,
+      "out_max": 98,
+      "base_max": 91,
+      "chord_tone_input_blocks": 0.493,
+      "fallback": 0,
+      "misses": 0
+    },
+    {
+      "register": "high",
+      "seed": 43,
+      "shift": 1.06,
+      "expected": true,
+      "out_max": 92,
+      "base_max": 84,
+      "chord_tone_input_blocks": 0.539,
+      "fallback": 0,
+      "misses": 0
+    },
+    {
+      "register": "high",
+      "seed": 44,
+      "shift": -0.67,
+      "expected": false,
+      "out_max": 83,
+      "base_max": 81,
+      "chord_tone_input_blocks": 0.565,
+      "fallback": 0,
+      "misses": 0
+    },
+    {
+      "register": "low",
+      "seed": 42,
+      "shift": -5.85,
+      "expected": true,
+      "out_max": 75,
+      "base_max": 91,
+      "chord_tone_input_blocks": 0.508,
+      "fallback": 0,
+      "misses": 0
+    },
+    {
+      "register": "low",
+      "seed": 43,
+      "shift": 3.32,
+      "expected": false,
+      "out_max": 83,
+      "base_max": 84,
+      "chord_tone_input_blocks": 0.514,
+      "fallback": 0,
+      "misses": 0
+    },
+    {
+      "register": "low",
+      "seed": 44,
+      "shift": 0.2,
+      "expected": false,
+      "out_max": 81,
+      "base_max": 81,
+      "chord_tone_input_blocks": 0.585,
+      "fallback": 0,
+      "misses": 0
+    }
+  ]
+}
