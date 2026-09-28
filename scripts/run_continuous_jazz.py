@@ -227,7 +227,7 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
                 clock=None, clock_ns=None, wait_until=None,
                 deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE,
                 sub_builder=None, fetch_margin_ms=None, start_budget_bars=None,
-                beats_per_block=BEATS_PER_BAR):
+                beats_per_block=BEATS_PER_BAR, adaptive_start_safety=None):
     """Play ``bars`` bars, producing one bar ahead.
 
     ``clock``/``clock_ns``/``wait_until`` exist so tests can drive the run off a
@@ -242,6 +242,22 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
     fallbacks = build_fallback_blocks(
         clock=clock, bars=bars, bpm=bpm, chords=chords, seed=seed, duration=duration
     )
+    def start_not_before(block_index):
+        """Latest start that still leaves the budget before the block's fetch.
+
+        With ``adaptive_start_safety`` the budget grows to safety x the slowest
+        of the last four generations whenever that exceeds the fixed fraction,
+        so a loaded machine starts earlier instead of missing the fetch
+        (docs/experiments/ADAPTIVE_BUDGET.md)."""
+        budget = start_budget_bars * clock.bar_duration_ns
+        if adaptive_start_safety:
+            recent = [r.completed_ns - r.requested_ns for r in producer.records
+                      if r.requested_ns is not None and r.completed_ns is not None][-4:]
+            if recent:
+                budget = max(budget, adaptive_start_safety * max(recent))
+        budget = min(budget, clock.bar_duration_ns)
+        return clock.bar_start_ns(block_index) - round(fetch_margin_ms * 1e6) - round(budget)
+
     producer = BarBlockProducer(
         # Lead of 2, not 1. The scheduler asks for bar 1 at bar 0's downbeat,
         # and the watermark only advances once it starts, so a lead of 1 leaves
@@ -255,8 +271,7 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
         # `start_budget_bars` before its fetch (docs/experiments/START_BUDGET.md).
         start_not_before_ns=(
             None if start_budget_bars is None or fetch_margin_ms is None
-            else (lambda b: clock.bar_start_ns(b) - round(fetch_margin_ms * 1e6)
-                  - round(start_budget_bars * clock.bar_duration_ns))),
+            else lambda b: start_not_before(b)),
         build_block=_make_builder(clock=clock, duration=duration, generate=generate,
                                   sub_builder=sub_builder),
     )
@@ -577,6 +592,10 @@ def main(argv=None):
                              "a bar before it is fetched, so it hears more recent input "
                              "(docs/experiments/START_BUDGET.md). 'auto' = 0.5 with late fetch, "
                              "nothing without it; 'off' starts right after the previous fetch")
+    parser.add_argument("--adaptive-start-safety", default="off",
+                        help="with a start budget: widen it to this multiple of the slowest of "
+                             "the last four generations when that is larger, e.g. 1.5 "
+                             "(docs/experiments/ADAPTIVE_BUDGET.md); 'off' keeps it fixed")
     parser.add_argument("--spin-window-ms", type=float, default=5.0,
                         help="scheduler busy-spin before each event. The wait before it "
                              "can oversleep by a few ms; a longer spin absorbs that but "
@@ -594,6 +613,16 @@ def main(argv=None):
         parser.error("spin_window_ms must be between 0 and 50")
     if args.fetch_margin_ms is not None and not 0.0 <= args.fetch_margin_ms <= 500.0:
         parser.error("fetch_margin_ms must be between 0 and 500")
+    safety = str(args.adaptive_start_safety).lower()
+    if safety in ("off", "none"):
+        args.adaptive_start_safety = None
+    else:
+        try:
+            args.adaptive_start_safety = float(safety)
+        except ValueError:
+            parser.error("--adaptive-start-safety takes off or a number")
+        if not 1.0 <= args.adaptive_start_safety <= 4.0:
+            parser.error("adaptive_start_safety must be between 1 and 4")
     budget = str(args.start_budget_bars).lower()
     if budget == "auto":
         args.start_budget_bars = 0.5 if args.fetch_margin_ms is not None else None
@@ -835,6 +864,7 @@ def main(argv=None):
                     generate=generate, input_buffer=input_buffer, sub_builder=sub_builder,
                     spin_window_ms=args.spin_window_ms, fetch_margin_ms=args.fetch_margin_ms,
                     start_budget_bars=args.start_budget_bars,
+                    adaptive_start_safety=args.adaptive_start_safety,
                 )
             finally:
                 if tracer is not None:
@@ -884,6 +914,7 @@ def main(argv=None):
             report["merge_lora"] = bool(args.merge_lora)
             report["fetch_margin_ms"] = args.fetch_margin_ms
             report["start_budget_bars"] = args.start_budget_bars
+            report["adaptive_start_safety"] = args.adaptive_start_safety
             if not args.fallback_only and bank is not None:
                 swaps = sorted(bank.swap_ms)
                 report["adapter_swap"] = {

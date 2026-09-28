@@ -1,0 +1,142 @@
+{
+  "schema": "live_select_probe_v1",
+  "command": [
+    "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/.venv/bin/python",
+    "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/scripts/run_continuous_jazz.py",
+    "--checkpoint",
+    "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/outputs/final_tatum/export/checkpoint_update518.pt",
+    "--adapter-name",
+    "tatum",
+    "--swap-adapter",
+    "mehldau=/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/outputs/tvm/export_mehldau/checkpoint_update128.pt",
+    "--conditioning-midi",
+    "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/outputs/chord_ab/ii_V_I.mid",
+    "--chord-primer",
+    "--chord-blocks-per-bar",
+    "2",
+    "--chords",
+    "Dm7,G7,Cmaj7,A7",
+    "--bars",
+    "16",
+    "--bpm",
+    "128",
+    "--seed",
+    "44",
+    "--capture",
+    "--half-bar-blocks",
+    "--adaptive-start-safety",
+    "1.5",
+    "--input-port",
+    "AdapterSelectProbe",
+    "--adapter-control",
+    "program",
+    "--output-dir",
+    "outputs/adaptive/probe_seed44"
+  ],
+  "exit_code": 0,
+  "sent": [
+    {
+      "at_s": 11.001,
+      "value": 1
+    },
+    {
+      "at_s": 15.405,
+      "value": 0
+    },
+    {
+      "at_s": 19.903,
+      "value": 1
+    },
+    {
+      "at_s": 24.104,
+      "value": 0
+    },
+    {
+      "at_s": 28.206,
+      "value": 1
+    }
+  ],
+  "per_bar": [
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "mehldau",
+    "mehldau",
+    "mehldau",
+    "mehldau",
+    "mehldau",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "mehldau",
+    "mehldau",
+    "mehldau",
+    "mehldau",
+    "mehldau",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "mehldau",
+    "mehldau",
+    "mehldau",
+    "mehldau",
+    "mehldau"
+  ],
+  "switches": [
+    {
+      "received_ms_from_start": 7444.729916,
+      "value": 1,
+      "selected": "mehldau",
+      "arrived_bar": 7,
+      "applied_bar": 9,
+      "latency_bars": 2,
+      "latency_ms": 992.7700839999998
+    },
+    {
+      "received_ms_from_start": 11848.947875,
+      "value": 0,
+      "selected": "tatum",
+      "arrived_bar": 12,
+      "applied_bar": 14,
+      "latency_bars": 2,
+      "latency_ms": 1276.0521250000002
+    },
+    {
+      "received_ms_from_start": 16347.114458,
+      "value": 1,
+      "selected": "mehldau",
+      "arrived_bar": 17,
+      "applied_bar": 18,
+      "latency_bars": 1,
+      "latency_ms": 527.885542
+    },
+    {
+      "received_ms_from_start": 20547.682291,
+      "value": 0,
+      "selected": "tatum",
+      "arrived_bar": 21,
+      "applied_bar": 23,
+      "latency_bars": 2,
+      "latency_ms": 1014.817708999999
+    },
+    {
+      "received_ms_from_start": 24649.176291,
+      "value": 1,
+      "selected": "mehldau",
+      "arrived_bar": 26,
+      "applied_bar": 27,
+      "latency_bars": 1,
+      "latency_ms": 663.3237090000002
+    }
+  ],
+  "fallback_bars": 0,
+  "deadline_misses": 0
+}

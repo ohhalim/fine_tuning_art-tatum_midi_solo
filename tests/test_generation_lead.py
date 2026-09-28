@@ -153,6 +153,44 @@ class StartBudgetTest(unittest.TestCase):
                 main(["--output-dir", d, "--fallback-only", *extra])
 
 
+class AdaptiveBudgetTest(unittest.TestCase):
+    def test_budget_widens_after_slow_generations(self) -> None:
+        import scripts.run_continuous_jazz as module
+        captured = {}
+        real = module.BarBlockProducer
+
+        class Capture(real):
+            def __init__(self, **kw):
+                super().__init__(**kw)
+                captured["producer"] = self
+                captured["f"] = kw["start_not_before_ns"]
+
+        from unittest import mock
+        from inference.realtime.continuous import BarProductionRecord
+        clock = MonotonicBarClock(bpm=120, beats_per_bar=4, start_ns=0)   # 2 s bars
+        with mock.patch.object(module, "BarBlockProducer", Capture), \
+                mock.patch.object(module.OneBarMidiScheduler, "run", side_effect=RuntimeError("stop")):
+            class Port:
+                def reset(self): pass
+                def panic(self): pass
+            with self.assertRaises(RuntimeError):
+                module.run_session(port=Port(), bars=4, bpm=120, chords=["C"], seed=0,
+                                   generate=None, start_delay_seconds=0.0, clock=clock,
+                                   fetch_margin_ms=50.0, start_budget_bars=0.5,
+                                   adaptive_start_safety=1.5)
+        producer, f = captured["producer"], captured["f"]
+        fixed = clock.bar_start_ns(3) - 50_000_000 - 1_000_000_000
+        self.assertEqual(f(3), fixed)                          # no history: fixed budget
+        with producer._cv:
+            producer._records[1] = BarProductionRecord(bar_index=1, source="model", used_fallback=False,
+                                                       requested_ns=0, completed_ns=1_200_000_000)
+        self.assertEqual(f(3), clock.bar_start_ns(3) - 50_000_000 - 1_800_000_000)   # 1.5 x 1.2 s
+        with producer._cv:
+            producer._records[1] = BarProductionRecord(bar_index=1, source="model", used_fallback=False,
+                                                       requested_ns=0, completed_ns=5_000_000_000)
+        self.assertEqual(f(3), clock.bar_start_ns(3) - 50_000_000 - 2_000_000_000)   # capped at one block
+
+
 class RuntimeDefaultTest(unittest.TestCase):
     def test_start_budget_defaults_to_half_a_bar_only_with_late_fetch(self) -> None:
         import tempfile
