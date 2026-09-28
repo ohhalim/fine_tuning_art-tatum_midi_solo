@@ -1,0 +1,170 @@
+{
+  "S": {
+    "identical_bars": 48,
+    "bars": 48,
+    "runs": [
+      {
+        "seed": 42,
+        "identical": 16,
+        "per_bar": [
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau"
+        ],
+        "swaps": 3,
+        "swap_ms_max": 9.802915970794857,
+        "fallback": 0,
+        "misses": 0
+      },
+      {
+        "seed": 43,
+        "identical": 16,
+        "per_bar": [
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau"
+        ],
+        "swaps": 3,
+        "swap_ms_max": 3.2817500177770853,
+        "fallback": 0,
+        "misses": 0
+      },
+      {
+        "seed": 44,
+        "identical": 16,
+        "per_bar": [
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau"
+        ],
+        "swaps": 3,
+        "swap_ms_max": 8.495084010064602,
+        "fallback": 0,
+        "misses": 0
+      }
+    ]
+  },
+  "D": {
+    "identical_bars": 48,
+    "bars": 48,
+    "runs": [
+      {
+        "seed": 42,
+        "identical": 16,
+        "per_bar": [
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau"
+        ],
+        "swaps": 3,
+        "swap_ms_max": 19.637249992229044,
+        "fallback": 0,
+        "misses": 0
+      },
+      {
+        "seed": 43,
+        "identical": 16,
+        "per_bar": [
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau"
+        ],
+        "swaps": 3,
+        "swap_ms_max": 18.43925000866875,
+        "fallback": 0,
+        "misses": 0
+      },
+      {
+        "seed": 44,
+        "identical": 16,
+        "per_bar": [
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "tatum",
+          "tatum",
+          "tatum",
+          "tatum",
+          "mehldau",
+          "mehldau",
+          "mehldau",
+          "mehldau"
+        ],
+        "swaps": 3,
+        "swap_ms_max": 18.473792006261647,
+        "fallback": 0,
+        "misses": 0
+      }
+    ]
+  }
+}
