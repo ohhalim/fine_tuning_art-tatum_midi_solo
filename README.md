@@ -215,7 +215,7 @@ flowchart LR
 | **멜다우 개인화 (완료 판정)** | `outputs/clean_base/c2_export/checkpoint_update128.pt` | **멜다우 미학습 base** + out_proj LoRA 128 update. 미학습 멜다우 곡 CE −0.046(4-fold 4/4), 재사용 holdout 2곡 −0.047·특화도 −0.021, 복사 0, 128 BPM 8/8. 가능도 수준 완료, 청취 미검증(#1497). 학습량 확장 CV(64–384, #1511)에서도 held-out 개선이 64–128에서 포화해 이 모델을 유지 |
 | **Tatum vs 멜다우 비교용 (공통 base)** | `outputs/tvm/export_{tatum,mehldau}/checkpoint_update128.pt` | 두 연주자 모두 제외한 공통 base + 같은 out_proj LoRA·16곡·128 update. 둘 다 자기 연주자 미학습 곡 개선·일반 대비 특화(3×3 교차 평가). 우열은 가중 방식에 따라 뒤집혀 미확정(멜다우 holdout 2곡). 128 BPM 8/8(#1499) |
 
-**생성 속도 (KV 캐시, #1507):** 런타임 기본값으로 켰다(`--no-kv-cache`로 끔). 출력 토큰은 동일하고, 16마디 생성 p95가 51–56% 줄었다(Tatum 최악 마디 91% → 39%). **LoRA 병합(#1512)**도 기본값으로 켰다(`--no-merge-lora`로 끔). 출력은 동일하고, Tatum 완성 모델(QKV LoRA) 16마디 p50이 625 → 408 ms로 35% 줄었다. 16마디 실사용 점검(#1503)에서는 코드 primer 모드 fallback 0이었고, 마디 간 문맥 연결은 아직 기준 미달이다.
+**생성 속도 (KV 캐시, #1507):** 런타임 기본값으로 켰다(`--no-kv-cache`로 끔). 출력 토큰은 동일하고, 16마디 생성 p95가 51–56% 줄었다(Tatum 최악 마디 91% → 39%). **LoRA 병합(#1512)**도 기본값으로 켰다(`--no-merge-lora`로 끔). 출력은 동일하고, Tatum 완성 모델(QKV LoRA) 16마디 p50이 625 → 408 ms로 35% 줄었다. 16마디 실사용 점검(#1503)에서는 코드 primer 모드 fallback 0이었고, 마디 간 문맥 연결은 3차례 모두 기준 미달로 시험을 닫았다. 직전 문맥을 생성 앞에 두면 경계는 매끄러워지지만 코드톤 비율이 0.11–0.20 떨어진다(#1513).
 | **Tatum u518** | `outputs/tatum_lora_v1/u518/checkpoint_update518.pt` | 8/8, 오류 0, 생성 p50 **778 ms** (노트가 많음, 128 BPM 한 마디 안) |
 | **Tatum v2 (out_proj+QKV) u518** | `outputs/tatum_lora_v2_qkv/u518/checkpoint_update518.pt` | 240 BPM 3회 fallback 0, 생성 p95 712 ms (v1 대비 1.11배). 미학습 Tatum 특화도 −0.111 (v1 −0.063), 일반 CE +0.015 |
 
