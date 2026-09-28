@@ -282,6 +282,27 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
     return result, producer
 
 
+def played_bar_notes(result, clock, bars: int) -> list[dict]:
+    """Dispatched notes per scheduler bar, timed from that bar's grid start.
+
+    ``played.mid`` starts at the first note, so it cannot say where a bar
+    begins; this keeps the bar alignment for per-bar analysis.
+    """
+    per_bar: list[list[list[float]]] = [[] for _ in range(bars)]
+    open_notes: dict[int, tuple[int, int]] = {}
+    for r in result.records:
+        m = r.message
+        if m.type == "note_on" and m.velocity > 0:
+            open_notes[m.note] = (r.bar_index, r.target_ns)
+        elif m.type in ("note_off", "note_on") and m.note in open_notes:
+            bar, on_ns = open_notes.pop(m.note)
+            if 0 <= bar < bars:
+                start = (on_ns - clock.bar_start_ns(bar)) / 1e9
+                end = (r.target_ns - clock.bar_start_ns(bar)) / 1e9
+                per_bar[bar].append([int(m.note), round(start, 4), round(end, 4)])
+    return [{"bar": b, "notes": sorted(n, key=lambda x: (x[1], x[0]))} for b, n in enumerate(per_bar)]
+
+
 def summarize_lateness_ms(lateness_ns) -> dict:
     """Distribution of scheduler dispatch lateness over every attempt, not just the tail."""
     values = sorted(ns / 1e6 for ns in lateness_ns)
@@ -668,6 +689,9 @@ def main(argv=None):
             report["learned_chord_conditioning"] = False
             report["chord_following_verified"] = False
             args.output_dir.mkdir(parents=True, exist_ok=True)
+            clock = getattr(producer, "_clock", None)
+            if clock is not None:
+                report["played_bars"] = played_bar_notes(result, clock, args.bars)
             report["played_note_count"] = write_played_midi(
                 result, args.output_dir / "played.mid", bpm=args.bpm
             )

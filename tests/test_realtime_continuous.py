@@ -308,6 +308,23 @@ class DeadlineMissDetailTest(unittest.TestCase):
         self.assertAlmostEqual(out[0]["lateness_ms"], 30 / 1e6)
 
 
+class PlayedBarNotesTest(unittest.TestCase):
+    def test_notes_are_timed_from_their_bar_start(self) -> None:
+        from types import SimpleNamespace
+
+        from scripts.run_continuous_jazz import played_bar_notes
+
+        clock = SimpleNamespace(bar_start_ns=lambda b: 1_000_000_000 + b * 2_000_000_000)
+        def rec(bar, t_s, kind, note, vel=64):
+            return SimpleNamespace(bar_index=bar, target_ns=int(t_s * 1e9),
+                                   message=Message(kind, note=note, velocity=vel))
+        records = [rec(0, 1.5, "note_on", 60), rec(0, 1.75, "note_off", 60),
+                   rec(1, 3.0, "note_on", 62), rec(1, 3.5, "note_on", 62, vel=0)]
+        out = played_bar_notes(SimpleNamespace(records=records), clock, bars=2)
+        self.assertEqual(out[0]["notes"], [[60, 0.5, 0.75]])
+        self.assertEqual(out[1]["notes"], [[62, 0.0, 0.5]])
+
+
 class LatenessSummaryTest(unittest.TestCase):
     def test_summary_over_all_attempts(self) -> None:
         from scripts.run_continuous_jazz import summarize_lateness_ms
