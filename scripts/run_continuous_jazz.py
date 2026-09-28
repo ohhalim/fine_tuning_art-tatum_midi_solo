@@ -509,6 +509,10 @@ def main(argv=None):
     parser.add_argument("--chord-primer-tokens", type=int, default=48,
                         help="with --chord-primer and sub-blocks: max tokens of the chord "
                              "statement per block (48 = previous behaviour)")
+    parser.add_argument("--merge-lora", action=argparse.BooleanOptionalAction, default=True,
+                        help="fold LoRA deltas into the base weights before playing: identical "
+                             "tokens, about 35%% lower p50 on the Tatum final adapter "
+                             "(docs/experiments/LORA_MERGE.md); --no-merge-lora for the old path")
     parser.add_argument("--context-carry-tokens", type=int, default=0,
                         help="with --chord-primer: prepend the last N tokens of the previous "
                              "valid block to each block's primer (0 = off, the previous behaviour)")
@@ -564,6 +568,9 @@ def main(argv=None):
             lora_path=str(args.checkpoint.parent), checkpoint_path=str(args.checkpoint),
             prefer_full_checkpoint=True, max_sequence=args.max_sequence,
         )
+        if args.merge_lora:
+            from scripts.train_qlora import merge_lora_for_inference
+            merge_lora_for_inference(model)
         base_primer = build_primer(
             conditioning_midi=str(args.conditioning_midi), primer_max_tokens=32,
             append_sep_token=True, control_format="control_v1", role="lead",
@@ -726,6 +733,7 @@ def main(argv=None):
             report["chord_primer_enabled"] = bool(args.chord_primer)
             report["chord_blocks_per_bar"] = args.chord_blocks_per_bar
             report["kv_cache"] = bool(args.kv_cache)
+            report["merge_lora"] = bool(args.merge_lora)
             report["chords"] = chords
             report["chord_primer_tokens"] = args.chord_primer_tokens
             report["context_carry_tokens"] = args.context_carry_tokens

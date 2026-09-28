@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Criteria 1-2 of docs/experiments/KV_CACHE.md on real checkpoints.
+"""Criteria 1-2 of docs/experiments/LORA_MERGE.md on real checkpoints (KV cache on in both arms).
 
-1. logits: cached vs full forward on several sequences (max abs diff < 1e-4)
-2. tokens: generate_once with/without the cache, chord-primer-like block settings,
-   seeds 1-8 -> identical token lists. Also records wall time for both paths.
+1. logits: merged vs unmerged model on several sequences (max abs diff < 1e-4)
+2. tokens: generate_once (KV cache on) merged vs unmerged, chord-primer-like block
+   settings, seeds 1-8 -> identical token lists. Also records wall time for both.
 """
 from __future__ import annotations
 
@@ -25,15 +25,13 @@ def main(argv=None) -> int:
     ap.add_argument("--model", action="append", required=True, metavar="NAME=CHECKPOINT")
     ap.add_argument("--songs", type=Path, default=ROOT / "data/tvm/tatum16/train")
     ap.add_argument("--seeds", default="1,2,3,4,5,6,7,8")
-    ap.add_argument("--device", choices=["cpu", "mps"], default="cpu")
     ap.add_argument("--output", type=Path, required=True)
     args = ap.parse_args(argv)
 
     import numpy as np
     import torch
-    from utilities.device import get_device, use_cuda
-    use_cuda(args.device == "mps")
-    device = get_device()
+    from utilities.device import use_cuda
+    use_cuda(False)
     from inference.control.chord_primer import chord_guide_notes_for_duration
     from scripts.generate import (encode_notes_simple, generate_once, load_model_with_lora,
                                   truncate_tokens_preserving_velocity)
@@ -47,22 +45,22 @@ def main(argv=None) -> int:
         notes = sorted(chord_guide_notes_for_duration(chord, bpm=bpm, seconds=sub),
                        key=lambda n: (n.start, n.pitch))
         chord_primers.append(truncate_tokens_preserving_velocity(encode_notes_simple(notes), 48))
-    out = {"schema": "kv_cache_verify_v1", "device": str(device), "models": {}}
+    out = {"schema": "lora_merge_verify_v1", "models": {}}
     for spec in args.model:
         name, path = spec.split("=", 1)
-        model = load_model_with_lora(lora_path=str(Path(path).parent), checkpoint_path=path,
-                                     prefer_full_checkpoint=True).to(device)
-        model.eval()
+        from scripts.train_qlora import merge_lora_for_inference
+
+        def fresh():
+            m = load_model_with_lora(lora_path=str(Path(path).parent), checkpoint_path=path,
+                                     prefer_full_checkpoint=True)
+            return m.eval()
+        plain, merged_model = fresh(), fresh()
+        merge_lora_for_inference(merged_model)
         maxdiff = 0.0
         with torch.no_grad():
             for seq in seqs:
-                x = torch.tensor(np.asarray(seq, dtype=np.int64)).to(device)
-                full = model(x.unsqueeze(0))[0]
-                cache = {}
-                parts = [model.forward_cached(x[:16], cache)]
-                for t in range(16, len(x)):
-                    parts.append(model.forward_cached(x[t:t + 1], cache))
-                maxdiff = max(maxdiff, (full - torch.cat(parts)).abs().max().item())
+                x = torch.tensor(np.asarray(seq, dtype=np.int64)).unsqueeze(0)
+                maxdiff = max(maxdiff, (plain(x) - merged_model(x)).abs().max().item())
         identical, total, t_full, t_cache = 0, 0, 0.0, 0.0
         mismatches = []
         for seed in (int(s) for s in args.seeds.split(",") if s.strip()):
@@ -72,10 +70,11 @@ def main(argv=None) -> int:
                 for use in (False, True):
                     torch.manual_seed(seed * 100 + ci)
                     t0 = time.perf_counter()
-                    toks, _ = generate_once(model=model, primer=primer, target_length=min(192, len(cp) + 96),
+                    toks, _ = generate_once(model=merged_model if use else plain, primer=primer,
+                                            target_length=min(192, len(cp) + 96),
                                             strip_primer=True, temperature=1.0, top_k=32, top_p=0.95,
                                             grammar_mask=True, target_duration_seconds=sub,
-                                            return_metadata=True, use_kv_cache=use)
+                                            return_metadata=True, use_kv_cache=True)
                     dt = time.perf_counter() - t0
                     res[use] = [int(t) for t in toks]
                     if use:
@@ -90,7 +89,7 @@ def main(argv=None) -> int:
         out["models"][name] = {"logits_max_abs_diff": maxdiff, "logits_ok": maxdiff < 1e-4,
                                "blocks": total, "identical_blocks": identical,
                                "tokens_ok": identical == total, "mismatches": mismatches,
-                               "wall_s_full": t_full, "wall_s_cache": t_cache,
+                               "wall_s_unmerged": t_full, "wall_s_merged": t_cache,
                                "speedup": t_full / t_cache if t_cache else None}
         print(name, json.dumps({k: v for k, v in out["models"][name].items() if k != "mismatches"}), flush=True)
     args.output.parent.mkdir(parents=True, exist_ok=True)

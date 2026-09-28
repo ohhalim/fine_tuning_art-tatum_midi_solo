@@ -1,0 +1,38 @@
+{
+  "schema": "lora_merge_verify_v1",
+  "models": {
+    "tatum_final": {
+      "logits_max_abs_diff": 0.0,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_unmerged": 11.676503041235264,
+      "wall_s_merged": 7.765412583306897,
+      "speedup": 1.5036552038890934
+    },
+    "tatum16": {
+      "logits_max_abs_diff": 0.0,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_unmerged": 6.47644074971322,
+      "wall_s_merged": 6.386964457051363,
+      "speedup": 1.0140092047268359
+    },
+    "mehldau16": {
+      "logits_max_abs_diff": 0.0,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_unmerged": 4.662956831103656,
+      "wall_s_merged": 4.6370206258725375,
+      "speedup": 1.0055932908916572
+    }
+  }
+}
