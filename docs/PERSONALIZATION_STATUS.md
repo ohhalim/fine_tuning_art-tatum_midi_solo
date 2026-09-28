@@ -51,6 +51,7 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
 | Tatum 완성 생성 p50 | 690 ms(초기) → 625(KV 캐시) → **307 ms**(LoRA 병합) | [KV_CACHE](experiments/KV_CACHE.md), [LORA_MERGE](experiments/LORA_MERGE.md) |
 | 어댑터 스왑 | 같은 base 0.8 ms, 다른 base 2–20 ms. 스왑 세션 마디가 단독 세션과 48/48 동일 | [ADAPTER_SWAP](experiments/ADAPTER_SWAP.md) |
 | 입력 → 반영 (도착에서 반영 블록 시작까지, 128 BPM, PC 기준) | 약 7.5 s → 2.7 s(늦은 fetch) → 1.8 s(시작 예산) → **평균 0.9 s, 0.5–1.3 s**(반 마디 블록, 프리셋 기본) | [GENERATION_LEAD](experiments/GENERATION_LEAD.md), [START_BUDGET](experiments/START_BUDGET.md), [HALF_BAR_BLOCKS](experiments/HALF_BAR_BLOCKS.md) |
+| CPU 부하 여유 (Tatum 완성, 반 마디 블록) | 바쁜 프로세스 2·4개: 128/240 BPM 성립. 8개(성능 코어 전부): 생성 2.5–3배 느려져 fallback 16–28%, 시작 예산 off면 0–3% | [LOAD_MARGIN](experiments/LOAD_MARGIN.md) |
 | 키보드 전환 | Program Change/CC, 모든 메시지 적용(9/9, 15/15), 적용까지 1–2마디 | [ADAPTER_LIVE_SELECT](experiments/ADAPTER_LIVE_SELECT.md), [START_BUDGET](experiments/START_BUDGET.md) |
 
 ## 4. 쇼케이스 MIDI
