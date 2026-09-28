@@ -621,6 +621,11 @@ def main(argv=None):
     parser.add_argument("--block-metrics", action=argparse.BooleanOptionalAction, default=True,
                         help="record per-block metrics in the report (on by default); "
                              "--no-block-metrics turns the in-loop measurement off")
+    parser.add_argument("--reserve-chord-tokens", action=argparse.BooleanOptionalAction,
+                        default=False,
+                        help="with --chord-primer and live input: keep the full chord statement "
+                             "right before generation and fill the rest of the 48-token primer "
+                             "with the newest input (docs/experiments/RESERVE_CHORD_TOKENS.md)")
     parser.add_argument("--adapter-name", default="primary",
                         help="name of the --checkpoint adapter in --adapter-schedule")
     parser.add_argument("--swap-adapter", action="append", default=[], metavar="NAME=CHECKPOINT",
@@ -822,10 +827,22 @@ def main(argv=None):
             # Only the downbeat sub-block folds in what the player just did; a
             # later sub-block would be conditioning on input it already used.
             # A half-bar block has its own, newer snapshot, so it folds its input in.
-            if fresh_block:
-                notes.extend(input_events_to_notes(input_events))
-            notes.sort(key=lambda note: (note.start, note.pitch))
-            tokens = truncate_tokens_preserving_velocity(encode_notes_simple(notes), 48)
+            played = input_events_to_notes(input_events) if fresh_block else []
+            if args.reserve_chord_tokens and played:
+                # Dense input used to push the chord statement out of the 48-token
+                # window (docs/experiments/RESERVE_CHORD_TOKENS.md): keep the whole
+                # chord statement next to generation and give the input what is left.
+                chord_tokens = truncate_tokens_preserving_velocity(encode_notes_simple(
+                    sorted(notes, key=lambda note: (note.start, note.pitch))), 48)
+                input_tokens = truncate_tokens_preserving_velocity(encode_notes_simple(
+                    sorted(played, key=lambda note: (note.start, note.pitch))),
+                    max(0, 48 - len(chord_tokens)))
+                notes = notes + played
+                tokens = list(input_tokens) + list(chord_tokens)
+            else:
+                notes.extend(played)
+                notes.sort(key=lambda note: (note.start, note.pitch))
+                tokens = truncate_tokens_preserving_velocity(encode_notes_simple(notes), 48)
             # Opt-in context carry: the tail of the previous valid block goes in
             # front of this block's chord statement, so the model continues the
             # line instead of starting every half bar from scratch.
