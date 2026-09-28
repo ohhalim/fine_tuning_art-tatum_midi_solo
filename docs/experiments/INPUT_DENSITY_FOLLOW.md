@@ -36,3 +36,8 @@
   3. 음계형 입력 뒤에 모델이 긴 음을 둔다
 - fallback 0, 미스 0(3회)
 - 의미: 입력 경로는 입력을 쓰지만, 촘촘한 연주에 촘촘하게 답하도록 설계돼 있지 않다. primer 구성(입력 음의 시간 창과 토큰 배분)이 다음 질문이다
+
+### 원인 후보 추가 점검 (코드 읽기, 측정 없음)
+- **"primer가 시간 예산을 먹는다"는 기각한다.** `MusicTransformer.generate`의 `generated_duration_steps`는 0에서 시작해 생성 토큰의 time shift만 센다(`music_transformer/model/music_transformer.py`의 생성 루프). primer 길이는 생성 시간 목표에 들어가지 않는다
+- **새 후보(미검증):** 입력 음 16개가 들어간 primer를 48토큰에서 자르면 note_off가 잘려 나갈 수 있다. 그러면 열린 음이 `active_pitches`에 남는다. grammar mask가 그 음들을 닫게 하면서 생성 토큰 일부가 새 음 대신 note_off에 쓰일 수 있다
+- 다음 질문(한 질문): 입력이 있을 때 primer의 열린 음 수와 생성 블록의 새 음 수를 블록마다 기록해 상관을 본다. 그 뒤 "잘린 입력 음을 닫고 넣기" 같은 처방을 사전 등록해 시험한다
