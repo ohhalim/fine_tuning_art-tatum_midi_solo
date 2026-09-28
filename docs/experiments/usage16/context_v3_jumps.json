@@ -1,0 +1,42 @@
+{
+  "baseline": {
+    "base": {
+      "within_median": 6.0,
+      "boundary_median": 11,
+      "n_within": 628,
+      "n_boundary": 45
+    },
+    "mehldau": {
+      "within_median": 7.0,
+      "boundary_median": 15,
+      "n_within": 704,
+      "n_boundary": 45
+    },
+    "tatum": {
+      "within_median": 6,
+      "boundary_median": 14,
+      "n_within": 995,
+      "n_boundary": 45
+    }
+  },
+  "v3": {
+    "base": {
+      "within_median": 6,
+      "boundary_median": 5,
+      "n_within": 641,
+      "n_boundary": 45
+    },
+    "mehldau": {
+      "within_median": 8.0,
+      "boundary_median": 15,
+      "n_within": 818,
+      "n_boundary": 45
+    },
+    "tatum": {
+      "within_median": 6,
+      "boundary_median": 6,
+      "n_within": 871,
+      "n_boundary": 45
+    }
+  }
+}
