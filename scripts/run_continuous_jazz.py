@@ -556,11 +556,11 @@ def main(argv=None):
                              "and keep one bar of lead, so input reaches the output two bars "
                              "sooner (docs/experiments/GENERATION_LEAD.md); 'off' restores the "
                              "old one-bar-ahead fetch with two bars of lead")
-    parser.add_argument("--start-budget-bars", type=float, default=None,
+    parser.add_argument("--start-budget-bars", default="auto",
                         help="with late fetch: start generating each bar only this fraction of "
                              "a bar before it is fetched, so it hears more recent input "
-                             "(docs/experiments/START_BUDGET.md). Default: start right after "
-                             "the previous fetch")
+                             "(docs/experiments/START_BUDGET.md). 'auto' = 0.5 with late fetch, "
+                             "nothing without it; 'off' starts right after the previous fetch")
     parser.add_argument("--spin-window-ms", type=float, default=5.0,
                         help="scheduler busy-spin before each event. The wait before it "
                              "can oversleep by a few ms; a longer spin absorbs that but "
@@ -578,7 +578,16 @@ def main(argv=None):
         parser.error("spin_window_ms must be between 0 and 50")
     if args.fetch_margin_ms is not None and not 0.0 <= args.fetch_margin_ms <= 500.0:
         parser.error("fetch_margin_ms must be between 0 and 500")
-    if args.start_budget_bars is not None:
+    budget = str(args.start_budget_bars).lower()
+    if budget == "auto":
+        args.start_budget_bars = 0.5 if args.fetch_margin_ms is not None else None
+    elif budget in ("off", "none"):
+        args.start_budget_bars = None
+    else:
+        try:
+            args.start_budget_bars = float(budget)
+        except ValueError:
+            parser.error("--start-budget-bars takes auto, off or a number")
         if args.fetch_margin_ms is None:
             parser.error("--start-budget-bars needs the late fetch (drop --fetch-margin-ms off)")
         if not 0.1 <= args.start_budget_bars <= 0.95:

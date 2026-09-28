@@ -154,6 +154,26 @@ class StartBudgetTest(unittest.TestCase):
 
 
 class RuntimeDefaultTest(unittest.TestCase):
+    def test_start_budget_defaults_to_half_a_bar_only_with_late_fetch(self) -> None:
+        import tempfile
+        from unittest import mock
+        import scripts.run_continuous_jazz as module
+        seen = {}
+
+        def fake_run_session(**kw):
+            seen.update(kw)
+            raise SystemExit(0)
+
+        for extra, want in (([], 0.5), (["--start-budget-bars", "off"], None),
+                            (["--fetch-margin-ms", "off"], None),
+                            (["--start-budget-bars", "0.3"], 0.3)):
+            seen.clear()
+            with tempfile.TemporaryDirectory() as d, \
+                    mock.patch.object(module, "run_session", fake_run_session), \
+                    mock.patch("mido.open_output"), self.assertRaises(SystemExit):
+                module.main(["--output-dir", d, "--fallback-only", *extra])
+            self.assertEqual(seen.get("start_budget_bars"), want, extra)
+
     def test_late_fetch_is_the_default_with_an_off_switch(self) -> None:
         from pathlib import Path
         from scripts.run_continuous_jazz import _fetch_margin
