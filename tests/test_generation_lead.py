@@ -67,6 +67,40 @@ class LateFetchSchedulerTest(unittest.TestCase):
         self.assertEqual(result.completed_bar_count, 4)
         self.assertEqual(calls, [(0, 0)] + [(b, clock.bar_start_ns(b) - 50_000_000) for b in (1, 2, 3)])
 
+    def test_boundary_note_off_does_not_delay_the_fetch(self) -> None:
+        # Astra M1: a note held to the bar line used to push the next fetch to
+        # the downbeat. 120 BPM, bar 1 starts at 3.0 s -> fetch due at 2.95 s.
+        from mido import Message
+        from inference.realtime.scheduler import ScheduledMidiBlock, ScheduledMidiEvent
+        fake = FakeTime()
+        clock = MonotonicBarClock(bpm=120, beats_per_bar=4, start_ns=1_000_000_000)
+
+        def held_block(b):
+            start, end = clock.bar_start_ns(b), clock.bar_start_ns(b + 1)
+            return ScheduledMidiBlock(bar_index=b, target_start_ns=start, events=(
+                ScheduledMidiEvent(sequence_index=0, bar_index=b, target_ns=start,
+                                   message=Message("note_on", note=60, velocity=80), is_bar_start=True),
+                ScheduledMidiEvent(sequence_index=1, bar_index=b, target_ns=end,
+                                   message=Message("note_off", note=60, velocity=0)),
+            ))
+
+        blocks = RecordingBlocks({b: held_block(b) for b in range(3)}, fake)
+        sent = []
+
+        class OrderSink:
+            def send(self, message):
+                sent.append((fake.now_ns, message.type))
+
+        scheduler = OneBarMidiScheduler(sink=OrderSink(), clock=clock, clock_ns=fake.clock_ns,
+                                        wait_until=fake.wait_until,
+                                        deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE,
+                                        fetch_margin_ms=50.0)
+        result = scheduler.run(blocks=blocks, expected_bar_count=3)
+        self.assertTrue(result.run_completed)
+        self.assertEqual(blocks.calls, [(0, 0), (1, 2_950_000_000), (2, 4_950_000_000)])
+        # the boundary note-off still goes out before the next bar's note-on
+        self.assertEqual([t for _, t in sent], ["note_on", "note_off"] * 3)
+
     def test_negative_margin_is_refused(self) -> None:
         clock = MonotonicBarClock(bpm=120, beats_per_bar=4, start_ns=0)
         with self.assertRaises(ValueError):

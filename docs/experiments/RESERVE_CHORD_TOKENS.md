@@ -24,7 +24,7 @@
 
 ---
 
-## 결과 — 기준 1–3 모두 충족, **`--reserve-chord-tokens` 기본 on**
+## 결과 — 기준 1–3 모두 충족, 당시 기본 on으로 변경 (**현재는 기본 off**, 아래 「리뷰 후 조치 (#1558)」 참조)
 원시값: `docs/experiments/reserve_chord/summary.json`.
 
 | seed | 입력 블록 코드톤 비율 (기존 → 예약) | 출력 음 수 (기존 → 예약) | 무입력 블록 동일 | fallback / 미스 |
