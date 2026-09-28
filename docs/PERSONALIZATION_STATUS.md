@@ -53,6 +53,7 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
 | 어댑터 스왑 | 같은 base 0.8 ms, 다른 base 2–20 ms. 스왑 세션 마디가 단독 세션과 48/48 동일 | [ADAPTER_SWAP](experiments/ADAPTER_SWAP.md) |
 | 입력 → 반영 (도착에서 반영 블록 시작까지, 128 BPM, PC 기준) | 약 7.5 s → 2.7 s(늦은 fetch) → 1.8 s(시작 예산) → **평균 0.9 s, 0.5–1.3 s**(반 마디 블록, 프리셋 기본) | [GENERATION_LEAD](experiments/GENERATION_LEAD.md), [START_BUDGET](experiments/START_BUDGET.md), [HALF_BAR_BLOCKS](experiments/HALF_BAR_BLOCKS.md) |
 | 키보드 음 입력 | 반 마디 블록에서 입력이 든 블록만 달라지고(입력 없는 블록은 26/26 동일) 4초 창이 지나면 원래대로 돌아온다. 최신 입력 → 블록 시작 0.52–0.55 s | [NOTE_INPUT_HALF_BAR](experiments/NOTE_INPUT_HALF_BAR.md) |
+| 입력 음역 따라가기 (탐색) | 높은/낮은 음역 구절을 입력하면 출력 평균 음높이가 6개 비교 중 5개에서 그 방향으로 이동(+2.8 ~ +8.1 / −1.5 ~ −8.2 반음) | [INPUT_REGISTER_FOLLOW](experiments/INPUT_REGISTER_FOLLOW.md) |
 | CPU 부하 여유 (Tatum 완성, 반 마디 블록) | 바쁜 프로세스 2·4개: 128/240 BPM 성립. 8개(성능 코어 전부): 생성이 2.5–3배 느려짐. fallback은 고정 예산 22%, 적응형 4%, 예산 off 1.6% | [LOAD_MARGIN](experiments/LOAD_MARGIN.md), [ADAPTIVE_BUDGET](experiments/ADAPTIVE_BUDGET.md) |
 | 키보드 전환 | Program Change/CC, 모든 메시지 적용(9/9, 15/15), 적용까지 1–2마디 | [ADAPTER_LIVE_SELECT](experiments/ADAPTER_LIVE_SELECT.md), [START_BUDGET](experiments/START_BUDGET.md) |
 
