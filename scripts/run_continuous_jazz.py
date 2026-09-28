@@ -517,6 +517,11 @@ def main(argv=None):
                              "(docs/experiments/ADAPTER_SWAP.md); needs --adapter-schedule")
     parser.add_argument("--adapter-schedule", default=None,
                         help='bars per adapter, cycled: e.g. "tatum:4,mehldau:4"')
+    parser.add_argument("--adapter-control", default=None, metavar="program|cc:N",
+                        help="choose the adapter live from --input-port: Program Change p picks "
+                             "the p-th adapter (--checkpoint first, then --swap-adapter order), or "
+                             "CC N splits 0-127 across them; applied at the next bar generated "
+                             "(docs/experiments/ADAPTER_LIVE_SELECT.md)")
     parser.add_argument("--allow-different-bases", action="store_true",
                         help="let --swap-adapter checkpoints come from different bases; a swap "
                              "then copies the whole model instead of the LoRA-touched weights")
@@ -566,8 +571,14 @@ def main(argv=None):
         if name in swap_specs or name == args.adapter_name:
             parser.error(f"duplicate adapter name {name!r}")
         swap_specs[name] = Path(path)
-    if bool(swap_specs) != bool(args.adapter_schedule):
-        parser.error("--swap-adapter and --adapter-schedule go together")
+    if swap_specs and not (args.adapter_schedule or args.adapter_control):
+        parser.error("--swap-adapter needs --adapter-schedule or --adapter-control")
+    if (args.adapter_schedule or args.adapter_control) and not swap_specs:
+        parser.error("--adapter-schedule/--adapter-control need --swap-adapter")
+    if args.adapter_schedule and args.adapter_control:
+        parser.error("use either --adapter-schedule or --adapter-control")
+    if args.adapter_control and not args.input_port:
+        parser.error("--adapter-control reads the player's input; give --input-port")
     if swap_specs and not args.merge_lora:
         parser.error("adapter swapping works on merged weights; drop --no-merge-lora")
     if swap_specs and args.fallback_only:
@@ -589,7 +600,7 @@ def main(argv=None):
         if args.merge_lora:
             from scripts.train_qlora import merge_lora_for_inference
             merge_lora_for_inference(model)
-        bank = schedule = None
+        bank = schedule = live_selector = None
         if swap_specs:
             from scripts.adapter_bank import AdapterBank, parse_schedule
             models = {args.adapter_name: model}
@@ -602,15 +613,22 @@ def main(argv=None):
                 models[name] = other
             bank = AdapterBank(models, allow_different_bases=args.allow_different_bases)
             del models
-            schedule = parse_schedule(args.adapter_schedule, bank.names)
+            if args.adapter_schedule:
+                schedule = parse_schedule(args.adapter_schedule, bank.names)
+            else:
+                from scripts.adapter_bank import LiveAdapterSelector
+                live_selector = LiveAdapterSelector(bank.names, args.adapter_control)
         adapter_per_bar: dict[int, str] = {}
 
-        def select_adapter(bar_index):
+        def select_adapter(bar_index, input_events=()):
             """Swap at bar starts only, on the producer thread, between generations."""
             if bank is None:
                 return
-            from scripts.adapter_bank import adapter_for_bar
-            name = adapter_for_bar(schedule, bar_index)
+            if live_selector is not None:
+                name = live_selector.update(input_events)
+            else:
+                from scripts.adapter_bank import adapter_for_bar
+                name = adapter_for_bar(schedule, bar_index)
             bank.select(name)
             adapter_per_bar[bar_index] = name
         base_primer = build_primer(
@@ -630,7 +648,7 @@ def main(argv=None):
             )
 
             if sub_index == 0:
-                select_adapter(bar_index)
+                select_adapter(bar_index, input_events)
             chord = chords[bar_index % len(chords)]
             notes = list(chord_guide_notes_for_duration(chord, bpm=args.bpm,
                                                         seconds=sub_duration))
@@ -661,7 +679,7 @@ def main(argv=None):
             return tokens_out
 
         def generate(bar_index, input_events):
-            select_adapter(bar_index)
+            select_adapter(bar_index, input_events)
             if args.chord_primer:
                 primer, used_input, used_chord = build_chord_live_primer(
                     input_events, chords[bar_index % len(chords)], bpm=args.bpm,
@@ -784,6 +802,7 @@ def main(argv=None):
                     "adapters": {args.adapter_name: str(args.checkpoint),
                                  **{n: str(p) for n, p in swap_specs.items()}},
                     "schedule": args.adapter_schedule,
+                    "control": args.adapter_control,
                     "per_bar": [adapter_per_bar.get(i) for i in range(args.bars)],
                     "shared_base": bank.shared_base,
                     "swap_keys": len(bank.swap_keys),
@@ -791,6 +810,12 @@ def main(argv=None):
                     "swap_ms_p50": swaps[len(swaps) // 2] if swaps else None,
                     "swap_ms_max": swaps[-1] if swaps else None,
                 }
+                clock_for_events = getattr(producer, "_clock", None)
+                if live_selector is not None and clock_for_events is not None:
+                    report["adapter_swap"]["control_events"] = [
+                        {"received_ms_from_start": (e["received_ns"] - clock_for_events.start_ns) / 1e6,
+                         "value": e["value"], "selected": e["selected"]}
+                        for e in live_selector.events]
             report["chords"] = chords
             report["context_carry_tokens"] = args.context_carry_tokens
             report["context_carry_position"] = args.context_carry_position
