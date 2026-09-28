@@ -1,0 +1,21 @@
+{
+  "schema": "near_duplicate_v1",
+  "n": 16,
+  "flag": 0.2,
+  "reference": "data/jazz_full_notatum_nomehldau",
+  "reference_unique_ngrams": 23037041,
+  "sets": {
+    "tatum_all": {
+      "songs": 122,
+      "max_share": 0.00021586616297895306,
+      "mean_share": 2.5665861140028214e-06,
+      "flagged": []
+    },
+    "mehldau_all": {
+      "songs": 18,
+      "max_share": 0.0,
+      "mean_share": 0.0,
+      "flagged": []
+    }
+  }
+}

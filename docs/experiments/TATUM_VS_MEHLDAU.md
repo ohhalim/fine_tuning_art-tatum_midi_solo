@@ -69,3 +69,20 @@ Tatum과 멜다우의 겹침은 0이다. **두 연주자를 모두 제외한 bas
 - 실험 수 고정: 공통 base 1 + CV 8 run(2 연주자 × 4 fold) + 최종 2 run + 평가·생성
 - 시간 상한은 총 **8시간**(base 약 2시간 + 나머지). 넘으면 그 시점까지 확보한 결과로 보고한다
 - 새 유료 GPU·API, 외부 데이터, 원본 덮어쓰기는 하지 않는다
+
+## 결과
+
+### P0 준비 — 제외 manifest, 분할, 중복 전사 점검
+- 공통 base 학습셋: `jazz_full`(2,777곡)에서 Tatum과 멜다우 해시 일치 곡을 뺐다(train 126곡, val 14곡 제외) → **2,637곡**. 제외 목록: `docs/experiments/tvm/common_base_exclusion_manifest.json`
+- 분할(`docs/experiments/tvm/splits_manifest.json`, 곡 제목·해시·토큰 수 포함)
+
+| 세트 | 곡 | 토큰 | 과거 관측 |
+|---|---|---|---|
+| Tatum train16 | 16 | **150,865** | 과거 Tatum 어댑터의 학습 데이터(이번 모델과 무관) |
+| 멜다우 train16 | 16 | **59,654** | 과거 멜다우 어댑터의 학습 데이터 |
+| Tatum holdout fresh12 | 12 | 122,734 | 평가·선정에 쓰인 적 없음 |
+| Tatum holdout val12 | 12 | 99,701 | **재사용**(T1/T4/M-S1 평가·선정) |
+| 멜다우 holdout val2 | 2 | 6,398 | **재사용**(V2/M-A1/#1497 평가·선정) |
+
+- **해소하지 않은 비대칭:** 학습 곡 수는 같지만 Tatum 곡이 길어 **학습셋 토큰이 2.5배**다. update당 학습 토큰은 같다(곡당 1024 crop 1개). 즉 같은 update 수에서 Tatum은 더 다양한 재료를 본다
+- **중복 전사 점검**(`docs/experiments/tvm/near_duplicates_summary.json`): 공통 base 학습셋의 고유 16-gram 2,304만 개와 비교했다. 곡별 16-gram 공유 비율은 Tatum 122곡 최대 **0.0002**, 멜다우 18곡 최대 **0**이다. 기준 0.2를 넘는 곡이 없다. 다른 파일명의 동일 전사는 보이지 않는다(짧은 구절 수준의 유사성까지 배제하지는 않는다)
