@@ -44,8 +44,11 @@ def switch_latencies(report: dict) -> list[dict]:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--port-name", default="AdapterSelectProbe")
-    ap.add_argument("--sends", required=True,
+    ap.add_argument("--sends", default="",
                     help='"SECONDS:VALUE,..." after launch; VALUE is a program (or CC value)')
+    ap.add_argument("--notes", default="",
+                    help='"SECONDS:PITCH,..." after launch: note_on (velocity 90) then note_off '
+                         '0.25 s later, to check that played input reaches the primer')
     ap.add_argument("--cc", type=int, default=None, help="send CC N instead of Program Change")
     ap.add_argument("--output-dir", type=Path, required=True)
     ap.add_argument("--python", default=sys.executable)
@@ -58,7 +61,14 @@ def main(argv=None) -> int:
     for part in args.sends.split(","):
         if part.strip():
             t, v = part.split(":")
-            sends.append((float(t), int(v)))
+            msg = (mido.Message("control_change", control=args.cc, value=int(v)) if args.cc is not None
+                   else mido.Message("program_change", program=int(v)))
+            sends.append((float(t), msg))
+    for part in args.notes.split(","):
+        if part.strip():
+            t, pitch = part.split(":")
+            sends.append((float(t), mido.Message("note_on", note=int(pitch), velocity=90)))
+            sends.append((float(t) + 0.25, mido.Message("note_off", note=int(pitch), velocity=0)))
     extra = [a for a in args.runtime_args if a != "--"]
     control = f"cc:{args.cc}" if args.cc is not None else "program"
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -71,17 +81,15 @@ def main(argv=None) -> int:
         t0 = time.monotonic()
         child = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, cwd=ROOT)
         sent = []
-        for at, value in sorted(sends):
+        for at, msg in sorted(sends, key=lambda x: x[0]):
             while time.monotonic() - t0 < at:
                 if child.poll() is not None:
                     break
                 time.sleep(0.005)
             if child.poll() is not None:
                 break
-            msg = (mido.Message("control_change", control=args.cc, value=value) if args.cc is not None
-                   else mido.Message("program_change", program=value))
             port.send(msg)
-            sent.append({"at_s": round(time.monotonic() - t0, 3), "value": value})
+            sent.append({"at_s": round(time.monotonic() - t0, 3), "message": str(msg)})
         code = child.wait()
     log.close()
     report_path = args.output_dir / "continuous_report.json"
@@ -90,6 +98,10 @@ def main(argv=None) -> int:
         report = json.loads(report_path.read_text())
         out["per_bar"] = report["adapter_swap"]["per_bar"]
         out["switches"] = switch_latencies(report)
+        out["input_blocks"] = [
+            {"block": b["bar_index"], "input_event_count": b["input_event_count"],
+             "input_to_block_start_ms": b["input_to_bar_start_ms"]}
+            for b in report["bars_detail"] if b["input_event_count"]]
         out["fallback_bars"] = report["production"]["fallback_bar_count"]
         out["deadline_misses"] = report["scheduler_dispatch_deadline_miss_count"]
     (args.output_dir / "probe.json").write_text(json.dumps(out, indent=2) + "\n")

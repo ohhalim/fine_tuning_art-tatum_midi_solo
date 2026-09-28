@@ -1,0 +1,146 @@
+{
+  "schema": "live_select_probe_v1",
+  "command": [
+    "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/.venv/bin/python",
+    "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/scripts/run_continuous_jazz.py",
+    "--checkpoint",
+    "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/outputs/final_tatum/export/checkpoint_update518.pt",
+    "--adapter-name",
+    "tatum",
+    "--swap-adapter",
+    "mehldau=/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/outputs/tvm/export_mehldau/checkpoint_update128.pt",
+    "--conditioning-midi",
+    "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/\uc989\ud765\uc5f0\uc8fc\uc7ac-\uc124\uacc4/outputs/chord_ab/ii_V_I.mid",
+    "--chord-primer",
+    "--chord-blocks-per-bar",
+    "2",
+    "--chords",
+    "Dm7,G7,Cmaj7,A7",
+    "--bars",
+    "16",
+    "--bpm",
+    "128",
+    "--seed",
+    "44",
+    "--capture",
+    "--half-bar-blocks",
+    "--input-port",
+    "AdapterSelectProbe",
+    "--adapter-control",
+    "program",
+    "--output-dir",
+    "outputs/note_input/seed44"
+  ],
+  "exit_code": 0,
+  "sent": [
+    {
+      "at_s": 14.005,
+      "message": "note_on channel=0 note=72 velocity=90 time=0"
+    },
+    {
+      "at_s": 14.254,
+      "message": "note_off channel=0 note=72 velocity=0 time=0"
+    },
+    {
+      "at_s": 14.303,
+      "message": "note_on channel=0 note=76 velocity=90 time=0"
+    },
+    {
+      "at_s": 14.551,
+      "message": "note_off channel=0 note=76 velocity=0 time=0"
+    },
+    {
+      "at_s": 14.602,
+      "message": "note_on channel=0 note=79 velocity=90 time=0"
+    },
+    {
+      "at_s": 14.857,
+      "message": "note_off channel=0 note=79 velocity=0 time=0"
+    },
+    {
+      "at_s": 14.906,
+      "message": "note_on channel=0 note=83 velocity=90 time=0"
+    },
+    {
+      "at_s": 15.154,
+      "message": "note_off channel=0 note=83 velocity=0 time=0"
+    },
+    {
+      "at_s": 15.207,
+      "message": "note_on channel=0 note=86 velocity=90 time=0"
+    },
+    {
+      "at_s": 15.453,
+      "message": "note_off channel=0 note=86 velocity=0 time=0"
+    }
+  ],
+  "per_bar": [
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum",
+    "tatum"
+  ],
+  "switches": [],
+  "input_blocks": [
+    {
+      "block": 12,
+      "input_event_count": 2,
+      "input_to_block_start_ms": 528.803084
+    },
+    {
+      "block": 13,
+      "input_event_count": 9,
+      "input_to_block_start_ms": 513.2365
+    },
+    {
+      "block": 14,
+      "input_event_count": 10,
+      "input_to_block_start_ms": 1204.528834
+    },
+    {
+      "block": 15,
+      "input_event_count": 10,
+      "input_to_block_start_ms": 2142.028834
+    },
+    {
+      "block": 16,
+      "input_event_count": 9,
+      "input_to_block_start_ms": 3079.528834
+    },
+    {
+      "block": 17,
+      "input_event_count": 3,
+      "input_to_block_start_ms": 4017.028834
+    }
+  ],
+  "fallback_bars": 0,
+  "deadline_misses": 0
+}
