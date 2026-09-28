@@ -226,16 +226,17 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
                 start_delay_seconds=2.5, spin_window_ms=5.0,
                 clock=None, clock_ns=None, wait_until=None,
                 deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE,
-                sub_builder=None, fetch_margin_ms=None, start_budget_bars=None):
+                sub_builder=None, fetch_margin_ms=None, start_budget_bars=None,
+                beats_per_block=BEATS_PER_BAR):
     """Play ``bars`` bars, producing one bar ahead.
 
     ``clock``/``clock_ns``/``wait_until`` exist so tests can drive the run off a
     fake clock instead of waiting out real bars.
     """
-    duration = 240.0 / bpm
+    duration = 60.0 / bpm * beats_per_block
     if clock is None:
         clock = MonotonicBarClock(
-            bpm=bpm, beats_per_bar=BEATS_PER_BAR,
+            bpm=bpm, beats_per_bar=beats_per_block,
             start_ns=time.perf_counter_ns() + round(start_delay_seconds * 1e9),
         )
     fallbacks = build_fallback_blocks(
@@ -310,6 +311,17 @@ def played_bar_notes(result, clock, bars: int) -> list[dict]:
                 end = (r.target_ns - clock.bar_start_ns(bar)) / 1e9
                 per_bar[bar].append([int(m.note), round(start, 4), round(end, 4)])
     return [{"bar": b, "notes": sorted(n, key=lambda x: (x[1], x[0]))} for b, n in enumerate(per_bar)]
+
+
+def merge_half_bars(half_bars: list[dict], *, half_seconds: float) -> list[dict]:
+    """Join half-bar blocks back into bars, second half offset by half a bar."""
+    out = []
+    for b in range(len(half_bars) // 2):
+        first, second = half_bars[2 * b]["notes"], half_bars[2 * b + 1]["notes"]
+        notes = first + [[p, round(s + half_seconds, 4), round(e + half_seconds, 4)]
+                         for p, s, e in second]
+        out.append({"bar": b, "notes": sorted(notes, key=lambda x: (x[1], x[0]))})
+    return out
 
 
 def carry_tokens(previous, n: int) -> list[int]:
@@ -523,6 +535,10 @@ def main(argv=None):
                         help="fold LoRA deltas into the base weights before playing: identical "
                              "tokens, about 50%% lower p50 on the Tatum final adapter "
                              "(docs/experiments/LORA_MERGE.md); --no-merge-lora for the old path")
+    parser.add_argument("--half-bar-blocks", action="store_true",
+                        help="with --chord-primer --chord-blocks-per-bar 2: hand each half bar to "
+                             "the scheduler as its own block, so late fetch, start budget, input "
+                             "and adapter choice work per half bar (docs/experiments/HALF_BAR_BLOCKS.md)")
     parser.add_argument("--adapter-name", default="primary",
                         help="name of the --checkpoint adapter in --adapter-schedule")
     parser.add_argument("--swap-adapter", action="append", default=[], metavar="NAME=CHECKPOINT",
@@ -602,6 +618,10 @@ def main(argv=None):
         parser.error("chord primer (48) + context carry + generation tokens exceeds --max-sequence")
     if args.chord_blocks_per_bar > 1 and not args.chord_primer:
         parser.error("--chord-blocks-per-bar needs --chord-primer")
+    if args.half_bar_blocks and not (args.chord_primer and args.chord_blocks_per_bar == 2):
+        parser.error("--half-bar-blocks needs --chord-primer --chord-blocks-per-bar 2")
+    if args.half_bar_blocks and args.fallback_only:
+        parser.error("--half-bar-blocks needs a model; drop --fallback-only")
     swap_specs = {}
     for spec in args.swap_adapter:
         name, sep, path = spec.partition("=")
@@ -659,17 +679,20 @@ def main(argv=None):
                 live_selector = LiveAdapterSelector(bank.names, args.adapter_control)
         adapter_per_bar: dict[int, str] = {}
 
-        def select_adapter(bar_index, input_events=()):
-            """Swap at bar starts only, on the producer thread, between generations."""
+        def select_adapter(block_index, input_events=(), bar_index=None):
+            """Swap at block starts only, on the producer thread, between generations.
+
+            A block is a bar, or a half bar with --half-bar-blocks; a schedule
+            still counts whole bars."""
             if bank is None:
                 return
             if live_selector is not None:
                 name = live_selector.update(input_events)
             else:
                 from scripts.adapter_bank import adapter_for_bar
-                name = adapter_for_bar(schedule, bar_index)
+                name = adapter_for_bar(schedule, block_index if bar_index is None else bar_index)
             bank.select(name)
-            adapter_per_bar[bar_index] = name
+            adapter_per_bar[block_index] = name
         base_primer = build_primer(
             conditioning_midi=str(args.conditioning_midi), primer_max_tokens=32,
             append_sep_token=True, control_format="control_v1", role="lead",
@@ -678,22 +701,30 @@ def main(argv=None):
 
         context_carry = {"tokens": []}
 
-        def generate_sub(bar_index, sub_index, input_events, sub_duration):
-            """One sub-block: harmony restated, then continue."""
+        def generate_sub(bar_index, sub_index, input_events, sub_duration, block_index=None):
+            """One sub-block: harmony restated, then continue.
+
+            ``block_index`` is set when the sub-block is its own scheduler block
+            (--half-bar-blocks): then every sub-block takes the newest input and
+            adapter choice, not only the downbeat one. Seeds stay per (bar, sub),
+            so with no input the tokens match the one-block-per-bar path."""
             from inference.control.chord_primer import chord_guide_notes_for_duration
             from scripts.generate import (
                 encode_notes_simple,
                 truncate_tokens_preserving_velocity,
             )
 
-            if sub_index == 0:
-                select_adapter(bar_index, input_events)
+            fresh_block = sub_index == 0 or block_index is not None
+            if fresh_block:
+                select_adapter(bar_index if block_index is None else block_index,
+                               input_events, bar_index=bar_index)
             chord = chords[bar_index % len(chords)]
             notes = list(chord_guide_notes_for_duration(chord, bpm=args.bpm,
                                                         seconds=sub_duration))
             # Only the downbeat sub-block folds in what the player just did; a
             # later sub-block would be conditioning on input it already used.
-            if sub_index == 0:
+            # A half-bar block has its own, newer snapshot, so it folds its input in.
+            if fresh_block:
                 notes.extend(input_events_to_notes(input_events))
             notes.sort(key=lambda note: (note.start, note.pitch))
             tokens = truncate_tokens_preserving_velocity(encode_notes_simple(notes), 48)
@@ -774,7 +805,14 @@ def main(argv=None):
                     callback=lambda m: captured.append((time.perf_counter_ns(), m)),
                 )
             sub_builder = None
-            if args.chord_blocks_per_bar > 1:
+            blocks = args.bars * 2 if args.half_bar_blocks else args.bars
+            if args.half_bar_blocks:
+                def sub_builder(*, clock, duration):
+                    return make_sub_block_builder(
+                        clock=clock, duration=duration, blocks_per_bar=1,
+                        generate_sub=lambda h, _sub, events, d: generate_sub(
+                            h // 2, h % 2, events, d, block_index=h))
+            elif args.chord_blocks_per_bar > 1:
                 def sub_builder(*, clock, duration):
                     return make_sub_block_builder(
                         clock=clock, duration=duration, generate_sub=generate_sub,
@@ -790,7 +828,10 @@ def main(argv=None):
                 tracer = StallTracer().start()
             try:
                 result, producer = run_session(
-                    port=port, bars=args.bars, bpm=args.bpm, chords=chords, seed=args.seed,
+                    port=port, bars=blocks, bpm=args.bpm, seed=args.seed,
+                    chords=([chords[(h // 2) % len(chords)] for h in range(2 * len(chords))]
+                            if args.half_bar_blocks else chords),
+                    beats_per_block=2 if args.half_bar_blocks else BEATS_PER_BAR,
                     generate=generate, input_buffer=input_buffer, sub_builder=sub_builder,
                     spin_window_ms=args.spin_window_ms, fetch_margin_ms=args.fetch_margin_ms,
                     start_budget_bars=args.start_budget_bars,
@@ -815,6 +856,11 @@ def main(argv=None):
             report = build_report(result, producer, bars=args.bars, bpm=args.bpm,
                                   spin_window_ms=args.spin_window_ms,
                                   capture=capture_summary)
+            if args.half_bar_blocks:
+                # Scheduler and producer counts are per half-bar block here.
+                report["block_beats"] = 2
+                report["blocks"] = blocks
+                report["completed_bars"] = result.completed_bar_count // 2
             if tracer is not None:
                 from inference.realtime.stall_trace import classify_late_events, summarize_trace
                 producer_intervals = [
@@ -845,7 +891,7 @@ def main(argv=None):
                                  **{n: str(p) for n, p in swap_specs.items()}},
                     "schedule": args.adapter_schedule,
                     "control": args.adapter_control,
-                    "per_bar": [adapter_per_bar.get(i) for i in range(args.bars)],
+                    "per_bar": [adapter_per_bar.get(i) for i in range(blocks)],
                     "shared_base": bank.shared_base,
                     "swap_keys": len(bank.swap_keys),
                     "swaps": len(swaps),
@@ -869,7 +915,10 @@ def main(argv=None):
             args.output_dir.mkdir(parents=True, exist_ok=True)
             clock = getattr(producer, "_clock", None)
             if clock is not None:
-                report["played_bars"] = played_bar_notes(result, clock, args.bars)
+                played = played_bar_notes(result, clock, blocks)
+                if args.half_bar_blocks:
+                    played = merge_half_bars(played, half_seconds=120.0 / args.bpm)
+                report["played_bars"] = played
             report["played_note_count"] = write_played_midi(
                 result, args.output_dir / "played.mid", bpm=args.bpm
             )
