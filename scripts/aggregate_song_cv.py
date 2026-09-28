@@ -16,7 +16,8 @@ GENERIC_LIMIT = 0.02
 SPEC_TARGET = -0.02
 
 
-def aggregate(fold_reports: list[dict]) -> dict:
+def aggregate(fold_reports: list[dict], require_target_drop: bool = False,
+              tie_tolerance: float = 0.0) -> dict:
     updates = sorted({r["update"] for rep in fold_reports for r in rep["rows"] if r["update"] > 0})
     table = []
     for u in updates:
@@ -27,8 +28,15 @@ def aggregate(fold_reports: list[dict]) -> dict:
                       "mean_d_ce_heldout": statistics.mean(r["d_ce_target_val"] for r in rows),
                       "mean_d_ce_generic": statistics.mean(r["d_ce_generic"] for r in rows),
                       "folds_negative": sum(s < 0 for s in specs), "per_fold": specs})
-    eligible = [t for t in table if t["mean_d_ce_generic"] <= GENERIC_LIMIT]
-    chosen = min(eligible, key=lambda t: t["mean_specialisation"]) if eligible else None
+    eligible = [t for t in table if t["mean_d_ce_generic"] <= GENERIC_LIMIT
+                and (not require_target_drop or t["mean_d_ce_heldout"] < 0)]
+    chosen = None
+    if eligible:
+        best = min(t["mean_specialisation"] for t in eligible)
+        # Tie rule: anything within tie_tolerance of the best counts as tied;
+        # the smallest update among the tied wins.
+        tied = [t for t in eligible if t["mean_specialisation"] - best <= tie_tolerance]
+        chosen = min(tied, key=lambda t: t["update"])
     # Specialisation alone can pass while the target CE itself gets worse (the
     # generic CE just rose more); the target CE must drop too.
     criterion = bool(chosen and chosen["mean_specialisation"] <= SPEC_TARGET
@@ -40,11 +48,18 @@ def aggregate(fold_reports: list[dict]) -> dict:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--fold-report", type=Path, action="append", required=True)
+    ap.add_argument("--require-target-drop", action="store_true",
+                    help="only updates whose fold-mean held-out dCE < 0 are eligible")
+    ap.add_argument("--tie-tolerance", type=float, default=0.0,
+                    help="specialisation within this of the best is a tie; smallest update wins")
     ap.add_argument("--output", type=Path, required=True)
     args = ap.parse_args(argv)
     out = {"schema": "song_cv_v1", "generic_limit": GENERIC_LIMIT, "spec_target": SPEC_TARGET,
+           "require_target_drop": args.require_target_drop, "tie_tolerance": args.tie_tolerance,
            "fold_reports": [str(p) for p in args.fold_report],
-           **aggregate([json.loads(p.read_text()) for p in args.fold_report])}
+           **aggregate([json.loads(p.read_text()) for p in args.fold_report],
+                       require_target_drop=args.require_target_drop,
+                       tie_tolerance=args.tie_tolerance)}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(out, indent=2) + "\n")
     for t in out["table"]:

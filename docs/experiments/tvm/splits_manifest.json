@@ -1,0 +1,427 @@
+{
+  "schema": "tvm_splits_v1",
+  "tatum_train16_seed": 0,
+  "tatum_fresh12_seed": 1,
+  "sets": {
+    "tatum16_train": [
+      {
+        "file": "00005.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00005.npy",
+        "sha1": "e3a4540927d883d8327fa41f84ce14c8d3ed7541",
+        "tokens": 7920,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 2/I Don't Stand A Ghost Of A Chance With You.midi"
+      },
+      {
+        "file": "00027.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00027.npy",
+        "sha1": "ab8528166d1700fae3ff42c33447fd28dc030ce2",
+        "tokens": 10916,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 3/Tenderly.midi"
+      },
+      {
+        "file": "00033.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00033.npy",
+        "sha1": "49bbda3775b77c658199c2e4a9f3d43239af9b71",
+        "tokens": 8014,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 4/I've Got The World On A String.midi"
+      },
+      {
+        "file": "00038.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00038.npy",
+        "sha1": "da450f0fde42a35c30ade9c1100d7f3eb38b0bca",
+        "tokens": 11138,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 4/Stardust.midi"
+      },
+      {
+        "file": "00045.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00045.npy",
+        "sha1": "1a7d81baf87ddf76cbf0973aa2b26c13a4853c5d",
+        "tokens": 8743,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 5/Don't Worry 'Bout Me.midi"
+      },
+      {
+        "file": "00049.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00049.npy",
+        "sha1": "d384e1aab54c06aff48320ace2a1fd2d6496e5d5",
+        "tokens": 9824,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 5/Louise.midi"
+      },
+      {
+        "file": "00051.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00051.npy",
+        "sha1": "45c7a1206c23b7e698e331b3b48fa9bbb768db6c",
+        "tokens": 8343,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 5/Makin' Whoopee.midi"
+      },
+      {
+        "file": "00053.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00053.npy",
+        "sha1": "0214f931d402d4be7c7bb9dd44835b2827a17baa",
+        "tokens": 9871,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 5/Stars Fell On Alabama.midi"
+      },
+      {
+        "file": "00061.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00061.npy",
+        "sha1": "17a6ed571c678d526c8665d3babf73c370a11f94",
+        "tokens": 10621,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 6/Do Nothing Till You Hear From Me.midi"
+      },
+      {
+        "file": "00062.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00062.npy",
+        "sha1": "f656a264d2d646d10f1173c7ef3b849322e6ee55",
+        "tokens": 8038,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 6/Happy Feet.midi"
+      },
+      {
+        "file": "00065.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00065.npy",
+        "sha1": "11ba0c3646872f91514a107a8c9b92040042241e",
+        "tokens": 9092,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 6/Night And Day.midi"
+      },
+      {
+        "file": "00074.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00074.npy",
+        "sha1": "635f7a1fa745b4a4c1349c4ff0498502bb0777b8",
+        "tokens": 8879,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 7/Judy.midi"
+      },
+      {
+        "file": "00097.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00097.npy",
+        "sha1": "d2f334b83eef08422bdd3746f12a2bcf06dad123",
+        "tokens": 10768,
+        "title": "The Art Tatum Solo Masterpieces, Volume 1/Willow Weep For Me.midi"
+      },
+      {
+        "file": "00100.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00100.npy",
+        "sha1": "b7923cc60a79fd857042080be698018d9ea927af",
+        "tokens": 8607,
+        "title": "The Complete Capitol Recordings (Vol. One)/Dardanella.midi"
+      },
+      {
+        "file": "00106.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00106.npy",
+        "sha1": "2febd599b147d50f4b3e5b1505ec7011f564c5b1",
+        "tokens": 7466,
+        "title": "The Complete Capitol Recordings (Vol. One)/Someone To Watch Over Me.midi"
+      },
+      {
+        "file": "00108.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00108.npy",
+        "sha1": "440a81893bfe312974b7c86e1f31f75546b473b8",
+        "tokens": 12625,
+        "title": "The Complete Capitol Recordings (Vol. One)/Tea For Two.midi"
+      }
+    ],
+    "holdout_tatum_fresh12": [
+      {
+        "file": "00009.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00009.npy",
+        "sha1": "7140bddcf042fc1b0e0ccb841b6457b345de14ea",
+        "tokens": 10434,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 2/Tea For Two.midi"
+      },
+      {
+        "file": "00013.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00013.npy",
+        "sha1": "ea62fd588d37e2fdf727ad43f52bb09df4d74ba0",
+        "tokens": 9594,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 2/Would You Like To Take A Walk.midi"
+      },
+      {
+        "file": "00016.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00016.npy",
+        "sha1": "03c5193ad3fd1008f0950c122ade558cbdbb00c1",
+        "tokens": 8325,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 3/Begin The Beguine.midi"
+      },
+      {
+        "file": "00018.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00018.npy",
+        "sha1": "79715b6db47ea69b662b8642e237ab8ca988d016",
+        "tokens": 10237,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 3/Deep Purple.midi"
+      },
+      {
+        "file": "00028.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00028.npy",
+        "sha1": "bc7fff3dc67317d780d26f73c90a8aae22cfe5ef",
+        "tokens": 8281,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 3/When Your Lover Has Gone.midi"
+      },
+      {
+        "file": "00035.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00035.npy",
+        "sha1": "26fe9042e60aa4b891ad4d5f125456b89802691f",
+        "tokens": 10870,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 4/Ill Wind.midi"
+      },
+      {
+        "file": "00056.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00056.npy",
+        "sha1": "6fc5616e561bcf4ab78b38d309133506037bec4f",
+        "tokens": 8945,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 5/The Moon Is Low.midi"
+      },
+      {
+        "file": "00068.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00068.npy",
+        "sha1": "21971a3139f157f5030424100d98cb93cc20fafd",
+        "tokens": 13203,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 6/The Way You Look Tonight.midi"
+      },
+      {
+        "file": "00071.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00071.npy",
+        "sha1": "8140f8c034aa64bc5447d51cf0c4e2d14f8f4008",
+        "tokens": 9180,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 7/Dancing In The Dark.midi"
+      },
+      {
+        "file": "00075.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00075.npy",
+        "sha1": "776c749e0dfff4413d0ad0eace4b475ada355226",
+        "tokens": 13779,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 7/Mighty Like A Rose.midi"
+      },
+      {
+        "file": "00084.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00084.npy",
+        "sha1": "4eab1115edf68f33b1e925afce5ff2548b19037d",
+        "tokens": 7911,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 7/Wrap Your Troubles In Dreams.midi"
+      },
+      {
+        "file": "00095.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/train/00095.npy",
+        "sha1": "d5637cb3e249847b22297b8232a5cf07ae38606b",
+        "tokens": 11975,
+        "title": "The Art Tatum Solo Masterpieces, Volume 1/Stay As Sweet As You Are.midi"
+      }
+    ],
+    "holdout_tatum_val12": [
+      {
+        "file": "00000.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00000.npy",
+        "sha1": "1a260b2b49d17e55e458dd71872431043b6d7a2e",
+        "tokens": 8356,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 2/September Song.midi"
+      },
+      {
+        "file": "00001.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00001.npy",
+        "sha1": "7840bfa9a6cb471bcb4ace92be0538ec54cbe989",
+        "tokens": 8666,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 3/Yesterdays.midi"
+      },
+      {
+        "file": "00002.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00002.npy",
+        "sha1": "eb937fdc08568dc2cba333c18c8cb05f7771b590",
+        "tokens": 8941,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 5/S'posin'.midi"
+      },
+      {
+        "file": "00003.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00003.npy",
+        "sha1": "1e57c057623e6ff8ee651f55cce8d97ebfe9ac48",
+        "tokens": 12597,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 6/Boulevard Of Broken Dreams.midi"
+      },
+      {
+        "file": "00004.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00004.npy",
+        "sha1": "8e1c8d3d38435534617e08d2608b9ff52e21a1fa",
+        "tokens": 7148,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 6/I'm Comin' Virginia.midi"
+      },
+      {
+        "file": "00005.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00005.npy",
+        "sha1": "552193d3d9329a23fc2073ab2f28152b320126f0",
+        "tokens": 7949,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 7/Japanese Sandman.midi"
+      },
+      {
+        "file": "00006.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00006.npy",
+        "sha1": "0cba9adf6a51f933b4cd438626fced7e853c06bd",
+        "tokens": 8631,
+        "title": "The Art Tatum Solo Masterpieces, Vol. 7/Smoke Gets In Your Eyes.midi"
+      },
+      {
+        "file": "00007.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00007.npy",
+        "sha1": "c7555c31dbdbe6a5765b8d2137832c3bf96f1fda",
+        "tokens": 7667,
+        "title": "The Art Tatum Solo Masterpieces, Volume 1/It's Only A Paper Moon.midi"
+      },
+      {
+        "file": "00008.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00008.npy",
+        "sha1": "f5727dbd228c6981b6b4c105b3ff451ac7032fb7",
+        "tokens": 9447,
+        "title": "The Art Tatum Solo Masterpieces, Volume 1/Just A-Sittin' And A-Rockin'.midi"
+      },
+      {
+        "file": "00009.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00009.npy",
+        "sha1": "e2cf2f83d46afe4d196ad5c790e1fc29cc371c80",
+        "tokens": 5859,
+        "title": "The Complete Capitol Recordings (Vol. One)/I Cover The Waterfront.midi"
+      },
+      {
+        "file": "00010.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00010.npy",
+        "sha1": "ced0073237362783bf6dfc45cccb968e87dbf385",
+        "tokens": 7369,
+        "title": "The Complete Capitol Recordings (Vol. One)/Somebody Loves Me.midi"
+      },
+      {
+        "file": "00011.npy",
+        "source": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full/val/00011.npy",
+        "sha1": "a5dc9451823855c9ecb2fe4cb1916bceb0bd5c3a",
+        "tokens": 7071,
+        "title": "The Complete Capitol Recordings (Vol. One)/Willow Weep For Me.midi"
+      }
+    ],
+    "mehldau16_train": [
+      {
+        "file": "00000.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00000.npy",
+        "sha1": "e2c6410130a89e4d9a483847d26abe9242fedc17",
+        "tokens": 4270
+      },
+      {
+        "file": "00001.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00001.npy",
+        "sha1": "0d2c31bd7fc4a373601941f7842b115a6ae502dd",
+        "tokens": 4464
+      },
+      {
+        "file": "00002.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00002.npy",
+        "sha1": "3990be723a5424c33e20070790ffbe75dc57506f",
+        "tokens": 1968
+      },
+      {
+        "file": "00003.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00003.npy",
+        "sha1": "d99a06359a0d3eba8610410207205ddde9cabddf",
+        "tokens": 6720
+      },
+      {
+        "file": "00004.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00004.npy",
+        "sha1": "c61783c03f0ca2795489245f8a67ae8f2126e56f",
+        "tokens": 10050
+      },
+      {
+        "file": "00005.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00005.npy",
+        "sha1": "b90dd575a169d5cdbc5a41236c18866714ee3ff8",
+        "tokens": 2542
+      },
+      {
+        "file": "00006.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00006.npy",
+        "sha1": "917bfd4d68172016edbf2e68e40c861200a06e84",
+        "tokens": 1572
+      },
+      {
+        "file": "00007.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00007.npy",
+        "sha1": "e2789b7f65d542ac3cf958b91810862fbc31b9e4",
+        "tokens": 1525
+      },
+      {
+        "file": "00008.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00008.npy",
+        "sha1": "d7d2fe2e3b0945bcdfed80d793879bd9248ddad6",
+        "tokens": 3142
+      },
+      {
+        "file": "00009.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00009.npy",
+        "sha1": "5695eada165df1a432696064497e2260b1f6c834",
+        "tokens": 3670
+      },
+      {
+        "file": "00010.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00010.npy",
+        "sha1": "3e5743ed16131bed0bd48094437d3ae1a24111c0",
+        "tokens": 3851
+      },
+      {
+        "file": "00011.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00011.npy",
+        "sha1": "9daaa3bef29fb42c473d53e73cd44bc882be71ef",
+        "tokens": 2977
+      },
+      {
+        "file": "00012.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00012.npy",
+        "sha1": "4cd45f5a443ca62d526324f0f63f8fda82f4f8f7",
+        "tokens": 2640
+      },
+      {
+        "file": "00013.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00013.npy",
+        "sha1": "f53da021429aa28c316d248a8b8b4d2db9731aec",
+        "tokens": 2514
+      },
+      {
+        "file": "00014.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00014.npy",
+        "sha1": "a1d9a899a645aed2623e36ef518b4d92bf23108b",
+        "tokens": 5154
+      },
+      {
+        "file": "00015.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/train/00015.npy",
+        "sha1": "3fa0a71012084930e8712657fb85933b2618f671",
+        "tokens": 2595
+      }
+    ],
+    "holdout_mehldau_val2": [
+      {
+        "file": "00000.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/val/00000.npy",
+        "sha1": "4afc453f8d5f4dc1b8a629807e994a26de255c98",
+        "tokens": 1031
+      },
+      {
+        "file": "00001.npy",
+        "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full/val/00001.npy",
+        "sha1": "f977cac0a5c307ec660fc66f02c6d1ddd02f7e06",
+        "tokens": 5367
+      }
+    ]
+  },
+  "summary": {
+    "tatum16_train": {
+      "songs": 16,
+      "tokens": 150865
+    },
+    "holdout_tatum_fresh12": {
+      "songs": 12,
+      "tokens": 122734
+    },
+    "holdout_tatum_val12": {
+      "songs": 12,
+      "tokens": 99701
+    },
+    "mehldau16_train": {
+      "songs": 16,
+      "tokens": 59654
+    },
+    "holdout_mehldau_val2": {
+      "songs": 2,
+      "tokens": 6398
+    }
+  }
+}
