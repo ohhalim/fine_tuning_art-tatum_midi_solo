@@ -26,11 +26,11 @@ class FlagsTest(unittest.TestCase):
 
 
 class ReserveChordTokensDefaultTest(unittest.TestCase):
-    def test_on_by_default_with_opt_out(self) -> None:
+    def test_off_by_default_experimental(self) -> None:
         from pathlib import Path
         text = (Path(__file__).resolve().parents[1] / "scripts" / "run_continuous_jazz.py").read_text()
         self.assertIn('"--reserve-chord-tokens", action=argparse.BooleanOptionalAction,\n'
-                      '                        default=True', text)
+                      '                        default=False', text)
 
 
 if __name__ == "__main__":
