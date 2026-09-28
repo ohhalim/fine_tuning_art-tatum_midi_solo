@@ -1,0 +1,60 @@
+{
+  "schema": "density_follow_v1",
+  "hits": 0,
+  "rows": [
+    {
+      "seed": 42,
+      "input_blocks": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "input_notes_max": 32,
+      "out_notes": 72,
+      "base_notes": 85,
+      "more": false,
+      "fallback": 0,
+      "misses": 0
+    },
+    {
+      "seed": 43,
+      "input_blocks": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "input_notes_max": 32,
+      "out_notes": 64,
+      "base_notes": 92,
+      "more": false,
+      "fallback": 0,
+      "misses": 0
+    },
+    {
+      "seed": 44,
+      "input_blocks": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "input_notes_max": 32,
+      "out_notes": 51,
+      "base_notes": 73,
+      "more": false,
+      "fallback": 0,
+      "misses": 0
+    }
+  ]
+}
