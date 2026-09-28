@@ -42,6 +42,26 @@ def copy_rate(tokens, reference: set, n: int):
     return None if not grams else sum(g in reference for g in grams) / len(grams)
 
 
+def free_generation_validity(tokens) -> dict:
+    """Grammar validity of an untimed generation.
+
+    The bar validator also requires the exact target duration and every note
+    closed at the end, which a fixed-length free generation cannot meet by
+    construction (it is cut mid-phrase). Those two checks are dropped here;
+    per-bar validity is covered by the runtime, which validates every block.
+    """
+    from scripts.run_resident_model_probe import validate_generated_token_block
+
+    v = validate_generated_token_block(tokens, lookahead_ms=1.0)
+    valid = (v["decode_error"] is None and v["decoded_note_count"] > 0
+             and v["orphan_note_off_count"] == 0 and v["duplicate_note_on_count"] == 0
+             and v["silent_note_count"] == 0)
+    return {"grammar_valid": bool(valid), "decoded_notes": v["decoded_note_count"],
+            "orphan_note_off": v["orphan_note_off_count"],
+            "duplicate_note_on": v["duplicate_note_on_count"],
+            "silent_notes": v["silent_note_count"], "open_at_end": v["stuck_note_count"]}
+
+
 def bootstrap_diff(a, b, iters=2000, seed=0):
     """95% CI of mean(b) - mean(a) resampling seeds (paired by seed index)."""
     rng = np.random.default_rng(seed)
@@ -170,11 +190,12 @@ def main(argv=None) -> int:
                 "p_target": (float(clf.predict_proba(feature_vector(counts)[None])[0])
                              if clf else None),
                 "copy8": copy_rate(tokens, train_grams[8], 8),
-                "copy16": copy_rate(tokens, train_grams[16], 16)})
+                "copy16": copy_rate(tokens, train_grams[16], 16),
+                **free_generation_validity(tokens)})
             decode_midi(tokens, file_path=str(args.output_dir / f"gen_u{update:03d}_s{seed}.mid"))
         generations[update] = gens
         row["per_seed"] = per_seed
-        for k in ("js_shift", "p_target", "copy8", "copy16", "notes"):
+        for k in ("js_shift", "p_target", "copy8", "copy16", "notes", "grammar_valid"):
             vals = [s[k] for s in per_seed if s[k] is not None]
             row[f"mean_{k}"] = float(np.mean(vals)) if vals else None
         row["wall_s"] = round(time.perf_counter() - t0, 1)
