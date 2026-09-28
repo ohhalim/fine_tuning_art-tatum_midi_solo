@@ -236,6 +236,30 @@ def block_metrics(block, *, chord: str, adapter: str | None, input_events) -> di
     }
 
 
+def block_voicings(block, *, window_s: float = 0.05):
+    """Pitch-class sets of near-simultaneous onsets in a block, grouped exactly as
+    D1's ``diversity_metrics.group_voicings`` (50 ms window)."""
+    from scripts.diversity_metrics import group_voicings
+
+    notes = [((e.target_ns - block.target_start_ns) / 1e9, e.message.note, 0.0, e.message.velocity)
+             for e in block.events if e.message.type == "note_on" and e.message.velocity > 0]
+    return group_voicings(notes, window_sec=window_s)
+
+
+class VoicingPool:
+    """Running unique voicings per adapter over a session (in-loop diversity)."""
+
+    def __init__(self) -> None:
+        self._pool: dict[str, list] = {}
+
+    def add(self, adapter: str | None, voicings) -> dict:
+        pool = self._pool.setdefault(adapter or "-", [])
+        pool.extend(voicings)
+        unique = len(set(pool))
+        return {"voicings": len(voicings), "unique_voicings_so_far": unique,
+                "distinct_voicing_ratio_so_far": round(unique / len(pool), 4) if pool else None}
+
+
 def with_block_metrics(factory, *, record):
     """Wrap a builder factory so every model block also reports ``block_metrics``."""
     def make(*, clock, duration):
@@ -892,6 +916,7 @@ def main(argv=None):
                         clock=clock, duration=duration, generate_sub=generate_sub,
                         blocks_per_bar=args.chord_blocks_per_bar)
             metrics_by_block: dict[int, dict] = {}
+            voicing_pool = VoicingPool()
             if not args.fallback_only and args.block_metrics:
                 def record_metrics(block, input_events):
                     b = block.bar_index
@@ -899,12 +924,14 @@ def main(argv=None):
                     m = block_metrics(block, chord=chords[bar % len(chords)],
                                       adapter=adapter_per_bar.get(b, None if bank else args.adapter_name),
                                       input_events=input_events)
+                    m.update(voicing_pool.add(m["adapter"], block_voicings(block)))
                     metrics_by_block[b] = m
                     if args.live_metrics:
                         print(f"block {b:3d} {m['adapter'] or '-':>8} notes {m['notes']:3d} "
                               f"pitch {m['pitch_mean'] if m['pitch_mean'] is not None else '-':>6} "
                               f"chord-tone {m['chord_tone_ratio'] if m['chord_tone_ratio'] is not None else '-':>6} "
-                              f"input {m['input_notes']}", flush=True)
+                              f"input {m['input_notes']} voicings {m['voicings']} "
+                              f"unique-so-far {m['unique_voicings_so_far']}", flush=True)
 
                 base_factory = sub_builder or (
                     lambda *, clock, duration: make_block_builder(
