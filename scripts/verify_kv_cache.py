@@ -25,13 +25,15 @@ def main(argv=None) -> int:
     ap.add_argument("--model", action="append", required=True, metavar="NAME=CHECKPOINT")
     ap.add_argument("--songs", type=Path, default=ROOT / "data/tvm/tatum16/train")
     ap.add_argument("--seeds", default="1,2,3,4,5,6,7,8")
+    ap.add_argument("--device", choices=["cpu", "mps"], default="cpu")
     ap.add_argument("--output", type=Path, required=True)
     args = ap.parse_args(argv)
 
     import numpy as np
     import torch
-    from utilities.device import use_cuda
-    use_cuda(False)
+    from utilities.device import get_device, use_cuda
+    use_cuda(args.device == "mps")
+    device = get_device()
     from inference.control.chord_primer import chord_guide_notes_for_duration
     from scripts.generate import (encode_notes_simple, generate_once, load_model_with_lora,
                                   truncate_tokens_preserving_velocity)
@@ -45,16 +47,16 @@ def main(argv=None) -> int:
         notes = sorted(chord_guide_notes_for_duration(chord, bpm=bpm, seconds=sub),
                        key=lambda n: (n.start, n.pitch))
         chord_primers.append(truncate_tokens_preserving_velocity(encode_notes_simple(notes), 48))
-    out = {"schema": "kv_cache_verify_v1", "models": {}}
+    out = {"schema": "kv_cache_verify_v1", "device": str(device), "models": {}}
     for spec in args.model:
         name, path = spec.split("=", 1)
         model = load_model_with_lora(lora_path=str(Path(path).parent), checkpoint_path=path,
-                                     prefer_full_checkpoint=True)
+                                     prefer_full_checkpoint=True).to(device)
         model.eval()
         maxdiff = 0.0
         with torch.no_grad():
             for seq in seqs:
-                x = torch.tensor(np.asarray(seq, dtype=np.int64))
+                x = torch.tensor(np.asarray(seq, dtype=np.int64)).to(device)
                 full = model(x.unsqueeze(0))[0]
                 cache = {}
                 parts = [model.forward_cached(x[:16], cache)]

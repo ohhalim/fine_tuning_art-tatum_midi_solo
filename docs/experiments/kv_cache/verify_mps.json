@@ -1,0 +1,39 @@
+{
+  "schema": "kv_cache_verify_v1",
+  "device": "mps",
+  "models": {
+    "tatum_final": {
+      "logits_max_abs_diff": 1.049041748046875e-05,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_full": 69.06978604209144,
+      "wall_s_cache": 31.43542700004764,
+      "speedup": 2.1971957321269016
+    },
+    "tatum16": {
+      "logits_max_abs_diff": 1.1444091796875e-05,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_full": 131.07025266613346,
+      "wall_s_cache": 37.54300041904207,
+      "speedup": 3.4912034521261575
+    },
+    "mehldau16": {
+      "logits_max_abs_diff": 1.1920928955078125e-05,
+      "logits_ok": true,
+      "blocks": 32,
+      "identical_blocks": 32,
+      "tokens_ok": true,
+      "mismatches": [],
+      "wall_s_full": 103.83994425198762,
+      "wall_s_cache": 27.685618335963227,
+      "speedup": 3.7506817796841836
+    }
+  }
+}
