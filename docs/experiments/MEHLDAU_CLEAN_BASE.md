@@ -77,3 +77,39 @@
   - 일반 재즈 CE도 −0.024 내려갔다. 이득의 절반 이상은 "재즈 전반"에 대한 적응이고, 멜다우 고유분(특화도)은 −0.022다
   - 특화도는 기준을 겨우 넘었다
   - 128은 시험 범위의 끝값이라 더 긴 예산이 더 나을 수 있다(결과를 본 뒤 예산을 늘리지는 않는다)
+
+## C2 결과 — 완료 기준 전부 충족 → **가능도 수준 멜다우 개인화 완료 (청취 미검증)**
+최종 어댑터는 새 base(멜다우 미학습)에 out_proj LoRA를 붙여 멜다우 train 16곡으로 **128 update** 학습했다(cosine 128, seed 42).
+판정 리포트: `docs/experiments/mehldau_clean_base/personalization_report.json`
+
+| 기준 | 값 | 판정 |
+|---|---|---|
+| 1. CV(미학습 곡, 4-fold) | 특화도 −0.022, held-out CE −0.046, 일반 −0.024, 음수 fold 4/4 | ✓ |
+| 2. 원래 val 2곡(재사용 holdout: 새 base·어댑터·예산 선택에 미사용) | **ΔCE_val −0.047**(< 0), **특화도 −0.021**(≤ −0.01), 일반 −0.026 | ✓ |
+| 3. 생성 문법 유효성 (seed 1–4, 768토큰) | 4/4 | ✓ |
+| 3. 16-gram 복사 (멜다우 train 대비) | 최대 0(8-gram도 0) | ✓ |
+| 3. 런타임 128 BPM 8마디 | 8/8, fallback 0, 미스 0, 생성 p50 435 ms | ✓ |
+
+재로드 검증: 내보낸 체크포인트를 `load_model_with_lora`로 다시 불러오면 logits가 동일하다.
+
+### 쓰는 법
+```sh
+FORCE_CPU=1 .venv/bin/python scripts/run_continuous_jazz.py \
+    --checkpoint outputs/clean_base/c2_export/checkpoint_update128.pt \
+    --conditioning-midi <primer.mid> --bars 8 --bpm 128 --capture \
+    --chord-primer --chord-blocks-per-bar 2 --output-dir outputs/continuous/mehldau
+```
+- 체크포인트(gitignore): `outputs/clean_base/c2_export/checkpoint_update128.pt`
+- 비교 MIDI 10개(`outputs/clean_base/compare_midi/`)
+  - `clean_base_seed{1-4}.mid` vs `mehldau_personalized_seed{1-4}.mid`: 같은 primer·seed끼리 비교
+  - `runtime128_{clean_base,mehldau_personalized}.mid`: 실시간 경로에서 재생된 8마디
+
+### 이 "완료"가 뜻하는 것과 뜻하지 않는 것
+- **뜻하는 것:** 멜다우를 한 번도 보지 않은 모델이 멜다우 16곡으로 적응한 뒤, **처음 보는 멜다우 곡**을 더 잘 예측한다. 그 이득 중 재즈 전반 적응을 뺀 멜다우 고유분이 −0.02 수준이고, 곡을 복사하지 않으며, 실시간으로 동작한다
+- **뜻하지 않는 것:** "멜다우처럼 들린다"(청취 없음), 음악적 품질(`musical_quality_verified: false`, `style_verified: false`)
+- 한계
+  - 멜다우 학습 데이터는 16곡이다
+  - val 2곡은 재사용 holdout이다
+  - 멜다우 스타일을 가르는 생성 지표는 V1/V1b에서 타당성 기준에 미달했다
+  - 128은 시험 범위의 끝값이다
+- 이전 후보(armB + out_proj u64)와의 차이: armB는 멜다우를 이미 봐서 미학습 곡 효과를 잴 수 없었다. 새 후보는 그 측정이 가능한 구성이다

@@ -34,7 +34,7 @@
 핵심은 **"재생하면서 다음 것을 만든다"** 입니다. 마디가 끝나고 생각하기 시작하면
 이미 늦습니다.
 
-최종 목표는 여기에 **연주자 본인의 스타일 적응**을 얹는 것입니다. 멜다우·Art Tatum으로
+최종 목표는 여기에 **연주자 스타일 적응**을 얹는 것입니다. 멜다우는 **가능도 수준 개인화 완료**(멜다우를 한 번도 안 본 base에서 처음 보는 멜다우 곡 예측이 개선, 청취 미검증, #1497). 멜다우·Art Tatum으로
 시험한 결과, 어댑터는 모델 수치상 대상 스타일로 특화됩니다(Tatum은 학습하지 않은 곡까지).
 다만 귀로 들리는 차이는 아직 확인하지 못했습니다(§5).
 
@@ -210,7 +210,8 @@ flowchart LR
 | 어댑터 | 체크포인트 (gitignore) | 런타임 스모크 (8마디, CPU) |
 |---|---|---|
 | 멜다우 u128 | `outputs/mehldau_lora_v2/u128/checkpoint_update128.pt` | 8/8, 오류 0, 생성 p50 404 ms |
-| **멜다우 u64 (현재 후보)** | `outputs/mehldau_apply/export_outproj_u64/checkpoint_update64.pt` | 128 BPM 8/8, fallback 0, 생성 p50 355 ms. val 2곡 기준 사전 규칙으로 선정(val −0.023, 일반 −0.012). QKV 확장은 16곡에서 과적합해 기준 미달(#1495) |
+| 멜다우 u64 (이전 후보, armB 위) | `outputs/mehldau_apply/export_outproj_u64/checkpoint_update64.pt` | 128 BPM 8/8, fallback 0, 생성 p50 355 ms. val 2곡 기준 사전 규칙으로 선정(val −0.023, 일반 −0.012). QKV 확장은 16곡에서 과적합해 기준 미달(#1495) |
+| **멜다우 개인화 (완료 판정)** | `outputs/clean_base/c2_export/checkpoint_update128.pt` | **멜다우 미학습 base** + out_proj LoRA 128 update. 미학습 멜다우 곡 CE −0.046(4-fold 4/4), 재사용 holdout 2곡 −0.047·특화도 −0.021, 복사 0, 128 BPM 8/8. 가능도 수준 완료, 청취 미검증(#1497) |
 | **Tatum u518** | `outputs/tatum_lora_v1/u518/checkpoint_update518.pt` | 8/8, 오류 0, 생성 p50 **778 ms** (노트가 많음, 128 BPM 한 마디 안) |
 | **Tatum v2 (out_proj+QKV) u518** | `outputs/tatum_lora_v2_qkv/u518/checkpoint_update518.pt` | 240 BPM 3회 fallback 0, 생성 p95 712 ms (v1 대비 1.11배). 미학습 Tatum 특화도 −0.111 (v1 −0.063), 일반 CE +0.015 |
 
@@ -317,7 +318,7 @@ uv run --with-requirements requirements.txt bash scripts/agent_harness.sh demo
 - [생성 지연 측정](docs/phase1/GENERATION_LATENCY.md) · [구간별 예산](docs/phase1/LATENCY_BUDGET.md)
 - [코드 primer 비교 실험](docs/experiments/CHORD_PRIMER_AB.md)
 - [멜다우 개인화 실험 (첫 시도)](docs/experiments/MEHLDAU_PERSONALIZATION.md)
-- [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Art Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md) · [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md) · [런타임 멈춤 원인](docs/experiments/RUNTIME_STALL_CAUSE.md) · [Tatum LoRA 타깃](docs/experiments/TATUM_LORA_TARGETS.md) · [seed 반복·멜다우 적용](docs/experiments/SEED_REPEAT_AND_MEHLDAU_APPLY.md)
+- [업데이트 예산 진단](docs/experiments/MEHLDAU_UPDATE_BUDGET_DIAG.md) · [멜다우 스타일 이동](docs/experiments/MEHLDAU_STYLE_SHIFT.md) · [Art Tatum 개인화](docs/experiments/TATUM_PERSONALIZATION.md) · [Tatum 실시간 템포](docs/experiments/TATUM_REALTIME_TEMPO.md) · [런타임 멈춤 원인](docs/experiments/RUNTIME_STALL_CAUSE.md) · [Tatum LoRA 타깃](docs/experiments/TATUM_LORA_TARGETS.md) · [seed 반복·멜다우 적용](docs/experiments/SEED_REPEAT_AND_MEHLDAU_APPLY.md) · [멜다우 개인화 완료](docs/experiments/MEHLDAU_CLEAN_BASE.md)
 - [기존 D0–D4 연구 기록](docs/RESEARCH_SUMMARY.md)
 
 과거 Stage B 실험은 `archive/` 와 연구 문서에 보존합니다.
