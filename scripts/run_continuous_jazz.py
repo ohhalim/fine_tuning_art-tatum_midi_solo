@@ -622,10 +622,12 @@ def main(argv=None):
                         help="record per-block metrics in the report (on by default); "
                              "--no-block-metrics turns the in-loop measurement off")
     parser.add_argument("--reserve-chord-tokens", action=argparse.BooleanOptionalAction,
-                        default=True,
-                        help="with --chord-primer and live input: keep the full chord statement "
-                             "right before generation and fill the rest of the 48-token primer "
-                             "with the newest input (docs/experiments/RESERVE_CHORD_TOKENS.md)")
+                        default=False,
+                        help="experimental, off by default: with --chord-primer and live input, keep "
+                             "the full chord statement right before generation and fill the rest of "
+                             "the 48-token primer with the newest input. Raises chord-tone ratio under "
+                             "dense input but weakened register following (docs/experiments/"
+                             "RESERVE_CHORD_TOKENS.md, INPUT_REGISTER_FOLLOW.md)")
     parser.add_argument("--adapter-name", default="primary",
                         help="name of the --checkpoint adapter in --adapter-schedule")
     parser.add_argument("--swap-adapter", action="append", default=[], metavar="NAME=CHECKPOINT",

@@ -202,7 +202,7 @@ flowchart LR
 - **학습 곡 이득(−0.073)이 학습하지 않은 곡으로 거의 그대로 이어집니다.** 일반 재즈 성능은 끝까지 나빠지지 않았습니다
 - 사용자가 들은 단서 "빠른 속주"를 지표로 쟀습니다. 40–120 ms 간격 비율은 실제 Tatum 0.44 / 일반 재즈 0.21이고, 생성은 원래 모델 0.33 → **Tatum 어댑터 0.43**으로 올랐습니다. 95% CI 하한이 +0.0003이라 경계선입니다
 - 청취: 6쌍 중 1쌍만 응답했습니다("pair4_B가 가장 Tatum 같다, 빠른 속주"). **판정 미완**
-- 16-gram 복사율은 두 아티스트 모두 0입니다
+- 검사한 생성 샘플에서 학습곡 exact 16-gram은 두 아티스트 모두 검출되지 않았습니다
 
 ### 해석의 한계
 - 멜다우와 Tatum 곡 **모두 base 사전학습셋에 들어 있습니다.** Tatum val은 "어댑터가 보지 않은 곡"일 뿐 base는 봤습니다. 완전히 새로운 곡에 대한 일반화는 아닙니다
@@ -213,14 +213,14 @@ flowchart LR
 |---|---|---|
 | 멜다우 u128 | `outputs/mehldau_lora_v2/u128/checkpoint_update128.pt` | 8/8, 오류 0, 생성 p50 404 ms |
 | 멜다우 u64 (이전 후보, armB 위) | `outputs/mehldau_apply/export_outproj_u64/checkpoint_update64.pt` | 128 BPM 8/8, fallback 0, 생성 p50 355 ms. val 2곡 기준 사전 규칙으로 선정(val −0.023, 일반 −0.012). QKV 확장은 16곡에서 과적합해 기준 미달(#1495) |
-| **Tatum 완성 모델 (기본)** | `outputs/final_tatum/export/checkpoint_update518.pt` | 공통 base(Tatum·멜다우 미학습) + out_proj+QKV, Tatum 98곡, val12로 선택. **미학습 Tatum fresh12 CE −0.126**(16곡 모델의 2.3배), 일반 재즈 +0.009, 멜다우 곡 +0.052(Tatum 특이적). 복사 0, 128 BPM 16마디 fallback 0(#1509) |
-| **멜다우 개인화 (완료 판정)** | `outputs/clean_base/c2_export/checkpoint_update128.pt` | **멜다우 미학습 base** + out_proj LoRA 128 update. 미학습 멜다우 곡 CE −0.046(4-fold 4/4), 재사용 holdout 2곡 −0.047·특화도 −0.021, 복사 0, 128 BPM 8/8. 가능도 수준 완료, 청취 미검증(#1497). 학습량 확장 CV(64–384, #1511)에서도 held-out 개선이 64–128에서 포화해 이 모델을 유지. 공통 base 멜다우보다 절대 CE가 0.028 낮아(16/16곡) base 통합도 하지 않음(#1517) |
+| **Tatum 완성 모델 (기본)** | `outputs/final_tatum/export/checkpoint_update518.pt` | 공통 base(Tatum·멜다우 미학습) + out_proj+QKV, Tatum 98곡, val12로 선택. **미학습 Tatum fresh12 CE −0.126**(16곡 모델의 2.3배), 일반 재즈 +0.009, 멜다우 곡 +0.052(Tatum 특이적). 검사 샘플 exact 16-gram 미검출, 128 BPM 16마디 fallback 0(#1509) |
+| **멜다우 개인화 (완료 판정)** | `outputs/clean_base/c2_export/checkpoint_update128.pt` | **멜다우 미학습 base** + out_proj LoRA 128 update. 미학습 멜다우 곡 CE −0.046(4-fold 4/4), 재사용 holdout 2곡 −0.047·특화도 −0.021, 검사 샘플 exact 16-gram 미검출, 128 BPM 8/8. 가능도 수준 완료, 청취 미검증(#1497). 학습량 확장 CV(64–384, #1511)에서도 held-out 개선이 64–128에서 포화해 이 모델을 유지. 공통 base 멜다우보다 절대 CE가 0.028 낮아(16/16곡) base 통합도 하지 않음(#1517) |
 | **Tatum vs 멜다우 비교용 (공통 base)** | `outputs/tvm/export_{tatum,mehldau}/checkpoint_update128.pt` | 두 연주자 모두 제외한 공통 base + 같은 out_proj LoRA·16곡·128 update. 둘 다 자기 연주자 미학습 곡 개선·일반 대비 특화(3×3 교차 평가). 우열은 가중 방식에 따라 뒤집혀 미확정(멜다우 holdout 2곡). 128 BPM 8/8(#1499) |
 
 **연주 중 전환과 입력 반영 지연 (#1525, #1526):**
 - `--adapter-control program`(또는 `cc:N`)과 `--input-port`로 키보드 프리셋 버튼에서 어댑터를 고른다
 - 늦은 fetch(`--fetch-margin-ms 50`, 기본값)로 생성 선행을 3마디에서 1마디로 줄였다. 입력이 반영되기까지 4마디(약 7.5초)에서 2마디(약 2.3–3.7초, 128 BPM)가 됐다. 생성 내용은 240/240마디 동일하다
-- 생성 시작 예산(`--start-budget-bars auto` = 0.5마디, #1530)으로 입력 도착에서 반영 마디 시작까지 평균 2.7초에서 **1.8초**(1.3–2.4초)로 더 줄었다. 생성 내용은 288/288마디 동일하다
+- 생성 시작 예산(`--start-budget-bars auto` = 0.5마디, #1530)으로 입력 도착에서 반영 마디 시작까지 평균 2.7초에서 **1.8초**(1.3–2.4초)로 더 줄었다. 생성 내용은 288/288마디 동일하다. 1차 기준(미스 0)은 미달이었다. 기본값은 가상 포트·무부하에서의 잠정 선택이다(#1558)
 - 반 마디 스케줄러 블록(`--half-bar-blocks`, #1532)으로 평균 **0.9초**(0.5–1.3초)가 됐다. 프리셋 실행기는 이 모드를 쓴다. 생성 내용은 288/288 단위 동일하다
 
 **최종 두 모델 템포 (#1523):** Tatum 완성과 멜다우 #1497 모두 128–240 BPM 24회에서 fallback 0, 미스 0이었다. 생성 p95는 마디의 최대 29%다.

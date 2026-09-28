@@ -67,3 +67,7 @@
     --adapter-control program --conditioning-midi outputs/chord_ab/ii_V_I.mid --chord-primer --chord-blocks-per-bar 2
   ```
   이 설정에서 키보드 프리셋 버튼(PC 0 = Tatum, PC 1 = 멜다우)으로 전환한다. 실물 키보드로는 검증하지 않았다(`external_keyboard_verified: false`)
+
+## 리뷰 후 교정 (#1558)
+- 알려진 probe 결함(Astra M3): 이미 선택된 어댑터를 다시 요청하면 현재 마디를 적용 마디로 잡아 음수 지연이 나온다. `per_bar`는 생성 시점 선택이므로 fallback도 적용으로 셀 수 있다
+- 이 문서와 #1526·#1530·#1532의 지연 수치는 영향이 없다. PC가 매번 어댑터를 바꿨고(1/0/1…, no-op 없음) 모든 probe 실행이 fallback 0이었기 때문이다. probe는 따로 고친다
