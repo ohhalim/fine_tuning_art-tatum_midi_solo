@@ -1,0 +1,41 @@
+{
+  "schema": "cross_artist_indices_v1",
+  "columns": {
+    "tatum": "tatum_fresh12",
+    "mehldau": "mehldau_val2"
+  },
+  "tatum_adapter": {
+    "self_gain_macro": -0.0554551257977263,
+    "self_gain_token": -0.05512716432497733,
+    "self_gain_positive": true,
+    "specialisation_macro": -0.034870311520836375,
+    "specialisation_ci95": [
+      -0.04279052894025732,
+      -0.027240592992500843
+    ],
+    "specificity_macro": -0.017679835785366506,
+    "specificity_ci95": [
+      -0.036230115171913706,
+      0.0008474020348077131
+    ],
+    "other_gain_macro": -0.0377752900123598,
+    "generic_gain_macro": -0.02058481427688993
+  },
+  "mehldau_adapter": {
+    "self_gain_macro": -0.05616714954376234,
+    "self_gain_token": -0.03728862603505423,
+    "self_gain_positive": true,
+    "specialisation_macro": -0.040050719377196745,
+    "specialisation_ci95": [
+      -0.07020606968476187,
+      -0.009888064479978783
+    ],
+    "specificity_macro": -0.04595392263746504,
+    "specificity_ci95": [
+      -0.07576062913886548,
+      -0.01598327372977894
+    ],
+    "other_gain_macro": -0.010213226906297298,
+    "generic_gain_macro": -0.0161164301665656
+  }
+}
