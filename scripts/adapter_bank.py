@@ -152,6 +152,7 @@ class LiveAdapterSelector:
         it asked for the adapter already active (``noop``), and whether a later
         message consumed by the same block overrode it (``superseded``).
         """
+        before = self.current                 # adapter of the previous block
         batch = []
         for e in events:
             if e.received_ns <= self._last_ns:
@@ -161,13 +162,17 @@ class LiveAdapterSelector:
             if value is None:
                 continue
             record = {"received_ns": e.received_ns, "value": value, "selected": name,
-                      "previous": self.current, "noop": name is not None and name == self.current,
-                      "superseded": False, "consumed_block": block_index}
+                      "previous": before, "noop": False, "superseded": False,
+                      "consumed_block": block_index}
             self.events.append(record)
             if name is not None:
                 self.current = name
                 batch.append(record)
-        effective = [r for r in batch if not r["noop"]]
-        for r in effective[:-1]:
+        # Judged against the adapter the previous block used, not an intermediate
+        # state: the last valid message in the batch is the one this block acts on
+        # (noop if it asks for what was already playing); earlier ones are overridden.
+        for r in batch[:-1]:
             r["superseded"] = True
+        if batch:
+            batch[-1]["noop"] = batch[-1]["selected"] == before
         return self.current
