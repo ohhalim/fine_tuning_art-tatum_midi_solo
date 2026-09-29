@@ -694,6 +694,10 @@ def main(argv=None):
                              "the 48-token primer with the newest input. Raises chord-tone ratio under "
                              "dense input but weakened register following (docs/experiments/"
                              "RESERVE_CHORD_TOKENS.md, INPUT_REGISTER_FOLLOW.md)")
+    parser.add_argument("--reserve-chord-when-cut", action="store_true",
+                        help="experimental: reserve chord tokens (as --reserve-chord-tokens) only "
+                             "when the standard 48-token cut would drop a chord guide note "
+                             "(docs/experiments/CONDITIONAL_CHORD_RESERVE.md)")
     parser.add_argument("--adapter-name", default="primary",
                         help="name of the --checkpoint adapter in --adapter-schedule")
     parser.add_argument("--swap-adapter", action="append", default=[], metavar="NAME=CHECKPOINT",
@@ -789,6 +793,8 @@ def main(argv=None):
         parser.error("--chord-blocks-per-bar needs --chord-primer")
     if args.half_bar_blocks and not (args.chord_primer and args.chord_blocks_per_bar == 2):
         parser.error("--half-bar-blocks needs --chord-primer --chord-blocks-per-bar 2")
+    if args.reserve_chord_when_cut and args.reserve_chord_tokens:
+        parser.error("use either --reserve-chord-tokens or --reserve-chord-when-cut")
     if args.live_metrics and not args.block_metrics:
         parser.error("--live-metrics needs --block-metrics")
     if args.half_bar_blocks and args.fallback_only:
@@ -871,6 +877,7 @@ def main(argv=None):
         )
 
         context_carry = {"tokens": []}
+        chord_reserved_blocks: list[int] = []
 
         def generate_sub(bar_index, sub_index, input_events, sub_duration, block_index=None):
             """One sub-block: harmony restated, then continue.
@@ -896,7 +903,17 @@ def main(argv=None):
             # later sub-block would be conditioning on input it already used.
             # A half-bar block has its own, newer snapshot, so it folds its input in.
             played = input_events_to_notes(input_events) if fresh_block else []
-            if args.reserve_chord_tokens and played:
+            standard = None
+            if played:
+                standard = truncate_tokens_preserving_velocity(encode_notes_simple(
+                    sorted(notes + played, key=lambda note: (note.start, note.pitch))), 48)
+            # when-cut: reserve only if the standard 48-token cut actually dropped
+            # a chord guide note (docs/experiments/CONDITIONAL_CHORD_RESERVE.md).
+            # An input note at the same pitch can mask a dropped guide note.
+            guide_cut = bool(played) and not (
+                {n.pitch for n in notes} <= {t for t in standard if 0 <= t < 128})
+            if played and (args.reserve_chord_tokens or (args.reserve_chord_when_cut and guide_cut)):
+                chord_reserved_blocks.append(block_index if block_index is not None else bar_index)
                 # Dense input used to push the chord statement out of the 48-token
                 # window (docs/experiments/RESERVE_CHORD_TOKENS.md): keep the whole
                 # chord statement next to generation and give the input what is left.
@@ -907,8 +924,10 @@ def main(argv=None):
                     max(0, 48 - len(chord_tokens)))
                 notes = notes + played
                 tokens = list(input_tokens) + list(chord_tokens)
-            else:
+            elif played:
                 notes.extend(played)
+                tokens = standard
+            else:
                 notes.sort(key=lambda note: (note.start, note.pitch))
                 tokens = truncate_tokens_preserving_velocity(encode_notes_simple(notes), 48)
             # Opt-in context carry: the tail of the previous valid block goes in
@@ -1088,6 +1107,10 @@ def main(argv=None):
             report["merge_lora"] = bool(args.merge_lora)
             # Blocks whose model block get() actually handed to the scheduler.
             report["adopted_blocks"] = sorted(producer.adopted_blocks)
+            report["reserve_chord_mode"] = ("always" if args.reserve_chord_tokens else
+                                            "when_cut" if args.reserve_chord_when_cut else "off")
+            report["chord_reserved_blocks"] = (sorted(set(chord_reserved_blocks))
+                                               if not args.fallback_only else [])
             report["fetch_margin_ms"] = args.fetch_margin_ms
             report["start_budget_bars"] = args.start_budget_bars
             report["adaptive_start_safety"] = args.adaptive_start_safety
