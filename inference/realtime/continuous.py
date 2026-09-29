@@ -154,6 +154,9 @@ class BarBlockProducer:
         self._ready: dict[int, ScheduledMidiBlock] = {}
         self._records: dict[int, BarProductionRecord] = {}
         self._abandoned: set[int] = set()
+        # Bars for which get() handed the scheduler the model block itself
+        # (not a fallback): the only evidence that a model block was adopted.
+        self._adopted: set[int] = set()
         self._consumed_watermark = -1
         self._cv = Condition()
         self._stop = Event()
@@ -201,6 +204,7 @@ class BarBlockProducer:
                 self._cv.notify_all()
             block = self._ready.pop(bar_index, None)
             if block is not None:
+                self._adopted.add(bar_index)
                 return block
             if self._build_block is None:
                 return self._fallback[bar_index]
@@ -345,6 +349,18 @@ class BarBlockProducer:
     def records(self) -> tuple[BarProductionRecord, ...]:
         with self._cv:
             return tuple(self._records[i] for i in sorted(self._records))
+
+    @property
+    def adopted_blocks(self) -> frozenset[int]:
+        """Bars whose model block get() actually returned to the scheduler."""
+        with self._cv:
+            return frozenset(self._adopted)
+
+    @property
+    def consumed_watermark(self) -> int:
+        """Highest bar the scheduler has asked for (-1 before the first get)."""
+        with self._cv:
+            return self._consumed_watermark
 
     def record_for(self, bar_index: int) -> BarProductionRecord | None:
         with self._cv:

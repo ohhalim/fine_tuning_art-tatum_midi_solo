@@ -48,7 +48,7 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
   - LoRA 병합(#1512, #1520)
   - 늦은 fetch 50 ms(#1526)
   - 생성 시작 예산 0.5블록(#1530): 잠정 기본값. 1차 기준(미스 0)은 미달이었고, 후속 교대 12회는 원인 분리 탐색일 뿐 비열등 입증이 아니다
-  - 루프 안 블록 지표 기록(#1544, #1546): 잠정 기본값, 위와 같은 단서. 폐기된 늦은 블록의 지표가 섞이는 결함은 수정 예정(Astra M2)
+  - 루프 안 블록 지표 기록(#1544, #1546): 잠정 기본값, 위와 같은 단서. 재생 지표와 누적은 `get()`이 실제로 반환한 모델 블록만 쓴다(#1562, Astra M2 수정)
   - 코드 토큰 예약(#1553)은 **실험 옵션, 기본 off**(#1558). 음역 따라가기가 5/6에서 2/6로 떨어진 비용이 있다
   - 스케줄러 spin 5 ms, QoS user-interactive
 
@@ -63,14 +63,14 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
 | 키보드 음 입력 | 반 마디 블록에서 입력이 든 블록만 달라지고(입력 없는 블록은 26/26 동일) 4초 창이 지나면 원래대로 돌아온다. 최신 입력 → 블록 시작 0.52–0.55 s | [NOTE_INPUT_HALF_BAR](experiments/NOTE_INPUT_HALF_BAR.md) |
 | 입력 음역 따라가기 (탐색) | 높은/낮은 음역 구절을 입력하면 출력 평균 음높이가 6개 비교 중 5개에서 그 방향으로 이동(+2.8 ~ +8.1 / −1.5 ~ −8.2 반음) | [INPUT_REGISTER_FOLLOW](experiments/INPUT_REGISTER_FOLLOW.md) |
 | 입력 밀도 따라가기 (탐색) | 16분음표 16개 입력 시 출력 음 수가 3/3 seed에서 **줄었다**(−15 ~ −30%). 따라간다는 근거 없음. 이때 코드 진술이 primer에서 잘려 나감을 확인했다(인과는 미검증). 코드 토큰 예약(#1553, **실험 옵션, 기본 off**)을 켜면 입력 블록 코드톤 비율이 3/3 올랐지만(0.39–0.47 → 0.50–0.61) 음역 따라가기가 5/6에서 2/6로 떨어졌다 | [INPUT_DENSITY_FOLLOW](experiments/INPUT_DENSITY_FOLLOW.md), [RESERVE_CHORD_TOKENS](experiments/RESERVE_CHORD_TOKENS.md) |
-| 루프 안 지표 | 블록마다 어댑터·음 수·음높이·코드톤·입력·보이싱 수·어댑터별 누적 고유 보이싱을 기록(`block_metrics`, 기본 on). fallback 없는 실행에서 오프라인 계산과 일치(288/288, 96/96). 교대 12회에서 미스 차이는 관측되지 않았다(비열등 미입증). 늦게 폐기된 블록의 지표가 섞이는 결함이 있다(수정 예정) | [LIVE_METRICS](experiments/LIVE_METRICS.md), [LIVE_DIVERSITY](experiments/LIVE_DIVERSITY.md) |
+| 루프 안 지표 | 블록마다 어댑터·음 수·음높이·코드톤·입력·보이싱 수·어댑터별 누적 고유 보이싱을 기록(`block_metrics`, 기본 on). fallback 없는 실행에서 오프라인 계산과 일치(288/288, 96/96). 교대 12회에서 미스 차이는 관측되지 않았다(비열등 미입증). 채택 블록만 재생 지표로 쓰고, 생성 지표와 전송 상태는 분리했다(#1562) | [LIVE_METRICS](experiments/LIVE_METRICS.md), [LIVE_DIVERSITY](experiments/LIVE_DIVERSITY.md) |
 | CPU 부하 여유 (Tatum 완성, 반 마디 블록) | 바쁜 프로세스 2·4개: 128/240 BPM 성립. 8개(성능 코어 전부): 생성이 2.5–3배 느려짐. fallback은 고정 예산 22%, 적응형 4%, 예산 off 1.6% | [LOAD_MARGIN](experiments/LOAD_MARGIN.md), [ADAPTIVE_BUDGET](experiments/ADAPTIVE_BUDGET.md) |
 | 키보드 전환 | Program Change/CC, 모든 메시지 적용(9/9, 15/15, 15/15). 반 마디 블록에서 도착 → 적용 블록 시작 평균 0.9 s | [ADAPTER_LIVE_SELECT](experiments/ADAPTER_LIVE_SELECT.md), [HALF_BAR_BLOCKS](experiments/HALF_BAR_BLOCKS.md) |
 
 주의
 - 음 입력(#1538)과 음역 따라가기(#1542)는 입력 음과 코드 음을 시간순으로 섞는 primer로 쟀다. 코드 토큰 예약을 끈 현재 기본값과 같은 구성이다
 - 키보드 전환 지연 수치는 PC가 매번 어댑터를 바꾸고 fallback이 0인 실행에서 쟀다. no-op 요청과 fallback을 적용으로 세는 probe 결함(Astra M3)이 있다. 이 조건이라 영향은 낮을 것으로 예상하지만 검산 전이다. probe 수정과 기존 artifact 검산은 예정이다
-- 늦은 fetch는 이전 블록의 note_off가 마디 경계에 있으면 fetch가 −50 ms가 아니라 경계에서 일어나는 결함이 있다(Astra M1, 수정 예정)
+- 늦은 fetch가 경계 note_off 뒤로 밀리던 결함은 고쳤다(#1560, Astra M1). 보고용 교대 A/B의 미스는 수정 전 2건, 수정 후 4건이었다. 소표본이고 외부 부하가 있던 시간대라 판정하지 않았다
 
 ## 4. 쇼케이스 MIDI
 
