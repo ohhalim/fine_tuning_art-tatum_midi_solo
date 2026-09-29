@@ -488,10 +488,12 @@ def block_to_notes(block):
             open_notes[m.note] = (t, m.velocity)
         elif m.type in ("note_off", "note_on") and m.note in open_notes:
             t0, vel = open_notes.pop(m.note)
-            notes.append(pretty_midi.Note(velocity=vel, pitch=m.note, start=t0, end=max(t, t0 + 0.01)))
+            # Keep the played duration, however short (Astra review): callers
+            # quantise and clamp to the block, and decide what a zero length means.
+            notes.append(pretty_midi.Note(velocity=vel, pitch=m.note, start=t0, end=max(t, t0)))
     for pitch, (t0, vel) in open_notes.items():
         notes.append(pretty_midi.Note(velocity=vel, pitch=pitch, start=t0,
-                                      end=max(end_s or t0 + 0.01, t0 + 0.01)))
+                                      end=max(end_s if end_s is not None else t0, t0)))
     return sorted(notes, key=lambda n: (n.start, n.pitch))
 
 
@@ -526,11 +528,21 @@ class PlayedHistory:
         for i in range(self.next_block, watermark + 1):
             block = generated.get(i) if i in adopted else fallback_for(i)
             base_s = i * self.block_s
+            lo = int(round(i * self.block_s * 100))            # this block's quantised edges
+            hi = int(round((i + 1) * self.block_s * 100))
             for n in (block_to_notes(block) if block is not None else []):
-                start = int(round((base_s + n.start) * 100))
-                end = max(start + 1, int(round((base_s + n.end) * 100)))
+                start = min(max(int(round((base_s + n.start) * 100)), lo), hi)
+                end = min(max(int(round((base_s + n.end) * 100)), lo), hi)
+                if end <= start:
+                    # Zero length on the 10 ms grid (e.g. a 2.5 ms note at the block
+                    # end). Policy: move the onset one tick earlier when that stays
+                    # inside the block and does not overlap the same pitch; else drop.
+                    start, end = end - 1, end
+                    if start < lo or any(p == n.pitch and e > start and s0 < end
+                                         for s0, e, p, _ in self._notes[-32:]):
+                        continue
                 self._notes.append((start, end, n.pitch, n.velocity))
-            self.boundary_step = int(round((i + 1) * self.block_s * 100))
+            self.boundary_step = hi
             self.next_block = i + 1
         self._rebuild()
 

@@ -103,6 +103,41 @@ class PlayedHistoryTest(unittest.TestCase):
         self.assertEqual(shifts_ms(hist.tokens), hist.span_steps() * 10)
         self.assertLessEqual(hist.span_steps(), 3000 + round(93.75))
 
+    def _inside(self, hist):
+        return all(s0 < e <= hist.boundary_step for s0, e, _, _ in hist._notes)
+
+    def test_last_2_5_ms_note_stays_inside_its_block(self) -> None:
+        # Astra's case: note_on 0.935 s, note_off 0.9375 s (the half-bar end at 128 BPM).
+        hist = PlayedHistory(BLOCK_S)
+        hist.settle(adopted={0}, watermark=0, generated={0: events_block(0, [(0.935, BLOCK_S, 60)])},
+                    fallback_for=lambda i: None)
+        self.assertEqual(hist.boundary_step, 94)
+        self.assertEqual(hist._notes, [(93, 94, 60, 80)])
+        self.assertTrue(self._inside(hist))
+        self.assertEqual(shifts_ms(hist.tokens), hist.span_steps() * 10)
+
+    def test_notes_collapsing_to_one_tick_get_a_tick_or_are_dropped(self) -> None:
+        hist = PlayedHistory(BLOCK_S)
+        # 4 ms note mid-block -> onset moved one tick; a zero-length note at the block
+        # start cannot move earlier and is dropped.
+        blk = events_block(0, [(0.100, 0.104, 62), (0.0, 0.0, 64)])
+        hist.settle(adopted={0}, watermark=0, generated={0: blk}, fallback_for=lambda i: None)
+        self.assertEqual(sorted(hist._notes), [(9, 10, 62, 80)])
+
+    def test_same_pitch_across_the_boundary_keeps_off_before_on(self) -> None:
+        from midi_processor.processor import decode_midi
+        gen = {0: events_block(0, [(0.90, BLOCK_S, 60)]), 1: events_block(1, [(0.0, 0.2, 60)])}
+        hist = PlayedHistory(BLOCK_S)
+        hist.settle(adopted={0, 1}, watermark=1, generated=gen, fallback_for=lambda i: None)
+        self.assertTrue(self._inside(hist))
+        ons = [t for t in hist.tokens if t == 60]
+        offs = [t for t in hist.tokens if t == 128 + 60]
+        self.assertEqual((len(ons), len(offs)), (2, 2))
+        first_off = hist.tokens.index(128 + 60)
+        second_on = [i for i, t in enumerate(hist.tokens) if t == 60][1]
+        self.assertLess(first_off, second_on)
+        self.assertEqual(len([n for inst in decode_midi(hist.tokens).instruments for n in inst.notes]), 2)
+
     def test_block_to_notes_times_from_the_block_start(self) -> None:
         notes = block_to_notes(block(3, 67))
         self.assertEqual([(n.pitch, round(n.start, 3), round(n.end, 3)) for n in notes], [(67, 0.1, 0.3)])
