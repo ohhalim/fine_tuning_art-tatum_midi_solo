@@ -474,6 +474,108 @@ def carry_tokens(previous, n: int) -> list[int]:
     return truncate_tokens_preserving_velocity(previous, n)
 
 
+def block_to_notes(block):
+    """Notes of a scheduled block, timed from its start (unclosed notes end at the block end)."""
+    import pretty_midi
+
+    start_ns = block.target_start_ns
+    end_s = ((block.target_end_ns - start_ns) / 1e9) if block.target_end_ns is not None else None
+    open_notes, notes = {}, []
+    for e in block.events:
+        m = e.message
+        t = (e.target_ns - start_ns) / 1e9
+        if m.type == "note_on" and m.velocity > 0:
+            open_notes[m.note] = (t, m.velocity)
+        elif m.type in ("note_off", "note_on") and m.note in open_notes:
+            t0, vel = open_notes.pop(m.note)
+            # Keep the played duration, however short (Astra review): callers
+            # quantise and clamp to the block, and decide what a zero length means.
+            notes.append(pretty_midi.Note(velocity=vel, pitch=m.note, start=t0, end=max(t, t0)))
+    for pitch, (t0, vel) in open_notes.items():
+        notes.append(pretty_midi.Note(velocity=vel, pitch=pitch, start=t0,
+                                      end=max(end_s if end_s is not None else t0, t0)))
+    return sorted(notes, key=lambda n: (n.start, n.pitch))
+
+
+class PlayedHistory:
+    """Token history of the adopted/scheduled blocks, one block at a time.
+
+    Astra reviews of #1572: a block enters only once the scheduler has asked for
+    it: the model block if get() adopted it, otherwise the fallback scheduled in
+    its place. This is what was handed to the scheduler, not a record of sends
+    that finished: a block's future note-offs are included, and a cancelled run
+    can stop mid-block.
+
+    Timing: every note time is first placed on the absolute 10 ms session grid,
+    and tokens encode differences of those grid times, so per-event rounding
+    cannot accumulate (a note held to each block end used to add 2.5 ms per
+    block). Each settled block ends exactly on its cumulative boundary
+    (docs/experiments/CONTEXT_HISTORY.md).
+    """
+
+    def __init__(self, block_s: float, cap: int = 2048, horizon_s: float = 30.0):
+        self.block_s = block_s
+        self.cap = cap
+        self.horizon_steps = int(round(horizon_s * 100))
+        self.tokens: list[int] = []
+        self.next_block = 0
+        self.boundary_step = 0            # end of the last settled block, in 10 ms steps
+        self._notes: list[tuple[int, int, int, int]] = []    # (start, end, pitch, velocity) steps
+        self._last_end: dict[int, int] = {}                  # latest end tick per pitch
+
+    def settle(self, *, adopted, watermark: int, generated: dict, fallback_for) -> None:
+        if watermark < self.next_block:
+            return
+        for i in range(self.next_block, watermark + 1):
+            block = generated.get(i) if i in adopted else fallback_for(i)
+            base_s = i * self.block_s
+            lo = int(round(i * self.block_s * 100))            # this block's quantised edges
+            hi = int(round((i + 1) * self.block_s * 100))
+            for n in (block_to_notes(block) if block is not None else []):
+                start = min(max(int(round((base_s + n.start) * 100)), lo), hi)
+                end = min(max(int(round((base_s + n.end) * 100)), lo), hi)
+                if end <= start:
+                    # Zero length on the 10 ms grid (e.g. a 2.5 ms note at the block
+                    # end). Policy: move the onset one tick earlier when that stays
+                    # inside the block and does not overlap the same pitch; else drop.
+                    # Rounding keeps order, so only this move can create an overlap,
+                    # and notes arrive in onset order: the pitch's last end suffices.
+                    start, end = end - 1, end
+                    if start < lo or start < self._last_end.get(n.pitch, -1):
+                        continue
+                self._notes.append((start, end, n.pitch, n.velocity))
+                self._last_end[n.pitch] = max(self._last_end.get(n.pitch, -1), end)
+            self.boundary_step = hi
+            self.next_block = i + 1
+        self._rebuild()
+
+    def _rebuild(self) -> None:
+        import pretty_midi
+        from scripts.generate import encode_notes_simple, truncate_tokens_preserving_velocity
+
+        low = self.boundary_step - self.horizon_steps
+        self._notes = [x for x in self._notes if x[1] > low]
+        if not self._notes:
+            self.tokens = []
+            return
+        origin = min(x[0] for x in self._notes)
+        notes = [pretty_midi.Note(velocity=v, pitch=p, start=(s - origin) / 100, end=(e - origin) / 100)
+                 for s, e, p, v in self._notes]
+        toks = encode_notes_simple(sorted(notes, key=lambda n: (n.start, n.pitch)))
+        remaining = self.boundary_step - max(max(x[1] for x in self._notes), max(x[0] for x in self._notes))
+        while remaining > 0:
+            step = min(remaining, 100)
+            toks.append(255 + step)
+            remaining -= step
+        self.tokens = truncate_tokens_preserving_velocity(toks, self.cap)
+
+    def span_steps(self) -> int:
+        """Time covered by the (uncapped) note window, first note to the last boundary."""
+        if not self._notes:
+            return 0
+        return self.boundary_step - min(x[0] for x in self._notes)
+
+
 def summarize_lateness_ms(lateness_ns) -> dict:
     """Distribution of scheduler dispatch lateness over every attempt, not just the tail."""
     values = sorted(ns / 1e6 for ns in lateness_ns)
@@ -712,6 +814,13 @@ def main(argv=None):
     parser.add_argument("--context-carry-tokens", type=int, default=0,
                         help="with --chord-primer: prepend the last N tokens of the previous "
                              "valid block to each block's primer (0 = off, the previous behaviour)")
+    parser.add_argument("--temperature", type=float, default=1.0,
+                        help="sampling temperature (1.0 = previous behaviour). Lower values made "
+                             "continuous Tatum output reuse motifs more (docs/experiments/COHERENCE_GOAL.md)")
+    parser.add_argument("--context-history", action="store_true",
+                        help="with --context-carry-tokens: carry the last N tokens of everything "
+                             "played so far (several blocks), not only the previous block "
+                             "(docs/experiments/CONTEXT_HISTORY.md)")
     parser.add_argument("--context-carry-position", choices=["before", "after"], default="before",
                         help="where the carried tail goes: before the chord statement (default) "
                              "or after it, right before generation")
@@ -783,6 +892,16 @@ def main(argv=None):
         parser.error("context_carry_tokens must be >= 0")
     if args.context_carry_tokens and not args.chord_primer:
         parser.error("--context-carry-tokens needs --chord-primer")
+    if not 0.1 <= args.temperature <= 2.0:
+        parser.error("temperature must be between 0.1 and 2.0")
+    if args.context_history and not args.context_carry_tokens:
+        parser.error("--context-history needs --context-carry-tokens")
+    if args.context_history and not args.half_bar_blocks:
+        # Each history entry is one scheduler block whose adoption is known;
+        # other paths would silently ignore the option (Astra review).
+        parser.error("--context-history needs --half-bar-blocks")
+    if args.context_carry_tokens and args.chord_blocks_per_bar < 2:
+        parser.error("--context-carry-tokens needs --chord-blocks-per-bar 2 (sub-block path)")
     if args.chord_primer and 48 + args.context_carry_tokens + args.generation_tokens > args.max_sequence:
         parser.error("chord primer (48) + context carry + generation tokens exceeds --max-sequence")
     if args.chord_blocks_per_bar > 1 and not args.chord_primer:
@@ -871,6 +990,8 @@ def main(argv=None):
         )
 
         context_carry = {"tokens": []}
+        played_history = PlayedHistory(60.0 / args.bpm * 2)     # half-bar blocks only
+        generated_blocks: dict = {}
 
         def generate_sub(bar_index, sub_index, input_events, sub_duration, block_index=None):
             """One sub-block: harmony restated, then continue.
@@ -914,7 +1035,18 @@ def main(argv=None):
             # Opt-in context carry: the tail of the previous valid block goes in
             # front of this block's chord statement, so the model continues the
             # line instead of starting every half bar from scratch.
-            carried = carry_tokens(context_carry["tokens"], args.context_carry_tokens)
+            if args.context_history:
+                # Only blocks the scheduler already asked for: adopted model
+                # blocks, or the fallbacks that played instead (Astra review).
+                producer_now = producer_box.get("producer")
+                if producer_now is not None:
+                    adopted_now, watermark_now = producer_now.adoption_snapshot()
+                    played_history.settle(adopted=adopted_now, watermark=watermark_now,
+                                          generated=generated_blocks,
+                                          fallback_for=producer_now.fallback_for)
+                carried = carry_tokens(played_history.tokens, args.context_carry_tokens)
+            else:
+                carried = carry_tokens(context_carry["tokens"], args.context_carry_tokens)
             ordered = (tokens + carried) if args.context_carry_position == "after" else (carried + tokens)
             primer = torch.tensor(ordered or [60], dtype=torch.long)
             chord_primer_bars.append(bool(notes))
@@ -922,13 +1054,14 @@ def main(argv=None):
             tokens_out, _meta = generate_once(
                 model=model, primer=primer,
                 target_length=min(args.max_sequence, len(primer) + args.generation_tokens),
-                strip_primer=True, temperature=1.0, top_k=32, top_p=0.95,
+                strip_primer=True, temperature=args.temperature, top_k=32, top_p=0.95,
                 grammar_mask=True, target_duration_seconds=sub_duration,
                 return_metadata=True, use_kv_cache=args.kv_cache,
             )
             if args.context_carry_tokens > 0 and validate_generated_token_block(
                     tokens_out, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]:
-                context_carry["tokens"] = [int(t) for t in tokens_out]
+                if not args.context_history:
+                    context_carry["tokens"] = [int(t) for t in tokens_out]
             return tokens_out
 
         def generate(bar_index, input_events):
@@ -951,7 +1084,7 @@ def main(argv=None):
             target_length = min(args.max_sequence, len(primer) + args.generation_tokens)
             return generate_once(
                 model=model, primer=primer, target_length=target_length, strip_primer=True,
-                temperature=1.0, top_k=32, top_p=0.95, grammar_mask=True,
+                temperature=args.temperature, top_k=32, top_p=0.95, grammar_mask=True,
                 target_duration_seconds=240.0 / args.bpm, return_metadata=True,
                 use_kv_cache=args.kv_cache,
             )
@@ -1002,6 +1135,9 @@ def main(argv=None):
                         blocks_per_bar=args.chord_blocks_per_bar)
             recorder = None
             producer_box: dict = {}
+            if not args.fallback_only and args.context_history:
+                sub_builder = with_block_metrics(
+                    sub_builder, record=lambda block, _ev: generated_blocks.__setitem__(block.bar_index, block))
             if not args.fallback_only and args.block_metrics:
                 def print_adopted(m):
                     print(f"block {m['block']:3d} {m['adapter'] or '-':>8} notes {m['notes']:3d} "
@@ -1116,6 +1252,8 @@ def main(argv=None):
             report["chords"] = chords
             report["context_carry_tokens"] = args.context_carry_tokens
             report["context_carry_position"] = args.context_carry_position
+            report["context_history"] = bool(args.context_history)
+            report["temperature"] = args.temperature
             report["chord_primer_bar_count"] = sum(1 for x in chord_primer_bars if x)
             # Note-based steering only. The model has no chord token, and no
             # human has judged whether the result sounds harmonically right.

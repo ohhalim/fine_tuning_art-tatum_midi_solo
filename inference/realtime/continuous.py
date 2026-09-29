@@ -356,6 +356,10 @@ class BarBlockProducer:
         with self._cv:
             return frozenset(self._adopted)
 
+    def fallback_for(self, bar_index: int) -> ScheduledMidiBlock:
+        """The prebuilt fallback block of ``bar_index`` (what plays if the model misses)."""
+        return self._fallback[bar_index]
+
     def adoption_snapshot(self) -> tuple[frozenset[int], int]:
         """(adopted bars, consumed watermark) read under one lock.
 
