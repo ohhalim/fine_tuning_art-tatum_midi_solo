@@ -356,6 +356,17 @@ class BarBlockProducer:
         with self._cv:
             return frozenset(self._adopted)
 
+    def adoption_snapshot(self) -> tuple[frozenset[int], int]:
+        """(adopted bars, consumed watermark) read under one lock.
+
+        ``get`` moves the watermark and records adoption inside the same critical
+        section, so a bar at or below the watermark in this snapshot has its
+        adoption decided. Reading the two properties separately can pair a new
+        watermark with an old adopted set and drop an adopted bar (Astra, #1562).
+        """
+        with self._cv:
+            return frozenset(self._adopted), self._consumed_watermark
+
     @property
     def consumed_watermark(self) -> int:
         """Highest bar the scheduler has asked for (-1 before the first get)."""

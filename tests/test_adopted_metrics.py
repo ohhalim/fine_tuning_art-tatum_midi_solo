@@ -68,6 +68,9 @@ class RecorderTest(unittest.TestCase):
         class Fake:
             adopted_blocks = frozenset()
             consumed_watermark = -1
+
+            def adoption_snapshot(self):
+                return self.adopted_blocks, self.consumed_watermark
         fake = Fake()
         rec = self._recorder(fake)
         rec.on_generated(model_block(0, (60, 64)), ())
@@ -87,10 +90,62 @@ class RecorderTest(unittest.TestCase):
         self.assertEqual(rec.played[0]["send_status"], "complete")
         self.assertEqual(rec.played[2]["send_status"], "complete")
 
+    def test_get_between_the_two_reads_does_not_drop_an_adopted_block(self) -> None:
+        # Astra's interleaving: block 0 pending; while block 1 is being recorded,
+        # the scheduler's get(0) returns the model block between the two reads.
+        # With separate property reads this paired adopted={} with watermark=0 and
+        # dropped block 0 for good; the one-lock snapshot cannot see that pair.
+        clock = MonotonicBarClock(bpm=120, beats_per_bar=4, start_ns=0)
+        fallbacks = build_deterministic_blocks(clock=clock, bar_count=3)
+        producer = BarBlockProducer(bar_count=3, fallback_blocks=fallbacks, build_block=None, clock=clock)
+        producer._ready[0] = model_block(0)                 # ready, not yet asked for
+
+        class Interleaved:
+            """Proxy that runs get(0) right after the first read, wherever the reader reads."""
+            def __init__(self, inner):
+                self.inner, self.done = inner, False
+
+            def _once(self):
+                if not self.done:
+                    self.done = True
+                    self.inner.get(0)
+
+            @property
+            def adopted_blocks(self):
+                value = self.inner.adopted_blocks
+                self._once()
+                return value
+
+            @property
+            def consumed_watermark(self):
+                value = self.inner.consumed_watermark
+                self._once()
+                return value
+
+            def adoption_snapshot(self):
+                value = self.inner.adoption_snapshot()
+                self._once()
+                return value
+
+        proxy = Interleaved(producer)
+        rec = self._recorder(proxy)
+        rec._pending.append(0)                              # block 0 generated earlier
+        rec.generation[0] = {"block": 0, "adapter": "tatum", "notes": 2, "events": 2}
+        rec._voicings[0] = []
+        rec.on_generated(model_block(1), ())                # get(0) lands mid-read
+        self.assertEqual(producer.adopted_blocks, frozenset({0}))
+        rec.finish([Record(0), Record(0)])
+        self.assertIn(0, rec.played)                        # adopted block kept
+        self.assertTrue(rec.generation[0]["adopted"])
+        self.assertEqual(rec.played[0]["send_status"], "complete")
+
     def test_partial_and_unsent(self) -> None:
         class Fake:
             adopted_blocks = frozenset({0, 1})
             consumed_watermark = 1
+
+            def adoption_snapshot(self):
+                return self.adopted_blocks, self.consumed_watermark
         rec = self._recorder(Fake())
         rec.on_generated(model_block(0, (60, 64)), ())
         rec.on_generated(model_block(1, (60,)), ())
