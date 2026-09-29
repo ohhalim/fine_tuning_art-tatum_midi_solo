@@ -143,7 +143,16 @@ class LiveAdapterSelector:
                                                  len(self.names) - 1)]
         return None, None
 
-    def update(self, events) -> str:
+    def update(self, events, block_index: int | None = None) -> str:
+        """Apply new selector messages; ``block_index`` is the block whose
+        generation consumes them (docs/experiments/ADAPTER_LIVE_SELECT.md).
+
+        Each recorded event says what it asked for (``selected``, None when the
+        program is out of range), what was active before (``previous``), whether
+        it asked for the adapter already active (``noop``), and whether a later
+        message consumed by the same block overrode it (``superseded``).
+        """
+        batch = []
         for e in events:
             if e.received_ns <= self._last_ns:
                 continue
@@ -151,7 +160,14 @@ class LiveAdapterSelector:
             value, name = self._pick(e.message)
             if value is None:
                 continue
-            self.events.append({"received_ns": e.received_ns, "value": value, "selected": name})
+            record = {"received_ns": e.received_ns, "value": value, "selected": name,
+                      "previous": self.current, "noop": name is not None and name == self.current,
+                      "superseded": False, "consumed_block": block_index}
+            self.events.append(record)
             if name is not None:
                 self.current = name
+                batch.append(record)
+        effective = [r for r in batch if not r["noop"]]
+        for r in effective[:-1]:
+            r["superseded"] = True
         return self.current

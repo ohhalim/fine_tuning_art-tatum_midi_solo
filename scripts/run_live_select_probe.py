@@ -20,24 +20,69 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def adopted_blocks(report: dict) -> tuple[set[int], str]:
+    """Blocks whose model block the scheduler actually got (Astra M3/M2).
+
+    New reports record ``adopted_blocks`` from the producer. For older reports:
+    ``get()`` marks every bar that was not ready as a fallback, so in a
+    completed run whose every record is a model block with no fallback, get()
+    returned the model block for each bar. Anything else is reported as partial.
+    """
+    if "adopted_blocks" in report:
+        return set(report["adopted_blocks"]), "recorded"
+    detail = report["bars_detail"]
+    model = {b["bar_index"] for b in detail if b["source"] == "model" and not b["used_fallback"]}
+    if report.get("run_completed") and len(model) == len(detail):
+        return model, "reconstructed_all_model"
+    return model, "reconstructed_partial"
+
+
 def switch_latencies(report: dict) -> list[dict]:
-    """Bars from arrival to the first bar that plays the chosen adapter."""
+    """Per selector message: the block that consumed it, whether that block was
+    adopted, and arrival -> downbeat of the first adopted block playing the choice.
+
+    ``noop`` (asked for the active adapter), ``superseded`` (overridden before
+    any block used it) and ``ignored`` (program out of range) messages get no
+    latency. A "block" is half a bar with --half-bar-blocks.
+    """
     swap = report["adapter_swap"]
     per_bar = swap["per_bar"]
-    # A "bar" here is a scheduler block: half a bar with --half-bar-blocks.
     bar_ms = 60_000.0 / report["bpm"] * report.get("block_beats", 4)
+    adopted, how = adopted_blocks(report)
+    current = next(iter(swap["adapters"]))            # --adapter-name comes first
     rows = []
     for e in swap.get("control_events", []):
         arrived = math.floor(e["received_ms_from_start"] / bar_ms)
-        applied = None
+        legacy = "consumed_block" not in e
+        noop = e.get("noop", e["selected"] is not None and e["selected"] == current)
+        superseded = e.get("superseded", False)
+        consumed = e.get("consumed_block")
+        if legacy and e["selected"] is not None and not noop:
+            # Old reports: with no noop, the first block at/after arrival that
+            # plays the choice is the block whose generation consumed it.
+            consumed = next((b for b in range(max(arrived, 0), len(per_bar))
+                             if per_bar[b] == e["selected"]), None)
+        if e["selected"] is None:
+            status, effective = "ignored", None
+        elif noop:
+            status, effective = "noop", None
+        elif superseded:
+            status, effective = "superseded", None
+        elif consumed is None:
+            status, effective = "not_consumed", None
+        else:
+            effective = next((b for b in range(consumed, len(per_bar))
+                              if b in adopted and per_bar[b] == e["selected"]), None)
+            status = ("applied" if effective == consumed
+                      else "applied_after_fallback" if effective is not None else "not_adopted")
         if e["selected"] is not None:
-            applied = next((b for b in range(max(arrived, 0), len(per_bar))
-                            if per_bar[b] == e["selected"]), None)
-        rows.append({**e, "arrived_bar": arrived, "applied_bar": applied,
-                     "latency_bars": None if applied is None else applied - arrived,
-                     # arrival -> downbeat of the first bar that plays the choice
-                     "latency_ms": None if applied is None
-                     else applied * bar_ms - e["received_ms_from_start"]})
+            current = e["selected"]
+        rows.append({**e, "arrived_bar": arrived, "consumed_block": consumed, "status": status,
+                     "adoption_evidence": how, "mapping": "legacy_reconstructed" if legacy else "recorded",
+                     "applied_bar": effective,
+                     "latency_bars": None if effective is None else effective - arrived,
+                     "latency_ms": None if effective is None
+                     else effective * bar_ms - e["received_ms_from_start"]})
     return rows
 
 
