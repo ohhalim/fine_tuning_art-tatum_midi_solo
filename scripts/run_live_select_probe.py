@@ -41,16 +41,19 @@ def switch_latencies(report: dict) -> list[dict]:
     """Per selector message: the block that consumed it, whether that block was
     adopted, and arrival -> downbeat of the first adopted block playing the choice.
 
-    ``noop`` (asked for the active adapter), ``superseded`` (overridden before
-    any block used it) and ``ignored`` (program out of range) messages get no
-    latency. A "block" is half a bar with --half-bar-blocks.
+    A request is only looked up until the next effective request takes over
+    (Astra review of #1566): an adoption after that belongs to the later request.
+    ``noop`` (asked for the active adapter), ``superseded`` (overridden in the
+    same block), ``ignored`` (program out of range) and ``not_adopted`` (replaced
+    before any of its blocks was adopted) get no latency. A "block" is half a bar
+    with --half-bar-blocks.
     """
     swap = report["adapter_swap"]
     per_bar = swap["per_bar"]
     bar_ms = 60_000.0 / report["bpm"] * report.get("block_beats", 4)
     adopted, how = adopted_blocks(report)
     current = next(iter(swap["adapters"]))            # --adapter-name comes first
-    rows = []
+    staged = []
     for e in swap.get("control_events", []):
         arrived = math.floor(e["received_ms_from_start"] / bar_ms)
         legacy = "consumed_block" not in e
@@ -63,20 +66,28 @@ def switch_latencies(report: dict) -> list[dict]:
             consumed = next((b for b in range(max(arrived, 0), len(per_bar))
                              if per_bar[b] == e["selected"]), None)
         if e["selected"] is None:
-            status, effective = "ignored", None
+            status = "ignored"
         elif noop:
-            status, effective = "noop", None
+            status = "noop"
         elif superseded:
-            status, effective = "superseded", None
+            status = "superseded"
         elif consumed is None:
-            status, effective = "not_consumed", None
+            status = "not_consumed"
         else:
-            effective = next((b for b in range(consumed, len(per_bar))
+            status = "effective"
+        if e["selected"] is not None:
+            current = e["selected"]
+        staged.append((e, arrived, consumed, status, legacy))
+    rows = []
+    for i, (e, arrived, consumed, status, legacy) in enumerate(staged):
+        effective = None
+        if status == "effective":
+            later = [c for (_, _, c, st, _) in staged[i + 1:] if st == "effective" and c is not None]
+            limit = later[0] if later else len(per_bar)
+            effective = next((b for b in range(consumed, limit)
                               if b in adopted and per_bar[b] == e["selected"]), None)
             status = ("applied" if effective == consumed
                       else "applied_after_fallback" if effective is not None else "not_adopted")
-        if e["selected"] is not None:
-            current = e["selected"]
         rows.append({**e, "arrived_bar": arrived, "consumed_block": consumed, "status": status,
                      "adoption_evidence": how, "mapping": "legacy_reconstructed" if legacy else "recorded",
                      "applied_bar": effective,

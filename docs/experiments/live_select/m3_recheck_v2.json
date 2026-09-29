@@ -1,0 +1,1180 @@
+{
+  "schema": "m3_recheck_v2",
+  "rule": "bounded by next effective request (Astra review of #1566)",
+  "artifacts": [
+    "outputs/adaptive/probe_seed42",
+    "outputs/adaptive/probe_seed43",
+    "outputs/adaptive/probe_seed44",
+    "outputs/gen_lead/probe_seed42",
+    "outputs/gen_lead/probe_seed43",
+    "outputs/gen_lead/probe_seed44",
+    "outputs/half_bar/probe_seed42",
+    "outputs/half_bar/probe_seed43",
+    "outputs/half_bar/probe_seed44",
+    "outputs/live_select/seed42",
+    "outputs/live_select/seed43",
+    "outputs/live_select/seed44",
+    "outputs/m3_check/seed42",
+    "outputs/m3_check/seed42_v2",
+    "outputs/session_clock/run1_seed42",
+    "outputs/session_clock/run2_seed42",
+    "outputs/session_clock/run3_seed43",
+    "outputs/session_clock/run4_seed43",
+    "outputs/session_clock_v2/run1_seed42",
+    "outputs/session_clock_v2/run2_seed42",
+    "outputs/session_clock_v2/run3_seed43",
+    "outputs/session_clock_v2/run4_seed43",
+    "outputs/session_clock_v3/run1_seed42",
+    "outputs/session_clock_v3/run2_seed42",
+    "outputs/session_clock_v3/run3_seed43",
+    "outputs/session_clock_v3/run4_seed43",
+    "outputs/session_clock_v3/run5_seed44",
+    "outputs/session_clock_v3/run6_seed44",
+    "outputs/session_clock_v4/run1_seed42",
+    "outputs/session_clock_v4/run2_seed42",
+    "outputs/session_clock_v4/run3_seed43",
+    "outputs/session_clock_v4/run4_seed43",
+    "outputs/session_clock_v4/run5_seed44",
+    "outputs/session_clock_v4/run6_seed44",
+    "outputs/start_budget/probe_base_seed42",
+    "outputs/start_budget/probe_base_seed43",
+    "outputs/start_budget/probe_base_seed44",
+    "outputs/start_budget/probe_beta05_seed42",
+    "outputs/start_budget/probe_beta05_seed43",
+    "outputs/start_budget/probe_beta05_seed44"
+  ],
+  "summary": {
+    "applied|reconstructed_all_model": 75,
+    "applied|recorded": 45,
+    "noop|recorded": 3,
+    "superseded|recorded": 2
+  },
+  "changed_vs_stored": 0,
+  "events": [
+    {
+      "artifact": "outputs/adaptive/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 980.0209999999997,
+      "new": 980.0209999999997,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1264.012084,
+      "new": 1264.012084,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 518.0605840000007,
+      "new": 518.0605840000007,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1000.0812499999993,
+      "new": 1000.0812499999993,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 651.234292000001,
+      "new": 651.234292000001,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 955.0982080000003,
+      "new": 955.0982080000003,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1245.3943330000002,
+      "new": 1245.3943330000002,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1432.1404170000005,
+      "new": 1432.1404170000005,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 984.7821670000012,
+      "new": 984.7821670000012,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 631.703042000001,
+      "new": 631.703042000001,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 992.7700839999998,
+      "new": 992.7700839999998,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1276.0521250000002,
+      "new": 1276.0521250000002,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 527.885542,
+      "new": 527.885542,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1014.817708999999,
+      "new": 1014.817708999999,
+      "same": true
+    },
+    {
+      "artifact": "outputs/adaptive/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 663.3237090000002,
+      "new": 663.3237090000002,
+      "same": true
+    },
+    {
+      "artifact": "outputs/gen_lead/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 6,
+      "new": 6,
+      "same": true
+    },
+    {
+      "artifact": "outputs/gen_lead/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 10,
+      "new": 10,
+      "same": true
+    },
+    {
+      "artifact": "outputs/gen_lead/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 15,
+      "new": 15,
+      "same": true
+    },
+    {
+      "artifact": "outputs/gen_lead/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 6,
+      "new": 6,
+      "same": true
+    },
+    {
+      "artifact": "outputs/gen_lead/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 10,
+      "new": 10,
+      "same": true
+    },
+    {
+      "artifact": "outputs/gen_lead/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 15,
+      "new": 15,
+      "same": true
+    },
+    {
+      "artifact": "outputs/gen_lead/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 6,
+      "new": 6,
+      "same": true
+    },
+    {
+      "artifact": "outputs/gen_lead/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 10,
+      "new": 10,
+      "same": true
+    },
+    {
+      "artifact": "outputs/gen_lead/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 15,
+      "new": 15,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 987.1637499999997,
+      "new": 987.1637499999997,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1276.6167079999996,
+      "new": 1276.6167079999996,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 524.0407080000004,
+      "new": 524.0407080000004,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1012.0978749999995,
+      "new": 1012.0978749999995,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 663.5045419999988,
+      "new": 663.5045419999988,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 989.9956670000001,
+      "new": 989.9956670000001,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1274.5261250000003,
+      "new": 1274.5261250000003,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 529.6993340000008,
+      "new": 529.6993340000008,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1012.3776670000007,
+      "new": 1012.3776670000007,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 665.901249999999,
+      "new": 665.901249999999,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 978.3697499999998,
+      "new": 978.3697499999998,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1262.9177920000002,
+      "new": 1262.9177920000002,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 518.9676249999993,
+      "new": 518.9676249999993,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1002.9480829999993,
+      "new": 1002.9480829999993,
+      "same": true
+    },
+    {
+      "artifact": "outputs/half_bar/probe_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 649.2276669999992,
+      "new": 649.2276669999992,
+      "same": true
+    },
+    {
+      "artifact": "outputs/live_select/seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 8,
+      "new": 8,
+      "same": true
+    },
+    {
+      "artifact": "outputs/live_select/seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 12,
+      "new": 12,
+      "same": true
+    },
+    {
+      "artifact": "outputs/live_select/seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 8,
+      "new": 8,
+      "same": true
+    },
+    {
+      "artifact": "outputs/live_select/seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 12,
+      "new": 12,
+      "same": true
+    },
+    {
+      "artifact": "outputs/live_select/seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 8,
+      "new": 8,
+      "same": true
+    },
+    {
+      "artifact": "outputs/live_select/seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "applied_bar",
+      "old": 12,
+      "new": 12,
+      "same": true
+    },
+    {
+      "artifact": "outputs/m3_check/seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 1055.4878330000001,
+      "new": 1055.4878330000001,
+      "same": true
+    },
+    {
+      "artifact": "outputs/m3_check/seed42",
+      "status": "noop",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": null,
+      "new": null,
+      "same": true
+    },
+    {
+      "artifact": "outputs/m3_check/seed42",
+      "status": "superseded",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": null,
+      "new": null,
+      "same": true
+    },
+    {
+      "artifact": "outputs/m3_check/seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 1287.297208,
+      "new": 1287.297208,
+      "same": true
+    },
+    {
+      "artifact": "outputs/m3_check/seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 589.2865419999998,
+      "new": 589.2865419999998,
+      "same": true
+    },
+    {
+      "artifact": "outputs/m3_check/seed42_v2",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 1035.3269170000003,
+      "new": 1035.3269170000003,
+      "same": true
+    },
+    {
+      "artifact": "outputs/m3_check/seed42_v2",
+      "status": "noop",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": null,
+      "new": null,
+      "same": true
+    },
+    {
+      "artifact": "outputs/m3_check/seed42_v2",
+      "status": "superseded",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": null,
+      "new": null,
+      "same": true
+    },
+    {
+      "artifact": "outputs/m3_check/seed42_v2",
+      "status": "noop",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": null,
+      "new": null,
+      "same": true
+    },
+    {
+      "artifact": "outputs/m3_check/seed42_v2",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 570.9729169999991,
+      "new": 570.9729169999991,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock/run1_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.3071659999996,
+      "new": 987.3071659999996,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock/run1_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 984.4357909999999,
+      "new": 984.4357909999999,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock/run2_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.1153329999997,
+      "new": 987.1153329999997,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock/run2_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 984.7480419999993,
+      "new": 984.7480419999993,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock/run3_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 985.7038329999996,
+      "new": 985.7038329999996,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock/run3_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.3298329999998,
+      "new": 987.3298329999998,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock/run4_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.0719580000004,
+      "new": 987.0719580000004,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock/run4_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.1540829999994,
+      "new": 987.1540829999994,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v2/run1_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 986.7584999999999,
+      "new": 986.7584999999999,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v2/run1_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 970.8368329999994,
+      "new": 970.8368329999994,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v2/run2_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 986.7679589999998,
+      "new": 986.7679589999998,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v2/run2_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 984.8737500000007,
+      "new": 984.8737500000007,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v2/run3_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.1375420000004,
+      "new": 987.1375420000004,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v2/run3_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.1604169999991,
+      "new": 987.1604169999991,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v2/run4_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.2606249999999,
+      "new": 987.2606249999999,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v2/run4_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.1481669999994,
+      "new": 987.1481669999994,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run1_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.1639580000001,
+      "new": 987.1639580000001,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run1_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 982.0389579999992,
+      "new": 982.0389579999992,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run2_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.3201250000002,
+      "new": 987.3201250000002,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run2_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 984.3019999999997,
+      "new": 984.3019999999997,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run3_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 986.7528339999999,
+      "new": 986.7528339999999,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run3_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.1223339999997,
+      "new": 987.1223339999997,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run4_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 986.6043749999999,
+      "new": 986.6043749999999,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run4_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.1880829999991,
+      "new": 987.1880829999991,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run5_seed44",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.3294580000002,
+      "new": 987.3294580000002,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run5_seed44",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 986.5273749999997,
+      "new": 986.5273749999997,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run6_seed44",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.1549999999997,
+      "new": 987.1549999999997,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v3/run6_seed44",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.3105419999993,
+      "new": 987.3105419999993,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run1_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.3588339999997,
+      "new": 987.3588339999997,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run1_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 984.8910419999993,
+      "new": 984.8910419999993,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run2_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.3307089999998,
+      "new": 987.3307089999998,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run2_seed42",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 984.8367920000001,
+      "new": 984.8367920000001,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run3_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.349416,
+      "new": 987.349416,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run3_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.1516659999998,
+      "new": 987.1516659999998,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run4_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.2531660000004,
+      "new": 987.2531660000004,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run4_seed43",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.319958,
+      "new": 987.319958,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run5_seed44",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 977.09825,
+      "new": 977.09825,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run5_seed44",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.3062919999993,
+      "new": 987.3062919999993,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run6_seed44",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.3507499999996,
+      "new": 987.3507499999996,
+      "same": true
+    },
+    {
+      "artifact": "outputs/session_clock_v4/run6_seed44",
+      "status": "applied",
+      "evidence": "recorded",
+      "basis": "latency_ms",
+      "old": 987.2656659999993,
+      "new": 987.2656659999993,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 3745.879417,
+      "new": 3745.879417,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 3088.6120420000007,
+      "new": 3088.6120420000007,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 2343.798666999999,
+      "new": 2343.798666999999,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1891.5224170000001,
+      "new": 1891.5224170000001,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 3415.001042,
+      "new": 3415.001042,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1903.961542,
+      "new": 1903.961542,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 3128.084500000001,
+      "new": 3128.084500000001,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 2373.543334,
+      "new": 2373.543334,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1926.9523340000014,
+      "new": 1926.9523340000014,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 3454.932084,
+      "new": 3454.932084,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1915.81275,
+      "new": 1915.81275,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 3143.2252499999995,
+      "new": 3143.2252499999995,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 2393.522333000001,
+      "new": 2393.522333000001,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1943.9130829999995,
+      "new": 1943.9130829999995,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_base_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 3468.8247499999998,
+      "new": 3468.8247499999998,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1935.5535840000002,
+      "new": 1935.5535840000002,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1289.0926670000008,
+      "new": 1289.0926670000008,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 2410.1668339999997,
+      "new": 2410.1668339999997,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1964.4462090000015,
+      "new": 1964.4462090000015,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed42",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1610.7182500000017,
+      "new": 1610.7182500000017,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1919.644416,
+      "new": 1919.644416,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1270.6545409999999,
+      "new": 1270.6545409999999,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 2396.2160000000003,
+      "new": 2396.2160000000003,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1943.1103330000005,
+      "new": 1943.1103330000005,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed43",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1595.4830000000002,
+      "new": 1595.4830000000002,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1919.9576660000002,
+      "new": 1919.9576660000002,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1274.173041,
+      "new": 1274.173041,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 2399.973583000001,
+      "new": 2399.973583000001,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1946.8947079999998,
+      "new": 1946.8947079999998,
+      "same": true
+    },
+    {
+      "artifact": "outputs/start_budget/probe_beta05_seed44",
+      "status": "applied",
+      "evidence": "reconstructed_all_model",
+      "basis": "latency_ms",
+      "old": 1599.2868329999983,
+      "new": 1599.2868329999983,
+      "same": true
+    }
+  ]
+}

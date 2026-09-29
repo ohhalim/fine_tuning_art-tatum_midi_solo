@@ -35,6 +35,20 @@ class SwitchLatencyTest(unittest.TestCase):
         row = switch_latencies(report(per_bar, ev, adopted=[0, 1, 2, 3]))[0]
         self.assertEqual((row["status"], row["applied_bar"], row["latency_ms"]), ("applied", 2, 3000.0))
 
+    def test_adoption_after_a_later_request_is_not_credited_to_the_earlier_one(self) -> None:
+        # Astra's case: Mehldau asked (block 1 fell back), Tatum asked (block 2
+        # adopted), Mehldau asked again (block 3 adopted). The first request was
+        # never adopted; block 3 belongs to the third request.
+        ev = [{"received_ms_from_start": 100.0, "value": 1, "selected": "mehldau", "previous": "tatum",
+               "noop": False, "superseded": False, "consumed_block": 1},
+              {"received_ms_from_start": 2100.0, "value": 0, "selected": "tatum", "previous": "mehldau",
+               "noop": False, "superseded": False, "consumed_block": 2},
+              {"received_ms_from_start": 4100.0, "value": 1, "selected": "mehldau", "previous": "tatum",
+               "noop": False, "superseded": False, "consumed_block": 3}]
+        rows = switch_latencies(report(["tatum", "mehldau", "tatum", "mehldau"], ev, adopted=[0, 2, 3]))
+        self.assertEqual([(r["status"], r["applied_bar"]) for r in rows],
+                         [("not_adopted", None), ("applied", 2), ("applied", 3)])
+
     def test_superseded_and_ignored(self) -> None:
         ev = [{"received_ms_from_start": 900.0, "value": 1, "selected": "mehldau", "previous": "tatum",
                "noop": False, "superseded": True, "consumed_block": 1},
