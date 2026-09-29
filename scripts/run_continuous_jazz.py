@@ -474,6 +474,23 @@ def carry_tokens(previous, n: int) -> list[int]:
     return truncate_tokens_preserving_velocity(previous, n)
 
 
+def pad_to_duration(tokens, seconds: float) -> list[int]:
+    """Append time shifts so a block's tokens span its whole window.
+
+    A block that ends early would otherwise make the next block's history
+    look as if it followed without the rest in between
+    (docs/experiments/CONTEXT_HISTORY.md). Time shift 256+k = (k+1) x 10 ms.
+    """
+    used_ms = sum((t - 255) * 10 for t in tokens if 256 <= t <= 355)
+    remaining = int(round(seconds * 1000)) - used_ms
+    out = list(tokens)
+    while remaining >= 10:
+        step = min(remaining, 1000) // 10 * 10
+        out.append(255 + step // 10)
+        remaining -= step
+    return out
+
+
 def summarize_lateness_ms(lateness_ns) -> dict:
     """Distribution of scheduler dispatch lateness over every attempt, not just the tail."""
     values = sorted(ns / 1e6 for ns in lateness_ns)
@@ -712,6 +729,10 @@ def main(argv=None):
     parser.add_argument("--context-carry-tokens", type=int, default=0,
                         help="with --chord-primer: prepend the last N tokens of the previous "
                              "valid block to each block's primer (0 = off, the previous behaviour)")
+    parser.add_argument("--context-history", action="store_true",
+                        help="with --context-carry-tokens: carry the last N tokens of everything "
+                             "played so far (several blocks), not only the previous block "
+                             "(docs/experiments/CONTEXT_HISTORY.md)")
     parser.add_argument("--context-carry-position", choices=["before", "after"], default="before",
                         help="where the carried tail goes: before the chord statement (default) "
                              "or after it, right before generation")
@@ -783,6 +804,8 @@ def main(argv=None):
         parser.error("context_carry_tokens must be >= 0")
     if args.context_carry_tokens and not args.chord_primer:
         parser.error("--context-carry-tokens needs --chord-primer")
+    if args.context_history and not args.context_carry_tokens:
+        parser.error("--context-history needs --context-carry-tokens")
     if args.chord_primer and 48 + args.context_carry_tokens + args.generation_tokens > args.max_sequence:
         parser.error("chord primer (48) + context carry + generation tokens exceeds --max-sequence")
     if args.chord_blocks_per_bar > 1 and not args.chord_primer:
@@ -928,7 +951,12 @@ def main(argv=None):
             )
             if args.context_carry_tokens > 0 and validate_generated_token_block(
                     tokens_out, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]:
-                context_carry["tokens"] = [int(t) for t in tokens_out]
+                if args.context_history:
+                    # Keep what was played across blocks, timed to each window.
+                    context_carry["tokens"] = (context_carry["tokens"] + pad_to_duration(
+                        [int(t) for t in tokens_out], sub_duration))[-2048:]
+                else:
+                    context_carry["tokens"] = [int(t) for t in tokens_out]
             return tokens_out
 
         def generate(bar_index, input_events):
@@ -1116,6 +1144,7 @@ def main(argv=None):
             report["chords"] = chords
             report["context_carry_tokens"] = args.context_carry_tokens
             report["context_carry_position"] = args.context_carry_position
+            report["context_history"] = bool(args.context_history)
             report["chord_primer_bar_count"] = sum(1 for x in chord_primer_bars if x)
             # Note-based steering only. The model has no chord token, and no
             # human has judged whether the result sounds harmonically right.
