@@ -694,6 +694,9 @@ def main(argv=None):
                              "the 48-token primer with the newest input. Raises chord-tone ratio under "
                              "dense input but weakened register following (docs/experiments/"
                              "RESERVE_CHORD_TOKENS.md, INPUT_REGISTER_FOLLOW.md)")
+    parser.add_argument("--announce-clock", action="store_true",
+                        help="print SESSION_CLOCK_START_NS <perf_counter_ns of bar 0> before playing, "
+                             "for drivers that send input on the session grid")
     parser.add_argument("--adapter-name", default="primary",
                         help="name of the --checkpoint adapter in --adapter-schedule")
     parser.add_argument("--swap-adapter", action="append", default=[], metavar="NAME=CHECKPOINT",
@@ -1002,6 +1005,14 @@ def main(argv=None):
                         blocks_per_bar=args.chord_blocks_per_bar)
             recorder = None
             producer_box: dict = {}
+
+            def announce_producer(p):
+                producer_box["producer"] = p
+                if args.announce_clock:
+                    # perf_counter_ns is one system-wide clock on macOS, so a driver
+                    # process can schedule input against this session's bar grid
+                    # (docs/experiments/SESSION_CLOCK_PROBE.md).
+                    print(f"SESSION_CLOCK_START_NS {p._clock.start_ns}", flush=True)
             if not args.fallback_only and args.block_metrics:
                 def print_adopted(m):
                     print(f"block {m['block']:3d} {m['adapter'] or '-':>8} notes {m['notes']:3d} "
@@ -1038,7 +1049,7 @@ def main(argv=None):
                     spin_window_ms=args.spin_window_ms, fetch_margin_ms=args.fetch_margin_ms,
                     start_budget_bars=args.start_budget_bars,
                     adaptive_start_safety=args.adaptive_start_safety,
-                    on_producer=lambda p: producer_box.__setitem__("producer", p),
+                    on_producer=announce_producer,
                 )
             finally:
                 if tracer is not None:

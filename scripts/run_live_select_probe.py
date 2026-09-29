@@ -14,6 +14,7 @@ import json
 import math
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -95,6 +96,10 @@ def main(argv=None) -> int:
                     help='"SECONDS:PITCH,..." after launch: note_on (velocity 90) then note_off '
                          '0.25 s later, to check that played input reaches the primer')
     ap.add_argument("--cc", type=int, default=None, help="send CC N instead of Program Change")
+    ap.add_argument("--session-relative", action="store_true",
+                    help="times are seconds from the session clock start (bar 0 downbeat), which "
+                         "the runtime announces; default is seconds after launch, which shifts with "
+                         "model loading time (docs/experiments/SESSION_CLOCK_PROBE.md)")
     ap.add_argument("--output-dir", type=Path, required=True)
     ap.add_argument("--python", default=sys.executable)
     ap.add_argument("runtime_args", nargs=argparse.REMAINDER,
@@ -120,25 +125,62 @@ def main(argv=None) -> int:
     cmd = [args.python, str(ROOT / "scripts" / "run_continuous_jazz.py"), *extra,
            "--input-port", args.port_name, "--adapter-control", control,
            "--output-dir", str(args.output_dir)]
+    if args.session_relative:
+        cmd.append("--announce-clock")
     log = (args.output_dir / "runtime.log").open("w")
     with mido.open_output(args.port_name, virtual=True) as port:
         time.sleep(0.5)   # let CoreMIDI publish the port before the child looks for it
-        t0 = time.monotonic()
-        child = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, cwd=ROOT)
         sent = []
-        for at, msg in sorted(sends, key=lambda x: x[0]):
-            while time.monotonic() - t0 < at:
+        if args.session_relative:
+            child = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                     cwd=ROOT, text=True, bufsize=1)
+            base = {}
+            announced = threading.Event()
+
+            def pump():
+                for line in child.stdout:
+                    log.write(line)
+                    if line.startswith("SESSION_CLOCK_START_NS "):
+                        base["ns"] = int(line.split()[1])
+                        announced.set()
+                announced.set()
+
+            reader = threading.Thread(target=pump, daemon=True)
+            reader.start()
+            announced.wait(timeout=180)
+            if "ns" in base:
+                for at, msg in sorted(sends, key=lambda x: x[0]):
+                    target = base["ns"] + round(at * 1e9)
+                    while time.perf_counter_ns() < target - 2_000_000:
+                        if child.poll() is not None:
+                            break
+                        time.sleep(0.001)
+                    while time.perf_counter_ns() < target:
+                        pass
+                    if child.poll() is not None:
+                        break
+                    port.send(msg)
+                    sent.append({"at_s": round((time.perf_counter_ns() - base["ns"]) / 1e9, 4),
+                                 "message": str(msg)})
+            code = child.wait()
+            reader.join(timeout=5)
+        else:
+            t0 = time.monotonic()
+            child = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, cwd=ROOT)
+            for at, msg in sorted(sends, key=lambda x: x[0]):
+                while time.monotonic() - t0 < at:
+                    if child.poll() is not None:
+                        break
+                    time.sleep(0.005)
                 if child.poll() is not None:
                     break
-                time.sleep(0.005)
-            if child.poll() is not None:
-                break
-            port.send(msg)
-            sent.append({"at_s": round(time.monotonic() - t0, 3), "message": str(msg)})
-        code = child.wait()
+                port.send(msg)
+                sent.append({"at_s": round(time.monotonic() - t0, 3), "message": str(msg)})
+            code = child.wait()
     log.close()
     report_path = args.output_dir / "continuous_report.json"
-    out = {"schema": "live_select_probe_v1", "command": cmd, "exit_code": code, "sent": sent}
+    out = {"schema": "live_select_probe_v1", "command": cmd, "exit_code": code, "sent": sent,
+           "time_base": "session" if args.session_relative else "launch"}
     if code == 0 and report_path.exists():
         report = json.loads(report_path.read_text())
         out["per_bar"] = report["adapter_swap"]["per_bar"]
