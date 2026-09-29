@@ -131,6 +131,7 @@ def main(argv=None) -> int:
     with mido.open_output(args.port_name, virtual=True) as port:
         time.sleep(0.5)   # let CoreMIDI publish the port before the child looks for it
         sent = []
+        qos = None
         if args.session_relative:
             child = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                      cwd=ROOT, text=True, bufsize=1)
@@ -148,10 +149,19 @@ def main(argv=None) -> int:
             reader = threading.Thread(target=pump, daemon=True)
             reader.start()
             announced.wait(timeout=180)
+            qos = None
+            try:
+                # Same class the runtime gives its scheduler: under load a plain
+                # 1 ms sleep overshot by up to ~5 ms (SESSION_CLOCK_PROBE.md v3).
+                sys.path.insert(0, str(ROOT))
+                from inference.realtime.thread_qos import set_current_thread_qos
+                qos = set_current_thread_qos("user-interactive")
+            except Exception as exc:  # noqa: BLE001 - timing aid only, never fatal
+                qos = {"applied": False, "error": str(exc)}
             if "ns" in base:
                 for at, msg in sorted(sends, key=lambda x: x[0]):
                     target = base["ns"] + round(at * 1e9)
-                    while time.perf_counter_ns() < target - 2_000_000:
+                    while time.perf_counter_ns() < target - 10_000_000:
                         if child.poll() is not None:
                             break
                         time.sleep(0.001)
@@ -181,6 +191,8 @@ def main(argv=None) -> int:
     report_path = args.output_dir / "continuous_report.json"
     out = {"schema": "live_select_probe_v1", "command": cmd, "exit_code": code, "sent": sent,
            "time_base": "session" if args.session_relative else "launch"}
+    if args.session_relative:
+        out["sender_qos"] = qos
     if code == 0 and report_path.exists():
         report = json.loads(report_path.read_text())
         out["per_bar"] = report["adapter_swap"]["per_bar"]
