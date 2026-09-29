@@ -297,8 +297,7 @@ class BlockMetricsRecorder:
         producer = self._producer_ref()
         if producer is None:
             return
-        adopted = producer.adopted_blocks
-        decided_up_to = producer.consumed_watermark
+        adopted, decided_up_to = producer.adoption_snapshot()
         still = []
         for b in sorted(self._pending):
             if b in adopted:
