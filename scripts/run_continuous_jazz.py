@@ -1090,6 +1090,16 @@ def main(argv=None):
             report["thread_qos"] = qos_result or {"requested": "default", "applied": False,
                                                   "error": None}
             report["input_events_received"] = input_buffer.received_count
+            clock_for_input = getattr(producer, "_clock", None)
+            if clock_for_input is not None:
+                # Every message kept by the input buffer (up to its 512 cap), timed
+                # from bar 0, so a driver can check delivery against what it sent.
+                report["input_log"] = [
+                    {"ms_from_start": round((e.received_ns - clock_for_input.start_ns) / 1e6, 3),
+                     "type": e.message.type,
+                     "note": getattr(e.message, "note", None),
+                     "program": getattr(e.message, "program", None)}
+                    for e in input_buffer.all_events()]
             report["live_primer_bar_count"] = (
                 sum(1 for x in live_primer_bars if x) if not args.fallback_only else 0
             )

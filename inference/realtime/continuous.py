@@ -99,6 +99,11 @@ class MidiInputSnapshotBuffer:
         with self._lock:
             return tuple(e for e in self._events if e.received_ns >= cutoff)
 
+    def all_events(self) -> tuple[TimedInputMessage, ...]:
+        """Every message still held (up to ``max_events``), oldest first."""
+        with self._lock:
+            return tuple(self._events)
+
     @property
     def received_count(self) -> int:
         with self._lock:

@@ -190,6 +190,20 @@ def main(argv=None) -> int:
              "input_to_block_start_ms": b["input_to_bar_start_ms"]}
             for b in report["bars_detail"] if b["input_event_count"]]
         out["fallback_bars"] = report["production"]["fallback_bar_count"]
+        if args.session_relative and "input_log" in report:
+            # Delivery check: each sent message against the runtime's receive time.
+            log_by_key = {}
+            for e in report["input_log"]:
+                log_by_key.setdefault((e["type"], e["note"], e["program"]), []).append(e["ms_from_start"])
+            errors = []
+            for at, msg in sorted(sends, key=lambda x: x[0]):
+                key = (msg.type, getattr(msg, "note", None), getattr(msg, "program", None))
+                if key == ("note_off", key[1], None) and log_by_key.get(key) is None:
+                    key = ("note_on", key[1], None)       # note_off may arrive as note_on velocity 0
+                times = log_by_key.get(key) or []
+                if times:
+                    errors.append(round(times.pop(0) - at * 1000, 3))
+            out["arrival_error_ms"] = errors
         out["deadline_misses"] = report["scheduler_dispatch_deadline_miss_count"]
     (args.output_dir / "probe.json").write_text(json.dumps(out, indent=2) + "\n")
     print(json.dumps({k: v for k, v in out.items() if k != "command"}, indent=2))
