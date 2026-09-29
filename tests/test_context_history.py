@@ -124,6 +124,16 @@ class PlayedHistoryTest(unittest.TestCase):
         hist.settle(adopted={0}, watermark=0, generated={0: blk}, fallback_for=lambda i: None)
         self.assertEqual(sorted(hist._notes), [(9, 10, 62, 80)])
 
+    def test_onset_move_never_overlaps_the_same_pitch_even_far_back(self) -> None:
+        # Astra's case: pitch 60 held 0-0.800 s, 33 other pitches in between, then a
+        # 4 ms pitch-60 note at 0.800 s. Moving its onset to 79 would overlap (0, 80).
+        notes = [(0.0, 0.800, 60)] + [(0.01 + i * 0.02, 0.02 + i * 0.02, 70 + i) for i in range(33)]
+        notes.append((0.800, 0.804, 60))
+        hist = PlayedHistory(BLOCK_S)
+        hist.settle(adopted={0}, watermark=0, generated={0: events_block(0, notes)}, fallback_for=lambda i: None)
+        self.assertEqual([(s0, e) for s0, e, p, _ in hist._notes if p == 60], [(0, 80)])
+        self.assertEqual(len([x for x in hist._notes if x[2] != 60]), 33)
+
     def test_same_pitch_across_the_boundary_keeps_off_before_on(self) -> None:
         from midi_processor.processor import decode_midi
         gen = {0: events_block(0, [(0.90, BLOCK_S, 60)]), 1: events_block(1, [(0.0, 0.2, 60)])}

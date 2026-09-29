@@ -521,6 +521,7 @@ class PlayedHistory:
         self.next_block = 0
         self.boundary_step = 0            # end of the last settled block, in 10 ms steps
         self._notes: list[tuple[int, int, int, int]] = []    # (start, end, pitch, velocity) steps
+        self._last_end: dict[int, int] = {}                  # latest end tick per pitch
 
     def settle(self, *, adopted, watermark: int, generated: dict, fallback_for) -> None:
         if watermark < self.next_block:
@@ -537,11 +538,13 @@ class PlayedHistory:
                     # Zero length on the 10 ms grid (e.g. a 2.5 ms note at the block
                     # end). Policy: move the onset one tick earlier when that stays
                     # inside the block and does not overlap the same pitch; else drop.
+                    # Rounding keeps order, so only this move can create an overlap,
+                    # and notes arrive in onset order: the pitch's last end suffices.
                     start, end = end - 1, end
-                    if start < lo or any(p == n.pitch and e > start and s0 < end
-                                         for s0, e, p, _ in self._notes[-32:]):
+                    if start < lo or start < self._last_end.get(n.pitch, -1):
                         continue
                 self._notes.append((start, end, n.pitch, n.velocity))
+                self._last_end[n.pitch] = max(self._last_end.get(n.pitch, -1), end)
             self.boundary_step = hi
             self.next_block = i + 1
         self._rebuild()
