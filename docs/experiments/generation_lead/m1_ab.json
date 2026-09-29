@@ -1,0 +1,115 @@
+{
+  "schema": "m1_ab_v1",
+  "note": "report-only, not a decision criterion",
+  "runs": [
+    {
+      "arm": "A",
+      "seed": 42,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 17.541625
+    },
+    {
+      "arm": "B",
+      "seed": 42,
+      "misses": 2,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 30.622583
+    },
+    {
+      "arm": "A",
+      "seed": 43,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 12.088166
+    },
+    {
+      "arm": "B",
+      "seed": 43,
+      "misses": 2,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 36.312
+    },
+    {
+      "arm": "A",
+      "seed": 44,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 16.715708
+    },
+    {
+      "arm": "B",
+      "seed": 44,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 5.985834
+    },
+    {
+      "arm": "A",
+      "seed": 45,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 15.86
+    },
+    {
+      "arm": "B",
+      "seed": 45,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 9.735041
+    },
+    {
+      "arm": "A",
+      "seed": 46,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 6.649917
+    },
+    {
+      "arm": "B",
+      "seed": 46,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 10.86575
+    },
+    {
+      "arm": "A",
+      "seed": 47,
+      "misses": 2,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 37.371542
+    },
+    {
+      "arm": "B",
+      "seed": 47,
+      "misses": 0,
+      "fallback": 0,
+      "busy_misses": 0,
+      "lateness_max_ms": 10.586625
+    }
+  ],
+  "totals": {
+    "A": [
+      2,
+      0,
+      0
+    ],
+    "B": [
+      4,
+      0,
+      0
+    ]
+  },
+  "identical_bars_A_vs_B": 96
+}

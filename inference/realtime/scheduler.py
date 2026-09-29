@@ -399,19 +399,28 @@ class OneBarMidiScheduler:
             queue_depth_max = 1
 
         late_fetch = self._fetch_margin_ns is not None
+
+        def fetch_late(index: int) -> None:
+            nonlocal enqueued_block_count, queue_depth_max
+            fetched = blocks.get(index)
+            if fetched is not None:
+                enqueued_ns = self._clock_ns()
+                queue[index] = fetched
+                enqueued_block_count += 1
+                enqueue_lead_time_ns.append(max(0, fetched.target_start_ns - enqueued_ns))
+                queue_depth_max = max(queue_depth_max, len(queue))
+
         for bar_index in range(expected_bar_count):
             target_bar_start_ns = self._clock.bar_start_ns(bar_index)
             if late_fetch and bar_index not in queue:
+                # Only reached when the previous block had no event at or after
+                # this fetch time; otherwise the fetch already ran inside its
+                # dispatch loop (below), at the fetch time rather than after
+                # a note-off sitting on the boundary.
                 self._wait_until(target_bar_start_ns - self._fetch_margin_ns, self._stop)
                 if self._stop.is_set():
                     break
-                fetched = blocks.get(bar_index)
-                if fetched is not None:
-                    enqueued_ns = self._clock_ns()
-                    queue[bar_index] = fetched
-                    enqueued_block_count += 1
-                    enqueue_lead_time_ns.append(max(0, fetched.target_start_ns - enqueued_ns))
-                    queue_depth_max = max(queue_depth_max, len(queue))
+                fetch_late(bar_index)
             self._wait_until(target_bar_start_ns, self._stop)
             if self._stop.is_set():
                 break
@@ -452,7 +461,22 @@ class OneBarMidiScheduler:
 
             started_bar_count += 1
             block_completed = True
+            next_fetch_ns = (
+                self._clock.bar_start_ns(bar_index + 1) - self._fetch_margin_ns
+                if late_fetch and bar_index + 1 < expected_bar_count
+                else None
+            )
             for event in block.events:
+                if next_fetch_ns is not None and event.target_ns >= next_fetch_ns:
+                    # The next block's fetch is a timed step of its own: run it
+                    # before any event due at or after it, keeping event order.
+                    self._wait_until(next_fetch_ns, self._stop)
+                    if self._stop.is_set():
+                        block_completed = False
+                        break
+                    if bar_index + 1 not in queue:
+                        fetch_late(bar_index + 1)
+                    next_fetch_ns = None
                 self._wait_until(event.target_ns, self._stop)
                 if self._stop.is_set():
                     block_completed = False
