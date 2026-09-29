@@ -496,40 +496,69 @@ def block_to_notes(block):
 
 
 class PlayedHistory:
-    """Token history of what was actually played, one block at a time.
+    """Token history of the adopted/scheduled blocks, one block at a time.
 
-    Astra review of #1572: accumulating generated tokens right after generation
-    kept blocks that were later discarded as late and left out the fallback
-    blocks that played instead. Here a block enters the history only once the
-    scheduler has asked for it: the model block if get() adopted it, otherwise
-    the fallback that played. Time is aligned cumulatively to the block grid so
-    10 ms quantisation does not drift (docs/experiments/CONTEXT_HISTORY.md).
+    Astra reviews of #1572: a block enters only once the scheduler has asked for
+    it: the model block if get() adopted it, otherwise the fallback scheduled in
+    its place. This is what was handed to the scheduler, not a record of sends
+    that finished: a block's future note-offs are included, and a cancelled run
+    can stop mid-block.
+
+    Timing: every note time is first placed on the absolute 10 ms session grid,
+    and tokens encode differences of those grid times, so per-event rounding
+    cannot accumulate (a note held to each block end used to add 2.5 ms per
+    block). Each settled block ends exactly on its cumulative boundary
+    (docs/experiments/CONTEXT_HISTORY.md).
     """
 
-    def __init__(self, block_s: float, cap: int = 2048):
+    def __init__(self, block_s: float, cap: int = 2048, horizon_s: float = 30.0):
         self.block_s = block_s
         self.cap = cap
+        self.horizon_steps = int(round(horizon_s * 100))
         self.tokens: list[int] = []
         self.next_block = 0
-        self._ms = 0          # time covered by self.tokens since block 0, in ms
+        self.boundary_step = 0            # end of the last settled block, in 10 ms steps
+        self._notes: list[tuple[int, int, int, int]] = []    # (start, end, pitch, velocity) steps
 
     def settle(self, *, adopted, watermark: int, generated: dict, fallback_for) -> None:
-        from scripts.generate import encode_notes_simple, truncate_tokens_preserving_velocity
-
+        if watermark < self.next_block:
+            return
         for i in range(self.next_block, watermark + 1):
             block = generated.get(i) if i in adopted else fallback_for(i)
-            notes = block_to_notes(block) if block is not None else []
-            toks = encode_notes_simple(notes) if notes else []
-            used = sum((t - 255) * 10 for t in toks if 256 <= t <= 355)
-            target = int(round((i + 1) * self.block_s * 100)) * 10
-            remaining = target - (self._ms + used)
-            while remaining >= 10:
-                step = min(remaining, 1000) // 10 * 10
-                toks.append(255 + step // 10)
-                remaining -= step
-            self._ms = max(target, self._ms + used)
-            self.tokens = truncate_tokens_preserving_velocity(self.tokens + toks, self.cap)
+            base_s = i * self.block_s
+            for n in (block_to_notes(block) if block is not None else []):
+                start = int(round((base_s + n.start) * 100))
+                end = max(start + 1, int(round((base_s + n.end) * 100)))
+                self._notes.append((start, end, n.pitch, n.velocity))
+            self.boundary_step = int(round((i + 1) * self.block_s * 100))
             self.next_block = i + 1
+        self._rebuild()
+
+    def _rebuild(self) -> None:
+        import pretty_midi
+        from scripts.generate import encode_notes_simple, truncate_tokens_preserving_velocity
+
+        low = self.boundary_step - self.horizon_steps
+        self._notes = [x for x in self._notes if x[1] > low]
+        if not self._notes:
+            self.tokens = []
+            return
+        origin = min(x[0] for x in self._notes)
+        notes = [pretty_midi.Note(velocity=v, pitch=p, start=(s - origin) / 100, end=(e - origin) / 100)
+                 for s, e, p, v in self._notes]
+        toks = encode_notes_simple(sorted(notes, key=lambda n: (n.start, n.pitch)))
+        remaining = self.boundary_step - max(max(x[1] for x in self._notes), max(x[0] for x in self._notes))
+        while remaining > 0:
+            step = min(remaining, 100)
+            toks.append(255 + step)
+            remaining -= step
+        self.tokens = truncate_tokens_preserving_velocity(toks, self.cap)
+
+    def span_steps(self) -> int:
+        """Time covered by the (uncapped) note window, first note to the last boundary."""
+        if not self._notes:
+            return 0
+        return self.boundary_step - min(x[0] for x in self._notes)
 
 
 def summarize_lateness_ms(lateness_ns) -> dict:
