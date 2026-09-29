@@ -59,3 +59,16 @@
 ## 리뷰 후 교정 (#1558)
 - 1차 기준 2(미스 0) 미달은 그대로다. 후속 교대 12회는 원인 분리 탐색이며 비열등을 입증하지 않는다. 기본 on은 잠정 선택이다
 - 알려진 결함(Astra M2): 늦게 끝나 fallback으로 폐기된 블록도 `block_metrics`와 `VoicingPool`에 들어간다. 위 정확성 확인(288/288, 96/96)은 fallback 0인 실행에서만 했다. 채택된 블록만 누적하도록 따로 고친다
+
+## 결함 수정 (#1562, Astra M2) — 채택된 블록만 재생 지표·누적에
+- **결함:** `record_metrics`가 생성 직후 호출돼서, 늦게 끝나 fallback으로 대체된 블록도 `block_metrics`와 `VoicingPool`에 들어갔다
+- **채택 기준:** producer의 `get()`이 **모델 블록 자체를 스케줄러에 반환했을 때만** 채택이다(`BarBlockProducer.adopted_blocks`). `source=model`(생성 완료·ready)은 채택 증거가 아니다. ready 상태에서 늦게 버려지거나 스케줄러가 멈출 수 있기 때문이다(Astra 지적)
+- **구현:** `BlockMetricsRecorder`
+  - `generation_metrics`: 만든 모든 모델 블록과 `adopted` 플래그
+  - `block_metrics`: 채택된 블록만. 채택이 확정된 순서로 `VoicingPool`에 쌓는다
+  - `send_status`: 스케줄러 전송 기록과 블록 이벤트 수를 비교한 별도 상태다(`complete` / `partial` / `none`). 채택과 다른 개념이다
+  - `--live-metrics`는 채택이 확정된 블록만 출력한다. 그래서 한두 블록 늦게 찍힌다
+- **확인**
+  - 단위 테스트: Astra 재현 그대로 get(0)을 생성 완료 전에 부르면 fallback이 나가고, 생성 지표는 남지만 `adopted=False`이며 재생 지표와 누적에는 없다. 부분 전송과 미전송도 구분한다
+  - 실제 실행(swap 프리셋, seed 42): 32블록 모두 채택·전송 완료(fallback 0)다. 누적 고유 보이싱은 #1546 실행과 32/32 같고, 연주 마디는 16/16 같다
+- 이 실행에서 미스 5건이 났다(2건은 생성 중). 측정 당시 부하 평균은 4.8이었고, 다른 프로그램(브라우저 렌더러 2개)이 각각 CPU를 거의 100% 쓰고 있었다. 실시간성 판정에는 쓰지 않는다

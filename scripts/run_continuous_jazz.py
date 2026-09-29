@@ -260,6 +260,71 @@ class VoicingPool:
                 "distinct_voicing_ratio_so_far": round(unique / len(pool), 4) if pool else None}
 
 
+class BlockMetricsRecorder:
+    """Generation metrics for every model block; played metrics only for adopted ones.
+
+    A block counts as adopted only when the producer's ``get`` actually returned
+    the model block to the scheduler (``producer.adopted_blocks``). Ready-but-late
+    blocks the scheduler replaced with a fallback, and blocks never fetched, stay
+    in ``generation`` only and never reach the voicing pool (Astra M2). Whether
+    an adopted block's events were all sent is a separate status, filled in from
+    the scheduler records at the end (docs/experiments/LIVE_METRICS.md).
+    """
+
+    def __init__(self, *, producer_ref, chord_for_block, adapter_for_block, on_adopted=None):
+        self._producer_ref = producer_ref          # () -> BarBlockProducer (set after creation)
+        self._chord_for_block = chord_for_block
+        self._adapter_for_block = adapter_for_block
+        self._on_adopted = on_adopted              # callback(metrics) for live printing
+        self.generation: dict[int, dict] = {}
+        self.played: dict[int, dict] = {}
+        self._pending: list[int] = []
+        self._pool = VoicingPool()
+        self._voicings: dict[int, list] = {}
+
+    def on_generated(self, block, input_events) -> None:
+        """Producer thread, right after a model block is built (before it is ready)."""
+        b = block.bar_index
+        m = block_metrics(block, chord=self._chord_for_block(b), adapter=self._adapter_for_block(b),
+                          input_events=input_events)
+        m["events"] = len(block.events)
+        self.generation[b] = m
+        self._voicings[b] = block_voicings(block)
+        self._pending.append(b)
+        self._settle()
+
+    def _settle(self, final: bool = False) -> None:
+        producer = self._producer_ref()
+        if producer is None:
+            return
+        adopted = producer.adopted_blocks
+        decided_up_to = producer.consumed_watermark
+        still = []
+        for b in sorted(self._pending):
+            if b in adopted:
+                m = dict(self.generation[b])
+                m.update(self._pool.add(m["adapter"], self._voicings[b]))
+                self.played[b] = m
+                if self._on_adopted is not None:
+                    self._on_adopted(m)
+            elif not final and b > decided_up_to:
+                still.append(b)                   # not asked for yet: undecided
+        self._pending = still
+
+    def finish(self, records) -> None:
+        """After the session: settle everything and add the send status."""
+        self._settle(final=True)
+        sent: dict[int, int] = {}
+        for r in records:
+            sent[r.bar_index] = sent.get(r.bar_index, 0) + 1
+        for b, m in self.generation.items():
+            m["adopted"] = b in self.played
+        for b, m in self.played.items():
+            n = sent.get(b, 0)
+            m["events_sent"] = n
+            m["send_status"] = ("complete" if n == m["events"] else "partial" if n else "none")
+
+
 def with_block_metrics(factory, *, record):
     """Wrap a builder factory so every model block also reports ``block_metrics``."""
     def make(*, clock, duration):
@@ -287,7 +352,7 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
                 clock=None, clock_ns=None, wait_until=None,
                 deadline_policy=DEADLINE_POLICY_RECORD_AND_CONTINUE,
                 sub_builder=None, fetch_margin_ms=None, start_budget_bars=None,
-                beats_per_block=BEATS_PER_BAR, adaptive_start_safety=None):
+                beats_per_block=BEATS_PER_BAR, adaptive_start_safety=None, on_producer=None):
     """Play ``bars`` bars, producing one bar ahead.
 
     ``clock``/``clock_ns``/``wait_until`` exist so tests can drive the run off a
@@ -338,6 +403,8 @@ def run_session(*, port, bars, bpm, chords, seed, generate, input_buffer=None,
     # A single OS hiccup must not end a performance. The scheduler probe uses
     # abort_on_first_miss to make timing failures loud; a live instrument wants
     # the miss recorded and the music continued.
+    if on_producer is not None:
+        on_producer(producer)
     scheduler_kwargs = {"sink": port, "clock": clock, "spin_window_ms": spin_window_ms,
                         "deadline_policy": deadline_policy, "fetch_margin_ms": fetch_margin_ms}
     if clock_ns is not None:
@@ -934,28 +1001,25 @@ def main(argv=None):
                     return make_sub_block_builder(
                         clock=clock, duration=duration, generate_sub=generate_sub,
                         blocks_per_bar=args.chord_blocks_per_bar)
-            metrics_by_block: dict[int, dict] = {}
-            voicing_pool = VoicingPool()
+            recorder = None
+            producer_box: dict = {}
             if not args.fallback_only and args.block_metrics:
-                def record_metrics(block, input_events):
-                    b = block.bar_index
-                    bar = b // 2 if args.half_bar_blocks else b
-                    m = block_metrics(block, chord=chords[bar % len(chords)],
-                                      adapter=adapter_per_bar.get(b, None if bank else args.adapter_name),
-                                      input_events=input_events)
-                    m.update(voicing_pool.add(m["adapter"], block_voicings(block)))
-                    metrics_by_block[b] = m
-                    if args.live_metrics:
-                        print(f"block {b:3d} {m['adapter'] or '-':>8} notes {m['notes']:3d} "
-                              f"pitch {m['pitch_mean'] if m['pitch_mean'] is not None else '-':>6} "
-                              f"chord-tone {m['chord_tone_ratio'] if m['chord_tone_ratio'] is not None else '-':>6} "
-                              f"input {m['input_notes']} voicings {m['voicings']} "
-                              f"unique-so-far {m['unique_voicings_so_far']}", flush=True)
+                def print_adopted(m):
+                    print(f"block {m['block']:3d} {m['adapter'] or '-':>8} notes {m['notes']:3d} "
+                          f"pitch {m['pitch_mean'] if m['pitch_mean'] is not None else '-':>6} "
+                          f"chord-tone {m['chord_tone_ratio'] if m['chord_tone_ratio'] is not None else '-':>6} "
+                          f"input {m['input_notes']} voicings {m['voicings']} "
+                          f"unique-so-far {m['unique_voicings_so_far']}", flush=True)
 
+                recorder = BlockMetricsRecorder(
+                    producer_ref=lambda: producer_box.get("producer"),
+                    chord_for_block=lambda b: chords[(b // 2 if args.half_bar_blocks else b) % len(chords)],
+                    adapter_for_block=lambda b: adapter_per_bar.get(b, None if bank else args.adapter_name),
+                    on_adopted=print_adopted if args.live_metrics else None)
                 base_factory = sub_builder or (
                     lambda *, clock, duration: make_block_builder(
                         clock=clock, duration=duration, generate=generate))
-                sub_builder = with_block_metrics(base_factory, record=record_metrics)
+                sub_builder = with_block_metrics(base_factory, record=recorder.on_generated)
             qos_result = None
             if args.thread_qos != "default":
                 # The scheduler runs on this (main) thread inside run_session.
@@ -975,6 +1039,7 @@ def main(argv=None):
                     spin_window_ms=args.spin_window_ms, fetch_margin_ms=args.fetch_margin_ms,
                     start_budget_bars=args.start_budget_bars,
                     adaptive_start_safety=args.adaptive_start_safety,
+                    on_producer=lambda p: producer_box.__setitem__("producer", p),
                 )
             finally:
                 if tracer is not None:
@@ -1060,9 +1125,15 @@ def main(argv=None):
                 if args.half_bar_blocks:
                     played = merge_half_bars(played, half_seconds=120.0 / args.bpm)
                 report["played_bars"] = played
-            # Blocks served from fallback have no entry (None).
-            report["block_metrics"] = ([metrics_by_block.get(i) for i in range(blocks)]
-                                       if args.block_metrics else None)
+            # block_metrics: only blocks whose model block get() returned to the
+            # scheduler (played; send_status says whether all events went out).
+            # generation_metrics: every model block built, adopted or not.
+            if recorder is not None:
+                recorder.finish(result.records)
+                report["block_metrics"] = [recorder.played.get(i) for i in range(blocks)]
+                report["generation_metrics"] = [recorder.generation.get(i) for i in range(blocks)]
+            else:
+                report["block_metrics"] = report["generation_metrics"] = None
             report["played_note_count"] = write_played_midi(
                 result, args.output_dir / "played.mid", bpm=args.bpm
             )
