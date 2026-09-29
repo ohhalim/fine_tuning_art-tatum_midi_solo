@@ -106,6 +106,18 @@ class LiveSelectorTest(unittest.TestCase):
         self.assertEqual(sel.update([self._ev(4, mido.Message("program_change", program=0))]), "tatum")
         self.assertEqual([e["selected"] for e in sel.events], ["mehldau", None, "tatum"])
 
+    def test_records_consumer_noop_and_superseded(self) -> None:
+        import mido
+        sel = LiveAdapterSelector(["tatum", "mehldau"], "program")
+        pc = lambda ns, p: self._ev(ns, mido.Message("program_change", program=p))
+        sel.update([pc(1, 1)], block_index=5)
+        sel.update([pc(2, 1)], block_index=6)                 # already mehldau -> noop
+        sel.update([pc(3, 0), pc(4, 1)], block_index=7)       # 0 overridden by 1 in the same block
+        e = sel.events
+        self.assertEqual([(x["consumed_block"], x["previous"], x["noop"], x["superseded"]) for x in e],
+                         [(5, "tatum", False, False), (6, "mehldau", True, False),
+                          (7, "mehldau", False, True), (7, "tatum", False, False)])
+
     def test_cc_value_bins(self) -> None:
         import mido
         sel = LiveAdapterSelector(["a", "b", "c"], "cc:20")
