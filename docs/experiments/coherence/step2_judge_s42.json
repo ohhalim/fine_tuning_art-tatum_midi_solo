@@ -1,0 +1,122 @@
+{
+  "A0.8_tatum": {
+    "boundary_ratio": 1.519814655706732,
+    "motif_reuse": 0.01592356687898089,
+    "chord_tone_diff": 0.04918654206109322,
+    "fallback": 0,
+    "misses": 2,
+    "notes": 1363,
+    "pass": [
+      true,
+      false,
+      true,
+      true
+    ],
+    "all": false
+  },
+  "A0.7_tatum": {
+    "boundary_ratio": 1.4011589246698966,
+    "motif_reuse": 0.011922503725782414,
+    "chord_tone_diff": 0.09031559533823874,
+    "fallback": 5,
+    "misses": 0,
+    "notes": 1372,
+    "pass": [
+      true,
+      false,
+      true,
+      false
+    ],
+    "all": false
+  },
+  "E0.8_tatum": {
+    "boundary_ratio": 1.3964707786951596,
+    "motif_reuse": 0.014953271028037384,
+    "chord_tone_diff": -0.023873798762234815,
+    "fallback": 11,
+    "misses": 0,
+    "notes": 1256,
+    "pass": [
+      true,
+      false,
+      true,
+      false
+    ],
+    "all": false
+  },
+  "E0.7_tatum": {
+    "boundary_ratio": 1.5978857286685126,
+    "motif_reuse": 0.03715670436187399,
+    "chord_tone_diff": 0.011205074402575602,
+    "fallback": 15,
+    "misses": 0,
+    "notes": 1242,
+    "pass": [
+      false,
+      true,
+      true,
+      false
+    ],
+    "all": false
+  },
+  "A0.8_mehldau": {
+    "boundary_ratio": 1.2798776699956993,
+    "motif_reuse": 0.0335195530726257,
+    "chord_tone_diff": -0.005727821782583835,
+    "fallback": 2,
+    "misses": 0,
+    "notes": 823,
+    "pass": [
+      false,
+      false,
+      true,
+      false
+    ],
+    "all": false
+  },
+  "A0.7_mehldau": {
+    "boundary_ratio": 1.2136012136012138,
+    "motif_reuse": 0.052763819095477386,
+    "chord_tone_diff": 0.06185097646895025,
+    "fallback": 5,
+    "misses": 0,
+    "notes": 889,
+    "pass": [
+      true,
+      true,
+      true,
+      false
+    ],
+    "all": false
+  },
+  "E0.8_mehldau": {
+    "boundary_ratio": 0.8196982776339047,
+    "motif_reuse": 0.01557632398753894,
+    "chord_tone_diff": 0.0018066279329739994,
+    "fallback": 7,
+    "misses": 0,
+    "notes": 1059,
+    "pass": [
+      true,
+      false,
+      true,
+      false
+    ],
+    "all": false
+  },
+  "E0.7_mehldau": {
+    "boundary_ratio": 1.868542199488491,
+    "motif_reuse": 0.1515748031496063,
+    "chord_tone_diff": -0.009062962750538084,
+    "fallback": 27,
+    "misses": 0,
+    "notes": 1191,
+    "pass": [
+      false,
+      true,
+      true,
+      false
+    ],
+    "all": false
+  }
+}
