@@ -858,7 +858,7 @@ def main(argv=None):
             if bank is None:
                 return
             if live_selector is not None:
-                name = live_selector.update(input_events)
+                name = live_selector.update(input_events, block_index=block_index)
             else:
                 from scripts.adapter_bank import adapter_for_bar
                 name = adapter_for_bar(schedule, block_index if bar_index is None else bar_index)
@@ -1086,6 +1086,8 @@ def main(argv=None):
             report["chord_blocks_per_bar"] = args.chord_blocks_per_bar
             report["kv_cache"] = bool(args.kv_cache)
             report["merge_lora"] = bool(args.merge_lora)
+            # Blocks whose model block get() actually handed to the scheduler.
+            report["adopted_blocks"] = sorted(producer.adopted_blocks)
             report["fetch_margin_ms"] = args.fetch_margin_ms
             report["start_budget_bars"] = args.start_budget_bars
             report["adaptive_start_safety"] = args.adaptive_start_safety
@@ -1107,7 +1109,9 @@ def main(argv=None):
                 if live_selector is not None and clock_for_events is not None:
                     report["adapter_swap"]["control_events"] = [
                         {"received_ms_from_start": (e["received_ns"] - clock_for_events.start_ns) / 1e6,
-                         "value": e["value"], "selected": e["selected"]}
+                         "value": e["value"], "selected": e["selected"], "previous": e["previous"],
+                         "noop": e["noop"], "superseded": e["superseded"],
+                         "consumed_block": e["consumed_block"]}
                         for e in live_selector.events]
             report["chords"] = chords
             report["context_carry_tokens"] = args.context_carry_tokens

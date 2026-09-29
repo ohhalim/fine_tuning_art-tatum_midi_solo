@@ -69,7 +69,7 @@ python scripts/play_personalized.py --preset swap --live-select --input-port "<�
 
 주의
 - 음 입력(#1538)과 음역 따라가기(#1542)는 입력 음과 코드 음을 시간순으로 섞는 primer로 쟀다. 코드 토큰 예약을 끈 현재 기본값과 같은 구성이다
-- 키보드 전환 지연 수치는 PC가 매번 어댑터를 바꾸고 fallback이 0인 실행에서 쟀다. no-op 요청과 fallback을 적용으로 세는 probe 결함(Astra M3)이 있다. 이 조건이라 영향은 낮을 것으로 예상하지만 검산 전이다. probe 수정과 기존 artifact 검산은 예정이다
+- 키보드 전환 지연 수치는 PC가 매번 어댑터를 바꾸고 fallback이 0인 실행에서 쟀다. probe가 no-op 요청과 fallback을 적용으로 세던 결함(Astra M3)은 고쳤다(#1564). 새 매핑을 기존 probe 18개(PC 75건)에 적용해 검산했고, 모두 applied, 지연 동일이었다. 단 옛 리포트의 채택·소비 블록은 기록값이 아니라 재구성값이다
 - 늦은 fetch가 경계 note_off 뒤로 밀리던 결함은 고쳤다(#1560, Astra M1). 보고용 교대 A/B의 미스는 수정 전 2건, 수정 후 4건이었다. 소표본이고 외부 부하가 있던 시간대라 판정하지 않았다
 
 ## 4. 쇼케이스 MIDI
