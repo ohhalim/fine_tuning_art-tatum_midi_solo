@@ -729,6 +729,9 @@ def main(argv=None):
     parser.add_argument("--context-carry-tokens", type=int, default=0,
                         help="with --chord-primer: prepend the last N tokens of the previous "
                              "valid block to each block's primer (0 = off, the previous behaviour)")
+    parser.add_argument("--temperature", type=float, default=1.0,
+                        help="sampling temperature (1.0 = previous behaviour). Lower values made "
+                             "continuous Tatum output reuse motifs more (docs/experiments/COHERENCE_GOAL.md)")
     parser.add_argument("--context-history", action="store_true",
                         help="with --context-carry-tokens: carry the last N tokens of everything "
                              "played so far (several blocks), not only the previous block "
@@ -804,6 +807,8 @@ def main(argv=None):
         parser.error("context_carry_tokens must be >= 0")
     if args.context_carry_tokens and not args.chord_primer:
         parser.error("--context-carry-tokens needs --chord-primer")
+    if not 0.1 <= args.temperature <= 2.0:
+        parser.error("temperature must be between 0.1 and 2.0")
     if args.context_history and not args.context_carry_tokens:
         parser.error("--context-history needs --context-carry-tokens")
     if args.chord_primer and 48 + args.context_carry_tokens + args.generation_tokens > args.max_sequence:
@@ -945,7 +950,7 @@ def main(argv=None):
             tokens_out, _meta = generate_once(
                 model=model, primer=primer,
                 target_length=min(args.max_sequence, len(primer) + args.generation_tokens),
-                strip_primer=True, temperature=1.0, top_k=32, top_p=0.95,
+                strip_primer=True, temperature=args.temperature, top_k=32, top_p=0.95,
                 grammar_mask=True, target_duration_seconds=sub_duration,
                 return_metadata=True, use_kv_cache=args.kv_cache,
             )
@@ -979,7 +984,7 @@ def main(argv=None):
             target_length = min(args.max_sequence, len(primer) + args.generation_tokens)
             return generate_once(
                 model=model, primer=primer, target_length=target_length, strip_primer=True,
-                temperature=1.0, top_k=32, top_p=0.95, grammar_mask=True,
+                temperature=args.temperature, top_k=32, top_p=0.95, grammar_mask=True,
                 target_duration_seconds=240.0 / args.bpm, return_metadata=True,
                 use_kv_cache=args.kv_cache,
             )
@@ -1145,6 +1150,7 @@ def main(argv=None):
             report["context_carry_tokens"] = args.context_carry_tokens
             report["context_carry_position"] = args.context_carry_position
             report["context_history"] = bool(args.context_history)
+            report["temperature"] = args.temperature
             report["chord_primer_bar_count"] = sum(1 for x in chord_primer_bars if x)
             # Note-based steering only. The model has no chord token, and no
             # human has judged whether the result sounds harmonically right.

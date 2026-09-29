@@ -1,0 +1,98 @@
+{
+  "schema": "coherence_v1",
+  "style_verified": false,
+  "musical_quality_verified": false,
+  "sets": {
+    "tatum_real": {
+      "kind": "real",
+      "items": 110,
+      "boundary_mean": 8.803832521045635,
+      "within_mean": 6.893929659679136,
+      "boundary_ratio": 1.2770412457987554,
+      "boundary_median": 4.0,
+      "within_median": 3.0,
+      "motif_reuse": 0.07255926962155794,
+      "n_boundary": 27084,
+      "n_within": 108956,
+      "n_grams": 135820
+    },
+    "mehldau_real": {
+      "kind": "real",
+      "items": 16,
+      "boundary_mean": 7.70565371024735,
+      "within_mean": 7.991219818124804,
+      "boundary_ratio": 0.9642650165585778,
+      "boundary_median": 5.0,
+      "within_median": 5.0,
+      "motif_reuse": 0.09448561464690497,
+      "n_boundary": 2830,
+      "n_within": 6378,
+      "n_grams": 9176
+    },
+    "A_tatum": {
+      "kind": "runtime",
+      "items": 6,
+      "boundary_mean": 9.877906976744185,
+      "within_mean": 6.589426321709786,
+      "boundary_ratio": 1.499054165641103,
+      "boundary_median": 8.0,
+      "within_median": 4,
+      "motif_reuse": 0.0009532888465204957,
+      "n_boundary": 172,
+      "n_within": 889,
+      "n_grams": 1049
+    },
+    "E_tatum": {
+      "kind": "runtime",
+      "items": 6,
+      "boundary_mean": 8.781609195402298,
+      "within_mean": 7.425685425685426,
+      "boundary_ratio": 1.1825991396062558,
+      "boundary_median": 6.5,
+      "within_median": 5,
+      "motif_reuse": 0.00935672514619883,
+      "n_boundary": 174,
+      "n_within": 693,
+      "n_grams": 855
+    },
+    "A_mehldau": {
+      "kind": "runtime",
+      "items": 6,
+      "boundary_mean": 7.911764705882353,
+      "within_mean": 6.521484375,
+      "boundary_ratio": 1.2131846449271533,
+      "boundary_median": 5.5,
+      "within_median": 5.0,
+      "motif_reuse": 0.004477611940298508,
+      "n_boundary": 170,
+      "n_within": 512,
+      "n_grams": 670
+    },
+    "E_mehldau": {
+      "kind": "runtime",
+      "items": 6,
+      "boundary_mean": 6.854651162790698,
+      "within_mean": 6.976842105263158,
+      "boundary_ratio": 0.9824862107198495,
+      "boundary_median": 5.0,
+      "within_median": 5,
+      "motif_reuse": 0.004724409448818898,
+      "n_boundary": 172,
+      "n_within": 475,
+      "n_grams": 635
+    },
+    "B_continuous_tatum": {
+      "kind": "runtime",
+      "items": 1,
+      "boundary_mean": 9.0,
+      "within_mean": 5.463203463203463,
+      "boundary_ratio": 1.6473851030110935,
+      "boundary_median": 9,
+      "within_median": 4,
+      "motif_reuse": 0.015384615384615385,
+      "n_boundary": 31,
+      "n_within": 231,
+      "n_grams": 260
+    }
+  }
+}
