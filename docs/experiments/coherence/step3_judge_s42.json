@@ -1,0 +1,92 @@
+{
+  "A0.7g_tatum": {
+    "boundary_ratio": 1.430829944413697,
+    "motif_reuse": 0.011527377521613832,
+    "chord_tone_diff": 0.08181979491361742,
+    "fallback": 1,
+    "misses": 0,
+    "notes": 1461,
+    "pass": [
+      true,
+      false,
+      true,
+      false
+    ],
+    "all": false
+  },
+  "E0.8g_tatum": {
+    "boundary_ratio": 1.1746298099093098,
+    "motif_reuse": 0.009541984732824428,
+    "chord_tone_diff": -0.04804784558264206,
+    "fallback": 0,
+    "misses": 0,
+    "notes": 1518,
+    "pass": [
+      true,
+      false,
+      false,
+      true
+    ],
+    "all": false
+  },
+  "E0.7g_tatum": {
+    "boundary_ratio": 1.14564157609911,
+    "motif_reuse": 0.029069767441860465,
+    "chord_tone_diff": -0.03306272338758226,
+    "fallback": 0,
+    "misses": 0,
+    "notes": 1613,
+    "pass": [
+      true,
+      false,
+      false,
+      true
+    ],
+    "all": false
+  },
+  "A0.7g_mehldau": {
+    "boundary_ratio": 1.2783576139740522,
+    "motif_reuse": 0.05121951219512195,
+    "chord_tone_diff": 0.046836565166063306,
+    "fallback": 2,
+    "misses": 2,
+    "notes": 964,
+    "pass": [
+      false,
+      true,
+      true,
+      false
+    ],
+    "all": false
+  },
+  "E0.8g_mehldau": {
+    "boundary_ratio": 1.3581272468325947,
+    "motif_reuse": 0.02702702702702703,
+    "chord_tone_diff": -0.08345381131624009,
+    "fallback": 0,
+    "misses": 2,
+    "notes": 1966,
+    "pass": [
+      false,
+      false,
+      false,
+      true
+    ],
+    "all": false
+  },
+  "E0.7g_mehldau": {
+    "boundary_ratio": 1.1593213784003595,
+    "motif_reuse": 0.034026465028355386,
+    "chord_tone_diff": -0.04232450376518123,
+    "fallback": 0,
+    "misses": 0,
+    "notes": 2248,
+    "pass": [
+      true,
+      false,
+      false,
+      true
+    ],
+    "all": false
+  }
+}
