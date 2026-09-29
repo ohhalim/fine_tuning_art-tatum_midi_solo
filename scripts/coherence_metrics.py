@@ -71,9 +71,13 @@ def motif_reuse(line, horizon_s: float = 8.0) -> tuple[int, int]:
     return reused, len(grams)
 
 
-def summarize(lines, block_s: float) -> dict:
+def summarize(items) -> dict:
+    """``items``: (top line, its own block length in seconds) pairs.
+
+    Each line is cut with its own block length (Astra review: a group mixing
+    120 and 128 BPM runs was cut with the last file's length)."""
     b, w, reused, total = [], [], 0, 0
-    for line in lines:
+    for line, block_s in items:
         bj, wj = jumps(line, block_s)
         b += bj
         w += wj
@@ -89,12 +93,21 @@ def summarize(lines, block_s: float) -> dict:
             "n_boundary": len(b), "n_within": len(w), "n_grams": total}
 
 
+def generation_block_s(report: dict) -> float:
+    """Length of the unit each generation call filled: the scheduler block
+    (``block_beats``) with --half-bar-blocks, else the sub-block of the bar."""
+    beat_s = 60.0 / report["bpm"]
+    if report.get("block_beats"):
+        return beat_s * report["block_beats"]
+    return beat_s * report.get("beats_per_bar", 4) / max(1, report.get("chord_blocks_per_bar") or 1)
+
+
 def report_line(path: Path) -> tuple[list[tuple[float, int]], float, float]:
-    """Top line of a runtime report and its generation block length (half bar)."""
+    """Top line of a runtime report, its generation block length and bar length."""
     r = json.loads(path.read_text())
-    bar_s = 240.0 / r["bpm"]
+    bar_s = 60.0 / r["bpm"] * r.get("beats_per_bar", 4)
     notes = [(i * bar_s + n[1], n[0]) for i, b in enumerate(r["played_bars"]) for n in b["notes"]]
-    return top_line(notes), bar_s / 2, bar_s
+    return top_line(notes), generation_block_s(r), bar_s
 
 
 def song_line(path: Path) -> list[tuple[float, int]]:
@@ -115,18 +128,18 @@ def main(argv=None) -> int:
     out = {"schema": "coherence_v1", "style_verified": False, "musical_quality_verified": False, "sets": {}}
     for spec in args.songs:
         name, d = spec.split("=", 1)
-        lines = [song_line(f) for f in sorted(Path(d).glob("*.npy"))]
-        out["sets"][name] = {"kind": "real", "items": len(lines), **summarize(lines, args.block_s)}
+        lines = [(song_line(f), args.block_s) for f in sorted(Path(d).glob("*.npy"))]
+        out["sets"][name] = {"kind": "real", "items": len(lines), **summarize(lines)}
     grouped: dict[str, list[Path]] = {}
     for spec in args.reports:                     # the same name may repeat: files accumulate
         name, pattern = spec.split("=", 1)
         grouped.setdefault(name, []).extend(sorted(ROOT.glob(pattern)))
     for name, files in grouped.items():
-        lines, block = [], None
+        items = []
         for f in files:
             line, block, _ = report_line(f)
-            lines.append(line)
-        out["sets"][name] = {"kind": "runtime", "items": len(files), **summarize(lines, block or args.block_s)}
+            items.append((line, block))
+        out["sets"][name] = {"kind": "runtime", "items": len(files), **summarize(items)}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(out, indent=2) + "\n")
     for name, s in out["sets"].items():

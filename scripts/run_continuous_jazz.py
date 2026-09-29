@@ -474,21 +474,62 @@ def carry_tokens(previous, n: int) -> list[int]:
     return truncate_tokens_preserving_velocity(previous, n)
 
 
-def pad_to_duration(tokens, seconds: float) -> list[int]:
-    """Append time shifts so a block's tokens span its whole window.
+def block_to_notes(block):
+    """Notes of a scheduled block, timed from its start (unclosed notes end at the block end)."""
+    import pretty_midi
 
-    A block that ends early would otherwise make the next block's history
-    look as if it followed without the rest in between
-    (docs/experiments/CONTEXT_HISTORY.md). Time shift 256+k = (k+1) x 10 ms.
+    start_ns = block.target_start_ns
+    end_s = ((block.target_end_ns - start_ns) / 1e9) if block.target_end_ns is not None else None
+    open_notes, notes = {}, []
+    for e in block.events:
+        m = e.message
+        t = (e.target_ns - start_ns) / 1e9
+        if m.type == "note_on" and m.velocity > 0:
+            open_notes[m.note] = (t, m.velocity)
+        elif m.type in ("note_off", "note_on") and m.note in open_notes:
+            t0, vel = open_notes.pop(m.note)
+            notes.append(pretty_midi.Note(velocity=vel, pitch=m.note, start=t0, end=max(t, t0 + 0.01)))
+    for pitch, (t0, vel) in open_notes.items():
+        notes.append(pretty_midi.Note(velocity=vel, pitch=pitch, start=t0,
+                                      end=max(end_s or t0 + 0.01, t0 + 0.01)))
+    return sorted(notes, key=lambda n: (n.start, n.pitch))
+
+
+class PlayedHistory:
+    """Token history of what was actually played, one block at a time.
+
+    Astra review of #1572: accumulating generated tokens right after generation
+    kept blocks that were later discarded as late and left out the fallback
+    blocks that played instead. Here a block enters the history only once the
+    scheduler has asked for it: the model block if get() adopted it, otherwise
+    the fallback that played. Time is aligned cumulatively to the block grid so
+    10 ms quantisation does not drift (docs/experiments/CONTEXT_HISTORY.md).
     """
-    used_ms = sum((t - 255) * 10 for t in tokens if 256 <= t <= 355)
-    remaining = int(round(seconds * 1000)) - used_ms
-    out = list(tokens)
-    while remaining >= 10:
-        step = min(remaining, 1000) // 10 * 10
-        out.append(255 + step // 10)
-        remaining -= step
-    return out
+
+    def __init__(self, block_s: float, cap: int = 2048):
+        self.block_s = block_s
+        self.cap = cap
+        self.tokens: list[int] = []
+        self.next_block = 0
+        self._ms = 0          # time covered by self.tokens since block 0, in ms
+
+    def settle(self, *, adopted, watermark: int, generated: dict, fallback_for) -> None:
+        from scripts.generate import encode_notes_simple, truncate_tokens_preserving_velocity
+
+        for i in range(self.next_block, watermark + 1):
+            block = generated.get(i) if i in adopted else fallback_for(i)
+            notes = block_to_notes(block) if block is not None else []
+            toks = encode_notes_simple(notes) if notes else []
+            used = sum((t - 255) * 10 for t in toks if 256 <= t <= 355)
+            target = int(round((i + 1) * self.block_s * 100)) * 10
+            remaining = target - (self._ms + used)
+            while remaining >= 10:
+                step = min(remaining, 1000) // 10 * 10
+                toks.append(255 + step // 10)
+                remaining -= step
+            self._ms = max(target, self._ms + used)
+            self.tokens = truncate_tokens_preserving_velocity(self.tokens + toks, self.cap)
+            self.next_block = i + 1
 
 
 def summarize_lateness_ms(lateness_ns) -> dict:
@@ -811,6 +852,12 @@ def main(argv=None):
         parser.error("temperature must be between 0.1 and 2.0")
     if args.context_history and not args.context_carry_tokens:
         parser.error("--context-history needs --context-carry-tokens")
+    if args.context_history and not args.half_bar_blocks:
+        # Each history entry is one scheduler block whose adoption is known;
+        # other paths would silently ignore the option (Astra review).
+        parser.error("--context-history needs --half-bar-blocks")
+    if args.context_carry_tokens and args.chord_blocks_per_bar < 2:
+        parser.error("--context-carry-tokens needs --chord-blocks-per-bar 2 (sub-block path)")
     if args.chord_primer and 48 + args.context_carry_tokens + args.generation_tokens > args.max_sequence:
         parser.error("chord primer (48) + context carry + generation tokens exceeds --max-sequence")
     if args.chord_blocks_per_bar > 1 and not args.chord_primer:
@@ -899,6 +946,8 @@ def main(argv=None):
         )
 
         context_carry = {"tokens": []}
+        played_history = PlayedHistory(60.0 / args.bpm * 2)     # half-bar blocks only
+        generated_blocks: dict = {}
 
         def generate_sub(bar_index, sub_index, input_events, sub_duration, block_index=None):
             """One sub-block: harmony restated, then continue.
@@ -942,7 +991,18 @@ def main(argv=None):
             # Opt-in context carry: the tail of the previous valid block goes in
             # front of this block's chord statement, so the model continues the
             # line instead of starting every half bar from scratch.
-            carried = carry_tokens(context_carry["tokens"], args.context_carry_tokens)
+            if args.context_history:
+                # Only blocks the scheduler already asked for: adopted model
+                # blocks, or the fallbacks that played instead (Astra review).
+                producer_now = producer_box.get("producer")
+                if producer_now is not None:
+                    adopted_now, watermark_now = producer_now.adoption_snapshot()
+                    played_history.settle(adopted=adopted_now, watermark=watermark_now,
+                                          generated=generated_blocks,
+                                          fallback_for=producer_now.fallback_for)
+                carried = carry_tokens(played_history.tokens, args.context_carry_tokens)
+            else:
+                carried = carry_tokens(context_carry["tokens"], args.context_carry_tokens)
             ordered = (tokens + carried) if args.context_carry_position == "after" else (carried + tokens)
             primer = torch.tensor(ordered or [60], dtype=torch.long)
             chord_primer_bars.append(bool(notes))
@@ -956,11 +1016,7 @@ def main(argv=None):
             )
             if args.context_carry_tokens > 0 and validate_generated_token_block(
                     tokens_out, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]:
-                if args.context_history:
-                    # Keep what was played across blocks, timed to each window.
-                    context_carry["tokens"] = (context_carry["tokens"] + pad_to_duration(
-                        [int(t) for t in tokens_out], sub_duration))[-2048:]
-                else:
+                if not args.context_history:
                     context_carry["tokens"] = [int(t) for t in tokens_out]
             return tokens_out
 
@@ -1035,6 +1091,9 @@ def main(argv=None):
                         blocks_per_bar=args.chord_blocks_per_bar)
             recorder = None
             producer_box: dict = {}
+            if not args.fallback_only and args.context_history:
+                sub_builder = with_block_metrics(
+                    sub_builder, record=lambda block, _ev: generated_blocks.__setitem__(block.bar_index, block))
             if not args.fallback_only and args.block_metrics:
                 def print_adopted(m):
                     print(f"block {m['block']:3d} {m['adapter'] or '-':>8} notes {m['notes']:3d} "

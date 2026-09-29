@@ -1,0 +1,85 @@
+{
+  "schema": "coherence_v1",
+  "style_verified": false,
+  "musical_quality_verified": false,
+  "sets": {
+    "tatum_real": {
+      "kind": "real",
+      "items": 110,
+      "boundary_mean": 8.803832521045635,
+      "within_mean": 6.893929659679136,
+      "boundary_ratio": 1.2770412457987554,
+      "boundary_median": 4.0,
+      "within_median": 3.0,
+      "motif_reuse": 0.07255926962155794,
+      "n_boundary": 27084,
+      "n_within": 108956,
+      "n_grams": 135820
+    },
+    "mehldau_real": {
+      "kind": "real",
+      "items": 16,
+      "boundary_mean": 7.70565371024735,
+      "within_mean": 7.991219818124804,
+      "boundary_ratio": 0.9642650165585778,
+      "boundary_median": 5.0,
+      "within_median": 5.0,
+      "motif_reuse": 0.09448561464690497,
+      "n_boundary": 2830,
+      "n_within": 6378,
+      "n_grams": 9176
+    },
+    "A_tatum": {
+      "kind": "runtime",
+      "items": 6,
+      "boundary_mean": 11.107142857142858,
+      "within_mean": 6.372900335946248,
+      "boundary_ratio": 1.7428709491176546,
+      "boundary_median": 9.5,
+      "within_median": 4,
+      "motif_reuse": 0.0009532888465204957,
+      "n_boundary": 168,
+      "n_within": 893,
+      "n_grams": 1049
+    },
+    "E_tatum": {
+      "kind": "runtime",
+      "items": 6,
+      "boundary_mean": 8.83529411764706,
+      "within_mean": 7.420373027259684,
+      "boundary_ratio": 1.190680587780356,
+      "boundary_median": 7.0,
+      "within_median": 5,
+      "motif_reuse": 0.00935672514619883,
+      "n_boundary": 170,
+      "n_within": 697,
+      "n_grams": 855
+    },
+    "A_mehldau": {
+      "kind": "runtime",
+      "items": 6,
+      "boundary_mean": 8.55421686746988,
+      "within_mean": 6.325581395348837,
+      "boundary_ratio": 1.3523210489014883,
+      "boundary_median": 7.0,
+      "within_median": 5.0,
+      "motif_reuse": 0.004477611940298508,
+      "n_boundary": 166,
+      "n_within": 516,
+      "n_grams": 670
+    },
+    "E_mehldau": {
+      "kind": "runtime",
+      "items": 6,
+      "boundary_mean": 6.928571428571429,
+      "within_mean": 6.949895615866389,
+      "boundary_ratio": 0.9969317255289019,
+      "boundary_median": 5.0,
+      "within_median": 5,
+      "motif_reuse": 0.004724409448818898,
+      "n_boundary": 168,
+      "n_within": 479,
+      "n_grams": 635
+    }
+  }
+}
