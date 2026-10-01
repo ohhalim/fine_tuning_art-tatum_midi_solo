@@ -858,8 +858,9 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     chords = [c.strip() for c in args.chords.split(",") if c.strip()]
-    if not 8 <= args.bars <= 16:
-        parser.error("this path is limited to 8..16 bars for now")
+    # 16 was the first build's scope (ace0787f); longer runs are for playing (#1581).
+    if not 8 <= args.bars <= 256:
+        parser.error("bars must be between 8 and 256")
     if not 40 <= args.bpm <= 240 or not chords:
         parser.error("require 40..240 BPM and nonempty chords")
     if args.generation_tokens < 1 or args.max_sequence < args.generation_tokens:
