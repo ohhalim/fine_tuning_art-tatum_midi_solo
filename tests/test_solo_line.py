@@ -6,7 +6,7 @@ import unittest
 
 import pretty_midi
 
-from inference.control.solo_line import solo_line_tokens, top_notes
+from inference.control.solo_line import solo_line_tokens, solo_with_comp_tokens, top_notes
 from scripts.generate import encode_notes_simple
 from scripts.run_continuous_jazz import main
 from scripts.run_resident_model_probe import stage_a_musical_duration_ms, validate_generated_token_block
@@ -35,6 +35,19 @@ class SoloLineTest(unittest.TestCase):
     def test_top_notes_are_monophonic(self) -> None:
         kept = top_notes([note(72, 0.0, 0.5), note(74, 0.2, 0.6), note(60, 0.21, 0.4)])
         self.assertEqual([(n.pitch, n.start, n.end) for n in kept], [(72, 0.0, 0.2), (74, 0.2, 0.6)])
+
+    def test_comp_adds_the_voicing_but_never_a_pitch_the_line_plays(self) -> None:
+        comp = [note(48, 0.0, 0.56, 56), note(55, 0.0, 0.56, 56), note(74, 0.0, 0.56, 56)]
+        out = solo_with_comp_tokens(self.block(), comp)
+        pitches = sorted(n.pitch for n in tokens_to_notes(out))
+        self.assertEqual(pitches, [48, 55, 72, 74, 76])                  # comp 74 dropped: the line has it
+        self.assertEqual(stage_a_musical_duration_ms(out), stage_a_musical_duration_ms(self.block()))
+        self.assertTrue(validate_generated_token_block(out, lookahead_ms=940, allow_rest_bar=True)["valid"])
+
+    def test_comp_needs_solo_line(self) -> None:
+        with tempfile.TemporaryDirectory() as d, self.assertRaises(SystemExit):
+            main(["--output-dir", d, "--checkpoint", "x.pt", "--conditioning-midi", "p.mid", "--chord-primer",
+                  "--chord-blocks-per-bar", "2", "--comp"])
 
     def test_rest_blocks_are_left_alone(self) -> None:
         self.assertEqual(solo_line_tokens([255 + 94]), [255 + 94])
