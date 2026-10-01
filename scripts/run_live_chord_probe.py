@@ -90,6 +90,8 @@ def main(argv=None) -> int:
     ap.add_argument("--start-after-s", type=float, default=1.0)
     ap.add_argument("--port-name", default="LiveChordProbe")
     ap.add_argument("--output-dir", type=Path, required=True)
+    ap.add_argument("runtime_args", nargs=argparse.REMAINDER,
+                    help="after --: more run_continuous_jazz flags (e.g. --generation-tokens 192)")
     args = ap.parse_args(argv)
     import mido
     from scripts.play_personalized import build_command
@@ -98,7 +100,8 @@ def main(argv=None) -> int:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     cmd = build_command(args.preset, bars=args.bars, bpm=args.bpm, chords=args.static_chords, seed=args.seed,
                         output_dir=args.output_dir, input_port=args.port_name,
-                        extra=["--live-chords", args.mode, "--live-metrics"])
+                        extra=["--live-chords", args.mode, "--live-metrics",
+                               *[a for a in args.runtime_args if a != "--"]])
     first_block = threading.Event()
     log = (args.output_dir / "runtime.log").open("w")
     sent = []
