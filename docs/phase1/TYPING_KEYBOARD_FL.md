@@ -1,6 +1,41 @@
-# 컴퓨터 자판으로 치고 FL Studio로 듣기 (#1581)
+# FL Studio에서 치고 세럼으로 듣기 (#1581, 갱신)
 
 작성 2026-10-01. `musical_quality_verified: false`. 사용자 실연주 전 문서다.
+
+## 권장 경로: FL 자판 → MIDI Out → 런타임 → 세럼 (추가 도구 없음)
+사용자 지적: FL Studio는 자판 입력을 이미 받는다. 그래서 별도 자판 도구 없이 FL에서 MIDI를 내보내고 다시 받으면 된다.
+
+```
+FL(자판 → MIDI Out 채널, port 1) ──IAC Bus 1──▶ 런타임 ──IAC Bus 2──▶ FL(세럼 채널, input port 2) → 소리
+```
+
+1. macOS(한 번만): Audio MIDI 설정 → 윈도우 → MIDI 스튜디오 보기 → IAC Driver → "기기가 온라인 상태임", 버스 2개(Bus 1, Bus 2)
+2. FL Options → MIDI settings
+   - Output: `IAC Driver Bus 1`, Port **1**
+   - Input: `IAC Driver Bus 2`만 Enable, Port **2**. Bus 1은 Input에서 켜지 않는다(자기 출력을 다시 받아 반복됨)
+3. 채널
+   - MIDI Out 채널 추가, Port **1**. 이 채널을 선택하고 자판으로 친다
+   - 세럼: 플러그인 톱니바퀴 → MIDI → Input port **2**
+4. 런타임
+   ```
+   cd /Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계
+   PY=/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/.venv/bin/python
+   FORCE_CPU=1 $PY scripts/play_personalized.py --preset tatum --bars 128 --bpm 128 --chords Cmaj7 \
+     --input-port "IAC Driver Bus 1" -- --port "IAC Driver Bus 2" --live-chords follow --chord-split 128
+   ```
+   - `--chord-split 128`: 높이와 무관하게 눌린 음 전부로 코드를 판단한다(FL 자판 옥타브는 확인 전)
+- 한계: 템포는 FL과 맞추지 않는다(런타임 자체 128 BPM). FL 메뉴 이름은 버전마다 다를 수 있다. FL 경로 자체는 Claude가 GUI를 조작할 수 없어 검증하지 못했다
+
+### FL 대역 시뮬레이션 (2026-10-01, 1회, 탐색)
+`outputs/sim_fl/sim_fl.py`(git 미추적): 가상 출력 포트가 FL MIDI Out 역할로 코드를 보내고, 가상 입력 포트가 세럼 역할로 출력을 받는다. 위 런타임 명령을 포트 이름만 바꿔 그대로 썼다.
+- 처음에는 `--chord-split 128`이 범위(1–127) 밖이라 런타임이 거부했다. 안내 명령이 틀렸던 것이다. 128(전부)을 허용하도록 고쳤다
+- 결과: 코드 4개(C-E-G → Cmaj7, Dm7, G7, Abmaj7) 모두 인식, 반영 지연 약 1.39초, fallback 0, 미스 0, 세럼 역할 포트에 음 415개 도착
+- 각 코드를 누르고 1.5초 뒤부터 받은 음의 코드톤 비율: Dm7 0.63(정적 Cmaj7 기준 0.18), G7 0.54(0.35), Abmaj7 0.43(0.26)
+
+---
+
+# (참고) 터미널 자판 도구
+FL을 쓰지 않을 때만 필요하다.
 
 ## 구성
 ```

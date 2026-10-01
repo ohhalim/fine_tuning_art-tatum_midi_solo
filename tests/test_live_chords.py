@@ -134,6 +134,10 @@ class FlagTest(unittest.TestCase):
         self._exit("--half-bar-blocks", "--live-chords", "follow")
         self._exit("--input-port", "x", "--live-chords", "observe")
         self._exit("--half-bar-blocks", "--input-port", "x", "--live-chords", "follow", "--chord-split", "0")
+        self._exit("--half-bar-blocks", "--input-port", "x", "--live-chords", "follow", "--chord-split", "129")
+
+    def test_split_128_counts_every_held_note(self) -> None:
+        self.assertEqual(sorted(held_notes(chord(0, 60, 64, 67, 127), below=128)), [60, 64, 67, 127])
 
 
 if __name__ == "__main__":

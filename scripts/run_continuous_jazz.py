@@ -822,7 +822,7 @@ def main(argv=None):
                              "records it, follow also uses it as the next block's chord statement "
                              "(docs/experiments/LIVE_CHORDS.md)")
     parser.add_argument("--chord-split", type=int, default=60,
-                        help="--live-chords: only notes below this pitch name the chord")
+                        help="--live-chords: only notes below this pitch name the chord (128 = all)")
     parser.add_argument("--context-history", action="store_true",
                         help="with --context-carry-tokens: carry the last N tokens of everything "
                              "played so far (several blocks), not only the previous block "
@@ -920,8 +920,8 @@ def main(argv=None):
     if args.live_chords != "off" and not args.half_bar_blocks:
         # One chord decision per scheduler block, made with that block's snapshot.
         parser.error("--live-chords needs --half-bar-blocks")
-    if not 1 <= args.chord_split <= 127:
-        parser.error("chord_split must be between 1 and 127")
+    if not 1 <= args.chord_split <= 128:
+        parser.error("chord_split must be between 1 and 128 (128 = every held note)")
     if args.live_metrics and not args.block_metrics:
         parser.error("--live-metrics needs --block-metrics")
     if args.half_bar_blocks and args.fallback_only:
