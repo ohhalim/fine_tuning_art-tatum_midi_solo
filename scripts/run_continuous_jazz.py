@@ -826,6 +826,8 @@ def main(argv=None):
     parser.add_argument("--ignore-echo-ms", type=float, default=0.0,
                         help="drop input notes that repeat a note this run sent within N ms "
                              "(a DAW forwarding the AI channel back to its MIDI Out); 0 = off")
+    parser.add_argument("--solo-line", action="store_true",
+                        help="send only the top line of each generated block (no left-hand chords)")
     parser.add_argument("--context-history", action="store_true",
                         help="with --context-carry-tokens: carry the last N tokens of everything "
                              "played so far (several blocks), not only the previous block "
@@ -925,6 +927,8 @@ def main(argv=None):
         parser.error("--live-chords needs --half-bar-blocks")
     if not 1 <= args.chord_split <= 128:
         parser.error("chord_split must be between 1 and 128 (128 = every held note)")
+    if args.solo_line and args.chord_blocks_per_bar < 2:
+        parser.error("--solo-line works on the sub-block path: --chord-primer --chord-blocks-per-bar 2")
     if not 0 <= args.ignore_echo_ms <= 500:
         parser.error("ignore_echo_ms must be between 0 and 500")
     if args.ignore_echo_ms and not args.input_port:
@@ -1085,6 +1089,9 @@ def main(argv=None):
                 grammar_mask=True, target_duration_seconds=sub_duration,
                 return_metadata=True, use_kv_cache=args.kv_cache,
             )
+            if args.solo_line:
+                from inference.control.solo_line import solo_line_tokens
+                tokens_out = solo_line_tokens(tokens_out)
             if args.context_carry_tokens > 0 and validate_generated_token_block(
                     tokens_out, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]:
                 if not args.context_history:
@@ -1262,6 +1269,7 @@ def main(argv=None):
             # Blocks whose model block get() actually handed to the scheduler.
             report["adopted_blocks"] = sorted(producer.adopted_blocks)
             report["fetch_margin_ms"] = args.fetch_margin_ms
+            report["solo_line"] = bool(args.solo_line)
             if echo_guard is not None:
                 report["echo_guard"] = {"window_ms": args.ignore_echo_ms, "dropped": echo_guard.dropped}
             if live_chords is not None and producer.clock is not None:
