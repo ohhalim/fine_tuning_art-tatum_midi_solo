@@ -817,6 +817,12 @@ def main(argv=None):
     parser.add_argument("--temperature", type=float, default=1.0,
                         help="sampling temperature (1.0 = previous behaviour). Lower values made "
                              "continuous Tatum output reuse motifs more (docs/experiments/COHERENCE_GOAL.md)")
+    parser.add_argument("--live-chords", choices=["off", "observe", "follow"], default="off",
+                        help="read the chord held below --chord-split from --input-port: observe "
+                             "records it, follow also uses it as the next block's chord statement "
+                             "(docs/experiments/LIVE_CHORDS.md)")
+    parser.add_argument("--chord-split", type=int, default=60,
+                        help="--live-chords: only notes below this pitch name the chord")
     parser.add_argument("--context-history", action="store_true",
                         help="with --context-carry-tokens: carry the last N tokens of everything "
                              "played so far (several blocks), not only the previous block "
@@ -908,6 +914,13 @@ def main(argv=None):
         parser.error("--chord-blocks-per-bar needs --chord-primer")
     if args.half_bar_blocks and not (args.chord_primer and args.chord_blocks_per_bar == 2):
         parser.error("--half-bar-blocks needs --chord-primer --chord-blocks-per-bar 2")
+    if args.live_chords != "off" and not args.input_port:
+        parser.error("--live-chords reads the player's input; give --input-port")
+    if args.live_chords != "off" and not args.half_bar_blocks:
+        # One chord decision per scheduler block, made with that block's snapshot.
+        parser.error("--live-chords needs --half-bar-blocks")
+    if not 1 <= args.chord_split <= 127:
+        parser.error("chord_split must be between 1 and 127")
     if args.live_metrics and not args.block_metrics:
         parser.error("--live-metrics needs --block-metrics")
     if args.half_bar_blocks and args.fallback_only:
@@ -934,6 +947,10 @@ def main(argv=None):
         parser.error("--swap-adapter needs a model; drop --fallback-only")
 
     generate = None
+    live_chords = None
+    if args.live_chords != "off":
+        from inference.control.live_chords import LiveChordTracker
+        live_chords = LiveChordTracker(split=args.chord_split, follow=args.live_chords == "follow")
     live_primer_bars: list[bool] = []
     chord_primer_bars: list[bool] = []
     if not args.fallback_only:
@@ -1011,6 +1028,8 @@ def main(argv=None):
                 select_adapter(bar_index if block_index is None else block_index,
                                input_events, bar_index=bar_index)
             chord = chords[bar_index % len(chords)]
+            if live_chords is not None:
+                chord = live_chords.update(input_events, block_index, default=chord)
             notes = list(chord_guide_notes_for_duration(chord, bpm=args.bpm,
                                                         seconds=sub_duration))
             # Only the downbeat sub-block folds in what the player just did; a
@@ -1148,7 +1167,9 @@ def main(argv=None):
 
                 recorder = BlockMetricsRecorder(
                     producer_ref=lambda: producer_box.get("producer"),
-                    chord_for_block=lambda b: chords[(b // 2 if args.half_bar_blocks else b) % len(chords)],
+                    chord_for_block=lambda b: (
+                        live_chords.chord_for(b, chords[(b // 2) % len(chords)]) if live_chords is not None
+                        else chords[(b // 2 if args.half_bar_blocks else b) % len(chords)]),
                     adapter_for_block=lambda b: adapter_per_bar.get(b, None if bank else args.adapter_name),
                     on_adopted=print_adopted if args.live_metrics else None)
                 base_factory = sub_builder or (
@@ -1225,6 +1246,9 @@ def main(argv=None):
             # Blocks whose model block get() actually handed to the scheduler.
             report["adopted_blocks"] = sorted(producer.adopted_blocks)
             report["fetch_margin_ms"] = args.fetch_margin_ms
+            if live_chords is not None and producer.clock is not None:
+                report["live_chords"] = live_chords.report(producer.clock.bar_start_ns,
+                                                           producer.clock.bar_start_ns(0))
             report["start_budget_bars"] = args.start_budget_bars
             report["adaptive_start_safety"] = args.adaptive_start_safety
             if not args.fallback_only and bank is not None:

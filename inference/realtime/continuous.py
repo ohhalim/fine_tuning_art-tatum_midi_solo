@@ -317,6 +317,10 @@ class BarBlockProducer:
             )
             self._cv.notify_all()
 
+    @property
+    def clock(self) -> MonotonicBarClock | None:
+        return self._clock
+
     def _input_to_bar_start_ms(self, bar_index: int, newest_input_ns: int | None) -> float | None:
         """Input to the moment the bar is due.
 
