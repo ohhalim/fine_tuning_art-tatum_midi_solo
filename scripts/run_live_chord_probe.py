@@ -24,7 +24,7 @@ for p in (ROOT, ROOT / "music_transformer", ROOT / "scripts"):
 
 from inference.app.fallback import parse_chord  # noqa: E402
 
-PLAN = "Dbmaj7,Gb7,Bm7,E7,Abmaj7,Ebm7,Bbm7b5,Gbmaj7"
+PLAN = "Dbmaj7,Gb7,Bm7,Bbm7b5,E7,Abmaj7"
 
 
 def pcs(chord: str) -> frozenset:
@@ -82,7 +82,7 @@ def main(argv=None) -> int:
     ap.add_argument("--mode", choices=["observe", "follow"], required=True)
     ap.add_argument("--preset", default="tatum")
     ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--bars", type=int, default=24)
+    ap.add_argument("--bars", type=int, default=16)
     ap.add_argument("--bpm", type=int, default=128)
     ap.add_argument("--static-chords", default="Cmaj7")
     ap.add_argument("--plan", default=PLAN)
