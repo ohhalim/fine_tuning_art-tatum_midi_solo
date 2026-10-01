@@ -28,12 +28,16 @@
 ## 실행 순서
 1. **터미널 1** (자판 도구를 먼저 켜야 런타임이 포트를 찾는다)
    ```
-   cd /Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo
-   .venv/bin/python scripts/typing_keyboard.py
+   cd /Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계
+   PY=/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/.venv/bin/python
+   $PY scripts/typing_keyboard.py
    ```
+   - 체크포인트와 최신 코드는 이 워크트리에 있다. 본체 저장소(`git_box/...`)는 오래된 main이고 체크포인트가 없다. 파이썬만 본체의 venv를 쓴다
 2. **터미널 2** (런타임. 128마디 = 128 BPM에서 4분)
    ```
-   FORCE_CPU=1 .venv/bin/python scripts/play_personalized.py --preset tatum --bars 128 --bpm 128 \
+   cd /Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계
+   PY=/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/.venv/bin/python
+   FORCE_CPU=1 $PY scripts/play_personalized.py --preset tatum --bars 128 --bpm 128 \
      --chords Dm7,G7,Cmaj7,Cmaj7 --input-port TypingKeyboard -- --live-chords follow --live-metrics
    ```
    - `--live-chords follow`: 왼손 코드를 다음 블록 코드로 쓴다(약 1–1.3초 뒤 반영). 빼면 `--chords` 진행 그대로다
