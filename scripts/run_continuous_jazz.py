@@ -823,6 +823,9 @@ def main(argv=None):
                              "(docs/experiments/LIVE_CHORDS.md)")
     parser.add_argument("--chord-split", type=int, default=60,
                         help="--live-chords: only notes below this pitch name the chord (128 = all)")
+    parser.add_argument("--ignore-echo-ms", type=float, default=0.0,
+                        help="drop input notes that repeat a note this run sent within N ms "
+                             "(a DAW forwarding the AI channel back to its MIDI Out); 0 = off")
     parser.add_argument("--context-history", action="store_true",
                         help="with --context-carry-tokens: carry the last N tokens of everything "
                              "played so far (several blocks), not only the previous block "
@@ -922,6 +925,10 @@ def main(argv=None):
         parser.error("--live-chords needs --half-bar-blocks")
     if not 1 <= args.chord_split <= 128:
         parser.error("chord_split must be between 1 and 128 (128 = every held note)")
+    if not 0 <= args.ignore_echo_ms <= 500:
+        parser.error("ignore_echo_ms must be between 0 and 500")
+    if args.ignore_echo_ms and not args.input_port:
+        parser.error("--ignore-echo-ms filters --input-port; give --input-port")
     if args.live_metrics and not args.block_metrics:
         parser.error("--live-metrics needs --block-metrics")
     if args.half_bar_blocks and args.fallback_only:
@@ -1114,10 +1121,16 @@ def main(argv=None):
     import mido
 
     input_buffer = MidiInputSnapshotBuffer()
+    echo_guard = None
+    if args.ignore_echo_ms:
+        from inference.realtime.echo import EchoGuard
+        echo_guard = EchoGuard(args.ignore_echo_ms)
     input_port = None
     if args.input_port:
         input_port = mido.open_input(
-            args.input_port, callback=lambda m: input_buffer.handle(m)
+            args.input_port,
+            callback=(lambda m: input_buffer.handle(m)) if echo_guard is None
+            else (lambda m: None if echo_guard.is_echo(m) else input_buffer.handle(m)),
         )
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -1134,6 +1147,8 @@ def main(argv=None):
     capture_input = None
     try:
         with opener() as port:
+            if echo_guard is not None:
+                port = echo_guard.wrap(port)
             if args.capture:
                 # Independent consumer: a separate CoreMIDI input, not the sink.
                 capture_input = mido.open_input(
@@ -1247,6 +1262,8 @@ def main(argv=None):
             # Blocks whose model block get() actually handed to the scheduler.
             report["adopted_blocks"] = sorted(producer.adopted_blocks)
             report["fetch_margin_ms"] = args.fetch_margin_ms
+            if echo_guard is not None:
+                report["echo_guard"] = {"window_ms": args.ignore_echo_ms, "dropped": echo_guard.dropped}
             if live_chords is not None and producer.clock is not None:
                 report["live_chords"] = live_chords.report(producer.clock.bar_start_ns,
                                                            producer.clock.bar_start_ns(0))
