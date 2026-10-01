@@ -56,3 +56,34 @@ def solo_line_tokens(tokens) -> list[int]:
         out.append(TIME_SHIFT_START + step - 1)
         remaining -= step
     return out
+
+
+def solo_with_comp_tokens(tokens, comp_notes) -> list[int]:
+    """Top line plus ``comp_notes`` (e.g. the chord guide voicing), same total length.
+
+    A comp pitch that the top line also plays in this block is left out, so the
+    two never sound the same key twice."""
+    import pretty_midi
+
+    from scripts.generate import encode_notes_simple
+    from scripts.style_distance import tokens_to_notes
+
+    tokens = [int(t) for t in tokens]
+    total = _steps(tokens)
+    line = top_notes(tokens_to_notes(tokens))
+    used = {n.pitch for n in line}
+    limit = total / 100
+    comp = [pretty_midi.Note(velocity=n.velocity, pitch=n.pitch, start=n.start, end=min(n.end, limit))
+            for n in comp_notes if n.pitch not in used and n.start < limit]
+    notes = sorted(line + comp, key=lambda n: (n.start, n.pitch))
+    if not notes:
+        return tokens
+    out = encode_notes_simple(notes)
+    remaining = total - _steps(out)
+    if remaining < 0:
+        return solo_line_tokens(tokens)
+    while remaining > 0:
+        step = min(remaining, TIME_SHIFT_END - TIME_SHIFT_START + 1)
+        out.append(TIME_SHIFT_START + step - 1)
+        remaining -= step
+    return out

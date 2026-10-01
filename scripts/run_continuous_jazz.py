@@ -828,6 +828,9 @@ def main(argv=None):
                              "(a DAW forwarding the AI channel back to its MIDI Out); 0 = off")
     parser.add_argument("--solo-line", action="store_true",
                         help="send only the top line of each generated block (no left-hand chords)")
+    parser.add_argument("--comp", action="store_true",
+                        help="with --solo-line: play the chord guide voicing, short and soft, "
+                             "on each bar's first half so the progression stays audible")
     parser.add_argument("--context-history", action="store_true",
                         help="with --context-carry-tokens: carry the last N tokens of everything "
                              "played so far (several blocks), not only the previous block "
@@ -927,6 +930,8 @@ def main(argv=None):
         parser.error("--live-chords needs --half-bar-blocks")
     if not 1 <= args.chord_split <= 128:
         parser.error("chord_split must be between 1 and 128 (128 = every held note)")
+    if args.comp and not args.solo_line:
+        parser.error("--comp goes with --solo-line")
     if args.solo_line and args.chord_blocks_per_bar < 2:
         parser.error("--solo-line works on the sub-block path: --chord-primer --chord-blocks-per-bar 2")
     if not 0 <= args.ignore_echo_ms <= 500:
@@ -1090,8 +1095,15 @@ def main(argv=None):
                 return_metadata=True, use_kv_cache=args.kv_cache,
             )
             if args.solo_line:
-                from inference.control.solo_line import solo_line_tokens
-                tokens_out = solo_line_tokens(tokens_out)
+                from inference.control.solo_line import solo_line_tokens, solo_with_comp_tokens
+                if args.comp and sub_index == 0:
+                    import pretty_midi
+                    guide = chord_guide_notes_for_duration(chord, bpm=args.bpm, seconds=sub_duration)
+                    comp = [pretty_midi.Note(velocity=56, pitch=n.pitch, start=0.0, end=sub_duration * 0.6)
+                            for n in guide]
+                    tokens_out = solo_with_comp_tokens(tokens_out, comp)
+                else:
+                    tokens_out = solo_line_tokens(tokens_out)
             if args.context_carry_tokens > 0 and validate_generated_token_block(
                     tokens_out, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]:
                 if not args.context_history:
@@ -1270,6 +1282,7 @@ def main(argv=None):
             report["adopted_blocks"] = sorted(producer.adopted_blocks)
             report["fetch_margin_ms"] = args.fetch_margin_ms
             report["solo_line"] = bool(args.solo_line)
+            report["comp"] = bool(args.comp)
             if echo_guard is not None:
                 report["echo_guard"] = {"window_ms": args.ignore_echo_ms, "dropped": echo_guard.dropped}
             if live_chords is not None and producer.clock is not None:

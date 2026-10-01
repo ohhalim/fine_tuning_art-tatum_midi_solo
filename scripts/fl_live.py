@@ -36,6 +36,8 @@ def main(argv=None) -> int:
                     help="use the held chord as the next block's chord (else keep --chords)")
     ap.add_argument("--solo", action=argparse.BooleanOptionalAction, default=True,
                     help="send only the top line (no chords) of what the model plays")
+    ap.add_argument("--comp", action=argparse.BooleanOptionalAction, default=True,
+                    help="with --solo: soft chord voicing once a bar so the progression is audible")
     args = ap.parse_args(argv)
     import mido
 
@@ -45,7 +47,7 @@ def main(argv=None) -> int:
            "--input-port", src, "--output-dir", str(ROOT / "outputs" / "fl_live" / args.preset), "--",
            "--port", dst, "--live-chords", "follow" if args.follow else "observe",
            "--chord-split", "128", "--ignore-echo-ms", "30", "--live-metrics",
-           *(["--solo-line"] if args.solo else [])]
+           *(["--solo-line"] if args.solo else []), *(["--comp"] if args.solo and args.comp else [])]
     try:
         return subprocess.call(cmd, cwd=ROOT, env={**os.environ, "FORCE_CPU": "1"})
     except KeyboardInterrupt:
