@@ -204,7 +204,9 @@ def reappearance(gen_line, session_line, n: int = WINDOW) -> dict:
     interval same intervals, any rhythm
     Each count is of distinct session patterns, so repeating one pattern adds at
     most 1 while the denominator (non-degenerate generated windows, repeats
-    included) keeps growing. Degenerate windows are left out on both sides."""
+    included) keeps growing. Degenerate windows are left out on both sides.
+    A pattern found exactly is not also a variant (Astra review: one key could
+    match one session window exactly and another as a variant)."""
     gen = [w for w in windows(gen_line, n) if not degenerate(w)]
     ses = [w for w in windows(session_line, n) if not degenerate(w)]
     exact, variant, interval = set(), set(), set()
@@ -218,6 +220,7 @@ def reappearance(gen_line, session_line, n: int = WINDOW) -> dict:
                 exact.add(giv)
             elif all(VARIANT_RATIO[0] <= a / b <= VARIANT_RATIO[1] for a, b in zip(gd, sd)):
                 variant.add(giv)
+    variant -= exact
     return {"windows": len(gen), "distinct_windows": len({intervals(p) for p, _ in gen}),
             "exact": len(exact), "variant": len(variant), "interval": len(interval)}
 
@@ -330,8 +333,12 @@ def gate(sessions: dict, min_positive: int) -> dict:
 
 
 # ---- generation ------------------------------------------------------------------
-def prepare_case(model: str, session_dir: str, report: dict, notes, line, k: int) -> dict:
-    """Everything about block ``k`` that does not depend on the generation seed."""
+def prepare_case(model: str, session_dir: str, report: dict, notes, k: int) -> dict:
+    """Everything about block ``k`` that does not depend on the generation seed.
+
+    The top line is built only from notes that start before block ``k``: a 50 ms
+    cluster opening just before the block could otherwise take its highest pitch
+    from a note of block ``k`` itself (Astra review)."""
     from inference.control.chord_primer import chord_guide_notes_for_duration
     from scripts.generate import encode_notes_simple, truncate_tokens_preserving_velocity
 
@@ -340,6 +347,7 @@ def prepare_case(model: str, session_dir: str, report: dict, notes, line, k: int
     chords = report["chords"]
     chord = chords[(k // 2) % len(chords)]
     t_k = k * block_s
+    line = top_line_notes([n for n in notes if n[0] < t_k])
     chord_notes = sorted(chord_guide_notes_for_duration(chord, bpm=bpm, seconds=block_s),
                          key=lambda n: (n.start, n.pitch))
     case = {"id": f"{model}|{session_dir}|{k}", "model": model, "session": session_dir, "k": k,
@@ -424,12 +432,11 @@ def run(set_name: str, models, out_dir: Path, *, dry_run: bool = False) -> int:
             d = ROOT / session_dir
             report = json.loads((d / "continuous_report.json").read_text())
             notes = session_notes(report, d / "played.mid")
-            line = top_line_notes(notes)
             n_blocks = report["bars"] * 2
             for k in BLOCKS:
                 if k >= n_blocks:
                     continue
-                case = prepare_case(model_name, session_dir, report, notes, line, k)
+                case = prepare_case(model_name, session_dir, report, notes, k)
                 cases.append(case)
                 if dry_run:
                     continue

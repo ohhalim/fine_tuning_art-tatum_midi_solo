@@ -140,6 +140,11 @@ class ReappearanceTest(unittest.TestCase):
         far = reappearance(line_of([67, 69, 71, 72], ioi=0.4), self.SESSION)        # ratio 2.0
         self.assertEqual((far["variant"], far["interval"]), (0, 1))
 
+    def test_an_exact_pattern_is_not_also_a_variant(self) -> None:
+        session = line_of([60, 62, 64, 65]) + line_of([67, 69, 71, 72], t0=2.0)     # same intervals twice
+        r = reappearance(line_of([60, 62, 64, 65]), session)
+        self.assertEqual((r["exact"], r["variant"], r["interval"]), (1, 0, 1))
+
     def test_same_note_and_too_short_lines_have_no_windows(self) -> None:
         same = reappearance(line_of([60] * 8), self.SESSION)
         self.assertEqual((same["windows"], same["variant"], same["exact"]), (0, 0, 0))
@@ -211,7 +216,7 @@ class CaseTest(unittest.TestCase):
     def case(self, pitches, k=2):
         report = self.report(pitches)
         notes = [(s, e, p, 80) for p, s, e in report["played_bars"][0]["notes"]]
-        return prepare_case("m", "sess", report, notes, top_line_notes(notes), k)
+        return prepare_case("m", "sess", report, notes, k)
 
     def test_primers_share_the_chord_statement_and_b_c_lengths(self) -> None:
         c = self.case([60, 62, 65, 64, 69, 67, 71])
@@ -223,6 +228,16 @@ class CaseTest(unittest.TestCase):
         self.assertEqual(len(b), len(cc))
         self.assertEqual(c["motif_B"], [65, 64, 69, 67, 71])     # the latest run
         self.assertTrue(all(t < 0.0 for t, _ in c["session_line"]))
+
+    def test_material_stops_at_the_block_start(self) -> None:
+        # Astra's reproduction: a cluster opening at 0.99 s took pitch 84 from a note at 1.02 s.
+        report = {"bpm": 120, "beats_per_bar": 4, "bars": 4, "chords": ["C7"],
+                  "played_bars": [{"notes": []}] * 4}
+        notes = [(0.0, 0.1, 60, 80), (0.2, 0.3, 62, 80), (0.4, 0.5, 64, 80), (0.6, 0.7, 65, 80),
+                 (0.99, 1.0, 67, 80), (1.02, 1.1, 84, 80)]
+        c = prepare_case("m", "sess", report, notes, 1)          # block 1 starts at 1.0 s
+        self.assertEqual([p for _, p in c["session_line"]], [60, 62, 64, 65, 67])
+        self.assertEqual(c["motif_B"], [60, 62, 64, 65, 67])
 
     def test_statuses_are_kept(self) -> None:
         self.assertEqual(self.case([60, 62])["status"], "no_motif")

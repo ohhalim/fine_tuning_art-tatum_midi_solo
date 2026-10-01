@@ -105,7 +105,7 @@
 
 ## 실행
 ```
-python scripts/motif_transfer_ab.py --set dev --output-dir outputs/motif_transfer/dev
+python scripts/motif_transfer_ab.py --set dev --output-dir outputs/motif_transfer/dev_v2
 python -m unittest tests.test_motif_transfer
 ```
 
@@ -174,3 +174,16 @@ python -m unittest tests.test_motif_transfer
   - 모델은 primer 안의 짧은 선율보다, 바로 앞 코드 진술과 블록 길이 목표에 맞춰 생성하는 것으로 보인다
   - 학습 때 "짧은 동기 → 이어지는 변형"을 primer 단위로 본 적이 없을 수 있다
 - 다른 설계(순서, 길이, 학습 목표 변경 등)는 새 이슈와 새 사전 등록으로만 다룬다
+
+## 정정 (Astra 리뷰 재현 출력, 재실행 전 기록)
+Astra가 사용 한도로 중단되기 전 남긴 재현 출력 두 개를 Claude가 다시 재현했다. 둘 다 사실이었다.
+1. **같은 세션 패턴이 exact와 variant로 동시에 집계됐다.** 같은 음정 키가 세션의 한 창과는 정확히, 다른 창과는 변형으로 맞으면 둘 다 셌다
+   - 수정: 정확 일치한 패턴은 변형에서 뺀다(사전 등록의 "정확 일치는 아닌 것"과 맞춤)
+2. **블록 k의 음이 세션 재료와 동기에 섞였다.** 윗선율을 세션 전체에서 만든 뒤 시각으로 잘랐다. 그래서 블록 직전(예: 0.99초)에 열린 50 ms 클러스터가 블록 k 안의 음(1.02초)에서 최고음을 가져갔다
+   - dev 사례 114개 중 12개의 세션 재료, 8개의 동기가 영향을 받았다
+   - 수정: 사례마다 블록 k 시작 전에 시작한 음만으로 윗선율을 만든다
+   - 사후 보정 스크립트도 같은 방식이었다. 창마다 그 창 안의 음으로 윗선율을 만들도록 고쳤다
+- 회귀 테스트 2개를 더했다. 옛 구현에서는 둘 다 틀린 값을 낸다(variant 1, 동기에 블록 k의 음 84)
+- **처리:** 설계, 게이트, seed, 예산은 그대로 두고 dev를 다시 실행한다(`outputs/motif_transfer/dev_v2`)
+  - 위 "결과 — 개발 단계"는 수정 전 실행 기록으로 남긴다
+  - 고친 사례 목록(dry-run): Tatum `ok` 33 / `no_motif` 5, 멜다우 `ok` 32 / `no_motif` 6, base `ok` 28 / `no_motif` 9 / `c_unavailable` 1
