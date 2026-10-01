@@ -21,6 +21,9 @@
 - 입력은 사용자의 키보드다. 코드를 짚거나 멜로디 라인을 준다
 - 출력 MIDI는 FL Studio로 들어가서 FL의 악기로 소리가 난다
 
+### 진행 상황 (2026-10-01) ✅
+- FL Studio와 실제로 연결했다: FL 자판 → MIDI Out → 런타임 → Serum #2. 사용자 청취 소감은 "무작위적"이다(`docs/phase1/FL_MVP_RECORD.md`)
+
 ### 이미 있는 것 ✅
 - MIDI 입력 → 생성 → MIDI 출력 루프(`run_continuous_jazz.py`, 가상 포트 `ContinuousJazz`)
 - 키보드 입력이 반 마디 블록마다 primer에 반영된다. 입력 도착부터 반영 블록 시작까지 약 0.5–1.3초다(128 BPM, 가상 포트)
