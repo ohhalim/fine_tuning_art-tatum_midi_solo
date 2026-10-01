@@ -104,12 +104,13 @@ def main(argv=None) -> int:
             for kind, pitch in events:
                 port.send(mido.Message(kind, note=pitch, velocity=args.velocity if kind == "note_on" else 0))
 
-        print(f"virtual MIDI output '{args.port_name}' open. chords: Z-row (C3-B3), melody: Q-row (C4-). "
-              "Space releases the chord, [ ] octave, Esc quits.", flush=True)
         fd = sys.stdin.fileno()
         saved = termios.tcgetattr(fd)
         try:
             tty.setcbreak(fd)
+            # Announce only now: keys typed before cbreak are flushed by the switch.
+            print(f"virtual MIDI output '{args.port_name}' open. chords: Z-row (C3-B3), melody: Q-row (C4-). "
+                  "Space releases the chord, [ ] octave, Esc quits.", flush=True)
             while True:
                 ready, _, _ = select.select([sys.stdin], [], [], 0.01)
                 now = time.monotonic()
