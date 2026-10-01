@@ -3,6 +3,18 @@
 작성 2026-10-01. `musical_quality_verified: false`. 사용자 실연주 전 문서다.
 
 ## 권장 경로: FL 자판 → MIDI Out → 런타임 → 세럼 (추가 도구 없음)
+
+### 다시 켜는 법 (2026-10-01 설정 저장됨)
+1. FL에서 iCloud `mvp/mvp.flp`를 연다(MIDI Out 채널 Port 5, Serum #2 입력 Port 7, Serum 입력 Port 6이 저장돼 있다)
+2. 채널 랙에서 **MIDI Out**을 선택한다
+3. 터미널:
+   ```
+   cd /Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계
+   /Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/.venv/bin/python scripts/fl_live.py --bars 64
+   ```
+   - 64마디 = 128 BPM에서 2분. Ctrl-C로 멈추면 모든 음을 끈다. `--preset mehldau`, `--no-follow`(코드 고정)
+- macOS IAC(포트 "AI In"과 두 번째 버스)와 FL MIDI 설정(출력 IAC AI In Port 5, 입력 IAC 두 번째 버스 Port 7)은 프로젝트 밖 설정이라 그대로 유지된다
+- 2026-10-01 실연결: 입력이 런타임에 들어오고(150–176번 블록 입력 3음), AI 음이 Serum #2로 나왔다. 사용자 청취 소감은 "무작위적"이다. 연결은 되지만 내용은 아직 쓸 만하지 않다
 사용자 지적: FL Studio는 자판 입력을 이미 받는다. 그래서 별도 자판 도구 없이 FL에서 MIDI를 내보내고 다시 받으면 된다.
 
 ```
