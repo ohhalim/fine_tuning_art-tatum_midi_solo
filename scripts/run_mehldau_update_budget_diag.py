@@ -99,6 +99,9 @@ def main(argv=None) -> int:
                    help="comma list of out_proj,qkv,ffn; extras are attached after the base loads")
     p.add_argument("--bpm", type=int, default=128)
     p.add_argument("--generation-tokens", type=int, default=96)
+    p.add_argument("--repeat-weight", type=float, default=1.0,
+                   help="loss weight on note_on tokens that re-complete a recent top-line pattern "
+                        "(docs/experiments/REPEAT_WEIGHT_PILOT.md); 1 = the unchanged loss path")
     args = p.parse_args(argv)
 
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
@@ -220,6 +223,7 @@ def main(argv=None) -> int:
         print(json.dumps(row), flush=True)
 
     updates, tokens_seen, train_wall = 0, 0, 0.0
+    marked_tokens = 0
     taken = {0}
     take_snapshot(0, optimizer.param_groups[0]["lr"], 0.0, 0, None)
     stopped = "planned_epochs"
@@ -231,7 +235,14 @@ def main(argv=None) -> int:
         for bi, (x, y) in enumerate(loader):
             x, y = x.to(device), y.to(device)
             out = model(x)
-            raw = loss_fn(out.view(-1, out.size(-1)), y.view(-1))
+            if args.repeat_weight == 1.0:
+                raw = loss_fn(out.view(-1, out.size(-1)), y.view(-1))
+            else:
+                from scripts.repeat_weights import batch_weights, weighted_smooth_ce
+                w = batch_weights(x.cpu(), y.cpu(), args.repeat_weight, TOKEN_PAD).to(device)
+                marked_tokens += int((w > 1.0).sum())
+                raw = weighted_smooth_ce(out.view(-1, out.size(-1)), y.reshape(-1), w.view(-1),
+                                         args.label_smoothing, VOCAB_SIZE)
             (raw / args.gradient_accumulation).backward()
             tokens_seen += int((y != TOKEN_PAD).sum())
             epoch_loss += raw.item()
@@ -319,6 +330,7 @@ def main(argv=None) -> int:
         "optimizer_updates": updates, "adam_state_steps": sorted(adam_steps),
         "train_wall_s": round(train_wall, 1), "stopped_by": stopped,
         "train_tokens_seen": tokens_seen,
+        "repeat_weight": args.repeat_weight, "repeat_marked_tokens": marked_tokens,
         "curve": curve, "generation_identity": identity,
         "val_songs_in_base_pretrain": True,
         "mehldau_style_verified": False, "musical_quality_verified": False,
