@@ -41,7 +41,11 @@ def main(argv=None) -> int:
     ap.add_argument("--solo", action=argparse.BooleanOptionalAction, default=True,
                     help="send only the top line (no chords) of what the model plays")
     ap.add_argument("--comp", action=argparse.BooleanOptionalAction, default=True,
-                    help="with --solo: soft chord voicing once a bar so the progression is audible")
+                    help="with --solo: short root-3rd-7th hits on beat 1 and the & of 3 so the progression "
+                         "is audible")
+    ap.add_argument("--breath", type=int, default=0, metavar="N",
+                    help="with --solo: rest 0.4 s after N notes without a gap (24 passed its check, "
+                         "docs/experiments/PHRASE_BREATH.md; 0 = off)")
     ap.add_argument("--phrase", action="store_true",
                     help="EXPERIMENTAL, for listening: history context + temperature 0.6 + pattern cache "
                          "(the G2 setting of docs/experiments/RUNTIME_CACHE_FALLBACK.md; it did not pass its "
@@ -56,6 +60,7 @@ def main(argv=None) -> int:
            "--port", dst, "--live-chords", "follow" if args.follow else "observe",
            "--chord-split", "128", "--ignore-echo-ms", "30", "--live-metrics",
            *(["--solo-line"] if args.solo else []), *(["--comp"] if args.solo and args.comp else []),
+           *(["--phrase-breath", str(args.breath)] if args.solo and args.breath else []),
            *(PHRASE_ARGS if args.phrase else [])]
     try:
         return subprocess.call(cmd, cwd=ROOT, env={**os.environ, "FORCE_CPU": "1"})
