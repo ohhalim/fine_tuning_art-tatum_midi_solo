@@ -826,6 +826,9 @@ def main(argv=None):
     parser.add_argument("--ignore-echo-ms", type=float, default=0.0,
                         help="drop input notes that repeat a note this run sent within N ms "
                              "(a DAW forwarding the AI channel back to its MIDI Out); 0 = off")
+    parser.add_argument("--pattern-cache", action="store_true",
+                        help="raise the probability of note_on pitches that continue a recent top-line "
+                             "interval pattern (docs/experiments/PATTERN_CACHE_DECODING.md); off by default")
     parser.add_argument("--solo-line", action="store_true",
                         help="send only the top line of each generated block (no left-hand chords)")
     parser.add_argument("--comp", action="store_true",
@@ -932,6 +935,8 @@ def main(argv=None):
         parser.error("chord_split must be between 1 and 128 (128 = every held note)")
     if args.comp and not args.solo_line:
         parser.error("--comp goes with --solo-line")
+    if args.pattern_cache and args.chord_blocks_per_bar < 2:
+        parser.error("--pattern-cache works on the sub-block path: --chord-primer --chord-blocks-per-bar 2")
     if args.solo_line and args.chord_blocks_per_bar < 2:
         parser.error("--solo-line works on the sub-block path: --chord-primer --chord-blocks-per-bar 2")
     if not 0 <= args.ignore_echo_ms <= 500:
@@ -1025,6 +1030,7 @@ def main(argv=None):
 
         context_carry = {"tokens": []}
         render_stats: dict = {}            # --solo-line: raw vs rendered validity (Astra review)
+        cache_stats: dict = {}             # --pattern-cache: steps sampled / steps biased
         played_history = PlayedHistory(60.0 / args.bpm * 2)     # half-bar blocks only
         generated_blocks: dict = {}
 
@@ -1088,13 +1094,20 @@ def main(argv=None):
             primer = torch.tensor(ordered or [60], dtype=torch.long)
             chord_primer_bars.append(bool(notes))
             torch.manual_seed(args.seed + bar_index * 13 + sub_index * 977)
+            proc = None
+            if args.pattern_cache:
+                from scripts.pattern_cache import PatternCacheBias
+                proc = PatternCacheBias()
             tokens_out, _meta = generate_once(
                 model=model, primer=primer,
                 target_length=min(args.max_sequence, len(primer) + args.generation_tokens),
                 strip_primer=True, temperature=args.temperature, top_k=32, top_p=0.95,
                 grammar_mask=True, target_duration_seconds=sub_duration,
-                return_metadata=True, use_kv_cache=args.kv_cache,
+                return_metadata=True, use_kv_cache=args.kv_cache, logits_processor=proc,
             )
+            if proc is not None:
+                cache_stats["steps"] = cache_stats.get("steps", 0) + proc.steps
+                cache_stats["fired"] = cache_stats.get("fired", 0) + proc.fired
             if args.solo_line:
                 from inference.control.solo_line import render_block
                 comp = None
@@ -1283,6 +1296,9 @@ def main(argv=None):
             report["adopted_blocks"] = sorted(producer.adopted_blocks)
             report["fetch_margin_ms"] = args.fetch_margin_ms
             report["solo_line"] = bool(args.solo_line)
+            report["pattern_cache"] = bool(args.pattern_cache)
+            if args.pattern_cache and not args.fallback_only:
+                report["pattern_cache_stats"] = dict(cache_stats)
             if args.solo_line and not args.fallback_only:
                 report["solo_line_render"] = dict(render_stats)
             report["comp"] = bool(args.comp)
