@@ -834,6 +834,9 @@ def main(argv=None):
     parser.add_argument("--comp", action="store_true",
                         help="with --solo-line: short shell-voicing hits (root, 3rd, 7th) on beat 1 and "
                              "the & of 3 so the progression stays audible")
+    parser.add_argument("--phrase-breath", type=int, default=0, metavar="N",
+                        help="with --solo-line: after N top-line notes without a 0.3 s gap, drop notes "
+                             "for 0.4 s so the line breathes (0 = off; docs/experiments/PHRASE_BREATH.md)")
     parser.add_argument("--context-history", action="store_true",
                         help="with --context-carry-tokens: carry the last N tokens of everything "
                              "played so far (several blocks), not only the previous block "
@@ -935,6 +938,10 @@ def main(argv=None):
         parser.error("chord_split must be between 1 and 128 (128 = every held note)")
     if args.comp and not args.solo_line:
         parser.error("--comp goes with --solo-line")
+    if args.phrase_breath and not args.solo_line:
+        parser.error("--phrase-breath goes with --solo-line")
+    if args.phrase_breath < 0:
+        parser.error("--phrase-breath must be 0 (off) or a note count")
     if args.pattern_cache and args.chord_blocks_per_bar < 2:
         parser.error("--pattern-cache works on the sub-block path: --chord-primer --chord-blocks-per-bar 2")
     if args.solo_line and args.chord_blocks_per_bar < 2:
@@ -1030,6 +1037,10 @@ def main(argv=None):
 
         context_carry = {"tokens": []}
         render_stats: dict = {}            # --solo-line: raw vs rendered validity (Astra review)
+        breath = None
+        if args.phrase_breath:
+            from inference.control.solo_line import PhraseBreath
+            breath = PhraseBreath(args.phrase_breath)
         cache_stats: dict = {}             # --pattern-cache: steps sampled / steps biased
         played_history = PlayedHistory(60.0 / args.bpm * 2)     # half-bar blocks only
         generated_blocks: dict = {}
@@ -1119,8 +1130,12 @@ def main(argv=None):
                     at = 0.0 if sub_index == 0 else 0.5 * 60.0 / args.bpm
                     comp = [pretty_midi.Note(velocity=56, pitch=p, start=at, end=min(at + 0.25, sub_duration))
                             for p in shell_voicing(chord)]
+                line_filter = None
+                if breath is not None:
+                    block_start = (bar_index * args.chord_blocks_per_bar + sub_index) * sub_duration
+                    line_filter = lambda ns, t0=block_start: breath(ns, t0)
                 tokens_out = render_block(tokens_out, lookahead_ms=sub_duration * 1000,
-                                          comp_notes=comp, stats=render_stats)
+                                          comp_notes=comp, stats=render_stats, line_filter=line_filter)
             if args.context_carry_tokens > 0 and validate_generated_token_block(
                     tokens_out, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]:
                 if not args.context_history:
@@ -1304,6 +1319,8 @@ def main(argv=None):
                 report["pattern_cache_stats"] = dict(cache_stats)
             if args.solo_line and not args.fallback_only:
                 report["solo_line_render"] = dict(render_stats)
+                report["phrase_breath"] = ({"max_notes": breath.max_notes, "rest_s": breath.rest_s,
+                                            "dropped_notes": breath.dropped} if breath else None)
             report["comp"] = bool(args.comp)
             if echo_guard is not None:
                 report["echo_guard"] = {"window_ms": args.ignore_echo_ms, "dropped": echo_guard.dropped}
