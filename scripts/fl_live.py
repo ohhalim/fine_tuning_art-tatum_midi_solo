@@ -15,6 +15,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# G2 (#1610): Tatum motif reuse 0.066 vs real 0.072 without same-note grams, 1 fallback in 6 runs.
+PHRASE_ARGS = ["--context-carry-tokens", "256", "--context-history", "--context-carry-position", "before",
+               "--max-sequence", "512", "--temperature", "0.6", "--pattern-cache",
+               "--start-budget-bars", "0.9", "--generation-tokens", "128"]
 
 
 def find_ports(inputs, outputs, *, source_hint: str = "AI In"):
@@ -38,6 +42,10 @@ def main(argv=None) -> int:
                     help="send only the top line (no chords) of what the model plays")
     ap.add_argument("--comp", action=argparse.BooleanOptionalAction, default=True,
                     help="with --solo: soft chord voicing once a bar so the progression is audible")
+    ap.add_argument("--phrase", action="store_true",
+                    help="EXPERIMENTAL, for listening: history context + temperature 0.6 + pattern cache "
+                         "(the G2 setting of docs/experiments/RUNTIME_CACHE_FALLBACK.md; it did not pass its "
+                         "preregistered fallback rule). Chords take about 0.4 block longer to follow")
     args = ap.parse_args(argv)
     import mido
 
@@ -47,7 +55,8 @@ def main(argv=None) -> int:
            "--input-port", src, "--output-dir", str(ROOT / "outputs" / "fl_live" / args.preset), "--",
            "--port", dst, "--live-chords", "follow" if args.follow else "observe",
            "--chord-split", "128", "--ignore-echo-ms", "30", "--live-metrics",
-           *(["--solo-line"] if args.solo else []), *(["--comp"] if args.solo and args.comp else [])]
+           *(["--solo-line"] if args.solo else []), *(["--comp"] if args.solo and args.comp else []),
+           *(PHRASE_ARGS if args.phrase else [])]
     try:
         return subprocess.call(cmd, cwd=ROOT, env={**os.environ, "FORCE_CPU": "1"})
     except KeyboardInterrupt:
