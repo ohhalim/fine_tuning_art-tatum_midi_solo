@@ -3,10 +3,12 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+from unittest import mock
 
 import pretty_midi
 
-from inference.control.solo_line import solo_line_tokens, solo_with_comp_tokens, top_notes
+from inference.control import solo_line
+from inference.control.solo_line import render_block, solo_line_tokens, solo_with_comp_tokens, top_notes
 from scripts.generate import encode_notes_simple
 from scripts.run_continuous_jazz import main
 from scripts.run_resident_model_probe import stage_a_musical_duration_ms, validate_generated_token_block
@@ -48,6 +50,30 @@ class SoloLineTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d, self.assertRaises(SystemExit):
             main(["--output-dir", d, "--checkpoint", "x.pt", "--conditioning-midi", "p.mid", "--chord-primer",
                   "--chord-blocks-per-bar", "2", "--comp"])
+
+    def test_invalid_raw_blocks_stay_invalid_so_the_fallback_plays(self) -> None:
+        # Astra's reproduction: duplicate note_on / orphan note_off became valid after the rewrite.
+        stats = {}
+        for raw in ([376, 60, 60, 349, 188], [376, 60, 349, 188, 188]):
+            self.assertTrue(validate_generated_token_block(solo_line_tokens(raw), lookahead_ms=940,
+                                                           allow_rest_bar=True)["valid"])   # the old trap
+            out = render_block(raw, lookahead_ms=940, stats=stats)
+            self.assertEqual(out, raw)
+            self.assertFalse(validate_generated_token_block(out, lookahead_ms=940, allow_rest_bar=True)["valid"])
+        self.assertEqual(stats, {"raw_invalid": 2})
+
+    def test_valid_raw_blocks_are_rendered_and_counted(self) -> None:
+        stats = {}
+        out = render_block(self.block(), lookahead_ms=940, stats=stats)
+        self.assertEqual([n.pitch for n in tokens_to_notes(out)], [72, 74, 76])
+        self.assertEqual(stats, {"rendered": 1})
+
+    def test_a_rewrite_that_fails_validation_plays_the_raw_block(self) -> None:
+        stats = {}
+        with mock.patch.object(solo_line, "solo_line_tokens", return_value=[60]):
+            out = render_block(self.block(), lookahead_ms=940, stats=stats)
+        self.assertEqual(out, self.block())
+        self.assertEqual(stats, {"rendered_invalid": 1})
 
     def test_rest_blocks_are_left_alone(self) -> None:
         self.assertEqual(solo_line_tokens([255 + 94]), [255 + 94])

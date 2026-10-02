@@ -87,3 +87,30 @@ def solo_with_comp_tokens(tokens, comp_notes) -> list[int]:
         out.append(TIME_SHIFT_START + step - 1)
         remaining -= step
     return out
+
+
+def render_block(tokens, *, lookahead_ms: float, comp_notes=None, stats: dict | None = None) -> list[int]:
+    """What to schedule for a generated block under --solo-line / --comp.
+
+    Astra review: the raw model block is validated first. An invalid raw block
+    is returned unchanged so the block builder rejects it and the usual fallback
+    plays; the rewrite must not turn a model error into a valid block. The
+    rewritten block is validated again; if it fails, the valid raw block plays.
+    ``stats`` counts raw_invalid / rendered / rendered_invalid separately, per
+    generation attempt: not per adopted block, not per block actually sent."""
+    from scripts.run_resident_model_probe import validate_generated_token_block
+
+    def valid(t) -> bool:
+        return bool(validate_generated_token_block(t, lookahead_ms=lookahead_ms, allow_rest_bar=True)["valid"])
+
+    stats = stats if stats is not None else {}
+    raw = [int(t) for t in tokens]
+    if not valid(raw):
+        stats["raw_invalid"] = stats.get("raw_invalid", 0) + 1
+        return raw
+    rendered = solo_with_comp_tokens(raw, comp_notes) if comp_notes else solo_line_tokens(raw)
+    if not valid(rendered):
+        stats["rendered_invalid"] = stats.get("rendered_invalid", 0) + 1
+        return raw
+    stats["rendered"] = stats.get("rendered", 0) + 1
+    return rendered
