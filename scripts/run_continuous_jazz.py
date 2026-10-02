@@ -1340,6 +1340,8 @@ def main(argv=None):
                          "consumed_block": e["consumed_block"]}
                         for e in live_selector.events]
             report["chords"] = chords
+            report["seed"] = args.seed
+            report["checkpoint"] = str(args.checkpoint) if args.checkpoint else None
             report["context_carry_tokens"] = args.context_carry_tokens
             report["context_carry_position"] = args.context_carry_position
             report["context_history"] = bool(args.context_history)

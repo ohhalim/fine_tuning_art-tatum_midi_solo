@@ -61,8 +61,9 @@ def solo_line_tokens(tokens) -> list[int]:
 def solo_with_comp_tokens(tokens, comp_notes) -> list[int]:
     """Top line plus ``comp_notes`` (e.g. the chord guide voicing), same total length.
 
-    A comp pitch that the top line also plays in this block is left out, so the
-    two never sound the same key twice."""
+    A comp note is left out only when the top line holds the same pitch at an
+    overlapping time, so the two never sound the same key at once (#1621 review:
+    dropping it for the whole block lost chord tones the line used elsewhere)."""
     import pretty_midi
 
     from scripts.generate import encode_notes_simple
@@ -71,10 +72,12 @@ def solo_with_comp_tokens(tokens, comp_notes) -> list[int]:
     tokens = [int(t) for t in tokens]
     total = _steps(tokens)
     line = top_notes(tokens_to_notes(tokens))
-    used = {n.pitch for n in line}
     limit = total / 100
+
+    def clashes(c) -> bool:
+        return any(m.pitch == c.pitch and m.start < c.end and c.start < m.end for m in line)
     comp = [pretty_midi.Note(velocity=n.velocity, pitch=n.pitch, start=n.start, end=min(n.end, limit))
-            for n in comp_notes if n.pitch not in used and n.start < limit]
+            for n in comp_notes if n.start < limit and not clashes(n)]
     notes = sorted(line + comp, key=lambda n: (n.start, n.pitch))
     if not notes:
         return tokens
