@@ -129,8 +129,12 @@
 - 수정: 세 단계를 나눠 기록한다
   - 인식: `seen_in_block`, `seen_latency_ms`
   - 생성: `first_generated_block`, `generated_latency_ms`
-  - 채택: `first_adopted_block`, `latency_ms`
-  - 블록마다 `adopted`와 실제 연주된 코드(`played_chord`, fallback이면 실행 때 진행)를 적는다
+  - 채택: `first_adopted_block`, `latency_ms`. 채택은 스케줄러에 넘겨진(예약된) 것이고 재생 완료가 아니다
+  - 생성 블록은 **다음 코드 변화가 인식된 블록 전까지만** 찾는다. 같은 코드가 나중에 다시 나와도 앞 변화가 뒤 블록을 빌려 쓰지 않는다(조기 리뷰)
+  - 블록마다 `schedule`과 `scheduled_chord`를 적는다
+    - `adopted`: 그 코드
+    - `fallback`: 소비 위치(watermark) 이하인데 채택되지 않은 블록. 실행 때 진행의 코드
+    - `not_consumed`: 요청되지 않은 블록. `null`
 - 저장된 리포트 재계산(follow 실행의 변화 56건): **1건이 바뀐다**
   - #1576 follow seed 43의 Abmaj7: 생성 블록 24는 fallback이었다. 채택은 25번이다
   - 지연이 1,063 ms → **2,000 ms**로 바뀐다

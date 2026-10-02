@@ -1289,11 +1289,12 @@ def main(argv=None):
             if echo_guard is not None:
                 report["echo_guard"] = {"window_ms": args.ignore_echo_ms, "dropped": echo_guard.dropped}
             if live_chords is not None and producer.clock is not None:
-                # Adopted blocks played the tracked chord; the rest played their
-                # fallback, built from the launch progression (Astra review, #1595).
+                # Adopted blocks were scheduled with the tracked chord; consumed blocks that
+                # were not adopted had their fallback (launch progression) scheduled (#1595).
+                adopted_now, watermark_now = producer.adoption_snapshot()
                 report["live_chords"] = live_chords.report(
                     producer.clock.bar_start_ns, producer.clock.bar_start_ns(0),
-                    adopted=set(producer.adopted_blocks),
+                    adopted=set(adopted_now), consumed_through=watermark_now,
                     fallback_chord=lambda b: chords[(b // 2) % len(chords)])
             report["start_budget_bars"] = args.start_budget_bars
             report["adaptive_start_safety"] = args.adaptive_start_safety

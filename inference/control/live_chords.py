@@ -85,23 +85,28 @@ class LiveChordTracker:
         entry = self.blocks.get(block_index)
         return entry["chord"] if entry else default
 
-    def report(self, block_start_ns, origin_ns: int, *, adopted=None, fallback_chord=None) -> dict:
+    def report(self, block_start_ns, origin_ns: int, *, adopted=None, consumed_through=None,
+               fallback_chord=None) -> dict:
         """``block_start_ns(b)``: session time of block b; times are ms from ``origin_ns``.
 
-        Three stages are kept apart (Astra review, #1595):
+        Three stages are kept apart (Astra reviews, #1595):
           seen       the snapshot of block ``seen_in_block`` held the chord (recognition)
-          generated  first block generated with it (``first_generated_block``)
-          adopted    first of those the scheduler actually played (``first_adopted_block``,
-                     ``latency_ms``); needs ``adopted``, the set of adopted block indices.
-        A block that was not adopted played its fallback, whose chord is
-        ``fallback_chord(b)`` (the launch progression)."""
+          generated  first block generated with it before the next change was seen
+          adopted    first of those whose model block the scheduler took (``latency_ms``)
+        ``adopted`` and ``consumed_through`` come from one ``adoption_snapshot()``.
+        "Adopted" means handed to the scheduler (scheduled), not finished playing.
+        A block at or below ``consumed_through`` that was not adopted had its
+        fallback scheduled, with ``fallback_chord(b)``; a later block was never
+        asked for, so its scheduled chord is unknown (None)."""
         def ms(b, onset):
             return round((block_start_ns(b) - onset) / 1e6, 1) if b is not None else None
 
         live = [b for b in sorted(self.blocks) if self.blocks[b]["source"] != "static"]
         changes = []
-        for c in self.changes:
-            gen = [b for b in live if b >= c["block"] and self.blocks[b]["chord"] == c["chord"]]
+        for i, c in enumerate(self.changes):
+            until = self.changes[i + 1]["block"] if i + 1 < len(self.changes) else None
+            gen = [b for b in live if b >= c["block"] and (until is None or b < until)
+                   and self.blocks[b]["chord"] == c["chord"]]
             first_gen = gen[0] if gen else None
             first_adopted = (next((b for b in gen if b in adopted), None) if adopted is not None else None)
             changes.append({"chord": c["chord"], "onset_ms": round((c["onset_ns"] - origin_ns) / 1e6, 1),
@@ -114,9 +119,14 @@ class LiveChordTracker:
         for b in sorted(self.blocks):
             entry = {"block": b, **self.blocks[b]}
             if adopted is not None:
-                entry["adopted"] = b in adopted
-                entry["played_chord"] = (self.blocks[b]["chord"] if b in adopted
-                                         else (fallback_chord(b) if fallback_chord else None))
+                if b in adopted:
+                    status, scheduled = "adopted", self.blocks[b]["chord"]
+                elif consumed_through is not None and b <= consumed_through:
+                    status, scheduled = "fallback", (fallback_chord(b) if fallback_chord else None)
+                else:
+                    status, scheduled = "not_consumed", None
+                entry["schedule"] = status
+                entry["scheduled_chord"] = scheduled
             blocks.append(entry)
         return {"follow": self.follow, "split": self.split, "adoption_known": adopted is not None,
                 "changes": changes, "blocks": blocks}
