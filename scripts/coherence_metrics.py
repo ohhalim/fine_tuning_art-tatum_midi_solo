@@ -49,8 +49,12 @@ def jumps(line, block_s: float) -> tuple[list[int], list[int]]:
     return boundary, within
 
 
-def motif_reuse(line, horizon_s: float = 8.0) -> tuple[int, int]:
-    """(reused, total) interval 3-grams, reuse looked up in the previous ``horizon_s``."""
+def motif_reuse(line, horizon_s: float = 8.0, skip_same_note: bool = False) -> tuple[int, int]:
+    """(reused, total) interval 3-grams, reuse looked up in the previous ``horizon_s``.
+
+    ``skip_same_note`` leaves (0, 0, 0) grams out of both counts: hammering one
+    key would otherwise score as motif reuse (#1612). Default keeps the
+    original definition so earlier results stay comparable."""
     from collections import Counter, deque
 
     grams = [(line[i][0], tuple(line[i + k + 1][1] - line[i + k][1] for k in range(3)))
@@ -65,10 +69,17 @@ def motif_reuse(line, horizon_s: float = 8.0) -> tuple[int, int]:
         while window and t - window[0][0] > horizon_s:
             _, old = window.popleft()
             counts[old] -= 1
-        if counts[g] > 0:
-            reused += 1
+        if not (skip_same_note and not any(g)):
+            reused += counts[g] > 0
         pending.append((i, t, g))
-    return reused, len(grams)
+    total = sum(1 for _, g in grams if any(g)) if skip_same_note else len(grams)
+    return reused, total
+
+
+def same_note_share(line) -> float | None:
+    """Share of top-line interval 3-grams that repeat one pitch (0, 0, 0)."""
+    grams = [tuple(line[i + k + 1][1] - line[i + k][1] for k in range(3)) for i in range(len(line) - 3)]
+    return (sum(1 for g in grams if not any(g)) / len(grams)) if grams else None
 
 
 def summarize(items) -> dict:
