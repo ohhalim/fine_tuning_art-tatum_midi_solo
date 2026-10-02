@@ -68,7 +68,7 @@ def verdict(s) -> dict:
     return {**ok, "pass": all(ok.values()), "note": "no runtime default change; runtime opt-in and listening are separate"}
 
 
-def run(set_name, models, out_dir):
+def run(set_name, models, out_dir, temperature: float = 1.0):
     import torch
     from scripts.generate import generate_once, load_model_with_lora
     from scripts.pattern_cache import PatternCacheBias
@@ -77,7 +77,8 @@ def run(set_name, models, out_dir):
     from scripts.validate_style_distance import load
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    report = {"schema": "pattern_cache_v1", "set": set_name, "bias": BIAS, "musical_quality_verified": False,
+    report = {"schema": "pattern_cache_v1", "set": set_name, "bias": BIAS, "temperature": temperature,
+              "musical_quality_verified": False,
               "models": {}}
     for m in models:
         files = sorted((ROOT / SETS[set_name][m]).glob("*.npy"))
@@ -100,7 +101,7 @@ def run(set_name, models, out_dir):
                         torch.manual_seed(seed * 1000 + pi)
                         gen, _ = generate_once(model=model, primer=torch.tensor(primer, dtype=torch.long),
                                                target_length=min(MAX_SEQ, len(primer) + GEN_TOKENS),
-                                               strip_primer=True, temperature=1.0, top_k=32, top_p=0.95,
+                                               strip_primer=True, temperature=temperature, top_k=32, top_p=0.95,
                                                grammar_mask=True, target_duration_seconds=TARGET_STEPS / 100,
                                                return_metadata=True, use_kv_cache=True, logits_processor=proc)
                         gen = [int(x) for x in gen]
@@ -131,9 +132,12 @@ def main(argv=None) -> int:
     ap.add_argument("--set", choices=sorted(SETS), required=True)
     ap.add_argument("--models", default=None)
     ap.add_argument("--output-dir", type=Path, required=True)
+    ap.add_argument("--temperature", type=float, default=1.0,
+                    help="both arms; 0.6 for the combined unit (docs/experiments/COMBINED_DECODING.md)")
     args = ap.parse_args(argv)
     os.environ.setdefault("FORCE_CPU", "1")
-    run(args.set, args.models.split(",") if args.models else list(SETS[args.set]), args.output_dir)
+    run(args.set, args.models.split(",") if args.models else list(SETS[args.set]), args.output_dir,
+        args.temperature)
     return 0
 
 
