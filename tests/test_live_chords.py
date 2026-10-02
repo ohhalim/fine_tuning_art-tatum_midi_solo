@@ -78,19 +78,56 @@ class TrackerTest(unittest.TestCase):
         self.assertEqual([c["chord"] for c in t.changes], ["G7"])
         self.assertEqual(t.chord_for(2, "x"), "Cmaj7")
 
-    def test_report_latency_from_chord_onset_to_first_block_using_it(self) -> None:
+    def test_report_latency_from_chord_onset_to_first_adopted_block(self) -> None:
         t = LiveChordTracker(split=60, follow=True)
         t.update(chord(1_500_000_000, 43, 47, 50, 53), 2, "Cmaj7")    # onset = last note at 1.5 s + 3 ns
-        rep = t.report(lambda b: b * 937_500_000, 0)
+        rep = t.report(lambda b: b * 937_500_000, 0, adopted={2})
         c = rep["changes"][0]
-        self.assertEqual((c["chord"], c["first_block"], c["seen_in_block"]), ("G7", 2, 2))
+        self.assertEqual((c["chord"], c["seen_in_block"], c["first_generated_block"], c["first_adopted_block"]),
+                         ("G7", 2, 2, 2))
         self.assertAlmostEqual(c["latency_ms"], 375.0, places=0)
         self.assertEqual(c["latency_ms"], c["seen_latency_ms"])
         obs = LiveChordTracker(split=60, follow=False)
         obs.update(chord(1_500_000_000, 43, 47, 50, 53), 2, "Cmaj7")
-        o = obs.report(lambda b: b * 937_500_000, 0)["changes"][0]
-        self.assertIsNone(o["first_block"])
+        o = obs.report(lambda b: b * 937_500_000, 0, adopted={2})["changes"][0]
+        self.assertIsNone(o["first_adopted_block"])
+        self.assertIsNone(o["latency_ms"])
         self.assertAlmostEqual(o["seen_latency_ms"], 375.0, places=0)
+
+    def test_a_fallback_block_is_not_counted_as_applying_the_chord(self) -> None:
+        # Astra review: block 2 was generated with G7 but its fallback (launch chord) was scheduled.
+        t = LiveChordTracker(split=60, follow=True)
+        g7 = chord(1_000_000_000, 43, 47, 50, 53)
+        t.update(g7, 2, "Cmaj7")
+        t.update(g7, 3, "Cmaj7")
+        t.update(g7, 4, "Cmaj7")
+        rep = t.report(lambda b: b * 937_500_000, 0, adopted={3}, consumed_through=3,
+                       fallback_chord=lambda b: "Cmaj7")
+        c = rep["changes"][0]
+        self.assertEqual((c["first_generated_block"], c["first_adopted_block"]), (2, 3))
+        self.assertAlmostEqual(c["generated_latency_ms"], 875.0, places=0)
+        self.assertAlmostEqual(c["latency_ms"], 1812.5, places=0)
+        sched = {b["block"]: (b["schedule"], b["scheduled_chord"]) for b in rep["blocks"]}
+        # block 4 was generated but never asked for: unknown, not a fallback
+        self.assertEqual(sched, {2: ("fallback", "Cmaj7"), 3: ("adopted", "G7"), 4: ("not_consumed", None)})
+
+    def test_search_stops_at_the_next_change(self) -> None:
+        # Astra review: Dm7@1 not adopted, G7@2 adopted, Dm7@3 adopted. The first Dm7
+        # was never applied; it must not borrow block 3 from the second Dm7.
+        t = LiveChordTracker(split=60, follow=True)
+        t.update(chord(1_000_000_000, 48, 50, 53, 57), 1, "Cmaj7")             # C D F A -> Dm7
+        t.update(chord(2_000_000_000, 43, 47, 50, 53), 2, "Cmaj7")             # G7
+        t.update(chord(3_000_000_000, 48, 50, 53, 57), 3, "Cmaj7")             # Dm7 again
+        rep = t.report(lambda b: b * 937_500_000, 0, adopted={2, 3}, consumed_through=3)
+        got = [(c["chord"], c["first_generated_block"], c["first_adopted_block"]) for c in rep["changes"]]
+        self.assertEqual(got, [("Dm7", 1, None), ("G7", 2, 2), ("Dm7", 3, 3)])
+
+    def test_without_adoption_information_nothing_is_called_applied(self) -> None:
+        t = LiveChordTracker(split=60, follow=True)
+        t.update(chord(1_000_000_000, 43, 47, 50, 53), 2, "Cmaj7")
+        rep = t.report(lambda b: b * 937_500_000, 0)
+        self.assertFalse(rep["adoption_known"])
+        self.assertEqual((rep["changes"][0]["first_generated_block"], rep["changes"][0]["latency_ms"]), (2, None))
 
     def test_the_same_chord_again_is_not_a_change(self) -> None:
         t = LiveChordTracker(split=60, follow=True)

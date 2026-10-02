@@ -85,18 +85,49 @@ class LiveChordTracker:
         entry = self.blocks.get(block_index)
         return entry["chord"] if entry else default
 
-    def report(self, block_start_ns, origin_ns: int) -> dict:
-        """``block_start_ns(b)``: session time of block b; times are ms from ``origin_ns``."""
+    def report(self, block_start_ns, origin_ns: int, *, adopted=None, consumed_through=None,
+               fallback_chord=None) -> dict:
+        """``block_start_ns(b)``: session time of block b; times are ms from ``origin_ns``.
+
+        Three stages are kept apart (Astra reviews, #1595):
+          seen       the snapshot of block ``seen_in_block`` held the chord (recognition)
+          generated  first block whose generation attempt used it (failed attempts included),
+                     before the next change was seen
+          adopted    first of those whose model block the scheduler took (``latency_ms``)
+        ``adopted`` and ``consumed_through`` come from one ``adoption_snapshot()``.
+        "Adopted" means handed to the scheduler (scheduled), not finished playing.
+        A block at or below ``consumed_through`` that was not adopted had its
+        fallback scheduled, with ``fallback_chord(b)``; a later block was never
+        asked for, so its scheduled chord is unknown (None)."""
+        def ms(b, onset):
+            return round((block_start_ns(b) - onset) / 1e6, 1) if b is not None else None
+
+        live = [b for b in sorted(self.blocks) if self.blocks[b]["source"] != "static"]
         changes = []
-        for c in self.changes:
-            first = next((b for b in sorted(self.blocks) if b >= c["block"]
-                          and self.blocks[b]["source"] != "static" and self.blocks[b]["chord"] == c["chord"]),
-                         None)
+        for i, c in enumerate(self.changes):
+            until = self.changes[i + 1]["block"] if i + 1 < len(self.changes) else None
+            gen = [b for b in live if b >= c["block"] and (until is None or b < until)
+                   and self.blocks[b]["chord"] == c["chord"]]
+            first_gen = gen[0] if gen else None
+            first_adopted = (next((b for b in gen if b in adopted), None) if adopted is not None else None)
             changes.append({"chord": c["chord"], "onset_ms": round((c["onset_ns"] - origin_ns) / 1e6, 1),
-                            "seen_in_block": c["block"],
-                            "seen_latency_ms": round((block_start_ns(c["block"]) - c["onset_ns"]) / 1e6, 1),
-                            "first_block": first,
-                            "latency_ms": (round((block_start_ns(first) - c["onset_ns"]) / 1e6, 1)
-                                           if first is not None else None)})
-        return {"follow": self.follow, "split": self.split, "changes": changes,
-                "blocks": [{"block": b, **self.blocks[b]} for b in sorted(self.blocks)]}
+                            "seen_in_block": c["block"], "seen_latency_ms": ms(c["block"], c["onset_ns"]),
+                            "first_generated_block": first_gen,
+                            "generated_latency_ms": ms(first_gen, c["onset_ns"]),
+                            "first_adopted_block": first_adopted,
+                            "latency_ms": ms(first_adopted, c["onset_ns"])})
+        blocks = []
+        for b in sorted(self.blocks):
+            entry = {"block": b, **self.blocks[b]}
+            if adopted is not None:
+                if b in adopted:
+                    status, scheduled = "adopted", self.blocks[b]["chord"]
+                elif consumed_through is not None and b <= consumed_through:
+                    status, scheduled = "fallback", (fallback_chord(b) if fallback_chord else None)
+                else:
+                    status, scheduled = "not_consumed", None
+                entry["schedule"] = status
+                entry["scheduled_chord"] = scheduled
+            blocks.append(entry)
+        return {"follow": self.follow, "split": self.split, "adoption_known": adopted is not None,
+                "changes": changes, "blocks": blocks}
