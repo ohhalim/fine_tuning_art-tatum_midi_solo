@@ -832,8 +832,8 @@ def main(argv=None):
     parser.add_argument("--solo-line", action="store_true",
                         help="send only the top line of each generated block (no left-hand chords)")
     parser.add_argument("--comp", action="store_true",
-                        help="with --solo-line: play the chord guide voicing, short and soft, "
-                             "on each bar's first half so the progression stays audible")
+                        help="with --solo-line: short shell-voicing hits (root, 3rd, 7th) on beat 1 and "
+                             "the & of 3 so the progression stays audible")
     parser.add_argument("--context-history", action="store_true",
                         help="with --context-carry-tokens: carry the last N tokens of everything "
                              "played so far (several blocks), not only the previous block "
@@ -1111,11 +1111,14 @@ def main(argv=None):
             if args.solo_line:
                 from inference.control.solo_line import render_block
                 comp = None
-                if args.comp and sub_index == 0:
+                if args.comp:
+                    # Short shell-voicing hits, beat 1 and the & of 3 (one per half-bar block):
+                    # "just tell me which chord, short and clean" (user, 2026-10-02).
                     import pretty_midi
-                    guide = chord_guide_notes_for_duration(chord, bpm=args.bpm, seconds=sub_duration)
-                    comp = [pretty_midi.Note(velocity=56, pitch=n.pitch, start=0.0, end=sub_duration * 0.6)
-                            for n in guide]
+                    from inference.control.solo_line import shell_voicing
+                    at = 0.0 if sub_index == 0 else 0.5 * 60.0 / args.bpm
+                    comp = [pretty_midi.Note(velocity=56, pitch=p, start=at, end=min(at + 0.25, sub_duration))
+                            for p in shell_voicing(chord)]
                 tokens_out = render_block(tokens_out, lookahead_ms=sub_duration * 1000,
                                           comp_notes=comp, stats=render_stats)
             if args.context_carry_tokens > 0 and validate_generated_token_block(

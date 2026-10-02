@@ -32,7 +32,7 @@ def find_ports(inputs, outputs, *, source_hint: str = "AI In"):
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--preset", default="tatum", choices=["tatum", "mehldau", "base"])
+    ap.add_argument("--preset", default="tatum", choices=["tatum", "mehldau", "base", "bebop"])
     ap.add_argument("--bars", type=int, default=64)
     ap.add_argument("--bpm", type=int, default=128)
     ap.add_argument("--chords", default="Cmaj7")

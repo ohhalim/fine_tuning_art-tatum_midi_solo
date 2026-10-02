@@ -85,3 +85,15 @@ class SoloLineTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ShellVoicingTest(unittest.TestCase):
+    def test_root_third_seventh_without_seconds(self) -> None:
+        from inference.control.solo_line import shell_voicing
+        self.assertEqual(shell_voicing("Dm7"), [38, 53, 60])      # D2 F3 C4
+        self.assertEqual(shell_voicing("G7"), [43, 53, 59])       # G2 F3 B3
+        self.assertEqual(shell_voicing("Cmaj7"), [36, 52, 59])    # C2 E3 B3
+        for ch in ("Dbmaj7", "Gb7", "Bbm7b5", "Abm7", "E7"):
+            v = shell_voicing(ch)
+            upper = v[1:]
+            self.assertTrue(all(b - a >= 3 for a, b in zip(upper, upper[1:])), (ch, v))

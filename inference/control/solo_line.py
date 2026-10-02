@@ -114,3 +114,17 @@ def render_block(tokens, *, lookahead_ms: float, comp_notes=None, stats: dict | 
         return raw
     stats["rendered"] = stats.get("rendered", 0) + 1
     return rendered
+
+
+def shell_voicing(chord: str) -> list[int]:
+    """Root low (C2-G2 / Ab1-B1), third and seventh in E3-Eb4: no seconds between them.
+
+    The chord-guide voicing used before had seconds in it (e.g. Dbmaj7 C-Db) and
+    rang for 60% of the block; the user heard the comping as messy (2026-10-02)."""
+    from inference.app.fallback import parse_chord
+
+    root, iv = parse_chord(chord)
+    r = 36 + root if root <= 7 else 24 + root
+    third = 52 + ((root + iv[1]) - 52) % 12
+    seventh = 52 + ((root + iv[3]) - 52) % 12
+    return sorted({r, third, seventh})

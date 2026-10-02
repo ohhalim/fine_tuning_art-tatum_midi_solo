@@ -25,6 +25,8 @@ CHECKPOINTS = {
     "tatum": "outputs/final_tatum/export/checkpoint_update518.pt",
     "mehldau": "outputs/clean_base/c2_export/checkpoint_update128.pt",
     "base": "outputs/tvm/common_base/checkpoint_epoch8.pt",
+    # right-hand lines of 13 bebop pianists (docs/experiments/BEBOP_RH_ADAPTER.md, #1618)
+    "bebop": "outputs/bebop_rh/export/checkpoint_update516.pt",
 }
 PRIMER = "outputs/chord_ab/ii_V_I.mid"
 
@@ -33,7 +35,7 @@ def build_command(preset: str, *, bars: int, bpm: int, chords: str, seed: int, o
                   input_port: str | None = None, live_select: bool = False,
                   swap_bars: int = 4, capture: bool = False, python: str = sys.executable,
                   root: Path = ROOT, extra=()) -> list[str]:
-    if preset not in ("tatum", "mehldau", "swap", "base"):
+    if preset not in ("tatum", "mehldau", "swap", "base", "bebop"):
         raise ValueError(f"unknown preset {preset!r}")
     if live_select and preset != "swap":
         raise ValueError("--live-select applies to the swap preset")
@@ -64,7 +66,7 @@ def build_command(preset: str, *, bars: int, bpm: int, chords: str, seed: int, o
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--preset", required=True, choices=["tatum", "mehldau", "swap", "base"])
+    ap.add_argument("--preset", required=True, choices=["tatum", "mehldau", "swap", "base", "bebop"])
     ap.add_argument("--bars", type=int, default=16)
     ap.add_argument("--bpm", type=int, default=128)
     ap.add_argument("--chords", default="Dm7,G7,Cmaj7,A7")
