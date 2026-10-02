@@ -128,7 +128,7 @@
 - 결함: 리포트가 "그 코드로 **생성된** 첫 블록"을 반영 블록으로 셌다. 채택 여부를 보지 않아서, 모델 블록이 버려지고 fallback(정적 코드)이 연주돼도 반영된 것으로 기록될 수 있었다
 - 수정: 세 단계를 나눠 기록한다
   - 인식: `seen_in_block`, `seen_latency_ms`
-  - 생성: `first_generated_block`, `generated_latency_ms`
+  - 생성: `first_generated_block`, `generated_latency_ms`. 완료된 블록이 아니라 그 코드로 생성을 **시도**한 첫 블록이다(실패한 시도 포함)
   - 채택: `first_adopted_block`, `latency_ms`. 채택은 스케줄러에 넘겨진(예약된) 것이고 재생 완료가 아니다
   - 생성 블록은 **다음 코드 변화가 인식된 블록 전까지만** 찾는다. 같은 코드가 나중에 다시 나와도 앞 변화가 뒤 블록을 빌려 쓰지 않는다(조기 리뷰)
   - 블록마다 `schedule`과 `scheduled_chord`를 적는다

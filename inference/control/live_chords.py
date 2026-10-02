@@ -91,7 +91,8 @@ class LiveChordTracker:
 
         Three stages are kept apart (Astra reviews, #1595):
           seen       the snapshot of block ``seen_in_block`` held the chord (recognition)
-          generated  first block generated with it before the next change was seen
+          generated  first block whose generation attempt used it (failed attempts included),
+                     before the next change was seen
           adopted    first of those whose model block the scheduler took (``latency_ms``)
         ``adopted`` and ``consumed_through`` come from one ``adoption_snapshot()``.
         "Adopted" means handed to the scheduler (scheduled), not finished playing.
