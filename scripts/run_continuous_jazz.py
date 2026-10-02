@@ -1024,6 +1024,7 @@ def main(argv=None):
         )
 
         context_carry = {"tokens": []}
+        render_stats: dict = {}            # --solo-line: raw vs rendered validity (Astra review)
         played_history = PlayedHistory(60.0 / args.bpm * 2)     # half-bar blocks only
         generated_blocks: dict = {}
 
@@ -1095,15 +1096,15 @@ def main(argv=None):
                 return_metadata=True, use_kv_cache=args.kv_cache,
             )
             if args.solo_line:
-                from inference.control.solo_line import solo_line_tokens, solo_with_comp_tokens
+                from inference.control.solo_line import render_block
+                comp = None
                 if args.comp and sub_index == 0:
                     import pretty_midi
                     guide = chord_guide_notes_for_duration(chord, bpm=args.bpm, seconds=sub_duration)
                     comp = [pretty_midi.Note(velocity=56, pitch=n.pitch, start=0.0, end=sub_duration * 0.6)
                             for n in guide]
-                    tokens_out = solo_with_comp_tokens(tokens_out, comp)
-                else:
-                    tokens_out = solo_line_tokens(tokens_out)
+                tokens_out = render_block(tokens_out, lookahead_ms=sub_duration * 1000,
+                                          comp_notes=comp, stats=render_stats)
             if args.context_carry_tokens > 0 and validate_generated_token_block(
                     tokens_out, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]:
                 if not args.context_history:
@@ -1282,6 +1283,8 @@ def main(argv=None):
             report["adopted_blocks"] = sorted(producer.adopted_blocks)
             report["fetch_margin_ms"] = args.fetch_margin_ms
             report["solo_line"] = bool(args.solo_line)
+            if args.solo_line and not args.fallback_only:
+                report["solo_line_render"] = dict(render_stats)
             report["comp"] = bool(args.comp)
             if echo_guard is not None:
                 report["echo_guard"] = {"window_ms": args.ignore_echo_ms, "dropped": echo_guard.dropped}
