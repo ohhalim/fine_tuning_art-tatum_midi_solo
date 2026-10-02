@@ -13,6 +13,7 @@
    /Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/.venv/bin/python scripts/fl_live.py --bars 64
    ```
    - 64마디 = 128 BPM에서 2분. Ctrl-C로 멈추면 모든 음을 끈다. `--preset mehldau`, `--no-follow`(코드 고정)
+   - `--preset bebop`(#1620): 비밥 피아니스트 오른손으로 학습한 어댑터. 솔로는 맨 위 선율만, 컴핑은 근음·3음·7음을 1박과 3박 &에 짧게 친다(지금 코드만 알려 주는 용도)
 - macOS IAC(포트 "AI In"과 두 번째 버스)와 FL MIDI 설정(출력 IAC AI In Port 5, 입력 IAC 두 번째 버스 Port 7)은 프로젝트 밖 설정이라 그대로 유지된다
 - 2026-10-01 실연결: 입력이 런타임에 들어오고(150–176번 블록 입력 3음), AI 음이 Serum #2로 나왔다. 사용자 청취 소감은 "무작위적"이다. 연결은 되지만 내용은 아직 쓸 만하지 않다
 사용자 지적: FL Studio는 자판 입력을 이미 받는다. 그래서 별도 자판 도구 없이 FL에서 MIDI를 내보내고 다시 받으면 된다.
