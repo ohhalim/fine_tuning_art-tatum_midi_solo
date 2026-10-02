@@ -8,7 +8,7 @@ from unittest import mock
 import pretty_midi
 
 from inference.control import solo_line
-from inference.control.solo_line import render_block, solo_line_tokens, solo_with_comp_tokens, top_notes
+from inference.control.solo_line import PhraseBreath, render_block, solo_line_tokens, solo_with_comp_tokens, top_notes
 from scripts.generate import encode_notes_simple
 from scripts.run_continuous_jazz import main
 from scripts.run_resident_model_probe import stage_a_musical_duration_ms, validate_generated_token_block
@@ -91,6 +91,39 @@ class SoloLineTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PhraseBreathTest(unittest.TestCase):
+    def run_line(self, n, ioi=0.1, max_notes=4, block=1.0):
+        breath = PhraseBreath(max_notes, rest_s=0.4)
+        line = [note(60 + k % 5, k * ioi, k * ioi + ioi) for k in range(n)]
+        kept = []
+        for b in range(int(n * ioi / block) + 1):                          # split across blocks
+            part = [note(x.pitch, x.start - b * block, x.end - b * block) for x in line
+                    if b * block <= x.start < (b + 1) * block]
+            kept += [round(b * block + x.start, 2) for x in breath(part, b * block)]
+        return kept, breath
+
+    def test_a_rest_follows_max_notes_even_across_blocks(self) -> None:
+        kept, breath = self.run_line(12, max_notes=4)
+        # 4 notes (0.0-0.3) end at 0.4; starts before 0.8 drop; the block boundary at 1.0 keeps the count
+        self.assertEqual(kept, [0.0, 0.1, 0.2, 0.3, 0.8, 0.9, 1.0, 1.1])
+        self.assertEqual(breath.dropped, 4)
+
+    def test_a_natural_rest_resets_the_count(self) -> None:
+        breath = PhraseBreath(3, rest_s=0.4)
+        notes = [note(60, 0.0, 0.1), note(62, 0.1, 0.2), note(64, 0.6, 0.7), note(65, 0.7, 0.8), note(67, 0.8, 0.9)]
+        self.assertEqual(len(breath(notes, 0.0)), 5)                       # gap 0.4 s after two notes
+        self.assertEqual(breath.dropped, 0)
+
+    def test_render_with_breath_stays_valid_and_keeps_length(self) -> None:
+        toks = SoloLineTest().block()
+        out = render_block(toks, lookahead_ms=940, line_filter=lambda ns: PhraseBreath(1)(ns, 0.0))
+        self.assertEqual([n.pitch for n in tokens_to_notes(out)], [72])
+        self.assertEqual(stage_a_musical_duration_ms(out), stage_a_musical_duration_ms(toks))
+        empty = solo_line_tokens(toks, line_filter=lambda ns: [])
+        self.assertEqual(tokens_to_notes(empty), [])
+        self.assertEqual(stage_a_musical_duration_ms(empty), stage_a_musical_duration_ms(toks))
 
 
 class ShellVoicingTest(unittest.TestCase):

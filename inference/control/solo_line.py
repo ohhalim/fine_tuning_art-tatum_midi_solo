@@ -38,8 +38,43 @@ def top_notes(notes, window_s: float = 0.05):
     return out
 
 
-def solo_line_tokens(tokens) -> list[int]:
-    """Re-encode ``tokens`` as their top line, same total length; unchanged if that is impossible."""
+class PhraseBreath:
+    """Opt-in rest after long phrases in the top line, kept across blocks (#1626).
+
+    Real bebop right hands rest about every 16 notes; the runtime line ran up to
+    ~100 notes without a 0.3 s gap (blues, #1620). Once ``max_notes`` notes have
+    played since the last gap of ``REST_S``, notes starting within ``rest_s`` of
+    the last kept note's end are dropped. Notes are only removed, never moved.
+    State follows generated blocks in order (not adoption), a known limitation."""
+
+    REST_S = 0.3
+
+    def __init__(self, max_notes: int, rest_s: float = 0.4) -> None:
+        self.max_notes, self.rest_s = max_notes, rest_s
+        self.count, self.last_end = 0, None
+        self.dropped = 0
+
+    def __call__(self, notes, block_start: float):
+        kept = []
+        for n in notes:
+            start, end = block_start + n.start, block_start + n.end
+            if self.count >= self.max_notes:                        # breathing: wait rest_s
+                if start < self.last_end + self.rest_s:
+                    self.dropped += 1
+                    continue
+                self.count = 0
+            elif self.last_end is not None and start - self.last_end >= self.REST_S:
+                self.count = 0                                       # a natural rest
+            kept.append(n)
+            self.count += 1
+            self.last_end = end
+        return kept
+
+
+def solo_line_tokens(tokens, line_filter=None) -> list[int]:
+    """Re-encode ``tokens`` as their top line, same total length; unchanged if that is impossible.
+
+    ``line_filter(notes)`` may remove top-line notes first (e.g. a bound PhraseBreath)."""
     from scripts.generate import encode_notes_simple
     from scripts.style_distance import tokens_to_notes
 
@@ -47,7 +82,10 @@ def solo_line_tokens(tokens) -> list[int]:
     notes = tokens_to_notes(tokens)
     if not notes:
         return tokens
-    out = encode_notes_simple(top_notes(notes))
+    line = top_notes(notes)
+    if line_filter is not None:
+        line = line_filter(line)
+    out = encode_notes_simple(line) if line else []          # all filtered out: a rest block
     remaining = _steps(tokens) - _steps(out)
     if remaining < 0:
         return tokens
@@ -58,7 +96,7 @@ def solo_line_tokens(tokens) -> list[int]:
     return out
 
 
-def solo_with_comp_tokens(tokens, comp_notes) -> list[int]:
+def solo_with_comp_tokens(tokens, comp_notes, line_filter=None) -> list[int]:
     """Top line plus ``comp_notes`` (e.g. the chord guide voicing), same total length.
 
     A comp note is left out only when the top line holds the same pitch at an
@@ -79,9 +117,9 @@ def solo_with_comp_tokens(tokens, comp_notes) -> list[int]:
     comp = [pretty_midi.Note(velocity=n.velocity, pitch=n.pitch, start=n.start, end=min(n.end, limit))
             for n in comp_notes if n.start < limit and not clashes(n)]
     notes = sorted(line + comp, key=lambda n: (n.start, n.pitch))
-    if not notes:
+    if not notes and line_filter is None:
         return tokens
-    out = encode_notes_simple(notes)
+    out = encode_notes_simple(notes) if notes else []
     remaining = total - _steps(out)
     if remaining < 0:
         return solo_line_tokens(tokens)
@@ -92,7 +130,8 @@ def solo_with_comp_tokens(tokens, comp_notes) -> list[int]:
     return out
 
 
-def render_block(tokens, *, lookahead_ms: float, comp_notes=None, stats: dict | None = None) -> list[int]:
+def render_block(tokens, *, lookahead_ms: float, comp_notes=None, stats: dict | None = None,
+                 line_filter=None) -> list[int]:
     """What to schedule for a generated block under --solo-line / --comp.
 
     Astra review: the raw model block is validated first. An invalid raw block
@@ -111,7 +150,8 @@ def render_block(tokens, *, lookahead_ms: float, comp_notes=None, stats: dict | 
     if not valid(raw):
         stats["raw_invalid"] = stats.get("raw_invalid", 0) + 1
         return raw
-    rendered = solo_with_comp_tokens(raw, comp_notes) if comp_notes else solo_line_tokens(raw)
+    rendered = (solo_with_comp_tokens(raw, comp_notes, line_filter) if comp_notes
+                else solo_line_tokens(raw, line_filter))
     if not valid(rendered):
         stats["rendered_invalid"] = stats.get("rendered_invalid", 0) + 1
         return raw
