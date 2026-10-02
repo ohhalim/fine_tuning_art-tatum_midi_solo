@@ -35,6 +35,22 @@ class CandidateTest(unittest.TestCase):
         self.assertEqual(candidate_pitches(melody([60, 62, 64, 65, 50, 67, 69, 71], ioi=2.0)), set())
 
 
+class IncrementalTest(unittest.TestCase):
+    def test_incremental_candidates_equal_the_reference_at_every_prefix(self) -> None:
+        import random
+        rng = random.Random(0)
+        for trial in range(20):
+            notes, t = [], 0.0
+            for k in range(60):
+                t += rng.choice([0.0, 0.02, 0.1, 0.2, 0.3])              # some same-cluster onsets
+                pitch = 55 + rng.choice([0, 2, 4, 5, 7, 9, 11, 12, 14])
+                notes.append(pretty_midi.Note(velocity=80, pitch=pitch, start=t, end=t + 0.05))
+            toks = encode_notes_simple(sorted(notes, key=lambda n: (n.start, n.pitch)))
+            proc = PatternCacheBias()
+            for i in range(1, len(toks) + 1):
+                self.assertEqual(proc.candidates(toks[:i]), candidate_pitches(toks[:i]), (trial, i))
+
+
 class BiasTest(unittest.TestCase):
     def test_adds_bias_only_to_candidate_note_on(self) -> None:
         seq = torch.tensor(melody([60, 62, 64, 65, 50, 67, 69, 71]))
