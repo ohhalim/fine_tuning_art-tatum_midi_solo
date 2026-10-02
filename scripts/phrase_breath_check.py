@@ -20,15 +20,17 @@ for p in (ROOT, ROOT / "scripts"):
 from scripts.runtime_rh_check import DATA, check_run_set, pooled, solo_stats, timing  # noqa: E402
 
 BREATH = 24
+REST_S = 0.4
 
 
 def breath_problems(run_dirs, expect) -> list[str]:
     out = []
     for d in run_dirs:
         pb = json.loads(Path(d, "continuous_report.json").read_text()).get("phrase_breath")
-        got = pb["max_notes"] if pb else None
-        if got != expect:
-            out.append(f"{Path(d).name}: phrase_breath {got}, expected {expect}")
+        got = (pb["max_notes"], pb["rest_s"]) if pb else None
+        want = (expect, REST_S) if expect else None
+        if got != want:
+            out.append(f"{Path(d).name}: phrase_breath {got}, expected {want}")
     return out
 
 

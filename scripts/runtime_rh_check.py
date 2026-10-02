@@ -76,7 +76,7 @@ def check_run_set(run_dirs, preset: str) -> list[str]:
     report records them (#1621 review M1: a single run used to pass)."""
     from scripts.play_personalized import CHECKPOINTS
 
-    problems, seen = [], {}
+    problems, seen, legacy = [], {}, []
     for d in run_dirs:
         name = Path(d).name
         try:
@@ -100,6 +100,12 @@ def check_run_set(run_dirs, preset: str) -> list[str]:
             problems.append(f"{name}: not completed")
         if not r.get("solo_line") or r.get("comp"):
             problems.append(f"{name}: needs --solo-line without --comp")
+        # Preregistered decoding (#1627 review M2): T 1.0, no carried context, no pattern cache.
+        if (r.get("temperature") != 1.0 or r.get("context_carry_tokens") != 0
+                or r.get("context_history") is not False or r.get("pattern_cache") is not False):
+            problems.append(f"{name}: decoding settings differ from the preregistered default")
+        if "seed" not in r or "checkpoint" not in r:
+            legacy.append(name)
         if "seed" in r and r["seed"] != seed:
             problems.append(f"{name}: report seed {r['seed']}")
         if r.get("checkpoint") and not str(r["checkpoint"]).endswith(CHECKPOINTS[preset]):
@@ -109,6 +115,9 @@ def check_run_set(run_dirs, preset: str) -> list[str]:
         seen[(tag, seed)] = name
     missing = [f"{preset}_{t}_s{s}" for t in PROGRESSIONS for s in SEEDS if (t, s) not in seen]
     problems += [f"{m}: missing" for m in missing]
+    if legacy:
+        # Runs from before seed/checkpoint were recorded (#1620): checked by name only.
+        print(f"legacy runs (seed/checkpoint checked by directory name only): {legacy}", file=sys.stderr)
     return problems
 
 

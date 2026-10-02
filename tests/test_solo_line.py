@@ -126,6 +126,33 @@ class PhraseBreathTest(unittest.TestCase):
         self.assertEqual(stage_a_musical_duration_ms(empty), stage_a_musical_duration_ms(toks))
 
 
+class BreathWithCompTest(unittest.TestCase):
+    """#1627 review H1: the comp path ignored the breath filter."""
+
+    def line_block(self):
+        toks = encode_notes_simple([note(60 + k, k * 0.1, k * 0.1 + 0.1) for k in range(8)])
+        return toks + [255 + 20]                                 # rest to 1.0 s
+
+    def test_breath_drops_the_same_notes_with_and_without_comp(self) -> None:
+        counts = {}
+        for comp in (None, [note(36, 0.0, 0.25, 56), note(52, 0.0, 0.25, 56)]):
+            breath = PhraseBreath(3)
+            out = render_block(self.line_block(), lookahead_ms=1000, comp_notes=comp,
+                               line_filter=lambda ns, b=breath: b(ns, 0.0))
+            solo = [n for n in tokens_to_notes(out) if n.pitch >= 55]
+            counts[comp is None] = (len(solo), breath.dropped)
+            self.assertEqual(stage_a_musical_duration_ms(out), 1000)
+        self.assertEqual(counts[False], counts[True])            # comp changes nothing in the line
+        self.assertGreater(counts[True][1], 0)
+        self.assertEqual(sum(counts[True]), 8)
+
+    def test_filter_runs_once_per_block(self) -> None:
+        calls = []
+        render_block(self.line_block(), lookahead_ms=1000, comp_notes=[note(36, 0.0, 0.25, 56)],
+                     line_filter=lambda ns: calls.append(1) or ns)
+        self.assertEqual(len(calls), 1)
+
+
 class ShellVoicingTest(unittest.TestCase):
     def test_root_third_seventh_without_seconds(self) -> None:
         from inference.control.solo_line import shell_voicing
