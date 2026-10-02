@@ -71,11 +71,25 @@ class PhraseBreath:
         return kept
 
 
+def _padded(notes, total: int):
+    """``notes`` encoded and padded with rest to ``total`` steps; None if they do not fit."""
+    from scripts.generate import encode_notes_simple
+
+    out = encode_notes_simple(notes) if notes else []
+    remaining = total - _steps(out)
+    if remaining < 0:
+        return None
+    while remaining > 0:
+        step = min(remaining, TIME_SHIFT_END - TIME_SHIFT_START + 1)
+        out.append(TIME_SHIFT_START + step - 1)
+        remaining -= step
+    return out
+
+
 def solo_line_tokens(tokens, line_filter=None) -> list[int]:
     """Re-encode ``tokens`` as their top line, same total length; unchanged if that is impossible.
 
     ``line_filter(notes)`` may remove top-line notes first (e.g. a bound PhraseBreath)."""
-    from scripts.generate import encode_notes_simple
     from scripts.style_distance import tokens_to_notes
 
     tokens = [int(t) for t in tokens]
@@ -84,16 +98,9 @@ def solo_line_tokens(tokens, line_filter=None) -> list[int]:
         return tokens
     line = top_notes(notes)
     if line_filter is not None:
-        line = line_filter(line)
-    out = encode_notes_simple(line) if line else []          # all filtered out: a rest block
-    remaining = _steps(tokens) - _steps(out)
-    if remaining < 0:
-        return tokens
-    while remaining > 0:
-        step = min(remaining, TIME_SHIFT_END - TIME_SHIFT_START + 1)
-        out.append(TIME_SHIFT_START + step - 1)
-        remaining -= step
-    return out
+        line = line_filter(line)                                 # all filtered out: a rest block
+    out = _padded(line, _steps(tokens))
+    return tokens if out is None else out
 
 
 def solo_with_comp_tokens(tokens, comp_notes, line_filter=None) -> list[int]:
@@ -104,12 +111,14 @@ def solo_with_comp_tokens(tokens, comp_notes, line_filter=None) -> list[int]:
     dropping it for the whole block lost chord tones the line used elsewhere)."""
     import pretty_midi
 
-    from scripts.generate import encode_notes_simple
     from scripts.style_distance import tokens_to_notes
 
     tokens = [int(t) for t in tokens]
     total = _steps(tokens)
     line = top_notes(tokens_to_notes(tokens))
+    if line_filter is not None:
+        # Once per block (it keeps phrase state), before the comp clash check (#1627 review H1).
+        line = line_filter(line)
     limit = total / 100
 
     def clashes(c) -> bool:
@@ -119,15 +128,10 @@ def solo_with_comp_tokens(tokens, comp_notes, line_filter=None) -> list[int]:
     notes = sorted(line + comp, key=lambda n: (n.start, n.pitch))
     if not notes and line_filter is None:
         return tokens
-    out = encode_notes_simple(notes) if notes else []
-    remaining = total - _steps(out)
-    if remaining < 0:
-        return solo_line_tokens(tokens)
-    while remaining > 0:
-        step = min(remaining, TIME_SHIFT_END - TIME_SHIFT_START + 1)
-        out.append(TIME_SHIFT_START + step - 1)
-        remaining -= step
-    return out
+    out = _padded(notes, total)
+    if out is None:                                  # comp does not fit: the (filtered) line alone
+        out = _padded(line, total)
+    return tokens if out is None else out
 
 
 def render_block(tokens, *, lookahead_ms: float, comp_notes=None, stats: dict | None = None,

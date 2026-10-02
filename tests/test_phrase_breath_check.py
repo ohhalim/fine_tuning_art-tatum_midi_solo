@@ -3,7 +3,11 @@ from __future__ import annotations
 
 import unittest
 
-from scripts.phrase_breath_check import judge
+import json
+import tempfile
+from pathlib import Path
+
+from scripts.phrase_breath_check import breath_problems, judge
 
 
 class JudgeTest(unittest.TestCase):
@@ -19,6 +23,24 @@ class JudgeTest(unittest.TestCase):
         self.assertFalse(judge(a, {**b, "solo_chord_tone": 0.48}, ax, bx)["pass"])
         self.assertFalse(judge(a, b, ax, {**bx, "rendered_invalid": 1})["pass"])
         self.assertFalse(judge(a, b, ax, {**bx, "gen_ms_max": 260})["pass"])
+
+
+class BreathSettingTest(unittest.TestCase):
+    def test_max_notes_and_rest_must_match(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            def run(name, pb):
+                d = Path(tmp) / name
+                d.mkdir()
+                (d / "continuous_report.json").write_text(json.dumps({"phrase_breath": pb}))
+                return str(d)
+            ok = run("ok", {"max_notes": 24, "rest_s": 0.4, "dropped_notes": 3})
+            bad_rest = run("bad_rest", {"max_notes": 24, "rest_s": 0.8, "dropped_notes": 3})
+            off = run("off", None)
+            self.assertEqual(breath_problems([ok], 24), [])
+            self.assertTrue(breath_problems([bad_rest], 24))
+            self.assertTrue(breath_problems([off], 24))
+            self.assertEqual(breath_problems([off], None), [])
+            self.assertTrue(breath_problems([ok], None))
 
 
 if __name__ == "__main__":

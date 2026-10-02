@@ -13,7 +13,8 @@ def write_run(root: Path, name: str, **over) -> str:
     tag = name.rsplit("_", 2)[1]
     chords, bars, bpm = PROGRESSIONS[tag]
     r = {"chords": chords.split(","), "bars": bars, "bpm": bpm, "run_completed": True,
-         "completed_bars": bars, "solo_line": True, "comp": False, **over}
+         "completed_bars": bars, "solo_line": True, "comp": False, "temperature": 1.0,
+         "context_carry_tokens": 0, "context_history": False, "pattern_cache": False, **over}
     d = root / name
     d.mkdir(parents=True, exist_ok=True)
     (d / "continuous_report.json").write_text(json.dumps(r))
@@ -47,7 +48,8 @@ class RunSetTest(unittest.TestCase):
 
     def test_incomplete_comp_or_wrong_settings_are_refused(self) -> None:
         for over in ({"run_completed": False}, {"completed_bars": 3}, {"comp": True}, {"solo_line": False},
-                     {"bpm": 90}, {"seed": 7}, {"checkpoint": "outputs/final_tatum/export/checkpoint_update518.pt"}):
+                     {"bpm": 90}, {"seed": 7}, {"temperature": 0.6}, {"context_carry_tokens": 256},
+                     {"context_history": True}, {"pattern_cache": True}, {"checkpoint": "outputs/final_tatum/export/checkpoint_update518.pt"}):
             with tempfile.TemporaryDirectory() as tmp:
                 dirs = self.full(Path(tmp))
                 write_run(Path(tmp), "bebop_iiVI_s42", **over)
