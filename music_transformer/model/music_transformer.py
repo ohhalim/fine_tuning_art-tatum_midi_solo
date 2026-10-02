@@ -269,8 +269,11 @@ class MusicTransformer(nn.Module):
         target_duration_steps=None,
         return_metadata=False,
         use_kv_cache=False,
+        logits_processor=None,
     ):
         """
+        ``logits_processor(token_logits, sequence_so_far)``, when given, may
+        adjust the next-token logits after the grammar mask (None: unchanged).
         ----------
         Author: Damon Gwinn
         ----------
@@ -327,6 +330,8 @@ class MusicTransformer(nn.Module):
             model_forward_step_count += 1
             if grammar_mask:
                 token_logits = _apply_grammar_mask(token_logits, active_pitches)
+            if logits_processor is not None:
+                token_logits = logits_processor(token_logits, gen_seq[0, :cur_i])
             token_probs = _sample_probs_from_logits(
                 token_logits,
                 temperature=temperature,

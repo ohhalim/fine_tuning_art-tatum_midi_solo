@@ -378,6 +378,7 @@ def generate_once(
     target_duration_seconds: float | None = None,
     return_metadata: bool = False,
     use_kv_cache: bool = False,
+    logits_processor=None,
 ) -> List[int] | tuple[List[int], dict[str, object]]:
     device = get_device()
     primer = primer.to(device)
@@ -399,6 +400,7 @@ def generate_once(
             target_duration_steps=target_duration_steps,
             return_metadata=return_metadata,
             use_kv_cache=use_kv_cache,
+            logits_processor=logits_processor,
         )
 
     if return_metadata:
