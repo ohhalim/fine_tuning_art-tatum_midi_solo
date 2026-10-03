@@ -31,10 +31,10 @@ def avoid_pitch_classes(chord: str) -> set[int]:
 class HarmonyBias:
     """logits_processor for generate_once: ``(logits, sequence) -> logits``."""
 
-    def __init__(self, chord: str, strength: float = 2.0) -> None:
+    def __init__(self, chord: str, strength: float = 2.0, repeat: float = 0.0) -> None:
         import torch
 
-        self.chord, self.strength = chord, strength
+        self.chord, self.strength, self.repeat = chord, strength, repeat
         pcs = avoid_pitch_classes(chord)
         self.bias = None
         self._mask = torch.tensor([float(p % 12 in pcs) for p in range(NOTE_ON_END + 1)])
@@ -46,4 +46,11 @@ class HarmonyBias:
             self.bias = (-self.strength * self._mask).to(device=logits.device, dtype=logits.dtype)
         out = logits.clone()
         out[..., NOTE_ON_START:NOTE_ON_END + 1] = out[..., NOTE_ON_START:NOTE_ON_END + 1] + self.bias
+        if self.repeat and sequence is not None and len(sequence):
+            # Penalise striking the most recent note_on pitch again (#1658): with the avoid penalty the
+            # model fell back on repeating it (same-note share .109 -> .175; real bebop .055).
+            ons = (sequence <= NOTE_ON_END).nonzero()
+            if len(ons):
+                last = int(sequence[int(ons[-1])])
+                out[..., last] = out[..., last] - self.repeat
         return out
