@@ -1051,6 +1051,7 @@ def main(argv=None):
         render_stats: dict = {}            # --solo-line: raw vs rendered validity (Astra review)
         candidate_stats: dict = {}         # --candidates: blocks ranked, candidate 0 kept, none qualified
         comp_state: dict = {}              # --comp-style varied: previous figure / voicing / chord
+        comp_trace: dict = {}              # --comp: per generated block, planned / emitted / dropped comp
         breath = None
         if args.phrase_breath:
             from inference.control.solo_line import PhraseBreath
@@ -1174,8 +1175,12 @@ def main(argv=None):
                 if breath is not None:
                     block_start = (bar_index * args.chord_blocks_per_bar + sub_index) * sub_duration
                     line_filter = lambda ns, t0=block_start: breath(ns, t0)
-                tokens_out = render_block(tokens_out, lookahead_ms=sub_duration * 1000,
-                                          comp_notes=comp, stats=render_stats, line_filter=line_filter)
+                trace: dict = {}
+                tokens_out = render_block(tokens_out, lookahead_ms=sub_duration * 1000, comp_notes=comp,
+                                          stats=render_stats, line_filter=line_filter, trace=trace)
+                if comp is not None:
+                    # Per generated block (not per adopted block): planned vs emitted comp (#1647 review M1).
+                    comp_trace[bar_index * args.chord_blocks_per_bar + sub_index] = {"chord": chord, **trace}
             if args.context_carry_tokens > 0 and validate_generated_token_block(
                     tokens_out, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]:
                 if not args.context_history:
@@ -1363,6 +1368,8 @@ def main(argv=None):
                                             "dropped_notes": breath.dropped} if breath else None)
             report["comp"] = bool(args.comp)
             report["comp_style"] = args.comp_style if args.comp else None
+            report["comp_trace"] = ([comp_trace.get(i) for i in range(max(comp_trace) + 1)]
+                                    if args.comp and comp_trace else None)
             report["candidates"] = args.candidates
             report["candidate_stats"] = dict(candidate_stats) if args.candidates > 1 else None
             if echo_guard is not None:

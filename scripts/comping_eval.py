@@ -123,7 +123,14 @@ def main(argv=None) -> int:
     ap.add_argument("--output", type=Path, required=True)
     args = ap.parse_args(argv)
     per_arm = {"F": [], "V": [], "R": []}
-    for d in sorted(glob.glob(str(ROOT / args.solo_runs))):
+    dirs = sorted(d for d in glob.glob(str(ROOT / args.solo_runs)) if Path(d).is_dir())
+    # Exact preregistered solo set (#1647 review M2): the 6 N=1 runs, completed, settings checked
+    from scripts.runtime_candidates_check import check_set
+    problems = check_set(dirs, 1)
+    if problems:
+        print(json.dumps({"refused": problems}, indent=1))
+        return 2
+    for d in dirs:
         r = json.loads(Path(d, "continuous_report.json").read_text())
         solo, chords, bars, seed = solo_of(r), r["chords"], r["bars"], r["seed"]
         for arm in per_arm:

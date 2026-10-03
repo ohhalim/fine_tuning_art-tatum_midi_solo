@@ -103,7 +103,11 @@ def solo_line_tokens(tokens, line_filter=None) -> list[int]:
     return tokens if out is None else out
 
 
-def solo_with_comp_tokens(tokens, comp_notes, line_filter=None) -> list[int]:
+def _note_row(n) -> list:
+    return [int(n.pitch), round(float(n.start), 4), round(float(n.end), 4), int(n.velocity)]
+
+
+def solo_with_comp_tokens(tokens, comp_notes, line_filter=None, trace: dict | None = None) -> list[int]:
     """Top line plus ``comp_notes`` (e.g. the chord guide voicing), same total length.
 
     A comp note is left out only when the top line holds the same pitch at an
@@ -123,19 +127,30 @@ def solo_with_comp_tokens(tokens, comp_notes, line_filter=None) -> list[int]:
 
     def clashes(c) -> bool:
         return any(m.pitch == c.pitch and m.start < c.end and c.start < m.end for m in line)
-    comp = [pretty_midi.Note(velocity=n.velocity, pitch=n.pitch, start=n.start, end=min(n.end, limit))
-            for n in comp_notes if n.start < limit and not clashes(n)]
+    comp, dropped = [], {}
+    for n in comp_notes:
+        reason = "past_block_end" if n.start >= limit else "same_pitch_overlap" if clashes(n) else None
+        if reason:
+            dropped[reason] = dropped.get(reason, 0) + 1
+            continue
+        comp.append(pretty_midi.Note(velocity=n.velocity, pitch=n.pitch, start=n.start, end=min(n.end, limit)))
+    if trace is not None:                            # where each planned comp note went (#1647 review M1)
+        trace.update(planned=[_note_row(n) for n in comp_notes], emitted=[_note_row(n) for n in comp],
+                     dropped=dropped, clipped=sum(1 for n in comp_notes if n.start < limit < n.end))
     notes = sorted(line + comp, key=lambda n: (n.start, n.pitch))
     if not notes and line_filter is None:
         return tokens
     out = _padded(notes, total)
     if out is None:                                  # comp does not fit: the (filtered) line alone
         out = _padded(line, total)
+        if trace is not None:
+            trace["dropped"]["reencode_fallback"] = len(trace["emitted"])
+            trace["emitted"] = []
     return tokens if out is None else out
 
 
 def render_block(tokens, *, lookahead_ms: float, comp_notes=None, stats: dict | None = None,
-                 line_filter=None) -> list[int]:
+                 line_filter=None, trace: dict | None = None) -> list[int]:
     """What to schedule for a generated block under --solo-line / --comp.
 
     Astra review: the raw model block is validated first. An invalid raw block
@@ -150,16 +165,20 @@ def render_block(tokens, *, lookahead_ms: float, comp_notes=None, stats: dict | 
         return bool(validate_generated_token_block(t, lookahead_ms=lookahead_ms, allow_rest_bar=True)["valid"])
 
     stats = stats if stats is not None else {}
+    trace = trace if trace is not None else {}
     raw = [int(t) for t in tokens]
     if not valid(raw):
         stats["raw_invalid"] = stats.get("raw_invalid", 0) + 1
+        trace.update(outcome="raw_invalid", emitted=[])
         return raw
-    rendered = (solo_with_comp_tokens(raw, comp_notes, line_filter) if comp_notes
+    rendered = (solo_with_comp_tokens(raw, comp_notes, line_filter, trace) if comp_notes
                 else solo_line_tokens(raw, line_filter))
     if not valid(rendered):
         stats["rendered_invalid"] = stats.get("rendered_invalid", 0) + 1
+        trace.update(outcome="rendered_invalid", emitted=[])
         return raw
     stats["rendered"] = stats.get("rendered", 0) + 1
+    trace["outcome"] = "rendered"
     return rendered
 
 
