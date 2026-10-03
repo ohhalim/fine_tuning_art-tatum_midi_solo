@@ -184,8 +184,9 @@ def main(argv=None) -> int:
         "render_valid": out["rendered_invalid"] == 0 and out["raw_invalid"] == 0,
         "misses_le_2": out["misses_total"] <= 2,
         "gen_p99_le_419": out["gen_ms_p99"] is not None and out["gen_ms_p99"] <= 419,
-        "emitted_alignment_ge_0.95": out["emitted_alignment"] >= 0.95,
-        "delivery_ge_0.98": out["delivery"] is not None and out["delivery"] >= 0.98,
+        # COMP_PROVENANCE.md gates (#1650); #1648 used emitted_alignment >= .95 and delivery >= .98
+        "delivery_ge_0.99": out["delivery"] is not None and out["delivery"] >= 0.99,
+        "unknown_0": out["unknown_notes"] == 0,
     }
     verdict["pass"] = all(verdict.values())
     report = {"schema": "comp_source_check_v1", "summary": out, "verdict": verdict, "musical_quality_verified": False}
