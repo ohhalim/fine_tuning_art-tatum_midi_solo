@@ -30,5 +30,14 @@ class BreathTest(unittest.TestCase):
         self.assertNotIn("--phrase-breath", command("--preset", "bebop", "--breath", "24", "--no-solo"))
 
 
+class CompStyleTest(unittest.TestCase):
+    def test_varied_is_the_fl_default_and_shell_can_be_chosen(self) -> None:
+        cmd = command("--preset", "bebop")
+        self.assertEqual(cmd[cmd.index("--comp-style") + 1], "varied")
+        cmd = command("--preset", "bebop", "--comp-style", "shell")
+        self.assertEqual(cmd[cmd.index("--comp-style") + 1], "shell")
+        self.assertNotIn("--comp-style", command("--preset", "bebop", "--no-comp"))
+
+
 if __name__ == "__main__":
     unittest.main()

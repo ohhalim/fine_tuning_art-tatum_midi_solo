@@ -43,7 +43,7 @@ def main(argv=None) -> int:
     ap.add_argument("--comp", action=argparse.BooleanOptionalAction, default=True,
                     help="with --solo: short root-3rd-7th hits on beat 1 and the & of 3 so the progression "
                          "is audible")
-    ap.add_argument("--comp-style", choices=["shell", "varied"], default="shell",
+    ap.add_argument("--comp-style", choices=["shell", "varied"], default="varied",
                     help="with --comp: varied = half-bar figures with rootless voice leading "
                          "(docs/experiments/COMPING.md)")
     ap.add_argument("--breath", type=int, default=0, metavar="N",
