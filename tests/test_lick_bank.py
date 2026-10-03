@@ -40,12 +40,18 @@ class LickTest(unittest.TestCase):
         out = swing([(60, 0.0, 0.05, 70), (62, 0.46875, 0.6, 70)], 128)
         self.assertAlmostEqual(out[0][2] - out[0][1], 0.12)
 
-    def test_swing_chord_tones_end_before_the_next_chord(self) -> None:
+    def test_swing_chord_tones_do_not_cut_each_other(self) -> None:
         chord = [(48, 0.0, 0.5, 46), (52, 0.0, 0.5, 46), (48, 0.46875, 0.8, 46), (52, 0.46875, 0.8, 46)]
         out = swing(chord, 128)
+        self.assertEqual(out[0][2], out[1][2])                       # same onset, same end
+        self.assertGreater(out[0][2] - out[0][1], 0.4)
         for p, s, e, _ in out[:2]:
-            self.assertLess(e, out[2][1])
+            self.assertLess(e, out[2][1])                             # nor into the next chord's same pitches
 
+    def test_swing_keeps_a_held_comp_note_over_another_voice(self) -> None:
+        # a sustained bass under an off-beat upper note is held, not cut at the other voice's onset (Astra on #1674)
+        out = swing([(36, 0.0, 0.9, 46), (60, 0.234375, 0.3, 70)], 128)
+        self.assertGreater(out[0][2], out[1][1] + 0.3)
 
 if __name__ == "__main__":
     unittest.main()

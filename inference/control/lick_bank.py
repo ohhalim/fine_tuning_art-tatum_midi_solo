@@ -93,13 +93,18 @@ def plan(bank, *, bars: int, bpm: float, seed: int, rest_8ths=(1, 4)):
 
 
 def swing(notes, bpm: float, ratio: float = 2 / 3, min_s: float = 0.12):
-    """Swung onsets for straight-eighth notes [(pitch, onset, end, velocity)].
+    """Swung onsets for straight-eighth notes [(pitch, onset, end, velocity)], a line or chords.
 
-    Off-beat eighths move later; each note's length is then recomputed from the next
-    onset (#1669: mapping the ends too squeezed off-beat notes to ~0.07 s, "plinky").
-    ``min_s`` lengthens short notes only up to the next later onset: after a short
-    inter-onset interval the note stays short rather than overlapping the next one
-    (#1669's final ``max`` let two same-pitch notes overlap by 42 ms)."""
+    Off-beat eighths move later and each note's end is recomputed from what follows it
+    (#1669: mapping the ends too squeezed off-beat notes to ~0.07 s, "plinky"):
+    * held over the next onset (longer than 1.2x the gap): its own end, swung, so a
+      sustained comp note is not cut by another voice
+    * legato into the next onset (at least 0.8x the gap): up to the next swung onset
+    * otherwise its length, at least ``min_s``
+    Notes sharing an onset (chord tones) do not shorten each other. No note sounds into
+    the next onset of the same pitch: after a short interval the note stays short
+    (#1674 capped at any later onset, which would cut held comp notes; #1669's final
+    ``max`` let two same-pitch notes overlap by 42 ms)."""
     beat = 60.0 / bpm
 
     def at(t):
@@ -109,15 +114,19 @@ def swing(notes, bpm: float, ratio: float = 2 / 3, min_s: float = 0.12):
         f = f / 0.5 * ratio if f < 0.5 else ratio + (f - 0.5) / 0.5 * (1 - ratio)
         return (whole + f) * beat
 
-    ons = [at(s) for _, s, _, _ in notes]
     out = []
-    for k, (p, s, e, v) in enumerate(notes):
-        length = e - s
-        nxt = min((o for o in ons[k + 1:] if o > ons[k]), default=None)    # chord tones share an onset
-        end = ons[k] + max(min_s, length)
-        if nxt is not None:
-            if length >= (nxt - ons[k]) * 0.8:                              # legato into the next note
-                end = nxt - 0.01
-            end = min(end, nxt - 0.01)
-        out.append((p, ons[k], max(end, ons[k] + 0.01), v))
+    for p, s, e, v in notes:
+        on, length = at(s), e - s
+        later = [q for q in notes if q[1] > s + 1e-6]
+        nxt = min((q[1] for q in later), default=None)
+        same = min((q[1] for q in later if q[0] == p), default=None)
+        if nxt is not None and length > (nxt - s) * 1.2:
+            end = at(e)
+        elif nxt is not None and length >= (nxt - s) * 0.8:
+            end = at(nxt) - 0.01
+        else:
+            end = on + max(min_s, length)
+        if same is not None:
+            end = min(end, at(same) - 0.01)
+        out.append((p, on, max(end, on + 0.01), v))
     return out
