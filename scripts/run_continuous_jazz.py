@@ -834,6 +834,9 @@ def main(argv=None):
     parser.add_argument("--comp", action="store_true",
                         help="with --solo-line: short shell-voicing hits (root, 3rd, 7th) on beat 1 and "
                              "the & of 3 so the progression stays audible")
+    parser.add_argument("--rank-repeat-weight", type=float, default=0.0, metavar="W",
+                        help="with --candidates > 1: the ranker also subtracts W x the share of repeated "
+                             "same-pitch steps (docs/experiments/RANK_REPEAT.md); 0 = off")
     parser.add_argument("--repeat-penalty", type=float, default=0.0, metavar="R",
                         help="with --harmony-bias: subtract R from the logit of the most recent note_on pitch "
                              "(docs/experiments/HARMONY_BIAS_REPEAT.md); 0 = off")
@@ -1159,6 +1162,7 @@ def main(argv=None):
                 from inference.control.candidate_rank import pick
                 root, iv = parse_chord(chord)
                 chosen, _scores = pick(candidates, {(root + i) % 12 for i in iv}, block_s=sub_duration,
+                                       repeat_weight=args.rank_repeat_weight,
                                        valid=lambda t: bool(validate_generated_token_block(
                                            t, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]))
                 tokens_out = candidates[chosen]
@@ -1390,6 +1394,7 @@ def main(argv=None):
             report["comp_style"] = args.comp_style if args.comp else None
             report["harmony_bias"] = args.harmony_bias
             report["repeat_penalty"] = args.repeat_penalty
+            report["rank_repeat_weight"] = args.rank_repeat_weight
             report["comp_trace"] = ([comp_trace.get(i) for i in range(max(comp_trace) + 1)]
                                     if args.comp and comp_trace else None)
             report["candidates"] = args.candidates

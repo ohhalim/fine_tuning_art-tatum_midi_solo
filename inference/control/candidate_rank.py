@@ -20,7 +20,9 @@ def solo_line(tokens, block_s: float):
     return [(n.pitch, n.start, min(n.end, block_s)) for n in line if n.pitch >= SOLO_SPLIT and n.start < block_s]
 
 
-def score(solo, pcs) -> float | None:
+def score(solo, pcs, repeat_weight: float = 0.0) -> float | None:
+    """fit - clash (duration weighted), minus ``repeat_weight`` x the share of consecutive
+    same-pitch steps (#1660; 0 = the #1637 ranker)."""
     if len(solo) < MIN_NOTES:
         return None
     dur = [max(e - s, 0.01) for _, s, e in solo]
@@ -28,14 +30,18 @@ def score(solo, pcs) -> float | None:
     fit = sum(d for (p, _, _), d in zip(solo, dur) if p % 12 in pcs) / tot
     clash = sum(d for (p, _, _), d in zip(solo, dur)
                 if min(min((p - q) % 12, (q - p) % 12) for q in pcs) == 1) / tot
+    if repeat_weight:
+        steps = list(zip(solo, solo[1:]))
+        same = sum(1 for (p, _, _), (q, _, _) in steps if p == q) / len(steps)
+        return fit - clash - repeat_weight * same
     return fit - clash
 
 
-def pick(candidates, pcs, *, block_s: float, valid) -> tuple[int, list]:
+def pick(candidates, pcs, *, block_s: float, valid, repeat_weight: float = 0.0) -> tuple[int, list]:
     """(index, scores) for token lists ``candidates``; ``valid(tokens) -> bool``."""
     best, best_i, scores = None, 0, []
     for i, toks in enumerate(candidates):
-        s = score(solo_line(toks, block_s), pcs) if valid(toks) else None
+        s = score(solo_line(toks, block_s), pcs, repeat_weight) if valid(toks) else None
         scores.append(s)
         if s is not None and (best is None or s > best):
             best, best_i = s, i

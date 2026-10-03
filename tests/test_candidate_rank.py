@@ -35,6 +35,16 @@ class EqualityTest(unittest.TestCase):
             self.assertEqual(got, expected, trial)
 
 
+class RepeatWeightTest(unittest.TestCase):
+    def test_repeated_notes_lower_the_score_only_with_a_weight(self) -> None:
+        pcs = {0, 4, 7}
+        rep = [(60, 0.0, 0.2), (60, 0.2, 0.4), (60, 0.4, 0.6), (64, 0.6, 0.8)]
+        mov = [(60, 0.0, 0.2), (64, 0.2, 0.4), (67, 0.4, 0.6), (64, 0.6, 0.8)]
+        self.assertEqual(score(rep, pcs), score(mov, pcs))                     # both all chord tones
+        self.assertLess(score(rep, pcs, 0.5), score(mov, pcs, 0.5))
+        self.assertAlmostEqual(score(rep, pcs) - score(rep, pcs, 0.5), 0.5 * 2 / 3)
+
+
 class RuntimeFlagTest(unittest.TestCase):
     def test_candidates_need_the_sub_block_path_and_no_pattern_cache(self) -> None:
         from scripts import run_continuous_jazz
