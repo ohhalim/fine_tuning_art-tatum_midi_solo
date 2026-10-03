@@ -43,5 +43,23 @@ class RealizerTest(unittest.TestCase):
         self.assertEqual([sign(b[0] - a[0]) for a, b in zip(out, out[1:])], [1, 1, 1, -1, -1, -1, -1])
 
 
+class ApproachResolvesTest(unittest.TestCase):
+    def test_an_approach_note_is_followed_by_its_goal(self) -> None:
+        beat = 60 / 128
+        # weak short note a step below a beat-1 note: realized as a chromatic approach that resolves up by a half step
+        src = [note(70, 0.0, 0.2), note(72, beat * 1.5, beat * 1.5 + 0.1), note(74, beat * 2, beat * 2 + 0.3)]
+        out = realize(abstract(src), chord_at=c7_at, bpm=128)
+        for (p, s, e, _), nxt in zip(out, out[1:]):
+            if p % 12 not in {0, 2, 4, 7, 9, 10}:
+                self.assertEqual(nxt[0] - p, 1)
+
+    def test_comp_aware_candidates_avoid_semitones(self) -> None:
+        from inference.control.realizer import clear_comp
+        solo = [(65, 0.0, 0.5, 80)]                  # F over a sounding E: semitone
+        comp = [(52, 0.0, 1.0, 50)]
+        fixed = clear_comp(solo, comp, c7_at)
+        self.assertNotIn((fixed[0][0] - 52) % 12, (1, 11))
+
+
 if __name__ == "__main__":
     unittest.main()

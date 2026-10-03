@@ -99,13 +99,13 @@ def shell_half(chord: str, *, sub_index: int, bpm: float):
 
 
 
-GUIDE_LOW, GUIDE_HIGH = 45, 56     # A2-Ab3: below the solo floor C4 (#1665)
+GUIDE_LOW, GUIDE_HIGH = 48, 59     # C3-B3: A2-Ab3 put a minor 3rd / tritone below the low interval limits (#1669)
 GUIDE_FIGURES = [[(0.0, 0.6)], [(1.5, 0.5)], [(0.0, 0.6)], [(0.0, 0.6)]]   # per half bar: 1 | &2 | 1 | 1
 GUIDE_VEL = 46
 
 
 def guide_tones(chord: str, previous=None) -> tuple[int, ...]:
-    """3rd and 7th inside A2-Ab3, the pair closest to the previous pair."""
+    """3rd and 7th inside C3-B3, the pair closest to the previous pair."""
     _, (third, _fifth, seventh, _ninth) = chord_tones(chord)
     cands = []
     for a in range(GUIDE_LOW, GUIDE_HIGH + 1):
@@ -116,7 +116,7 @@ def guide_tones(chord: str, previous=None) -> tuple[int, ...]:
 
 
 def guide_half(chord: str, *, block: int, bpm: float, state: dict):
-    """Clean comp (#1665): root low on a chord change, 3rd + 7th in A2-Ab3, soft and short.
+    """Clean comp (#1665): root low on a chord change, 3rd + 7th in C3-B3, soft and short.
 
     The figure follows a fixed 2-bar cycle (beat 1, & of 2, beat 1, beat 1), so it is
     predictable rather than random; a new chord is always stated on its first beat."""

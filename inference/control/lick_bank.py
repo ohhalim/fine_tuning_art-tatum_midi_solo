@@ -44,7 +44,8 @@ def lick_from_run(run) -> dict | None:
     on = [round((n.start - t0) / eighth * 2) / 2 for n in run]
     if any(b <= a for a, b in zip(on, on[1:])):
         return None
-    dur = [max(0.5, round(min(n.end - n.start, eighth * 2) / eighth * 2) / 2) for n in run]
+    # legato inside the lick: each note lasts to the next onset (the last one its own length)
+    dur = [max(0.5, on[k + 1] - on[k]) for k in range(len(on) - 1)] + [max(1.0, round((run[-1].end - run[-1].start) / eighth * 2) / 2)]
     return {"onset_8ths": on, "dur_8ths": dur, "intervals": [b.pitch - a.pitch for a, b in zip(run, run[1:])],
             "velocity": [n.velocity for n in run], "length_8ths": on[-1] + dur[-1]}
 
@@ -79,9 +80,39 @@ def plan(bank, *, bars: int, bpm: float, seed: int, rest_8ths=(1, 4)):
         if fitting is None:
             break
         lick = fitting
+        vel = lick["velocity"]
+        lo, hi = min(vel), max(vel)
         for k, (on, d) in enumerate(zip(lick["onset_8ths"], lick["dur_8ths"])):
-            events.append({"onset": (pos + on) * eighth, "dur": d * eighth * 0.95, "velocity": lick["velocity"][k],
+            # source velocities come from different recordings: rescale each lick to 62-84, +6 on the beat
+            v = 62 + (22 * (vel[k] - lo) / (hi - lo) if hi > lo else 11) + (6 if (pos + on) % 2 == 0 else 0)
+            events.append({"onset": (pos + on) * eighth, "dur": d * eighth * 0.92, "velocity": int(min(90, v)),
                            "interval": None if k == 0 else lick["intervals"][k - 1], "phrase_end": False})
         events[-1]["phrase_end"] = True
         pos += int(lick["length_8ths"] + 0.999) + rng.randint(*rest_8ths)
     return events
+
+
+def swing(notes, bpm: float, ratio: float = 2 / 3, min_s: float = 0.12):
+    """Swung onsets for straight-eighth notes [(pitch, onset, end, velocity)].
+
+    Off-beat eighths move later; each note's length is then recomputed from the next
+    onset (#1669: mapping the ends too squeezed off-beat notes to ~0.07 s, "plinky")."""
+    beat = 60.0 / bpm
+
+    def at(t):
+        b = t / beat
+        whole = int(b + 1e-6)
+        f = b - whole
+        f = f / 0.5 * ratio if f < 0.5 else ratio + (f - 0.5) / 0.5 * (1 - ratio)
+        return (whole + f) * beat
+
+    ons = [at(s) for _, s, _, _ in notes]
+    out = []
+    for k, (p, s, e, v) in enumerate(notes):
+        length = e - s
+        nxt = ons[k + 1] if k + 1 < len(notes) else None
+        end = ons[k] + max(min_s, length)
+        if nxt is not None and nxt - ons[k] > 0 and length >= (nxt - ons[k]) * 0.8:   # legato into the next note
+            end = nxt - 0.01
+        out.append((p, ons[k], max(end, ons[k] + min_s), v))
+    return out
