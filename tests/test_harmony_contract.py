@@ -21,6 +21,12 @@ class GuideTest(unittest.TestCase):
         self.assertNotEqual(guide_pitches(*chord_pcs("Dm7b5")), guide_pitches(*chord_pcs("Dm7")))
         self.assertIn(56, guide_pitches(*chord_pcs("Dm7b5")))                    # Ab, the flat fifth
 
+    def test_every_runtime_chord_keeps_all_its_pitch_classes(self) -> None:
+        for chord in ["Dm7", "G7", "Cmaj7", "F7", "Bb7", "Gm7", "C7", "Dm7b5", "Cm7"]:
+            root, pcs = chord_pcs(chord)
+            self.assertEqual({p % 12 for p in guide_pitches(root, pcs)}, pcs, chord)
+        self.assertNotEqual(guide_pitches(*chord_pcs("G7")), guide_pitches(*chord_pcs("Gm7")))
+
     def test_guide_timing_matches_the_runtime_guide(self) -> None:
         ns = guide_notes(7, {7, 11, 2, 5}, 0.9375)
         self.assertTrue(all(n.start == 0.0 and abs(n.end - 0.797) < 1e-3 and n.velocity == 58 for n in ns))
