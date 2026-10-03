@@ -72,7 +72,7 @@ def arm(dirs) -> dict:
     return p
 
 
-def check_set(dirs, bias: float, repeat: float = 0.0) -> list[str]:
+def check_set(dirs, bias: float, repeat: float = 0.0, rank_weight: float = 0.0) -> list[str]:
     problems, seen = [], set()
     for d in dirs:
         name = Path(d).name
@@ -87,6 +87,8 @@ def check_set(dirs, bias: float, repeat: float = 0.0) -> list[str]:
         expect = {**COMBINED, "seed": int(s.lstrip("s")), "harmony_bias": bias}
         if repeat or "repeat_penalty" in r:
             expect["repeat_penalty"] = repeat
+        if rank_weight or "rank_repeat_weight" in r:
+            expect["rank_repeat_weight"] = rank_weight
         for k, v in expect.items():
             if r.get(k) != v:
                 problems.append(f"{name}: {k} = {r.get(k)!r}, expected {v!r}")
@@ -127,25 +129,34 @@ def judge_repeat(a: dict, b: dict) -> dict:
     return {**base, "pass": all(base.values())}
 
 
+def judge_rank(a: dict, b: dict) -> dict:
+    """RANK_REPEAT.md: judge_repeat plus within-block leaps no wider than baseline + 2 (p90)."""
+    base = judge_repeat(a, b)
+    base.pop("pass")
+    base["within_p90_le_baseline_plus_2"] = b["within_p90"] <= a["within_p90"] + 2
+    return {**base, "pass": all(base.values())}
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--runs-dir", type=Path, required=True)
     ap.add_argument("--bias", type=float, default=2.0)
     ap.add_argument("--repeat", type=float, default=0.0, help="repeat penalty of the candidate arm")
     ap.add_argument("--label", default=None, help="candidate arm directory (default bias<S>)")
+    ap.add_argument("--rank-weight", type=float, default=0.0, help="rank repeat weight of the candidate arm")
     ap.add_argument("--output", type=Path, required=True)
     args = ap.parse_args(argv)
     arms = {}
     cand = args.label or f"bias{args.bias:g}"
-    for label, bias, repeat in (("bias0", 0.0, 0.0), (cand, args.bias, args.repeat)):
+    for label, bias, repeat, rw in (("bias0", 0.0, 0.0, 0.0), (cand, args.bias, args.repeat, args.rank_weight)):
         dirs = sorted(d for d in glob.glob(str(args.runs_dir / label / "bebop_*")) if Path(d).is_dir())
-        problems = check_set(dirs, bias, repeat)
+        problems = check_set(dirs, bias, repeat, rw)
         if problems:
             print(json.dumps({"refused": problems}, indent=1))
             return 2
         arms[label] = arm(dirs)
     a, b = arms["bias0"], arms[cand]
-    verdict = judge_repeat(a, b) if args.repeat else judge(a, b)
+    verdict = judge_rank(a, b) if args.rank_weight else judge_repeat(a, b) if args.repeat else judge(a, b)
     report = {"schema": "dissonance_check_v1", "arms": arms, "verdict": verdict, "musical_quality_verified": False}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n")
