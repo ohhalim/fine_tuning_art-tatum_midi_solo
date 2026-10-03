@@ -153,6 +153,39 @@ class BreathWithCompTest(unittest.TestCase):
         self.assertEqual(len(calls), 1)
 
 
+class CompTraceTest(unittest.TestCase):
+    """Planned vs emitted comp and why notes were dropped (#1647 review M1)."""
+
+    def block(self):
+        return SoloLineTest().block()                 # top line 72 (0-0.3), 74 (0.3-0.6), 76 (0.6-0.9); 0.94 s
+
+    def test_normal_case_emits_everything(self) -> None:
+        trace = {}
+        render_block(self.block(), lookahead_ms=940, comp_notes=[note(53, 0.0, 0.3, 50), note(59, 0.0, 0.3, 50)],
+                     trace=trace)
+        self.assertEqual((len(trace["planned"]), len(trace["emitted"]), trace["dropped"], trace["outcome"]),
+                         (2, 2, {}, "rendered"))
+
+    def test_solo_on_the_comp_third_drops_it_with_a_reason(self) -> None:
+        trace = {}
+        render_block(self.block(), lookahead_ms=940, comp_notes=[note(74, 0.2, 0.5, 50), note(53, 0.2, 0.5, 50)],
+                     trace=trace)
+        self.assertEqual(trace["dropped"], {"same_pitch_overlap": 1})
+        self.assertEqual([r[0] for r in trace["emitted"]], [53])
+
+    def test_past_block_end_and_clip(self) -> None:
+        trace = {}
+        render_block(self.block(), lookahead_ms=940, comp_notes=[note(53, 0.95, 1.2, 50), note(55, 0.8, 1.5, 50)],
+                     trace=trace)
+        self.assertEqual(trace["dropped"], {"past_block_end": 1})
+        self.assertEqual(trace["clipped"], 1)
+
+    def test_invalid_raw_emits_no_comp(self) -> None:
+        trace = {}
+        render_block([256 + 99] * 3, lookahead_ms=500, comp_notes=[note(53, 0.0, 0.3, 50)], trace=trace)
+        self.assertEqual((trace["outcome"], trace["emitted"]), ("raw_invalid", []))
+
+
 class ShellVoicingTest(unittest.TestCase):
     def test_root_third_seventh_without_seconds(self) -> None:
         from inference.control.solo_line import shell_voicing
