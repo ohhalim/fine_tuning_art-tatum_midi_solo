@@ -57,6 +57,20 @@ def song_windows(path: str) -> tuple[list[dict], dict]:
     return out, stats
 
 
+def matched_donor(used, si: int, w: dict):
+    """A window from another song with the same pitch-class count (so the same guide token
+    length) and a different guide, searched from song si + SHUFFLE_OFFSET onward (#1633 review M1)."""
+    n = len(used)
+    for k in range(SHUFFLE_OFFSET, SHUFFLE_OFFSET + n):
+        sj = (si + k) % n
+        if sj == si:
+            continue
+        for o in used[sj]:
+            if len(o["pcs"]) == len(w["pcs"]) and (o["bass"], o["pcs"]) != (w["bass"], w["pcs"]):
+                return o
+    return None
+
+
 def target_tokens(guide, solo) -> int:
     from inference.control.harmony_contract import serialize
 
@@ -117,6 +131,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--output-dir", type=Path, required=True)
     ap.add_argument("--models", nargs="+", default=list(MODELS))
+    ap.add_argument("--matched", action="store_true",
+                    help="shuffled donor with the same pitch-class count / guide length (review M1)")
     ap.add_argument("--add-model", action="append", default=[], metavar="NAME=CHECKPOINT",
                     help="score another checkpoint too (e.g. guide=outputs/bebop_guide/export/...)")
     args = ap.parse_args(argv)
@@ -154,23 +170,27 @@ def main(argv=None) -> int:
         merge_lora_for_inference(model)
         model.eval()
         per_song = {"true": [], "shuffled": [], "absent": []}
-        same_guide = 0
+        same_guide = unmatched = 0
         rows_out = []
         for si, ws in enumerate(used):
             other = used[(si + SHUFFLE_OFFSET) % len(used)]
             rows = {"true": [], "shuffled": [], "absent": []}
             for wi, w in enumerate(ws):
-                o = other[wi % len(other)]
+                o = matched_donor(used, si, w) if args.matched else other[wi % len(other)]
+                if o is None:
+                    unmatched += 1
+                    continue
                 same_guide += int((o["bass"], o["pcs"]) == (w["bass"], w["pcs"]))
                 rows["true"].append(solo_nll(model, guide_notes(w["bass"], w["pcs"], WINDOW_S), w["solo"]))
                 rows["shuffled"].append(solo_nll(model, guide_notes(o["bass"], o["pcs"], WINDOW_S), w["solo"]))
                 rows["absent"].append(solo_nll(model, [], w["solo"]))
             for k in rows:
                 per_song[k].append(rows[k])
-            rows_out += [{"song": si, "t": w["t"], **{k: rows[k][wi] for k in rows}} for wi, w in enumerate(ws)]
+            rows_out += [{"song": si, **{k: rows[k][wi] for k in rows}} for wi in range(len(rows["true"]))]
         out = {k: sum(map(sum, v)) / sum(map(len, v)) for k, v in per_song.items()}
         for cond in ("shuffled", "absent"):
-            diffs = [[a - b for a, b in zip(per_song[cond][i], per_song["true"][i])] for i in range(len(used))]
+            diffs = [d for d in ([a - b for a, b in zip(per_song[cond][i], per_song["true"][i])]
+                                 for i in range(len(used))) if d]
             vals = [v for s in diffs for v in s]
             song_means = [sum(d) / len(d) for d in diffs]
             out[f"d_{cond}"] = {"mean": sum(vals) / len(vals), "ci95": bootstrap_ci(diffs),
@@ -178,6 +198,7 @@ def main(argv=None) -> int:
                                 "song_macro_mean": sum(song_means) / len(song_means),
                                 "songs_positive": sum(m > 0 for m in song_means)}
         out["donor_same_as_true"] = same_guide
+        out["donor_unmatched_excluded"] = unmatched
         (args.output_dir / f"windows_{name}.json").parent.mkdir(parents=True, exist_ok=True)
         (args.output_dir / f"windows_{name}.json").write_text(json.dumps(rows_out))
         res[name] = out
