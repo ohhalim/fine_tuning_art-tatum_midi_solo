@@ -52,6 +52,10 @@ def main(argv=None) -> int:
     ap.add_argument("--carry", type=int, default=0, metavar="TOKENS",
                     help="carry the previous block's solo (TOKENS, after the chord guide) so the line continues "
                          "across half bars; 48 passed (docs/experiments/SOLO_CARRY.md, COMBINED_CHECK.md); 0 = off")
+    ap.add_argument("--bias", type=float, default=0.0, metavar="S",
+                    help="lower the chord's avoid notes while sampling (docs/experiments/HARMONY_BIAS.md); 0 = off")
+    ap.add_argument("--repeat", type=float, default=0.0, metavar="R",
+                    help="with --bias: lower repeating the last note (N1_BIAS_SWEEP.md chose 0.5); 0 = off")
     ap.add_argument("--breath", type=int, default=0, metavar="N",
                     help="with --solo: rest 0.4 s after N notes without a gap (24 passed its check, "
                          "docs/experiments/PHRASE_BREATH.md; 0 = off)")
@@ -73,6 +77,8 @@ def main(argv=None) -> int:
            *(["--comp-style", args.comp_style] if args.solo and args.comp else []),
            *(["--candidates", str(args.candidates)] if args.candidates > 1 else []),
            *(["--context-carry-tokens", str(args.carry), "--context-carry-position", "after"] if args.carry else []),
+           *(["--harmony-bias", str(args.bias)] if args.bias else []),
+           *(["--repeat-penalty", str(args.repeat)] if args.bias and args.repeat else []),
            *(PHRASE_ARGS if args.phrase else [])]
     try:
         return subprocess.call(cmd, cwd=ROOT, env={**os.environ, "FORCE_CPU": "1"})
