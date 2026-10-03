@@ -1180,11 +1180,15 @@ def main(argv=None):
                                           stats=render_stats, line_filter=line_filter, trace=trace)
                 if comp is not None:
                     # Per generated block (not per adopted block): planned vs emitted comp (#1647 review M1).
-                    comp_trace[bar_index * args.chord_blocks_per_bar + sub_index] = {"chord": chord, **trace}
+                    comp_trace[bar_index * args.chord_blocks_per_bar + sub_index] = {
+                        "chord": chord, **{k: v for k, v in trace.items() if k != "solo_tokens"}}
             if args.context_carry_tokens > 0 and validate_generated_token_block(
                     tokens_out, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]:
                 if not args.context_history:
-                    context_carry["tokens"] = [int(t) for t in tokens_out]
+                    # With --comp the rendered block holds comp hits too; carry the solo alone so the
+                    # model continues the line, not the accompaniment (docs/experiments/SOLO_CARRY.md).
+                    solo_only = trace.get("solo_tokens") if args.solo_line and args.comp else None
+                    context_carry["tokens"] = [int(t) for t in (solo_only if solo_only else tokens_out)]
             return tokens_out
 
         def generate(bar_index, input_events):

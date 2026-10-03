@@ -144,6 +144,9 @@ def solo_with_comp_tokens(tokens, comp_notes, line_filter=None, trace: dict | No
             dropped[reason] = dropped.get(reason, 0) + 1
             continue
         comp.append(pretty_midi.Note(velocity=n.velocity, pitch=n.pitch, start=n.start, end=min(n.end, limit)))
+    if trace is not None:                            # the solo alone, for context carry without the comp
+        solo_only = _padded(line, total)
+        trace["solo_tokens"] = solo_only if solo_only is not None else None
     if trace is not None:                            # where each planned comp note went (#1647 review M1)
         trace.update(planned=[_note_row(n) for n in comp_notes], emitted=[_note_row(n) for n in comp],
                      dropped=dropped, clipped=sum(1 for n in comp_notes if n.start < limit < n.end))

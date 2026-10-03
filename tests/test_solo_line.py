@@ -214,6 +214,15 @@ class GridProvenanceTest(unittest.TestCase):
             self.assertEqual(got, sorted((p, round(s0, 3), round(e0, 3)) for p, s0, e0, _ in trace["emitted"]), trial)
 
 
+class SoloCarryTokensTest(unittest.TestCase):
+    def test_trace_holds_the_solo_alone(self) -> None:
+        toks = SoloLineTest().block()
+        trace = {}
+        render_block(toks, lookahead_ms=940, comp_notes=[note(53, 0.0, 0.3, 50)], trace=trace)
+        self.assertEqual([n.pitch for n in tokens_to_notes(trace["solo_tokens"])], [72, 74, 76])
+        self.assertEqual(stage_a_musical_duration_ms(trace["solo_tokens"]), stage_a_musical_duration_ms(toks))
+
+
 class ShellVoicingTest(unittest.TestCase):
     def test_root_third_seventh_without_seconds(self) -> None:
         from inference.control.solo_line import shell_voicing
