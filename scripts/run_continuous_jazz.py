@@ -834,6 +834,9 @@ def main(argv=None):
     parser.add_argument("--comp", action="store_true",
                         help="with --solo-line: short shell-voicing hits (root, 3rd, 7th) on beat 1 and "
                              "the & of 3 so the progression stays audible")
+    parser.add_argument("--candidates", type=int, default=1, metavar="N",
+                        help="generate N candidates per sub-block from the same primer and keep the fixed "
+                             "ranker's pick (docs/experiments/CANDIDATE_SELECT.md); 1 = off")
     parser.add_argument("--phrase-breath", type=int, default=0, metavar="N",
                         help="with --solo-line: after N top-line notes without a 0.3 s gap, drop notes "
                              "for 0.4 s so the line breathes (0 = off; docs/experiments/PHRASE_BREATH.md)")
@@ -938,6 +941,12 @@ def main(argv=None):
         parser.error("chord_split must be between 1 and 128 (128 = every held note)")
     if args.comp and not args.solo_line:
         parser.error("--comp goes with --solo-line")
+    if not 1 <= args.candidates <= 8:
+        parser.error("--candidates must be 1-8")
+    if args.candidates > 1 and args.pattern_cache:
+        parser.error("--candidates does not combine with --pattern-cache (the cache keeps per-run state)")
+    if args.candidates > 1 and args.chord_blocks_per_bar < 2:
+        parser.error("--candidates works on the sub-block path: --chord-primer --chord-blocks-per-bar 2")
     if args.phrase_breath and not args.solo_line:
         parser.error("--phrase-breath goes with --solo-line")
     if args.phrase_breath < 0:
@@ -1037,6 +1046,7 @@ def main(argv=None):
 
         context_carry = {"tokens": []}
         render_stats: dict = {}            # --solo-line: raw vs rendered validity (Astra review)
+        candidate_stats: dict = {}         # --candidates: blocks ranked, candidate 0 kept, none qualified
         breath = None
         if args.phrase_breath:
             from inference.control.solo_line import PhraseBreath
@@ -1109,13 +1119,32 @@ def main(argv=None):
             if args.pattern_cache:
                 from scripts.pattern_cache import PatternCacheBias
                 proc = PatternCacheBias()
-            tokens_out, _meta = generate_once(
-                model=model, primer=primer,
-                target_length=min(args.max_sequence, len(primer) + args.generation_tokens),
-                strip_primer=True, temperature=args.temperature, top_k=32, top_p=0.95,
-                grammar_mask=True, target_duration_seconds=sub_duration,
-                return_metadata=True, use_kv_cache=args.kv_cache, logits_processor=proc,
-            )
+            candidates = []
+            for k in range(args.candidates):
+                if k:
+                    # Same primer, another seed: the offline check used seed + k * 1000 (#1637).
+                    torch.manual_seed(args.seed + bar_index * 13 + sub_index * 977 + k * 1000)
+                tokens_k, _meta = generate_once(
+                    model=model, primer=primer,
+                    target_length=min(args.max_sequence, len(primer) + args.generation_tokens),
+                    strip_primer=True, temperature=args.temperature, top_k=32, top_p=0.95,
+                    grammar_mask=True, target_duration_seconds=sub_duration,
+                    return_metadata=True, use_kv_cache=args.kv_cache, logits_processor=proc,
+                )
+                candidates.append(tokens_k)
+            tokens_out = candidates[0]
+            if args.candidates > 1:
+                from inference.app.fallback import parse_chord
+                from inference.control.candidate_rank import pick
+                root, iv = parse_chord(chord)
+                chosen, _scores = pick(candidates, {(root + i) % 12 for i in iv}, block_s=sub_duration,
+                                       valid=lambda t: bool(validate_generated_token_block(
+                                           t, lookahead_ms=sub_duration * 1000, allow_rest_bar=True)["valid"]))
+                tokens_out = candidates[chosen]
+                candidate_stats["blocks"] = candidate_stats.get("blocks", 0) + 1
+                candidate_stats["picked_0"] = candidate_stats.get("picked_0", 0) + int(chosen == 0)
+                candidate_stats["no_qualifying"] = (candidate_stats.get("no_qualifying", 0)
+                                                    + int(all(x is None for x in _scores)))
             if proc is not None:
                 cache_stats["steps"] = cache_stats.get("steps", 0) + proc.steps
                 cache_stats["fired"] = cache_stats.get("fired", 0) + proc.fired
@@ -1322,6 +1351,8 @@ def main(argv=None):
                 report["phrase_breath"] = ({"max_notes": breath.max_notes, "rest_s": breath.rest_s,
                                             "dropped_notes": breath.dropped} if breath else None)
             report["comp"] = bool(args.comp)
+            report["candidates"] = args.candidates
+            report["candidate_stats"] = dict(candidate_stats) if args.candidates > 1 else None
             if echo_guard is not None:
                 report["echo_guard"] = {"window_ms": args.ignore_echo_ms, "dropped": echo_guard.dropped}
             if live_chords is not None and producer.clock is not None:
