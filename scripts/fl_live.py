@@ -46,6 +46,9 @@ def main(argv=None) -> int:
     ap.add_argument("--comp-style", choices=["shell", "varied"], default="varied",
                     help="with --comp: varied = half-bar figures with rootless voice leading "
                          "(docs/experiments/COMPING.md)")
+    ap.add_argument("--candidates", type=int, default=1, metavar="N",
+                    help="generate N candidates per block and keep the ranker's pick; 2 passed a feasibility "
+                         "check with 55 ms worst-case headroom (docs/experiments/RUNTIME_N2.md); 1 = off")
     ap.add_argument("--breath", type=int, default=0, metavar="N",
                     help="with --solo: rest 0.4 s after N notes without a gap (24 passed its check, "
                          "docs/experiments/PHRASE_BREATH.md; 0 = off)")
@@ -65,6 +68,7 @@ def main(argv=None) -> int:
            *(["--solo-line"] if args.solo else []), *(["--comp"] if args.solo and args.comp else []),
            *(["--phrase-breath", str(args.breath)] if args.solo and args.breath else []),
            *(["--comp-style", args.comp_style] if args.solo and args.comp else []),
+           *(["--candidates", str(args.candidates)] if args.candidates > 1 else []),
            *(PHRASE_ARGS if args.phrase else [])]
     try:
         return subprocess.call(cmd, cwd=ROOT, env={**os.environ, "FORCE_CPU": "1"})
