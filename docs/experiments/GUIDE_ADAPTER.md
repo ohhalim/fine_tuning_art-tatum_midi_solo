@@ -44,3 +44,20 @@
 - val 곡은 base 사전학습에 들어 있다(`val_songs_in_base_pretrain: true`, #1618 report)
 - val과 test는 화음 적합 지표 탐색에서 이미 봤다
 - 그래서 이번 결과는 모두 **탐색**으로 표시한다
+
+## 생성 평가 (봉인 해제 후 등록: U3 결과 3f4008f9 이후, 학습 결과를 보기 전)
+- U3 판정에 따라 rel_js(합산 분포)만 게이트로 쓴다. fit과 clash는 집단 수준 보고로만 쓴다
+- 스크립트: `scripts/guide_gen_eval.py`
+- 데이터: val 491창
+- 생성 조건: 각 창의 true guide만 primer로 준다(history 없는 런타임 계약). 0.9375초, T 1.0, top-k 32, top-p 0.95, grammar mask, seed 2개
+- 솔로: 생성 결과의 G3 이상 최고음 선율
+- 비교: bebop, guide 어댑터, 실제(같은 창의 실제 솔로)
+- 보고만
+  - 같은 생성을 donor 화성으로 잰 fit. guide 화성을 따르는지 보는 값이다
+  - 빈 창 수
+- **통과:** guide 어댑터가 모두 충족
+  1. rel_js < bebop
+  2. rel_js ≤ 0.10. 실제 val은 .048, 화성 교환 대조는 .088이다
+  3. fit ≥ bebop + 0.03(집단 수준)
+  4. 초당 음 수가 실제 창의 0.67–1.5배
+- 미달이면 기록한다. sweep은 하지 않는다. 통과해도 런타임 통합과 청취는 별도 단위다. "듣기 좋다"는 주장은 하지 않는다
