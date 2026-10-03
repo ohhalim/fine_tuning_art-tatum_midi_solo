@@ -46,5 +46,13 @@ class CandidatesTest(unittest.TestCase):
         self.assertEqual(cmd[cmd.index("--candidates") + 1], "2")
 
 
+class CarryTest(unittest.TestCase):
+    def test_off_by_default_and_after_the_guide_when_set(self) -> None:
+        self.assertNotIn("--context-carry-tokens", command("--preset", "bebop"))
+        cmd = command("--preset", "bebop", "--carry", "48")
+        self.assertEqual(cmd[cmd.index("--context-carry-tokens") + 1], "48")
+        self.assertEqual(cmd[cmd.index("--context-carry-position") + 1], "after")
+
+
 if __name__ == "__main__":
     unittest.main()
