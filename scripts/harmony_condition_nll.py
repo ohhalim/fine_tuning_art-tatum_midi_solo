@@ -57,6 +57,23 @@ def song_windows(path: str) -> tuple[list[dict], dict]:
     return out, stats
 
 
+def target_tokens(guide, solo) -> int:
+    from inference.control.harmony_contract import serialize
+
+    toks, at = serialize(guide, solo, WINDOW_S)
+    return len(toks) - at - 1
+
+
+def runtime_guide_stats() -> dict:
+    """pc count / range of the runtime chord-symbol guides (the 7 progressions' chords) vs proxies."""
+    from inference.control.harmony_contract import chord_pcs, guide_pitches
+
+    chords = ["Dm7", "G7", "Cmaj7", "F7", "Bb7", "Gm7", "C7", "Dm7b5", "Cm7"]
+    gp = [guide_pitches(*chord_pcs(c)) for c in chords]
+    return {"chords": chords, "pcs": [len(g) for g in gp], "range": [min(map(min, gp)), max(map(max, gp))],
+            "changes_per_window": 0}
+
+
 def solo_nll(model, guide, solo) -> float:
     import torch
     import torch.nn.functional as F
@@ -118,7 +135,11 @@ def main(argv=None) -> int:
     flat = [x for w in used for x in w]
     extraction.update({"songs": len(songs), "songs_used": len(used), "windows": len(flat),
                        "pcs_hist": {k: sum(1 for x in flat if len(x["pcs"]) == k) for k in range(2, 13)},
-                       "onset_groups_median": statistics.median(x["onset_groups"] for x in flat)})
+                       "onset_groups_median": statistics.median(x["onset_groups"] for x in flat),
+                       "proxy_range": [min(36 + x["bass"] for x in flat), 59],
+                       "target_tokens": {"total": sum(target_tokens([], x["solo"]) for x in flat),
+                                         "median": statistics.median(target_tokens([], x["solo"]) for x in flat)},
+                       "runtime_guides": runtime_guide_stats()})
     res = {}
     for name in args.models:
         ck = ROOT / MODELS[name]
@@ -127,22 +148,32 @@ def main(argv=None) -> int:
         merge_lora_for_inference(model)
         model.eval()
         per_song = {"true": [], "shuffled": [], "absent": []}
+        same_guide = 0
+        rows_out = []
         for si, ws in enumerate(used):
             other = used[(si + SHUFFLE_OFFSET) % len(used)]
             rows = {"true": [], "shuffled": [], "absent": []}
             for wi, w in enumerate(ws):
                 o = other[wi % len(other)]
+                same_guide += int((o["bass"], o["pcs"]) == (w["bass"], w["pcs"]))
                 rows["true"].append(solo_nll(model, guide_notes(w["bass"], w["pcs"], WINDOW_S), w["solo"]))
                 rows["shuffled"].append(solo_nll(model, guide_notes(o["bass"], o["pcs"], WINDOW_S), w["solo"]))
                 rows["absent"].append(solo_nll(model, [], w["solo"]))
             for k in rows:
                 per_song[k].append(rows[k])
+            rows_out += [{"song": si, "t": w["t"], **{k: rows[k][wi] for k in rows}} for wi, w in enumerate(ws)]
         out = {k: sum(map(sum, v)) / sum(map(len, v)) for k, v in per_song.items()}
         for cond in ("shuffled", "absent"):
             diffs = [[a - b for a, b in zip(per_song[cond][i], per_song["true"][i])] for i in range(len(used))]
             vals = [v for s in diffs for v in s]
+            song_means = [sum(d) / len(d) for d in diffs]
             out[f"d_{cond}"] = {"mean": sum(vals) / len(vals), "ci95": bootstrap_ci(diffs),
-                                "share_positive": sum(v > 0 for v in vals) / len(vals)}
+                                "share_positive": sum(v > 0 for v in vals) / len(vals),
+                                "song_macro_mean": sum(song_means) / len(song_means),
+                                "songs_positive": sum(m > 0 for m in song_means)}
+        out["donor_same_as_true"] = same_guide
+        (args.output_dir / f"windows_{name}.json").parent.mkdir(parents=True, exist_ok=True)
+        (args.output_dir / f"windows_{name}.json").write_text(json.dumps(rows_out))
         res[name] = out
         print(name, json.dumps(out), flush=True)
         del model
