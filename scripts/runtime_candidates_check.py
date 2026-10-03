@@ -101,9 +101,12 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--runs-dir", type=Path, required=True)
     ap.add_argument("--output", type=Path, required=True)
+    ap.add_argument("--candidate-arm", type=int, default=3, help="N of the arm compared with N=1")
+    ap.add_argument("--budget-ms", type=float, default=None,
+                    help="block-ready p99 limit; default 0.6 x block (the #1639 registration)")
     args = ap.parse_args(argv)
     out = {}
-    for n in (1, 3):
+    for n in (1, args.candidate_arm):
         dirs = sorted(d for d in glob.glob(str(args.runs_dir / f"N{n}" / "bebop_*")) if Path(d).is_dir())
         problems = check_set(dirs, n)
         if problems:
@@ -124,19 +127,21 @@ def main(argv=None) -> int:
             "candidate_stats": [r.get("candidate_stats") for r in reports],
         }
     block_ms = 60000.0 / 128 * 2
-    a, b = out["N1"], out["N3"]
+    a, b = out["N1"], out[f"N{args.candidate_arm}"]
+    budget = args.budget_ms if args.budget_ms is not None else 0.6 * block_ms
     if not a["on_beat_clash_n"] or not b["on_beat_clash_n"]:
         print(json.dumps({"indeterminate": "no on-beat notes in an arm"}))
         return 3
     verdict = {
         "fallback_0": b["fallback_total"] == 0,
-        "gen_p99_le_0.6_block": b["gen_ms_p99"] is not None and b["gen_ms_p99"] <= 0.6 * block_ms,
+        "gen_p99_le_budget": b["gen_ms_p99"] is not None and b["gen_ms_p99"] <= budget,
         "misses_le_N1_plus_2": b["misses_total"] <= a["misses_total"] + 2,
         "on_beat_clash_below_N1": b["on_beat_clash"] < a["on_beat_clash"],
         "density_0.67_1.5x_data": 0.67 * DATA_NOTES_PER_S <= b["notes_per_s"] <= 1.5 * DATA_NOTES_PER_S,
     }
     verdict["pass"] = all(verdict.values())
-    report = {"schema": "runtime_candidates_check_v1", "block_ms": block_ms, "arms": out, "verdict": verdict,
+    report = {"schema": "runtime_candidates_check_v1", "block_ms": block_ms, "budget_ms": budget, "arms": out,
+              "verdict": verdict,
               "musical_quality_verified": False}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n")
