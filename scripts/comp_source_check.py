@@ -46,12 +46,12 @@ def tag_run(r) -> dict:
         for k, v in t.get("dropped", {}).items():
             dropped[k] = dropped.get(k, 0) + v
         t0 = i * half
-        emitted_abs += [(p, t0 + s, t0 + e) for p, s, e, _ in t["emitted"]]
+        emitted_abs += [(p, t0 + s, t0 + e) for p, s, e, _ in t.get("emitted", [])]   # "rest" figure: no comp
         if t["chord"] != prev_chord:
             align_n += 1
             root, (third, fifth, seventh, ninth) = chord_tones(t["chord"])
             by_onset = {}
-            for p, s, e, _ in t["emitted"]:
+            for p, s, e, _ in t.get("emitted", []):
                 if s < beat:
                     by_onset.setdefault(round(s, 3), set()).add(p % 12)
             if any({third, seventh} <= pcs for pcs in by_onset.values()):
