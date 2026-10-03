@@ -27,5 +27,16 @@ class BiasTest(unittest.TestCase):
         self.assertEqual(float(out[0, 128:].clamp(min=-1).abs().sum()), 1.0)  # only the masked one changed below
 
 
+class RepeatTest(unittest.TestCase):
+    def test_last_note_on_is_penalised(self) -> None:
+        proc = HarmonyBias("C7", strength=2.0, repeat=1.5)
+        seq = torch.tensor([300, 64, 260, 192, 67, 270])          # ... note_on 64, ..., note_on 67, time shift
+        out = proc(torch.zeros(1, 390), seq)
+        self.assertAlmostEqual(float(out[0, 67]), -1.5)            # G: last struck, chord tone
+        self.assertAlmostEqual(float(out[0, 64]), 0.0)
+        self.assertAlmostEqual(float(out[0, 65]), -2.0)            # F: avoid
+        self.assertAlmostEqual(float(HarmonyBias("C7", 2.0)(torch.zeros(1, 390), seq)[0, 67]), 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -834,6 +834,9 @@ def main(argv=None):
     parser.add_argument("--comp", action="store_true",
                         help="with --solo-line: short shell-voicing hits (root, 3rd, 7th) on beat 1 and "
                              "the & of 3 so the progression stays audible")
+    parser.add_argument("--repeat-penalty", type=float, default=0.0, metavar="R",
+                        help="with --harmony-bias: subtract R from the logit of the most recent note_on pitch "
+                             "(docs/experiments/HARMONY_BIAS_REPEAT.md); 0 = off")
     parser.add_argument("--harmony-bias", type=float, default=0.0, metavar="STRENGTH",
                         help="subtract STRENGTH from the logits of the block chord's avoid notes while sampling "
                              "(docs/experiments/HARMONY_BIAS.md); 0 = off")
@@ -949,8 +952,10 @@ def main(argv=None):
         parser.error("--comp goes with --solo-line")
     if args.harmony_bias and args.pattern_cache:
         parser.error("--harmony-bias does not combine with --pattern-cache (one logits processor)")
-    if args.harmony_bias < 0:
-        parser.error("--harmony-bias must be >= 0")
+    if args.harmony_bias < 0 or args.repeat_penalty < 0:
+        parser.error("--harmony-bias / --repeat-penalty must be >= 0")
+    if args.repeat_penalty and not args.harmony_bias:
+        parser.error("--repeat-penalty goes with --harmony-bias")
     if not 1 <= args.candidates <= 8:
         parser.error("--candidates must be 1-8")
     if args.candidates > 1 and args.pattern_cache:
@@ -1134,7 +1139,7 @@ def main(argv=None):
             elif args.harmony_bias:
                 # Soft penalty on the block chord's avoid notes (docs/experiments/HARMONY_BIAS.md)
                 from inference.control.harmony_bias import HarmonyBias
-                proc = HarmonyBias(chord, strength=args.harmony_bias)
+                proc = HarmonyBias(chord, strength=args.harmony_bias, repeat=args.repeat_penalty)
             candidates = []
             for k in range(args.candidates):
                 if k:
@@ -1384,6 +1389,7 @@ def main(argv=None):
             report["comp"] = bool(args.comp)
             report["comp_style"] = args.comp_style if args.comp else None
             report["harmony_bias"] = args.harmony_bias
+            report["repeat_penalty"] = args.repeat_penalty
             report["comp_trace"] = ([comp_trace.get(i) for i in range(max(comp_trace) + 1)]
                                     if args.comp and comp_trace else None)
             report["candidates"] = args.candidates
