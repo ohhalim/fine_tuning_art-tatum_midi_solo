@@ -39,5 +39,12 @@ class CompStyleTest(unittest.TestCase):
         self.assertNotIn("--comp-style", command("--preset", "bebop", "--no-comp"))
 
 
+class CandidatesTest(unittest.TestCase):
+    def test_off_by_default_and_passed_when_set(self) -> None:
+        self.assertNotIn("--candidates", command("--preset", "bebop"))
+        cmd = command("--preset", "bebop", "--candidates", "2")
+        self.assertEqual(cmd[cmd.index("--candidates") + 1], "2")
+
+
 if __name__ == "__main__":
     unittest.main()
