@@ -6,6 +6,10 @@ a candidate is a (root, quality) whose guide tones (3rd and 7th, or 6th) are all
 sounding and whose chord tones plus allowed tensions cover every sounding pitch
 class. The root may be absent (rootless voicings). D-F-A-C stays ambiguous (Dm7 and
 F6), as do rootless dominants and their tritone substitutes.
+
+Triads are candidates too, and a slice needs at least three pitch classes: the first
+audit run read major-third dyads (left-hand tenths) as minor-major sevenths and plain
+major triads as rootless minor sevenths, because nothing else could explain them.
 """
 from __future__ import annotations
 
@@ -21,14 +25,17 @@ QUALITIES = {
     "6": ({0, 4, 7, 9}, {4, 9}, {2}),
     "m6": ({0, 3, 7, 9}, {3, 9}, {2, 5}),
     "mMaj7": ({0, 3, 7, 11}, {3, 11}, {2, 5}),
+    "maj": ({0, 4, 7}, {4, 7}, {2}),
+    "min": ({0, 3, 7}, {3, 7}, {2}),
 }
+MIN_PCS = 3
 
 
 def candidates(pcs) -> list[tuple[int, str]]:
     """Every (root pc, quality) consistent with the sounding pitch classes."""
     pcs = {p % 12 for p in pcs}
     out = []
-    if len(pcs) < 2:
+    if len(pcs) < MIN_PCS:
         return out
     for root in range(12):
         rel = {(p - root) % 12 for p in pcs}

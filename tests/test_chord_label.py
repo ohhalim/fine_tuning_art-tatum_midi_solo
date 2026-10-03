@@ -37,6 +37,10 @@ class ChordLabelTest(unittest.TestCase):
     def test_known_ambiguities_stay_ambiguous(self) -> None:
         # D-F-A-C: Dm7, F6, or rootless Bbmaj9
         self.assertEqual(sorted(candidates([2, 5, 9, 0])), [(2, "m7"), (5, "6"), (10, "maj7")])
+        # F-A-C: F, or rootless Dm7; the bass decides
+        self.assertEqual(sorted(candidates([5, 9, 0])), [(2, "m7"), (5, "maj")])
+        self.assertEqual(classify([5, 9, 0], None)[0], "ambiguous")
+        self.assertEqual(classify([5, 9, 0], 5)[:2], ("bass_resolved", (5, "maj")))
         rootless_c7 = [4, 10, 2, 9]                                                        # E-Bb-D-A
         self.assertIn((6, "7"), candidates(rootless_c7))                                   # Gb7 (tritone sub)
         self.assertEqual(classify(rootless_c7, None)[0], "ambiguous")
@@ -47,10 +51,10 @@ class ChordLabelTest(unittest.TestCase):
         self.assertEqual(candidates(dm7 | g7), [(2, "m7")])
         self.assertIn((7, "7"), candidates(g7))
 
-    def test_too_few_tones_are_unknown_and_two_tones_stay_open(self) -> None:
+    def test_fewer_than_three_tones_are_unknown(self) -> None:
         self.assertEqual(classify([0], 0)[0], "unknown")
-        cls, label, _ = classify([0, 7], 0)                                                # open fifth: no single chord
-        self.assertEqual((cls, label), ("ambiguous", None))
+        self.assertEqual(classify([0, 7], 0)[0], "unknown")                                # open fifth
+        self.assertEqual(classify([0, 4], 0)[0], "unknown")                                # a tenth, once read as C#mMaj7
 
 
 if __name__ == "__main__":
