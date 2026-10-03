@@ -96,3 +96,40 @@ def shell_half(chord: str, *, sub_index: int, bpm: float):
 
     at = 0.0 if sub_index == 0 else 0.5 * 60.0 / bpm
     return [(p, at, at + 0.25, 56) for p in shell_voicing(chord)]
+
+
+
+GUIDE_LOW, GUIDE_HIGH = 45, 56     # A2-Ab3: below the solo floor C4 (#1665)
+GUIDE_FIGURES = [[(0.0, 0.6)], [(1.5, 0.5)], [(0.0, 0.6)], [(0.0, 0.6)]]   # per half bar: 1 | &2 | 1 | 1
+GUIDE_VEL = 46
+
+
+def guide_tones(chord: str, previous=None) -> tuple[int, ...]:
+    """3rd and 7th inside A2-Ab3, the pair closest to the previous pair."""
+    _, (third, _fifth, seventh, _ninth) = chord_tones(chord)
+    cands = []
+    for a in range(GUIDE_LOW, GUIDE_HIGH + 1):
+        for b in range(GUIDE_LOW, GUIDE_HIGH + 1):
+            if a % 12 == third and b % 12 == seventh:
+                cands.append(tuple(sorted((a, b))))
+    return closest(sorted(set(cands)), previous)
+
+
+def guide_half(chord: str, *, block: int, bpm: float, state: dict):
+    """Clean comp (#1665): root low on a chord change, 3rd + 7th in A2-Ab3, soft and short.
+
+    The figure follows a fixed 2-bar cycle (beat 1, & of 2, beat 1, beat 1), so it is
+    predictable rather than random; a new chord is always stated on its first beat."""
+    beat = 60.0 / bpm
+    changed = chord != state.get("chord")
+    figure = [(0.0, 0.6)] if changed else GUIDE_FIGURES[block % len(GUIDE_FIGURES)]
+    pair = guide_tones(chord, state.get("voicing"))
+    state["voicing"] = pair
+    notes = []
+    for start, length in figure:
+        t0, t1 = start * beat, (start + length) * beat
+        if changed:
+            notes.append((BASS_LOW + chord_tones(chord)[0], t0, t1, GUIDE_VEL + 4))
+        notes += [(p, t0, t1, GUIDE_VEL) for p in pair]
+    state["chord"] = chord
+    return notes, "guide"
