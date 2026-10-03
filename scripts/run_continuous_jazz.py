@@ -1161,7 +1161,7 @@ def main(argv=None):
                 candidate_stats["picked_0"] = candidate_stats.get("picked_0", 0) + int(chosen == 0)
                 candidate_stats["no_qualifying"] = (candidate_stats.get("no_qualifying", 0)
                                                     + int(all(x is None for x in _scores)))
-            if proc is not None:
+            if proc is not None and args.pattern_cache:
                 cache_stats["steps"] = cache_stats.get("steps", 0) + proc.steps
                 cache_stats["fired"] = cache_stats.get("fired", 0) + proc.fired
             if args.solo_line:
