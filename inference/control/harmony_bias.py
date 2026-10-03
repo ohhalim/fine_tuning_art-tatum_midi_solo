@@ -54,3 +54,46 @@ class HarmonyBias:
                 last = int(sequence[int(ons[-1])])
                 out[..., last] = out[..., last] - self.repeat
         return out
+
+
+# Strict scales for --clean-harmony (#1665): no altered tensions on dominants.
+SCALE = {(0, 4, 7, 11): {0, 2, 4, 7, 9, 11}, (0, 4, 7, 10): {0, 2, 4, 7, 9, 10}, (0, 3, 7, 10): {0, 2, 3, 5, 7, 9, 10},
+         (0, 3, 6, 10): {0, 2, 3, 5, 6, 8, 10}, (0, 3, 6, 9): {0, 2, 3, 5, 6, 8, 9, 11}}
+
+
+class CleanHarmony:
+    """logits_processor: scale notes only, chromatic notes only as approach notes (#1665).
+
+    The user still heard "a lot of dissonance" with the soft avoid penalty (2026-10-03):
+    a few clashing notes per phrase are enough. Here a note outside the chord's scale
+    gets ``outside`` subtracted (4.0: ~1/55 of its probability), and right after one,
+    every note_on except a chord tone within two semitones of it is masked, so an
+    outside note always resolves by step into the chord."""
+
+    def __init__(self, chord: str, outside: float = 4.0) -> None:
+        import torch
+        from inference.app.fallback import parse_chord
+
+        root, iv = parse_chord(chord)
+        self.scale = {(root + k) % 12 for k in SCALE.get(tuple(iv), set(iv))}
+        self.chord_tones = {(root + k) % 12 for k in iv}
+        self._outside = torch.tensor([float(p % 12 not in self.scale) for p in range(NOTE_ON_END + 1)]) * outside
+        self.steps = self.forced = 0
+
+    def __call__(self, logits, sequence=None):
+        self.steps += 1
+        out = logits.clone()
+        note = out[..., NOTE_ON_START:NOTE_ON_END + 1]
+        note -= self._outside.to(device=out.device, dtype=out.dtype)
+        if sequence is not None and len(sequence):
+            ons = (sequence <= NOTE_ON_END).nonzero()
+            if len(ons):
+                last = int(sequence[int(ons[-1])])
+                if last % 12 not in self.scale:              # resolve: chord tone within 2 semitones
+                    allowed = [p for p in range(max(0, last - 2), min(NOTE_ON_END, last + 2) + 1)
+                               if p % 12 in self.chord_tones]
+                    keep = note[..., allowed].clone()
+                    note[...] = float("-inf")
+                    note[..., allowed] = keep
+                    self.forced += 1
+        return out

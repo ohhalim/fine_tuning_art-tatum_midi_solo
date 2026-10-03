@@ -843,7 +843,12 @@ def main(argv=None):
     parser.add_argument("--harmony-bias", type=float, default=0.0, metavar="STRENGTH",
                         help="subtract STRENGTH from the logits of the block chord's avoid notes while sampling "
                              "(docs/experiments/HARMONY_BIAS.md); 0 = off")
-    parser.add_argument("--comp-style", choices=["shell", "varied"], default="shell",
+    parser.add_argument("--solo-floor", type=int, default=0, metavar="PITCH",
+                        help="with --solo-line: model notes below PITCH are not solo (bass notes leaked into the "
+                             "top line); 0 = off")
+    parser.add_argument("--clean-harmony", action="store_true",
+                        help="scale notes only; a chromatic note must resolve by step to a chord tone")
+    parser.add_argument("--comp-style", choices=["shell", "varied", "guide"], default="shell",
                         help="with --comp: shell = root-3rd-7th on beat 1 / & of 3 (#1620); varied = half-bar "
                              "figures with rootless voice leading (docs/experiments/COMPING.md)")
     parser.add_argument("--candidates", type=int, default=1, metavar="N",
@@ -953,6 +958,8 @@ def main(argv=None):
         parser.error("chord_split must be between 1 and 128 (128 = every held note)")
     if args.comp and not args.solo_line:
         parser.error("--comp goes with --solo-line")
+    if args.clean_harmony and (args.pattern_cache or args.harmony_bias):
+        parser.error("--clean-harmony replaces --harmony-bias and does not combine with --pattern-cache")
     if args.harmony_bias and args.pattern_cache:
         parser.error("--harmony-bias does not combine with --pattern-cache (one logits processor)")
     if args.harmony_bias < 0 or args.repeat_penalty < 0:
@@ -1139,6 +1146,10 @@ def main(argv=None):
             if args.pattern_cache:
                 from scripts.pattern_cache import PatternCacheBias
                 proc = PatternCacheBias()
+            elif args.clean_harmony:
+                # Scale notes only; an outside note must resolve by step (docs/experiments/CLEAN_MODE.md)
+                from inference.control.harmony_bias import CleanHarmony
+                proc = CleanHarmony(chord)
             elif args.harmony_bias:
                 # Soft penalty on the block chord's avoid notes (docs/experiments/HARMONY_BIAS.md)
                 from inference.control.harmony_bias import HarmonyBias
@@ -1178,7 +1189,12 @@ def main(argv=None):
                 comp = None
                 if args.comp:
                     import pretty_midi
-                    if args.comp_style == "varied":
+                    if args.comp_style == "guide":
+                        # Root + 3rd + 7th under the solo, fixed figure cycle (docs/experiments/CLEAN_MODE.md)
+                        from inference.control.comping import guide_half
+                        hits, _figure = guide_half(chord, block=bar_index * args.chord_blocks_per_bar + sub_index,
+                                                   bpm=args.bpm, state=comp_state)
+                    elif args.comp_style == "varied":
                         # Half-bar figures + rootless voice leading (docs/experiments/COMPING.md):
                         # the shell comp was heard as "too mechanical" (user, 2026-10-03).
                         from inference.control.comping import comp_half
@@ -1197,7 +1213,8 @@ def main(argv=None):
                     line_filter = lambda ns, t0=block_start: breath(ns, t0)
                 trace: dict = {}
                 tokens_out = render_block(tokens_out, lookahead_ms=sub_duration * 1000, comp_notes=comp,
-                                          stats=render_stats, line_filter=line_filter, trace=trace)
+                                          stats=render_stats, line_filter=line_filter, trace=trace,
+                                          floor=args.solo_floor, harsh_drop=args.comp_style == "guide")
                 if comp is not None:
                     # Per generated block (not per adopted block): planned vs emitted comp (#1647 review M1).
                     comp_trace[bar_index * args.chord_blocks_per_bar + sub_index] = {
@@ -1393,6 +1410,8 @@ def main(argv=None):
             report["comp"] = bool(args.comp)
             report["comp_style"] = args.comp_style if args.comp else None
             report["harmony_bias"] = args.harmony_bias
+            report["clean_harmony"] = bool(args.clean_harmony)
+            report["solo_floor"] = args.solo_floor
             report["repeat_penalty"] = args.repeat_penalty
             report["rank_repeat_weight"] = args.rank_repeat_weight
             report["comp_trace"] = ([comp_trace.get(i) for i in range(max(comp_trace) + 1)]

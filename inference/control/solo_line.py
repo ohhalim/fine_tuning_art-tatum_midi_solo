@@ -86,7 +86,11 @@ def _padded(notes, total: int):
     return out
 
 
-def solo_line_tokens(tokens, line_filter=None) -> list[int]:
+def _above(notes, floor):
+    return [n for n in notes if n.pitch >= floor] if floor else notes
+
+
+def solo_line_tokens(tokens, line_filter=None, floor: int = 0) -> list[int]:
     """Re-encode ``tokens`` as their top line, same total length; unchanged if that is impossible.
 
     ``line_filter(notes)`` may remove top-line notes first (e.g. a bound PhraseBreath)."""
@@ -96,7 +100,7 @@ def solo_line_tokens(tokens, line_filter=None) -> list[int]:
     notes = tokens_to_notes(tokens)
     if not notes:
         return tokens
-    line = top_notes(notes)
+    line = top_notes(_above(notes, floor))
     if line_filter is not None:
         line = line_filter(line)                                 # all filtered out: a rest block
     out = _padded(line, _steps(tokens))
@@ -115,7 +119,11 @@ def _grid(t: float) -> float:
     return round(round(t * 100) / 100, 2)
 
 
-def solo_with_comp_tokens(tokens, comp_notes, line_filter=None, trace: dict | None = None) -> list[int]:
+HARSH = (1, 11, 13)       # minor 2nd, major 7th, minor 9th between a comp note and a sounding solo note
+
+
+def solo_with_comp_tokens(tokens, comp_notes, line_filter=None, trace: dict | None = None,
+                          floor: int = 0, harsh_drop: bool = False) -> list[int]:
     """Top line plus ``comp_notes`` (e.g. the chord guide voicing), same total length.
 
     A comp note is left out only when the top line holds the same pitch at an
@@ -127,13 +135,16 @@ def solo_with_comp_tokens(tokens, comp_notes, line_filter=None, trace: dict | No
 
     tokens = [int(t) for t in tokens]
     total = _steps(tokens)
-    line = top_notes(tokens_to_notes(tokens))
+    line = top_notes(_above(tokens_to_notes(tokens), floor))
     if line_filter is not None:
         # Once per block (it keeps phrase state), before the comp clash check (#1627 review H1).
         line = line_filter(line)
     limit = total / 100
 
     def clashes(c) -> bool:
+        if harsh_drop:      # also a minor 2nd / major 7th / minor 9th against a sounding solo note (#1665)
+            return any((m.pitch == c.pitch or abs(m.pitch - c.pitch) in HARSH) and m.start < c.end and c.start < m.end
+                       for m in line)
         return any(m.pitch == c.pitch and m.start < c.end and c.start < m.end for m in line)
     comp_notes = [pretty_midi.Note(velocity=n.velocity, pitch=n.pitch, start=_grid(n.start),
                                    end=max(_grid(n.end), _grid(n.start) + 0.01)) for n in comp_notes]
@@ -163,7 +174,7 @@ def solo_with_comp_tokens(tokens, comp_notes, line_filter=None, trace: dict | No
 
 
 def render_block(tokens, *, lookahead_ms: float, comp_notes=None, stats: dict | None = None,
-                 line_filter=None, trace: dict | None = None) -> list[int]:
+                 line_filter=None, trace: dict | None = None, floor: int = 0, harsh_drop: bool = False) -> list[int]:
     """What to schedule for a generated block under --solo-line / --comp.
 
     Astra review: the raw model block is validated first. An invalid raw block
@@ -184,8 +195,8 @@ def render_block(tokens, *, lookahead_ms: float, comp_notes=None, stats: dict | 
         stats["raw_invalid"] = stats.get("raw_invalid", 0) + 1
         trace.update(outcome="raw_invalid", emitted=[])
         return raw
-    rendered = (solo_with_comp_tokens(raw, comp_notes, line_filter, trace) if comp_notes
-                else solo_line_tokens(raw, line_filter))
+    rendered = (solo_with_comp_tokens(raw, comp_notes, line_filter, trace, floor, harsh_drop) if comp_notes
+                else solo_line_tokens(raw, line_filter, floor))
     if not valid(rendered):
         stats["rendered_invalid"] = stats.get("rendered_invalid", 0) + 1
         trace.update(outcome="rendered_invalid", emitted=[])
