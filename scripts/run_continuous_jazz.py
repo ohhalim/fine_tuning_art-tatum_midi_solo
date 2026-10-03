@@ -834,6 +834,9 @@ def main(argv=None):
     parser.add_argument("--comp", action="store_true",
                         help="with --solo-line: short shell-voicing hits (root, 3rd, 7th) on beat 1 and "
                              "the & of 3 so the progression stays audible")
+    parser.add_argument("--comp-style", choices=["shell", "varied"], default="shell",
+                        help="with --comp: shell = root-3rd-7th on beat 1 / & of 3 (#1620); varied = half-bar "
+                             "figures with rootless voice leading (docs/experiments/COMPING.md)")
     parser.add_argument("--candidates", type=int, default=1, metavar="N",
                         help="generate N candidates per sub-block from the same primer and keep the fixed "
                              "ranker's pick (docs/experiments/CANDIDATE_SELECT.md); 1 = off")
@@ -1047,6 +1050,7 @@ def main(argv=None):
         context_carry = {"tokens": []}
         render_stats: dict = {}            # --solo-line: raw vs rendered validity (Astra review)
         candidate_stats: dict = {}         # --candidates: blocks ranked, candidate 0 kept, none qualified
+        comp_state: dict = {}              # --comp-style varied: previous figure / voicing / chord
         breath = None
         if args.phrase_breath:
             from inference.control.solo_line import PhraseBreath
@@ -1152,13 +1156,20 @@ def main(argv=None):
                 from inference.control.solo_line import render_block
                 comp = None
                 if args.comp:
-                    # Short shell-voicing hits, beat 1 and the & of 3 (one per half-bar block):
-                    # "just tell me which chord, short and clean" (user, 2026-10-02).
                     import pretty_midi
-                    from inference.control.solo_line import shell_voicing
-                    at = 0.0 if sub_index == 0 else 0.5 * 60.0 / args.bpm
-                    comp = [pretty_midi.Note(velocity=56, pitch=p, start=at, end=min(at + 0.25, sub_duration))
-                            for p in shell_voicing(chord)]
+                    if args.comp_style == "varied":
+                        # Half-bar figures + rootless voice leading (docs/experiments/COMPING.md):
+                        # the shell comp was heard as "too mechanical" (user, 2026-10-03).
+                        from inference.control.comping import comp_half
+                        hits, _figure = comp_half(chord, block=bar_index * args.chord_blocks_per_bar + sub_index,
+                                                  bpm=args.bpm, seed=args.seed, state=comp_state)
+                    else:
+                        # Short shell-voicing hits, beat 1 and the & of 3 (one per half-bar block):
+                        # "just tell me which chord, short and clean" (user, 2026-10-02).
+                        from inference.control.comping import shell_half
+                        hits = shell_half(chord, sub_index=sub_index, bpm=args.bpm)
+                    comp = [pretty_midi.Note(velocity=v, pitch=p, start=s0, end=min(e0, sub_duration))
+                            for p, s0, e0, v in hits if s0 < sub_duration]
                 line_filter = None
                 if breath is not None:
                     block_start = (bar_index * args.chord_blocks_per_bar + sub_index) * sub_duration
@@ -1351,6 +1362,7 @@ def main(argv=None):
                 report["phrase_breath"] = ({"max_notes": breath.max_notes, "rest_s": breath.rest_s,
                                             "dropped_notes": breath.dropped} if breath else None)
             report["comp"] = bool(args.comp)
+            report["comp_style"] = args.comp_style if args.comp else None
             report["candidates"] = args.candidates
             report["candidate_stats"] = dict(candidate_stats) if args.candidates > 1 else None
             if echo_guard is not None:
