@@ -107,6 +107,14 @@ def _note_row(n) -> list:
     return [int(n.pitch), round(float(n.start), 4), round(float(n.end), 4), int(n.velocity)]
 
 
+def _grid(t: float) -> float:
+    """The 10 ms token grid. Model output is already on it; comp hits at beat fractions
+    (e.g. 1.5 beats = 0.703125 s at 128 BPM) are not, and the encoder rounds each delta
+    while keeping raw times, so off-grid comp shifted the solo notes after it by up to
+    ~28 ms (#1649 review)."""
+    return round(round(t * 100) / 100, 2)
+
+
 def solo_with_comp_tokens(tokens, comp_notes, line_filter=None, trace: dict | None = None) -> list[int]:
     """Top line plus ``comp_notes`` (e.g. the chord guide voicing), same total length.
 
@@ -127,6 +135,8 @@ def solo_with_comp_tokens(tokens, comp_notes, line_filter=None, trace: dict | No
 
     def clashes(c) -> bool:
         return any(m.pitch == c.pitch and m.start < c.end and c.start < m.end for m in line)
+    comp_notes = [pretty_midi.Note(velocity=n.velocity, pitch=n.pitch, start=_grid(n.start),
+                                   end=max(_grid(n.end), _grid(n.start) + 0.01)) for n in comp_notes]
     comp, dropped = [], {}
     for n in comp_notes:
         reason = "past_block_end" if n.start >= limit else "same_pitch_overlap" if clashes(n) else None

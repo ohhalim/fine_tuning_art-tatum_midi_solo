@@ -186,6 +186,34 @@ class CompTraceTest(unittest.TestCase):
         self.assertEqual((trace["outcome"], trace["emitted"]), ("raw_invalid", []))
 
 
+class GridProvenanceTest(unittest.TestCase):
+    """Comp at beat fractions must not move the solo; emitted comp is in the output 1:1 (#1649 review)."""
+
+    def test_solo_unchanged_and_comp_exact_on_random_blocks(self) -> None:
+        import random
+        from inference.control.comping import comp_half
+        rng = random.Random(0)
+        for trial in range(60):
+            t, solo = 0.0, []
+            while True:                                          # model-like: times on the 10 ms grid
+                t = round(t + rng.choice([0.07, 0.12, 0.23, 0.05]), 2)
+                if t >= 0.9:
+                    break
+                solo.append(note(rng.randrange(66, 84), t, round(min(t + rng.choice([0.05, 0.1]), 0.93), 2)))
+            toks = encode_notes_simple(solo) + [255 + 3]         # pad toward the 0.9375 s block
+            hits, _ = comp_half(rng.choice(["Dm7", "G7", "Cmaj7", "Bb7"]), block=trial, bpm=128, seed=1,
+                                state={"chord": None})
+            comp = [note(p, s0, e0, v) for p, s0, e0, v in hits]
+            trace = {}
+            out = solo_with_comp_tokens(toks, comp, trace=trace)
+            dec = tokens_to_notes(out)
+            alone = tokens_to_notes(solo_line_tokens(toks))
+            key = lambda n: (n.pitch, round(n.start, 3), round(n.end, 3), n.velocity // 4)
+            self.assertEqual(sorted(key(n) for n in dec if n.pitch >= 66), sorted(key(n) for n in alone), trial)
+            got = sorted((n.pitch, round(n.start, 3), round(n.end, 3)) for n in dec if n.pitch < 66)
+            self.assertEqual(got, sorted((p, round(s0, 3), round(e0, 3)) for p, s0, e0, _ in trace["emitted"]), trial)
+
+
 class ShellVoicingTest(unittest.TestCase):
     def test_root_third_seventh_without_seconds(self) -> None:
         from inference.control.solo_line import shell_voicing
