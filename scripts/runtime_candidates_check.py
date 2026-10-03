@@ -53,7 +53,14 @@ def run_stats(report) -> dict:
             "completed": bool(report["run_completed"]) and report["completed_bars"] == report["bars"]}
 
 
+EXPECT = {"bpm": 128, "bars": 16, "temperature": 1.0, "context_carry_tokens": 0, "context_history": False,
+          "pattern_cache": False, "start_budget_bars": 0.5, "fetch_margin_ms": 50.0}
+
+
 def check_set(dirs, n: int) -> list[str]:
+    """Exact paired set, completed, preregistered settings (#1640 review: completion was not in the verdict)."""
+    from scripts.play_personalized import CHECKPOINTS
+
     problems, seen = [], set()
     for d in dirs:
         name = Path(d).name
@@ -69,6 +76,17 @@ def check_set(dirs, n: int) -> list[str]:
             problems.append(f"{name}: chords differ")
         if r.get("candidates") != n or not r.get("solo_line") or r.get("comp") or r.get("phrase_breath"):
             problems.append(f"{name}: settings differ (candidates {r.get('candidates')})")
+        for k, v in EXPECT.items():
+            if r.get(k) != v:
+                problems.append(f"{name}: {k} = {r.get(k)!r}, expected {v!r}")
+        if not r.get("run_completed") or r.get("completed_bars") != r.get("bars"):
+            problems.append(f"{name}: not completed")
+        if r.get("seed") != int(s.lstrip("s")):
+            problems.append(f"{name}: report seed {r.get('seed')}")
+        if not str(r.get("checkpoint", "")).endswith(CHECKPOINTS["bebop"]):
+            problems.append(f"{name}: checkpoint {r.get('checkpoint')}")
+        if (tag, s) in seen:
+            problems.append(f"{name}: duplicate")
         seen.add((tag, s))
     problems += [f"missing {t}_s{s}" for t in PROGRESSIONS for s in SEEDS if (t, f"s{s}") not in seen]
     return problems
@@ -100,11 +118,16 @@ def main(argv=None) -> int:
             "gen_ms_p50": pctl(gen, 0.5), "gen_ms_p95": pctl(gen, 0.95), "gen_ms_p99": pctl(gen, 0.99),
             "gen_samples": len(gen),
             "notes_per_s": sum(s["notes"] for s in stats) / sum(s["seconds"] for s in stats),
-            "on_beat_clash": sum(s["on_beat_clash"] for s in stats) / sum(s["on_beat"] for s in stats),
+            "on_beat_clash": (sum(s["on_beat_clash"] for s in stats) / sum(s["on_beat"] for s in stats)
+                              if sum(s["on_beat"] for s in stats) else None),
+            "on_beat_clash_n": sum(s["on_beat"] for s in stats),
             "candidate_stats": [r.get("candidate_stats") for r in reports],
         }
     block_ms = 60000.0 / 128 * 2
     a, b = out["N1"], out["N3"]
+    if not a["on_beat_clash_n"] or not b["on_beat_clash_n"]:
+        print(json.dumps({"indeterminate": "no on-beat notes in an arm"}))
+        return 3
     verdict = {
         "fallback_0": b["fallback_total"] == 0,
         "gen_p99_le_0.6_block": b["gen_ms_p99"] is not None and b["gen_ms_p99"] <= 0.6 * block_ms,
