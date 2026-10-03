@@ -96,7 +96,10 @@ def swing(notes, bpm: float, ratio: float = 2 / 3, min_s: float = 0.12):
     """Swung onsets for straight-eighth notes [(pitch, onset, end, velocity)].
 
     Off-beat eighths move later; each note's length is then recomputed from the next
-    onset (#1669: mapping the ends too squeezed off-beat notes to ~0.07 s, "plinky")."""
+    onset (#1669: mapping the ends too squeezed off-beat notes to ~0.07 s, "plinky").
+    ``min_s`` lengthens short notes only up to the next later onset: after a short
+    inter-onset interval the note stays short rather than overlapping the next one
+    (#1669's final ``max`` let two same-pitch notes overlap by 42 ms)."""
     beat = 60.0 / bpm
 
     def at(t):
@@ -110,9 +113,11 @@ def swing(notes, bpm: float, ratio: float = 2 / 3, min_s: float = 0.12):
     out = []
     for k, (p, s, e, v) in enumerate(notes):
         length = e - s
-        nxt = ons[k + 1] if k + 1 < len(notes) else None
+        nxt = min((o for o in ons[k + 1:] if o > ons[k]), default=None)    # chord tones share an onset
         end = ons[k] + max(min_s, length)
-        if nxt is not None and nxt - ons[k] > 0 and length >= (nxt - ons[k]) * 0.8:   # legato into the next note
-            end = nxt - 0.01
-        out.append((p, ons[k], max(end, ons[k] + min_s), v))
+        if nxt is not None:
+            if length >= (nxt - ons[k]) * 0.8:                              # legato into the next note
+                end = nxt - 0.01
+            end = min(end, nxt - 0.01)
+        out.append((p, ons[k], max(end, ons[k] + 0.01), v))
     return out

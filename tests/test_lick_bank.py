@@ -5,7 +5,7 @@ import unittest
 
 import pretty_midi
 
-from inference.control.lick_bank import build, lick_from_run, plan
+from inference.control.lick_bank import build, lick_from_run, plan, swing
 
 
 def run(n, ioi=0.15, start=0.0, base=70):
@@ -29,6 +29,22 @@ class LickTest(unittest.TestCase):
         ev = plan(bank, bars=8, bpm=128, seed=1)
         self.assertGreater(ev[-1]["onset"], 8 * 4 * 60 / 128 * 0.75)
         self.assertTrue(all(e["interval"] is None for e in ev if e is ev[0]))
+
+    def test_swing_never_overlaps_the_next_onset(self) -> None:
+        # Astra's repro on #1669: min_s=0.12 used to push the first end past the second onset (42 ms same-pitch overlap)
+        out = swing([(60, 0.234375, 0.344375, 70), (60, 0.3515625, 0.4615625, 70)], 128)
+        self.assertLess(out[0][2], out[1][1])
+        self.assertGreater(out[0][2], out[0][1])
+
+    def test_swing_keeps_min_length_when_there_is_room(self) -> None:
+        out = swing([(60, 0.0, 0.05, 70), (62, 0.46875, 0.6, 70)], 128)
+        self.assertAlmostEqual(out[0][2] - out[0][1], 0.12)
+
+    def test_swing_chord_tones_end_before_the_next_chord(self) -> None:
+        chord = [(48, 0.0, 0.5, 46), (52, 0.0, 0.5, 46), (48, 0.46875, 0.8, 46), (52, 0.46875, 0.8, 46)]
+        out = swing(chord, 128)
+        for p, s, e, _ in out[:2]:
+            self.assertLess(e, out[2][1])
 
 
 if __name__ == "__main__":
