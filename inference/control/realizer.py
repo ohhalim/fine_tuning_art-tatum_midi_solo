@@ -47,8 +47,11 @@ def _fold(target: float) -> float:
     return target
 
 
-def _nearest(target: float, allowed_pcs, direction: int = 0, prev: int | None = None) -> int:
+def _nearest(target: float, allowed_pcs, direction: int = 0, prev: int | None = None, avoid=()) -> int:
     cands = [p for p in range(LOW, HIGH + 1) if p % 12 in allowed_pcs]
+    if avoid:                             # no semitone / minor 9th / major 7th against a sounding comp note
+        clear = [p for p in cands if all((p - q) % 12 not in (1, 11) for q in avoid)]
+        cands = clear or cands
     target = _fold(target)
     if direction and prev is not None:
         dirn = [p for p in cands if (p - prev) * direction > 0]
@@ -58,35 +61,64 @@ def _nearest(target: float, allowed_pcs, direction: int = 0, prev: int | None = 
     return min(cands, key=lambda p: (abs(p - target), p))
 
 
-def realize(events, *, chord_at, bpm: float, start: int = 72):
+def realize(events, *, chord_at, bpm: float, start: int = 72, comp_at=None):
     """Pitched notes [(pitch, onset, end, velocity)] for an abstract phrase sequence.
 
-    ``chord_at(t) -> (chord tone pcs, scale pcs)``."""
+    ``chord_at(t) -> (chord tone pcs, scale pcs)``; ``comp_at(t0, t1) -> comp pitches sounding in
+    [t0, t1)`` (optional): candidates a semitone / minor 9th / major 7th from them are skipped.
+
+    An approach note is placed only on a short weak note right before an anchor, and
+    the anchor is then fixed to the goal it approaches (#1669: the first version computed
+    the next note independently, so approaches did not resolve and Gb over Fmaj7 or B
+    over Gm7 stayed). Chromatic approaches come from a half step below; from above the
+    approach is the scale tone above the goal."""
     beat = 60.0 / bpm
-    out, prev = [], None
+    out, prev, forced = [], None, None
+
+    def is_anchor(ev):
+        return abs(ev["onset"] - round(ev["onset"] / beat) * beat) <= 0.03 or ev["dur"] >= LONG_S or ev["phrase_end"]
+
     for i, ev in enumerate(events):
         tones, scale = chord_at(ev["onset"])
-        anchor = (abs(ev["onset"] - round(ev["onset"] / beat) * beat) <= 0.03 or ev["dur"] >= LONG_S
-                  or ev["phrase_end"])
-        if ev["interval"] is None or prev is None:
-            target, direction = (prev if prev is not None else start), 0
-        else:
-            target, direction = prev + ev["interval"], (ev["interval"] > 0) - (ev["interval"] < 0)
-        if direction == 0 and ev["interval"] == 0 and prev is not None:
+        anchor = is_anchor(ev)
+        avoid = comp_at(ev["onset"], ev["onset"] + ev["dur"]) if comp_at else ()
+        if forced is not None:
+            pitch, forced = forced, None
+        elif ev["interval"] is None or prev is None:
+            pitch = _nearest(prev if prev is not None else start, tones, avoid=avoid)
+        elif ev["interval"] == 0:
             pitch = prev                                          # the source repeats here
         else:
-            pitch = _nearest(target, tones if anchor else scale, direction, prev)
+            direction = 1 if ev["interval"] > 0 else -1
+            pitch = _nearest(prev + ev["interval"], tones if anchor else scale, direction, prev, avoid)
             nxt = events[i + 1] if i + 1 < len(events) else None
-            if (not anchor and nxt is not None and nxt["interval"] is not None and 0 < abs(nxt["interval"]) <= 2):
-                ntones, _ = chord_at(nxt["onset"])
-                nxt_anchor = (abs(nxt["onset"] - round(nxt["onset"] / beat) * beat) <= 0.03
-                              or nxt["dur"] >= LONG_S or nxt["phrase_end"])
-                if nxt_anchor:
-                    goal = _nearest(pitch + nxt["interval"], ntones)
-                    approach = goal - (1 if nxt["interval"] > 0 else -1)
-                    if LOW <= approach <= HIGH:
-                        pitch = approach                          # chromatic approach into the anchor
-        pitch = max(LOW, min(HIGH, pitch))
+            if (not anchor and ev["dur"] <= 0.2 and nxt is not None and nxt["interval"] is not None
+                    and 0 < abs(nxt["interval"]) <= 2 and is_anchor(nxt)):
+                ntones, nscale = chord_at(nxt["onset"])
+                goal = _nearest(pitch + nxt["interval"], ntones)
+                if nxt["interval"] > 0:
+                    approach = goal - 1                           # chromatic from below
+                else:
+                    above = [p for p in range(goal + 1, goal + 3) if p % 12 in nscale]
+                    approach = above[0] if above else goal + 2    # scale tone from above
+                if LOW <= approach <= HIGH and approach != prev:
+                    pitch, forced = approach, goal
+        pitch = int(_fold(pitch))
         out.append((pitch, ev["onset"], ev["onset"] + ev["dur"], ev["velocity"]))
         prev = pitch
+    return out
+
+
+def clear_comp(solo, comp, chord_at):
+    """Final pass on the played timeline: a solo note sounding a semitone / minor 9th / major 7th
+    from an overlapping comp note moves to the nearest chord tone that clashes with nothing (#1669)."""
+    out = []
+    for k, (p, s, e, v) in enumerate(solo):
+        sound = [q for q, cs, ce, _ in comp if min(e, ce) - max(s, cs) > 0.02]
+        if any((p - q) % 12 in (1, 11) for q in sound):
+            tones, _ = chord_at(s)
+            cands = [c for c in range(LOW, HIGH + 1) if c % 12 in tones and all((c - q) % 12 not in (1, 11) for q in sound)]
+            if cands:
+                p = min(cands, key=lambda c: (abs(c - p), c))
+        out.append((p, s, e, v))
     return out
