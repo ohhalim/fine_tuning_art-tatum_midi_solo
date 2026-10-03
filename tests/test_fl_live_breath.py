@@ -54,5 +54,14 @@ class CarryTest(unittest.TestCase):
         self.assertEqual(cmd[cmd.index("--context-carry-position") + 1], "after")
 
 
+class BiasTest(unittest.TestCase):
+    def test_bias_and_repeat(self) -> None:
+        self.assertNotIn("--harmony-bias", command("--preset", "bebop"))
+        cmd = command("--preset", "bebop", "--bias", "2", "--repeat", "0.5")
+        self.assertEqual(cmd[cmd.index("--harmony-bias") + 1], "2.0")
+        self.assertEqual(cmd[cmd.index("--repeat-penalty") + 1], "0.5")
+        self.assertNotIn("--repeat-penalty", command("--preset", "bebop", "--repeat", "0.5"))
+
+
 if __name__ == "__main__":
     unittest.main()

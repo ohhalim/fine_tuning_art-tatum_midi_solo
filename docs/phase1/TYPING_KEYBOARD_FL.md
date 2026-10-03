@@ -16,6 +16,7 @@
    - `--preset bebop`(#1620): 비밥 피아니스트 오른손으로 학습한 어댑터. 솔로는 맨 위 선율만, 컴핑은 근음·3음·7음을 1박과 3박 &에 짧게 친다(지금 코드만 알려 주는 용도)
    - `--breath 24`(#1626): 솔로가 쉬지 않고 24음을 치면 0.4초 비운다. 기본값은 꺼짐. 권장 조합은 `fl_live.py --preset bebop --breath 24 --bars 64`
    - 2026-10-03 권장 조합(객관 검사 통과, 청취 미검증): `fl_live.py --preset bebop --breath 24 --candidates 2 --carry 48 --bars 64`. 컴핑은 기본값(varied). 대체 패턴(엉뚱한 화음 패턴)이 들리면 CPU 여유가 부족한 것이다. `--candidates 1`로 낮춘다(COMBINED_CHECK.md: 예산 여유 11 ms)
+   - 2026-10-03 밤 불협 감소 조합(확인 실험에서 기준 1개 근소 미달, 청취 미검증): `fl_live.py --preset bebop --breath 24 --carry 48 --bias 2 --repeat 0.5 --bars 64`. 후보 1개라 처리 여유가 크다(p99 약 250 ms). N1_BIAS_SWEEP.md 참고
 - macOS IAC(포트 "AI In"과 두 번째 버스)와 FL MIDI 설정(출력 IAC AI In Port 5, 입력 IAC 두 번째 버스 Port 7)은 프로젝트 밖 설정이라 그대로 유지된다
 - 2026-10-01 실연결: 입력이 런타임에 들어오고(150–176번 블록 입력 3음), AI 음이 Serum #2로 나왔다. 사용자 청취 소감은 "무작위적"이다. 연결은 되지만 내용은 아직 쓸 만하지 않다
 사용자 지적: FL Studio는 자판 입력을 이미 받는다. 그래서 별도 자판 도구 없이 FL에서 MIDI를 내보내고 다시 받으면 된다.
