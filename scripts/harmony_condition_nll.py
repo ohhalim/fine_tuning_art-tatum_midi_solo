@@ -117,7 +117,13 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--output-dir", type=Path, required=True)
     ap.add_argument("--models", nargs="+", default=list(MODELS))
+    ap.add_argument("--add-model", action="append", default=[], metavar="NAME=CHECKPOINT",
+                    help="score another checkpoint too (e.g. guide=outputs/bebop_guide/export/...)")
     args = ap.parse_args(argv)
+    for spec in args.add_model:
+        name, path = spec.split("=", 1)
+        MODELS[name] = path
+        args.models.append(name)
     os.environ.setdefault("FORCE_CPU", "1")
     from inference.control.harmony_contract import guide_notes
     from scripts.generate import load_model_with_lora
