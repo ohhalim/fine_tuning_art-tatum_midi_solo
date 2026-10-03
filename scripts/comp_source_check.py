@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 for p in (ROOT, ROOT / "music_transformer", ROOT / "scripts"):
     sys.path.insert(0, str(p))
 
-TOL = 0.012
+TOL = 0.006           # comp is snapped to the 10 ms token grid before merging: the join is exact up to float error
 PROGRESSIONS = {"iiVIF": "Gm7,C7,Fmaj7,Fmaj7", "rhythmA": "Bbmaj7,G7,Cm7,F7", "minorA": "Bm7b5,E7,Am7,Am7"}
 SEEDS = (42, 43)
 EXPECT = {"bpm": 128, "bars": 16, "candidates": 2, "comp_style": "varied", "solo_line": True}
@@ -58,17 +58,38 @@ def tag_run(r) -> dict:
                 align_ok += 1
         prev_chord = t["chord"]
     played = [(n[0], b["bar"] * bar_s + n[1], b["bar"] * bar_s + n[2]) for b in r["played_bars"] for n in b["notes"]]
-    used, comp, solo = set(), [], []
+    model_block = lambda t: (int(t // half) < len(sources) and sources[int(t // half)] == "model")
+    used, comp, solo, unknown, fallback = set(), [], [], [], []
     for n in played:
+        if not model_block(n[1]):
+            fallback.append(n)                               # fallback blocks: not model solo, not traced comp
+            continue
         hit = next((j for j, c in enumerate(emitted_abs)
-                    if j not in used and c[0] == n[0] and abs(c[1] - n[1]) <= TOL), None)
-        if hit is None:
-            solo.append(n)
-        else:
+                    if j not in used and c[0] == n[0] and abs(c[1] - n[1]) <= TOL and abs(c[2] - n[2]) <= TOL), None)
+        if hit is not None:
             used.add(hit)
             comp.append(n)
+        elif any(c[0] == n[0] and abs(c[1] - n[1]) <= 0.05 for c in emitted_abs):
+            unknown.append(n)                                # near an emitted comp note but not exact: ambiguous
+        else:
+            solo.append(n)
+    # composite at each chord change: do the 3rd and 7th sound (comp or solo) within the first beat?
+    comp_ok = union_ok = changes = 0
+    prev = None
+    for i, t in enumerate(trace):
+        if t is None or i >= len(sources) or sources[i] != "model":
+            prev = t["chord"] if t else prev
+            continue
+        if t["chord"] != prev:
+            changes += 1
+            root, (third, fifth, seventh, ninth) = chord_tones(t["chord"])
+            t0 = i * half
+            sounding = {p % 12 for p, s0, e0 in comp + solo if s0 < t0 + beat and e0 > t0}
+            union_ok += int({third, seventh} <= sounding)
+        prev = t["chord"]
     return {"emitted": len(emitted_abs), "planned": planned_n, "played_comp": len(comp), "dropped": dropped,
-            "align_ok": align_ok, "align_n": align_n, "solo": solo, "seconds": bars * bar_s,
+            "align_ok": align_ok, "align_n": align_n, "union_ok": union_ok, "union_n": changes,
+            "unknown": len(unknown), "fallback_notes": len(fallback), "solo": solo, "seconds": bars * bar_s,
             "fallback": r["production"]["fallback_bar_count"], "misses": r["scheduler_dispatch_deadline_miss_count"],
             "render": r.get("solo_line_render") or {},
             "gen_ms": [b["generation_ms"] for b in r["bars_detail"] if b.get("generation_ms") is not None]}
@@ -91,6 +112,8 @@ def solo_metrics(solo, seconds: float) -> dict:
         prev_end = max(prev_end, n.end)
     if cur:
         phrases.append(cur)
+    if seconds - prev_end >= REST_S:                         # trailing rest, as runtime_rh_check counts it
+        gaps.append(seconds - prev_end)
     return {"notes": len(line), "rest_time": sum(gaps), "phrases": phrases, "seconds": seconds}
 
 
@@ -149,6 +172,8 @@ def main(argv=None) -> int:
         "comp_planned": sum(r["planned"] for r in rows), "comp_emitted": sum(r["emitted"] for r in rows),
         "comp_played": sum(r["played_comp"] for r in rows), "dropped": dropped,
         "emitted_alignment": sum(r["align_ok"] for r in rows) / sum(r["align_n"] for r in rows),
+        "composite_alignment": sum(r["union_ok"] for r in rows) / sum(r["union_n"] for r in rows),
+        "unknown_notes": sum(r["unknown"] for r in rows), "fallback_notes": sum(r["fallback_notes"] for r in rows),
         "solo_notes_per_s": sum(s["notes"] for s in sm) / sum(s["seconds"] for s in sm),
         "solo_rest_share": sum(s["rest_time"] for s in sm) / sum(s["seconds"] for s in sm),
         "solo_phrase_median": phrases[len(phrases) // 2] if phrases else None,
