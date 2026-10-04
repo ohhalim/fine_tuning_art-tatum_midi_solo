@@ -133,3 +133,42 @@ def guide_half(chord: str, *, block: int, bpm: float, state: dict):
         notes += [(p, t0, t1, GUIDE_VEL) for p in pair]
     state["chord"] = chord
     return notes, "guide"
+
+
+GUIDE_ALTERNATIVES = (("3", "7"), ("3", "5"), ("5", "7"), ("1", "3"), ("1", "7"))   # docs/experiments/C1_COMP_AB.md
+
+
+def solo_clashes(upper, solo, t0: float, t1: float, overlap: float = 0.02):
+    """[(solo pitch, comp pitch, overlap s)] where a solo note sounding over [t0, t1) lies a
+    semitone (mod 12) above a comp pitch: minor 2nd, minor 9th and their compounds."""
+    out = []
+    for p, s, e in solo:
+        ov = min(e, t1) - max(s, t0)
+        if ov > overlap:
+            out += [(p, q, ov) for q in upper if p > q and (p - q) % 12 == 1]
+    return out
+
+
+def revoice_strike(chord: str, upper, solo, t0: float, t1: float):
+    """C1: the guide pair for one strike, re-chosen among the chord's own tones in C3-B3
+    when it clashes with the solo (``solo_clashes``). Dominant sevenths keep 3 + 7 (their
+    tritone is the function); no clash-free candidate keeps the original. Returns
+    (pitches, info) with info["status"] in clear / changed / unresolved / dominant_kept."""
+    from inference.app.fallback import parse_chord
+
+    root, iv = parse_chord(chord)
+    tone = {"1": root, "3": (root + iv[1]) % 12, "5": (root + iv[2]) % 12, "7": (root + iv[3]) % 12}
+    place = lambda pc: GUIDE_LOW + (pc - GUIDE_LOW) % 12
+    before = solo_clashes(upper, solo, t0, t1)
+    info = {"before": before}
+    if not before:
+        return tuple(upper), {**info, "status": "clear"}
+    if iv[1] == 4 and iv[3] == 10:
+        return tuple(upper), {**info, "status": "dominant_kept"}
+    for names in GUIDE_ALTERNATIVES:
+        cand = tuple(sorted(place(tone[n]) for n in names))
+        if len(set(c % 12 for c in cand)) == 2 and not solo_clashes(cand, solo, t0, t1):
+            omitted = [n for n in ("3", "7") if n not in names]
+            filled = {n: any(p % 12 == tone[n] and min(e, t1) - max(s, t0) > 0.02 for p, s, e in solo) for n in omitted}
+            return cand, {**info, "status": "changed", "voicing": names, "omitted": omitted, "solo_fills_omitted": filled}
+    return tuple(upper), {**info, "status": "unresolved"}
