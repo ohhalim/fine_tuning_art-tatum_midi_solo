@@ -32,6 +32,15 @@ def load(path):
     return pm, solo, comp
 
 
+def bar_of(pm, t: float, beats_per_bar: int = 4) -> int:
+    """Bar index from the event's MIDI tick, not its read-back seconds: PrettyMIDI returns a
+    strike written on a bar line ~20 us early, and a seconds tolerance would also pull a
+    deliberate anticipation just before the line into the next bar (Astra on #1678)."""
+    tempos = pm.get_tempo_changes()[1]
+    assert len(tempos) == 1, "one tempo expected"
+    return int(pm.time_to_tick(t)) // (pm.resolution * beats_per_bar)
+
+
 def strikes(comp):
     groups = {}
     for n in comp:
@@ -70,7 +79,7 @@ def main(argv=None) -> int:
             upper = sorted((n for n in strike if n.pitch >= UPPER_LOW), key=lambda n: n.pitch)
             t0, t1 = strike[0].start, max(n.end for n in strike)
             assert all(abs(n.start - t0) < 1e-6 and abs(n.end - upper[0].end) < 1e-6 for n in upper), "upper notes differ in time"
-            bar = int(t0 / BAR + 1e-3)        # a strike on a bar line belongs to the new bar (MIDI ticks read back ~20 us early)
+            bar = bar_of(pm, t0)
             chord = CHORDS[bar % len(CHORDS)]
             pitches, info = revoice_strike(chord, tuple(n.pitch for n in upper), solo3, upper[0].start, upper[0].end)
             new_comp += [pretty_midi.Note(velocity=n.velocity, pitch=n.pitch, start=n.start, end=n.end) for n in bass]
