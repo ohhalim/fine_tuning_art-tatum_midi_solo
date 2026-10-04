@@ -64,7 +64,7 @@
 | AMT (TMLR 2024) | 임의의 음표 스트림을 '컨트롤'로 인터리브 [직접 확인] | Small 128M·Medium 360M은 Lakh만 사용. Large-800k(780M)는 Lakh·MetaMIDI·FMA 전사·상용 녹음 45만 곡 전사 [검색 요약] ([HF music-large-800k](https://huggingface.co/stanford-crfm/music-large-800k)) | 반주 과제에서 사람 대비 18승 31무 11패(p = 0.194) [검색 요약] ([AMT 논문](https://arxiv.org/pdf/2306.08620)) | 코드 Apache-2.0 [직접 확인]. HF 카드도 Apache-2.0(저작권 데이터 주의 문구 포함) [검색 요약] |
 | Aria (ISMIR 2025) | 없음. 조건 임베딩 클래스 `TransformerLM_CND`는 있음 [직접 확인] | 전사 솔로 피아노 약 6만 시간, 약 658M [직접 확인·계산] | 46명이 AMT·MusicGen보다 선호 [검색 요약] | Apache-2.0 [직접 확인] ([EleutherAI/aria](https://github.com/EleutherAI/aria)). 학습 데이터는 CC BY-NC-SA [직접 확인] |
 | Edwards 외 (ISMIR 2026) | 없음(연주자 12명 임베딩에 대한 교차 주의) | Aria-medium + PiJAMA-12 | 분류기 평가만 있음: 의도 연주자 귀속 약 +33%p, 87%·95% [검색 요약] ([논문](https://webspace.eecs.qmul.ac.uk/s.e.dixon/pub/2026/EdwardsEtAl-ISMIR2026.pdf)) | HF 가중치 공개, 라이선스 미확인 |
-| Moonbeam (2025) | 코드·메타데이터 조건 미세조정 레시피 [직접 확인] | 8.16만 시간, 309M/839M [검색 요약] | 전문가 청취에서 코드 조건 적합성이 REMI 기준선보다 나음 [검색 요약] ([arXiv](https://arxiv.org/abs/2505.15559)) | Apache-2.0. 조건부 체크포인트는 'TODO' [직접 확인] ([Moonbeam](https://github.com/guozixunnicolas/Moonbeam-MIDI-Foundation-Model)) |
+| Moonbeam (2025) | 코드·메타데이터 조건 미세조정 레시피 [직접 확인] | 8.16만 시간, 309M/839M [검색 요약] | 전문가 청취에서 코드 조건 적합성이 REMI 기준선보다 나음 [검색 요약] ([arXiv](https://arxiv.org/abs/2505.15559)) | Apache-2.0. GitHub README의 조건부 체크포인트 링크는 'TODO'지만, HF에 ComMU 조건부 LoRA 어댑터(r8)와 309M·839M 가중치가 공개돼 있다 [직접 확인, 2026-10-03 정정: 처음에는 README만 보고 미공개로 적었다] ([Moonbeam](https://github.com/guozixunnicolas/Moonbeam-MIDI-Foundation-Model), [HF](https://huggingface.co/guozixunnicolas/moonbeam-midi-foundation-model)) |
 | MIDI-GPT (AAAI 2025) | 마디 단위 피치클래스 집합·조성 컨트롤 [직접 확인] | `expressive_medium`은 재즈·솔로 피아노 권장 [직접 확인] ([models.md](https://github.com/Metacreation-Lab/MIDI-GPT/blob/main/docs/models.md)) | 재즈 청취 근거 미발견 | GitHub MIT [직접 확인] vs HF 카드 CC BY-NC [검색 요약]. 서로 충돌 |
 
 MINGUS 평가는 세 가지 이유로 약한 근거다 [추론]. 평가자가 28명뿐이고 시스템당 클립이 5개다. 측정한 것은 화성 정확성이 아니라 선호도다. 그리고 모든 클립이 색소폰·트럼펫 관용구다.
@@ -458,3 +458,4 @@ FL Studio는 MIDI 클록을 보낼 수만 있고 받지 못한다. 그래서 FL�
 7. 지연 추정치를 설계 보장으로 쓰지 않음: 현 실측(M1 Max, p99 219/355 ms, 예산 약 419 ms)을 명시하고 포팅은 측정 근거가 생길 때만
 8. 라이선스 단정('GPL 코드를 가져오면 시스템 전체가 GPL', '비수익 데모는 모두 양립') 삭제, 미검증으로 표기
 9. R1~R6을 보수적 '안쪽' preset의 진단 규칙으로 한정: unknown 처리, 음별 근거 출력, 오탐 확인
+10. (2026-10-04) Moonbeam 행 정정: 조건부 체크포인트는 HF에 공개돼 있다. 2·3차 조사와 그 뒤 결정은 `MODEL_SELECTION_ROUND2_3.md`에 기록했다
