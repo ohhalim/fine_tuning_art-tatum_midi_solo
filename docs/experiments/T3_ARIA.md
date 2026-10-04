@@ -18,15 +18,18 @@
 ## 프라이머 (B, 생성 전에 고정)
 - **P1(양성 대조):** Aria 공식 예시 `example-prompts/pokey_jazz.mid`. 저자가 잘 연주된 입력으로 제공한 파일이라, 설치와 사용이 맞는지 확인하는 용도다
 - **P2, P3(우리 데이터):** `data/bebop_rh` test split에서 오른손 초당 음 수가 가장 높은 두 곡을 쓴다. 발라드가 아닌 빠른 라인을 보기 위해서다
-  - P2: Kenny Barron "Bud-Like"(5.50음/초)
-  - P3: Harold Mabern "Blues in FT-Bone Steak"(5.21음/초)
+  - P2: Harold Mabern "Joy Spring"(6.08음/초)
+  - P3: Kenny Barron "Bud-Like"(5.50음/초)
+  - 정정(생성 전): 처음 문서에는 P2 = Bud-Like, P3 = Mabern "Blues in FT-Bone Steak"(5.21)로 적었다. 연주자별 첫 곡만 보고 옮겨 적은 실수다. 규칙("초당 음 수 상위 2곡")대로 뽑으면 위 두 곡이다. 출력을 보기 전에 고쳤다
   - 원 MIDI 양손 그대로 60.0–68.0초 구간을 잘라 0초로 옮긴다. 라이브 녹음의 도입부를 피하려고 60초부터 잡았다
+  - 원 MIDI에는 페달(CC) 이벤트가 없다(PiJAMA 전사). 프라이머에도 없다
 - 프라이머 길이는 셋 다 8초(`--prompt_duration 8`). 미래 정답 음은 주지 않는다
 
 ## 생성 (D)
 - 공식 README 예시 샘플러: `--temp 0.98 --min_p 0.035`
 - 프라이머마다 `--variations 2`. 6개 전부 보고한다. 좋은 것만 고르지 않는다
-- 길이와 seed 옵션은 `aria generate -h`에서 확인해 결과에 적는다. 결과를 본 뒤 바꾸지 않는다
+- 길이: `--length 1024`(변형당 생성 토큰 수, 약 30초 분량으로 추정). README 예시는 2048이다. 청취 부담 때문에 1024로 정했고, 결과를 본 뒤 바꾸지 않는다
+- seed: CLI에 seed 옵션이 없다. 변형은 재현되지 않는다. 그래서 출력 MIDI 자체를 보존한다
 
 ## 출력과 청취 (C, F)
 - **양손 원본 출력이 주 청취물이다.** 페달, velocity, 타이밍 표현을 그대로 둔다
