@@ -1,0 +1,98 @@
+{
+ "purpose": "loop diagnosis on existing Aria outputs (T3, T3c)",
+ "aria_commit": "c2f67bc90b49335543c0249fe00fb84a9337faf8",
+ "weights_sha256_16": "5e6b07ee2680f004",
+ "sampler": {
+  "temp": 0.98,
+  "min_p": 0.035,
+  "length": 1024,
+  "prompt_s": 8,
+  "variations": 2
+ },
+ "definitions": {
+  "events": "notes within 30 ms grouped",
+  "loop": "exact event repetition with period k<=24, >=3 cycles, >=4 s"
+ },
+ "inputs": {
+  "P1_pokey_jazz": {
+   "prompt_decoded": [
+    "/Users/ohhalim/git_box/t3_aria/out/P1_pokey_jazz_prompt_decoded.mid",
+    "1d205440d232"
+   ],
+   "outputs": {
+    "1": [
+     "/Users/ohhalim/git_box/t3_aria/out/P1_pokey_jazz/res_1.mid",
+     "92fc6d3bc9bf"
+    ],
+    "2": [
+     "/Users/ohhalim/git_box/t3_aria/out/P1_pokey_jazz/res_2.mid",
+     "99a26774bfc4"
+    ]
+   }
+  },
+  "P2_Harold_Mabern": {
+   "prompt_decoded": [
+    "/Users/ohhalim/git_box/t3_aria/out/P2_Harold_Mabern_prompt_decoded.mid",
+    "cdbc6cb75de5"
+   ],
+   "outputs": {
+    "1": [
+     "/Users/ohhalim/git_box/t3_aria/out/P2_Harold_Mabern/res_1.mid",
+     "be4453f48661"
+    ],
+    "2": [
+     "/Users/ohhalim/git_box/t3_aria/out/P2_Harold_Mabern/res_2.mid",
+     "10540668e8cf"
+    ]
+   }
+  },
+  "P3_Kenny_Barron": {
+   "prompt_decoded": [
+    "/Users/ohhalim/git_box/t3_aria/out/P3_Kenny_Barron_prompt_decoded.mid",
+    "139c8977b27c"
+   ],
+   "outputs": {
+    "1": [
+     "/Users/ohhalim/git_box/t3_aria/out/P3_Kenny_Barron/res_1.mid",
+     "209336a30d93"
+    ],
+    "2": [
+     "/Users/ohhalim/git_box/t3_aria/out/P3_Kenny_Barron/res_2.mid",
+     "fd80ffc95df8"
+    ]
+   }
+  },
+  "TA": {
+   "prompt_decoded": [
+    "/Users/ohhalim/git_box/t3_aria/out/TA_prompt_decoded.mid",
+    "13156d80d147"
+   ],
+   "outputs": {
+    "1": [
+     "/Users/ohhalim/git_box/t3_aria/out/TA/res_1.mid",
+     "e6de26de7af9"
+    ],
+    "2": [
+     "/Users/ohhalim/git_box/t3_aria/out/TA/res_2.mid",
+     "9a53290c5bc1"
+    ]
+   }
+  },
+  "TB": {
+   "prompt_decoded": [
+    "/Users/ohhalim/git_box/t3_aria/out/TB_prompt_decoded.mid",
+    "f4ac6a5fa79a"
+   ],
+   "outputs": {
+    "1": [
+     "/Users/ohhalim/git_box/t3_aria/out/TB/res_1.mid",
+     "cfcb59ed7d90"
+    ],
+    "2": [
+     "/Users/ohhalim/git_box/t3_aria/out/TB/res_2.mid",
+     "53b459ad3f66"
+    ]
+   }
+  }
+ }
+}

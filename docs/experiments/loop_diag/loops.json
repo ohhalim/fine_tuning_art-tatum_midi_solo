@@ -1,0 +1,209 @@
+[
+ {
+  "exp": "T3",
+  "clip": "P1_pokey_jazz-1",
+  "gen_notes": 338,
+  "gen_span_s": 42.0,
+  "termination": "length cap (≈1024 tokens; no EOS)",
+  "primer_loop": null
+ },
+ {
+  "exp": "T3",
+  "clip": "P1_pokey_jazz-2",
+  "gen_notes": 339,
+  "gen_span_s": 30.5,
+  "termination": "length cap (≈1024 tokens; no EOS)",
+  "primer_loop": null
+ },
+ {
+  "exp": "T3",
+  "clip": "P2_Harold_Mabern-1",
+  "gen_notes": 340,
+  "gen_span_s": 18.6,
+  "termination": "length cap (≈1024 tokens; no EOS)",
+  "primer_loop": null
+ },
+ {
+  "exp": "T3",
+  "clip": "P2_Harold_Mabern-2",
+  "gen_notes": 340,
+  "gen_span_s": 19.1,
+  "termination": "length cap (≈1024 tokens; no EOS)",
+  "primer_loop": null,
+  "loop_start_s": 7.9,
+  "loop_dur_s": 11.1,
+  "to_end": true,
+  "period_events": 1,
+  "period_s": 0.1,
+  "cycles": 113.0,
+  "unit": [
+   [
+    "A0",
+    "A1"
+   ]
+  ],
+  "unit_events_in_primer": 0,
+  "unit_distinct_events": 1,
+  "mean_pitch_before_during": [
+   54.3,
+   27.0
+  ],
+  "density_before_during": [
+   14.5,
+   20.3
+  ]
+ },
+ {
+  "exp": "T3",
+  "clip": "P3_Kenny_Barron-1",
+  "gen_notes": 340,
+  "gen_span_s": 18.5,
+  "termination": "length cap (≈1024 tokens; no EOS)",
+  "primer_loop": null,
+  "loop_start_s": 2.0,
+  "loop_dur_s": 16.4,
+  "to_end": true,
+  "period_events": 11,
+  "period_s": 1.54,
+  "cycles": 10.7,
+  "unit": [
+   [
+    "D#4",
+    "G#4"
+   ],
+   [
+    "C#2"
+   ],
+   [
+    "F4",
+    "A#4"
+   ],
+   [
+    "G1",
+    "G2",
+    "D#4",
+    "G#4"
+   ],
+   [
+    "C#2",
+    "C#3",
+    "E4",
+    "A4"
+   ],
+   [
+    "G1",
+    "G2",
+    "F#4",
+    "B4"
+   ],
+   [
+    "C2",
+    "C3",
+    "E4",
+    "A4"
+   ],
+   [
+    "F#4",
+    "B4"
+   ]
+  ],
+  "unit_events_in_primer": 2,
+  "unit_distinct_events": 11,
+  "mean_pitch_before_during": [
+   57.8,
+   55.2
+  ],
+  "density_before_during": [
+   18.2,
+   18.5
+  ]
+ },
+ {
+  "exp": "T3",
+  "clip": "P3_Kenny_Barron-2",
+  "gen_notes": 340,
+  "gen_span_s": 19.4,
+  "termination": "length cap (≈1024 tokens; no EOS)",
+  "primer_loop": null
+ },
+ {
+  "exp": "T3c",
+  "clip": "TA-1",
+  "gen_notes": 339,
+  "gen_span_s": 17.0,
+  "termination": "length cap (≈1024 tokens; no EOS)",
+  "primer_loop": null
+ },
+ {
+  "exp": "T3c",
+  "clip": "TA-2",
+  "gen_notes": 340,
+  "gen_span_s": 22.1,
+  "termination": "length cap (≈1024 tokens; no EOS)",
+  "primer_loop": null,
+  "loop_start_s": 4.9,
+  "loop_dur_s": 17.0,
+  "to_end": true,
+  "period_events": 2,
+  "period_s": 0.19,
+  "cycles": 88.0,
+  "unit": [
+   [
+    "C#4",
+    "C#5"
+   ],
+   [
+    "C#3"
+   ]
+  ],
+  "unit_events_in_primer": 2,
+  "unit_distinct_events": 2,
+  "mean_pitch_before_during": [
+   64.8,
+   61.0
+  ],
+  "density_before_during": [
+   15.6,
+   15.5
+  ]
+ },
+ {
+  "exp": "T3c",
+  "clip": "TB-1",
+  "gen_notes": 339,
+  "gen_span_s": 29.8,
+  "termination": "length cap (≈1024 tokens; no EOS)",
+  "primer_loop": null,
+  "loop_start_s": 22.4,
+  "loop_dur_s": 6.3,
+  "to_end": true,
+  "period_events": 1,
+  "period_s": 0.22,
+  "cycles": 30.0,
+  "unit": [
+   [
+    "D1",
+    "D2",
+    "D3"
+   ]
+  ],
+  "unit_events_in_primer": 0,
+  "unit_distinct_events": 1,
+  "mean_pitch_before_during": [
+   60.8,
+   37.9
+  ],
+  "density_before_during": [
+   10.5,
+   14.1
+  ]
+ },
+ {
+  "exp": "T3c",
+  "clip": "TB-2",
+  "gen_notes": 339,
+  "gen_span_s": 25.8,
+  "termination": "length cap (≈1024 tokens; no EOS)",
+  "primer_loop": null
+ }
+]
