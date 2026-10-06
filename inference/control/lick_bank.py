@@ -104,7 +104,8 @@ def swing(notes, bpm: float, ratio: float = 2 / 3, min_s: float = 0.12):
     Notes sharing an onset (chord tones) do not shorten each other. No note sounds into
     the next onset of the same pitch: after a short interval the note stays short
     (#1674 capped at any later onset, which would cut held comp notes; #1669's final
-    ``max`` let two same-pitch notes overlap by 42 ms)."""
+    ``max`` let two same-pitch notes overlap by 42 ms). The 10 ms minimum length gives
+    way to that bound when two same-pitch onsets are closer than 20 ms (Astra, 10/6)."""
     beat = 60.0 / bpm
 
     def at(t):
@@ -126,7 +127,9 @@ def swing(notes, bpm: float, ratio: float = 2 / 3, min_s: float = 0.12):
             end = at(nxt) - 0.01
         else:
             end = on + max(min_s, length)
-        if same is not None:
-            end = min(end, at(same) - 0.01)
-        out.append((p, on, max(end, on + 0.01), v))
+        margin = 0.01
+        if same is not None:                        # the next same-pitch onset is a hard upper bound
+            margin = min(0.01, (at(same) - on) / 2)    # shrinks below 10 ms only when the gap is that short
+            end = min(end, at(same) - margin)
+        out.append((p, on, max(end, on + margin), v))
     return out
