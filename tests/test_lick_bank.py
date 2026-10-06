@@ -48,6 +48,12 @@ class LickTest(unittest.TestCase):
         for p, s, e, _ in out[:2]:
             self.assertLess(e, out[2][1])                             # nor into the next chord's same pitches
 
+    def test_swing_same_pitch_bound_holds_for_sub_10ms_gaps(self) -> None:
+        # Astra's repro (10/6): the 10 ms minimum used to push the first end past a 5.3 ms-later onset
+        out = swing([(60, 0.0, 0.004, 70), (60, 0.004, 0.008, 70)], 128)
+        self.assertLess(out[0][2], out[1][1])
+        self.assertGreater(out[0][2], out[0][1])
+
     def test_swing_keeps_a_held_comp_note_over_another_voice(self) -> None:
         # a sustained bass under an off-beat upper note is held, not cut at the other voice's onset (Astra on #1674)
         out = swing([(36, 0.0, 0.9, 46), (60, 0.234375, 0.3, 70)], 128)
