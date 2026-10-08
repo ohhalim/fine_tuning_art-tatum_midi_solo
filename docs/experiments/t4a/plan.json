@@ -1,0 +1,102 @@
+{
+ "P2": {
+  "history": "P2_Harold_Mabern",
+  "first_onset": 0.0,
+  "last_onset": 7.91,
+  "t_c": 8.11,
+  "root_pc": 11,
+  "inputs": {
+   "P": {
+    "path": "P2_P.mid",
+    "chord": [
+     47,
+     51,
+     58
+    ]
+   },
+   "Q": {
+    "path": "P2_Q.mid",
+    "chord": [
+     47,
+     50,
+     57
+    ]
+   }
+  }
+ },
+ "P3": {
+  "history": "P3_Kenny_Barron",
+  "first_onset": 0.0,
+  "last_onset": 7.84,
+  "t_c": 8.04,
+  "root_pc": 7,
+  "inputs": {
+   "P": {
+    "path": "P3_P.mid",
+    "chord": [
+     43,
+     59,
+     54
+    ]
+   },
+   "Q": {
+    "path": "P3_Q.mid",
+    "chord": [
+     43,
+     58,
+     53
+    ]
+   }
+  }
+ },
+ "TA": {
+  "history": "TA",
+  "first_onset": 0.0,
+  "last_onset": 7.94,
+  "t_c": 8.14,
+  "root_pc": 0,
+  "inputs": {
+   "P": {
+    "path": "TA_P.mid",
+    "chord": [
+     36,
+     52,
+     59
+    ]
+   },
+   "Q": {
+    "path": "TA_Q.mid",
+    "chord": [
+     36,
+     51,
+     58
+    ]
+   }
+  }
+ },
+ "TB": {
+  "history": "TB",
+  "first_onset": 0.0,
+  "last_onset": 7.71,
+  "t_c": 7.91,
+  "root_pc": 7,
+  "inputs": {
+   "P": {
+    "path": "TB_P.mid",
+    "chord": [
+     43,
+     59,
+     54
+    ]
+   },
+   "Q": {
+    "path": "TB_Q.mid",
+    "chord": [
+     43,
+     58,
+     53
+    ]
+   }
+  }
+ }
+}
