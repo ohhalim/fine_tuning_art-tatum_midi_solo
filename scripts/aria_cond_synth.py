@@ -53,3 +53,27 @@ def signature(family: str):
     pitches, ioi, kind, _ = FAMILIES[family]
     iois = ioi if isinstance(ioi, list) else [ioi] * len(pitches)
     return tuple(b - a for a, b in zip(pitches, pitches[1:])), tuple(iois), kind
+
+
+def first_discriminating_index(toks, cand) -> int:
+    """Index of the first piano token whose pitch is one of the two candidates."""
+    return next(i for i, x in enumerate(toks) if isinstance(x, tuple) and x[0] == "piano" and x[1] in cand.values())
+
+
+def target_mask(toks, first_idx: int, arm: str) -> list[bool]:
+    """Loss mask over shifted targets: mask[k] is for predicting toks[k + 1].
+    A: every target. B: targets from the first discriminating note on (its pitch, onset, duration,
+    later notes and <E>); prefix targets dropped. C: as B without the <E> target. Inputs are never
+    changed; only which targets count."""
+    out = []
+    for k in range(len(toks) - 1):
+        j = k + 1
+        if arm == "A":
+            out.append(True)
+        elif arm == "B":
+            out.append(j >= first_idx)
+        elif arm == "C":
+            out.append(j >= first_idx and toks[j] != "<E>")
+        else:
+            raise ValueError(arm)
+    return out
