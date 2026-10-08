@@ -5,6 +5,9 @@ predicts token i + 1) gets the chord sounding at the prefix time of tokens[0..i]
 already in the input, or the latest 5 s boundary, whichever is later. Nothing after position i is
 read, so a note's own onset never conditions the tokens before it. Pure Python; no Aria import.
 
+Limit: tokens come as pitch then onset, so the position that predicts the first pitch after a
+chord change still carries the previous chord. No leak, but the new chord reaches that note late.
+
 | input token at i  | what it reveals             | prefix time for position i       |
 |-------------------|-----------------------------|----------------------------------|
 | prefix, <S>       | nothing                     | 0                                |
