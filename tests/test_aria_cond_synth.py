@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import unittest
 
-from scripts.aria_cond_synth import EVAL, FAMILIES, TRAIN, example, signature
+from scripts.aria_cond_synth import EVAL, FAMILIES, TRAIN, example, first_discriminating_index, signature, target_mask
 
 
 class SynthTest(unittest.TestCase):
@@ -27,6 +27,20 @@ class SynthTest(unittest.TestCase):
             for q in "PQ":
                 notes, _ = example(fam, q)
                 self.assertLess(max(n[2] for n in notes), 5.0)
+
+
+    def test_loss_masks_by_shifted_target_index(self) -> None:
+        toks = [("prefix", "instrument", "piano"), "<S>", ("piano", 60, 80), ("onset", 0), ("dur", 200),
+                ("piano", 64, 80), ("onset", 250), ("dur", 200), ("piano", 67, 80), ("onset", 500), ("dur", 200), "<E>"]
+        first = first_discriminating_index(toks, {"P": 64, "Q": 63})
+        self.assertEqual(first, 5)
+        a, b, c = (target_mask(toks, first, arm) for arm in "ABC")
+        self.assertEqual(len(a), len(toks) - 1)
+        self.assertTrue(all(a))
+        self.assertEqual([k + 1 for k, m in enumerate(b) if m], list(range(5, 12)))       # pitch of the first discriminating note on, <E> included
+        self.assertEqual([k + 1 for k, m in enumerate(c) if m], list(range(5, 11)))       # same without the <E> target
+        self.assertTrue(b[first - 1] and c[first - 1])                                     # the discriminating pitch itself counts
+        self.assertFalse(any(b[: first - 1]))                                              # prefix targets dropped
 
 
 if __name__ == "__main__":
