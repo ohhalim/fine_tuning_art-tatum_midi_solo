@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -122,8 +123,10 @@ def main(argv=None) -> int:
         for seed in args.seeds:
             torch.manual_seed(seed)
             np.random.seed(seed)
+            t_gen = time.time()
             with torch.no_grad():
                 res = model.sampling(prime_rhythm, prime_pitch, chord, topk=topk)
+            gen_s = time.time() - t_gen
             pitch_idx = res["pitch"][0].tolist()
             rhythm_idx = res["rhythm"][0].tolist()
             notes = to_notes(pitch_idx)
@@ -136,7 +139,8 @@ def main(argv=None) -> int:
             report["runs"].append({"progression": name, "chords": chords, "seed": seed, "notes": len(notes),
                                    "pitch_range": [min((p for p, _, _ in notes), default=None),
                                                    max((p for p, _, _ in notes), default=None)],
-                                   "pitch_idx": pitch_idx, "rhythm_idx": rhythm_idx, "file": f"{stem}_raw.mid"})
+                                   "pitch_idx": pitch_idx, "rhythm_idx": rhythm_idx, "file": f"{stem}_raw.mid",
+                                   "gen_seconds": round(gen_s, 3)})
             print(stem, "notes", len(notes), "range", report["runs"][-1]["pitch_range"])
     (args.output_dir / "report.json").write_text(json.dumps(report, indent=1) + "\n")
     return 0
