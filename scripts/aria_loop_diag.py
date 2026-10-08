@@ -2,9 +2,12 @@
 
 Per output: generated part = output notes minus the decoded prompt tokens (pitch, onset multiset).
 Events = notes grouped within 30 ms (sorted pitch tuples). A loop = the longest stretch where
-event i equals event i+k (exact, period k <= 24 events) for >= 3 cycles and >= 4 s.
-Reports loop start/duration/period/unit, register and density before vs during, and whether the
-unit's events occur in the primer. Termination is inferred from the token budget (no logs kept).
+the pitch set of event i equals that of event i+k (period k <= 24 events) for >= 3 cycles and
+>= 4 s: a pitch-set sequence repetition after 30 ms grouping. Onset gaps, durations and
+velocities are not compared; whether the rhythm repeats too is reported separately (Astra #198).
+Reports loop start/duration/period/unit, register and density before vs during, whether it lasts
+to the last generated onset, and how many unit events also occur (as single events, order and
+rhythm ignored) in the primer. Termination was not logged: observed = unknown.
 """
 import collections, hashlib, json, sys
 import pretty_midi
@@ -42,7 +45,8 @@ def longest_loop(ev, kmax=24):
 
 manifest = {"purpose": "loop diagnosis on existing Aria outputs (T3, T3c)", "aria_commit": "c2f67bc90b49335543c0249fe00fb84a9337faf8",
             "weights_sha256_16": "5e6b07ee2680f004", "sampler": {"temp": 0.98, "min_p": 0.035, "length": 1024, "prompt_s": 8, "variations": 2},
-            "definitions": {"events": "notes within 30 ms grouped", "loop": "exact event repetition with period k<=24, >=3 cycles, >=4 s"},
+            "definitions": {"events": "notes within 30 ms grouped", "loop": "pitch-set sequence repetition after 30 ms grouping, period k<=24 events, >=3 cycles, >=4 s; rhythm not compared",
+                            "to_last_onset": "loop end index == last generated event", "rhythm_repeat": "onset gaps of the loop span equal to those one period later within 30 ms"},
             "inputs": {}}
 rows = []
 for exp, p in RUNS:
@@ -65,7 +69,8 @@ for exp, p in RUNS:
         ev = events(gen)
         loop = longest_loop(ev)
         row = {"exp": exp, "clip": f"{p}-{r}", "gen_notes": len(gen), "gen_span_s": round(max(n.end for n in gen) - t0, 1),
-               "termination": "length cap (≈1024 tokens; no EOS)" if len(gen) >= 330 else "early (EOS?)",
+               "termination_observed": "unknown (not logged)",
+               "length_cap_hypothesis": len(gen) >= 330,
                "primer_loop": None if not p_loop else {"period_events": p_loop["k"], "dur_s": round(p_loop["dur"], 1)}}
         if loop:
             s_t = ev[loop["start_idx"]][0] - t0
@@ -75,7 +80,14 @@ for exp, p in RUNS:
             during = [n for n in gen if ev[loop["start_idx"]][0] <= n.start <= ev[loop["end_idx"]][0]]
             mean = lambda xs: round(sum(n.pitch for n in xs) / len(xs), 1) if xs else None
             dens = lambda xs, d: round(len(xs) / d, 1) if xs and d > 0 else None
-            row.update({"loop_start_s": round(s_t, 1), "loop_dur_s": round(loop["dur"], 1), "to_end": abs(ev[loop["end_idx"]][0] - ev[-1][0]) < 1.0,
+            gaps = [ev[i + 1][0] - ev[i][0] for i in range(loop["start_idx"], loop["end_idx"] - loop["k"])]
+            gaps_next = [ev[i + 1 + loop["k"]][0] - ev[i + loop["k"]][0] for i in range(loop["start_idx"], loop["end_idx"] - loop["k"])]
+            rhythm = sum(1 for a, b in zip(gaps, gaps_next) if abs(a - b) <= 0.03) / max(1, len(gaps))
+            row.update({"loop_start_s": round(s_t, 1), "loop_dur_s": round(loop["dur"], 1),
+                        "to_last_onset": loop["end_idx"] == len(ev) - 1,
+                        "events_after_loop": len(ev) - 1 - loop["end_idx"],
+                        "seconds_after_loop": round(ev[-1][0] - ev[loop["end_idx"]][0], 2),
+                        "rhythm_repeat_share": round(rhythm, 2),
                         "period_events": loop["k"], "period_s": round(per_s, 2), "cycles": round(loop["cycles"], 1),
                         "unit": [[pretty_midi.note_number_to_name(x) for x in e] for e in unit][:8],
                         "unit_events_in_primer": sum(1 for e in set(unit) if pev_set[e] > 0), "unit_distinct_events": len(set(unit)),

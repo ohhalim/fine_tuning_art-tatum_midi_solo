@@ -11,7 +11,9 @@
  },
  "definitions": {
   "events": "notes within 30 ms grouped",
-  "loop": "exact event repetition with period k<=24, >=3 cycles, >=4 s"
+  "loop": "pitch-set sequence repetition after 30 ms grouping, period k<=24 events, >=3 cycles, >=4 s; rhythm not compared",
+  "to_last_onset": "loop end index == last generated event",
+  "rhythm_repeat": "onset gaps of the loop span equal to those one period later within 30 ms"
  },
  "inputs": {
   "P1_pokey_jazz": {
