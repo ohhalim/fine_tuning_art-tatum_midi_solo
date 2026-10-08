@@ -1,0 +1,34 @@
+{
+ "checkpoint": "/Users/ohhalim/git_box/t1_models/cmt/ckpt/best_jazz_model_8bars.pth.tar",
+ "checkpoint_sha256_16": "4aa54fde068719d2",
+ "hparams_sha1": "c2ef6135f3ee",
+ "epoch": 90,
+ "cmt_code_sha1": {
+  "model.py": "fd8a7d1679f8",
+  "layers.py": "1f8794bef554"
+ },
+ "generate_script_blob": "44895495cbcf716629614da757f83e954ffd2794",
+ "env": {
+  "python": "3.13.2",
+  "torch": "2.9.1",
+  "numpy": "2.4.1",
+  "pretty_midi": "0.2.11"
+ },
+ "command": "python scripts/t1_cmt_generate.py --cmt-dir /Users/ohhalim/git_box/t1_models/cmt --prime head --output-dir /Users/ohhalim/git_box/t1_models/cmt_runs/head",
+ "prime": "head (BebopNet head bar 1: G4 A4 Bb4 C5 D5 C5 Bb4 A4, eighths)",
+ "topk": 5,
+ "progressions": {
+  "P": "Gm7 C7 Fmaj7 Fmaj7 x2",
+  "Q": "Gm7b5 C7 Fm7 Fm7 x2"
+ },
+ "seeds": [
+  1,
+  2,
+  3,
+  4
+ ],
+ "raw_dir": "/Users/ohhalim/git_box/t1_models/cmt_runs/head",
+ "generated_representation": "/Users/ohhalim/git_box/t1_models/cmt_runs/head/report.json",
+ "conversion": "time x 120/128, velocity 90, no swing, no comp",
+ "duration_scale_max_error_s": 3e-06
+}
