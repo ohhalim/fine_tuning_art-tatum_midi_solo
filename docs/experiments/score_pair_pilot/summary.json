@@ -1,0 +1,322 @@
+{
+ "pilot": "score_pair_v1, first 3 families by filename",
+ "selection_rule": "sort by basename; group *_short, trailing _<digits> tempo variants and DespacitoS into one family; convert the non-short, non-variant file",
+ "families_total": 33,
+ "songs": [
+  {
+   "song": "A_Foggy_Day",
+   "family_files": [
+    "A_Foggy_Day.xml",
+    "short/A_Foggy_Day_short.xml"
+   ],
+   "converted_file": "A_Foggy_Day.xml",
+   "source_sha256": "add41c9a53729959da64d760e66533078d658a5247f7000d48a5764f97153488",
+   "converter_sha256": "5019d25a422f9c3705d56547885e131cd59d431f63529caea7859e8049b83132",
+   "derived_midi_sha256": "7873ed13ad43790c398776cedb66238977c1ba09cb5226e9dd5b521714d58eae",
+   "divisions": 2,
+   "ticks_exact": true,
+   "measures": 34,
+   "irregular_measures": 0,
+   "total_beats": 136.0,
+   "tempos": [
+    {
+     "measure": "1",
+     "beat": 0.0,
+     "bpm": 130.0
+    }
+   ],
+   "meters": [
+    [
+     4,
+     4
+    ]
+   ],
+   "notes": 75,
+   "features": {
+    "time_signature": 1,
+    "harmony_offset": 7,
+    "harmony_degree": 2,
+    "tie_merged": 23
+   },
+   "unsupported": [],
+   "midi_check": {
+    "notes": 75,
+    "missing": 0,
+    "added": 0,
+    "worst_tick_error": 0.0
+   },
+   "chord_coverage": {
+    "chord_segments": 46,
+    "mapped": 46,
+    "no_chord": 0,
+    "unlabeled_segments": 0
+   },
+   "kinds": [
+    [
+     "minor-seventh",
+     "m7",
+     15
+    ],
+    [
+     "dominant-ninth",
+     "7",
+     10
+    ],
+    [
+     "dominant",
+     "7",
+     6
+    ],
+    [
+     "major-sixth",
+     "6",
+     6
+    ],
+    [
+     "major-seventh",
+     "maj7",
+     4
+    ],
+    [
+     "half-diminished",
+     "m7b5",
+     3
+    ],
+    [
+     "dominant-13th",
+     "7",
+     1
+    ],
+    [
+     "minor-sixth",
+     "m6",
+     1
+    ]
+   ],
+   "recount": {
+    "tool": "music21 10.5.0",
+    "scope": "all measures",
+    "notes_music21": 75,
+    "notes_derived": 75,
+    "missing_in_derived": [],
+    "added_in_derived": [],
+    "chords_music21": 46,
+    "chords_converter": 46,
+    "chord_rows_with_difference": 0
+   },
+   "eligibility": {
+    "pipeline_test": true,
+    "training": false,
+    "musical": false
+   },
+   "rights_status": "unknown",
+   "source_type": "score_head",
+   "label_basis": "score_annotation",
+   "repeat_policy": "as_written"
+  },
+  {
+   "song": "All_The_Things_You_Are",
+   "family_files": [
+    "All_The_Things_You_Are.xml",
+    "short/All_The_Things_You_Are_short.xml"
+   ],
+   "converted_file": "All_The_Things_You_Are.xml",
+   "source_sha256": "6da4198ff28203ef8b16a8fe94fa092ca60f1c4a72543f5ef723cc51e97159d1",
+   "converter_sha256": "5019d25a422f9c3705d56547885e131cd59d431f63529caea7859e8049b83132",
+   "derived_midi_sha256": "34705f88c1b72bf1aa47348dd2ad43ec4c3e77f2e6aeb3d6f09fcfb6793698cd",
+   "divisions": 6,
+   "ticks_exact": true,
+   "measures": 36,
+   "irregular_measures": 0,
+   "total_beats": 144.0,
+   "tempos": [
+    {
+     "measure": "1",
+     "beat": 0.0,
+     "bpm": 150.0
+    }
+   ],
+   "meters": [
+    [
+     4,
+     4
+    ]
+   ],
+   "notes": 87,
+   "features": {
+    "time_signature": 1,
+    "tie_merged": 27,
+    "tuplet_note": 8,
+    "harmony_degree": 1
+   },
+   "unsupported": [],
+   "midi_check": {
+    "notes": 87,
+    "missing": 0,
+    "added": 0,
+    "worst_tick_error": 0.0
+   },
+   "chord_coverage": {
+    "chord_segments": 33,
+    "mapped": 33,
+    "no_chord": 0,
+    "unlabeled_segments": 0
+   },
+   "kinds": [
+    [
+     "minor-seventh",
+     "m7",
+     10
+    ],
+    [
+     "major-seventh",
+     "maj7",
+     10
+    ],
+    [
+     "dominant",
+     "7",
+     9
+    ],
+    [
+     "major",
+     "maj",
+     2
+    ],
+    [
+     "dominant-ninth",
+     "7",
+     1
+    ],
+    [
+     "diminished-seventh",
+     "dim7",
+     1
+    ]
+   ],
+   "recount": {
+    "tool": "music21 10.5.0",
+    "scope": "all measures",
+    "notes_music21": 88,
+    "notes_derived": 87,
+    "missing_in_derived": [
+     [
+      71,
+      34320,
+      34560
+     ],
+     [
+      71,
+      34560,
+      37200
+     ]
+    ],
+    "added_in_derived": [
+     [
+      71,
+      34320,
+      37200
+     ]
+    ],
+    "chords_music21": 33,
+    "chords_converter": 33,
+    "chord_rows_with_difference": 0
+   },
+   "eligibility": {
+    "pipeline_test": true,
+    "training": false,
+    "musical": false
+   },
+   "rights_status": "unknown",
+   "source_type": "score_head",
+   "label_basis": "score_annotation",
+   "repeat_policy": "as_written"
+  },
+  {
+   "song": "Billies_Bounce",
+   "family_files": [
+    "Billies_Bounce.xml"
+   ],
+   "converted_file": "Billies_Bounce.xml",
+   "source_sha256": "6424055bc53fcfed49eb9504e8fbd14a5b1ecaab7438c1fa26c8ed07f0c6b8a4",
+   "converter_sha256": "5019d25a422f9c3705d56547885e131cd59d431f63529caea7859e8049b83132",
+   "derived_midi_sha256": "90062776833baec0579b67f26fd24ca944f998dc2be9be78a1d1704da99a80b0",
+   "divisions": 6,
+   "ticks_exact": true,
+   "measures": 24,
+   "irregular_measures": 0,
+   "total_beats": 96.0,
+   "tempos": [
+    {
+     "measure": "1",
+     "beat": 0.0,
+     "bpm": 180.0
+    }
+   ],
+   "meters": [
+    [
+     4,
+     4
+    ]
+   ],
+   "notes": 126,
+   "features": {
+    "time_signature": 1,
+    "slash_bass": 2,
+    "tie_merged": 13,
+    "harmony_degree": 2,
+    "tuplet_note": 3
+   },
+   "unsupported": [],
+   "midi_check": {
+    "notes": 126,
+    "missing": 0,
+    "added": 0,
+    "worst_tick_error": 0.0
+   },
+   "chord_coverage": {
+    "chord_segments": 30,
+    "mapped": 30,
+    "no_chord": 0,
+    "unlabeled_segments": 0
+   },
+   "kinds": [
+    [
+     "dominant",
+     "7",
+     22
+    ],
+    [
+     "minor-seventh",
+     "m7",
+     6
+    ],
+    [
+     "diminished-seventh",
+     "dim7",
+     2
+    ]
+   ],
+   "recount": {
+    "tool": "music21 10.5.0",
+    "scope": "all measures",
+    "notes_music21": 126,
+    "notes_derived": 126,
+    "missing_in_derived": [],
+    "added_in_derived": [],
+    "chords_music21": 30,
+    "chords_converter": 30,
+    "chord_rows_with_difference": 0
+   },
+   "eligibility": {
+    "pipeline_test": true,
+    "training": false,
+    "musical": false
+   },
+   "rights_status": "unknown",
+   "source_type": "score_head",
+   "label_basis": "score_annotation",
+   "repeat_policy": "as_written"
+  }
+ ]
+}

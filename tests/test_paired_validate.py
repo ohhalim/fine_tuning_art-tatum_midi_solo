@@ -1,8 +1,8 @@
 """Paired take validator (scripts/paired_validate.py) on a synthetic fixture.
 
 The fixture is written to a temporary directory for parser and alignment tests only. It is
-marked source_type synthetic_fixture, so it can never be corpus eligible, and it is never
-stored under data/.
+marked source_type synthetic_fixture, is never approved for training, and is never stored
+under data/.
 """
 from __future__ import annotations
 
@@ -71,13 +71,13 @@ class PairedValidateTest(unittest.TestCase):
             build(d, **kw)
             return validate(d, write_processed=True), d
 
-    def test_valid_fixture_passes_but_is_never_verified_or_corpus_eligible(self) -> None:
+    def test_valid_fixture_passes_for_pipeline_tests_only(self) -> None:
         with tempfile.TemporaryDirectory() as d:
             build(d)
             r = validate(d, write_processed=True)
             self.assertTrue(r["technical_pass"], r["checks"])
             self.assertFalse(r["musically_verified"])
-            self.assertFalse(r["corpus_eligible"])
+            self.assertEqual(r["eligibility"], {"pipeline_test": True, "training": False, "musical": False})
             ppq, tracks, _, tempos, _ = read_midi(os.path.join(d, "processed.mid"))
             self.assertEqual(tracks["Solo"][0][1], 0)                       # count-in removed
             self.assertEqual(tempos, [(0, 500000), (8 * PPQ - COUNT_IN * PPQ, 600000)])
@@ -102,6 +102,19 @@ class PairedValidateTest(unittest.TestCase):
         self.assertFalse(self.run_case(label_basis="inferred")[0]["technical_pass"])
         r, _ = self.run_case(meta_tempo_map=[{"beat": 0, "bpm": 120}])
         self.assertFalse(r["checks"]["tempo_map_preserved"]["ok"])
+
+    def test_review_pass_never_approves_training(self) -> None:
+        with tempfile.TemporaryDirectory() as d:
+            build(d)
+            path = os.path.join(d, "take.json")
+            with open(path) as f:
+                meta = json.load(f)
+            meta["independent_review"] = {"reviewer": "someone else", "verdict": "pass"}
+            with open(path, "w") as f:
+                json.dump(meta, f)
+            r = validate(d)
+            self.assertTrue(r["eligibility"]["musical"])
+            self.assertFalse(r["eligibility"]["training"])
 
     def test_zero_length_note_fails(self) -> None:
         t = round((COUNT_IN + 2) * PPQ)

@@ -6,7 +6,10 @@ export, untouched: tempo track, solo track, comp track, count-in included). The 
 edits notes. A failed check means the contract is broken; a flag keeps the recording as it is
 and marks it for a person to look at. Passing every check is a technical result only: it never
 makes a harmony label correct, and `musically_verified` stays false without an independent
-human review.
+human review. Eligibility is reported per purpose and the purposes never imply each other:
+pipeline_test (the file can drive conversion and alignment tests), training (always false here;
+it needs a separate approval of rights, split and label accuracy that this validator does not
+check), musical (an independent human review passed).
 
 Usage: paired_validate.py <take dir> [--write-processed]
 """
@@ -33,6 +36,7 @@ REQUIRED = ["schema", "take_id", "progression_id", "split", "source", "source_ty
 LABEL_BASIS = {"planned", "performer_confirmed"}
 SPLITS = {"train_candidate", "heldout_candidate"}
 TICK_TOL = 1
+NOT_ELIGIBLE = {"pipeline_test": False, "training": False, "musical": False}
 
 
 def sha256(path: str) -> str:
@@ -108,7 +112,7 @@ def validate(take_dir: str, write_processed: bool = False) -> dict:
           f"missing {missing}" if missing else meta.get("schema"))
     if missing:
         return {"take_id": meta.get("take_id"), "checks": checks, "flags": flags, "technical_pass": False,
-                "musically_verified": False, "corpus_eligible": False}
+                "musically_verified": False, "eligibility": NOT_ELIGIBLE}
     check("label_basis", meta["label_basis"] in LABEL_BASIS, meta["label_basis"])
     check("split", meta["split"] in SPLITS, meta["split"])
     raw_sha = sha256(raw)
@@ -125,7 +129,7 @@ def validate(take_dir: str, write_processed: bool = False) -> dict:
     check("tracks_present", solo_name in tracks and comp_name in tracks, f"midi tracks {sorted(tracks)}")
     if not checks["tracks_present"]["ok"]:
         return {"take_id": meta["take_id"], "checks": checks, "flags": flags, "technical_pass": False,
-                "musically_verified": False, "corpus_eligible": False}
+                "musically_verified": False, "eligibility": NOT_ELIGIBLE}
     solo, comp = tracks[solo_name], tracks[comp_name]
 
     # chord plan: beats after the count-in, tiling [0, bars * beats per bar) with no gap or overlap
@@ -149,7 +153,7 @@ def validate(take_dir: str, write_processed: bool = False) -> dict:
     check("chord_plan_coverage", not plan_errors, "; ".join(plan_errors))
     if plan_errors:
         return {"take_id": meta["take_id"], "checks": checks, "flags": flags, "technical_pass": False,
-                "musically_verified": False, "corpus_eligible": False}
+                "musically_verified": False, "eligibility": NOT_ELIGIBLE}
     segs = [(offset + round(c["onset_beat"] * ppq), offset + round(c["end_beat"] * ppq), c) for c in chords]
     end_tick = offset + round(total_beats * ppq)
 
@@ -216,7 +220,7 @@ def validate(take_dir: str, write_processed: bool = False) -> dict:
     return {"take_id": meta["take_id"], "progression_id": meta["progression_id"], "split": meta["split"],
             "raw_sha256": raw_sha, "processed_sha256": processed_sha, "count_in_offset_ticks": offset,
             "checks": checks, "flags": flags, "technical_pass": technical, "musically_verified": verified,
-            "corpus_eligible": technical and meta["source_type"] != "synthetic_fixture"}
+            "eligibility": {"pipeline_test": technical, "training": False, "musical": verified}}
 
 
 def write_processed_midi(path, ppq, tempos, meter, offset, tracks):
@@ -255,7 +259,7 @@ def main() -> None:
     report = validate(args.take_dir, args.write_processed)
     with open(os.path.join(args.take_dir, "validation.json"), "w") as f:
         json.dump(report, f, indent=1)
-    print(json.dumps({k: report[k] for k in ("take_id", "technical_pass", "musically_verified", "corpus_eligible")}))
+    print(json.dumps({k: report[k] for k in ("take_id", "technical_pass", "musically_verified", "eligibility")}))
     sys.exit(0 if report["technical_pass"] else 1)
 
 
