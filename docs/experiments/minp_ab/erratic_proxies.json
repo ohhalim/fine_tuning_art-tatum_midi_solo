@@ -1,0 +1,202 @@
+[
+ {
+  "pair": "P1_s1",
+  "cond": "A",
+  "notes": 123,
+  "off_primer_pc_share": 0.17,
+  "outside_primer_range_share": 0.02,
+  "top_leap_gt12_share": 0.05,
+  "vel_jump_ge30_share": 0.12,
+  "vel_sd": 10.6
+ },
+ {
+  "pair": "P1_s2",
+  "cond": "A",
+  "notes": 118,
+  "off_primer_pc_share": 0.14,
+  "outside_primer_range_share": 0.03,
+  "top_leap_gt12_share": 0.0,
+  "vel_jump_ge30_share": 0.06,
+  "vel_sd": 8.9
+ },
+ {
+  "pair": "P1_s1",
+  "cond": "B",
+  "notes": 162,
+  "off_primer_pc_share": 0.14,
+  "outside_primer_range_share": 0.1,
+  "top_leap_gt12_share": 0.12,
+  "vel_jump_ge30_share": 0.12,
+  "vel_sd": 12.4
+ },
+ {
+  "pair": "P1_s2",
+  "cond": "B",
+  "notes": 113,
+  "off_primer_pc_share": 0.07,
+  "outside_primer_range_share": 0.03,
+  "top_leap_gt12_share": 0.04,
+  "vel_jump_ge30_share": 0.04,
+  "vel_sd": 14.6
+ },
+ {
+  "pair": "P2_s1",
+  "cond": "A",
+  "notes": 225,
+  "off_primer_pc_share": 0.25,
+  "outside_primer_range_share": 0.0,
+  "top_leap_gt12_share": 0.0,
+  "vel_jump_ge30_share": 0.0,
+  "vel_sd": 5.2
+ },
+ {
+  "pair": "P2_s2",
+  "cond": "A",
+  "notes": 245,
+  "off_primer_pc_share": 0.27,
+  "outside_primer_range_share": 0.09,
+  "top_leap_gt12_share": 0.0,
+  "vel_jump_ge30_share": 0.0,
+  "vel_sd": 6.3
+ },
+ {
+  "pair": "P2_s1",
+  "cond": "B",
+  "notes": 254,
+  "off_primer_pc_share": 0.44,
+  "outside_primer_range_share": 0.08,
+  "top_leap_gt12_share": 0.01,
+  "vel_jump_ge30_share": 0.08,
+  "vel_sd": 11.3
+ },
+ {
+  "pair": "P2_s2",
+  "cond": "B",
+  "notes": 207,
+  "off_primer_pc_share": 0.35,
+  "outside_primer_range_share": 0.02,
+  "top_leap_gt12_share": 0.06,
+  "vel_jump_ge30_share": 0.02,
+  "vel_sd": 8.0
+ },
+ {
+  "pair": "P3_s1",
+  "cond": "A",
+  "notes": 305,
+  "off_primer_pc_share": 0.11,
+  "outside_primer_range_share": 0.02,
+  "top_leap_gt12_share": 0.0,
+  "vel_jump_ge30_share": 0.01,
+  "vel_sd": 7.7
+ },
+ {
+  "pair": "P3_s2",
+  "cond": "A",
+  "notes": 70,
+  "off_primer_pc_share": 0.01,
+  "outside_primer_range_share": 0.0,
+  "top_leap_gt12_share": 0.0,
+  "vel_jump_ge30_share": 0.0,
+  "vel_sd": 4.8
+ },
+ {
+  "pair": "P3_s1",
+  "cond": "B",
+  "notes": 295,
+  "off_primer_pc_share": 0.27,
+  "outside_primer_range_share": 0.03,
+  "top_leap_gt12_share": 0.03,
+  "vel_jump_ge30_share": 0.0,
+  "vel_sd": 5.8
+ },
+ {
+  "pair": "P3_s2",
+  "cond": "B",
+  "notes": 237,
+  "off_primer_pc_share": 0.34,
+  "outside_primer_range_share": 0.03,
+  "top_leap_gt12_share": 0.03,
+  "vel_jump_ge30_share": 0.01,
+  "vel_sd": 9.1
+ },
+ {
+  "pair": "TA_s1",
+  "cond": "A",
+  "notes": 298,
+  "off_primer_pc_share": 0.07,
+  "outside_primer_range_share": 0.0,
+  "top_leap_gt12_share": 0.0,
+  "vel_jump_ge30_share": 0.0,
+  "vel_sd": 5.0
+ },
+ {
+  "pair": "TA_s2",
+  "cond": "A",
+  "notes": 340,
+  "off_primer_pc_share": 0.0,
+  "outside_primer_range_share": 0.0,
+  "top_leap_gt12_share": 0.03,
+  "vel_jump_ge30_share": 0.0,
+  "vel_sd": 5.8
+ },
+ {
+  "pair": "TA_s1",
+  "cond": "B",
+  "notes": 219,
+  "off_primer_pc_share": 0.23,
+  "outside_primer_range_share": 0.01,
+  "top_leap_gt12_share": 0.13,
+  "vel_jump_ge30_share": 0.0,
+  "vel_sd": 4.8
+ },
+ {
+  "pair": "TA_s2",
+  "cond": "B",
+  "notes": 163,
+  "off_primer_pc_share": 0.42,
+  "outside_primer_range_share": 0.07,
+  "top_leap_gt12_share": 0.23,
+  "vel_jump_ge30_share": 0.04,
+  "vel_sd": 9.5
+ },
+ {
+  "pair": "TB_s1",
+  "cond": "A",
+  "notes": 222,
+  "off_primer_pc_share": 0.2,
+  "outside_primer_range_share": 0.06,
+  "top_leap_gt12_share": 0.06,
+  "vel_jump_ge30_share": 0.0,
+  "vel_sd": 5.5
+ },
+ {
+  "pair": "TB_s2",
+  "cond": "A",
+  "notes": 168,
+  "off_primer_pc_share": 0.06,
+  "outside_primer_range_share": 0.01,
+  "top_leap_gt12_share": 0.27,
+  "vel_jump_ge30_share": 0.01,
+  "vel_sd": 7.0
+ },
+ {
+  "pair": "TB_s1",
+  "cond": "B",
+  "notes": 103,
+  "off_primer_pc_share": 0.15,
+  "outside_primer_range_share": 0.0,
+  "top_leap_gt12_share": 0.3,
+  "vel_jump_ge30_share": 0.05,
+  "vel_sd": 9.0
+ },
+ {
+  "pair": "TB_s2",
+  "cond": "B",
+  "notes": 152,
+  "off_primer_pc_share": 0.25,
+  "outside_primer_range_share": 0.0,
+  "top_leap_gt12_share": 0.1,
+  "vel_jump_ge30_share": 0.03,
+  "vel_sd": 7.8
+ }
+]
