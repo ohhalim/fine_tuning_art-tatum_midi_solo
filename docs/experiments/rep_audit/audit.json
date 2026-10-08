@@ -1,0 +1,535 @@
+[
+ {
+  "segment": "A Fable",
+  "notes": 92,
+  "chord_events": 20,
+  "events": 68,
+  "src_sha16": "ca81a2d725209c7b",
+  "segment_sha16": "aea4f0f1446d903c",
+  "aria": {
+   "tokens": 279,
+   "notes_after": 92,
+   "matched_15ms": 92,
+   "notes_over_5s": 0,
+   "end_err_ms_max_notes_le_5s": 9.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 3.0,
+   "end_err_ms_max": 9.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 20
+  },
+  "cmt": {
+   "top_voice_notes": 68,
+   "top_voice_share": 0.739,
+   "top_voice_below_C4": 19,
+   "after_grid": 48,
+   "grid_collisions_dropped": 20,
+   "collisions_phase_sweep_min_max": [
+    15,
+    20
+   ],
+   "leaps_over_12": 9,
+   "top_voice_range": 31,
+   "onset_err_ms_median": 33.0,
+   "onset_err_ms_max": 61.0,
+   "dur_err_ms_median": 30.0,
+   "out_of_48_pitch_window": 0,
+   "velocity_sd_removed": 8.0,
+   "kept_share_of_all_notes": 0.522
+  }
+ },
+ {
+  "segment": "A Memory That Became A Dream",
+  "notes": 103,
+  "chord_events": 28,
+  "events": 56,
+  "src_sha16": "9b323eacd2076320",
+  "segment_sha16": "18801f6d20762f1b",
+  "aria": {
+   "tokens": 312,
+   "notes_after": 103,
+   "matched_15ms": 103,
+   "notes_over_5s": 2,
+   "end_err_ms_max_notes_le_5s": 10.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 3.0,
+   "end_err_ms_max": 1275.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 28
+  },
+  "cmt": {
+   "top_voice_notes": 56,
+   "top_voice_share": 0.544,
+   "top_voice_below_C4": 17,
+   "after_grid": 41,
+   "grid_collisions_dropped": 15,
+   "collisions_phase_sweep_min_max": [
+    13,
+    16
+   ],
+   "leaps_over_12": 22,
+   "top_voice_range": 67,
+   "onset_err_ms_median": 27.0,
+   "onset_err_ms_max": 61.0,
+   "dur_err_ms_median": 41.0,
+   "out_of_48_pitch_window": 17,
+   "velocity_sd_removed": 6.1,
+   "kept_share_of_all_notes": 0.398
+  }
+ },
+ {
+  "segment": "Illusion",
+  "notes": 31,
+  "chord_events": 4,
+  "events": 27,
+  "src_sha16": "fe267605e5d98a72",
+  "segment_sha16": "daf8ab020d57ea7a",
+  "aria": {
+   "tokens": 96,
+   "notes_after": 31,
+   "matched_15ms": 31,
+   "notes_over_5s": 0,
+   "end_err_ms_max_notes_le_5s": 9.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 3.0,
+   "end_err_ms_max": 9.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 4
+  },
+  "cmt": {
+   "top_voice_notes": 27,
+   "top_voice_share": 0.871,
+   "top_voice_below_C4": 18,
+   "after_grid": 24,
+   "grid_collisions_dropped": 3,
+   "collisions_phase_sweep_min_max": [
+    2,
+    4
+   ],
+   "leaps_over_12": 5,
+   "top_voice_range": 38,
+   "onset_err_ms_median": 36.0,
+   "onset_err_ms_max": 59.0,
+   "dur_err_ms_median": 35.0,
+   "out_of_48_pitch_window": 0,
+   "velocity_sd_removed": 8.5,
+   "kept_share_of_all_notes": 0.774
+  }
+ },
+ {
+  "segment": "Kakavik (The Little Partridge)",
+  "notes": 92,
+  "chord_events": 9,
+  "events": 83,
+  "src_sha16": "ec5717eefe22b92a",
+  "segment_sha16": "ad6d53b8668d45ce",
+  "aria": {
+   "tokens": 279,
+   "notes_after": 92,
+   "matched_15ms": 92,
+   "notes_over_5s": 0,
+   "end_err_ms_max_notes_le_5s": 9.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 3.0,
+   "end_err_ms_max": 9.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 9
+  },
+  "cmt": {
+   "top_voice_notes": 83,
+   "top_voice_share": 0.902,
+   "top_voice_below_C4": 27,
+   "after_grid": 64,
+   "grid_collisions_dropped": 19,
+   "collisions_phase_sweep_min_max": [
+    19,
+    21
+   ],
+   "leaps_over_12": 4,
+   "top_voice_range": 28,
+   "onset_err_ms_median": 25.0,
+   "onset_err_ms_max": 59.0,
+   "dur_err_ms_median": 27.5,
+   "out_of_48_pitch_window": 0,
+   "velocity_sd_removed": 6.6,
+   "kept_share_of_all_notes": 0.696
+  }
+ },
+ {
+  "segment": "Longing",
+  "notes": 48,
+  "chord_events": 9,
+  "events": 29,
+  "src_sha16": "66e1030ec4fbae6d",
+  "segment_sha16": "a318bd76e90c2c68",
+  "aria": {
+   "tokens": 147,
+   "notes_after": 48,
+   "matched_15ms": 48,
+   "notes_over_5s": 0,
+   "end_err_ms_max_notes_le_5s": 7.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 2.5,
+   "end_err_ms_max": 7.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 9
+  },
+  "cmt": {
+   "top_voice_notes": 29,
+   "top_voice_share": 0.604,
+   "top_voice_below_C4": 5,
+   "after_grid": 22,
+   "grid_collisions_dropped": 7,
+   "collisions_phase_sweep_min_max": [
+    5,
+    7
+   ],
+   "leaps_over_12": 4,
+   "top_voice_range": 22,
+   "onset_err_ms_median": 26.0,
+   "onset_err_ms_max": 61.0,
+   "dur_err_ms_median": 35.0,
+   "out_of_48_pitch_window": 0,
+   "velocity_sd_removed": 7.0,
+   "kept_share_of_all_notes": 0.458
+  }
+ },
+ {
+  "segment": "Looking For The Block",
+  "notes": 72,
+  "chord_events": 10,
+  "events": 48,
+  "src_sha16": "22521c2304ce4bf5",
+  "segment_sha16": "4856b20402790909",
+  "aria": {
+   "tokens": 219,
+   "notes_after": 72,
+   "matched_15ms": 72,
+   "notes_over_5s": 0,
+   "end_err_ms_max_notes_le_5s": 9.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 2.0,
+   "end_err_ms_max": 9.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 9
+  },
+  "cmt": {
+   "top_voice_notes": 48,
+   "top_voice_share": 0.667,
+   "top_voice_below_C4": 44,
+   "after_grid": 43,
+   "grid_collisions_dropped": 5,
+   "collisions_phase_sweep_min_max": [
+    4,
+    8
+   ],
+   "leaps_over_12": 10,
+   "top_voice_range": 28,
+   "onset_err_ms_median": 34.0,
+   "onset_err_ms_max": 59.0,
+   "dur_err_ms_median": 27.0,
+   "out_of_48_pitch_window": 0,
+   "velocity_sd_removed": 6.2,
+   "kept_share_of_all_notes": 0.597
+  }
+ },
+ {
+  "segment": "Mother, Where Are You",
+  "notes": 18,
+  "chord_events": 6,
+  "events": 11,
+  "src_sha16": "9e608cd23082cb9d",
+  "segment_sha16": "22c8a3053e389a54",
+  "aria": {
+   "tokens": 57,
+   "notes_after": 18,
+   "matched_15ms": 18,
+   "notes_over_5s": 5,
+   "end_err_ms_max_notes_le_5s": 7.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 5.0,
+   "end_err_ms_max": 3833.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 6
+  },
+  "cmt": {
+   "top_voice_notes": 11,
+   "top_voice_share": 0.611,
+   "top_voice_below_C4": 4,
+   "after_grid": 8,
+   "grid_collisions_dropped": 3,
+   "collisions_phase_sweep_min_max": [
+    0,
+    3
+   ],
+   "leaps_over_12": 2,
+   "top_voice_range": 32,
+   "onset_err_ms_median": 22.0,
+   "onset_err_ms_max": 41.0,
+   "dur_err_ms_median": 36.5,
+   "out_of_48_pitch_window": 0,
+   "velocity_sd_removed": 7.8,
+   "kept_share_of_all_notes": 0.444
+  }
+ },
+ {
+  "segment": "Rain Shadow",
+  "notes": 64,
+  "chord_events": 10,
+  "events": 53,
+  "src_sha16": "5c048f1e79c0dd6d",
+  "segment_sha16": "adc3761918685f7f",
+  "aria": {
+   "tokens": 195,
+   "notes_after": 64,
+   "matched_15ms": 64,
+   "notes_over_5s": 0,
+   "end_err_ms_max_notes_le_5s": 9.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 3.0,
+   "end_err_ms_max": 9.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 12
+  },
+  "cmt": {
+   "top_voice_notes": 53,
+   "top_voice_share": 0.828,
+   "top_voice_below_C4": 2,
+   "after_grid": 35,
+   "grid_collisions_dropped": 18,
+   "collisions_phase_sweep_min_max": [
+    17,
+    20
+   ],
+   "leaps_over_12": 16,
+   "top_voice_range": 38,
+   "onset_err_ms_median": 34.0,
+   "onset_err_ms_max": 61.0,
+   "dur_err_ms_median": 39.0,
+   "out_of_48_pitch_window": 0,
+   "velocity_sd_removed": 7.5,
+   "kept_share_of_all_notes": 0.547
+  }
+ },
+ {
+  "segment": "Samsara",
+  "notes": 86,
+  "chord_events": 11,
+  "events": 73,
+  "src_sha16": "208a184837401585",
+  "segment_sha16": "bc1b339213fd1b23",
+  "aria": {
+   "tokens": 261,
+   "notes_after": 86,
+   "matched_15ms": 86,
+   "notes_over_5s": 0,
+   "end_err_ms_max_notes_le_5s": 10.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 3.0,
+   "end_err_ms_max": 10.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 11
+  },
+  "cmt": {
+   "top_voice_notes": 73,
+   "top_voice_share": 0.849,
+   "top_voice_below_C4": 47,
+   "after_grid": 61,
+   "grid_collisions_dropped": 12,
+   "collisions_phase_sweep_min_max": [
+    11,
+    13
+   ],
+   "leaps_over_12": 13,
+   "top_voice_range": 43,
+   "onset_err_ms_median": 32.0,
+   "onset_err_ms_max": 61.0,
+   "dur_err_ms_median": 41.0,
+   "out_of_48_pitch_window": 2,
+   "velocity_sd_removed": 7.6,
+   "kept_share_of_all_notes": 0.709
+  }
+ },
+ {
+  "segment": "Someday My Prince Will Come",
+  "notes": 46,
+  "chord_events": 8,
+  "events": 37,
+  "src_sha16": "763b00c8fcaab2e4",
+  "segment_sha16": "a49339d230d00d59",
+  "aria": {
+   "tokens": 141,
+   "notes_after": 46,
+   "matched_15ms": 46,
+   "notes_over_5s": 0,
+   "end_err_ms_max_notes_le_5s": 9.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 3.5,
+   "end_err_ms_max": 9.0,
+   "velocity_err_max": 4,
+   "chord_events_after": 8
+  },
+  "cmt": {
+   "top_voice_notes": 37,
+   "top_voice_share": 0.804,
+   "top_voice_below_C4": 4,
+   "after_grid": 29,
+   "grid_collisions_dropped": 8,
+   "collisions_phase_sweep_min_max": [
+    7,
+    10
+   ],
+   "leaps_over_12": 2,
+   "top_voice_range": 21,
+   "onset_err_ms_median": 27.0,
+   "onset_err_ms_max": 59.0,
+   "dur_err_ms_median": 36.0,
+   "out_of_48_pitch_window": 0,
+   "velocity_sd_removed": 8.7,
+   "kept_share_of_all_notes": 0.63
+  }
+ },
+ {
+  "segment": "The Legend Of The Moon",
+  "notes": 35,
+  "chord_events": 8,
+  "events": 18,
+  "src_sha16": "da6110e40444df2c",
+  "segment_sha16": "6e8df1bc40e5dc5b",
+  "aria": {
+   "tokens": 108,
+   "notes_after": 35,
+   "matched_15ms": 35,
+   "notes_over_5s": 1,
+   "end_err_ms_max_notes_le_5s": 7.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 4.0,
+   "end_err_ms_median": 1.0,
+   "end_err_ms_max": 348.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 8
+  },
+  "cmt": {
+   "top_voice_notes": 18,
+   "top_voice_share": 0.514,
+   "top_voice_below_C4": 2,
+   "after_grid": 14,
+   "grid_collisions_dropped": 4,
+   "collisions_phase_sweep_min_max": [
+    4,
+    6
+   ],
+   "leaps_over_12": 6,
+   "top_voice_range": 31,
+   "onset_err_ms_median": 41.0,
+   "onset_err_ms_max": 55.0,
+   "dur_err_ms_median": 30.0,
+   "out_of_48_pitch_window": 0,
+   "velocity_sd_removed": 12.9,
+   "kept_share_of_all_notes": 0.4
+  }
+ },
+ {
+  "segment": "The Spinners",
+  "notes": 59,
+  "chord_events": 14,
+  "events": 45,
+  "src_sha16": "15be413dd334a2da",
+  "segment_sha16": "234fccedea825c8e",
+  "aria": {
+   "tokens": 180,
+   "notes_after": 59,
+   "matched_15ms": 59,
+   "notes_over_5s": 0,
+   "end_err_ms_max_notes_le_5s": 9.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 3.0,
+   "end_err_ms_max": 9.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 14
+  },
+  "cmt": {
+   "top_voice_notes": 45,
+   "top_voice_share": 0.763,
+   "top_voice_below_C4": 22,
+   "after_grid": 38,
+   "grid_collisions_dropped": 7,
+   "collisions_phase_sweep_min_max": [
+    5,
+    8
+   ],
+   "leaps_over_12": 19,
+   "top_voice_range": 36,
+   "onset_err_ms_median": 36.5,
+   "onset_err_ms_max": 61.0,
+   "dur_err_ms_median": 40.0,
+   "out_of_48_pitch_window": 0,
+   "velocity_sd_removed": 7.8,
+   "kept_share_of_all_notes": 0.644
+  }
+ },
+ {
+  "segment": "What The Waves Brought",
+  "notes": 112,
+  "chord_events": 23,
+  "events": 86,
+  "src_sha16": "3101766c1806d709",
+  "segment_sha16": "f56da8ec379e7121",
+  "aria": {
+   "tokens": 339,
+   "notes_after": 112,
+   "matched_15ms": 112,
+   "notes_over_5s": 0,
+   "end_err_ms_max_notes_le_5s": 10.0,
+   "simultaneous_pairs_merged": 0,
+   "simultaneous_pairs_split": 0,
+   "onset_err_ms_max": 5.0,
+   "end_err_ms_median": 3.0,
+   "end_err_ms_max": 10.0,
+   "velocity_err_max": 5,
+   "chord_events_after": 25
+  },
+  "cmt": {
+   "top_voice_notes": 86,
+   "top_voice_share": 0.768,
+   "top_voice_below_C4": 49,
+   "after_grid": 63,
+   "grid_collisions_dropped": 23,
+   "collisions_phase_sweep_min_max": [
+    21,
+    23
+   ],
+   "leaps_over_12": 3,
+   "top_voice_range": 27,
+   "onset_err_ms_median": 27.0,
+   "onset_err_ms_max": 61.0,
+   "dur_err_ms_median": 35.0,
+   "out_of_48_pitch_window": 0,
+   "velocity_sd_removed": 6.9,
+   "kept_share_of_all_notes": 0.562
+  }
+ }
+]

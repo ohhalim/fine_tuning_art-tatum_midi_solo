@@ -1,0 +1,82 @@
+{
+ "experiment": "rep_audit (Astra #214)",
+ "date": "2026-10-08",
+ "source_dir": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/midi_dataset/midi/studio/Tigran Hamasyan/A Fable",
+ "selection": "all 13 files sorted by name, notes with onset in [60, 68) s, ends not clipped, none excluded",
+ "artifacts_dir": "/Users/ohhalim/git_box/t3_aria/audit",
+ "script": "scripts/rep_audit.py",
+ "script_sha16": "782b26ac907bbeab",
+ "command": "cd /Users/ohhalim/git_box/t3_aria/aria && ../.venv/bin/python <repo>/scripts/rep_audit.py /Users/ohhalim/git_box/t3_aria/aria /Users/ohhalim/git_box/t3_aria/audit",
+ "env": {
+  "python": "3.12.9",
+  "ariautils": "0.0.1",
+  "mido": "1.3.3"
+ },
+ "files": [
+  {
+   "segment": "A Fable",
+   "src_sha16": "ca81a2d725209c7b",
+   "segment_sha16": "aea4f0f1446d903c"
+  },
+  {
+   "segment": "A Memory That Became A Dream",
+   "src_sha16": "9b323eacd2076320",
+   "segment_sha16": "18801f6d20762f1b"
+  },
+  {
+   "segment": "Illusion",
+   "src_sha16": "fe267605e5d98a72",
+   "segment_sha16": "daf8ab020d57ea7a"
+  },
+  {
+   "segment": "Kakavik (The Little Partridge)",
+   "src_sha16": "ec5717eefe22b92a",
+   "segment_sha16": "ad6d53b8668d45ce"
+  },
+  {
+   "segment": "Longing",
+   "src_sha16": "66e1030ec4fbae6d",
+   "segment_sha16": "a318bd76e90c2c68"
+  },
+  {
+   "segment": "Looking For The Block",
+   "src_sha16": "22521c2304ce4bf5",
+   "segment_sha16": "4856b20402790909"
+  },
+  {
+   "segment": "Mother, Where Are You",
+   "src_sha16": "9e608cd23082cb9d",
+   "segment_sha16": "22c8a3053e389a54"
+  },
+  {
+   "segment": "Rain Shadow",
+   "src_sha16": "5c048f1e79c0dd6d",
+   "segment_sha16": "adc3761918685f7f"
+  },
+  {
+   "segment": "Samsara",
+   "src_sha16": "208a184837401585",
+   "segment_sha16": "bc1b339213fd1b23"
+  },
+  {
+   "segment": "Someday My Prince Will Come",
+   "src_sha16": "763b00c8fcaab2e4",
+   "segment_sha16": "a49339d230d00d59"
+  },
+  {
+   "segment": "The Legend Of The Moon",
+   "src_sha16": "da6110e40444df2c",
+   "segment_sha16": "6e8df1bc40e5dc5b"
+  },
+  {
+   "segment": "The Spinners",
+   "src_sha16": "15be413dd334a2da",
+   "segment_sha16": "234fccedea825c8e"
+  },
+  {
+   "segment": "What The Waves Brought",
+   "src_sha16": "3101766c1806d709",
+   "segment_sha16": "f56da8ec379e7121"
+  }
+ ]
+}
