@@ -1,0 +1,3009 @@
+{
+ "load_s": 0.14,
+ "block": 0.9375,
+ "budget_s": 0.8875,
+ "end_policy": "min(raw_end, block end); end<=onset dropped",
+ "temp": 0.98,
+ "min_p": 0.0,
+ "new_tokens": 48,
+ "rng": "torch.manual_seed(1000*seed + j)",
+ "sequences": [
+  {
+   "history": "P2",
+   "seed": 1,
+   "root_pc": 11,
+   "t0": 8.11,
+   "blocks": [
+    {
+     "j": 0,
+     "quality": "maj7",
+     "T": 8.11,
+     "q_ms": 8110,
+     "q_next_ms": 9050,
+     "grid_error_ms": 0.0,
+     "chord": [
+      47,
+      51,
+      58
+     ],
+     "prompt_tokens": 282,
+     "normalization": {
+      "counts": {
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "history<-guide": 0.6
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 7,
+     "dropped_after_block": 9,
+     "before_block": 0,
+     "clipped_at_block_end": 4,
+     "clipped_duration_lost_s": 0.08,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.706,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.231,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       70,
+       8.11,
+       9.05,
+       70
+      ],
+      [
+       63,
+       8.12,
+       8.68,
+       60
+      ],
+      [
+       67,
+       8.37,
+       9.05,
+       60
+      ],
+      [
+       63,
+       8.68,
+       9.05,
+       70
+      ],
+      [
+       47,
+       8.83,
+       9.05,
+       70
+      ],
+      [
+       51,
+       8.83,
+       9.05,
+       60
+      ],
+      [
+       58,
+       8.83,
+       9.05,
+       70
+      ]
+     ]
+    },
+    {
+     "j": 1,
+     "quality": "m7",
+     "T": 9.0475,
+     "q_ms": 9050,
+     "q_next_ms": 9990,
+     "grid_error_ms": 2.5,
+     "chord": [
+      47,
+      50,
+      57
+     ],
+     "prompt_tokens": 312,
+     "normalization": {
+      "counts": {
+       "truncated:guide<-generated": 3,
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "guide<-generated": 0.66,
+       "history<-guide": 0.6
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 5,
+     "dropped_after_block": 10,
+     "before_block": 0,
+     "clipped_at_block_end": 2,
+     "clipped_duration_lost_s": 0.08,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 260,
+     "eos": false,
+     "cost_s": 0.735,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.203,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       81,
+       9.31,
+       9.53,
+       80
+      ],
+      [
+       80,
+       9.51,
+       9.66,
+       80
+      ],
+      [
+       81,
+       9.67,
+       9.870000000000001,
+       90
+      ],
+      [
+       78,
+       9.81,
+       9.99,
+       80
+      ],
+      [
+       40,
+       9.97,
+       9.99,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 2,
+     "quality": "maj7",
+     "T": 9.985,
+     "q_ms": 9990,
+     "q_next_ms": 10920,
+     "grid_error_ms": 5.0,
+     "chord": [
+      47,
+      51,
+      58
+     ],
+     "prompt_tokens": 336,
+     "normalization": {
+      "counts": {
+       "truncated:guide<-generated": 3,
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "guide<-generated": 0.66,
+       "history<-guide": 0.6
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 4,
+     "dropped_after_block": 11,
+     "before_block": 0,
+     "clipped_at_block_end": 3,
+     "clipped_duration_lost_s": 1.98,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.685,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.252,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       78,
+       9.99,
+       10.92,
+       80
+      ],
+      [
+       49,
+       10.91,
+       10.92,
+       70
+      ],
+      [
+       52,
+       10.91,
+       10.92,
+       70
+      ],
+      [
+       59,
+       10.91,
+       10.92,
+       70
+      ]
+     ]
+    },
+    {
+     "j": 3,
+     "quality": "m7",
+     "T": 10.9225,
+     "q_ms": 10920,
+     "q_next_ms": 11860,
+     "grid_error_ms": -2.5,
+     "chord": [
+      47,
+      50,
+      57
+     ],
+     "prompt_tokens": 358,
+     "normalization": {
+      "counts": {
+       "truncated:guide<-generated": 3,
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "guide<-generated": 0.66,
+       "history<-guide": 0.6
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 7,
+     "dropped_after_block": 9,
+     "before_block": 0,
+     "clipped_at_block_end": 4,
+     "clipped_duration_lost_s": 3.31,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 280,
+     "eos": false,
+     "cost_s": 0.717,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.22,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       78,
+       11.2,
+       11.299999999999999,
+       70
+      ],
+      [
+       80,
+       11.29,
+       11.469999999999999,
+       70
+      ],
+      [
+       75,
+       11.44,
+       11.639999999999999,
+       80
+      ],
+      [
+       40,
+       11.839999999999998,
+       11.86,
+       60
+      ],
+      [
+       47,
+       11.839999999999998,
+       11.86,
+       60
+      ],
+      [
+       51,
+       11.839999999999998,
+       11.86,
+       60
+      ],
+      [
+       58,
+       11.839999999999998,
+       11.86,
+       60
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "history": "P2",
+   "seed": 2,
+   "root_pc": 11,
+   "t0": 8.11,
+   "blocks": [
+    {
+     "j": 0,
+     "quality": "m7",
+     "T": 8.11,
+     "q_ms": 8110,
+     "q_next_ms": 9050,
+     "grid_error_ms": 0.0,
+     "chord": [
+      47,
+      50,
+      57
+     ],
+     "prompt_tokens": 282,
+     "normalization": {
+      "counts": {
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "history<-guide": 0.6
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 10,
+     "dropped_after_block": 6,
+     "before_block": 0,
+     "clipped_at_block_end": 3,
+     "clipped_duration_lost_s": 0.21,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.635,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.303,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       62,
+       8.11,
+       9.049999999999999,
+       70
+      ],
+      [
+       71,
+       8.11,
+       9.049999999999999,
+       70
+      ],
+      [
+       59,
+       8.41,
+       9.049999999999999,
+       70
+      ],
+      [
+       40,
+       8.620000000000001,
+       9.049999999999999,
+       60
+      ],
+      [
+       41,
+       8.65,
+       8.719999999999999,
+       70
+      ],
+      [
+       39,
+       8.68,
+       9.049999999999999,
+       50
+      ],
+      [
+       41,
+       8.719999999999999,
+       9.049999999999999,
+       60
+      ],
+      [
+       64,
+       8.969999999999999,
+       9.05,
+       60
+      ],
+      [
+       46,
+       8.999999999999998,
+       9.05,
+       60
+      ],
+      [
+       61,
+       8.999999999999998,
+       9.05,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 1,
+     "quality": "maj7",
+     "T": 9.0475,
+     "q_ms": 9050,
+     "q_next_ms": 9990,
+     "grid_error_ms": 2.5,
+     "chord": [
+      47,
+      51,
+      58
+     ],
+     "prompt_tokens": 321,
+     "normalization": {
+      "counts": {
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "history<-guide": 0.6
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 7,
+     "dropped_after_block": 8,
+     "before_block": 0,
+     "clipped_at_block_end": 1,
+     "clipped_duration_lost_s": 0.03,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 290,
+     "eos": false,
+     "cost_s": 0.719,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.218,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       73,
+       9.339999999999998,
+       9.91,
+       70
+      ],
+      [
+       61,
+       9.559999999999999,
+       9.989999999999998,
+       60
+      ],
+      [
+       71,
+       9.77,
+       9.959999999999999,
+       70
+      ],
+      [
+       73,
+       9.91,
+       9.989999999999998,
+       70
+      ],
+      [
+       43,
+       9.94,
+       9.989999999999998,
+       60
+      ],
+      [
+       46,
+       9.94,
+       9.989999999999998,
+       60
+      ],
+      [
+       71,
+       9.959999999999999,
+       9.99,
+       70
+      ]
+     ]
+    },
+    {
+     "j": 2,
+     "quality": "m7",
+     "T": 9.985,
+     "q_ms": 9990,
+     "q_next_ms": 10920,
+     "grid_error_ms": 5.0,
+     "chord": [
+      47,
+      50,
+      57
+     ],
+     "prompt_tokens": 351,
+     "normalization": {
+      "counts": {
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "history<-guide": 0.6
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 6,
+     "dropped_after_block": 9,
+     "before_block": 0,
+     "clipped_at_block_end": 4,
+     "clipped_duration_lost_s": 0.04,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 320,
+     "eos": false,
+     "cost_s": 0.687,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.251,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       71,
+       10.309999999999999,
+       10.879999999999999,
+       70
+      ],
+      [
+       60,
+       10.559999999999999,
+       10.92,
+       70
+      ],
+      [
+       69,
+       10.69,
+       10.729999999999999,
+       70
+      ],
+      [
+       43,
+       10.879999999999999,
+       10.92,
+       60
+      ],
+      [
+       45,
+       10.899999999999999,
+       10.92,
+       60
+      ],
+      [
+       46,
+       10.899999999999999,
+       10.92,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 3,
+     "quality": "maj7",
+     "T": 10.9225,
+     "q_ms": 10920,
+     "q_next_ms": 11860,
+     "grid_error_ms": -2.5,
+     "chord": [
+      47,
+      51,
+      58
+     ],
+     "prompt_tokens": 379,
+     "normalization": {
+      "counts": {
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "history<-guide": 0.6
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 10,
+     "dropped_after_block": 6,
+     "before_block": 0,
+     "clipped_at_block_end": 7,
+     "clipped_duration_lost_s": 1.77,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.674,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.264,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       61,
+       10.919999999999998,
+       11.489999999999998,
+       60
+      ],
+      [
+       73,
+       11.249999999999998,
+       11.79,
+       60
+      ],
+      [
+       61,
+       11.489999999999998,
+       11.86,
+       60
+      ],
+      [
+       71,
+       11.649999999999999,
+       11.78,
+       60
+      ],
+      [
+       73,
+       11.819999999999999,
+       11.86,
+       70
+      ],
+      [
+       45,
+       11.849999999999998,
+       11.86,
+       60
+      ],
+      [
+       50,
+       11.849999999999998,
+       11.86,
+       60
+      ],
+      [
+       57,
+       11.849999999999998,
+       11.86,
+       60
+      ],
+      [
+       60,
+       11.849999999999998,
+       11.86,
+       60
+      ],
+      [
+       71,
+       11.849999999999998,
+       11.86,
+       60
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "history": "P3",
+   "seed": 1,
+   "root_pc": 7,
+   "t0": 8.04,
+   "blocks": [
+    {
+     "j": 0,
+     "quality": "maj7",
+     "T": 8.04,
+     "q_ms": 8040,
+     "q_next_ms": 8980,
+     "grid_error_ms": 0.0,
+     "chord": [
+      43,
+      59,
+      54
+     ],
+     "prompt_tokens": 339,
+     "normalization": {
+      "counts": {},
+      "lost_s": {}
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 6,
+     "dropped_after_block": 9,
+     "before_block": 0,
+     "clipped_at_block_end": 4,
+     "clipped_duration_lost_s": 3.56,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 30,
+     "eos": false,
+     "cost_s": 0.679,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.259,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       70,
+       8.07,
+       8.629999999999999,
+       70
+      ],
+      [
+       63,
+       8.1,
+       8.98,
+       60
+      ],
+      [
+       67,
+       8.37,
+       8.98,
+       60
+      ],
+      [
+       70,
+       8.68,
+       8.979999999999999,
+       70
+      ],
+      [
+       74,
+       8.94,
+       8.98,
+       70
+      ],
+      [
+       86,
+       8.969999999999999,
+       8.98,
+       80
+      ]
+     ]
+    },
+    {
+     "j": 1,
+     "quality": "m7",
+     "T": 8.9775,
+     "q_ms": 8980,
+     "q_next_ms": 9920,
+     "grid_error_ms": 2.5,
+     "chord": [
+      43,
+      58,
+      53
+     ],
+     "prompt_tokens": 366,
+     "normalization": {
+      "counts": {},
+      "lost_s": {}
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 2,
+     "dropped_after_block": 13,
+     "before_block": 0,
+     "clipped_at_block_end": 2,
+     "clipped_duration_lost_s": 0.02,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 330,
+     "eos": false,
+     "cost_s": 0.659,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.278,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       81,
+       9.309999999999999,
+       9.92,
+       80
+      ],
+      [
+       79,
+       9.61,
+       9.92,
+       70
+      ]
+     ]
+    },
+    {
+     "j": 2,
+     "quality": "maj7",
+     "T": 9.915,
+     "q_ms": 9920,
+     "q_next_ms": 10850,
+     "grid_error_ms": 5.0,
+     "chord": [
+      43,
+      59,
+      54
+     ],
+     "prompt_tokens": 381,
+     "normalization": {
+      "counts": {},
+      "lost_s": {}
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 3,
+     "dropped_after_block": 12,
+     "before_block": 0,
+     "clipped_at_block_end": 0,
+     "clipped_duration_lost_s": 0.0,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 40,
+     "eos": false,
+     "cost_s": 0.693,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.244,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       78,
+       9.959999999999999,
+       10.379999999999999,
+       70
+      ],
+      [
+       82,
+       10.239999999999998,
+       10.85,
+       70
+      ],
+      [
+       81,
+       10.52,
+       10.84,
+       70
+      ]
+     ]
+    },
+    {
+     "j": 3,
+     "quality": "m7",
+     "T": 10.8525,
+     "q_ms": 10850,
+     "q_next_ms": 11790,
+     "grid_error_ms": -2.5,
+     "chord": [
+      43,
+      58,
+      53
+     ],
+     "prompt_tokens": 400,
+     "normalization": {
+      "counts": {},
+      "lost_s": {}
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 7,
+     "dropped_after_block": 9,
+     "before_block": 0,
+     "clipped_at_block_end": 4,
+     "clipped_duration_lost_s": 3.73,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 30,
+     "eos": false,
+     "cost_s": 0.673,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.264,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       77,
+       10.879999999999999,
+       11.489999999999998,
+       70
+      ],
+      [
+       70,
+       11.169999999999998,
+       11.789999999999997,
+       70
+      ],
+      [
+       75,
+       11.439999999999998,
+       11.779999999999998,
+       80
+      ],
+      [
+       40,
+       11.749999999999998,
+       11.79,
+       60
+      ],
+      [
+       48,
+       11.779999999999998,
+       11.79,
+       60
+      ],
+      [
+       57,
+       11.779999999999998,
+       11.79,
+       60
+      ],
+      [
+       74,
+       11.779999999999998,
+       11.79,
+       80
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "history": "P3",
+   "seed": 2,
+   "root_pc": 7,
+   "t0": 8.04,
+   "blocks": [
+    {
+     "j": 0,
+     "quality": "m7",
+     "T": 8.04,
+     "q_ms": 8040,
+     "q_next_ms": 8980,
+     "grid_error_ms": 0.0,
+     "chord": [
+      43,
+      58,
+      53
+     ],
+     "prompt_tokens": 339,
+     "normalization": {
+      "counts": {},
+      "lost_s": {}
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 16,
+     "dropped_after_block": 0,
+     "before_block": 0,
+     "clipped_at_block_end": 0,
+     "clipped_duration_lost_s": 0.0,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.66,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.277,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       57,
+       8.040000000000001,
+       8.290000000000001,
+       60
+      ],
+      [
+       62,
+       8.040000000000001,
+       8.290000000000001,
+       60
+      ],
+      [
+       65,
+       8.040000000000001,
+       8.290000000000001,
+       60
+      ],
+      [
+       70,
+       8.040000000000001,
+       8.290000000000001,
+       70
+      ],
+      [
+       43,
+       8.290000000000001,
+       8.620000000000001,
+       60
+      ],
+      [
+       53,
+       8.290000000000001,
+       8.620000000000001,
+       60
+      ],
+      [
+       57,
+       8.290000000000001,
+       8.98,
+       60
+      ],
+      [
+       58,
+       8.290000000000001,
+       8.620000000000001,
+       60
+      ],
+      [
+       62,
+       8.290000000000001,
+       8.98,
+       60
+      ],
+      [
+       65,
+       8.290000000000001,
+       8.620000000000001,
+       60
+      ],
+      [
+       70,
+       8.290000000000001,
+       8.620000000000001,
+       60
+      ],
+      [
+       43,
+       8.620000000000001,
+       8.98,
+       60
+      ],
+      [
+       53,
+       8.620000000000001,
+       8.98,
+       60
+      ],
+      [
+       58,
+       8.620000000000001,
+       8.98,
+       60
+      ],
+      [
+       65,
+       8.620000000000001,
+       8.98,
+       60
+      ],
+      [
+       70,
+       8.620000000000001,
+       8.98,
+       70
+      ]
+     ]
+    },
+    {
+     "j": 1,
+     "quality": "maj7",
+     "T": 8.9775,
+     "q_ms": 8980,
+     "q_next_ms": 9920,
+     "grid_error_ms": 2.5,
+     "chord": [
+      43,
+      59,
+      54
+     ],
+     "prompt_tokens": 396,
+     "normalization": {
+      "counts": {
+       "truncated:guide<-generated": 3
+      },
+      "lost_s": {
+       "guide<-generated": 2.07
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 12,
+     "dropped_after_block": 4,
+     "before_block": 0,
+     "clipped_at_block_end": 0,
+     "clipped_duration_lost_s": 0.0,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.782,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.156,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       63,
+       8.98,
+       9.38,
+       60
+      ],
+      [
+       71,
+       8.98,
+       9.38,
+       70
+      ],
+      [
+       43,
+       9.38,
+       9.64,
+       60
+      ],
+      [
+       54,
+       9.38,
+       9.64,
+       60
+      ],
+      [
+       59,
+       9.38,
+       9.64,
+       60
+      ],
+      [
+       63,
+       9.38,
+       9.64,
+       60
+      ],
+      [
+       71,
+       9.38,
+       9.64,
+       70
+      ],
+      [
+       43,
+       9.64,
+       9.92,
+       60
+      ],
+      [
+       54,
+       9.64,
+       9.92,
+       60
+      ],
+      [
+       59,
+       9.64,
+       9.92,
+       60
+      ],
+      [
+       63,
+       9.64,
+       9.92,
+       60
+      ],
+      [
+       71,
+       9.64,
+       9.92,
+       70
+      ]
+     ]
+    },
+    {
+     "j": 2,
+     "quality": "m7",
+     "T": 9.915,
+     "q_ms": 9920,
+     "q_next_ms": 10850,
+     "grid_error_ms": 5.0,
+     "chord": [
+      43,
+      58,
+      53
+     ],
+     "prompt_tokens": 441,
+     "normalization": {
+      "counts": {
+       "truncated:guide<-generated": 6
+      },
+      "lost_s": {
+       "guide<-generated": 3.69
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 13,
+     "dropped_after_block": 2,
+     "before_block": 0,
+     "clipped_at_block_end": 6,
+     "clipped_duration_lost_s": 0.48,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.728,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.209,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       57,
+       9.92,
+       10.85,
+       60
+      ],
+      [
+       62,
+       9.92,
+       10.85,
+       60
+      ],
+      [
+       65,
+       9.92,
+       10.85,
+       60
+      ],
+      [
+       70,
+       9.92,
+       10.85,
+       80
+      ],
+      [
+       43,
+       10.2,
+       10.53,
+       70
+      ],
+      [
+       31,
+       10.219999999999999,
+       10.53,
+       60
+      ],
+      [
+       31,
+       10.53,
+       10.549999999999999,
+       60
+      ],
+      [
+       43,
+       10.53,
+       10.85,
+       60
+      ],
+      [
+       31,
+       10.549999999999999,
+       10.85,
+       60
+      ],
+      [
+       54,
+       10.799999999999999,
+       10.85,
+       60
+      ],
+      [
+       58,
+       10.799999999999999,
+       10.85,
+       60
+      ],
+      [
+       59,
+       10.799999999999999,
+       10.85,
+       60
+      ],
+      [
+       63,
+       10.799999999999999,
+       10.85,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 3,
+     "quality": "maj7",
+     "T": 10.8525,
+     "q_ms": 10850,
+     "q_next_ms": 11790,
+     "grid_error_ms": -2.5,
+     "chord": [
+      43,
+      59,
+      54
+     ],
+     "prompt_tokens": 490,
+     "normalization": {
+      "counts": {
+       "truncated:guide<-generated": 8
+      },
+      "lost_s": {
+       "guide<-generated": 4.39
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 4,
+     "dropped_after_block": 12,
+     "before_block": 0,
+     "clipped_at_block_end": 3,
+     "clipped_duration_lost_s": 1.07,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.729,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.209,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       71,
+       10.85,
+       11.79,
+       80
+      ],
+      [
+       83,
+       10.91,
+       11.79,
+       70
+      ],
+      [
+       80,
+       11.49,
+       11.79,
+       60
+      ],
+      [
+       78,
+       11.76,
+       11.79,
+       70
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "history": "TA",
+   "seed": 1,
+   "root_pc": 0,
+   "t0": 8.14,
+   "blocks": [
+    {
+     "j": 0,
+     "quality": "maj7",
+     "T": 8.14,
+     "q_ms": 8140,
+     "q_next_ms": 9080,
+     "grid_error_ms": -0.0,
+     "chord": [
+      36,
+      52,
+      59
+     ],
+     "prompt_tokens": 408,
+     "normalization": {
+      "counts": {},
+      "lost_s": {}
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 5,
+     "dropped_after_block": 10,
+     "before_block": 0,
+     "clipped_at_block_end": 1,
+     "clipped_duration_lost_s": 0.02,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.68,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.258,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       55,
+       8.139999999999992,
+       9.07999999999999,
+       60
+      ],
+      [
+       64,
+       8.139999999999992,
+       9.07999999999999,
+       70
+      ],
+      [
+       67,
+       8.36999999999999,
+       9.05999999999999,
+       60
+      ],
+      [
+       71,
+       8.67999999999999,
+       9.08,
+       60
+      ],
+      [
+       89,
+       8.82999999999999,
+       9.04999999999999,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 1,
+     "quality": "m7",
+     "T": 9.0775,
+     "q_ms": 9080,
+     "q_next_ms": 10020,
+     "grid_error_ms": 2.5,
+     "chord": [
+      36,
+      51,
+      58
+     ],
+     "prompt_tokens": 432,
+     "normalization": {
+      "counts": {},
+      "lost_s": {}
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 7,
+     "dropped_after_block": 8,
+     "before_block": 0,
+     "clipped_at_block_end": 2,
+     "clipped_duration_lost_s": 0.22,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.728,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.21,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       47,
+       9.07999999999999,
+       10.019999999999989,
+       60
+      ],
+      [
+       54,
+       9.07999999999999,
+       10.019999999999989,
+       60
+      ],
+      [
+       66,
+       9.21999999999999,
+       9.51999999999999,
+       60
+      ],
+      [
+       70,
+       9.53999999999999,
+       10.019999999999989,
+       70
+      ],
+      [
+       78,
+       9.63999999999999,
+       10.02,
+       70
+      ],
+      [
+       90,
+       9.63999999999999,
+       10.019999999999989,
+       70
+      ],
+      [
+       73,
+       9.73999999999999,
+       10.02,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 2,
+     "quality": "maj7",
+     "T": 10.015,
+     "q_ms": 10020,
+     "q_next_ms": 10950,
+     "grid_error_ms": 5.0,
+     "chord": [
+      36,
+      52,
+      59
+     ],
+     "prompt_tokens": 463,
+     "normalization": {
+      "counts": {},
+      "lost_s": {}
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 7,
+     "dropped_after_block": 9,
+     "before_block": 0,
+     "clipped_at_block_end": 0,
+     "clipped_duration_lost_s": 0.0,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 1.197,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": 0.259,
+     "miss": true,
+     "lateness_s": 0.309,
+     "accepted_notes": [
+      [
+       48,
+       10.019999999999989,
+       10.94999999999999,
+       60
+      ],
+      [
+       55,
+       10.019999999999989,
+       10.94999999999999,
+       60
+      ],
+      [
+       67,
+       10.32999999999999,
+       10.62999999999999,
+       60
+      ],
+      [
+       79,
+       10.37999999999999,
+       10.62999999999999,
+       70
+      ],
+      [
+       71,
+       10.64999999999999,
+       10.94999999999999,
+       60
+      ],
+      [
+       79,
+       10.64999999999999,
+       10.94999999999999,
+       60
+      ],
+      [
+       91,
+       10.64999999999999,
+       10.94999999999999,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 3,
+     "quality": "m7",
+     "T": 10.9525,
+     "q_ms": 10950,
+     "q_next_ms": 11890,
+     "grid_error_ms": -2.5,
+     "chord": [
+      36,
+      51,
+      58
+     ],
+     "prompt_tokens": 493,
+     "normalization": {
+      "counts": {},
+      "lost_s": {}
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 14,
+     "dropped_after_block": 2,
+     "before_block": 0,
+     "clipped_at_block_end": 0,
+     "clipped_duration_lost_s": 0.0,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.794,
+     "sim_start_rel_T": -0.678,
+     "sim_ready_rel_T": 0.116,
+     "miss": true,
+     "lateness_s": 0.166,
+     "accepted_notes": [
+      [
+       47,
+       10.94999999999999,
+       11.889999999999988,
+       60
+      ],
+      [
+       54,
+       10.94999999999999,
+       11.889999999999988,
+       60
+      ],
+      [
+       75,
+       11.02999999999999,
+       11.22999999999999,
+       60
+      ],
+      [
+       82,
+       11.11999999999999,
+       11.24999999999999,
+       60
+      ],
+      [
+       73,
+       11.24999999999999,
+       11.289999999999988,
+       60
+      ],
+      [
+       97,
+       11.24999999999999,
+       11.449999999999989,
+       60
+      ],
+      [
+       78,
+       11.33999999999999,
+       11.449999999999989,
+       60
+      ],
+      [
+       90,
+       11.33999999999999,
+       11.449999999999989,
+       60
+      ],
+      [
+       73,
+       11.449999999999989,
+       11.639999999999988,
+       60
+      ],
+      [
+       85,
+       11.449999999999989,
+       11.639999999999988,
+       60
+      ],
+      [
+       97,
+       11.539999999999988,
+       11.639999999999988,
+       60
+      ],
+      [
+       74,
+       11.669999999999987,
+       11.889999999999988,
+       60
+      ],
+      [
+       86,
+       11.669999999999987,
+       11.889999999999988,
+       60
+      ],
+      [
+       98,
+       11.749999999999988,
+       11.889999999999988,
+       70
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "history": "TA",
+   "seed": 2,
+   "root_pc": 0,
+   "t0": 8.14,
+   "blocks": [
+    {
+     "j": 0,
+     "quality": "m7",
+     "T": 8.14,
+     "q_ms": 8140,
+     "q_next_ms": 9080,
+     "grid_error_ms": -0.0,
+     "chord": [
+      36,
+      51,
+      58
+     ],
+     "prompt_tokens": 408,
+     "normalization": {
+      "counts": {},
+      "lost_s": {}
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 7,
+     "dropped_after_block": 9,
+     "before_block": 0,
+     "clipped_at_block_end": 5,
+     "clipped_duration_lost_s": 1.2,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 600,
+     "eos": false,
+     "cost_s": 0.787,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.151,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       75,
+       8.73999999999999,
+       9.069999999999988,
+       60
+      ],
+      [
+       73,
+       8.82999999999999,
+       9.079999999999988,
+       60
+      ],
+      [
+       82,
+       8.82999999999999,
+       9.08,
+       60
+      ],
+      [
+       85,
+       8.939999999999989,
+       9.08,
+       70
+      ],
+      [
+       80,
+       9.00999999999999,
+       9.08,
+       70
+      ],
+      [
+       39,
+       9.029999999999989,
+       9.08,
+       50
+      ],
+      [
+       51,
+       9.059999999999988,
+       9.08,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 1,
+     "quality": "maj7",
+     "T": 9.0775,
+     "q_ms": 9080,
+     "q_next_ms": 10020,
+     "grid_error_ms": 2.5,
+     "chord": [
+      36,
+      52,
+      59
+     ],
+     "prompt_tokens": 438,
+     "normalization": {
+      "counts": {
+       "truncated:guide<-generated": 1
+      },
+      "lost_s": {
+       "guide<-generated": 0.02
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 13,
+     "dropped_after_block": 2,
+     "before_block": 0,
+     "clipped_at_block_end": 6,
+     "clipped_duration_lost_s": 0.33,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 260,
+     "eos": false,
+     "cost_s": 0.949,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": 0.012,
+     "miss": true,
+     "lateness_s": 0.062,
+     "accepted_notes": [
+      [
+       79,
+       9.339999999999987,
+       10.019999999999985,
+       60
+      ],
+      [
+       72,
+       9.709999999999987,
+       9.909999999999986,
+       60
+      ],
+      [
+       84,
+       9.749999999999986,
+       10.019999999999985,
+       60
+      ],
+      [
+       72,
+       9.909999999999986,
+       10.019999999999985,
+       60
+      ],
+      [
+       80,
+       9.909999999999986,
+       10.019999999999985,
+       60
+      ],
+      [
+       41,
+       9.969999999999986,
+       10.019999999999985,
+       60
+      ],
+      [
+       81,
+       9.969999999999986,
+       10.019999999999985,
+       70
+      ],
+      [
+       39,
+       9.999999999999986,
+       10.02,
+       60
+      ],
+      [
+       44,
+       9.999999999999986,
+       10.02,
+       60
+      ],
+      [
+       35,
+       10.009999999999986,
+       10.02,
+       60
+      ],
+      [
+       51,
+       10.009999999999986,
+       10.02,
+       60
+      ],
+      [
+       82,
+       10.009999999999986,
+       10.02,
+       70
+      ],
+      [
+       94,
+       10.009999999999986,
+       10.02,
+       70
+      ]
+     ]
+    },
+    {
+     "j": 2,
+     "quality": "m7",
+     "T": 10.015,
+     "q_ms": 10020,
+     "q_next_ms": 10950,
+     "grid_error_ms": 5.0,
+     "chord": [
+      36,
+      51,
+      58
+     ],
+     "prompt_tokens": 487,
+     "normalization": {
+      "counts": {
+       "truncated:guide<-generated": 1
+      },
+      "lost_s": {
+       "guide<-generated": 0.02
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 11,
+     "dropped_after_block": 5,
+     "before_block": 0,
+     "clipped_at_block_end": 1,
+     "clipped_duration_lost_s": 0.01,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 10,
+     "eos": false,
+     "cost_s": 0.777,
+     "sim_start_rel_T": -0.926,
+     "sim_ready_rel_T": -0.149,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       47,
+       10.029999999999985,
+       10.949999999999982,
+       60
+      ],
+      [
+       35,
+       10.039999999999985,
+       10.949999999999982,
+       60
+      ],
+      [
+       73,
+       10.149999999999984,
+       10.279999999999983,
+       60
+      ],
+      [
+       85,
+       10.149999999999984,
+       10.269999999999984,
+       60
+      ],
+      [
+       75,
+       10.599999999999984,
+       10.949999999999982,
+       60
+      ],
+      [
+       73,
+       10.689999999999984,
+       10.949999999999982,
+       60
+      ],
+      [
+       82,
+       10.699999999999983,
+       10.949999999999982,
+       60
+      ],
+      [
+       85,
+       10.799999999999983,
+       10.949999999999982,
+       70
+      ],
+      [
+       80,
+       10.869999999999983,
+       10.949999999999982,
+       70
+      ],
+      [
+       39,
+       10.909999999999982,
+       10.949999999999982,
+       60
+      ],
+      [
+       51,
+       10.939999999999982,
+       10.95,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 3,
+     "quality": "maj7",
+     "T": 10.9525,
+     "q_ms": 10950,
+     "q_next_ms": 11890,
+     "grid_error_ms": -2.5,
+     "chord": [
+      36,
+      52,
+      59
+     ],
+     "prompt_tokens": 529,
+     "normalization": {
+      "counts": {
+       "truncated:guide<-generated": 2
+      },
+      "lost_s": {
+       "guide<-generated": 0.03
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 13,
+     "dropped_after_block": 3,
+     "before_block": 0,
+     "clipped_at_block_end": 1,
+     "clipped_duration_lost_s": 0.09,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.944,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": 0.006,
+     "miss": true,
+     "lateness_s": 0.056,
+     "accepted_notes": [
+      [
+       40,
+       10.949999999999982,
+       11.889999999999976,
+       60
+      ],
+      [
+       73,
+       11.059999999999981,
+       11.18999999999998,
+       60
+      ],
+      [
+       85,
+       11.07999999999998,
+       11.19999999999998,
+       60
+      ],
+      [
+       79,
+       11.11999999999998,
+       11.879999999999976,
+       60
+      ],
+      [
+       72,
+       11.53999999999998,
+       11.739999999999979,
+       60
+      ],
+      [
+       84,
+       11.579999999999979,
+       11.879999999999976,
+       60
+      ],
+      [
+       80,
+       11.71999999999998,
+       11.889999999999976,
+       60
+      ],
+      [
+       72,
+       11.739999999999979,
+       11.879999999999976,
+       60
+      ],
+      [
+       81,
+       11.779999999999978,
+       11.889999999999976,
+       70
+      ],
+      [
+       41,
+       11.809999999999977,
+       11.889999999999976,
+       60
+      ],
+      [
+       82,
+       11.849999999999977,
+       11.89,
+       70
+      ],
+      [
+       39,
+       11.869999999999976,
+       11.889999999999976,
+       60
+      ],
+      [
+       46,
+       11.869999999999976,
+       11.879999999999976,
+       60
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "history": "TB",
+   "seed": 1,
+   "root_pc": 7,
+   "t0": 7.91,
+   "blocks": [
+    {
+     "j": 0,
+     "quality": "maj7",
+     "T": 7.91,
+     "q_ms": 7910,
+     "q_next_ms": 8850,
+     "grid_error_ms": 0.0,
+     "chord": [
+      43,
+      59,
+      54
+     ],
+     "prompt_tokens": 237,
+     "normalization": {
+      "counts": {
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "history<-guide": 1.18
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 10,
+     "dropped_after_block": 6,
+     "before_block": 0,
+     "clipped_at_block_end": 6,
+     "clipped_duration_lost_s": 2.89,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 160,
+     "eos": false,
+     "cost_s": 0.659,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.278,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       55,
+       8.07,
+       8.63,
+       60
+      ],
+      [
+       60,
+       8.07,
+       8.63,
+       60
+      ],
+      [
+       67,
+       8.07,
+       8.85,
+       60
+      ],
+      [
+       56,
+       8.23,
+       8.620000000000001,
+       60
+      ],
+      [
+       61,
+       8.23,
+       8.63,
+       60
+      ],
+      [
+       57,
+       8.39,
+       8.85,
+       60
+      ],
+      [
+       62,
+       8.39,
+       8.85,
+       60
+      ],
+      [
+       48,
+       8.620000000000001,
+       8.85,
+       60
+      ],
+      [
+       53,
+       8.620000000000001,
+       8.85,
+       60
+      ],
+      [
+       56,
+       8.620000000000001,
+       8.85,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 1,
+     "quality": "m7",
+     "T": 8.8475,
+     "q_ms": 8850,
+     "q_next_ms": 9790,
+     "grid_error_ms": 2.5,
+     "chord": [
+      43,
+      58,
+      53
+     ],
+     "prompt_tokens": 276,
+     "normalization": {
+      "counts": {
+       "truncated:history<-guide": 1,
+       "truncated:history<-generated": 1
+      },
+      "lost_s": {
+       "history<-guide": 1.18,
+       "history<-generated": 1.31
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 6,
+     "dropped_after_block": 9,
+     "before_block": 0,
+     "clipped_at_block_end": 1,
+     "clipped_duration_lost_s": 0.03,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.675,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.262,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       47,
+       8.850000000000001,
+       8.88,
+       60
+      ],
+      [
+       56,
+       8.860000000000001,
+       9.780000000000001,
+       60
+      ],
+      [
+       67,
+       8.860000000000001,
+       9.330000000000002,
+       60
+      ],
+      [
+       47,
+       8.88,
+       9.770000000000001,
+       60
+      ],
+      [
+       67,
+       9.330000000000002,
+       9.360000000000001,
+       70
+      ],
+      [
+       79,
+       9.330000000000002,
+       9.79,
+       70
+      ]
+     ]
+    },
+    {
+     "j": 2,
+     "quality": "maj7",
+     "T": 9.785,
+     "q_ms": 9790,
+     "q_next_ms": 10720,
+     "grid_error_ms": 5.0,
+     "chord": [
+      43,
+      59,
+      54
+     ],
+     "prompt_tokens": 303,
+     "normalization": {
+      "counts": {
+       "truncated:history<-generated": 2,
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "history<-generated": 1.36,
+       "history<-guide": 1.18
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 10,
+     "dropped_after_block": 5,
+     "before_block": 0,
+     "clipped_at_block_end": 6,
+     "clipped_duration_lost_s": 5.67,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.685,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.253,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       68,
+       9.790000000000001,
+       10.719999999999999,
+       60
+      ],
+      [
+       71,
+       9.790000000000001,
+       10.719999999999999,
+       60
+      ],
+      [
+       80,
+       9.790000000000001,
+       10.719999999999999,
+       60
+      ],
+      [
+       53,
+       10.08,
+       10.719999999999999,
+       60
+      ],
+      [
+       67,
+       10.08,
+       10.72,
+       60
+      ],
+      [
+       79,
+       10.08,
+       10.72,
+       60
+      ],
+      [
+       36,
+       10.7,
+       10.72,
+       60
+      ],
+      [
+       43,
+       10.7,
+       10.72,
+       60
+      ],
+      [
+       62,
+       10.7,
+       10.72,
+       60
+      ],
+      [
+       74,
+       10.7,
+       10.72,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 3,
+     "quality": "m7",
+     "T": 10.7225,
+     "q_ms": 10720,
+     "q_next_ms": 11660,
+     "grid_error_ms": -2.5,
+     "chord": [
+      43,
+      58,
+      53
+     ],
+     "prompt_tokens": 343,
+     "normalization": {
+      "counts": {
+       "truncated:history<-generated": 2,
+       "truncated:history<-guide": 1,
+       "truncated:guide<-generated": 1
+      },
+      "lost_s": {
+       "history<-generated": 1.36,
+       "history<-guide": 1.18,
+       "guide<-generated": 0.02
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 6,
+     "dropped_after_block": 10,
+     "before_block": 0,
+     "clipped_at_block_end": 3,
+     "clipped_duration_lost_s": 0.19,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.739,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.198,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       55,
+       10.719999999999999,
+       11.659999999999998,
+       60
+      ],
+      [
+       62,
+       10.719999999999999,
+       11.659999999999998,
+       60
+      ],
+      [
+       50,
+       11.379999999999999,
+       11.659999999999998,
+       60
+      ],
+      [
+       74,
+       11.51,
+       11.66,
+       60
+      ],
+      [
+       73,
+       11.549999999999999,
+       11.66,
+       60
+      ],
+      [
+       72,
+       11.589999999999998,
+       11.66,
+       60
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "history": "TB",
+   "seed": 2,
+   "root_pc": 7,
+   "t0": 7.91,
+   "blocks": [
+    {
+     "j": 0,
+     "quality": "m7",
+     "T": 7.91,
+     "q_ms": 7910,
+     "q_next_ms": 8850,
+     "grid_error_ms": 0.0,
+     "chord": [
+      43,
+      58,
+      53
+     ],
+     "prompt_tokens": 237,
+     "normalization": {
+      "counts": {
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "history<-guide": 1.18
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 3,
+     "dropped_after_block": 12,
+     "before_block": 0,
+     "clipped_at_block_end": 2,
+     "clipped_duration_lost_s": 1.97,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 130,
+     "eos": false,
+     "cost_s": 0.621,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.317,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       50,
+       8.040000000000001,
+       8.370000000000001,
+       60
+      ],
+      [
+       57,
+       8.38,
+       8.85,
+       60
+      ],
+      [
+       62,
+       8.41,
+       8.85,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 1,
+     "quality": "maj7",
+     "T": 8.8475,
+     "q_ms": 8850,
+     "q_next_ms": 9790,
+     "grid_error_ms": 2.5,
+     "chord": [
+      43,
+      59,
+      54
+     ],
+     "prompt_tokens": 255,
+     "normalization": {
+      "counts": {
+       "truncated:history<-guide": 1
+      },
+      "lost_s": {
+       "history<-guide": 1.18
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 3,
+     "dropped_after_block": 12,
+     "before_block": 0,
+     "clipped_at_block_end": 1,
+     "clipped_duration_lost_s": 1.24,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.614,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.323,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       49,
+       8.85,
+       9.789999999999997,
+       60
+      ],
+      [
+       61,
+       9.129999999999999,
+       9.399999999999999,
+       60
+      ],
+      [
+       43,
+       9.769999999999998,
+       9.79,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 2,
+     "quality": "m7",
+     "T": 9.785,
+     "q_ms": 9790,
+     "q_next_ms": 10720,
+     "grid_error_ms": 5.0,
+     "chord": [
+      43,
+      58,
+      53
+     ],
+     "prompt_tokens": 273,
+     "normalization": {
+      "counts": {
+       "truncated:history<-guide": 1,
+       "truncated:guide<-generated": 1
+      },
+      "lost_s": {
+       "history<-guide": 1.18,
+       "guide<-generated": 0.02
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 15,
+     "accepted": 7,
+     "dropped_after_block": 8,
+     "before_block": 0,
+     "clipped_at_block_end": 2,
+     "clipped_duration_lost_s": 0.03,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 10,
+     "eos": false,
+     "cost_s": 0.648,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.29,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       50,
+       9.799999999999997,
+       10.719999999999997,
+       60
+      ],
+      [
+       31,
+       9.819999999999997,
+       10.689999999999998,
+       60
+      ],
+      [
+       62,
+       10.299999999999997,
+       10.339999999999996,
+       50
+      ],
+      [
+       43,
+       10.479999999999997,
+       10.699999999999998,
+       60
+      ],
+      [
+       31,
+       10.689999999999998,
+       10.72,
+       60
+      ],
+      [
+       79,
+       10.689999999999998,
+       10.719999999999997,
+       70
+      ],
+      [
+       43,
+       10.699999999999998,
+       10.72,
+       60
+      ]
+     ]
+    },
+    {
+     "j": 3,
+     "quality": "maj7",
+     "T": 10.7225,
+     "q_ms": 10720,
+     "q_next_ms": 11660,
+     "grid_error_ms": -2.5,
+     "chord": [
+      43,
+      59,
+      54
+     ],
+     "prompt_tokens": 304,
+     "normalization": {
+      "counts": {
+       "truncated:history<-guide": 1,
+       "truncated:guide<-generated": 2
+      },
+      "lost_s": {
+       "history<-guide": 1.18,
+       "guide<-generated": 0.26
+      }
+     },
+     "ctx_roundtrip": {
+      "missing": 0,
+      "extra": 0,
+      "missing_examples": [],
+      "extra_examples": []
+     },
+     "unmatched_ctx_in_output": 0,
+     "gen_notes": 16,
+     "accepted": 6,
+     "dropped_after_block": 10,
+     "before_block": 0,
+     "clipped_at_block_end": 2,
+     "clipped_duration_lost_s": 0.5,
+     "same_pitch_overlap": 0,
+     "generated_same_onset_as_guide_pitch": 0,
+     "first_gen_onset_rel_q_ms": 0,
+     "eos": false,
+     "cost_s": 0.725,
+     "sim_start_rel_T": -0.938,
+     "sim_ready_rel_T": -0.212,
+     "miss": false,
+     "lateness_s": 0.0,
+     "accepted_notes": [
+      [
+       75,
+       10.719999999999997,
+       11.659999999999997,
+       60
+      ],
+      [
+       83,
+       10.719999999999997,
+       11.659999999999997,
+       70
+      ],
+      [
+       87,
+       10.719999999999997,
+       11.659999999999997,
+       70
+      ],
+      [
+       49,
+       10.969999999999997,
+       11.209999999999997,
+       60
+      ],
+      [
+       50,
+       11.219999999999997,
+       11.66,
+       60
+      ],
+      [
+       45,
+       11.649999999999997,
+       11.66,
+       60
+      ]
+     ]
+    }
+   ]
+  }
+ ],
+ "contract": "v2 (Astra #210): absolute 10 ms grid q_j, 1 tick = 1 ms, context-only same-pitch normalization"
+}
