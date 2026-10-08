@@ -1,0 +1,120 @@
+{
+ "phases": {
+  "checkpoint_hash": {
+   "wall_s": 1.445,
+   "rss_now_bytes": 249905152,
+   "rss_max_bytes": 249905152,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 90%",
+   "sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+   "mps_current_allocated_bytes": 0,
+   "mps_driver_allocated_bytes": 393216
+  },
+  "load_cpu": {
+   "wall_s": 2.176,
+   "rss_now_bytes": 2873671680,
+   "rss_max_bytes": 5507792896,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 90%",
+   "params": 658538496,
+   "dtypes": [
+    "torch.float32"
+   ],
+   "mps_current_allocated_bytes": 0,
+   "mps_driver_allocated_bytes": 393216
+  },
+  "forward16_cpu": {
+   "wall_s": 0.116,
+   "rss_now_bytes": 2893676544,
+   "rss_max_bytes": 5507792896,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 90%",
+   "tokens": 16,
+   "mps_current_allocated_bytes": 0,
+   "mps_driver_allocated_bytes": 393216
+  },
+  "move_to_mps": {
+   "wall_s": 0.236,
+   "rss_now_bytes": 2278342656,
+   "rss_max_bytes": 5507792896,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 80%",
+   "mps_current_allocated_bytes": 2634428416,
+   "mps_driver_allocated_bytes": 3230023680
+  },
+  "forward16_mps": {
+   "wall_s": 0.447,
+   "rss_now_bytes": 2404384768,
+   "rss_max_bytes": 5507792896,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 79%",
+   "mps_current_allocated_bytes": 2636525568,
+   "mps_driver_allocated_bytes": 3240509440
+  },
+  "param_hash_before": {
+   "wall_s": 1.661,
+   "rss_now_bytes": 2447572992,
+   "rss_max_bytes": 5507792896,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 80%",
+   "mps_current_allocated_bytes": 2636525568,
+   "mps_driver_allocated_bytes": 3240493056
+  },
+  "score_forward_dry_run": {
+   "wall_s": 0.142,
+   "rss_now_bytes": 2453798912,
+   "rss_max_bytes": 5507792896,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 78%",
+   "tokens": 128,
+   "mps_current_allocated_bytes": 2654957056,
+   "mps_driver_allocated_bytes": 3240755200
+  }
+ },
+ "checks": {
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "mps_available": {
+   "ok": true
+  },
+  "mps_forward16": {
+   "ok": true,
+   "max_abs_diff_vs_cpu": 6.4849853515625e-05
+  },
+  "score_single_tempo": {
+   "ok": true,
+   "bpm": 130.0
+  },
+  "score_alignment": {
+   "ok": true,
+   "tokens": 128,
+   "leading_silence_ms": 231,
+   "positions_with_chord": 128
+  },
+  "score_zero_adapter_identical": {
+   "ok": true,
+   "max_abs_diff": 0.0
+  },
+  "fixture_shape": {
+   "ok": true,
+   "tokens": 76
+  },
+  "fixture_zero_adapter_identical": {
+   "ok": false,
+   "max_abs_diff": 1.52587890625e-05
+  }
+ },
+ "env": {
+  "torch": "2.14.1",
+  "mps": true,
+  "mps_fallback_env": null,
+  "start": {
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 90%"
+  },
+  "checkpoint": "/Users/ohhalim/git_box/t3_aria/ckpt/model-gen.safetensors"
+ },
+ "result": "stopped",
+ "stopped_at": "check failed: fixture_zero_adapter_identical"
+}

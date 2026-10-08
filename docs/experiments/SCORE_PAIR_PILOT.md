@@ -67,6 +67,7 @@
   - 20마디 첫 B4(duration 9)에 `<tie type="stop"/>`이 있다
   - 원문 표기는 세 음을 한 음으로 잇는다. **변환기 결과가 원문과 맞다.** music21이 이 연결의 첫 붙임줄을 합치지 않은 이유는 조사하지 않았다
 - 코드는 세 곡 109개 모두 시작 tick, 근음, bass, quality가 일치했다. A Foggy Day의 offset 코드 7개도 포함이다
+  - 일치한 것은 quality family까지다. degree와 변화음까지 같은지는 검산하지 않았다(dominant-ninth·13th → 7). degree 원문을 보존했다고 해서 반음계 코드의 정답이 완전하다고 쓰지 않는다
   - offset을 소리 위치에 적용하는 해석은 MusicXML의 harmony 기본값(`sound` = yes)에 대한 내 이해다. 두 파서가 같은 위치를 냈다
 
 ## 자격 (목적별, 이번은 pipeline 전용)

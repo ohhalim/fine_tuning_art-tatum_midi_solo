@@ -1,0 +1,66 @@
+{
+ "phases": {
+  "checkpoint_hash": {
+   "wall_s": 1.553,
+   "rss_now_bytes": 249675776,
+   "rss_max_bytes": 249675776,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 89%",
+   "sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+   "mps_current_allocated_bytes": 0,
+   "mps_driver_allocated_bytes": 393216
+  },
+  "load_cpu": {
+   "wall_s": 2.185,
+   "rss_now_bytes": 2873884672,
+   "rss_max_bytes": 5508038656,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 90%",
+   "params": 658538496,
+   "dtypes": [
+    "torch.float32"
+   ],
+   "mps_current_allocated_bytes": 0,
+   "mps_driver_allocated_bytes": 393216
+  },
+  "forward16_cpu": {
+   "wall_s": 0.135,
+   "rss_now_bytes": 2894217216,
+   "rss_max_bytes": 5508038656,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 90%",
+   "tokens": 16,
+   "mps_current_allocated_bytes": 0,
+   "mps_driver_allocated_bytes": 393216
+  },
+  "move_to_mps": {
+   "wall_s": 0.483,
+   "rss_now_bytes": 2279047168,
+   "rss_max_bytes": 5508038656,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 80%",
+   "mps_current_allocated_bytes": 2634428416,
+   "mps_driver_allocated_bytes": 3230023680
+  }
+ },
+ "checks": {
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "mps_available": {
+   "ok": true
+  }
+ },
+ "env": {
+  "torch": "2.14.1",
+  "mps": true,
+  "mps_fallback_env": null,
+  "start": {
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 89%"
+  },
+  "checkpoint": "/Users/ohhalim/git_box/t3_aria/ckpt/model-gen.safetensors"
+ },
+ "result": "stopped",
+ "stopped_at": "RuntimeError: The following operation failed in the TorchScript interpreter.\nTraceback of TorchScript (most recent call last):\n  File \"/Users/ohhalim/git_box/t3_aria/aria/aria/model.py\", line 407, in apply_rotary_emb\n    x1, x2 = x_float[..., :d], x_float[..., d : d * 2]\n    tmp = x1.clone()\n    x1.mul_(cos).addcmul_(x2, sin, value=-1)\n    ~~~~~~~ <--- HERE\n    x2.mul_(cos).addcmul_(tmp, sin, value=1)\n    return x.copy_(x_float)\nRuntimeError: Expected all tensors to be on the same device, but found at least two devices, mps:0 and cpu!\n"
+}
