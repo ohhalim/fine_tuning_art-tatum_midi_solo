@@ -94,3 +94,42 @@
 - 자료 자격·분할 확정 → 실제 자료 소규모 pilot 사전 등록 → 학습. 이 순서를 건너뛰지 않는다
 - 로컬 BebopNet XML은 프로젝트의 사용 조건 확인 기준을 채우지 못했다(법적 사용 불가 확정은 아님, `SCORE_PAIR_ENTRY.md`). 다음 출처 후보는 WJazzD다(공식 페이지 기준 DB는 ODbL, 사용자 다운로드 승인 필요)
 - v2는 prefix 기준 첫 다음 코드까지 올바르게 읽는 계약이다. 전환 첫 음 문제의 해결을 입증하지 않았다. 쉼이 여러 변경을 건너는 음(악보 32 family에서 2.2%)은 표현에 없다. 평가에서 별도 층으로 남긴다
+
+## late-injection adapter 경로 중단 (2026-10-09, 아스트라 결정)
+**판단:** "고정 Aria의 마지막 block 입력에 `Linear(29 → 1536)` 조건 adapter를 붙이고, WJazzD 24곡으로 128 update 학습"하는 경로를 제품 후보에서 뺀다. 프로젝트 전체를 포기하는 것이 아니다. 일반적인 Aria 조건 학습이나 다른 학습법이 불가능하다는 판정도 아니다.
+
+| 실험 | 같은 validation 8곡: pitch NLL base / 맞음 / 틀림 | continuation NLL base / 맞음 / 틀림 | 맞음 < base 곡 | 맞음 < 틀림 곡 | 생성 평가 split과 유효 수 |
+|---|---|---|---|---|---|
+| pilot(전 위치 주입, `WJAZZD_PILOT.md`) | 1.954 / 1.973 / 2.216 | 2.525 / 2.569 / 2.633 | 4/8 | 8/8 | test 앞 4곡 × seed 2: base 8/8, 맞음 5/8, 틀림 4/8 |
+| gate(음높이 예측 위치만, `WJAZZD_GATE_PILOT.md`) | 1.954 / 2.071 / 2.367 | 2.525 / 2.518 / 2.617 | 1/8 | 8/8 | validation 앞 4곡 × seed 2: base 8/8, 맞음 4/8, 틀림 8/8 |
+
+- **관측된 것은 조건 구별까지다.** 두 실험 모두 맞는 코드 계획이 틀린(+1 반음) 계획보다 pitch NLL이 낮았다(teacher forcing)
+- **채택하지 않는 이유:** 채택에 필요한 base 대비 pitch 예측 순효과와 생성 유효성이 두 실험 모두 미충족이다
+  - gate 실험의 continuation NLL(2.518)은 base(2.525)보다 조금 낮았다. 그러니 "모든 예측 성능이 나빠졌다"로 요약하지 않는다
+- 두 생성 평가는 split이 달라(test 대 validation) 서로 직접 비교하지 않는다
+- **원인은 미해결이다**
+  - 주입 위치 대조(`WJAZZD_PILOT.md` 후속 진단 2)는 기존 pilot checkpoint와 같은 prefix에서 현재 위치 주입을 빼면 허용 onset 질량이 국소적으로 회복된다는 관측이다. 이 관측은 여전히 유효하다
+  - gate 실험은 새로 학습한 별도 checkpoint에서 오류가 남았다. 결론은 "그 위치 개입을 빼서 얻은 국소 회복이, 따로 학습한 gate 모델의 생성 안전성으로 일반화되지 않았다"까지다
+  - 남은 후보: 과거 위치 주입의 attention 경로, 학습 신호 자체(train 24곡 쪽 공통 이동), 자료 편향. 모두 확인하지 않은 후보다
+- 기존 base도 코드 제어, 음악 품질, 티그랑 목표를 달성했다고 주장하지 않는다
+
+**보존(로컬, 기본 런타임에는 연결하지 않음).** `inference/` 아래에 이 adapter를 참조하는 코드가 없음을 확인했다.
+
+| 파일 | sha256 앞 16자리 |
+|---|---|
+| `/Users/ohhalim/git_box/wjazzd/wjazzd.db` | af6a0d9debf042c3 |
+| `/Users/ohhalim/git_box/wjazzd/PROVENANCE.json` | e517c80306248102 |
+| `/Users/ohhalim/git_box/wjazzd/pilot/data.json`(분할·덩어리·조건) | fc4e8ea2e91c1098 |
+| `/Users/ohhalim/git_box/wjazzd/pilot/adapter_wjazzd_pilot_diagnostic_only.pt` | dbfe8333b0e891be |
+| `/Users/ohhalim/git_box/wjazzd/pilot/result.json` | a15497fe832aef96 |
+| `/Users/ohhalim/git_box/wjazzd/pilot/generation_regen.json`(재생성, 원 집계 16/16 일치) | 9a162edd830fc758 |
+| `/Users/ohhalim/git_box/wjazzd/pilot/generation_base.json` | 9ebc4f50bbc600c0 |
+| `/Users/ohhalim/git_box/wjazzd/gate/adapter_wjazzd_gate_diagnostic_only.pt` | 53a7183f527ad9c4 |
+| `/Users/ohhalim/git_box/wjazzd/gate/gate_result.json`(생성 토큰 포함) | 53240464da3f49ef |
+
+**재사용할 것:** WJazzD 감사·분할·창 도구, 29차원 v2 계약과 fixture, 토큰 유효성 검사기, 주입 위치 진단, RNG 재현 도구(`WJAZZD_AUDIT.md`, `WJAZZD_PILOT.md`, `WJAZZD_GATE_PILOT.md`).
+
+**재개 조건.** 예산을 늘리는 것만으로는 재개하지 않는다. 새 근거가 있을 때만 재개한다.
+- 피아노 생성 능력 보존과 코드 제어를 함께 검증하는 학습 구조와 자료 계획
+- 지금까지 반복 진단에 쓴 validation·test와 구별된 평가 세트
+- 지금은 새 모델 탐색이나 학습을 자동으로 시작하지 않는다
