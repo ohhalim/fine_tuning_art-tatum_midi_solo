@@ -5,14 +5,34 @@
 ## 질문 (하나)
 로컬 BebopNet XML(51개 파일)을 코드 조건 학습 자료로 쓸 수 있는가. 출처, 사용 조건, 라벨 손실, family 단위 분할 가능성으로 판정한다.
 
-## 판정: 현재 근거로는 학습 부적격 → 학습 중단 상태 유지
+## 판정: 프로젝트의 사용 조건 확인 기준 미충족 → 학습 중단 상태 유지
 - 사용 조건을 확인할 근거가 로컬에 없다. 아래 "출처와 사용 조건"을 보라
+  - 이것은 이 프로젝트의 사용 조건 확인 기준을 채우지 못했다는 판정이다. 법적으로 쓸 수 없다고 확정한 것이 아니다
+- 사용자가 "로컬 연구용"이라고 명시해도 제3자(악보 작성자·업로더)의 허락 근거는 생기지 않는다. 그래서 그것을 해결책으로 두지 않는다
 - 라벨 손실, 분할 가능성, v2 표현 한계는 학습 가능 여부와 별개로 기록했다. 기술적으로는 family 단위 분할이 가능하다
-- 확보할 수 있는 다음 출처 하나: **WJazzD**(Weimar Jazz Database)
-  - 즉흥 솔로와 코드 주석이 정렬돼 있다
-  - 사용자 다운로드 승인이 필요하다(현재 미승인). 라이선스는 출처에서 직접 확인해야 하며, 이 저장소 문서에는 기록이 없다
-  - 역할은 화성 제어 쌍 자료다. 기존 조사 문서 기준으로 456곡 중 피아노는 약 6곡이고 대부분 관악이다. 스타일 자료가 아니다
-- 다른 길(사용자 결정): 사용자가 이 XML의 사용 범위(예: 로컬 연구 전용, 재배포 없음)를 명시하면 그 범위에서 다시 판정할 수 있다. 자동으로 추정하지 않는다
+- 다음 출처 하나: **WJazzD**(Weimar Jazz Database). 아래 "다음 출처" 참고
+
+## 다음 출처: WJazzD (공식 페이지 확인, 2026-10-09)
+- 공식 다운로드 페이지: `https://jazzomat.hfm-weimar.de/download/download.html`
+  - "The Weimar Jazz Database is released under the Open Data Commons Open DataBase License (ODbL)."
+  - ODbL 1.0 링크: `https://opendatacommons.org/licenses/odbl/1.0/`
+  - 버전은 Weimar Jazz Database v2.1(DB version 2.2), 솔로 전사 456개
+  - 페이지에 녹음 음원의 권리에 대한 문구는 없다
+- 파일: 서버 HEAD 응답만 봤고 받지 않았다
+  - `downloads/wjazzd.db`(SQLite3) 42,512,384 바이트, Last-Modified 2018-02-08
+  - 정량화하지 않은 MIDI `downloads/RELEASE2.0_mid_unquant.zip` 1,345,859 바이트
+- 범위 구분
+  - ODbL은 데이터베이스에 대한 라이선스다. 원 녹음 음원의 권리까지 포함한다고 넓히지 않는다
+  - 데이터베이스와 그 파생물(변환본, 학습 산출물)의 조건은 ODbL 본문에서 확인한다
+- 역할: 화성 조건 학습 후보다. 기존 조사 문서 기준으로 대부분 관악 단선율이다. 피아노 양손 연주나 티그랑 스타일의 근거는 아니다
+- 다운로드는 사용자 승인 뒤에만 한다(기존 별도 승인 경계)
+- 승인 뒤 첫 단위(학습 전 소규모 점검)
+  - 코드–음 정렬
+  - 곡 family 분할
+  - 단성 표상
+  - 29차원 v2의 경계 층(경계 첫 음, 표현 없음)
+  - 그다음 학습 단위를 정한다
+  - DB 안의 표 구조는 받은 뒤 확인한다
 
 ## 출처와 사용 조건 (확인한 사실)
 - 저장소 `shunithaviv/bebopnet-code`의 `LICENSE`는 MIT다. 대상은 "the Software"다. 악보 내용의 권리를 말하지 않는다. 저장소 라이선스를 악보 권리로 대신하지 않는다
@@ -81,16 +101,16 @@
 ## v2 표현의 한계 층 (아스트라 4번)
 v2는 prefix 시각 기준 현재 코드와 첫 다음 코드를 준다. 쉼 동안 코드가 두 번 이상 바뀌면, 다음 음이 시작될 때의 코드는 표현에 없다.
 
-- 32 family 합계(음 3,662개, 악보 수준 근사: prefix 시각 = 이전 음 onset, `<T>` 경계 무시)
+- BebopNet 32 family 합계(51 파일 / 33 family에서 로컬 생성물 1개 제외, 분모 = 음 3,662개, 측정층: 악보 수준 근사, prefix 시각 = 이전 음 onset, `<T>` 경계 무시)
   - 다음 음의 코드 = 현재: 2,669(72.9%)
   - = 첫 다음 코드(경계 첫 음): 914(25.0%)
   - **표현 없음: 79(2.2%)**
 - 많은 family: Giant Steps 7/26, A Foggy Day 11/75, I Got Rhythm 8/75, Summertime 7/90
-- 토큰 기준 정확 집계(pilot 3곡, `aria_cond_contract_v2/dryrun.json`)
+- 토큰 기준 정확 집계(pilot 3곡, `aria_cond_contract_v2/dryrun.json`). 측정층은 토큰 prefix 시각이다. 분모는 각 곡의 음 수(75 / 87 / 126)다
   - A Foggy Day {'same_as_current': 48, 'equals_first_next': 18, 'not_represented': 9}
   - ATTYA {'same_as_current': 62, 'equals_first_next': 24, 'not_represented': 1}
   - Billie's {'same_as_current': 102, 'equals_first_next': 24, 'not_represented': 0}
-  - 근사(11 / 1 / 0)보다 조금 적다. `<T>` 경계가 prefix 시각을 앞당기기 때문이다
+  - 표현 없음은 9/75, 1/87, 0/126이다. 악보 수준 근사(측정층: 이전 음 onset, `<T>` 무시)의 11/75, 1/87, 0/126보다 조금 적다. `<T>` 경계가 prefix 시각을 앞당기기 때문이다
 - 평가에서는 이 층을 빼지 않고 별도 층으로 남긴다. 경계 첫 음(25%)도 따로 본다. v3 구현은 지금 하지 않는다
 
 ## 재개 경계
