@@ -59,7 +59,7 @@ def build(d, chords=CHORDS, tempo_map=TEMPO_MAP, solo=SOLO, comp_shift=0, label_
             "performer": "none", "label_basis": label_basis, "ppq": PPQ, "time_signature": [4, 4],
             "tempo_map": meta_tempo_map or tempo_map, "count_in_beats": COUNT_IN, "bars": 2,
             "tracks": {"solo": "Solo", "comp": "Chords"}, "chords": chords,
-            "raw_sha256": sha256(raw), "independent_review": None}
+            "raw_sha256": sha256(raw), "independent_review": None, "end_kind": "crop_end"}
     with open(os.path.join(d, "take.json"), "w") as f:
         json.dump(meta, f)
     return d
@@ -115,6 +115,17 @@ class PairedValidateTest(unittest.TestCase):
             r = validate(d)
             self.assertTrue(r["eligibility"]["musical"])
             self.assertFalse(r["eligibility"]["training"])
+
+    def test_end_kind_is_required(self) -> None:
+        with tempfile.TemporaryDirectory() as d:
+            build(d)
+            path = os.path.join(d, "take.json")
+            with open(path) as f:
+                meta = json.load(f)
+            meta["end_kind"] = "unknown"
+            with open(path, "w") as f:
+                json.dump(meta, f)
+            self.assertFalse(validate(d)["checks"]["end_kind"]["ok"])
 
     def test_zero_length_note_fails(self) -> None:
         t = round((COUNT_IN + 2) * PPQ)

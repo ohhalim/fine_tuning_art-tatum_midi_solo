@@ -1,0 +1,791 @@
+{
+ "A_Foggy_Day": {
+  "source_xml": "/Users/ohhalim/git_box/bebopnet-code/resources/xmls/A_Foggy_Day.xml",
+  "derived_midi": "/Users/ohhalim/git_box/paired_score_pilot/A_Foggy_Day/derived.mid",
+  "bpm": 130.0,
+  "leading_silence_ms": 230.769,
+  "tokens": 240,
+  "current_known": 240,
+  "unknown": 0,
+  "no_chord_positions": 0,
+  "has_next": 240,
+  "clamped": 0,
+  "delta_sec_max_unclamped": 1.8461538461538458,
+  "chord_changes_seen_at_onsets": 28,
+  "lossy_annotation_segments": 13,
+  "of_segments": 46,
+  "positions_on_lossy_segments": 24,
+  "samples": [
+   {
+    "change": 5,
+    "position": 46,
+    "token": "('piano', 76, 80)",
+    "t_ms": 12460,
+    "beat": 27.4967,
+    "measure": 7,
+    "beat_in_measure": 4.4967,
+    "current": [
+     2,
+     5,
+     7,
+     11
+    ],
+    "current_label": "G7 (m7)",
+    "next": [
+     2,
+     5,
+     7,
+     10
+    ],
+    "delta_sec": 0.2323,
+    "music21": {
+     "current": [
+      2,
+      5,
+      7,
+      11
+     ],
+     "next": [
+      2,
+      5,
+      7,
+      10
+     ],
+     "delta_sec": 0.2323
+    },
+    "match": true
+   },
+   {
+    "change": 5,
+    "position": 47,
+    "token": "('onset', 4770)",
+    "t_ms": 14770,
+    "beat": 32.5017,
+    "measure": 9,
+    "beat_in_measure": 1.5017,
+    "current": [
+     0,
+     4,
+     5,
+     9
+    ],
+    "current_label": "Fmaj7 (m9)",
+    "next": [
+     0,
+     3,
+     7,
+     10
+    ],
+    "delta_sec": 1.6146,
+    "music21": {
+     "current": [
+      0,
+      4,
+      5,
+      9
+     ],
+     "next": [
+      0,
+      3,
+      7,
+      10
+     ],
+     "delta_sec": 1.6146
+    },
+    "match": true,
+    "onset_in_xml": true
+   },
+   {
+    "change": 10,
+    "position": 94,
+    "token": "('piano', 69, 80)",
+    "t_ms": 25000,
+    "beat": 54.6667,
+    "measure": 14,
+    "beat_in_measure": 3.6667,
+    "current": [
+     0,
+     2,
+     6,
+     9
+    ],
+    "current_label": "D7 (m14)",
+    "next": [
+     2,
+     5,
+     7,
+     11
+    ],
+    "delta_sec": 0.6154,
+    "music21": {
+     "current": [
+      0,
+      2,
+      6,
+      9
+     ],
+     "next": [
+      2,
+      5,
+      7,
+      11
+     ],
+     "delta_sec": 0.6154
+    },
+    "match": true
+   },
+   {
+    "change": 10,
+    "position": 95,
+    "token": "('onset', 850)",
+    "t_ms": 25850,
+    "beat": 56.5083,
+    "measure": 15,
+    "beat_in_measure": 1.5083,
+    "current": [
+     2,
+     5,
+     7,
+     11
+    ],
+    "current_label": "G7 (m15)",
+    "next": [
+     2,
+     5,
+     7,
+     10
+    ],
+    "delta_sec": 1.6115,
+    "music21": {
+     "current": [
+      2,
+      5,
+      7,
+      11
+     ],
+     "next": [
+      2,
+      5,
+      7,
+      10
+     ],
+     "delta_sec": 1.6116
+    },
+    "match": true,
+    "onset_in_xml": true
+   },
+   {
+    "change": 15,
+    "position": 145,
+    "token": "('piano', 68, 80)",
+    "t_ms": 38310,
+    "beat": 83.505,
+    "measure": 21,
+    "beat_in_measure": 4.505,
+    "current": [
+     0,
+     2,
+     5,
+     9
+    ],
+    "current_label": "F6 (m21)",
+    "next": [
+     0,
+     2,
+     5,
+     8
+    ],
+    "delta_sec": 0.2285,
+    "music21": {
+     "current": [
+      0,
+      2,
+      5,
+      9
+     ],
+     "next": [
+      0,
+      2,
+      5,
+      8
+     ],
+     "delta_sec": 0.2285
+    },
+    "match": true
+   },
+   {
+    "change": 15,
+    "position": 146,
+    "token": "('onset', 3540)",
+    "t_ms": 38540,
+    "beat": 84.0033,
+    "measure": 22,
+    "beat_in_measure": 1.0033,
+    "current": [
+     0,
+     2,
+     5,
+     8
+    ],
+    "current_label": "Dm7b5 (m22)",
+    "next": [
+     2,
+     5,
+     7,
+     11
+    ],
+    "delta_sec": 1.8446,
+    "music21": {
+     "current": [
+      0,
+      2,
+      5,
+      8
+     ],
+     "next": [
+      2,
+      5,
+      7,
+      11
+     ],
+     "delta_sec": 1.8446
+    },
+    "match": true,
+    "onset_in_xml": true
+   }
+  ],
+  "xml_check": {
+   "tool": "music21",
+   "samples": 6,
+   "matched": 6,
+   "onset_rows_found_in_xml": 3,
+   "onset_rows": 3
+  }
+ },
+ "All_The_Things_You_Are": {
+  "source_xml": "/Users/ohhalim/git_box/bebopnet-code/resources/xmls/All_The_Things_You_Are.xml",
+  "derived_midi": "/Users/ohhalim/git_box/paired_score_pilot/All_The_Things_You_Are/derived.mid",
+  "bpm": 150.0,
+  "leading_silence_ms": 0.0,
+  "tokens": 275,
+  "current_known": 275,
+  "unknown": 0,
+  "no_chord_positions": 0,
+  "has_next": 275,
+  "clamped": 0,
+  "delta_sec_max_unclamped": 3.2,
+  "chord_changes_seen_at_onsets": 29,
+  "lossy_annotation_segments": 2,
+  "of_segments": 33,
+  "positions_on_lossy_segments": 3,
+  "samples": [
+   {
+    "change": 5,
+    "position": 33,
+    "token": "('piano', 65, 80)",
+    "t_ms": 5800,
+    "beat": 14.5,
+    "measure": 4,
+    "beat_in_measure": 3.5,
+    "current": [
+     0,
+     3,
+     7,
+     8
+    ],
+    "current_label": "Abmaj7 (m4)",
+    "next": [
+     0,
+     1,
+     5,
+     8
+    ],
+    "delta_sec": 0.6,
+    "music21": {
+     "current": [
+      0,
+      3,
+      7,
+      8
+     ],
+     "next": [
+      0,
+      1,
+      5,
+      8
+     ],
+     "delta_sec": 0.6
+    },
+    "match": true
+   },
+   {
+    "change": 5,
+    "position": 34,
+    "token": "('onset', 1400)",
+    "t_ms": 6400,
+    "beat": 16.0,
+    "measure": 5,
+    "beat_in_measure": 1.0,
+    "current": [
+     0,
+     1,
+     5,
+     8
+    ],
+    "current_label": "Dbmaj7 (m5)",
+    "next": [
+     2,
+     5,
+     7,
+     11
+    ],
+    "delta_sec": 1.6,
+    "music21": {
+     "current": [
+      0,
+      1,
+      5,
+      8
+     ],
+     "next": [
+      2,
+      5,
+      7,
+      11
+     ],
+     "delta_sec": 1.6
+    },
+    "match": true,
+    "onset_in_xml": true
+   },
+   {
+    "change": 10,
+    "position": 68,
+    "token": "('piano', 62, 80)",
+    "t_ms": 15400,
+    "beat": 38.5,
+    "measure": 10,
+    "beat_in_measure": 3.5,
+    "current": [
+     0,
+     3,
+     5,
+     8
+    ],
+    "current_label": "Fm7 (m10)",
+    "next": [
+     2,
+     5,
+     8,
+     10
+    ],
+    "delta_sec": 0.6,
+    "music21": {
+     "current": [
+      0,
+      3,
+      5,
+      8
+     ],
+     "next": [
+      2,
+      5,
+      8,
+      10
+     ],
+     "delta_sec": 0.6
+    },
+    "match": true
+   },
+   {
+    "change": 10,
+    "position": 69,
+    "token": "('onset', 1000)",
+    "t_ms": 16000,
+    "beat": 40.0,
+    "measure": 11,
+    "beat_in_measure": 1.0,
+    "current": [
+     2,
+     5,
+     8,
+     10
+    ],
+    "current_label": "Bb7 (m11)",
+    "next": [
+     2,
+     3,
+     7,
+     10
+    ],
+    "delta_sec": 1.6,
+    "music21": {
+     "current": [
+      2,
+      5,
+      8,
+      10
+     ],
+     "next": [
+      2,
+      3,
+      7,
+      10
+     ],
+     "delta_sec": 1.6
+    },
+    "match": true,
+    "onset_in_xml": true
+   },
+   {
+    "change": 15,
+    "position": 133,
+    "token": "('piano', 74, 80)",
+    "t_ms": 25000,
+    "beat": 62.5,
+    "measure": 16,
+    "beat_in_measure": 3.5,
+    "current": [
+     2,
+     6,
+     7,
+     11
+    ],
+    "current_label": "Gmaj7 (m15)",
+    "next": [
+     0,
+     4,
+     7,
+     9
+    ],
+    "delta_sec": 0.6,
+    "music21": {
+     "current": [
+      2,
+      6,
+      7,
+      11
+     ],
+     "next": [
+      0,
+      4,
+      7,
+      9
+     ],
+     "delta_sec": 0.6
+    },
+    "match": true
+   },
+   {
+    "change": 15,
+    "position": 134,
+    "token": "('onset', 600)",
+    "t_ms": 25600,
+    "beat": 64.0,
+    "measure": 17,
+    "beat_in_measure": 1.0,
+    "current": [
+     0,
+     4,
+     7,
+     9
+    ],
+    "current_label": "Am7 (m17)",
+    "next": [
+     0,
+     2,
+     6,
+     9
+    ],
+    "delta_sec": 1.6,
+    "music21": {
+     "current": [
+      0,
+      4,
+      7,
+      9
+     ],
+     "next": [
+      0,
+      2,
+      6,
+      9
+     ],
+     "delta_sec": 1.6
+    },
+    "match": true,
+    "onset_in_xml": true
+   }
+  ],
+  "xml_check": {
+   "tool": "music21",
+   "samples": 6,
+   "matched": 6,
+   "onset_rows_found_in_xml": 3,
+   "onset_rows": 3
+  }
+ },
+ "Billies_Bounce": {
+  "source_xml": "/Users/ohhalim/git_box/bebopnet-code/resources/xmls/Billies_Bounce.xml",
+  "derived_midi": "/Users/ohhalim/git_box/paired_score_pilot/Billies_Bounce/derived.mid",
+  "bpm": 180.0,
+  "leading_silence_ms": 0.0,
+  "tokens": 388,
+  "current_known": 388,
+  "unknown": 0,
+  "no_chord_positions": 0,
+  "has_next": 388,
+  "clamped": 0,
+  "delta_sec_max_unclamped": 2.663333333333333,
+  "chord_changes_seen_at_onsets": 26,
+  "lossy_annotation_segments": 4,
+  "of_segments": 30,
+  "positions_on_lossy_segments": 38,
+  "samples": [
+   {
+    "change": 5,
+    "position": 105,
+    "token": "('piano', 77, 80)",
+    "t_ms": 7830,
+    "beat": 23.49,
+    "measure": 6,
+    "beat_in_measure": 4.49,
+    "current": [
+     2,
+     5,
+     8,
+     10
+    ],
+    "current_label": "Bb7 (m5)",
+    "next": [
+     0,
+     3,
+     5,
+     9
+    ],
+    "delta_sec": 0.17,
+    "music21": {
+     "current": [
+      2,
+      5,
+      8,
+      10
+     ],
+     "next": [
+      0,
+      3,
+      5,
+      9
+     ],
+     "delta_sec": 0.17
+    },
+    "match": true
+   },
+   {
+    "change": 5,
+    "position": 106,
+    "token": "('onset', 3170)",
+    "t_ms": 8170,
+    "beat": 24.51,
+    "measure": 7,
+    "beat_in_measure": 1.51,
+    "current": [
+     0,
+     3,
+     5,
+     9
+    ],
+    "current_label": "F7 (m7)",
+    "next": [
+     0,
+     4,
+     7,
+     9
+    ],
+    "delta_sec": 1.1633,
+    "music21": {
+     "current": [
+      0,
+      3,
+      5,
+      9
+     ],
+     "next": [
+      0,
+      4,
+      7,
+      9
+     ],
+     "delta_sec": 1.1633
+    },
+    "match": true,
+    "onset_in_xml": true
+   },
+   {
+    "change": 10,
+    "position": 172,
+    "token": "('piano', 65, 80)",
+    "t_ms": 13330,
+    "beat": 39.99,
+    "measure": 10,
+    "beat_in_measure": 4.99,
+    "current": [
+     0,
+     4,
+     7,
+     10
+    ],
+    "current_label": "C7 (m10)",
+    "next": [
+     0,
+     3,
+     5,
+     9
+    ],
+    "delta_sec": 0.0033,
+    "music21": {
+     "current": [
+      0,
+      4,
+      7,
+      10
+     ],
+     "next": [
+      0,
+      3,
+      5,
+      9
+     ],
+     "delta_sec": 0.0033
+    },
+    "match": true
+   },
+   {
+    "change": 10,
+    "position": 173,
+    "token": "('onset', 3830)",
+    "t_ms": 13830,
+    "beat": 41.49,
+    "measure": 11,
+    "beat_in_measure": 2.49,
+    "current": [
+     0,
+     3,
+     5,
+     9
+    ],
+    "current_label": "F7 (m11)",
+    "next": [
+     0,
+     2,
+     6,
+     9
+    ],
+    "delta_sec": 0.17,
+    "music21": {
+     "current": [
+      0,
+      3,
+      5,
+      9
+     ],
+     "next": [
+      0,
+      2,
+      6,
+      9
+     ],
+     "delta_sec": 0.17
+    },
+    "match": true,
+    "onset_in_xml": true
+   },
+   {
+    "change": 15,
+    "position": 221,
+    "token": "('piano', 62, 80)",
+    "t_ms": 17170,
+    "beat": 51.51,
+    "measure": 13,
+    "beat_in_measure": 4.51,
+    "current": [
+     0,
+     3,
+     5,
+     9
+    ],
+    "current_label": "F7 (m13)",
+    "next": [
+     2,
+     5,
+     8,
+     10
+    ],
+    "delta_sec": 0.1633,
+    "music21": {
+     "current": [
+      0,
+      3,
+      5,
+      9
+     ],
+     "next": [
+      2,
+      5,
+      8,
+      10
+     ],
+     "delta_sec": 0.1633
+    },
+    "match": true
+   },
+   {
+    "change": 15,
+    "position": 222,
+    "token": "('onset', 2500)",
+    "t_ms": 17500,
+    "beat": 52.5,
+    "measure": 14,
+    "beat_in_measure": 1.5,
+    "current": [
+     2,
+     5,
+     8,
+     10
+    ],
+    "current_label": "Bb7 (m14)",
+    "next": [
+     2,
+     5,
+     8,
+     11
+    ],
+    "delta_sec": 0.5,
+    "music21": {
+     "current": [
+      2,
+      5,
+      8,
+      10
+     ],
+     "next": [
+      2,
+      5,
+      8,
+      11
+     ],
+     "delta_sec": 0.5
+    },
+    "match": true,
+    "onset_in_xml": true
+   }
+  ],
+  "xml_check": {
+   "tool": "music21",
+   "samples": 6,
+   "matched": 6,
+   "onset_rows_found_in_xml": 3,
+   "onset_rows": 3
+  }
+ }
+}

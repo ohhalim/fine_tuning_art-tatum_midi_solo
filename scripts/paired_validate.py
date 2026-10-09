@@ -32,9 +32,10 @@ PC = {"C": 0, "B#": 0, "C#": 1, "Db": 1, "D": 2, "D#": 3, "Eb": 3, "E": 4, "Fb":
       "F#": 6, "Gb": 6, "G": 7, "G#": 8, "Ab": 8, "A": 9, "A#": 10, "Bb": 10, "B": 11, "Cb": 11}
 REQUIRED = ["schema", "take_id", "progression_id", "split", "source", "source_type", "rights_status",
             "performer", "label_basis", "ppq", "time_signature", "tempo_map", "count_in_beats", "bars",
-            "tracks", "chords", "raw_sha256"]
+            "tracks", "chords", "raw_sha256", "end_kind"]
 LABEL_BASIS = {"planned", "performer_confirmed"}
 SPLITS = {"train_candidate", "heldout_candidate"}
+END_KINDS = {"true_end", "crop_end"}      # the take ends as music, or only the recording stopped
 TICK_TOL = 1
 NOT_ELIGIBLE = {"pipeline_test": False, "training": False, "musical": False}
 
@@ -115,6 +116,7 @@ def validate(take_dir: str, write_processed: bool = False) -> dict:
                 "musically_verified": False, "eligibility": NOT_ELIGIBLE}
     check("label_basis", meta["label_basis"] in LABEL_BASIS, meta["label_basis"])
     check("split", meta["split"] in SPLITS, meta["split"])
+    check("end_kind", meta["end_kind"] in END_KINDS, meta["end_kind"])
     raw_sha = sha256(raw)
     check("raw_hash", raw_sha == meta["raw_sha256"], raw_sha[:16])
 
