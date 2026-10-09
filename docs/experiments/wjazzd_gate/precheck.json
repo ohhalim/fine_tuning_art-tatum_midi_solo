@@ -1,0 +1,52 @@
+{
+ "mode": "--precheck",
+ "phases": {
+  "load": {
+   "wall_s": 4.012,
+   "rss_now_bytes": 2316386304,
+   "rss_max_bytes": 5568266240,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 70%",
+   "mps_current_allocated_bytes": 2634428416
+  },
+  "forward_backward_longest_chunk": {
+   "wall_s": 0.205,
+   "rss_now_bytes": 2575433728,
+   "rss_max_bytes": 5568266240,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 68%",
+   "tokens": 464,
+   "mps_current_allocated_bytes": 2686780416
+  }
+ },
+ "checks": {
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "gate_consistency_on_data": {
+   "ok": true,
+   "counts": {
+    "on_but_next_not_note_start": 0
+   },
+   "gate_on_positions": 13241,
+   "positions": 38583
+  },
+  "zero_adapter_equals_base": {
+   "ok": true
+  },
+  "cost_probe_grad": {
+   "ok": true
+  },
+  "base_has_no_grad": {
+   "ok": true
+  },
+  "base_params_unchanged": {
+   "ok": true
+  }
+ },
+ "train_loss": [],
+ "eval": {},
+ "generation": [],
+ "result": "completed",
+ "stopped_at": null
+}
