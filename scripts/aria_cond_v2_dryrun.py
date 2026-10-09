@@ -76,6 +76,15 @@ def main() -> None:
                                     "current_label": None if ci is None else f"{conv['chords'][ci]['root']}{conv['chords'][ci]['quality']} (m{conv['chords'][ci]['measure']})",
                                     "next": None if f["next"] in (None, NC) else sorted(f["next"]),
                                     "delta_sec": None if f["delta_sec"] is None else round(f["delta_sec"], 4)})
+        # token-exact: is the chord at each note's actual onset among (current, next) at its pitch position?
+        cats = {"same_as_current": 0, "equals_first_next": 0, "not_represented": 0}
+        for i, t in enumerate(toks[:-1]):
+            if isinstance(t, tuple) and t[0] == "piano" and isinstance(toks[i + 1], tuple) and toks[i + 1][0] == "onset":
+                onset_t = feats[i + 1]["t_ms"]
+                seg = next((sg for sg in plan if sg[0] <= onset_t < sg[1]), None)
+                on = None if seg is None else seg[2]
+                key = "same_as_current" if on == feats[i]["current"] else "equals_first_next" if on == feats[i]["next"] else "not_represented"
+                cats[key] += 1
         n = len(feats)
         report[song] = {"source_xml": conv["source"], "derived_midi": conv["derived_midi"], "bpm": bpm,
                         "leading_silence_ms": round(shift_ms, 3), "tokens": n,
@@ -83,7 +92,7 @@ def main() -> None:
                         "no_chord_positions": sum(f["current"] == NC for f in feats),
                         "has_next": sum(f["has_next"] for f in feats), "clamped": sum(f["delta_clamped"] for f in feats),
                         "delta_sec_max_unclamped": max((f["delta_sec"] for f in feats if f["delta_sec"] is not None and not f["delta_clamped"]), default=None),
-                        "chord_changes_seen_at_onsets": len(changes),
+                        "chord_changes_seen_at_onsets": len(changes), "next_note_chord_token_exact": cats,
                         "lossy_annotation_segments": sum(lossy), "of_segments": len(lossy),
                         "positions_on_lossy_segments": sum(1 for f in feats if f["current_known"]
                                                            and seg_of(to_beat(f["t_ms"])) is not None and lossy[seg_of(to_beat(f["t_ms"]))]),
