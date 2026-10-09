@@ -1,0 +1,343 @@
+{
+ "db_info": {
+  "name": "Weimar Jazz Database (WJazzD)",
+  "creator": "The Jazzomat Research Project (c) 2012-2017",
+  "major": 2,
+  "minor": 2,
+  "release": "2.1",
+  "created": "2018-01-07T17:58:09.319568",
+  "license": "The Weimar Jazz Database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/ - See more at: http://opendatacommons.org/licenses/odbl/#sthash.u61y95w0.dpuf",
+  "status": "FINAL"
+ },
+ "solos": 456,
+ "instruments": [
+  [
+   "ts",
+   157
+  ],
+  [
+   "tp",
+   102
+  ],
+  [
+   "as",
+   80
+  ],
+  [
+   "tb",
+   26
+  ],
+  [
+   "ss",
+   23
+  ],
+  [
+   "cl",
+   15
+  ],
+  [
+   "cor",
+   15
+  ],
+  [
+   "vib",
+   12
+  ],
+  [
+   "bs",
+   11
+  ],
+  [
+   "p",
+   6
+  ],
+  [
+   "g",
+   6
+  ],
+  [
+   "bcl",
+   2
+  ],
+  [
+   "ts-c",
+   1
+  ]
+ ],
+ "styles": [
+  [
+   "POSTBOP",
+   147
+  ],
+  [
+   "HARDBOP",
+   76
+  ],
+  [
+   "SWING",
+   66
+  ],
+  [
+   "BEBOP",
+   56
+  ],
+  [
+   "COOL",
+   54
+  ],
+  [
+   "TRADITIONAL",
+   32
+  ],
+  [
+   "FUSION",
+   20
+  ],
+  [
+   "FREE",
+   5
+  ]
+ ],
+ "signatures": [
+  [
+   "4/4",
+   435
+  ],
+  [
+   "3/4",
+   8
+  ],
+  [
+   "",
+   8
+  ],
+  [
+   "9/4",
+   2
+  ],
+  [
+   "6/8",
+   1
+  ],
+  [
+   "5/4",
+   1
+  ],
+  [
+   "6/4",
+   1
+  ]
+ ],
+ "compositions_with_solos": 302,
+ "solos_per_composition": [
+  [
+   1,
+   189
+  ],
+  [
+   2,
+   87
+  ],
+  [
+   3,
+   21
+  ],
+  [
+   4,
+   4
+  ],
+  [
+   14,
+   1
+  ]
+ ],
+ "max_solos_one_composition": 14,
+ "templates_over_compositions": [
+  [
+   "(none)",
+   219
+  ],
+  [
+   "Blues",
+   65
+  ],
+  [
+   "I Got Rhythm",
+   10
+  ],
+  [
+   "So What",
+   1
+  ],
+  [
+   "Cherokee",
+   1
+  ],
+  [
+   "How High The Moon",
+   1
+  ],
+  [
+   "What Is this Thing Called Love",
+   1
+  ],
+  [
+   "Confirmation",
+   1
+  ],
+  [
+   "Tune Up",
+   1
+  ],
+  [
+   "So what",
+   1
+  ],
+  [
+   "All the things you are",
+   1
+  ]
+ ],
+ "solos_in_template_groups": {
+  "(none)": 328,
+  "Blues": 97,
+  "I Got Rhythm": 20,
+  "So What": 3,
+  "Cherokee": 1,
+  "How High The Moon": 1
+ },
+ "chord_change_events": 30548,
+ "distinct_chord_strings": 419,
+ "chord_label_stats": {
+  "mapped_exact": 26263,
+  "mapped_lossy": 2641,
+  "no_chord": 401,
+  "unmapped": 1243
+ },
+ "unmapped_top": [
+  [
+   "no family for 'sus7'",
+   371
+  ],
+  [
+   "no family for 'o'",
+   334
+  ],
+  [
+   "no family for 'sus'",
+   311
+  ],
+  [
+   "no family for 'sus7913'",
+   143
+  ],
+  [
+   "no family for '+'",
+   47
+  ],
+  [
+   "no family for 'sus79'",
+   30
+  ],
+  [
+   "no family for '+j7'",
+   7
+  ]
+ ],
+ "note_chord_labels": {
+  "exact": 166695,
+  "lossy": 17773,
+  "no_chord": 7829,
+  "unmapped": 8512
+ },
+ "alignment_timeline_vs_sections": {
+  "agree": 200809
+ },
+ "alignment_metrical_vs_time": {
+  "agree": 196187,
+  "disagree": 4622
+ },
+ "metrical_disagree_beat_minus_onset_s": {
+  "min": 2.2675736957467052e-05,
+  "median": 0.013628117913832227,
+  "max": 0.030000000000001137,
+  "note_before_its_beat": 4622
+ },
+ "monophony": {
+  "notes": 200809
+ },
+ "v2_strata_approx": {
+  "same_as_current": 174025,
+  "not_represented": 1132,
+  "equals_first_next": 25196
+ },
+ "v2_strata_by_instrument": {
+  "as": {
+   "same_as_current": 29359,
+   "equals_first_next": 3913,
+   "not_represented": 149
+  },
+  "bcl": {
+   "equals_first_next": 103,
+   "same_as_current": 1059,
+   "not_represented": 3
+  },
+  "bs": {
+   "same_as_current": 4165,
+   "equals_first_next": 763,
+   "not_represented": 25
+  },
+  "cl": {
+   "same_as_current": 2455,
+   "not_represented": 34,
+   "equals_first_next": 457
+  },
+  "cor": {
+   "equals_first_next": 475,
+   "not_represented": 22,
+   "same_as_current": 2407
+  },
+  "g": {
+   "same_as_current": 3074,
+   "equals_first_next": 439,
+   "not_represented": 4
+  },
+  "p": {
+   "same_as_current": 3014,
+   "equals_first_next": 124,
+   "not_represented": 5
+  },
+  "ss": {
+   "same_as_current": 10892,
+   "not_represented": 71,
+   "equals_first_next": 1166
+  },
+  "tb": {
+   "same_as_current": 5149,
+   "equals_first_next": 1260,
+   "not_represented": 53
+  },
+  "tp": {
+   "same_as_current": 29439,
+   "equals_first_next": 5055,
+   "not_represented": 306
+  },
+  "ts": {
+   "same_as_current": 79207,
+   "equals_first_next": 10712,
+   "not_represented": 438
+  },
+  "ts-c": {
+   "same_as_current": 764,
+   "equals_first_next": 171,
+   "not_represented": 5
+  },
+  "vib": {
+   "same_as_current": 3041,
+   "equals_first_next": 558,
+   "not_represented": 17
+  }
+ },
+ "notes_with_metrical_position": 200809,
+ "notes_with_loudness": 200320
+}
