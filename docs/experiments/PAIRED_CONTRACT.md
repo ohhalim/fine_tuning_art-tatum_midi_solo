@@ -55,6 +55,7 @@ take 하나 = 디렉터리 하나. 원본은 저장소 밖 영구 경로(예: `/
 | `tracks` | `{solo, comp}` 트랙 이름 |
 | `chords` | 카운트인 뒤 박 기준 `{onset_beat, end_beat, root, quality, bass, voicing}`. voicing은 계획한 MIDI 음높이 |
 | `raw_sha256` | 원본 해시 |
+| `end_kind` | `true_end`(음악적으로 끝남) 또는 `crop_end`(녹음만 멈춤). 실제 곡 끝 `<E>`만 학습 대상 후보다(`ARIA_COND_CONTRACT_V2.md`) |
 | `independent_review` | 선택. `{reviewer, verdict}`. 연주자 아닌 사람의 검토 |
 | `audio_latency_ms` | 선택. 정렬에 쓰지 않는다. 오디오 지연과 MIDI 정렬은 다른 문제다 |
 
