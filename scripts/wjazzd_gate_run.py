@@ -195,6 +195,13 @@ def main() -> None:
             path = os.path.join(out_dir, "adapter_wjazzd_gate_diagnostic_only.pt")
             torch.save({"weight": adapter.weight.detach().cpu(), "note": "gate pilot diagnostic; not a product model"}, path)
             log["adapter_sha256"] = file_sha(path)
+            re = torch.nn.Linear(DIM, cfg.d_model, bias=False).to(dev)
+            re.weight.data.copy_(torch.load(path)["weight"].to(dev))
+            chv = by_split["validation"][0]
+            with torch.no_grad():
+                a1 = run(ids_of(chv), gated_rows[id(chv)], adapter).float()
+                b1 = run(ids_of(chv), gated_rows[id(chv)], re).float()
+            check("save_reload_logits", (a1 - b1).abs().max().item() == 0.0, max_abs_diff=(a1 - b1).abs().max().item())
 
             def evaluate(split):
                 res = collections.defaultdict(lambda: collections.defaultdict(list))
