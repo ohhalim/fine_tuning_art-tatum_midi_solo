@@ -1,0 +1,607 @@
+{
+ "seed": 20261009,
+ "candidates": {
+  "compositions": 211,
+  "solos": 317
+ },
+ "songs_taken": 40,
+ "need": 40,
+ "skipped": {
+  "chunk_short": 169,
+  "chunk_condition_not_exact_after_tokenize": 94,
+  "song_without_valid_chunk": 20
+ },
+ "songs": [
+  {
+   "melid": 37,
+   "compid": 33,
+   "instrument": "ts",
+   "performer": "Bob Berg",
+   "title": "You and the Night and the Music",
+   "split": "train",
+   "chunks": 1,
+   "notes": 655,
+   "valid_notes": 321,
+   "targets": 66
+  },
+  {
+   "melid": 266,
+   "compid": 207,
+   "instrument": "as",
+   "performer": "Lee Konitz",
+   "title": "All the Things You Are",
+   "split": "train",
+   "chunks": 4,
+   "notes": 686,
+   "valid_notes": 664,
+   "targets": 1389
+  },
+  {
+   "melid": 398,
+   "compid": 75,
+   "instrument": "ts",
+   "performer": "Stan Getz",
+   "title": "Body and Soul",
+   "split": "train",
+   "chunks": 2,
+   "notes": 571,
+   "valid_notes": 514,
+   "targets": 821
+  },
+  {
+   "melid": 79,
+   "compid": 69,
+   "instrument": "ts",
+   "performer": "Chris Potter",
+   "title": "Arjuna",
+   "split": "train",
+   "chunks": 9,
+   "notes": 1318,
+   "valid_notes": 1318,
+   "targets": 3571
+  },
+  {
+   "melid": 177,
+   "compid": 141,
+   "instrument": "bs",
+   "performer": "Gerry Mulligan",
+   "title": "Walking Shoes",
+   "split": "train",
+   "chunks": 1,
+   "notes": 202,
+   "valid_notes": 190,
+   "targets": 259
+  },
+  {
+   "melid": 275,
+   "compid": 214,
+   "instrument": "tp",
+   "performer": "Lee Morgan",
+   "title": "Just One of Those Things",
+   "split": "train",
+   "chunks": 1,
+   "notes": 821,
+   "valid_notes": 756,
+   "targets": 321
+  },
+  {
+   "melid": 297,
+   "compid": 190,
+   "instrument": "cor",
+   "performer": "Louis Armstrong",
+   "title": "Once in a While",
+   "split": "train",
+   "chunks": 2,
+   "notes": 193,
+   "valid_notes": 193,
+   "targets": 491
+  },
+  {
+   "melid": 415,
+   "compid": 282,
+   "instrument": "ss",
+   "performer": "Steve Lacy",
+   "title": "Easy to Love",
+   "split": "train",
+   "chunks": 3,
+   "notes": 697,
+   "valid_notes": 399,
+   "targets": 213
+  },
+  {
+   "melid": 371,
+   "compid": 266,
+   "instrument": "tp",
+   "performer": "Roy Eldridge",
+   "title": "The Gasser",
+   "split": "train",
+   "chunks": 2,
+   "notes": 305,
+   "valid_notes": 303,
+   "targets": 817
+  },
+  {
+   "melid": 290,
+   "compid": 16,
+   "instrument": "vib",
+   "performer": "Lionel Hampton",
+   "title": "Whispering",
+   "split": "train",
+   "chunks": 1,
+   "notes": 152,
+   "valid_notes": 123,
+   "targets": 92
+  },
+  {
+   "melid": 88,
+   "compid": 77,
+   "instrument": "tp",
+   "performer": "Clifford Brown",
+   "title": "Daahoud",
+   "split": "train",
+   "chunks": 3,
+   "notes": 398,
+   "valid_notes": 390,
+   "targets": 1040
+  },
+  {
+   "melid": 437,
+   "compid": 286,
+   "instrument": "tp",
+   "performer": "Woody Shaw",
+   "title": "If I Were a Bell",
+   "split": "train",
+   "chunks": 1,
+   "notes": 306,
+   "valid_notes": 256,
+   "targets": 138
+  },
+  {
+   "melid": 82,
+   "compid": 72,
+   "instrument": "ts",
+   "performer": "Chris Potter",
+   "title": "Pop Tune #1",
+   "split": "train",
+   "chunks": 9,
+   "notes": 1353,
+   "valid_notes": 1353,
+   "targets": 3684
+  },
+  {
+   "melid": 27,
+   "compid": 23,
+   "instrument": "cor",
+   "performer": "Bix Beiderbecke",
+   "title": "Margie",
+   "split": "train",
+   "chunks": 1,
+   "notes": 62,
+   "valid_notes": 62,
+   "targets": 142
+  },
+  {
+   "melid": 17,
+   "compid": 14,
+   "instrument": "cl",
+   "performer": "Benny Goodman",
+   "title": "Runnin' Wild",
+   "split": "train",
+   "chunks": 1,
+   "notes": 162,
+   "valid_notes": 151,
+   "targets": 407
+  },
+  {
+   "melid": 229,
+   "compid": 180,
+   "instrument": "ts",
+   "performer": "John Coltrane",
+   "title": "Nature Boy",
+   "split": "train",
+   "chunks": 9,
+   "notes": 1292,
+   "valid_notes": 1286,
+   "targets": 3477
+  },
+  {
+   "melid": 215,
+   "compid": 172,
+   "instrument": "ts",
+   "performer": "John Coltrane",
+   "title": "26-2",
+   "split": "train",
+   "chunks": 1,
+   "notes": 668,
+   "valid_notes": 633,
+   "targets": 187
+  },
+  {
+   "melid": 271,
+   "compid": 211,
+   "instrument": "as",
+   "performer": "Lee Konitz",
+   "title": "Mean to Me",
+   "split": "train",
+   "chunks": 1,
+   "notes": 556,
+   "valid_notes": 496,
+   "targets": 132
+  },
+  {
+   "melid": 54,
+   "compid": 49,
+   "instrument": "as",
+   "performer": "Charlie Parker",
+   "title": "Don't Blame Me",
+   "split": "train",
+   "chunks": 4,
+   "notes": 516,
+   "valid_notes": 511,
+   "targets": 1364
+  },
+  {
+   "melid": 113,
+   "compid": 99,
+   "instrument": "ss",
+   "performer": "David Liebman",
+   "title": "Softly as in a Morning Sunrise",
+   "split": "train",
+   "chunks": 1,
+   "notes": 1098,
+   "valid_notes": 44,
+   "targets": 86
+  },
+  {
+   "melid": 80,
+   "compid": 70,
+   "instrument": "ts",
+   "performer": "Chris Potter",
+   "title": "In a Sentimental Mood",
+   "split": "train",
+   "chunks": 1,
+   "notes": 413,
+   "valid_notes": 341,
+   "targets": 407
+  },
+  {
+   "melid": 389,
+   "compid": 274,
+   "instrument": "ts",
+   "performer": "Sonny Rollins",
+   "title": "The Everywhere Calypso",
+   "split": "train",
+   "chunks": 7,
+   "notes": 949,
+   "valid_notes": 940,
+   "targets": 2522
+  },
+  {
+   "melid": 334,
+   "compid": 244,
+   "instrument": "tp",
+   "performer": "Nat Adderley",
+   "title": "Bohemia After Dark",
+   "split": "train",
+   "chunks": 2,
+   "notes": 378,
+   "valid_notes": 272,
+   "targets": 263
+  },
+  {
+   "melid": 363,
+   "compid": 262,
+   "instrument": "as",
+   "performer": "Phil Woods",
+   "title": "On a Slow Boat to China",
+   "split": "train",
+   "chunks": 1,
+   "notes": 847,
+   "valid_notes": 628,
+   "targets": 76
+  },
+  {
+   "melid": 16,
+   "compid": 13,
+   "instrument": "cl",
+   "performer": "Benny Goodman",
+   "title": "Nobody's Sweetheart",
+   "split": "validation",
+   "chunks": 1,
+   "notes": 198,
+   "valid_notes": 169,
+   "targets": 112
+  },
+  {
+   "melid": 347,
+   "compid": 251,
+   "instrument": "as",
+   "performer": "Paul Desmond",
+   "title": "Alianca",
+   "split": "validation",
+   "chunks": 1,
+   "notes": 102,
+   "valid_notes": 102,
+   "targets": 265
+  },
+  {
+   "melid": 18,
+   "compid": 15,
+   "instrument": "cl",
+   "performer": "Benny Goodman",
+   "title": "Tiger Rag",
+   "split": "validation",
+   "chunks": 1,
+   "notes": 180,
+   "valid_notes": 180,
+   "targets": 408
+  },
+  {
+   "melid": 25,
+   "compid": 21,
+   "instrument": "ts",
+   "performer": "Ben Webster",
+   "title": "Where or When",
+   "split": "validation",
+   "chunks": 1,
+   "notes": 268,
+   "valid_notes": 223,
+   "targets": 69
+  },
+  {
+   "melid": 293,
+   "compid": 222,
+   "instrument": "cor",
+   "performer": "Louis Armstrong",
+   "title": "Cornet Chop Suey",
+   "split": "validation",
+   "chunks": 1,
+   "notes": 92,
+   "valid_notes": 92,
+   "targets": 232
+  },
+  {
+   "melid": 435,
+   "compid": 136,
+   "instrument": "ts",
+   "performer": "Wayne Shorter",
+   "title": "Speak No Evil",
+   "split": "validation",
+   "chunks": 2,
+   "notes": 452,
+   "valid_notes": 343,
+   "targets": 194
+  },
+  {
+   "melid": 359,
+   "compid": 259,
+   "instrument": "as",
+   "performer": "Phil Woods",
+   "title": "Be My Love",
+   "split": "validation",
+   "chunks": 1,
+   "notes": 712,
+   "valid_notes": 608,
+   "targets": 283
+  },
+  {
+   "melid": 61,
+   "compid": 56,
+   "instrument": "as",
+   "performer": "Charlie Parker",
+   "title": "Ornithology",
+   "split": "validation",
+   "chunks": 1,
+   "notes": 194,
+   "valid_notes": 187,
+   "targets": 408
+  },
+  {
+   "melid": 12,
+   "compid": 9,
+   "instrument": "as",
+   "performer": "Benny Carter",
+   "title": "Long Ago and Far Away",
+   "split": "test",
+   "chunks": 1,
+   "notes": 254,
+   "valid_notes": 229,
+   "targets": 408
+  },
+  {
+   "melid": 6,
+   "compid": 5,
+   "instrument": "as",
+   "performer": "Art Pepper",
+   "title": "Stardust",
+   "split": "test",
+   "chunks": 6,
+   "notes": 909,
+   "valid_notes": 909,
+   "targets": 2467
+  },
+  {
+   "melid": 92,
+   "compid": 80,
+   "instrument": "tp",
+   "performer": "Clifford Brown",
+   "title": "Jordu",
+   "split": "test",
+   "chunks": 4,
+   "notes": 552,
+   "valid_notes": 552,
+   "targets": 1487
+  },
+  {
+   "melid": 292,
+   "compid": 221,
+   "instrument": "cor",
+   "performer": "Louis Armstrong",
+   "title": "Big Butter and Egg Man",
+   "split": "test",
+   "chunks": 1,
+   "notes": 173,
+   "valid_notes": 155,
+   "targets": 330
+  },
+  {
+   "melid": 179,
+   "compid": 143,
+   "instrument": "ts",
+   "performer": "Hank Mobley",
+   "title": "Lady Bird",
+   "split": "test",
+   "chunks": 4,
+   "notes": 499,
+   "valid_notes": 499,
+   "targets": 1326
+  },
+  {
+   "melid": 84,
+   "compid": 74,
+   "instrument": "ts",
+   "performer": "Chris Potter",
+   "title": "Togo",
+   "split": "test",
+   "chunks": 7,
+   "notes": 933,
+   "valid_notes": 933,
+   "targets": 2502
+  },
+  {
+   "melid": 270,
+   "compid": 210,
+   "instrument": "as",
+   "performer": "Lee Konitz",
+   "title": "Marshmallow",
+   "split": "test",
+   "chunks": 2,
+   "notes": 352,
+   "valid_notes": 335,
+   "targets": 635
+  },
+  {
+   "melid": 272,
+   "compid": 212,
+   "instrument": "as",
+   "performer": "Lee Konitz",
+   "title": "Tautology",
+   "split": "test",
+   "chunks": 1,
+   "notes": 351,
+   "valid_notes": 288,
+   "targets": 219
+  }
+ ],
+ "by_split": {
+  "train": {
+   "songs": 24,
+   "chunks": 68,
+   "targets": 21965,
+   "pitch_targets": 7204,
+   "strata": {
+    "current": 6655,
+    "boundary_first": 535,
+    "not_represented": 14
+   },
+   "anticipation": 105
+  },
+  "validation": {
+   "songs": 8,
+   "chunks": 9,
+   "targets": 1971,
+   "pitch_targets": 645,
+   "strata": {
+    "current": 550,
+    "boundary_first": 91,
+    "not_represented": 4
+   },
+   "anticipation": 19
+  },
+  "test": {
+   "songs": 8,
+   "chunks": 26,
+   "targets": 9374,
+   "pitch_targets": 3071,
+   "strata": {
+    "boundary_first": 283,
+    "current": 2786,
+    "not_represented": 2
+   },
+   "anticipation": 64
+  }
+ },
+ "note_exclusions_first_reason": {
+  "current_nc": 344,
+  "current_lossy": 4576,
+  "next_lossy": 2575,
+  "onset_lossy": 14,
+  "current_unmapped": 729,
+  "next_unmapped": 290,
+  "next_nc": 90,
+  "onset_unmapped": 2
+ },
+ "excluded_chord_strings_top": [
+  [
+   "Eb79#",
+   808
+  ],
+  [
+   "NC",
+   434
+  ],
+  [
+   "C79b",
+   434
+  ],
+  [
+   "Ebsus79",
+   362
+  ],
+  [
+   "F79#",
+   297
+  ],
+  [
+   "G79b",
+   264
+  ],
+  [
+   "C7911#",
+   237
+  ],
+  [
+   "D79b",
+   215
+  ],
+  [
+   "C79#",
+   201
+  ],
+  [
+   "E79b",
+   191
+  ],
+  [
+   "Eb79",
+   183
+  ],
+  [
+   "D7911#",
+   152
+  ],
+  [
+   "E7alt",
+   142
+  ],
+  [
+   "Ab7911#",
+   114
+  ],
+  [
+   "Bbj79",
+   113
+  ]
+ ],
+ "cap_s": 4.0
+}

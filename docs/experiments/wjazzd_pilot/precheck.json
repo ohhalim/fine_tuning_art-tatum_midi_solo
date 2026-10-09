@@ -1,0 +1,67 @@
+{
+ "mode": "--precheck",
+ "phases": {
+  "load": {
+   "wall_s": 4.534,
+   "rss_now_bytes": 2189574144,
+   "rss_max_bytes": 5568233472,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 75%",
+   "mps_current_allocated_bytes": 2634428416,
+   "mps_driver_allocated_bytes": 3230023680
+  },
+  "forward_backward_longest_chunk": {
+   "wall_s": 0.405,
+   "rss_now_bytes": 2078097408,
+   "rss_max_bytes": 5568233472,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 70%",
+   "tokens": 464,
+   "mps_current_allocated_bytes": 2695347200,
+   "mps_driver_allocated_bytes": 3274342400
+  }
+ },
+ "checks": {
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "zero_adapter_equals_base": {
+   "ok": true,
+   "max_abs_diff": 0.0
+  },
+  "masks_and_shapes": {
+   "ok": true,
+   "chunks": 103,
+   "bad": []
+  },
+  "condition_time_axis": {
+   "ok": true,
+   "samples": 15,
+   "matched": 15
+  },
+  "wrong_plan_same_chroma_positions": {
+   "ok": true,
+   "info_only": true,
+   "count": 0
+  },
+  "save_reload": {
+   "ok": true
+  },
+  "cost_probe_grad": {
+   "ok": true,
+   "loss": 2.8129730224609375,
+   "grad_norm": 1.3481245040893555
+  },
+  "base_has_no_grad": {
+   "ok": true
+  },
+  "base_params_unchanged": {
+   "ok": true
+  }
+ },
+ "train_loss": [],
+ "eval": {},
+ "generation": [],
+ "result": "completed",
+ "stopped_at": null
+}
