@@ -1,0 +1,1603 @@
+{
+ "mode": "--train",
+ "phases": {
+  "load": {
+   "wall_s": 3.859,
+   "rss_now_bytes": 2317303808,
+   "rss_max_bytes": 5569036288,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 77%",
+   "mps_current_allocated_bytes": 2634428416,
+   "mps_driver_allocated_bytes": 3230023680
+  },
+  "forward_backward_longest_chunk": {
+   "wall_s": 0.219,
+   "rss_now_bytes": 2531016704,
+   "rss_max_bytes": 5569036288,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 75%",
+   "tokens": 464,
+   "mps_current_allocated_bytes": 2695347200,
+   "mps_driver_allocated_bytes": 3274342400
+  },
+  "train_128_updates": {
+   "wall_s": 16.613,
+   "rss_now_bytes": 1233158144,
+   "rss_max_bytes": 5569036288,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 69%",
+   "mps_current_allocated_bytes": 2676711936,
+   "mps_driver_allocated_bytes": 3307634688
+  },
+  "evaluation": {
+   "wall_s": 24.836,
+   "rss_now_bytes": 1213186048,
+   "rss_max_bytes": 5569036288,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 71%",
+   "mps_current_allocated_bytes": 2676742400,
+   "mps_driver_allocated_bytes": 3259400192
+  },
+  "generation": {
+   "wall_s": 63.835,
+   "rss_now_bytes": 867057664,
+   "rss_max_bytes": 5569036288,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 74%",
+   "mps_current_allocated_bytes": 2676707328,
+   "mps_driver_allocated_bytes": 3257303040
+  }
+ },
+ "checks": {
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "zero_adapter_equals_base": {
+   "ok": true,
+   "max_abs_diff": 0.0
+  },
+  "masks_and_shapes": {
+   "ok": true,
+   "chunks": 103,
+   "bad": []
+  },
+  "condition_time_axis": {
+   "ok": true,
+   "samples": 15,
+   "matched": 15
+  },
+  "wrong_plan_same_chroma_positions": {
+   "ok": true,
+   "info_only": true,
+   "count": 0
+  },
+  "save_reload": {
+   "ok": true
+  },
+  "cost_probe_grad": {
+   "ok": true,
+   "loss": 2.8129730224609375,
+   "grad_norm": 1.3481245040893555
+  },
+  "base_has_no_grad": {
+   "ok": true
+  },
+  "optimizer_has_no_base_param": {
+   "ok": true
+  },
+  "base_has_no_grad_after_training": {
+   "ok": true
+  },
+  "base_params_unchanged": {
+   "ok": true
+  },
+  "checkpoint_file_unchanged": {
+   "ok": true
+  }
+ },
+ "train_loss": [
+  {
+   "update": 1,
+   "melid": 266,
+   "loss": 2.6071925163269043,
+   "targets": 162
+  },
+  {
+   "update": 2,
+   "melid": 27,
+   "loss": 2.8100106716156006,
+   "targets": 142
+  },
+  {
+   "update": 3,
+   "melid": 297,
+   "loss": 2.6686854362487793,
+   "targets": 82
+  },
+  {
+   "update": 4,
+   "melid": 266,
+   "loss": 2.392411947250366,
+   "targets": 409
+  },
+  {
+   "update": 5,
+   "melid": 290,
+   "loss": 3.022822618484497,
+   "targets": 92
+  },
+  {
+   "update": 6,
+   "melid": 363,
+   "loss": 2.6899547576904297,
+   "targets": 76
+  },
+  {
+   "update": 7,
+   "melid": 297,
+   "loss": 2.5824973583221436,
+   "targets": 409
+  },
+  {
+   "update": 8,
+   "melid": 177,
+   "loss": 2.748368740081787,
+   "targets": 259
+  },
+  {
+   "update": 9,
+   "melid": 54,
+   "loss": 2.5091395378112793,
+   "targets": 409
+  },
+  {
+   "update": 10,
+   "melid": 334,
+   "loss": 2.482215642929077,
+   "targets": 144
+  },
+  {
+   "update": 11,
+   "melid": 177,
+   "loss": 2.665971279144287,
+   "targets": 259
+  },
+  {
+   "update": 12,
+   "melid": 437,
+   "loss": 2.313840389251709,
+   "targets": 138
+  },
+  {
+   "update": 13,
+   "melid": 398,
+   "loss": 2.821662664413452,
+   "targets": 413
+  },
+  {
+   "update": 14,
+   "melid": 290,
+   "loss": 2.82010817527771,
+   "targets": 92
+  },
+  {
+   "update": 15,
+   "melid": 229,
+   "loss": 2.399104356765747,
+   "targets": 408
+  },
+  {
+   "update": 16,
+   "melid": 215,
+   "loss": 2.8122777938842773,
+   "targets": 187
+  },
+  {
+   "update": 17,
+   "melid": 334,
+   "loss": 2.264065980911255,
+   "targets": 119
+  },
+  {
+   "update": 18,
+   "melid": 275,
+   "loss": 2.017711639404297,
+   "targets": 321
+  },
+  {
+   "update": 19,
+   "melid": 27,
+   "loss": 2.6490697860717773,
+   "targets": 142
+  },
+  {
+   "update": 20,
+   "melid": 37,
+   "loss": 2.2601513862609863,
+   "targets": 66
+  },
+  {
+   "update": 21,
+   "melid": 415,
+   "loss": 2.861644983291626,
+   "targets": 58
+  },
+  {
+   "update": 22,
+   "melid": 389,
+   "loss": 2.5003480911254883,
+   "targets": 409
+  },
+  {
+   "update": 23,
+   "melid": 371,
+   "loss": 2.3604347705841064,
+   "targets": 408
+  },
+  {
+   "update": 24,
+   "melid": 215,
+   "loss": 2.711404800415039,
+   "targets": 187
+  },
+  {
+   "update": 25,
+   "melid": 437,
+   "loss": 2.1984622478485107,
+   "targets": 138
+  },
+  {
+   "update": 26,
+   "melid": 415,
+   "loss": 2.672497510910034,
+   "targets": 79
+  },
+  {
+   "update": 27,
+   "melid": 82,
+   "loss": 2.418497323989868,
+   "targets": 408
+  },
+  {
+   "update": 28,
+   "melid": 88,
+   "loss": 2.2663779258728027,
+   "targets": 407
+  },
+  {
+   "update": 29,
+   "melid": 334,
+   "loss": 2.1452672481536865,
+   "targets": 119
+  },
+  {
+   "update": 30,
+   "melid": 37,
+   "loss": 2.0061793327331543,
+   "targets": 66
+  },
+  {
+   "update": 31,
+   "melid": 215,
+   "loss": 2.7174086570739746,
+   "targets": 187
+  },
+  {
+   "update": 32,
+   "melid": 54,
+   "loss": 2.459843397140503,
+   "targets": 409
+  },
+  {
+   "update": 33,
+   "melid": 334,
+   "loss": 2.0892081260681152,
+   "targets": 119
+  },
+  {
+   "update": 34,
+   "melid": 415,
+   "loss": 2.3617238998413086,
+   "targets": 79
+  },
+  {
+   "update": 35,
+   "melid": 334,
+   "loss": 2.0453667640686035,
+   "targets": 119
+  },
+  {
+   "update": 36,
+   "melid": 334,
+   "loss": 2.401195526123047,
+   "targets": 144
+  },
+  {
+   "update": 37,
+   "melid": 371,
+   "loss": 2.293131113052368,
+   "targets": 408
+  },
+  {
+   "update": 38,
+   "melid": 275,
+   "loss": 1.982685923576355,
+   "targets": 321
+  },
+  {
+   "update": 39,
+   "melid": 371,
+   "loss": 2.2823455333709717,
+   "targets": 408
+  },
+  {
+   "update": 40,
+   "melid": 215,
+   "loss": 2.545253038406372,
+   "targets": 187
+  },
+  {
+   "update": 41,
+   "melid": 177,
+   "loss": 2.547065258026123,
+   "targets": 259
+  },
+  {
+   "update": 42,
+   "melid": 82,
+   "loss": 2.4195914268493652,
+   "targets": 409
+  },
+  {
+   "update": 43,
+   "melid": 27,
+   "loss": 2.5550363063812256,
+   "targets": 142
+  },
+  {
+   "update": 44,
+   "melid": 290,
+   "loss": 2.749239444732666,
+   "targets": 92
+  },
+  {
+   "update": 45,
+   "melid": 37,
+   "loss": 1.896289587020874,
+   "targets": 66
+  },
+  {
+   "update": 46,
+   "melid": 79,
+   "loss": 1.9262800216674805,
+   "targets": 408
+  },
+  {
+   "update": 47,
+   "melid": 37,
+   "loss": 1.8322702646255493,
+   "targets": 66
+  },
+  {
+   "update": 48,
+   "melid": 415,
+   "loss": 2.610065221786499,
+   "targets": 58
+  },
+  {
+   "update": 49,
+   "melid": 113,
+   "loss": 2.5485384464263916,
+   "targets": 86
+  },
+  {
+   "update": 50,
+   "melid": 82,
+   "loss": 2.3083457946777344,
+   "targets": 407
+  },
+  {
+   "update": 51,
+   "melid": 363,
+   "loss": 2.4947190284729004,
+   "targets": 76
+  },
+  {
+   "update": 52,
+   "melid": 275,
+   "loss": 1.9457650184631348,
+   "targets": 321
+  },
+  {
+   "update": 53,
+   "melid": 398,
+   "loss": 2.815359592437744,
+   "targets": 413
+  },
+  {
+   "update": 54,
+   "melid": 37,
+   "loss": 1.6261180639266968,
+   "targets": 66
+  },
+  {
+   "update": 55,
+   "melid": 371,
+   "loss": 2.6924006938934326,
+   "targets": 409
+  },
+  {
+   "update": 56,
+   "melid": 290,
+   "loss": 2.6640546321868896,
+   "targets": 92
+  },
+  {
+   "update": 57,
+   "melid": 82,
+   "loss": 2.440246105194092,
+   "targets": 408
+  },
+  {
+   "update": 58,
+   "melid": 17,
+   "loss": 2.3290209770202637,
+   "targets": 407
+  },
+  {
+   "update": 59,
+   "melid": 54,
+   "loss": 2.7290005683898926,
+   "targets": 409
+  },
+  {
+   "update": 60,
+   "melid": 229,
+   "loss": 2.1563210487365723,
+   "targets": 406
+  },
+  {
+   "update": 61,
+   "melid": 215,
+   "loss": 2.51603627204895,
+   "targets": 187
+  },
+  {
+   "update": 62,
+   "melid": 27,
+   "loss": 2.5082671642303467,
+   "targets": 142
+  },
+  {
+   "update": 63,
+   "melid": 79,
+   "loss": 2.2802934646606445,
+   "targets": 408
+  },
+  {
+   "update": 64,
+   "melid": 27,
+   "loss": 2.475726842880249,
+   "targets": 142
+  },
+  {
+   "update": 65,
+   "melid": 17,
+   "loss": 2.34458065032959,
+   "targets": 407
+  },
+  {
+   "update": 66,
+   "melid": 389,
+   "loss": 2.4122374057769775,
+   "targets": 409
+  },
+  {
+   "update": 67,
+   "melid": 371,
+   "loss": 2.666809558868408,
+   "targets": 409
+  },
+  {
+   "update": 68,
+   "melid": 266,
+   "loss": 2.3524973392486572,
+   "targets": 409
+  },
+  {
+   "update": 69,
+   "melid": 229,
+   "loss": 2.344050884246826,
+   "targets": 408
+  },
+  {
+   "update": 70,
+   "melid": 27,
+   "loss": 2.3637096881866455,
+   "targets": 142
+  },
+  {
+   "update": 71,
+   "melid": 82,
+   "loss": 2.4593119621276855,
+   "targets": 409
+  },
+  {
+   "update": 72,
+   "melid": 415,
+   "loss": 2.181952476501465,
+   "targets": 79
+  },
+  {
+   "update": 73,
+   "melid": 290,
+   "loss": 2.5900609493255615,
+   "targets": 92
+  },
+  {
+   "update": 74,
+   "melid": 437,
+   "loss": 2.1754770278930664,
+   "targets": 138
+  },
+  {
+   "update": 75,
+   "melid": 398,
+   "loss": 2.4904870986938477,
+   "targets": 408
+  },
+  {
+   "update": 76,
+   "melid": 334,
+   "loss": 2.048495054244995,
+   "targets": 119
+  },
+  {
+   "update": 77,
+   "melid": 371,
+   "loss": 2.6058733463287354,
+   "targets": 409
+  },
+  {
+   "update": 78,
+   "melid": 113,
+   "loss": 2.367443799972534,
+   "targets": 86
+  },
+  {
+   "update": 79,
+   "melid": 88,
+   "loss": 2.2330482006073,
+   "targets": 407
+  },
+  {
+   "update": 80,
+   "melid": 389,
+   "loss": 2.629307746887207,
+   "targets": 409
+  },
+  {
+   "update": 81,
+   "melid": 229,
+   "loss": 2.3670029640197754,
+   "targets": 408
+  },
+  {
+   "update": 82,
+   "melid": 80,
+   "loss": 2.7612178325653076,
+   "targets": 407
+  },
+  {
+   "update": 83,
+   "melid": 297,
+   "loss": 2.556137800216675,
+   "targets": 82
+  },
+  {
+   "update": 84,
+   "melid": 27,
+   "loss": 2.2542076110839844,
+   "targets": 142
+  },
+  {
+   "update": 85,
+   "melid": 415,
+   "loss": 2.499753475189209,
+   "targets": 76
+  },
+  {
+   "update": 86,
+   "melid": 82,
+   "loss": 2.396951675415039,
+   "targets": 408
+  },
+  {
+   "update": 87,
+   "melid": 229,
+   "loss": 2.503133535385132,
+   "targets": 407
+  },
+  {
+   "update": 88,
+   "melid": 363,
+   "loss": 2.4010372161865234,
+   "targets": 76
+  },
+  {
+   "update": 89,
+   "melid": 415,
+   "loss": 2.377969264984131,
+   "targets": 58
+  },
+  {
+   "update": 90,
+   "melid": 82,
+   "loss": 2.757957696914673,
+   "targets": 412
+  },
+  {
+   "update": 91,
+   "melid": 398,
+   "loss": 2.408215284347534,
+   "targets": 408
+  },
+  {
+   "update": 92,
+   "melid": 80,
+   "loss": 2.6816771030426025,
+   "targets": 407
+  },
+  {
+   "update": 93,
+   "melid": 297,
+   "loss": 2.477182626724243,
+   "targets": 82
+  },
+  {
+   "update": 94,
+   "melid": 54,
+   "loss": 2.901545524597168,
+   "targets": 138
+  },
+  {
+   "update": 95,
+   "melid": 398,
+   "loss": 2.357389211654663,
+   "targets": 408
+  },
+  {
+   "update": 96,
+   "melid": 17,
+   "loss": 2.2763686180114746,
+   "targets": 407
+  },
+  {
+   "update": 97,
+   "melid": 398,
+   "loss": 2.7903153896331787,
+   "targets": 413
+  },
+  {
+   "update": 98,
+   "melid": 363,
+   "loss": 2.235783100128174,
+   "targets": 76
+  },
+  {
+   "update": 99,
+   "melid": 389,
+   "loss": 2.5370700359344482,
+   "targets": 409
+  },
+  {
+   "update": 100,
+   "melid": 266,
+   "loss": 2.3411405086517334,
+   "targets": 409
+  },
+  {
+   "update": 101,
+   "melid": 79,
+   "loss": 2.543070077896118,
+   "targets": 311
+  },
+  {
+   "update": 102,
+   "melid": 415,
+   "loss": 2.078930616378784,
+   "targets": 79
+  },
+  {
+   "update": 103,
+   "melid": 275,
+   "loss": 1.9840688705444336,
+   "targets": 321
+  },
+  {
+   "update": 104,
+   "melid": 215,
+   "loss": 2.52329158782959,
+   "targets": 187
+  },
+  {
+   "update": 105,
+   "melid": 334,
+   "loss": 1.9961750507354736,
+   "targets": 119
+  },
+  {
+   "update": 106,
+   "melid": 79,
+   "loss": 2.225792407989502,
+   "targets": 408
+  },
+  {
+   "update": 107,
+   "melid": 290,
+   "loss": 2.5628793239593506,
+   "targets": 92
+  },
+  {
+   "update": 108,
+   "melid": 371,
+   "loss": 2.2865538597106934,
+   "targets": 408
+  },
+  {
+   "update": 109,
+   "melid": 398,
+   "loss": 2.721867084503174,
+   "targets": 413
+  },
+  {
+   "update": 110,
+   "melid": 363,
+   "loss": 2.118983507156372,
+   "targets": 76
+  },
+  {
+   "update": 111,
+   "melid": 415,
+   "loss": 2.231003999710083,
+   "targets": 76
+  },
+  {
+   "update": 112,
+   "melid": 266,
+   "loss": 2.417726755142212,
+   "targets": 162
+  },
+  {
+   "update": 113,
+   "melid": 389,
+   "loss": 2.482717990875244,
+   "targets": 409
+  },
+  {
+   "update": 114,
+   "melid": 17,
+   "loss": 2.281766891479492,
+   "targets": 407
+  },
+  {
+   "update": 115,
+   "melid": 415,
+   "loss": 2.073939085006714,
+   "targets": 76
+  },
+  {
+   "update": 116,
+   "melid": 80,
+   "loss": 2.635915517807007,
+   "targets": 407
+  },
+  {
+   "update": 117,
+   "melid": 88,
+   "loss": 2.195653200149536,
+   "targets": 225
+  },
+  {
+   "update": 118,
+   "melid": 275,
+   "loss": 1.9584274291992188,
+   "targets": 321
+  },
+  {
+   "update": 119,
+   "melid": 415,
+   "loss": 2.2672550678253174,
+   "targets": 58
+  },
+  {
+   "update": 120,
+   "melid": 363,
+   "loss": 1.9709304571151733,
+   "targets": 76
+  },
+  {
+   "update": 121,
+   "melid": 27,
+   "loss": 2.3146069049835205,
+   "targets": 142
+  },
+  {
+   "update": 122,
+   "melid": 415,
+   "loss": 2.064462184906006,
+   "targets": 58
+  },
+  {
+   "update": 123,
+   "melid": 271,
+   "loss": 2.1936142444610596,
+   "targets": 132
+  },
+  {
+   "update": 124,
+   "melid": 80,
+   "loss": 2.634312152862549,
+   "targets": 407
+  },
+  {
+   "update": 125,
+   "melid": 37,
+   "loss": 1.7758182287216187,
+   "targets": 66
+  },
+  {
+   "update": 126,
+   "melid": 415,
+   "loss": 2.3479599952697754,
+   "targets": 79
+  },
+  {
+   "update": 127,
+   "melid": 275,
+   "loss": 1.9410499334335327,
+   "targets": 321
+  },
+  {
+   "update": 128,
+   "melid": 334,
+   "loss": 2.496708869934082,
+   "targets": 144
+  }
+ ],
+ "eval": {
+  "test": {
+   "base": {
+    "song_mean": {
+     "pitch": 1.9200883709727066,
+     "joint": 1.9571666975611215,
+     "continuation": 2.4067380081376015
+    },
+    "per_song": {
+     "12": {
+      "pitch": 1.9479558420325838,
+      "joint": 1.9793228430034064,
+      "continuation": 2.308002696317785
+     },
+     "6": {
+      "pitch": 1.7518610271836044,
+      "joint": 1.7827981362068348,
+      "continuation": 2.469648784936314
+     },
+     "92": {
+      "pitch": 2.055595577997596,
+      "joint": 2.095043451847888,
+      "continuation": 2.4915399546990615
+     },
+     "292": {
+      "pitch": 2.2103970867271223,
+      "joint": 2.2519658056812153,
+      "continuation": 2.7444654060132576
+     },
+     "179": {
+      "pitch": 2.0299865366442003,
+      "joint": 2.070945194802339,
+      "continuation": 2.5957063957910926
+     },
+     "84": {
+      "pitch": 1.7787085953057018,
+      "joint": 1.8067396488750889,
+      "continuation": 2.3861089070553514
+     },
+     "270": {
+      "pitch": 1.8455209057144264,
+      "joint": 1.8855040946395243,
+      "continuation": 2.176491526273968
+     },
+     "272": {
+      "pitch": 1.7406813961764176,
+      "joint": 1.7850144054326746,
+      "continuation": 2.081940394013984
+     }
+    },
+    "strata_pitch_nll": {
+     "boundary_first": {
+      "n": 283,
+      "mean": 2.3526720780576498
+     },
+     "current": {
+      "n": 2786,
+      "mean": 1.8335159643139016
+     },
+     "anticipation": {
+      "n": 64,
+      "mean": 1.555168219609186
+     },
+     "not_represented": {
+      "n": 2,
+      "mean": 3.4810922145843506
+     }
+    }
+   },
+   "correct": {
+    "song_mean": {
+     "pitch": 1.993252529289905,
+     "joint": 1.9958975101933936,
+     "continuation": 2.455153291869013
+    },
+    "per_song": {
+     "12": {
+      "pitch": 2.031526770720731,
+      "joint": 2.0332789600117884,
+      "continuation": 2.369389403100107
+     },
+     "6": {
+      "pitch": 1.8051933474023247,
+      "joint": 1.807382975596082,
+      "continuation": 2.5594171648118302
+     },
+     "92": {
+      "pitch": 2.1854120077521997,
+      "joint": 2.18833029119802,
+      "continuation": 2.5782571380900907
+     },
+     "292": {
+      "pitch": 2.3771725725382566,
+      "joint": 2.3800930967209517,
+      "continuation": 2.8747325550426135
+     },
+     "179": {
+      "pitch": 2.1140170858289213,
+      "joint": 2.1162037538290397,
+      "continuation": 2.646186931669417
+     },
+     "84": {
+      "pitch": 1.7879689353009252,
+      "joint": 1.792541594820294,
+      "continuation": 2.3792945533374996
+     },
+     "270": {
+      "pitch": 1.8407157931310028,
+      "joint": 1.8430510810143614,
+      "continuation": 2.162862976921381
+     },
+     "272": {
+      "pitch": 1.8040137216448784,
+      "joint": 1.8062983283566103,
+      "continuation": 2.0710856119791665
+     }
+    },
+    "strata_pitch_nll": {
+     "boundary_first": {
+      "n": 283,
+      "mean": 2.404826204262858
+     },
+     "current": {
+      "n": 2786,
+      "mean": 1.895150698772889
+     },
+     "anticipation": {
+      "n": 64,
+      "mean": 1.6193439472699538
+     },
+     "not_represented": {
+      "n": 2,
+      "mean": 3.2382354736328125
+     }
+    }
+   },
+   "wrong": {
+    "song_mean": {
+     "pitch": 2.1135262082759603,
+     "joint": 2.116468697792304,
+     "continuation": 2.485512738748744
+    },
+    "per_song": {
+     "12": {
+      "pitch": 2.1601314091248742,
+      "joint": 2.162490396635301,
+      "continuation": 2.4087054682712927
+     },
+     "6": {
+      "pitch": 2.001151642769075,
+      "joint": 2.0037492255573692,
+      "continuation": 2.6180594303924
+     },
+     "92": {
+      "pitch": 2.2749225323395508,
+      "joint": 2.2787066398430658,
+      "continuation": 2.592071493194251
+     },
+     "292": {
+      "pitch": 2.483200164028892,
+      "joint": 2.485850206403821,
+      "continuation": 2.865994170217803
+     },
+     "179": {
+      "pitch": 2.227394085285628,
+      "joint": 2.2298215186515717,
+      "continuation": 2.6746286322996973
+     },
+     "84": {
+      "pitch": 1.8946658996227372,
+      "joint": 1.8994629699128256,
+      "continuation": 2.4405993450703707
+     },
+     "270": {
+      "pitch": 2.0088286209851502,
+      "joint": 2.0114619569658343,
+      "continuation": 2.2136228745484887
+     },
+     "272": {
+      "pitch": 1.857915312051773,
+      "joint": 1.8602066683686442,
+      "continuation": 2.070420495995648
+     }
+    },
+    "strata_pitch_nll": {
+     "boundary_first": {
+      "n": 283,
+      "mean": 2.5513227003833854
+     },
+     "current": {
+      "n": 2786,
+      "mean": 2.0194702890904
+     },
+     "anticipation": {
+      "n": 64,
+      "mean": 1.8721590301720425
+     },
+     "not_represented": {
+      "n": 2,
+      "mean": 3.714272379875183
+     }
+    }
+   },
+   "inactive": {
+    "song_mean": {
+     "pitch": 1.9200883709727066,
+     "joint": 1.9571666975611215,
+     "continuation": 2.4067380081376015
+    },
+    "per_song": {
+     "12": {
+      "pitch": 1.9479558420325838,
+      "joint": 1.9793228430034064,
+      "continuation": 2.308002696317785
+     },
+     "6": {
+      "pitch": 1.7518610271836044,
+      "joint": 1.7827981362068348,
+      "continuation": 2.469648784936314
+     },
+     "92": {
+      "pitch": 2.055595577997596,
+      "joint": 2.095043451847888,
+      "continuation": 2.4915399546990615
+     },
+     "292": {
+      "pitch": 2.2103970867271223,
+      "joint": 2.2519658056812153,
+      "continuation": 2.7444654060132576
+     },
+     "179": {
+      "pitch": 2.0299865366442003,
+      "joint": 2.070945194802339,
+      "continuation": 2.5957063957910926
+     },
+     "84": {
+      "pitch": 1.7787085953057018,
+      "joint": 1.8067396488750889,
+      "continuation": 2.3861089070553514
+     },
+     "270": {
+      "pitch": 1.8455209057144264,
+      "joint": 1.8855040946395243,
+      "continuation": 2.176491526273968
+     },
+     "272": {
+      "pitch": 1.7406813961764176,
+      "joint": 1.7850144054326746,
+      "continuation": 2.081940394013984
+     }
+    },
+    "strata_pitch_nll": {
+     "boundary_first": {
+      "n": 283,
+      "mean": 2.3526720780576498
+     },
+     "current": {
+      "n": 2786,
+      "mean": 1.8335159643139016
+     },
+     "anticipation": {
+      "n": 64,
+      "mean": 1.555168219609186
+     },
+     "not_represented": {
+      "n": 2,
+      "mean": 3.4810922145843506
+     }
+    }
+   },
+   "decision": {
+    "correct_lt_wrong_songs": 8,
+    "of": 8,
+    "song_mean_correct_lt_wrong": true,
+    "result": "condition_use_observed"
+   }
+  },
+  "validation_info": {
+   "base": {
+    "song_mean": {
+     "pitch": 1.9537185863115865,
+     "joint": 1.997770804514454,
+     "continuation": 2.5251151855791907
+    },
+    "per_song": {
+     "16": {
+      "pitch": 1.7580881314100445,
+      "joint": 1.844761421048158,
+      "continuation": 2.3642360142299106
+     },
+     "347": {
+      "pitch": 2.2004367596534795,
+      "joint": 2.233014736584453,
+      "continuation": 2.9096527675412736
+     },
+     "18": {
+      "pitch": 1.6162054121160685,
+      "joint": 1.6413776915061717,
+      "continuation": 1.9693564620672488
+     },
+     "25": {
+      "pitch": 2.0374555721540344,
+      "joint": 2.0919815554198893,
+      "continuation": 2.8770433508831523
+     },
+     "293": {
+      "pitch": 2.1062093716310826,
+      "joint": 2.140555469196682,
+      "continuation": 2.3997794841897897
+     },
+     "435": {
+      "pitch": 1.7450888388049908,
+      "joint": 1.7934309840679932,
+      "continuation": 2.8008533374683275
+     },
+     "359": {
+      "pitch": 1.9806791531743222,
+      "joint": 2.027897074498156,
+      "continuation": 2.407223543092977
+     },
+     "61": {
+      "pitch": 2.185585451548669,
+      "joint": 2.2091475037941293,
+      "continuation": 2.4727765251608456
+     }
+    },
+    "strata_pitch_nll": {
+     "current": {
+      "n": 550,
+      "mean": 1.9100330984897234
+     },
+     "boundary_first": {
+      "n": 91,
+      "mean": 2.2734125071501996
+     },
+     "anticipation": {
+      "n": 19,
+      "mean": 2.8528313048576055
+     },
+     "not_represented": {
+      "n": 4,
+      "mean": 2.0719849467277527
+     }
+    }
+   },
+   "correct": {
+    "song_mean": {
+     "pitch": 1.9725001962176802,
+     "joint": 1.9748293912584485,
+     "continuation": 2.569445286648124
+    },
+    "per_song": {
+     "16": {
+      "pitch": 1.5523651717482387,
+      "joint": 1.5550420843064785,
+      "continuation": 2.304095676967076
+     },
+     "347": {
+      "pitch": 2.2404054347858873,
+      "joint": 2.2424443114635557,
+      "continuation": 2.987265302550118
+     },
+     "18": {
+      "pitch": 1.5568411209648336,
+      "joint": 1.5583829609260185,
+      "continuation": 1.9804911893956803
+     },
+     "25": {
+      "pitch": 1.9687636330385099,
+      "joint": 1.972514397888021,
+      "continuation": 2.987673773281816
+     },
+     "293": {
+      "pitch": 2.0935048312438944,
+      "joint": 2.0954401662671254,
+      "continuation": 2.399714765877559
+     },
+     "435": {
+      "pitch": 1.9104462604468258,
+      "joint": 1.912743502559188,
+      "continuation": 2.94687970135663
+     },
+     "359": {
+      "pitch": 2.11479190905248,
+      "joint": 2.117317901904224,
+      "continuation": 2.427314246079947
+     },
+     "61": {
+      "pitch": 2.3428832084607722,
+      "joint": 2.344749804752976,
+      "continuation": 2.522127637676164
+     }
+    },
+    "strata_pitch_nll": {
+     "current": {
+      "n": 550,
+      "mean": 1.948685719067739
+     },
+     "boundary_first": {
+      "n": 91,
+      "mean": 2.345196040163001
+     },
+     "anticipation": {
+      "n": 19,
+      "mean": 2.807208982737441
+     },
+     "not_represented": {
+      "n": 4,
+      "mean": 2.414271056652069
+     }
+    }
+   },
+   "wrong": {
+    "song_mean": {
+     "pitch": 2.2159029504460603,
+     "joint": 2.2200755610935823,
+     "continuation": 2.6331659476438594
+    },
+    "per_song": {
+     "16": {
+      "pitch": 2.1804087923185245,
+      "joint": 2.1881578131704718,
+      "continuation": 2.5474352155412947
+     },
+     "347": {
+      "pitch": 2.5243430612392204,
+      "joint": 2.5273054822586305,
+      "continuation": 3.138353110259434
+     },
+     "18": {
+      "pitch": 1.8160578805897662,
+      "joint": 1.8187647723217508,
+      "continuation": 2.0583669625076593
+     },
+     "25": {
+      "pitch": 2.486436840485443,
+      "joint": 2.49476618709212,
+      "continuation": 2.982273709946784
+     },
+     "293": {
+      "pitch": 2.2766200515294543,
+      "joint": 2.2794283214760456,
+      "continuation": 2.466011310445851
+     },
+     "435": {
+      "pitch": 1.9114751363507447,
+      "joint": 1.916162409628622,
+      "continuation": 2.873486664918092
+     },
+     "359": {
+      "pitch": 2.182406297053701,
+      "joint": 2.184934792299104,
+      "continuation": 2.4741793251711575
+     },
+     "61": {
+      "pitch": 2.349475544001629,
+      "joint": 2.351084710501913,
+      "continuation": 2.5252212823606004
+     }
+    },
+    "strata_pitch_nll": {
+     "current": {
+      "n": 550,
+      "mean": 2.1332979908382352
+     },
+     "boundary_first": {
+      "n": 91,
+      "mean": 2.497805143532517
+     },
+     "anticipation": {
+      "n": 19,
+      "mean": 3.28372786390154
+     },
+     "not_represented": {
+      "n": 4,
+      "mean": 2.1747958064079285
+     }
+    }
+   },
+   "inactive": {
+    "song_mean": {
+     "pitch": 1.9537185863115865,
+     "joint": 1.997770804514454,
+     "continuation": 2.5251151855791907
+    },
+    "per_song": {
+     "16": {
+      "pitch": 1.7580881314100445,
+      "joint": 1.844761421048158,
+      "continuation": 2.3642360142299106
+     },
+     "347": {
+      "pitch": 2.2004367596534795,
+      "joint": 2.233014736584453,
+      "continuation": 2.9096527675412736
+     },
+     "18": {
+      "pitch": 1.6162054121160685,
+      "joint": 1.6413776915061717,
+      "continuation": 1.9693564620672488
+     },
+     "25": {
+      "pitch": 2.0374555721540344,
+      "joint": 2.0919815554198893,
+      "continuation": 2.8770433508831523
+     },
+     "293": {
+      "pitch": 2.1062093716310826,
+      "joint": 2.140555469196682,
+      "continuation": 2.3997794841897897
+     },
+     "435": {
+      "pitch": 1.7450888388049908,
+      "joint": 1.7934309840679932,
+      "continuation": 2.8008533374683275
+     },
+     "359": {
+      "pitch": 1.9806791531743222,
+      "joint": 2.027897074498156,
+      "continuation": 2.407223543092977
+     },
+     "61": {
+      "pitch": 2.185585451548669,
+      "joint": 2.2091475037941293,
+      "continuation": 2.4727765251608456
+     }
+    },
+    "strata_pitch_nll": {
+     "current": {
+      "n": 550,
+      "mean": 1.9100330984897234
+     },
+     "boundary_first": {
+      "n": 91,
+      "mean": 2.2734125071501996
+     },
+     "anticipation": {
+      "n": 19,
+      "mean": 2.8528313048576055
+     },
+     "not_represented": {
+      "n": 4,
+      "mean": 2.0719849467277527
+     }
+    }
+   },
+   "decision": {
+    "correct_lt_wrong_songs": 8,
+    "of": 8,
+    "song_mean_correct_lt_wrong": true,
+    "result": "condition_use_observed"
+   }
+  }
+ },
+ "generation": [
+  {
+   "melid": 12,
+   "seed": 1,
+   "plan": "correct",
+   "tokens": 96,
+   "eos": false,
+   "notes": 32,
+   "grammar_errors": 0,
+   "longest_repeat_notes": 7,
+   "chord_tone_ratio_descriptive": 0.5
+  },
+  {
+   "melid": 12,
+   "seed": 1,
+   "plan": "wrong",
+   "tokens": 96,
+   "eos": false,
+   "notes": 32,
+   "grammar_errors": 0,
+   "longest_repeat_notes": 6,
+   "chord_tone_ratio_descriptive": 0.28125
+  },
+  {
+   "melid": 12,
+   "seed": 2,
+   "plan": "correct",
+   "tokens": 96,
+   "eos": false,
+   "notes": 31,
+   "grammar_errors": 20,
+   "longest_repeat_notes": 17,
+   "chord_tone_ratio_descriptive": 0.8064516129032258
+  },
+  {
+   "melid": 12,
+   "seed": 2,
+   "plan": "wrong",
+   "tokens": 96,
+   "eos": false,
+   "notes": 12,
+   "grammar_errors": 58,
+   "longest_repeat_notes": 2,
+   "chord_tone_ratio_descriptive": 0.5
+  },
+  {
+   "melid": 6,
+   "seed": 1,
+   "plan": "correct",
+   "tokens": 96,
+   "eos": false,
+   "notes": 31,
+   "grammar_errors": 2,
+   "longest_repeat_notes": 10,
+   "chord_tone_ratio_descriptive": 0.8064516129032258
+  },
+  {
+   "melid": 6,
+   "seed": 1,
+   "plan": "wrong",
+   "tokens": 96,
+   "eos": false,
+   "notes": 31,
+   "grammar_errors": 0,
+   "longest_repeat_notes": 10,
+   "chord_tone_ratio_descriptive": 0.16129032258064516
+  },
+  {
+   "melid": 6,
+   "seed": 2,
+   "plan": "correct",
+   "tokens": 96,
+   "eos": false,
+   "notes": 32,
+   "grammar_errors": 0,
+   "longest_repeat_notes": 10,
+   "chord_tone_ratio_descriptive": 0.96875
+  },
+  {
+   "melid": 6,
+   "seed": 2,
+   "plan": "wrong",
+   "tokens": 96,
+   "eos": false,
+   "notes": 20,
+   "grammar_errors": 31,
+   "longest_repeat_notes": 7,
+   "chord_tone_ratio_descriptive": 0.3
+  },
+  {
+   "melid": 92,
+   "seed": 1,
+   "plan": "correct",
+   "tokens": 96,
+   "eos": false,
+   "notes": 31,
+   "grammar_errors": 1,
+   "longest_repeat_notes": 0,
+   "chord_tone_ratio_descriptive": 0.45161290322580644
+  },
+  {
+   "melid": 92,
+   "seed": 1,
+   "plan": "wrong",
+   "tokens": 96,
+   "eos": false,
+   "notes": 32,
+   "grammar_errors": 0,
+   "longest_repeat_notes": 7,
+   "chord_tone_ratio_descriptive": 0.375
+  },
+  {
+   "melid": 92,
+   "seed": 2,
+   "plan": "correct",
+   "tokens": 96,
+   "eos": false,
+   "notes": 18,
+   "grammar_errors": 40,
+   "longest_repeat_notes": 0,
+   "chord_tone_ratio_descriptive": 0.2777777777777778
+  },
+  {
+   "melid": 92,
+   "seed": 2,
+   "plan": "wrong",
+   "tokens": 96,
+   "eos": false,
+   "notes": 26,
+   "grammar_errors": 18,
+   "longest_repeat_notes": 5,
+   "chord_tone_ratio_descriptive": 0.3076923076923077
+  },
+  {
+   "melid": 292,
+   "seed": 1,
+   "plan": "correct",
+   "tokens": 96,
+   "eos": false,
+   "notes": 31,
+   "grammar_errors": 1,
+   "longest_repeat_notes": 4,
+   "chord_tone_ratio_descriptive": 0.6451612903225806
+  },
+  {
+   "melid": 292,
+   "seed": 1,
+   "plan": "wrong",
+   "tokens": 96,
+   "eos": false,
+   "notes": 32,
+   "grammar_errors": 0,
+   "longest_repeat_notes": 4,
+   "chord_tone_ratio_descriptive": 0.125
+  },
+  {
+   "melid": 292,
+   "seed": 2,
+   "plan": "correct",
+   "tokens": 96,
+   "eos": false,
+   "notes": 31,
+   "grammar_errors": 1,
+   "longest_repeat_notes": 0,
+   "chord_tone_ratio_descriptive": 0.41935483870967744
+  },
+  {
+   "melid": 292,
+   "seed": 2,
+   "plan": "wrong",
+   "tokens": 96,
+   "eos": false,
+   "notes": 27,
+   "grammar_errors": 11,
+   "longest_repeat_notes": 0,
+   "chord_tone_ratio_descriptive": 0.14814814814814814
+  }
+ ],
+ "result": "completed",
+ "stopped_at": null,
+ "adapter_sha256": "dbfe8333b0e891bee90b8e387f16aa5409c5789fbc5c122d42ae6e9f40f8f724"
+}
