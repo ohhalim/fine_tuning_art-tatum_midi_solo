@@ -12,9 +12,14 @@
   "clamped": 0,
   "delta_sec_max_unclamped": 1.8461538461538458,
   "chord_changes_seen_at_onsets": 28,
+  "next_note_chord_token_exact": {
+   "same_as_current": 48,
+   "equals_first_next": 18,
+   "not_represented": 9
+  },
   "lossy_annotation_segments": 13,
   "of_segments": 46,
-  "positions_on_lossy_segments": 24,
+  "positions_on_lossy_segments": 25,
   "samples": [
    {
     "change": 5,
@@ -275,6 +280,11 @@
   "clamped": 0,
   "delta_sec_max_unclamped": 3.2,
   "chord_changes_seen_at_onsets": 29,
+  "next_note_chord_token_exact": {
+   "same_as_current": 62,
+   "equals_first_next": 24,
+   "not_represented": 1
+  },
   "lossy_annotation_segments": 2,
   "of_segments": 33,
   "positions_on_lossy_segments": 3,
@@ -538,6 +548,11 @@
   "clamped": 0,
   "delta_sec_max_unclamped": 2.663333333333333,
   "chord_changes_seen_at_onsets": 26,
+  "next_note_chord_token_exact": {
+   "same_as_current": 102,
+   "equals_first_next": 24,
+   "not_represented": 0
+  },
   "lossy_annotation_segments": 4,
   "of_segments": 30,
   "positions_on_lossy_segments": 38,

@@ -1,0 +1,1485 @@
+{
+ "xml_dir": "/Users/ohhalim/git_box/bebopnet-code/resources/xmls",
+ "files": 51,
+ "families": 33,
+ "bebopnet_families": 32,
+ "rows": [
+  {
+   "family": "A_Foggy_Day",
+   "files": [
+    "A_Foggy_Day.xml",
+    "short/A_Foggy_Day_short.xml"
+   ],
+   "representative": "A_Foggy_Day.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "A Foggy Day",
+    "credits": [
+     "A Foggy Day"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-04-07"
+    ]
+   },
+   "measures": 34,
+   "irregular_measures": 0,
+   "notes": 75,
+   "chord_segments": 46,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 13,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 47,
+    "not_represented": 11,
+    "equals_first_next": 17
+   },
+   "content_sig": "6d8cd4579deb"
+  },
+  {
+   "family": "All_The_Things_You_Are",
+   "files": [
+    "All_The_Things_You_Are.xml",
+    "short/All_The_Things_You_Are_short.xml"
+   ],
+   "representative": "All_The_Things_You_Are.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "All The Things You Are",
+    "credits": [
+     "All The Things You Are"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.1.0"
+    ],
+    "encoding_date": [
+     "2019-03-10"
+    ]
+   },
+   "measures": 36,
+   "irregular_measures": 0,
+   "notes": 87,
+   "chord_segments": 33,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 2,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 58,
+    "equals_first_next": 28,
+    "not_represented": 1
+   },
+   "content_sig": "082a3241997d"
+  },
+  {
+   "family": "Billies_Bounce",
+   "files": [
+    "Billies_Bounce.xml"
+   ],
+   "representative": "Billies_Bounce.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Billie's Bounce 2",
+    "credits": [
+     "Billie's Bounce 2"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-19"
+    ]
+   },
+   "measures": 24,
+   "irregular_measures": 0,
+   "notes": 126,
+   "chord_segments": 30,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 4,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 99,
+    "equals_first_next": 27
+   },
+   "content_sig": "8e41f5c5038e"
+  },
+  {
+   "family": "Black_Orpheus",
+   "files": [
+    "Black_Orpheus.xml",
+    "short/Black_Orpheus_short.xml"
+   ],
+   "representative": "Black_Orpheus.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Black Orpheus 2",
+    "credits": [
+     "Black Orpheus 2"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-25"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 69,
+   "chord_segments": 42,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 13,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 36,
+    "equals_first_next": 28,
+    "not_represented": 5
+   },
+   "content_sig": "5ecdb774653a"
+  },
+  {
+   "family": "Blue_Bossa",
+   "files": [
+    "Blue_Bossa.xml",
+    "short/Blue_Bossa_short.xml"
+   ],
+   "representative": "Blue_Bossa.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "",
+    "credits": [
+     "Kenny Dorham",
+     "Blue Bossa",
+     "- Transcribed by Markus Schulze (2016) -"
+    ],
+    "rights": [
+     "- Transcribed by Markus Schulze (2016) -"
+    ],
+    "source": [
+     "http://api.musescore.com/score/2541016"
+    ],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-24"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 74,
+   "chord_segments": 26,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 6,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 54,
+    "equals_first_next": 20
+   },
+   "content_sig": "19330b14ff61"
+  },
+  {
+   "family": "Blue_Monk",
+   "files": [
+    "Blue_Monk.xml"
+   ],
+   "representative": "Blue_Monk.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Blue Monk",
+    "credits": [
+     "Blue Monk"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-19"
+    ]
+   },
+   "measures": 24,
+   "irregular_measures": 0,
+   "notes": 110,
+   "chord_segments": 32,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 28,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 80,
+    "equals_first_next": 30
+   },
+   "content_sig": "d6a8746bfd6d"
+  },
+  {
+   "family": "Cheese_Cake",
+   "files": [
+    "Cheese_Cake.xml",
+    "short/Cheese_Cake_short.xml"
+   ],
+   "representative": "Cheese_Cake.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Cheese Cake",
+    "credits": [
+     "Cheese Cake"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-24"
+    ]
+   },
+   "measures": 56,
+   "irregular_measures": 0,
+   "notes": 170,
+   "chord_segments": 62,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 29,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 110,
+    "equals_first_next": 59,
+    "not_represented": 1
+   },
+   "content_sig": "bd6960e8a4f2"
+  },
+  {
+   "family": "Confirmation",
+   "files": [
+    "Confirmation.xml"
+   ],
+   "representative": "Confirmation.xml",
+   "kind": "solo_transcription_by_title",
+   "meta": {
+    "title": "Confirmation Bird Solo",
+    "credits": [
+     "Confirmation Bird Solo"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-25"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 182,
+   "chord_segments": 50,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 3,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 133,
+    "equals_first_next": 49
+   },
+   "content_sig": "5b5c88307e82"
+  },
+  {
+   "family": "Dance_Monkey",
+   "files": [
+    "Dance_Monkey.xml"
+   ],
+   "representative": "Dance_Monkey.xml",
+   "kind": "pop",
+   "meta": {
+    "title": "Dance Monkey",
+    "credits": [
+     "Dance Monkey",
+     "Tones & I"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 3.2.3"
+    ],
+    "encoding_date": [
+     "2019-12-01"
+    ]
+   },
+   "measures": 24,
+   "irregular_measures": 0,
+   "notes": 148,
+   "chord_segments": 24,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 0,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 125,
+    "equals_first_next": 23
+   },
+   "content_sig": "b9433f0f221e"
+  },
+  {
+   "family": "Despacito",
+   "files": [
+    "Despacito.xml",
+    "DespacitoS.xml"
+   ],
+   "representative": "Despacito.xml",
+   "kind": "pop",
+   "meta": {
+    "title": "Despacito",
+    "credits": [
+     "Despacito",
+     "Luis Fonci & Daddy Yankee"
+    ],
+    "rights": [],
+    "source": [
+     "http://musescore.com/user/3858311/scores/4808879"
+    ],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-05-20"
+    ]
+   },
+   "measures": 24,
+   "irregular_measures": 0,
+   "notes": 196,
+   "chord_segments": 24,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 0,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 175,
+    "equals_first_next": 19,
+    "not_represented": 2
+   },
+   "content_sig": "8f4830aa8f81"
+  },
+  {
+   "family": "Donna_Lee",
+   "files": [
+    "Donna_Lee.xml",
+    "short/Donna_Lee_short.xml"
+   ],
+   "representative": "Donna_Lee.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Donna Lee",
+    "credits": [
+     "Donna Lee"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-07-14"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 208,
+   "chord_segments": 33,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 1,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 178,
+    "equals_first_next": 30
+   },
+   "content_sig": "817478827c1b"
+  },
+  {
+   "family": "Fly_me_to_the_moon",
+   "files": [
+    "Fly_me_to_the_moon.xml",
+    "short/Fly_me_to_the_moon_short.xml"
+   ],
+   "representative": "Fly_me_to_the_moon.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Fly me to the moon",
+    "credits": [
+     "Bart Howard",
+     "Fly me to the moon"
+    ],
+    "rights": [],
+    "source": [
+     "http://api.musescore.com/score/2635316"
+    ],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-20"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 81,
+   "chord_segments": 39,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 3,
+   "unsupported": 1,
+   "unsupported_items": [
+    "coda"
+   ],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 54,
+    "equals_first_next": 21,
+    "not_represented": 6
+   },
+   "content_sig": "46f4e36d8293"
+  },
+  {
+   "family": "Four_Brothers",
+   "files": [
+    "Four_Brothers.xml",
+    "short/Four_Brothers_short.xml"
+   ],
+   "representative": "Four_Brothers.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Four Brothers",
+    "credits": [
+     "Four Brothers"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-31"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 183,
+   "chord_segments": 49,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 6,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 139,
+    "equals_first_next": 44
+   },
+   "content_sig": "da903e9df0e0"
+  },
+  {
+   "family": "Giant_Steps",
+   "files": [
+    "Giant_Steps.xml",
+    "Giant_Steps_200.xml"
+   ],
+   "representative": "Giant_Steps.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Fly me to the moon",
+    "credits": [
+     "John Coltrane",
+     "Giant Steps"
+    ],
+    "rights": [],
+    "source": [
+     "http://api.musescore.com/score/2635316"
+    ],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2018-12-09"
+    ]
+   },
+   "measures": 16,
+   "irregular_measures": 0,
+   "notes": 26,
+   "chord_segments": 26,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 0,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 9,
+    "equals_first_next": 10,
+    "not_represented": 7
+   },
+   "content_sig": "d7c6c36f8b89"
+  },
+  {
+   "family": "How_high",
+   "files": [
+    "How_high.xml",
+    "short/How_high_short.xml"
+   ],
+   "representative": "How_high.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "How High The Moon (Morgan Lewis)",
+    "credits": [
+     "How High The Moon (Morgan Lewis)"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-31"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 84,
+   "chord_segments": 32,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 0,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 53,
+    "equals_first_next": 31
+   },
+   "content_sig": "dade02caa43e"
+  },
+  {
+   "family": "I_Got_Rhythm",
+   "files": [
+    "I_Got_Rhythm.xml"
+   ],
+   "representative": "I_Got_Rhythm.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "I Got Rhythm",
+    "credits": [
+     "George Gershwin",
+     "Ira Gershwin",
+     "I Got Rhythm",
+     "1930"
+    ],
+    "rights": [
+     "1930"
+    ],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-04-28"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 75,
+   "chord_segments": 59,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [
+    "augmented",
+    "diminished"
+   ],
+   "lossy_segments": 6,
+   "unsupported": 4,
+   "unsupported_items": [
+    "harmony kind 'augmented'",
+    "harmony kind 'diminished'"
+   ],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 27,
+    "equals_first_next": 40,
+    "not_represented": 8
+   },
+   "content_sig": "7f21da591b46"
+  },
+  {
+   "family": "It_dont_mean_a_thing",
+   "files": [
+    "It_dont_mean_a_thing.xml"
+   ],
+   "representative": "It_dont_mean_a_thing.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "",
+    "credits": [
+     "Duke",
+     "(Swing)",
+     "It don't mean a thing"
+    ],
+    "rights": [],
+    "source": [
+     "http://musescore.com/score/951491"
+    ],
+    "software": [
+     "MuseScore 2.1.0"
+    ],
+    "encoding_date": [
+     "2017-10-13"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 101,
+   "chord_segments": 32,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 0,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 79,
+    "equals_first_next": 19,
+    "not_represented": 3
+   },
+   "content_sig": "d21bc698bc91"
+  },
+  {
+   "family": "Juice",
+   "files": [
+    "Juice.xml"
+   ],
+   "representative": "Juice.xml",
+   "kind": "pop",
+   "meta": {
+    "title": "Good As Hell",
+    "credits": [
+     "opb: Lizzo",
+     "Juice"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 3.3.4"
+    ],
+    "encoding_date": [
+     "2019-12-29"
+    ]
+   },
+   "measures": 16,
+   "irregular_measures": 0,
+   "notes": 94,
+   "chord_segments": 21,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [
+    "suspended-fourth"
+   ],
+   "lossy_segments": 4,
+   "unsupported": 4,
+   "unsupported_items": [
+    "harmony kind 'suspended-fourth'"
+   ],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 75,
+    "equals_first_next": 19
+   },
+   "content_sig": "d9c71ae6b843"
+  },
+  {
+   "family": "Never_Gonna_Give_You_Up",
+   "files": [
+    "Never_Gonna_Give_You_Up.xml"
+   ],
+   "representative": "Never_Gonna_Give_You_Up.xml",
+   "kind": "pop",
+   "meta": {
+    "title": "Never Gonna Give You Up",
+    "credits": [
+     "Never Gonna Give You Up",
+     "Mike Stock / Matt Aitken / Peter Waterman",
+     "A Rick Roll"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 3.2.3"
+    ],
+    "encoding_date": [
+     "2019-12-01"
+    ]
+   },
+   "measures": 20,
+   "irregular_measures": 0,
+   "notes": 111,
+   "chord_segments": 26,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 0,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 88,
+    "equals_first_next": 23
+   },
+   "content_sig": "e457bf2d4215"
+  },
+  {
+   "family": "Over_The_Rainbow_with_chords",
+   "files": [
+    "Over_The_Rainbow_with_chords.xml"
+   ],
+   "representative": "Over_The_Rainbow_with_chords.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Somewhere Over the Rainbow",
+    "credits": [
+     "Harold Arlen",
+     "Over the Rainbow",
+     "QuarkMuse, Inc"
+    ],
+    "rights": [
+     "QuarkMuse, Inc"
+    ],
+    "source": [
+     "http://api.musescore.com/score/2032171"
+    ],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-01-17"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 109,
+   "chord_segments": 59,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [
+    "suspended-fourth"
+   ],
+   "lossy_segments": 6,
+   "unsupported": 2,
+   "unsupported_items": [
+    "harmony kind 'suspended-fourth'"
+   ],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 56,
+    "equals_first_next": 48,
+    "not_represented": 5
+   },
+   "content_sig": "671f8d56ab8f"
+  },
+  {
+   "family": "Song_for_My_Father_-_Horace_Silver",
+   "files": [
+    "Song_for_My_Father_-_Horace_Silver.xml"
+   ],
+   "representative": "Song_for_My_Father_-_Horace_Silver.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Song for my Father",
+    "credits": [
+     "Horace Silver",
+     "Song for my Father"
+    ],
+    "rights": [],
+    "source": [
+     "http://musescore.com/score/2014171"
+    ],
+    "software": [
+     "MuseScore 2.0.2"
+    ],
+    "encoding_date": [
+     "2016-10-15"
+    ]
+   },
+   "measures": 40,
+   "irregular_measures": 0,
+   "notes": 142,
+   "chord_segments": 29,
+   "no_chord": 0,
+   "unlabeled_segments": 1,
+   "unmapped_kinds": [],
+   "lossy_segments": 5,
+   "unsupported": 1,
+   "unsupported_items": [
+    "repeat"
+   ],
+   "repeat_or_ending": 1,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 121,
+    "equals_first_next": 20,
+    "not_represented": 1
+   },
+   "content_sig": "5b6eca6dbafb"
+  },
+  {
+   "family": "There_Will_Never_Be_Another_You",
+   "files": [
+    "There_Will_Never_Be_Another_You.xml",
+    "short/There_Will_Never_Be_Another_You_short.xml"
+   ],
+   "representative": "There_Will_Never_Be_Another_You.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "ANOTHER YOU (THERE WILL NEVER BE)",
+    "credits": [
+     "ANOTHER YOU (THERE WILL NEVER BE)"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-05"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 91,
+   "chord_segments": 32,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 9,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 68,
+    "not_represented": 6,
+    "equals_first_next": 17
+   },
+   "content_sig": "2549a6f7cae3"
+  },
+  {
+   "family": "Well_You_Neednt",
+   "files": [
+    "Well_You_Neednt.xml"
+   ],
+   "representative": "Well_You_Neednt.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "",
+    "credits": [
+     "Thelonious Monk, arr. : BE",
+     "Well You Needn´t"
+    ],
+    "rights": [],
+    "source": [
+     "http://musescore.com/user/23444/scores/3614021"
+    ],
+    "software": [
+     "MuseScore 2.0.2"
+    ],
+    "encoding_date": [
+     "2017-12-21"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 149,
+   "chord_segments": 31,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 0,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 120,
+    "equals_first_next": 29
+   },
+   "content_sig": "e67f3fd3a525"
+  },
+  {
+   "family": "chega",
+   "files": [
+    "chega.xml",
+    "short/chega_short.xml"
+   ],
+   "representative": "chega.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Chega De Saudade (No More Blues)",
+    "credits": [
+     "Chega De Saudade (No More Blues)"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-04-07"
+    ]
+   },
+   "measures": 68,
+   "irregular_measures": 0,
+   "notes": 184,
+   "chord_segments": 75,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 24,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 123,
+    "equals_first_next": 58,
+    "not_represented": 3
+   },
+   "content_sig": "81ef3759c18c"
+  },
+  {
+   "family": "greendol",
+   "files": [
+    "greendol.xml",
+    "short/greendol_short.xml"
+   ],
+   "representative": "greendol.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "GREEN DOLPHIN STREET",
+    "credits": [
+     "GREEN DOLPHIN STREET"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-25"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 60,
+   "chord_segments": 35,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 11,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 33,
+    "equals_first_next": 25,
+    "not_represented": 2
+   },
+   "content_sig": "ef051cb5003f"
+  },
+  {
+   "family": "just_friends",
+   "files": [
+    "just_friends.xml",
+    "short/just_friends_short.xml"
+   ],
+   "representative": "just_friends.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Just Friends",
+    "credits": [
+     "Just Friends",
+     "Copyright ©"
+    ],
+    "rights": [
+     "Copyright ©"
+    ],
+    "source": [],
+    "software": [
+     "MuseScore 2.2.1"
+    ],
+    "encoding_date": [
+     "2018-04-13"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 68,
+   "chord_segments": 35,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 0,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 42,
+    "equals_first_next": 25,
+    "not_represented": 1
+   },
+   "content_sig": "7636bd72f804"
+  },
+  {
+   "family": "moose",
+   "files": [
+    "moose.xml"
+   ],
+   "representative": "moose.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Moose The Mooch",
+    "credits": [
+     "Moose The Mooch"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-10"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 170,
+   "chord_segments": 43,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 4,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 128,
+    "equals_first_next": 42
+   },
+   "content_sig": "ef1343ed2bf7"
+  },
+  {
+   "family": "my_love",
+   "files": [
+    "my_love.xml"
+   ],
+   "representative": "my_love.xml",
+   "kind": "pop",
+   "meta": {
+    "title": "my_love_rock",
+    "credits": [
+     "האהבה שלי"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-25"
+    ]
+   },
+   "measures": 24,
+   "irregular_measures": 0,
+   "notes": 81,
+   "chord_segments": 24,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [
+    "augmented"
+   ],
+   "lossy_segments": 2,
+   "unsupported": 1,
+   "unsupported_items": [
+    "harmony kind 'augmented'"
+   ],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 60,
+    "equals_first_next": 21
+   },
+   "content_sig": "d474bd41b8de"
+  },
+  {
+   "family": "ours_iiVI_F",
+   "files": [
+    "ours_iiVI_F.xml"
+   ],
+   "excluded": "local file, not from the BebopNet repo"
+  },
+  {
+   "family": "recordame",
+   "files": [
+    "recordame.xml",
+    "short/recordame_short.xml"
+   ],
+   "representative": "recordame.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "Recorda Me",
+    "credits": [
+     "Recorda Me"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-04-07"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 121,
+   "chord_segments": 42,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 4,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 98,
+    "equals_first_next": 17,
+    "not_represented": 6
+   },
+   "content_sig": "ba04dd1d7a26"
+  },
+  {
+   "family": "simple_songs",
+   "files": [
+    "simple_songs.xml",
+    "simple_songs_120.xml"
+   ],
+   "representative": "simple_songs.xml",
+   "kind": "exercise",
+   "meta": {
+    "title": "GREEN DOLPHIN STREET",
+    "credits": [
+     "שירים פשוטים"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-26"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 65,
+   "chord_segments": 27,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 6,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 52,
+    "equals_first_next": 10,
+    "not_represented": 3
+   },
+   "content_sig": "fa4a9d82f26d"
+  },
+  {
+   "family": "summertime",
+   "files": [
+    "summertime.xml",
+    "short/summertime_short.xml"
+   ],
+   "representative": "summertime.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "",
+    "credits": [
+     "Summertime"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-24"
+    ]
+   },
+   "measures": 32,
+   "irregular_measures": 0,
+   "notes": 90,
+   "chord_segments": 47,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 6,
+   "unsupported": 1,
+   "unsupported_items": [
+    "two harmonies at one onset"
+   ],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 54,
+    "equals_first_next": 29,
+    "not_represented": 7
+   },
+   "content_sig": "419c25b2cfae"
+  },
+  {
+   "family": "things_you_see",
+   "files": [
+    "things_you_see.xml"
+   ],
+   "representative": "things_you_see.xml",
+   "kind": "jazz_head_by_title",
+   "meta": {
+    "title": "things_you_see",
+    "credits": [
+     "things_you_see"
+    ],
+    "rights": [],
+    "source": [],
+    "software": [
+     "MuseScore 2.3.2"
+    ],
+    "encoding_date": [
+     "2019-03-25"
+    ]
+   },
+   "measures": 40,
+   "irregular_measures": 0,
+   "notes": 132,
+   "chord_segments": 42,
+   "no_chord": 0,
+   "unlabeled_segments": 0,
+   "unmapped_kinds": [],
+   "lossy_segments": 7,
+   "unsupported": 0,
+   "unsupported_items": [],
+   "repeat_or_ending": 0,
+   "tempo_changes": 0,
+   "meter_changes": 0,
+   "next_note_chord": {
+    "same_as_current": 95,
+    "equals_first_next": 36,
+    "not_represented": 1
+   },
+   "content_sig": "921c53ce3010"
+  }
+ ],
+ "cross_family_same_first24_pitches": {},
+ "progression_jaccard_top": [
+  {
+   "a": "Donna_Lee",
+   "b": "Four_Brothers",
+   "jaccard": 0.152
+  },
+  {
+   "a": "Black_Orpheus",
+   "b": "chega",
+   "jaccard": 0.143
+  },
+  {
+   "a": "Confirmation",
+   "b": "Four_Brothers",
+   "jaccard": 0.13
+  },
+  {
+   "a": "Confirmation",
+   "b": "greendol",
+   "jaccard": 0.127
+  },
+  {
+   "a": "Fly_me_to_the_moon",
+   "b": "There_Will_Never_Be_Another_You",
+   "jaccard": 0.116
+  },
+  {
+   "a": "A_Foggy_Day",
+   "b": "moose",
+   "jaccard": 0.115
+  },
+  {
+   "a": "Four_Brothers",
+   "b": "greendol",
+   "jaccard": 0.1
+  },
+  {
+   "a": "Four_Brothers",
+   "b": "summertime",
+   "jaccard": 0.089
+  },
+  {
+   "a": "Billies_Bounce",
+   "b": "Blue_Monk",
+   "jaccard": 0.08
+  },
+  {
+   "a": "A_Foggy_Day",
+   "b": "just_friends",
+   "jaccard": 0.08
+  },
+  {
+   "a": "A_Foggy_Day",
+   "b": "Confirmation",
+   "jaccard": 0.076
+  },
+  {
+   "a": "Confirmation",
+   "b": "Fly_me_to_the_moon",
+   "jaccard": 0.073
+  },
+  {
+   "a": "Fly_me_to_the_moon",
+   "b": "summertime",
+   "jaccard": 0.068
+  },
+  {
+   "a": "A_Foggy_Day",
+   "b": "greendol",
+   "jaccard": 0.066
+  },
+  {
+   "a": "Fly_me_to_the_moon",
+   "b": "Over_The_Rainbow_with_chords",
+   "jaccard": 0.063
+  }
+ ],
+ "progression_pairs_jaccard_ge_0_3": 0,
+ "next_note_chord_pooled": {
+  "same_as_current": 2669,
+  "not_represented": 79,
+  "equals_first_next": 914
+ },
+ "not_represented_share": 0.021572910977607863,
+ "note": "prefix time approximated by the previous note onset (5 s <T> boundaries ignored)"
+}
