@@ -1,0 +1,122 @@
+{
+ "checks": {
+  "out_of_range_rejected_before_forward": {
+   "ok": true,
+   "attempt": "positions 1023..1024 with capacity 1024"
+  },
+  "E1_incremental_equals_full": {
+   "ok": true,
+   "positions": "101..612",
+   "max_abs_logit_diff": 0.00013065338134765625,
+   "mean_abs_logit_diff": 3.0647515814052895e-06,
+   "top1_agree": 512,
+   "of": 512
+  },
+  "E2_rollback_equals_fresh_full": {
+   "ok": true,
+   "positions": "101..612",
+   "max_abs_logit_diff": 6.580352783203125e-05,
+   "mean_abs_logit_diff": 2.8432302769942908e-06,
+   "top1_agree": 512,
+   "of": 512
+  },
+  "E3_reset_reuse_equals_full": {
+   "ok": true,
+   "positions": "0..613",
+   "max_abs_logit_diff": 0.0,
+   "mean_abs_logit_diff": 0.0,
+   "top1_agree": 614,
+   "of": 614
+  },
+  "E4_greedy_tokens_and_notes_identical": {
+   "ok": true,
+   "tokens": 128,
+   "first_token_difference": null,
+   "notes": 75
+  }
+ },
+ "latency": {
+  "cold_first_prefill_s": {
+   "tokens": 614,
+   "s": 0.2214
+  },
+  "warm_prefill_128": {
+   "median_s": 0.04327,
+   "max_s": 0.18376,
+   "n": 5
+  },
+  "warm_prefill_256": {
+   "median_s": 0.07337,
+   "max_s": 0.08624,
+   "n": 5
+  },
+  "warm_prefill_512": {
+   "median_s": 0.13472,
+   "max_s": 0.16188,
+   "n": 5
+  },
+  "warm_prefill_1024": {
+   "median_s": 0.28039,
+   "max_s": 0.32219,
+   "n": 5
+  },
+  "warm_decode_one_at_256": {
+   "median_s": 0.0109,
+   "max_s": 0.01174,
+   "n": 64
+  },
+  "warm_decode_one_at_512": {
+   "median_s": 0.01052,
+   "max_s": 0.01152,
+   "n": 64
+  },
+  "warm_decode_one_at_1024": {
+   "median_s": 0.01099,
+   "max_s": 0.01247,
+   "n": 64
+  },
+  "warm_decode_block_24_after_512": {
+   "median_s": 0.2516,
+   "max_s": 0.25382,
+   "n": 5
+  },
+  "note": "teacher-forced decode of saved tokens after an already prefilled prefix, including the sync and numpy copy; not block-ready time with prefill, not input-to-sound latency"
+ },
+ "reference": {
+  "max_abs_logit_diff_mlx_vs_mps": 0.00012493133544921875,
+  "mean_abs_logit_diff": 2.620841996758827e-06,
+  "top1_agree": 614,
+  "of": 614
+ },
+ "thermal_start": 0,
+ "result": "smoke_done",
+ "sequences": {
+  "prompt_tokens": 102,
+  "len_a": 614,
+  "len_b": 614,
+  "first_difference": 102
+ },
+ "cache_capacity": 1024,
+ "provenance": {
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "generations_sha256": "99ebff90047254bfd35f25532e5ddb030c267c866c257f58851132da678eaa01",
+  "data_sha256": "8501d2aca038d763dbea2149e0ed1171ddcf0107d7d33d6a0d6e5da0c92bd5bb",
+  "mlx": "0.25.2",
+  "aria_commit": "c2f67bc90b49335543c0249fe00fb84a9337faf8",
+  "aria_local_patch_sha256": "f648d574362f3f55d9a2bd21acacb8abf025c748884178bdd1cc8a5c968f4310",
+  "aria_local_patch_lines": 20
+ },
+ "cache_shape": {
+  "k_cache": [
+   1,
+   24,
+   1024,
+   64
+  ],
+  "causal_mask": [
+   1024,
+   1024
+  ]
+ },
+ "thermal_end": 0
+}
