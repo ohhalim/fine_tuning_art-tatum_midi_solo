@@ -28,6 +28,7 @@ Modes (one per process):
 from __future__ import annotations
 
 import json
+import math
 import os
 import signal
 import statistics
@@ -224,8 +225,12 @@ def main() -> None:
                         "p_selected": ps, "selected_rank": int((p > ps).sum().item()) + 1,
                         "top_non_piano": [str(vocab[i]) for i in torch.topk(torch.where(non_piano, p, 0.0), 3).indices.tolist()]}
 
+            def masses_ok(*ms):
+                """Finite masses and a positive base mass; otherwise the ratio is not computed (no epsilon)."""
+                return all(math.isfinite(m) for m in ms) and ms[0] > 0
+
             t = time.perf_counter()
-            points = []
+            points, prefix_at_c = [], {}
             for s in plan["streams"]:
                 if s["valid"]:
                     continue
@@ -242,6 +247,8 @@ def main() -> None:
                     i = s[where]
                     seq, sel, q, ok = prompt + ids[:i], ids[i], noise[i], allowed(*s["states"][i])
                     pb, pa = next_dist(seq, False), next_dist(seq, True)
+                    if where == "C":
+                        prefix_at_c[s["stream"]] = (pb, pa)
                     p_gen, p_other = (pa, pb) if s["adapter"] else (pb, pa)
                     pick_gen, pick_other = int(torch.argmax(p_gen / q)), int(torch.argmax(p_other / q))
                     points.append({
@@ -254,9 +261,11 @@ def main() -> None:
                         "other_model_pick_allowed": bool(ok[pick_other].item())})
             log["phases"]["E_C"] = {"wall_s": round(time.perf_counter() - t, 3), **rss(), **pressure()}
             log["points"] = points
+            check("E_C_masses_ok", all(masses_ok(p["base"]["p_non_piano"], p["adapter"]["p_non_piano"]) for p in points),
+                  min_base=min(p["base"]["p_non_piano"] for p in points), min_adapter=min(p["adapter"]["p_non_piano"] for p in points))
 
             t = time.perf_counter()
-            streams_s = []
+            streams_s, path_checks = [], []
             for s in plan["streams"]:
                 if not s["S"]:
                     continue
@@ -265,14 +274,28 @@ def main() -> None:
                 pb, pa = all_dists(seq, False), all_dists(seq, True)
                 rows = [len(prompt) - 1 + i for i in s["S"]]
                 nb, na = pb[rows][:, non_piano].sum(-1), pa[rows][:, non_piano].sum(-1)
+                check(f"S_masses_ok_stream_{s['stream']}", bool(torch.isfinite(nb).all() and torch.isfinite(na).all() and (nb > 0).all()),
+                      min_base=nb.min().item(), min_adapter=na.min().item())
                 ratio = (na / nb).tolist()
+                if s["stream"] in prefix_at_c:
+                    # same model, two numeric paths at C: full-length forward (S) vs cut prefix forward (E/C)
+                    cb, ca = prefix_at_c[s["stream"]]
+                    fb, fa = pb[len(prompt) - 1 + s["C"]], pa[len(prompt) - 1 + s["C"]]
+                    r_prefix, r_full = ca[non_piano].sum().item() / cb[non_piano].sum().item(), fa[non_piano].sum().item() / fb[non_piano].sum().item()
+                    path_checks.append({"stream": s["stream"], "C": s["C"],
+                                        "max_abs_diff_base": (fb - cb).abs().max().item(), "max_abs_diff_adapter": (fa - ca).abs().max().item(),
+                                        "non_piano_diff_base": fb[non_piano].sum().item() - cb[non_piano].sum().item(),
+                                        "non_piano_diff_adapter": fa[non_piano].sum().item() - ca[non_piano].sum().item(),
+                                        "ratio_prefix": r_prefix, "ratio_full": r_full, "direction_flips": (r_prefix > 1) != (r_full > 1)})
                 streams_s.append({"stream": s["stream"], "generator": "adapter" if s["adapter"] else "base", "positions": len(rows),
                                   "median_ratio": statistics.median(ratio),
+                                  "median_p_non_piano_base": nb.median().item(), "median_p_non_piano_adapter": na.median().item(),
                                   "positions_adapter_higher": sum(1 for r in ratio if r > 1),
                                   "mean_p_non_piano_base": nb.mean().item(), "mean_p_non_piano_adapter": na.mean().item(),
                                   "max_p_non_piano_base": nb.max().item(), "max_p_non_piano_adapter": na.max().item()})
             log["phases"]["S"] = {"wall_s": round(time.perf_counter() - t, 3), **rss(), **pressure()}
             log["S"] = streams_s
+            log["path_check_at_C"] = path_checks
 
             # reading rules (fixed before the run)
             e_pts = [p for p in points if p["where"] == "E"]
@@ -289,9 +312,12 @@ def main() -> None:
             reproduced = all(p["replay_reproduces_sample"] for p in points)
             log["reading"] = {
                 "R1_E": {"verdict": verdict(sum(r > 1 for r in r_e), sum(r < 1 for r in r_e), statistics.median(r_e), MAJORITY_E),
-                         "adapter_higher": sum(r > 1 for r in r_e), "of": len(r_e), "median_ratio": statistics.median(r_e)},
+                         "adapter_higher": sum(r > 1 for r in r_e), "of": len(r_e), "median_ratio": statistics.median(r_e),
+                         "per_error": [{"stream": p["stream"], "ratio": r, "base": p["base"]["p_non_piano"], "adapter": p["adapter"]["p_non_piano"]}
+                                       for p, r in zip(e_pts, r_e)]},
                 "R1_S": {"verdict": verdict(sum(m > 1 for m in med_s), sum(m < 1 for m in med_s), statistics.median(med_s), MAJORITY_S),
-                         "streams_adapter_higher": sum(m > 1 for m in med_s), "of": len(med_s), "median_of_stream_medians": statistics.median(med_s)},
+                         "streams_adapter_higher": sum(m > 1 for m in med_s), "of": len(med_s), "median_of_stream_medians": statistics.median(med_s),
+                         "withheld_path_direction_flip": any(x["direction_flips"] for x in path_checks)},
                 "R2": {"errors_with_p_selected_below": TAIL_P,
                        "count": sum(1 for p in e_pts if p[p["generator"]]["p_selected"] < TAIL_P), "of": len(e_pts)},
                 "R3": {"replay_reproduced_all": reproduced,
