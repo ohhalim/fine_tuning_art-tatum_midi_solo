@@ -1,0 +1,672 @@
+{
+ "targets_fixed_before_matching": [
+  16,
+  347,
+  18,
+  25
+ ],
+ "target_order": "data_summary.json order, split == validation, first 4",
+ "bank_songs": [
+  37,
+  266,
+  398,
+  79,
+  177,
+  275,
+  297,
+  415,
+  371,
+  290,
+  88,
+  437,
+  82,
+  27,
+  17,
+  229,
+  215,
+  271,
+  54,
+  113,
+  80,
+  389,
+  334,
+  363
+ ],
+ "bank_windows": 1567,
+ "distinct_relative_progressions": 211,
+ "index_build_s": 0.185,
+ "search_time_scope": "matching and placement only, index build excluded",
+ "rank_order": "|log scale|, |transpose|, melid, bar",
+ "results": [
+  {
+   "melid": 16,
+   "target_bar": 1,
+   "target_chords": [
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab"
+   ],
+   "target_rel": [
+    [
+     0,
+     0,
+     "maj"
+    ]
+   ],
+   "target_seconds": 1.5788,
+   "bank_rel_matches": 151,
+   "candidates_after_exclusion": 150,
+   "excluded": {
+    "empty_window": 1
+   },
+   "search_s": 0.022191,
+   "result": "returned",
+   "candidates": [
+    {
+     "rank": 1,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 17,
+     "source_bar": 17,
+     "source_time_s": [
+      17.182,
+      18.831
+     ],
+     "transpose": -2,
+     "time_scale": 0.9575,
+     "notes": 14,
+     "carry_in_excluded": 1,
+     "cropped_at_end": 1,
+     "cropped_seconds": 0.093,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      71,
+      78
+     ],
+     "midi_reread_matches": true,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 14,
+      "notes_before_first_error": 14,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb"
+     ]
+    },
+    {
+     "rank": 2,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 17,
+     "source_bar": 1,
+     "source_time_s": [
+      3.788,
+      5.445
+     ],
+     "transpose": -2,
+     "time_scale": 0.9525,
+     "notes": 13,
+     "carry_in_excluded": 1,
+     "cropped_at_end": 1,
+     "cropped_seconds": 0.295,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      63,
+      75
+     ],
+     "midi_reread_matches": true,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 13,
+      "notes_before_first_error": 13,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb"
+     ]
+    },
+    {
+     "rank": 3,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 17,
+     "source_bar": 27,
+     "source_time_s": [
+      25.617,
+      27.281
+     ],
+     "transpose": -2,
+     "time_scale": 0.949,
+     "notes": 8,
+     "carry_in_excluded": 1,
+     "cropped_at_end": 0,
+     "cropped_seconds": 0.0,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      68,
+      75
+     ],
+     "midi_reread_matches": true,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 8,
+      "notes_before_first_error": 8,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb"
+     ]
+    }
+   ]
+  },
+  {
+   "melid": 347,
+   "target_bar": 1,
+   "target_chords": [
+    "Bb",
+    "Bb",
+    "Bb",
+    "Bb",
+    "Bb",
+    "Bb",
+    "Bb",
+    "Bb"
+   ],
+   "target_rel": [
+    [
+     0,
+     0,
+     "maj"
+    ]
+   ],
+   "target_seconds": 1.9433,
+   "bank_rel_matches": 151,
+   "candidates_after_exclusion": 150,
+   "excluded": {
+    "empty_window": 1
+   },
+   "search_s": 0.016038,
+   "result": "returned",
+   "candidates": [
+    {
+     "rank": 1,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 17,
+     "source_bar": 31,
+     "source_time_s": [
+      29.013,
+      30.736
+     ],
+     "transpose": 0,
+     "time_scale": 1.1279,
+     "notes": 9,
+     "carry_in_excluded": 0,
+     "cropped_at_end": 1,
+     "cropped_seconds": 0.177,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      65,
+      77
+     ],
+     "midi_reread_matches": false,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 8,
+      "notes_before_first_error": 8,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb"
+     ]
+    },
+    {
+     "rank": 2,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 17,
+     "source_bar": 5,
+     "source_time_s": [
+      7.114,
+      8.812
+     ],
+     "transpose": -5,
+     "time_scale": 1.1445,
+     "notes": 18,
+     "carry_in_excluded": 1,
+     "cropped_at_end": 1,
+     "cropped_seconds": 0.21,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      67,
+      77
+     ],
+     "midi_reread_matches": true,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 18,
+      "notes_before_first_error": 18,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Eb",
+      "Eb",
+      "Eb",
+      "Eb",
+      "Eb",
+      "Eb",
+      "Eb",
+      "Eb"
+     ]
+    },
+    {
+     "rank": 3,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 17,
+     "source_bar": 7,
+     "source_time_s": [
+      8.812,
+      10.499
+     ],
+     "transpose": 0,
+     "time_scale": 1.1516,
+     "notes": 14,
+     "carry_in_excluded": 1,
+     "cropped_at_end": 1,
+     "cropped_seconds": 0.077,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      65,
+      79
+     ],
+     "midi_reread_matches": true,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 14,
+      "notes_before_first_error": 14,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb"
+     ]
+    }
+   ]
+  },
+  {
+   "melid": 18,
+   "target_bar": 0,
+   "target_chords": [
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab"
+   ],
+   "target_rel": [
+    [
+     0,
+     0,
+     "maj"
+    ]
+   ],
+   "target_seconds": 1.8425,
+   "bank_rel_matches": 151,
+   "candidates_after_exclusion": 150,
+   "excluded": {
+    "empty_window": 1
+   },
+   "search_s": 0.016364,
+   "result": "returned",
+   "candidates": [
+    {
+     "rank": 1,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 17,
+     "source_bar": 31,
+     "source_time_s": [
+      29.013,
+      30.736
+     ],
+     "transpose": -2,
+     "time_scale": 1.0694,
+     "notes": 9,
+     "carry_in_excluded": 0,
+     "cropped_at_end": 1,
+     "cropped_seconds": 0.177,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      63,
+      75
+     ],
+     "midi_reread_matches": true,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 9,
+      "notes_before_first_error": 9,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb"
+     ]
+    },
+    {
+     "rank": 2,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 17,
+     "source_bar": 5,
+     "source_time_s": [
+      7.114,
+      8.812
+     ],
+     "transpose": 5,
+     "time_scale": 1.0852,
+     "notes": 18,
+     "carry_in_excluded": 1,
+     "cropped_at_end": 1,
+     "cropped_seconds": 0.21,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      77,
+      87
+     ],
+     "midi_reread_matches": true,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 18,
+      "notes_before_first_error": 18,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Eb",
+      "Eb",
+      "Eb",
+      "Eb",
+      "Eb",
+      "Eb",
+      "Eb",
+      "Eb"
+     ]
+    },
+    {
+     "rank": 3,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 17,
+     "source_bar": 7,
+     "source_time_s": [
+      8.812,
+      10.499
+     ],
+     "transpose": -2,
+     "time_scale": 1.0919,
+     "notes": 14,
+     "carry_in_excluded": 1,
+     "cropped_at_end": 1,
+     "cropped_seconds": 0.077,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      63,
+      77
+     ],
+     "midi_reread_matches": true,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 14,
+      "notes_before_first_error": 14,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb",
+      "Bb"
+     ]
+    }
+   ]
+  },
+  {
+   "melid": 25,
+   "target_bar": 1,
+   "target_chords": [
+    "Abj7",
+    "Abj7",
+    "Abj7",
+    "Abj7",
+    "Abj7",
+    "Abj7",
+    "Abj7",
+    "Abj7"
+   ],
+   "target_rel": [
+    [
+     0,
+     0,
+     "maj7"
+    ]
+   ],
+   "target_seconds": 5.8977,
+   "bank_rel_matches": 29,
+   "candidates_after_exclusion": 29,
+   "excluded": {},
+   "search_s": 0.005419,
+   "result": "returned",
+   "candidates": [
+    {
+     "rank": 1,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 266,
+     "source_bar": 91,
+     "source_time_s": [
+      136.926,
+      139.462
+     ],
+     "transpose": 1,
+     "time_scale": 2.3256,
+     "notes": 13,
+     "carry_in_excluded": 1,
+     "cropped_at_end": 0,
+     "cropped_seconds": 0.0,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      65,
+      85
+     ],
+     "midi_reread_matches": true,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 13,
+      "notes_before_first_error": 13,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Gj7",
+      "Gj7",
+      "Gj7",
+      "Gj7",
+      "Gj7",
+      "Gj7",
+      "Gj7",
+      "Gj7"
+     ]
+    },
+    {
+     "rank": 2,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 266,
+     "source_bar": 51,
+     "source_time_s": [
+      86.911,
+      89.446
+     ],
+     "transpose": 1,
+     "time_scale": 2.3258,
+     "notes": 16,
+     "carry_in_excluded": 0,
+     "cropped_at_end": 0,
+     "cropped_seconds": 0.0,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      61,
+      73
+     ],
+     "midi_reread_matches": true,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 16,
+      "notes_before_first_error": 16,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Gj7",
+      "Gj7",
+      "Gj7",
+      "Gj7",
+      "Gj7",
+      "Gj7",
+      "Gj7",
+      "Gj7"
+     ]
+    },
+    {
+     "rank": 3,
+     "source": "WJazzD DB melody rows",
+     "source_melid": 266,
+     "source_bar": 43,
+     "source_time_s": [
+      76.916,
+      79.405
+     ],
+     "transpose": -4,
+     "time_scale": 2.3693,
+     "notes": 8,
+     "carry_in_excluded": 1,
+     "cropped_at_end": 1,
+     "cropped_seconds": 0.056,
+     "boundary_errors_s": [],
+     "pitch_range": [
+      56,
+      68
+     ],
+     "midi_reread_matches": true,
+     "aria_token_layer": {
+      "valid": true,
+      "first_error": null,
+      "cascade_errors": 0,
+      "complete_notes": 8,
+      "notes_before_first_error": 8,
+      "ended_by_eos": true,
+      "tail": null
+     },
+     "overlaps_earlier_candidate_bars": [],
+     "source_chords": [
+      "Cj7",
+      "Cj7",
+      "Cj7",
+      "Cj7",
+      "Cj7",
+      "Cj7",
+      "Cj7",
+      "Cj7"
+     ]
+    }
+   ]
+  }
+ ],
+ "coverage": {
+  "targets": 4,
+  "returned": 4
+ }
+}
