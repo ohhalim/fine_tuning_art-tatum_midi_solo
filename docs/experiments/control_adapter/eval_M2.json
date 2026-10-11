@@ -1,0 +1,1591 @@
+{
+ "mode": "--train",
+ "arm": "M",
+ "seed": 2,
+ "checks": {
+  "inputs_match_1726_and_control_manifest": {
+   "ok": true,
+   "mismatches": []
+  },
+  "schedule_done_on_same_inputs": {
+   "ok": true
+  },
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "optimizer_only_lora": {
+   "ok": true
+  },
+  "updates_done_on_fixed_schedule": {
+   "ok": true
+  },
+  "every_lora_tensor_changed": {
+   "ok": true,
+   "unchanged": []
+  },
+  "base_grads_none_after_training": {
+   "ok": true
+  },
+  "base_sha_unchanged_after_training": {
+   "ok": true,
+   "sha": "c312c20d6ab355d8"
+  },
+  "reload_from_file_equals_trained": {
+   "ok": true,
+   "max_abs_diff": 0.0,
+   "zeroed_differs_by": 15.805851936340332
+  },
+  "checkpoint_sha_unchanged": {
+   "ok": true
+  }
+ },
+ "phases": {
+  "load": {
+   "wall_s": 5.875,
+   "rss_now_bytes": 2493300736,
+   "rss_max_bytes": 5573181440,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 70%"
+  },
+  "train": {
+   "wall_s": 139.393,
+   "observed_max_driver_bytes": 5555699712,
+   "thermal_level": 0,
+   "rss_now_bytes": 3129933824,
+   "rss_max_bytes": 5573181440,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 61%"
+  },
+  "eval": {
+   "wall_s": 72.453,
+   "thermal_level": 0,
+   "rss_now_bytes": 1282441216,
+   "rss_max_bytes": 5573181440,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 60%"
+  }
+ },
+ "result": "train_done",
+ "stopped_at": null,
+ "inputs": {
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "mehldau_data_sha256": "8501d2aca038d763dbea2149e0ed1171ddcf0107d7d33d6a0d6e5da0c92bd5bb",
+  "mehldau_manifest_sha256": "0b075bceaa24b9b32818b96b36bf428bf3973525b5b79d51c8ea07eda619cf85",
+  "control_data_sha256": "4bd18eefddb5d199e63a2b487ce3358eec4f32c2dbc3bee272afd86d28a6cffc",
+  "control_manifest_sha256": "c6ecfe48e32e642013c7551e07fb9c4595df9800ce095cd916a03b921f7c223f",
+  "m0_lora_sha256": "0b634c8c10b1d48b865b9e26d8eb1f92e6c486d20958a5b90facda2d70896acb"
+ },
+ "train_steps": [
+  {
+   "update": 0,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/II. stepping outside.midi",
+   "window": 0,
+   "loss": 2.640225648880005
+  },
+  {
+   "update": 1,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+   "window": 1,
+   "loss": 3.0280492305755615
+  },
+  {
+   "update": 2,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+   "window": 1,
+   "loss": 3.1808202266693115
+  },
+  {
+   "update": 3,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+   "window": 4,
+   "loss": 2.513223171234131
+  },
+  {
+   "update": 4,
+   "path": "live/Brad Mehldau/10 Years Solo Live/And I Love Her - Live.midi",
+   "window": 38,
+   "loss": 1.985690712928772
+  },
+  {
+   "update": 5,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+   "window": 0,
+   "loss": 2.6567280292510986
+  },
+  {
+   "update": 6,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+   "window": 5,
+   "loss": 3.5252017974853516
+  },
+  {
+   "update": 7,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Los Angeles II - Live.midi",
+   "window": 6,
+   "loss": 2.3986587524414062
+  },
+  {
+   "update": 8,
+   "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+   "window": 13,
+   "loss": 2.539639711380005
+  },
+  {
+   "update": 9,
+   "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+   "window": 5,
+   "loss": 2.1736795902252197
+  },
+  {
+   "update": 10,
+   "path": "live/Brad Mehldau/Live in Marciac/Goodbye Storyteller - for Fred Myrow.midi",
+   "window": 7,
+   "loss": 1.306410789489746
+  },
+  {
+   "update": 11,
+   "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+   "window": 4,
+   "loss": 2.021794080734253
+  },
+  {
+   "update": 12,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+   "window": 0,
+   "loss": 2.577073097229004
+  },
+  {
+   "update": 13,
+   "path": "live/Brad Mehldau/10 Years Solo Live/John Boy - Live.midi",
+   "window": 3,
+   "loss": 2.5178372859954834
+  },
+  {
+   "update": 14,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Hey You - Live.midi",
+   "window": 6,
+   "loss": 2.518728017807007
+  },
+  {
+   "update": 15,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+   "window": 4,
+   "loss": 3.0298569202423096
+  },
+  {
+   "update": 16,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+   "window": 0,
+   "loss": 3.2141025066375732
+  },
+  {
+   "update": 17,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+   "window": 1,
+   "loss": 2.8748819828033447
+  },
+  {
+   "update": 18,
+   "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+   "window": 1,
+   "loss": 3.063319444656372
+  },
+  {
+   "update": 19,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Hey You - Live.midi",
+   "window": 2,
+   "loss": 3.0645434856414795
+  },
+  {
+   "update": 20,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/V. remembering before all this.midi",
+   "window": 2,
+   "loss": 2.410346746444702
+  },
+  {
+   "update": 21,
+   "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+   "window": 8,
+   "loss": 3.010411024093628
+  },
+  {
+   "update": 22,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/XI. family harmony.midi",
+   "window": 3,
+   "loss": 2.5257036685943604
+  },
+  {
+   "update": 23,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Meditation I - Lord Watch Over Me - Live.midi",
+   "window": 8,
+   "loss": 2.5865471363067627
+  },
+  {
+   "update": 24,
+   "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+   "window": 11,
+   "loss": 1.8889065980911255
+  },
+  {
+   "update": 25,
+   "path": "live/Brad Mehldau/Live in Marciac/Martha My Dear - Live.midi",
+   "window": 5,
+   "loss": 1.7569026947021484
+  },
+  {
+   "update": 26,
+   "path": "live/Brad Mehldau/10 Years Solo Live/John Boy - Live.midi",
+   "window": 3,
+   "loss": 2.3792569637298584
+  },
+  {
+   "update": 27,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+   "window": 1,
+   "loss": 3.021533250808716
+  },
+  {
+   "update": 28,
+   "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+   "window": 1,
+   "loss": 2.848505735397339
+  },
+  {
+   "update": 29,
+   "path": "live/Brad Mehldau/Live in Marciac/Things Behind the Sun - Live.midi",
+   "window": 7,
+   "loss": 3.0447816848754883
+  },
+  {
+   "update": 30,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+   "window": 4,
+   "loss": 1.9235085248947144
+  },
+  {
+   "update": 31,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+   "window": 5,
+   "loss": 1.7501376867294312
+  },
+  {
+   "update": 32,
+   "path": "live/Brad Mehldau/Live in Marciac/Trailer Park Ghost - Live.midi",
+   "window": 14,
+   "loss": 2.2350282669067383
+  },
+  {
+   "update": 33,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Smells Like Teen Spirit - Live.midi",
+   "window": 11,
+   "loss": 1.4215716123580933
+  },
+  {
+   "update": 34,
+   "path": "live/Brad Mehldau/Live in Marciac/Lithium - Live.midi",
+   "window": 8,
+   "loss": 3.504774570465088
+  },
+  {
+   "update": 35,
+   "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+   "window": 7,
+   "loss": 2.214951753616333
+  },
+  {
+   "update": 36,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+   "window": 3,
+   "loss": 2.3179471492767334
+  },
+  {
+   "update": 37,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Hey You - Live.midi",
+   "window": 13,
+   "loss": 2.726390838623047
+  },
+  {
+   "update": 38,
+   "path": "live/Brad Mehldau/Live in Tokyo/How Long Has This Been Going On.midi",
+   "window": 2,
+   "loss": 2.7431459426879883
+  },
+  {
+   "update": 39,
+   "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+   "window": 2,
+   "loss": 3.24202561378479
+  },
+  {
+   "update": 40,
+   "path": "live/Brad Mehldau/Live in Tokyo/Things Behind the Sun.midi",
+   "window": 3,
+   "loss": 2.318896770477295
+  },
+  {
+   "update": 41,
+   "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+   "window": 9,
+   "loss": 2.913240909576416
+  },
+  {
+   "update": 42,
+   "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+   "window": 1,
+   "loss": 2.689361810684204
+  },
+  {
+   "update": 43,
+   "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+   "window": 23,
+   "loss": 2.5071659088134766
+  },
+  {
+   "update": 44,
+   "path": "live/Brad Mehldau/10 Years Solo Live/And I Love Her - Live.midi",
+   "window": 31,
+   "loss": 1.5919567346572876
+  },
+  {
+   "update": 45,
+   "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+   "window": 5,
+   "loss": 1.9959492683410645
+  },
+  {
+   "update": 46,
+   "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+   "window": 9,
+   "loss": 2.038789749145508
+  },
+  {
+   "update": 47,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/III. keeping distance.midi",
+   "window": 1,
+   "loss": 3.05133318901062
+  },
+  {
+   "update": 48,
+   "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+   "window": 0,
+   "loss": 2.7234277725219727
+  },
+  {
+   "update": 49,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/XII. lullaby.midi",
+   "window": 0,
+   "loss": 2.2977712154388428
+  },
+  {
+   "update": 50,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/II. stepping outside.midi",
+   "window": 0,
+   "loss": 2.356191873550415
+  },
+  {
+   "update": 51,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Countdown - Live.midi",
+   "window": 7,
+   "loss": 2.5092356204986572
+  },
+  {
+   "update": 52,
+   "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+   "window": 14,
+   "loss": 2.728004217147827
+  },
+  {
+   "update": 53,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+   "window": 2,
+   "loss": 3.230469226837158
+  },
+  {
+   "update": 54,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/V. remembering before all this.midi",
+   "window": 2,
+   "loss": 2.2546727657318115
+  },
+  {
+   "update": 55,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+   "window": 6,
+   "loss": 2.620361089706421
+  },
+  {
+   "update": 56,
+   "path": "live/Brad Mehldau/10 Years Solo Live/And I Love Her - Live.midi",
+   "window": 3,
+   "loss": 2.4145493507385254
+  },
+  {
+   "update": 57,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+   "window": 5,
+   "loss": 3.0735204219818115
+  },
+  {
+   "update": 58,
+   "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+   "window": 1,
+   "loss": 2.1785261631011963
+  },
+  {
+   "update": 59,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/II. stepping outside.midi",
+   "window": 1,
+   "loss": 2.708590269088745
+  },
+  {
+   "update": 60,
+   "path": "live/Brad Mehldau/10 Years Solo Live/John Boy - Live.midi",
+   "window": 1,
+   "loss": 2.532438039779663
+  },
+  {
+   "update": 61,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+   "window": 5,
+   "loss": 2.6800217628479004
+  },
+  {
+   "update": 62,
+   "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+   "window": 0,
+   "loss": 2.8969879150390625
+  },
+  {
+   "update": 63,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/New York State of Mind.midi",
+   "window": 0,
+   "loss": 2.530627489089966
+  },
+  {
+   "update": 64,
+   "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+   "window": 0,
+   "loss": 2.8741960525512695
+  },
+  {
+   "update": 65,
+   "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+   "window": 14,
+   "loss": 2.8440115451812744
+  },
+  {
+   "update": 66,
+   "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+   "window": 2,
+   "loss": 2.8471426963806152
+  },
+  {
+   "update": 67,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+   "window": 1,
+   "loss": 2.1367409229278564
+  },
+  {
+   "update": 68,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+   "window": 0,
+   "loss": 3.0005481243133545
+  },
+  {
+   "update": 69,
+   "path": "live/Brad Mehldau/Live in Marciac/Exit Music (For a Film) - Live [Live].midi",
+   "window": 22,
+   "loss": 3.172111749649048
+  },
+  {
+   "update": 70,
+   "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/Ron's Place.midi",
+   "window": 3,
+   "loss": 2.5449883937835693
+  },
+  {
+   "update": 71,
+   "path": "live/Brad Mehldau/Live in Marciac/Martha My Dear - Live.midi",
+   "window": 0,
+   "loss": 2.313445806503296
+  },
+  {
+   "update": 72,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+   "window": 1,
+   "loss": 2.624177932739258
+  },
+  {
+   "update": 73,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+   "window": 0,
+   "loss": 2.3220927715301514
+  },
+  {
+   "update": 74,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Interstate Love Song - Live.midi",
+   "window": 39,
+   "loss": 1.9817073345184326
+  },
+  {
+   "update": 75,
+   "path": "live/Brad Mehldau/Live in Marciac/Storm - Live.midi",
+   "window": 5,
+   "loss": 2.137037515640259
+  },
+  {
+   "update": 76,
+   "path": "live/Brad Mehldau/Live in Tokyo/Paranoid Android.midi",
+   "window": 3,
+   "loss": 2.128889560699463
+  },
+  {
+   "update": 77,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Dream Brother - Live.midi",
+   "window": 10,
+   "loss": 1.4265280961990356
+  },
+  {
+   "update": 78,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+   "window": 0,
+   "loss": 2.0766520500183105
+  },
+  {
+   "update": 79,
+   "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+   "window": 14,
+   "loss": 2.1441500186920166
+  },
+  {
+   "update": 80,
+   "path": "live/Brad Mehldau/Live in Marciac/Lilac Wine - Live.midi",
+   "window": 0,
+   "loss": 1.6383951902389526
+  },
+  {
+   "update": 81,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+   "window": 3,
+   "loss": 2.0621941089630127
+  },
+  {
+   "update": 82,
+   "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+   "window": 1,
+   "loss": 3.0130202770233154
+  },
+  {
+   "update": 83,
+   "path": "live/Brad Mehldau/10 Years Solo Live/This Here - Live.midi",
+   "window": 3,
+   "loss": 2.2573964595794678
+  },
+  {
+   "update": 84,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+   "window": 1,
+   "loss": 2.561720132827759
+  },
+  {
+   "update": 85,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+   "window": 0,
+   "loss": 2.801121711730957
+  },
+  {
+   "update": 86,
+   "path": "live/Brad Mehldau/10 Years Solo Live/On the Street Where You Live - Live.midi",
+   "window": 1,
+   "loss": 2.9382245540618896
+  },
+  {
+   "update": 87,
+   "path": "live/Brad Mehldau/Live in Marciac/Exit Music (For a Film) - Live [Live].midi",
+   "window": 18,
+   "loss": 1.5963836908340454
+  },
+  {
+   "update": 88,
+   "path": "live/Brad Mehldau/Live in Tokyo/Things Behind the Sun.midi",
+   "window": 3,
+   "loss": 2.245560646057129
+  },
+  {
+   "update": 89,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+   "window": 5,
+   "loss": 1.6201306581497192
+  },
+  {
+   "update": 90,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/VII. - the day moves by -.midi",
+   "window": 1,
+   "loss": 1.9018725156784058
+  },
+  {
+   "update": 91,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+   "window": 2,
+   "loss": 2.085446357727051
+  },
+  {
+   "update": 92,
+   "path": "live/Brad Mehldau/Live in Marciac/Resignation - Live.midi",
+   "window": 13,
+   "loss": 2.3826074600219727
+  },
+  {
+   "update": 93,
+   "path": "live/Brad Mehldau/Live in Marciac/Things Behind the Sun - Live.midi",
+   "window": 0,
+   "loss": 1.8143391609191895
+  },
+  {
+   "update": 94,
+   "path": "live/Brad Mehldau/Live in Tokyo/How Long Has This Been Going On.midi",
+   "window": 2,
+   "loss": 2.6301066875457764
+  },
+  {
+   "update": 95,
+   "path": "live/Brad Mehldau/Live in Marciac/Trailer Park Ghost - Live.midi",
+   "window": 1,
+   "loss": 2.2740893363952637
+  },
+  {
+   "update": 96,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+   "window": 0,
+   "loss": 1.8360779285430908
+  },
+  {
+   "update": 97,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/V. remembering before all this.midi",
+   "window": 1,
+   "loss": 2.0148019790649414
+  },
+  {
+   "update": 98,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+   "window": 0,
+   "loss": 2.9282078742980957
+  },
+  {
+   "update": 99,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Smells Like Teen Spirit - Live.midi",
+   "window": 20,
+   "loss": 1.6005698442459106
+  },
+  {
+   "update": 100,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Bittersweet Symphony  Waterloo Sunset - Live.midi",
+   "window": 32,
+   "loss": 1.7514595985412598
+  },
+  {
+   "update": 101,
+   "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+   "window": 0,
+   "loss": 2.920698642730713
+  },
+  {
+   "update": 102,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+   "window": 1,
+   "loss": 2.5560152530670166
+  },
+  {
+   "update": 103,
+   "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+   "window": 1,
+   "loss": 2.562199592590332
+  },
+  {
+   "update": 104,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/III. keeping distance.midi",
+   "window": 1,
+   "loss": 2.9351999759674072
+  },
+  {
+   "update": 105,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+   "window": 0,
+   "loss": 2.2960011959075928
+  },
+  {
+   "update": 106,
+   "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+   "window": 4,
+   "loss": 2.6123695373535156
+  },
+  {
+   "update": 107,
+   "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+   "window": 1,
+   "loss": 2.5194077491760254
+  },
+  {
+   "update": 108,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+   "window": 5,
+   "loss": 2.2412352561950684
+  },
+  {
+   "update": 109,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+   "window": 2,
+   "loss": 2.830108404159546
+  },
+  {
+   "update": 110,
+   "path": "live/Brad Mehldau/Live in Marciac/Exit Music (For a Film) - Live [Live].midi",
+   "window": 0,
+   "loss": 1.2888771295547485
+  },
+  {
+   "update": 111,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/VII. - the day moves by -.midi",
+   "window": 0,
+   "loss": 1.8943270444869995
+  },
+  {
+   "update": 112,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Knives Out - Live.midi",
+   "window": 13,
+   "loss": 1.353131651878357
+  },
+  {
+   "update": 113,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+   "window": 0,
+   "loss": 2.8723835945129395
+  },
+  {
+   "update": 114,
+   "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+   "window": 1,
+   "loss": 2.5343921184539795
+  },
+  {
+   "update": 115,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+   "window": 0,
+   "loss": 2.273685932159424
+  },
+  {
+   "update": 116,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+   "window": 0,
+   "loss": 2.731900691986084
+  },
+  {
+   "update": 117,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/XI. family harmony.midi",
+   "window": 1,
+   "loss": 2.4227802753448486
+  },
+  {
+   "update": 118,
+   "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+   "window": 0,
+   "loss": 2.7140262126922607
+  },
+  {
+   "update": 119,
+   "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+   "window": 3,
+   "loss": 2.5937180519104004
+  },
+  {
+   "update": 120,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Smells Like Teen Spirit - Live.midi",
+   "window": 9,
+   "loss": 1.3999712467193604
+  },
+  {
+   "update": 121,
+   "path": "live/Brad Mehldau/Live in Marciac/Goodbye Storyteller - for Fred Myrow.midi",
+   "window": 10,
+   "loss": 1.115002989768982
+  },
+  {
+   "update": 122,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Knives Out - Live.midi",
+   "window": 6,
+   "loss": 2.9916231632232666
+  },
+  {
+   "update": 123,
+   "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+   "window": 14,
+   "loss": 2.601590633392334
+  },
+  {
+   "update": 124,
+   "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+   "window": 6,
+   "loss": 1.736868143081665
+  },
+  {
+   "update": 125,
+   "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+   "window": 12,
+   "loss": 2.259030342102051
+  },
+  {
+   "update": 126,
+   "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+   "window": 3,
+   "loss": 2.490896463394165
+  },
+  {
+   "update": 127,
+   "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+   "window": 0,
+   "loss": 2.2914044857025146
+  }
+ ],
+ "lora_file_sha256": "3bede47e1843c5305f6ba2e1295a7c8f8ce232f70206bfd25d5559d4e0e17aa1",
+ "eval": {
+  "val": [
+   {
+    "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/From This Moment On.midi",
+    "windows": 8,
+    "tokens": 7961,
+    "ce": 17627.23681640625,
+    "cat_ce": [
+     7031.1883544921875,
+     4781.038818359375,
+     5792.9951171875,
+     22.01420160382986,
+     0.0
+    ],
+    "cat_n": [
+     2636,
+     2636,
+     2636,
+     53,
+     0
+    ],
+    "pitch_marg": 5129.3245849609375,
+    "pitch_tok": 7031.1883544921875,
+    "mean_ce": 2.2141988213046413
+   },
+   {
+    "path": "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi",
+    "windows": 3,
+    "tokens": 2442,
+    "ce": 5941.490417480469,
+    "cat_ce": [
+     2073.1930236816406,
+     1171.2024230957031,
+     2678.769775390625,
+     18.325296878814697,
+     0.0
+    ],
+    "cat_n": [
+     807,
+     807,
+     807,
+     21,
+     0
+    ],
+    "pitch_marg": 1346.0518951416016,
+    "pitch_tok": 2073.1930236816406,
+    "mean_ce": 2.433042759001011
+   },
+   {
+    "path": "studio/Brad Mehldau/Suite -  April 2020/IV. stopping, listening -  hearing.midi",
+    "windows": 2,
+    "tokens": 1277,
+    "ce": 3314.2405395507812,
+    "cat_ce": [
+     1272.4253540039062,
+     561.1582107543945,
+     1466.3098449707031,
+     14.347193717956543,
+     0.0
+    ],
+    "cat_n": [
+     419,
+     419,
+     419,
+     20,
+     0
+    ],
+    "pitch_marg": 957.1506805419922,
+    "pitch_tok": 1272.4253540039062,
+    "mean_ce": 2.595333233790745
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+    "windows": 3,
+    "tokens": 2717,
+    "ce": 5651.736328125,
+    "cat_ce": [
+     1743.0465698242188,
+     1742.743896484375,
+     2150.0379638671875,
+     15.908016443252563,
+     0.0
+    ],
+    "cat_n": [
+     896,
+     896,
+     896,
+     29,
+     0
+    ],
+    "pitch_marg": 953.6235656738281,
+    "pitch_tok": 1743.0465698242188,
+    "mean_ce": 2.080138508695252
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi",
+    "windows": 8,
+    "tokens": 8162,
+    "ce": 20135.368774414062,
+    "cat_ce": [
+     8683.327392578125,
+     5674.5902099609375,
+     5751.914001464844,
+     25.53742742538452,
+     0.0
+    ],
+    "cat_n": [
+     2701,
+     2701,
+     2701,
+     59,
+     0
+    ],
+    "pitch_marg": 6083.083801269531,
+    "pitch_tok": 8683.327392578125,
+    "mean_ce": 2.466965054449162
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Holland - Live.midi",
+    "windows": 8,
+    "tokens": 8156,
+    "ce": 17372.678955078125,
+    "cat_ce": [
+     5796.082275390625,
+     2915.397003173828,
+     8637.653198242188,
+     23.546096324920654,
+     0.0
+    ],
+    "cat_n": [
+     2692,
+     2692,
+     2692,
+     80,
+     0
+    ],
+    "pitch_marg": 3504.674591064453,
+    "pitch_tok": 5796.082275390625,
+    "mean_ce": 2.130048915531894
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Jigsaw Falling into Place - Live.midi",
+    "windows": 8,
+    "tokens": 8158,
+    "ce": 16298.55859375,
+    "cat_ce": [
+     6039.313323974609,
+     3325.0030822753906,
+     6923.528381347656,
+     10.713770091533661,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     61,
+     0
+    ],
+    "pitch_marg": 3634.1814575195312,
+    "pitch_tok": 6039.313323974609,
+    "mean_ce": 1.9978620487558225
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/My Favorite Things - Live.midi",
+    "windows": 8,
+    "tokens": 8154,
+    "ce": 17257.615966796875,
+    "cat_ce": [
+     6543.9600830078125,
+     3110.5307006835938,
+     7590.703063964844,
+     12.422755748033524,
+     0.0
+    ],
+    "cat_n": [
+     2698,
+     2698,
+     2698,
+     60,
+     0
+    ],
+    "pitch_marg": 4093.169189453125,
+    "pitch_tok": 6543.9600830078125,
+    "mean_ce": 2.116460138189462
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Teardrop - Live.midi",
+    "windows": 8,
+    "tokens": 8161,
+    "ce": 19054.190185546875,
+    "cat_ce": [
+     6681.9080810546875,
+     3233.2110290527344,
+     9118.545715332031,
+     20.52484631538391,
+     0.0
+    ],
+    "cat_n": [
+     2692,
+     2692,
+     2692,
+     85,
+     0
+    ],
+    "pitch_marg": 4256.159484863281,
+    "pitch_tok": 6681.9080810546875,
+    "mean_ce": 2.334786200900242
+   },
+   {
+    "path": "live/Brad Mehldau/Live in Marciac/It's All Right With Me - Live.midi",
+    "windows": 8,
+    "tokens": 8162,
+    "ce": 19684.20263671875,
+    "cat_ce": [
+     9060.917358398438,
+     5235.6751708984375,
+     5362.664306640625,
+     24.945541501045227,
+     0.0
+    ],
+    "cat_n": [
+     2704,
+     2704,
+     2704,
+     50,
+     0
+    ],
+    "pitch_marg": 6655.17578125,
+    "pitch_tok": 9060.917358398438,
+    "mean_ce": 2.411688634736431
+   },
+   {
+    "path": "live/Brad Mehldau/Live in Marciac/My Favorite Things - Live.midi",
+    "windows": 8,
+    "tokens": 8159,
+    "ce": 16284.232299804688,
+    "cat_ce": [
+     6375.454345703125,
+     2938.3286895751953,
+     6948.794128417969,
+     21.655288413167,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     62,
+     0
+    ],
+    "pitch_marg": 4163.852081298828,
+    "pitch_tok": 6375.454345703125,
+    "mean_ce": 1.995861294252321
+   },
+   {
+    "path": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+    "windows": 8,
+    "tokens": 8153,
+    "ce": 18267.312377929688,
+    "cat_ce": [
+     8080.183654785156,
+     4695.893981933594,
+     5455.849914550781,
+     35.38476324081421,
+     0.0
+    ],
+    "cat_n": [
+     2698,
+     2698,
+     2698,
+     59,
+     0
+    ],
+    "pitch_marg": 5777.2489013671875,
+    "pitch_tok": 8080.183654785156,
+    "mean_ce": 2.240563274614214
+   }
+  ],
+  "probe": [
+   {
+    "path": "studio/Hiromi/Spectrum/Sepia Effect.midi",
+    "windows": 8,
+    "tokens": 8170,
+    "ce": 14923.801391601562,
+    "cat_ce": [
+     4955.578643798828,
+     4259.363952636719,
+     5693.601989746094,
+     15.25708045065403,
+     0.0
+    ],
+    "cat_n": [
+     2704,
+     2704,
+     2704,
+     58,
+     0
+    ],
+    "pitch_marg": 2757.6546936035156,
+    "pitch_tok": 4955.578643798828,
+    "mean_ce": 1.8266586770626148
+   },
+   {
+    "path": "studio/Hiromi/Spectrum/Yellow Wurlitzer Blues.midi",
+    "windows": 8,
+    "tokens": 8150,
+    "ce": 17348.26171875,
+    "cat_ce": [
+     8134.9423828125,
+     4621.8707275390625,
+     4570.513610839844,
+     20.934578761458397,
+     0.0
+    ],
+    "cat_n": [
+     2701,
+     2701,
+     2701,
+     47,
+     0
+    ],
+    "pitch_marg": 5547.3843994140625,
+    "pitch_tok": 8134.9423828125,
+    "mean_ce": 2.128621069785276
+   },
+   {
+    "path": "studio/Hiromi/Oscar, With Love -  The Songs of Oscar Peterson/Oscar's New Camera.midi",
+    "windows": 8,
+    "tokens": 8155,
+    "ce": 15762.0849609375,
+    "cat_ce": [
+     7873.9422607421875,
+     4228.21923828125,
+     3644.971923828125,
+     14.951219022274017,
+     0.0
+    ],
+    "cat_n": [
+     2706,
+     2706,
+     2706,
+     37,
+     0
+    ],
+    "pitch_marg": 5479.8487548828125,
+    "pitch_tok": 7873.9422607421875,
+    "mean_ce": 1.9328123802498467
+   },
+   {
+    "path": "studio/Hiromi/Spectrum/Kaleidoscope.midi",
+    "windows": 8,
+    "tokens": 8161,
+    "ce": 14154.006469726562,
+    "cat_ce": [
+     5716.4332275390625,
+     4049.2159423828125,
+     4379.60986328125,
+     8.747321128845215,
+     0.0
+    ],
+    "cat_n": [
+     2705,
+     2705,
+     2705,
+     46,
+     0
+    ],
+    "pitch_marg": 3578.0433654785156,
+    "pitch_tok": 5716.4332275390625,
+    "mean_ce": 1.7343470738544986
+   },
+   {
+    "path": "studio/Hiromi/Spectrum/Once In A Blue Moon.midi",
+    "windows": 8,
+    "tokens": 8158,
+    "ce": 15553.560180664062,
+    "cat_ce": [
+     6732.254638671875,
+     3542.1334381103516,
+     5243.959899902344,
+     35.21181392669678,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     61,
+     0
+    ],
+    "pitch_marg": 4487.743377685547,
+    "pitch_tok": 6732.254638671875,
+    "mean_ce": 1.9065408409737759
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/Lennie's Pennies - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8167,
+    "ce": 18171.013427734375,
+    "cat_ce": [
+     8363.161499023438,
+     5030.718994140625,
+     4762.0433349609375,
+     15.088717192411423,
+     0.0
+    ],
+    "cat_n": [
+     2708,
+     2708,
+     2708,
+     43,
+     0
+    ],
+    "pitch_marg": 5824.042724609375,
+    "pitch_tok": 8363.161499023438,
+    "mean_ce": 2.2249312388556843
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/You've Got To Be Modernistic - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8152,
+    "ce": 15402.938598632812,
+    "cat_ce": [
+     7081.6370849609375,
+     3609.3018493652344,
+     4700.8787841796875,
+     11.120740205049515,
+     0.0
+    ],
+    "cat_n": [
+     2707,
+     2707,
+     2707,
+     31,
+     0
+    ],
+    "pitch_marg": 4869.950439453125,
+    "pitch_tok": 7081.6370849609375,
+    "mean_ce": 1.8894674434044176
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/117th Street - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8166,
+    "ce": 18540.470947265625,
+    "cat_ce": [
+     8517.194030761719,
+     4559.266265869141,
+     5415.117004394531,
+     48.89365530014038,
+     0.0
+    ],
+    "cat_n": [
+     2701,
+     2701,
+     2701,
+     63,
+     0
+    ],
+    "pitch_marg": 6061.2327880859375,
+    "pitch_tok": 8517.194030761719,
+    "mean_ce": 2.2704470912644656
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/Drop Me A Line - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8149,
+    "ce": 18329.3095703125,
+    "cat_ce": [
+     7526.525085449219,
+     5015.8006591796875,
+     5766.215515136719,
+     20.76802110671997,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     52,
+     0
+    ],
+    "pitch_marg": 5345.187194824219,
+    "pitch_tok": 7526.525085449219,
+    "mean_ce": 2.249271023476807
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/Hallucinations - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8170,
+    "ce": 17085.707763671875,
+    "cat_ce": [
+     8014.2103271484375,
+     4620.400390625,
+     4441.855987548828,
+     9.240521490573883,
+     0.0
+    ],
+    "cat_n": [
+     2711,
+     2711,
+     2711,
+     37,
+     0
+    ],
+    "pitch_marg": 5613.116394042969,
+    "pitch_tok": 8014.2103271484375,
+    "mean_ce": 2.091273900082237
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/New York - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 8,
+    "tokens": 8150,
+    "ce": 19554.51513671875,
+    "cat_ce": [
+     8624.91748046875,
+     4632.718414306641,
+     6266.7049560546875,
+     30.173609852790833,
+     0.0
+    ],
+    "cat_n": [
+     2703,
+     2703,
+     2703,
+     41,
+     0
+    ],
+    "pitch_marg": 6377.923767089844,
+    "pitch_tok": 8624.91748046875,
+    "mean_ce": 2.3993270106403375
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/Street Of Dreams - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 5,
+    "tokens": 5083,
+    "ce": 13451.29736328125,
+    "cat_ce": [
+     5346.183898925781,
+     3341.1373901367188,
+     4727.4296875,
+     36.546823263168335,
+     0.0
+    ],
+    "cat_n": [
+     1679,
+     1679,
+     1679,
+     46,
+     0
+    ],
+    "pitch_marg": 3764.4031982421875,
+    "pitch_tok": 5346.183898925781,
+    "mean_ce": 2.646330388211932
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/'Round Midnight - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 7,
+    "tokens": 6463,
+    "ce": 16411.976989746094,
+    "cat_ce": [
+     6652.7069091796875,
+     3980.9708862304688,
+     5746.7545166015625,
+     31.5451979637146,
+     0.0
+    ],
+    "cat_n": [
+     2138,
+     2138,
+     2138,
+     49,
+     0
+    ],
+    "pitch_marg": 4779.290771484375,
+    "pitch_tok": 6652.7069091796875,
+    "mean_ce": 2.539374437528407
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/I Fall In Love Too Easily - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 8,
+    "tokens": 8164,
+    "ce": 20622.77685546875,
+    "cat_ce": [
+     8014.0291748046875,
+     5124.2353515625,
+     7445.778015136719,
+     38.734018087387085,
+     0.0
+    ],
+    "cat_n": [
+     2698,
+     2698,
+     2698,
+     70,
+     0
+    ],
+    "pitch_marg": 5626.863830566406,
+    "pitch_tok": 8014.0291748046875,
+    "mean_ce": 2.5260628191411993
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/Spiritual Medley -  Holy Holy Holy - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 2,
+    "tokens": 1626,
+    "ce": 3806.6907958984375,
+    "cat_ce": [
+     1381.471435546875,
+     740.82080078125,
+     1679.2323608398438,
+     5.166394472122192,
+     0.0
+    ],
+    "cat_n": [
+     537,
+     537,
+     537,
+     15,
+     0
+    ],
+    "pitch_marg": 926.8262023925781,
+    "pitch_tok": 1381.471435546875,
+    "mean_ce": 2.341138250860048
+   },
+   {
+    "path": "studio/Alan Pasqua/Soliloquy/In a Sentimental Mood.midi",
+    "windows": 7,
+    "tokens": 6271,
+    "ce": 15810.37808227539,
+    "cat_ce": [
+     6098.434951782227,
+     3348.663131713867,
+     6325.944244384766,
+     37.33608728647232,
+     0.0
+    ],
+    "cat_n": [
+     2070,
+     2070,
+     2070,
+     61,
+     0
+    ],
+    "pitch_marg": 4438.421569824219,
+    "pitch_tok": 6098.434951782227,
+    "mean_ce": 2.52118929712572
+   },
+   {
+    "path": "studio/Alan Pasqua/Soliloquy/Lotus Blossom.midi",
+    "windows": 7,
+    "tokens": 6339,
+    "ce": 16015.41259765625,
+    "cat_ce": [
+     5596.571228027344,
+     4540.607894897461,
+     5835.000961303711,
+     43.23216772079468,
+     0.0
+    ],
+    "cat_n": [
+     2087,
+     2087,
+     2087,
+     78,
+     0
+    ],
+    "pitch_marg": 3895.274742126465,
+    "pitch_tok": 5596.571228027344,
+    "mean_ce": 2.5264888149008122
+   },
+   {
+    "path": "studio/Alan Pasqua/Day Dream/In the Wee Small Hours of the Morning  Smile.midi",
+    "windows": 6,
+    "tokens": 5983,
+    "ce": 15922.677978515625,
+    "cat_ce": [
+     5787.162170410156,
+     3805.9246826171875,
+     6287.777282714844,
+     41.813939332962036,
+     0.0
+    ],
+    "cat_n": [
+     1969,
+     1969,
+     1969,
+     76,
+     0
+    ],
+    "pitch_marg": 4182.033447265625,
+    "pitch_tok": 5787.162170410156,
+    "mean_ce": 2.661320069950798
+   },
+   {
+    "path": "studio/Alan Pasqua/Russian Peasant/The Dream.midi",
+    "windows": 7,
+    "tokens": 6449,
+    "ce": 17710.871704101562,
+    "cat_ce": [
+     5785.02978515625,
+     4101.875869750977,
+     7777.6495361328125,
+     46.31661033630371,
+     0.0
+    ],
+    "cat_n": [
+     2119,
+     2119,
+     2119,
+     92,
+     0
+    ],
+    "pitch_marg": 3952.7398376464844,
+    "pitch_tok": 5785.02978515625,
+    "mean_ce": 2.7462973645683926
+   },
+   {
+    "path": "studio/Alan Pasqua/Solo/Improvisation 2.midi",
+    "windows": 7,
+    "tokens": 6771,
+    "ce": 17310.750732421875,
+    "cat_ce": [
+     6110.172760009766,
+     4090.6944885253906,
+     7056.0283203125,
+     53.855263233184814,
+     0.0
+    ],
+    "cat_n": [
+     2226,
+     2226,
+     2226,
+     93,
+     0
+    ],
+    "pitch_marg": 4185.91796875,
+    "pitch_tok": 6110.172760009766,
+    "mean_ce": 2.5566017918212784
+   }
+  ]
+ }
+}

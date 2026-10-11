@@ -1,0 +1,2351 @@
+{
+ "mode": "--train",
+ "arm": "C",
+ "seed": 0,
+ "checks": {
+  "inputs_match_1726_and_control_manifest": {
+   "ok": true,
+   "mismatches": []
+  },
+  "schedule_done_on_same_inputs": {
+   "ok": true
+  },
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "optimizer_only_lora": {
+   "ok": true
+  },
+  "updates_done_on_fixed_schedule": {
+   "ok": true
+  },
+  "every_lora_tensor_changed": {
+   "ok": true,
+   "unchanged": []
+  },
+  "base_grads_none_after_training": {
+   "ok": true
+  },
+  "base_sha_unchanged_after_training": {
+   "ok": true,
+   "sha": "c312c20d6ab355d8"
+  },
+  "reload_from_file_equals_trained": {
+   "ok": true,
+   "max_abs_diff": 0.0,
+   "zeroed_differs_by": 11.063483238220215
+  },
+  "checkpoint_sha_unchanged": {
+   "ok": true
+  },
+  "token_matched_snapshot_taken": {
+   "ok": true,
+   "k": 122
+  },
+  "token_matched_snapshot_differs_from_final": {
+   "ok": true,
+   "max_abs_diff": 1.1098623275756836
+  }
+ },
+ "phases": {
+  "load": {
+   "wall_s": 5.886,
+   "rss_now_bytes": 2492973056,
+   "rss_max_bytes": 5573656576,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 68%"
+  },
+  "train": {
+   "wall_s": 146.488,
+   "observed_max_driver_bytes": 5540757504,
+   "thermal_level": 0,
+   "rss_now_bytes": 1063649280,
+   "rss_max_bytes": 5573656576,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 60%"
+  },
+  "eval": {
+   "wall_s": 75.558,
+   "thermal_level": 0,
+   "rss_now_bytes": 1443479552,
+   "rss_max_bytes": 5573656576,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 61%"
+  },
+  "eval_tok": {
+   "wall_s": 73.612,
+   "thermal_level": 0,
+   "rss_now_bytes": 1441923072,
+   "rss_max_bytes": 5573656576,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 61%"
+  }
+ },
+ "result": "train_done",
+ "stopped_at": null,
+ "inputs": {
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "mehldau_data_sha256": "8501d2aca038d763dbea2149e0ed1171ddcf0107d7d33d6a0d6e5da0c92bd5bb",
+  "mehldau_manifest_sha256": "0b075bceaa24b9b32818b96b36bf428bf3973525b5b79d51c8ea07eda619cf85",
+  "control_data_sha256": "4bd18eefddb5d199e63a2b487ce3358eec4f32c2dbc3bee272afd86d28a6cffc",
+  "control_manifest_sha256": "c6ecfe48e32e642013c7551e07fb9c4595df9800ce095cd916a03b921f7c223f",
+  "m0_lora_sha256": "0b634c8c10b1d48b865b9e26d8eb1f92e6c486d20958a5b90facda2d70896acb"
+ },
+ "train_steps": [
+  {
+   "update": 0,
+   "path": "live/John Colianni/The Maybeck Recital Series, Vol. 37/Basin Street Dreams - Live At Maybeck Recital Hall, Berkeley, CA  November 14-16, 1994.midi",
+   "window": 6,
+   "loss": 2.720621109008789
+  },
+  {
+   "update": 1,
+   "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+   "window": 4,
+   "loss": 2.8252053260803223
+  },
+  {
+   "update": 2,
+   "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+   "window": 3,
+   "loss": 2.5916378498077393
+  },
+  {
+   "update": 3,
+   "path": "live/Teddy Wilson/Alone/Sweet Georgia Brown.midi",
+   "window": 2,
+   "loss": 2.758326768875122
+  },
+  {
+   "update": 4,
+   "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+   "window": 5,
+   "loss": 2.6860239505767822
+  },
+  {
+   "update": 5,
+   "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+   "window": 6,
+   "loss": 2.4388697147369385
+  },
+  {
+   "update": 6,
+   "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+   "window": 1,
+   "loss": 3.0478179454803467
+  },
+  {
+   "update": 7,
+   "path": "live/McCoy Tyner/Things Ain’t What They Used To Be (Live)/Things Ain't What They Used To Be - Live At Merkin Hall, NYC  1989  Remastered.midi",
+   "window": 2,
+   "loss": 2.7271153926849365
+  },
+  {
+   "update": 8,
+   "path": "studio/George Shearing/The Shearing Piano/Stella By Starlight.midi",
+   "window": 0,
+   "loss": 3.096658945083618
+  },
+  {
+   "update": 9,
+   "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+   "window": 1,
+   "loss": 1.9852347373962402
+  },
+  {
+   "update": 10,
+   "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+   "window": 11,
+   "loss": 3.011390209197998
+  },
+  {
+   "update": 11,
+   "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+   "window": 1,
+   "loss": 2.6948423385620117
+  },
+  {
+   "update": 12,
+   "path": "live/Ralph Sutton/The Maybeck Recital Series, Vol. 30/Echo Of Spring - Live At Maybeck Recital Hall, Berkeley, CA  August 8, 1993.midi",
+   "window": 1,
+   "loss": 2.6251158714294434
+  },
+  {
+   "update": 13,
+   "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+   "window": 0,
+   "loss": 3.0358033180236816
+  },
+  {
+   "update": 14,
+   "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+   "window": 1,
+   "loss": 2.87973690032959
+  },
+  {
+   "update": 15,
+   "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+   "window": 8,
+   "loss": 2.540971279144287
+  },
+  {
+   "update": 16,
+   "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+   "window": 5,
+   "loss": 2.3069374561309814
+  },
+  {
+   "update": 17,
+   "path": "live/Don Friedman/The Maybeck Recital Series, Vol. 33/How Deep Is The Ocean - Live At Maybeck Recital Hall, Berkeley, CA  September 5, 1993.midi",
+   "window": 5,
+   "loss": 2.648660182952881
+  },
+  {
+   "update": 18,
+   "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+   "window": 0,
+   "loss": 1.9457203149795532
+  },
+  {
+   "update": 19,
+   "path": "live/Kenny Drew Jr/The Maybeck Recital Series, Vol. 39/Waitin' For My Dearie - Live At Maybeck Recital Hall, Berkeley, CA  August 7, 1994.midi",
+   "window": 3,
+   "loss": 2.88543438911438
+  },
+  {
+   "update": 20,
+   "path": "live/Toshiko Akiyoshi/The Maybeck Recital Series, Vol. 36/Come Sunday - Live.midi",
+   "window": 6,
+   "loss": 3.146099090576172
+  },
+  {
+   "update": 21,
+   "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+   "window": 4,
+   "loss": 3.023819923400879
+  },
+  {
+   "update": 22,
+   "path": "live/George Cables/The Maybeck Recital Series, Vol. 35/Over The Rainbow - Live At Maybeck Recital Hall, Berkeley, CA  January 9, 1994.midi",
+   "window": 8,
+   "loss": 2.959857225418091
+  },
+  {
+   "update": 23,
+   "path": "live/John Hicks/The Maybeck Recital Series, Vol. 7/Speak Low - Live At Maybeck Recital Hall, Berkeley, CA  August 1990.midi",
+   "window": 1,
+   "loss": 2.7889978885650635
+  },
+  {
+   "update": 24,
+   "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+   "window": 1,
+   "loss": 2.8106141090393066
+  },
+  {
+   "update": 25,
+   "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+   "window": 5,
+   "loss": 3.121779680252075
+  },
+  {
+   "update": 26,
+   "path": "studio/Marcus Roberts/Marcus Roberts -  The Joy of Joplin/Everything's Cool - Instrumental.midi",
+   "window": 0,
+   "loss": 2.304854154586792
+  },
+  {
+   "update": 27,
+   "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+   "window": 1,
+   "loss": 1.8194001913070679
+  },
+  {
+   "update": 28,
+   "path": "live/Allen Farnham/The Maybeck Recital Series, Vol. 41/The Carpal Tunnel Blues - Live At Maybeck Recital Hall, Berkeley, CA  June 12, 1994.midi",
+   "window": 3,
+   "loss": 2.2679107189178467
+  },
+  {
+   "update": 29,
+   "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+   "window": 1,
+   "loss": 2.7374565601348877
+  },
+  {
+   "update": 30,
+   "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+   "window": 0,
+   "loss": 2.600111961364746
+  },
+  {
+   "update": 31,
+   "path": "live/Jaki Byard/The Maybeck Recital Series, Vol. 17/Family Suite - Live At Maybeck Recital Hall, Berkeley, CA  September 8, 1991.midi",
+   "window": 18,
+   "loss": 1.889013409614563
+  },
+  {
+   "update": 32,
+   "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+   "window": 3,
+   "loss": 2.475196361541748
+  },
+  {
+   "update": 33,
+   "path": "live/Denny Zeitlin/The Maybeck Recital Series, Vol. 27/The Girl Next Door - Live At Maybeck Recital Hall, Berkeley, California  October 18, 1992.midi",
+   "window": 4,
+   "loss": 2.55729341506958
+  },
+  {
+   "update": 34,
+   "path": "live/Toshiko Akiyoshi/The Maybeck Recital Series, Vol. 36/Come Sunday - Live.midi",
+   "window": 0,
+   "loss": 2.2236180305480957
+  },
+  {
+   "update": 35,
+   "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+   "window": 5,
+   "loss": 2.3714547157287598
+  },
+  {
+   "update": 36,
+   "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+   "window": 3,
+   "loss": 2.3936400413513184
+  },
+  {
+   "update": 37,
+   "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+   "window": 4,
+   "loss": 2.1052703857421875
+  },
+  {
+   "update": 38,
+   "path": "live/Kenny Drew Jr/The Maybeck Recital Series, Vol. 39/Waitin' For My Dearie - Live At Maybeck Recital Hall, Berkeley, CA  August 7, 1994.midi",
+   "window": 2,
+   "loss": 2.5386550426483154
+  },
+  {
+   "update": 39,
+   "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+   "window": 0,
+   "loss": 2.559469223022461
+  },
+  {
+   "update": 40,
+   "path": "live/Kenny Drew Jr/The Maybeck Recital Series, Vol. 39/Waitin' For My Dearie - Live At Maybeck Recital Hall, Berkeley, CA  August 7, 1994.midi",
+   "window": 2,
+   "loss": 2.5169599056243896
+  },
+  {
+   "update": 41,
+   "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+   "window": 3,
+   "loss": 2.3182013034820557
+  },
+  {
+   "update": 42,
+   "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+   "window": 4,
+   "loss": 2.6963658332824707
+  },
+  {
+   "update": 43,
+   "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+   "window": 9,
+   "loss": 1.9844733476638794
+  },
+  {
+   "update": 44,
+   "path": "live/Toshiko Akiyoshi/The Maybeck Recital Series, Vol. 36/Come Sunday - Live.midi",
+   "window": 0,
+   "loss": 2.16679310798645
+  },
+  {
+   "update": 45,
+   "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+   "window": 3,
+   "loss": 2.642331838607788
+  },
+  {
+   "update": 46,
+   "path": "live/Joanne Brackeen/The Maybeck Recital Series, Vol. 1/The Most Beautiful Girl In The World.midi",
+   "window": 9,
+   "loss": 2.1264865398406982
+  },
+  {
+   "update": 47,
+   "path": "live/Chick Corea/Solo Piano -  Standards/How Deep Is The Ocean - Live.midi",
+   "window": 4,
+   "loss": 2.563314199447632
+  },
+  {
+   "update": 48,
+   "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+   "window": 3,
+   "loss": 2.2367327213287354
+  },
+  {
+   "update": 49,
+   "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+   "window": 0,
+   "loss": 1.784651279449463
+  },
+  {
+   "update": 50,
+   "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+   "window": 1,
+   "loss": 1.7170350551605225
+  },
+  {
+   "update": 51,
+   "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+   "window": 1,
+   "loss": 1.786023497581482
+  },
+  {
+   "update": 52,
+   "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+   "window": 10,
+   "loss": 2.45963191986084
+  },
+  {
+   "update": 53,
+   "path": "studio/George Shearing/The Shearing Piano/Stella By Starlight.midi",
+   "window": 1,
+   "loss": 2.6687097549438477
+  },
+  {
+   "update": 54,
+   "path": "live/Denny Zeitlin/The Maybeck Recital Series, Vol. 27/The Girl Next Door - Live At Maybeck Recital Hall, Berkeley, California  October 18, 1992.midi",
+   "window": 0,
+   "loss": 2.739021062850952
+  },
+  {
+   "update": 55,
+   "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+   "window": 11,
+   "loss": 2.526820421218872
+  },
+  {
+   "update": 56,
+   "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+   "window": 10,
+   "loss": 2.1249401569366455
+  },
+  {
+   "update": 57,
+   "path": "live/Teddy Wilson/Alone/Sweet Georgia Brown.midi",
+   "window": 5,
+   "loss": 2.9209790229797363
+  },
+  {
+   "update": 58,
+   "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+   "window": 4,
+   "loss": 2.894676685333252
+  },
+  {
+   "update": 59,
+   "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+   "window": 12,
+   "loss": 3.004568099975586
+  },
+  {
+   "update": 60,
+   "path": "live/Chick Corea/Solo Piano -  Standards/How Deep Is The Ocean - Live.midi",
+   "window": 3,
+   "loss": 2.6513164043426514
+  },
+  {
+   "update": 61,
+   "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+   "window": 2,
+   "loss": 2.8974552154541016
+  },
+  {
+   "update": 62,
+   "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+   "window": 9,
+   "loss": 2.656435966491699
+  },
+  {
+   "update": 63,
+   "path": "live/Buddy Montgomery/The Maybeck Recital Series, Vol. 15/Soft Winds - Live At Maybeck Recital Hall, Berkeley, CA  1991.midi",
+   "window": 7,
+   "loss": 2.1916732788085938
+  },
+  {
+   "update": 64,
+   "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+   "window": 10,
+   "loss": 2.0375471115112305
+  },
+  {
+   "update": 65,
+   "path": "studio/Duke Jordan/One For The Library/No Problem.midi",
+   "window": 2,
+   "loss": 2.816801071166992
+  },
+  {
+   "update": 66,
+   "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+   "window": 5,
+   "loss": 2.2986927032470703
+  },
+  {
+   "update": 67,
+   "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+   "window": 0,
+   "loss": 1.7691431045532227
+  },
+  {
+   "update": 68,
+   "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+   "window": 9,
+   "loss": 1.6625523567199707
+  },
+  {
+   "update": 69,
+   "path": "studio/Marcus Roberts/Marcus Roberts -  The Joy of Joplin/Everything's Cool - Instrumental.midi",
+   "window": 2,
+   "loss": 2.101304292678833
+  },
+  {
+   "update": 70,
+   "path": "live/Jaki Byard/The Maybeck Recital Series, Vol. 17/Family Suite - Live At Maybeck Recital Hall, Berkeley, CA  September 8, 1991.midi",
+   "window": 7,
+   "loss": 2.072235345840454
+  },
+  {
+   "update": 71,
+   "path": "live/Alan Broadbent/The Maybeck Recital Series, Vol. 14/Peace - Live At Maybeck Recital Hall  Berkeley, CA.midi",
+   "window": 5,
+   "loss": 2.2849957942962646
+  },
+  {
+   "update": 72,
+   "path": "live/Buddy Montgomery/The Maybeck Recital Series, Vol. 15/Soft Winds - Live At Maybeck Recital Hall, Berkeley, CA  1991.midi",
+   "window": 1,
+   "loss": 2.466433048248291
+  },
+  {
+   "update": 73,
+   "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+   "window": 1,
+   "loss": 2.6901116371154785
+  },
+  {
+   "update": 74,
+   "path": "live/Ellis Larkins/The Maybeck Recital Series, Vol. 22/Blue Skies - Live At Maybeck Recital Hall, Berkeley, CA  March 29, 1992.midi",
+   "window": 2,
+   "loss": 2.6738712787628174
+  },
+  {
+   "update": 75,
+   "path": "live/Allen Farnham/The Maybeck Recital Series, Vol. 41/The Carpal Tunnel Blues - Live At Maybeck Recital Hall, Berkeley, CA  June 12, 1994.midi",
+   "window": 6,
+   "loss": 1.8916298151016235
+  },
+  {
+   "update": 76,
+   "path": "live/George Cables/The Maybeck Recital Series, Vol. 35/Over The Rainbow - Live At Maybeck Recital Hall, Berkeley, CA  January 9, 1994.midi",
+   "window": 1,
+   "loss": 2.8262555599212646
+  },
+  {
+   "update": 77,
+   "path": "live/Denny Zeitlin/The Maybeck Recital Series, Vol. 27/The Girl Next Door - Live At Maybeck Recital Hall, Berkeley, California  October 18, 1992.midi",
+   "window": 5,
+   "loss": 2.595594882965088
+  },
+  {
+   "update": 78,
+   "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+   "window": 0,
+   "loss": 2.6582584381103516
+  },
+  {
+   "update": 79,
+   "path": "live/Jessica Williams/The Maybeck Recital Series, Vol. 21/Kristen - Live At Maybeck Recital Hall, Berkeley, CA  February 16, 1992.midi",
+   "window": 10,
+   "loss": 2.096952199935913
+  },
+  {
+   "update": 80,
+   "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+   "window": 9,
+   "loss": 2.3725781440734863
+  },
+  {
+   "update": 81,
+   "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+   "window": 0,
+   "loss": 2.4058332443237305
+  },
+  {
+   "update": 82,
+   "path": "live/Alan Broadbent/The Maybeck Recital Series, Vol. 14/Peace - Live At Maybeck Recital Hall  Berkeley, CA.midi",
+   "window": 0,
+   "loss": 2.3194363117218018
+  },
+  {
+   "update": 83,
+   "path": "studio/Marcus Roberts/Marcus Roberts -  The Joy of Joplin/Everything's Cool - Instrumental.midi",
+   "window": 1,
+   "loss": 1.9050542116165161
+  },
+  {
+   "update": 84,
+   "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+   "window": 4,
+   "loss": 2.61100435256958
+  },
+  {
+   "update": 85,
+   "path": "live/Marian McPartland/Live At Maybeck Recital Hall/Turn Around - Live At Maybeck Recital Hall, Berkeley, CA  January 20, 1991.midi",
+   "window": 3,
+   "loss": 2.043532371520996
+  },
+  {
+   "update": 86,
+   "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+   "window": 5,
+   "loss": 2.2460386753082275
+  },
+  {
+   "update": 87,
+   "path": "live/Marian McPartland/Live At Maybeck Recital Hall/Turn Around - Live At Maybeck Recital Hall, Berkeley, CA  January 20, 1991.midi",
+   "window": 0,
+   "loss": 2.1042749881744385
+  },
+  {
+   "update": 88,
+   "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+   "window": 0,
+   "loss": 2.561332941055298
+  },
+  {
+   "update": 89,
+   "path": "live/Jaki Byard/The Maybeck Recital Series, Vol. 17/Family Suite - Live At Maybeck Recital Hall, Berkeley, CA  September 8, 1991.midi",
+   "window": 5,
+   "loss": 2.31577730178833
+  },
+  {
+   "update": 90,
+   "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+   "window": 0,
+   "loss": 2.450571060180664
+  },
+  {
+   "update": 91,
+   "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+   "window": 3,
+   "loss": 2.4110336303710938
+  },
+  {
+   "update": 92,
+   "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+   "window": 0,
+   "loss": 2.8192880153656006
+  },
+  {
+   "update": 93,
+   "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+   "window": 0,
+   "loss": 2.3681998252868652
+  },
+  {
+   "update": 94,
+   "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+   "window": 6,
+   "loss": 2.3505725860595703
+  },
+  {
+   "update": 95,
+   "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+   "window": 0,
+   "loss": 1.7095167636871338
+  },
+  {
+   "update": 96,
+   "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+   "window": 1,
+   "loss": 2.233724355697632
+  },
+  {
+   "update": 97,
+   "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+   "window": 1,
+   "loss": 2.3090996742248535
+  },
+  {
+   "update": 98,
+   "path": "studio/Duke Jordan/One For The Library/No Problem.midi",
+   "window": 2,
+   "loss": 2.729447603225708
+  },
+  {
+   "update": 99,
+   "path": "live/Gene Harris/The Maybeck Recital Series, Vol. 23/Penthouse Serenade - Live At Maybeck Recital Hall, Berkeley, CA  1993.midi",
+   "window": 6,
+   "loss": 2.288723945617676
+  },
+  {
+   "update": 100,
+   "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+   "window": 0,
+   "loss": 1.7155389785766602
+  },
+  {
+   "update": 101,
+   "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+   "window": 3,
+   "loss": 2.3088884353637695
+  },
+  {
+   "update": 102,
+   "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+   "window": 9,
+   "loss": 2.450592041015625
+  },
+  {
+   "update": 103,
+   "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+   "window": 6,
+   "loss": 2.337207555770874
+  },
+  {
+   "update": 104,
+   "path": "live/Jaki Byard/The Maybeck Recital Series, Vol. 17/Family Suite - Live At Maybeck Recital Hall, Berkeley, CA  September 8, 1991.midi",
+   "window": 8,
+   "loss": 2.2664480209350586
+  },
+  {
+   "update": 105,
+   "path": "live/Gene Harris/The Maybeck Recital Series, Vol. 23/Penthouse Serenade - Live At Maybeck Recital Hall, Berkeley, CA  1993.midi",
+   "window": 11,
+   "loss": 1.9768164157867432
+  },
+  {
+   "update": 106,
+   "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+   "window": 9,
+   "loss": 2.351020336151123
+  },
+  {
+   "update": 107,
+   "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+   "window": 3,
+   "loss": 2.469989776611328
+  },
+  {
+   "update": 108,
+   "path": "studio/Bill Cunliffe/Cunliffe, Bill -  Satisfaction/Polka Dots And Moonbeams.midi",
+   "window": 0,
+   "loss": 2.41736102104187
+  },
+  {
+   "update": 109,
+   "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+   "window": 0,
+   "loss": 2.3194711208343506
+  },
+  {
+   "update": 110,
+   "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+   "window": 5,
+   "loss": 2.5150840282440186
+  },
+  {
+   "update": 111,
+   "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+   "window": 4,
+   "loss": 2.824469566345215
+  },
+  {
+   "update": 112,
+   "path": "live/Marian McPartland/Live At Maybeck Recital Hall/Turn Around - Live At Maybeck Recital Hall, Berkeley, CA  January 20, 1991.midi",
+   "window": 4,
+   "loss": 1.9408130645751953
+  },
+  {
+   "update": 113,
+   "path": "live/Toshiko Akiyoshi/The Maybeck Recital Series, Vol. 36/Come Sunday - Live.midi",
+   "window": 5,
+   "loss": 2.474199056625366
+  },
+  {
+   "update": 114,
+   "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+   "window": 0,
+   "loss": 1.6852140426635742
+  },
+  {
+   "update": 115,
+   "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+   "window": 10,
+   "loss": 2.528045177459717
+  },
+  {
+   "update": 116,
+   "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+   "window": 9,
+   "loss": 2.5765554904937744
+  },
+  {
+   "update": 117,
+   "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+   "window": 2,
+   "loss": 2.493875503540039
+  },
+  {
+   "update": 118,
+   "path": "studio/Duke Jordan/One For The Library/No Problem.midi",
+   "window": 2,
+   "loss": 2.6761178970336914
+  },
+  {
+   "update": 119,
+   "path": "live/John Colianni/The Maybeck Recital Series, Vol. 37/Basin Street Dreams - Live At Maybeck Recital Hall, Berkeley, CA  November 14-16, 1994.midi",
+   "window": 4,
+   "loss": 2.086740255355835
+  },
+  {
+   "update": 120,
+   "path": "live/Denny Zeitlin/The Maybeck Recital Series, Vol. 27/The Girl Next Door - Live At Maybeck Recital Hall, Berkeley, California  October 18, 1992.midi",
+   "window": 4,
+   "loss": 2.3804290294647217
+  },
+  {
+   "update": 121,
+   "path": "studio/Chris Anderson/From the Heart/There's a Lull in My Life.midi",
+   "window": 0,
+   "loss": 3.495455265045166
+  },
+  {
+   "update": 122,
+   "path": "live/Kenny Werner/The Maybeck Recital Series, Vol. 34/Roberta Moon - Live At Maybeck Recital Hall, Berkeley, CA  February 27, 1994.midi",
+   "window": 11,
+   "loss": 2.7270779609680176
+  },
+  {
+   "update": 123,
+   "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+   "window": 5,
+   "loss": 2.2164528369903564
+  },
+  {
+   "update": 124,
+   "path": "studio/Jed Distler/Quiet Now/Your Story.midi",
+   "window": 0,
+   "loss": 2.6503968238830566
+  },
+  {
+   "update": 125,
+   "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+   "window": 4,
+   "loss": 2.353257179260254
+  },
+  {
+   "update": 126,
+   "path": "live/Barry Harris/The Maybeck Recital Series, Vol. 12/Would You Like To Take A Walk - Live At Maybeck Recital Hall, Berkeley, CA  March 12, 1990.midi",
+   "window": 1,
+   "loss": 2.7633259296417236
+  },
+  {
+   "update": 127,
+   "path": "studio/George Shearing/The Shearing Piano/Stella By Starlight.midi",
+   "window": 3,
+   "loss": 2.5476698875427246
+  }
+ ],
+ "lora_file_sha256": "b506db8d4a02440a456807d40e8e7be0453a7952946e58ecd805cb853e25d369",
+ "eval": {
+  "val": [
+   {
+    "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/From This Moment On.midi",
+    "windows": 8,
+    "tokens": 7961,
+    "ce": 17585.598388671875,
+    "cat_ce": [
+     7008.575927734375,
+     4783.30126953125,
+     5765.300842285156,
+     28.420570194721222,
+     0.0
+    ],
+    "cat_n": [
+     2636,
+     2636,
+     2636,
+     53,
+     0
+    ],
+    "pitch_marg": 5117.359069824219,
+    "pitch_tok": 7008.575927734375,
+    "mean_ce": 2.2089685201195675
+   },
+   {
+    "path": "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi",
+    "windows": 3,
+    "tokens": 2442,
+    "ce": 5992.96923828125,
+    "cat_ce": [
+     2088.1172485351562,
+     1189.2577056884766,
+     2698.6188354492188,
+     16.975453853607178,
+     0.0
+    ],
+    "cat_n": [
+     807,
+     807,
+     807,
+     21,
+     0
+    ],
+    "pitch_marg": 1362.0440521240234,
+    "pitch_tok": 2088.1172485351562,
+    "mean_ce": 2.454123357199529
+   },
+   {
+    "path": "studio/Brad Mehldau/Suite -  April 2020/IV. stopping, listening -  hearing.midi",
+    "windows": 2,
+    "tokens": 1277,
+    "ce": 3333.37158203125,
+    "cat_ce": [
+     1294.262939453125,
+     561.385986328125,
+     1463.1206970214844,
+     14.60194206237793,
+     0.0
+    ],
+    "cat_n": [
+     419,
+     419,
+     419,
+     20,
+     0
+    ],
+    "pitch_marg": 977.7202758789062,
+    "pitch_tok": 1294.262939453125,
+    "mean_ce": 2.6103144730080268
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+    "windows": 3,
+    "tokens": 2717,
+    "ce": 5780.9322509765625,
+    "cat_ce": [
+     1829.8757934570312,
+     1739.4741821289062,
+     2194.2702026367188,
+     17.31218695640564,
+     0.0
+    ],
+    "cat_n": [
+     896,
+     896,
+     896,
+     29,
+     0
+    ],
+    "pitch_marg": 1042.9485473632812,
+    "pitch_tok": 1829.8757934570312,
+    "mean_ce": 2.1276894556409873
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi",
+    "windows": 8,
+    "tokens": 8162,
+    "ce": 20069.727416992188,
+    "cat_ce": [
+     8692.057739257812,
+     5662.739349365234,
+     5686.638671875,
+     28.292080760002136,
+     0.0
+    ],
+    "cat_n": [
+     2701,
+     2701,
+     2701,
+     59,
+     0
+    ],
+    "pitch_marg": 6102.796936035156,
+    "pitch_tok": 8692.057739257812,
+    "mean_ce": 2.458922741606492
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Holland - Live.midi",
+    "windows": 8,
+    "tokens": 8156,
+    "ce": 17581.7646484375,
+    "cat_ce": [
+     5869.338562011719,
+     2964.7725219726562,
+     8716.602905273438,
+     31.050761938095093,
+     0.0
+    ],
+    "cat_n": [
+     2692,
+     2692,
+     2692,
+     80,
+     0
+    ],
+    "pitch_marg": 3580.4152221679688,
+    "pitch_tok": 5869.338562011719,
+    "mean_ce": 2.1556847288422634
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Jigsaw Falling into Place - Live.midi",
+    "windows": 8,
+    "tokens": 8158,
+    "ce": 16589.865478515625,
+    "cat_ce": [
+     6116.163391113281,
+     3478.6651458740234,
+     6982.277160644531,
+     12.759459376335144,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     61,
+     0
+    ],
+    "pitch_marg": 3717.712890625,
+    "pitch_tok": 6116.163391113281,
+    "mean_ce": 2.033570173880317
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/My Favorite Things - Live.midi",
+    "windows": 8,
+    "tokens": 8154,
+    "ce": 17328.680053710938,
+    "cat_ce": [
+     6580.570373535156,
+     3140.1942138671875,
+     7591.923156738281,
+     15.992817431688309,
+     0.0
+    ],
+    "cat_n": [
+     2698,
+     2698,
+     2698,
+     60,
+     0
+    ],
+    "pitch_marg": 4120.037780761719,
+    "pitch_tok": 6580.570373535156,
+    "mean_ce": 2.1251753806366125
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Teardrop - Live.midi",
+    "windows": 8,
+    "tokens": 8161,
+    "ce": 19267.825927734375,
+    "cat_ce": [
+     6750.484680175781,
+     3313.2899780273438,
+     9181.978210449219,
+     22.07322371006012,
+     0.0
+    ],
+    "cat_n": [
+     2692,
+     2692,
+     2692,
+     85,
+     0
+    ],
+    "pitch_marg": 4332.82470703125,
+    "pitch_tok": 6750.484680175781,
+    "mean_ce": 2.360963843614064
+   },
+   {
+    "path": "live/Brad Mehldau/Live in Marciac/It's All Right With Me - Live.midi",
+    "windows": 8,
+    "tokens": 8162,
+    "ce": 19723.421875,
+    "cat_ce": [
+     9122.629150390625,
+     5303.018859863281,
+     5271.304138183594,
+     26.469598650932312,
+     0.0
+    ],
+    "cat_n": [
+     2704,
+     2704,
+     2704,
+     50,
+     0
+    ],
+    "pitch_marg": 6706.931640625,
+    "pitch_tok": 9122.629150390625,
+    "mean_ce": 2.4164937362166135
+   },
+   {
+    "path": "live/Brad Mehldau/Live in Marciac/My Favorite Things - Live.midi",
+    "windows": 8,
+    "tokens": 8159,
+    "ce": 16298.7763671875,
+    "cat_ce": [
+     6415.7745361328125,
+     2922.5721435546875,
+     6934.4322509765625,
+     25.99714857339859,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     62,
+     0
+    ],
+    "pitch_marg": 4209.268707275391,
+    "pitch_tok": 6415.7745361328125,
+    "mean_ce": 1.9976438739045839
+   },
+   {
+    "path": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+    "windows": 8,
+    "tokens": 8153,
+    "ce": 18245.54443359375,
+    "cat_ce": [
+     8143.203430175781,
+     4656.121612548828,
+     5406.211486816406,
+     40.00790560245514,
+     0.0
+    ],
+    "cat_n": [
+     2698,
+     2698,
+     2698,
+     59,
+     0
+    ],
+    "pitch_marg": 5818.355773925781,
+    "pitch_tok": 8143.203430175781,
+    "mean_ce": 2.2378933439953084
+   }
+  ],
+  "probe": [
+   {
+    "path": "studio/Hiromi/Spectrum/Sepia Effect.midi",
+    "windows": 8,
+    "tokens": 8170,
+    "ce": 14990.2890625,
+    "cat_ce": [
+     5005.160430908203,
+     4285.3106689453125,
+     5680.7222900390625,
+     19.09540893882513,
+     0.0
+    ],
+    "cat_n": [
+     2704,
+     2704,
+     2704,
+     58,
+     0
+    ],
+    "pitch_marg": 2799.800750732422,
+    "pitch_tok": 5005.160430908203,
+    "mean_ce": 1.834796702876377
+   },
+   {
+    "path": "studio/Hiromi/Spectrum/Yellow Wurlitzer Blues.midi",
+    "windows": 8,
+    "tokens": 8150,
+    "ce": 17024.4833984375,
+    "cat_ce": [
+     8029.3934326171875,
+     4504.472839355469,
+     4467.830383300781,
+     22.787327483296394,
+     0.0
+    ],
+    "cat_n": [
+     2701,
+     2701,
+     2701,
+     47,
+     0
+    ],
+    "pitch_marg": 5470.2738037109375,
+    "pitch_tok": 8029.3934326171875,
+    "mean_ce": 2.0888936685199386
+   },
+   {
+    "path": "studio/Hiromi/Oscar, With Love -  The Songs of Oscar Peterson/Oscar's New Camera.midi",
+    "windows": 8,
+    "tokens": 8155,
+    "ce": 15435.578369140625,
+    "cat_ce": [
+     7828.3154296875,
+     4122.026885986328,
+     3467.2841186523438,
+     17.9519162774086,
+     0.0
+    ],
+    "cat_n": [
+     2706,
+     2706,
+     2706,
+     37,
+     0
+    ],
+    "pitch_marg": 5440.004638671875,
+    "pitch_tok": 7828.3154296875,
+    "mean_ce": 1.8927747846892244
+   },
+   {
+    "path": "studio/Hiromi/Spectrum/Kaleidoscope.midi",
+    "windows": 8,
+    "tokens": 8161,
+    "ce": 14190.68896484375,
+    "cat_ce": [
+     5714.829162597656,
+     4120.0904541015625,
+     4344.925628662109,
+     10.843815267086029,
+     0.0
+    ],
+    "cat_n": [
+     2705,
+     2705,
+     2705,
+     46,
+     0
+    ],
+    "pitch_marg": 3582.444351196289,
+    "pitch_tok": 5714.829162597656,
+    "mean_ce": 1.7388419268280542
+   },
+   {
+    "path": "studio/Hiromi/Spectrum/Once In A Blue Moon.midi",
+    "windows": 8,
+    "tokens": 8158,
+    "ce": 15574.197631835938,
+    "cat_ce": [
+     6747.599182128906,
+     3536.047637939453,
+     5251.6561279296875,
+     38.89428126811981,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     61,
+     0
+    ],
+    "pitch_marg": 4498.858001708984,
+    "pitch_tok": 6747.599182128906,
+    "mean_ce": 1.9090705604113676
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/Lennie's Pennies - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8167,
+    "ce": 17810.9658203125,
+    "cat_ce": [
+     8218.739562988281,
+     4912.1514892578125,
+     4663.339660644531,
+     16.734876841306686,
+     0.0
+    ],
+    "cat_n": [
+     2708,
+     2708,
+     2708,
+     43,
+     0
+    ],
+    "pitch_marg": 5739.048156738281,
+    "pitch_tok": 8218.739562988281,
+    "mean_ce": 2.1808455761371985
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/You've Got To Be Modernistic - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8152,
+    "ce": 15112.790405273438,
+    "cat_ce": [
+     6998.94580078125,
+     3493.9801635742188,
+     4604.759002685547,
+     15.105158805847168,
+     0.0
+    ],
+    "cat_n": [
+     2707,
+     2707,
+     2707,
+     31,
+     0
+    ],
+    "pitch_marg": 4825.1829833984375,
+    "pitch_tok": 6998.94580078125,
+    "mean_ce": 1.8538751723838858
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/117th Street - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8166,
+    "ce": 18234.892700195312,
+    "cat_ce": [
+     8380.614624023438,
+     4455.3223876953125,
+     5347.75927734375,
+     51.19666004180908,
+     0.0
+    ],
+    "cat_n": [
+     2701,
+     2701,
+     2701,
+     63,
+     0
+    ],
+    "pitch_marg": 5972.585754394531,
+    "pitch_tok": 8380.614624023438,
+    "mean_ce": 2.2330262919661172
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/Drop Me A Line - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8149,
+    "ce": 18143.5048828125,
+    "cat_ce": [
+     7470.4158935546875,
+     4957.461120605469,
+     5692.3785400390625,
+     23.24954903125763,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     52,
+     0
+    ],
+    "pitch_marg": 5323.539245605469,
+    "pitch_tok": 7470.4158935546875,
+    "mean_ce": 2.226470104652411
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/Hallucinations - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8170,
+    "ce": 16688.48828125,
+    "cat_ce": [
+     7876.087890625,
+     4471.994873046875,
+     4329.46240234375,
+     10.942330688238144,
+     0.0
+    ],
+    "cat_n": [
+     2711,
+     2711,
+     2711,
+     37,
+     0
+    ],
+    "pitch_marg": 5530.0394287109375,
+    "pitch_tok": 7876.087890625,
+    "mean_ce": 2.042654624388005
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/New York - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 8,
+    "tokens": 8150,
+    "ce": 19192.40380859375,
+    "cat_ce": [
+     8502.53515625,
+     4513.6295166015625,
+     6145.8585205078125,
+     30.380353450775146,
+     0.0
+    ],
+    "cat_n": [
+     2703,
+     2703,
+     2703,
+     41,
+     0
+    ],
+    "pitch_marg": 6283.234375,
+    "pitch_tok": 8502.53515625,
+    "mean_ce": 2.354896172833589
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/Street Of Dreams - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 5,
+    "tokens": 5083,
+    "ce": 13263.37353515625,
+    "cat_ce": [
+     5250.8095703125,
+     3261.5313110351562,
+     4712.955261230469,
+     38.077223777770996,
+     0.0
+    ],
+    "cat_n": [
+     1679,
+     1679,
+     1679,
+     46,
+     0
+    ],
+    "pitch_marg": 3695.3099365234375,
+    "pitch_tok": 5250.8095703125,
+    "mean_ce": 2.6093593419548005
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/'Round Midnight - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 7,
+    "tokens": 6463,
+    "ce": 16126.6025390625,
+    "cat_ce": [
+     6539.442565917969,
+     3896.4901733398438,
+     5656.435028076172,
+     34.23466873168945,
+     0.0
+    ],
+    "cat_n": [
+     2138,
+     2138,
+     2138,
+     49,
+     0
+    ],
+    "pitch_marg": 4693.777893066406,
+    "pitch_tok": 6539.442565917969,
+    "mean_ce": 2.495219331434705
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/I Fall In Love Too Easily - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 8,
+    "tokens": 8164,
+    "ce": 20387.16748046875,
+    "cat_ce": [
+     7916.650329589844,
+     4998.155517578125,
+     7430.406677246094,
+     41.95530331134796,
+     0.0
+    ],
+    "cat_n": [
+     2698,
+     2698,
+     2698,
+     70,
+     0
+    ],
+    "pitch_marg": 5556.672790527344,
+    "pitch_tok": 7916.650329589844,
+    "mean_ce": 2.4972032680632963
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/Spiritual Medley -  Holy Holy Holy - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 2,
+    "tokens": 1626,
+    "ce": 3786.7939453125,
+    "cat_ce": [
+     1364.626953125,
+     729.3150634765625,
+     1686.22802734375,
+     6.623921275138855,
+     0.0
+    ],
+    "cat_n": [
+     537,
+     537,
+     537,
+     15,
+     0
+    ],
+    "pitch_marg": 916.09521484375,
+    "pitch_tok": 1364.626953125,
+    "mean_ce": 2.3289015653828415
+   },
+   {
+    "path": "studio/Alan Pasqua/Soliloquy/In a Sentimental Mood.midi",
+    "windows": 7,
+    "tokens": 6271,
+    "ce": 15678.768493652344,
+    "cat_ce": [
+     6071.630813598633,
+     3311.4078979492188,
+     6258.597564697266,
+     37.1320663690567,
+     0.0
+    ],
+    "cat_n": [
+     2070,
+     2070,
+     2070,
+     61,
+     0
+    ],
+    "pitch_marg": 4411.416915893555,
+    "pitch_tok": 6071.630813598633,
+    "mean_ce": 2.50020227932584
+   },
+   {
+    "path": "studio/Alan Pasqua/Soliloquy/Lotus Blossom.midi",
+    "windows": 7,
+    "tokens": 6339,
+    "ce": 15914.975463867188,
+    "cat_ce": [
+     5586.467010498047,
+     4471.962982177734,
+     5811.402236938477,
+     45.1433584690094,
+     0.0
+    ],
+    "cat_n": [
+     2087,
+     2087,
+     2087,
+     78,
+     0
+    ],
+    "pitch_marg": 3869.431526184082,
+    "pitch_tok": 5586.467010498047,
+    "mean_ce": 2.510644496587346
+   },
+   {
+    "path": "studio/Alan Pasqua/Day Dream/In the Wee Small Hours of the Morning  Smile.midi",
+    "windows": 6,
+    "tokens": 5983,
+    "ce": 15786.9150390625,
+    "cat_ce": [
+     5727.324890136719,
+     3750.9261474609375,
+     6266.5072021484375,
+     42.15676283836365,
+     0.0
+    ],
+    "cat_n": [
+     1969,
+     1969,
+     1969,
+     76,
+     0
+    ],
+    "pitch_marg": 4122.882141113281,
+    "pitch_tok": 5727.324890136719,
+    "mean_ce": 2.638628620936403
+   },
+   {
+    "path": "studio/Alan Pasqua/Russian Peasant/The Dream.midi",
+    "windows": 7,
+    "tokens": 6449,
+    "ce": 17623.388061523438,
+    "cat_ce": [
+     5729.405181884766,
+     4069.478759765625,
+     7780.9803466796875,
+     43.524518966674805,
+     0.0
+    ],
+    "cat_n": [
+     2119,
+     2119,
+     2119,
+     92,
+     0
+    ],
+    "pitch_marg": 3915.374237060547,
+    "pitch_tok": 5729.405181884766,
+    "mean_ce": 2.7327319059580457
+   },
+   {
+    "path": "studio/Alan Pasqua/Solo/Improvisation 2.midi",
+    "windows": 7,
+    "tokens": 6771,
+    "ce": 17296.861450195312,
+    "cat_ce": [
+     6071.695037841797,
+     4074.717529296875,
+     7094.043518066406,
+     56.404762744903564,
+     0.0
+    ],
+    "cat_n": [
+     2226,
+     2226,
+     2226,
+     93,
+     0
+    ],
+    "pitch_marg": 4172.157135009766,
+    "pitch_tok": 6071.695037841797,
+    "mean_ce": 2.554550502170331
+   }
+  ]
+ },
+ "lora_tok_file_sha256": "2dfc5768949fa2e411bd4f1c88ec7384828cc33ff8154be26e033c4448316e54",
+ "token_matched_updates": 122,
+ "eval_tok": {
+  "val": [
+   {
+    "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/From This Moment On.midi",
+    "windows": 8,
+    "tokens": 7961,
+    "ce": 17646.531127929688,
+    "cat_ce": [
+     7032.4761962890625,
+     4793.088195800781,
+     5792.849914550781,
+     28.116359010338783,
+     0.0
+    ],
+    "cat_n": [
+     2636,
+     2636,
+     2636,
+     53,
+     0
+    ],
+    "pitch_marg": 5133.036865234375,
+    "pitch_tok": 7032.4761962890625,
+    "mean_ce": 2.2166224253146196
+   },
+   {
+    "path": "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi",
+    "windows": 3,
+    "tokens": 2442,
+    "ce": 6005.996276855469,
+    "cat_ce": [
+     2091.657501220703,
+     1194.6906433105469,
+     2702.7022399902344,
+     16.94578456878662,
+     0.0
+    ],
+    "cat_n": [
+     807,
+     807,
+     807,
+     21,
+     0
+    ],
+    "pitch_marg": 1366.22705078125,
+    "pitch_tok": 2091.657501220703,
+    "mean_ce": 2.459457934830249
+   },
+   {
+    "path": "studio/Brad Mehldau/Suite -  April 2020/IV. stopping, listening -  hearing.midi",
+    "windows": 2,
+    "tokens": 1277,
+    "ce": 3344.3324584960938,
+    "cat_ce": [
+     1293.7612609863281,
+     562.8862533569336,
+     1472.6446228027344,
+     15.040179252624512,
+     0.0
+    ],
+    "cat_n": [
+     419,
+     419,
+     419,
+     20,
+     0
+    ],
+    "pitch_marg": 976.7511901855469,
+    "pitch_tok": 1293.7612609863281,
+    "mean_ce": 2.618897774859901
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+    "windows": 3,
+    "tokens": 2717,
+    "ce": 5795.94384765625,
+    "cat_ce": [
+     1838.1361694335938,
+     1738.1865844726562,
+     2202.0701293945312,
+     17.55089235305786,
+     0.0
+    ],
+    "cat_n": [
+     896,
+     896,
+     896,
+     29,
+     0
+    ],
+    "pitch_marg": 1048.8418884277344,
+    "pitch_tok": 1838.1361694335938,
+    "mean_ce": 2.1332145188282112
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi",
+    "windows": 8,
+    "tokens": 8162,
+    "ce": 20080.780029296875,
+    "cat_ce": [
+     8689.802307128906,
+     5672.422271728516,
+     5690.70068359375,
+     27.854883313179016,
+     0.0
+    ],
+    "cat_n": [
+     2701,
+     2701,
+     2701,
+     59,
+     0
+    ],
+    "pitch_marg": 6099.466979980469,
+    "pitch_tok": 8689.802307128906,
+    "mean_ce": 2.460276896507826
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Holland - Live.midi",
+    "windows": 8,
+    "tokens": 8156,
+    "ce": 17663.017333984375,
+    "cat_ce": [
+     5878.06884765625,
+     2987.253875732422,
+     8766.969299316406,
+     30.725398540496826,
+     0.0
+    ],
+    "cat_n": [
+     2692,
+     2692,
+     2692,
+     80,
+     0
+    ],
+    "pitch_marg": 3589.5521850585938,
+    "pitch_tok": 5878.06884765625,
+    "mean_ce": 2.1656470492869513
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Jigsaw Falling into Place - Live.midi",
+    "windows": 8,
+    "tokens": 8158,
+    "ce": 16654.17333984375,
+    "cat_ce": [
+     6126.762512207031,
+     3500.4176330566406,
+     7014.218444824219,
+     12.7742118537426,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     61,
+     0
+    ],
+    "pitch_marg": 3721.3604125976562,
+    "pitch_tok": 6126.762512207031,
+    "mean_ce": 2.041452971297346
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/My Favorite Things - Live.midi",
+    "windows": 8,
+    "tokens": 8154,
+    "ce": 17395.866088867188,
+    "cat_ce": [
+     6583.222717285156,
+     3155.277130126953,
+     7641.1229248046875,
+     16.2430659532547,
+     0.0
+    ],
+    "cat_n": [
+     2698,
+     2698,
+     2698,
+     60,
+     0
+    ],
+    "pitch_marg": 4123.012451171875,
+    "pitch_tok": 6583.222717285156,
+    "mean_ce": 2.133415021936128
+   },
+   {
+    "path": "live/Brad Mehldau/10 Years Solo Live/Teardrop - Live.midi",
+    "windows": 8,
+    "tokens": 8161,
+    "ce": 19302.216674804688,
+    "cat_ce": [
+     6757.880187988281,
+     3323.8238220214844,
+     9198.370422363281,
+     22.141948342323303,
+     0.0
+    ],
+    "cat_n": [
+     2692,
+     2692,
+     2692,
+     85,
+     0
+    ],
+    "pitch_marg": 4339.403503417969,
+    "pitch_tok": 6757.880187988281,
+    "mean_ce": 2.3651778795251426
+   },
+   {
+    "path": "live/Brad Mehldau/Live in Marciac/It's All Right With Me - Live.midi",
+    "windows": 8,
+    "tokens": 8162,
+    "ce": 19743.234130859375,
+    "cat_ce": [
+     9134.809265136719,
+     5301.944030761719,
+     5280.44921875,
+     26.03220546245575,
+     0.0
+    ],
+    "cat_n": [
+     2704,
+     2704,
+     2704,
+     50,
+     0
+    ],
+    "pitch_marg": 6711.955078125,
+    "pitch_tok": 9134.809265136719,
+    "mean_ce": 2.418921113802913
+   },
+   {
+    "path": "live/Brad Mehldau/Live in Marciac/My Favorite Things - Live.midi",
+    "windows": 8,
+    "tokens": 8159,
+    "ce": 16338.052124023438,
+    "cat_ce": [
+     6429.610412597656,
+     2932.3887329101562,
+     6949.424255371094,
+     26.62879055738449,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     62,
+     0
+    ],
+    "pitch_marg": 4221.371368408203,
+    "pitch_tok": 6429.610412597656,
+    "mean_ce": 2.0024576693250933
+   },
+   {
+    "path": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+    "windows": 8,
+    "tokens": 8153,
+    "ce": 18278.691650390625,
+    "cat_ce": [
+     8152.9989013671875,
+     4660.400238037109,
+     5425.055023193359,
+     40.23730027675629,
+     0.0
+    ],
+    "cat_n": [
+     2698,
+     2698,
+     2698,
+     59,
+     0
+    ],
+    "pitch_marg": 5824.310363769531,
+    "pitch_tok": 8152.9989013671875,
+    "mean_ce": 2.2419589906035355
+   }
+  ],
+  "probe": [
+   {
+    "path": "studio/Hiromi/Spectrum/Sepia Effect.midi",
+    "windows": 8,
+    "tokens": 8170,
+    "ce": 15095.456176757812,
+    "cat_ce": [
+     5023.021636962891,
+     4301.737152099609,
+     5751.923889160156,
+     18.773418828845024,
+     0.0
+    ],
+    "cat_n": [
+     2704,
+     2704,
+     2704,
+     58,
+     0
+    ],
+    "pitch_marg": 2810.357749938965,
+    "pitch_tok": 5023.021636962891,
+    "mean_ce": 1.8476690546827188
+   },
+   {
+    "path": "studio/Hiromi/Spectrum/Yellow Wurlitzer Blues.midi",
+    "windows": 8,
+    "tokens": 8150,
+    "ce": 17067.442138671875,
+    "cat_ce": [
+     8048.0103759765625,
+     4516.478820800781,
+     4480.593902587891,
+     22.358873650431633,
+     0.0
+    ],
+    "cat_n": [
+     2701,
+     2701,
+     2701,
+     47,
+     0
+    ],
+    "pitch_marg": 5479.6044921875,
+    "pitch_tok": 8048.0103759765625,
+    "mean_ce": 2.0941646795916413
+   },
+   {
+    "path": "studio/Hiromi/Oscar, With Love -  The Songs of Oscar Peterson/Oscar's New Camera.midi",
+    "windows": 8,
+    "tokens": 8155,
+    "ce": 15448.8583984375,
+    "cat_ce": [
+     7837.518737792969,
+     4130.707550048828,
+     3462.5765991210938,
+     18.055666506290436,
+     0.0
+    ],
+    "cat_n": [
+     2706,
+     2706,
+     2706,
+     37,
+     0
+    ],
+    "pitch_marg": 5444.5943603515625,
+    "pitch_tok": 7837.518737792969,
+    "mean_ce": 1.8944032370861434
+   },
+   {
+    "path": "studio/Hiromi/Spectrum/Kaleidoscope.midi",
+    "windows": 8,
+    "tokens": 8161,
+    "ce": 14231.220092773438,
+    "cat_ce": [
+     5729.0311279296875,
+     4123.514221191406,
+     4368.141754150391,
+     10.532986164093018,
+     0.0
+    ],
+    "cat_n": [
+     2705,
+     2705,
+     2705,
+     46,
+     0
+    ],
+    "pitch_marg": 3586.9212341308594,
+    "pitch_tok": 5729.0311279296875,
+    "mean_ce": 1.7438083681869179
+   },
+   {
+    "path": "studio/Hiromi/Spectrum/Once In A Blue Moon.midi",
+    "windows": 8,
+    "tokens": 8158,
+    "ce": 15647.669799804688,
+    "cat_ce": [
+     6766.154113769531,
+     3545.824020385742,
+     5296.773529052734,
+     38.91839396953583,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     61,
+     0
+    ],
+    "pitch_marg": 4505.2218017578125,
+    "pitch_tok": 6766.154113769531,
+    "mean_ce": 1.9180767099539946
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/Lennie's Pennies - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8167,
+    "ce": 17839.107177734375,
+    "cat_ce": [
+     8220.012329101562,
+     4923.279357910156,
+     4679.1435546875,
+     16.672055155038834,
+     0.0
+    ],
+    "cat_n": [
+     2708,
+     2708,
+     2708,
+     43,
+     0
+    ],
+    "pitch_marg": 5743.652648925781,
+    "pitch_tok": 8220.012329101562,
+    "mean_ce": 2.184291315995393
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/You've Got To Be Modernistic - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8152,
+    "ce": 15150.201293945312,
+    "cat_ce": [
+     7008.6966552734375,
+     3504.8750915527344,
+     4621.56884765625,
+     15.061191380023956,
+     0.0
+    ],
+    "cat_n": [
+     2707,
+     2707,
+     2707,
+     31,
+     0
+    ],
+    "pitch_marg": 4830.030853271484,
+    "pitch_tok": 7008.6966552734375,
+    "mean_ce": 1.85846433929653
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/117th Street - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8166,
+    "ce": 18265.316772460938,
+    "cat_ce": [
+     8381.340454101562,
+     4460.990234375,
+     5371.370422363281,
+     51.61588406562805,
+     0.0
+    ],
+    "cat_n": [
+     2701,
+     2701,
+     2701,
+     63,
+     0
+    ],
+    "pitch_marg": 5965.5374755859375,
+    "pitch_tok": 8381.340454101562,
+    "mean_ce": 2.2367519927089075
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/Drop Me A Line - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8149,
+    "ce": 18219.779052734375,
+    "cat_ce": [
+     7466.8472900390625,
+     4976.377990722656,
+     5753.291259765625,
+     23.26273787021637,
+     0.0
+    ],
+    "cat_n": [
+     2699,
+     2699,
+     2699,
+     52,
+     0
+    ],
+    "pitch_marg": 5319.549743652344,
+    "pitch_tok": 7466.8472900390625,
+    "mean_ce": 2.235830046967036
+   },
+   {
+    "path": "live/Ted Rosenthal/The Maybeck Recital Series, Vol. 38/Hallucinations - Live At Maybeck Recital Hall, Berkeley, CA  October 30, 1994.midi",
+    "windows": 8,
+    "tokens": 8170,
+    "ce": 16721.533081054688,
+    "cat_ce": [
+     7881.739685058594,
+     4486.501708984375,
+     4342.375793457031,
+     10.915564239025116,
+     0.0
+    ],
+    "cat_n": [
+     2711,
+     2711,
+     2711,
+     37,
+     0
+    ],
+    "pitch_marg": 5533.730651855469,
+    "pitch_tok": 7881.739685058594,
+    "mean_ce": 2.0466992755268896
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/New York - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 8,
+    "tokens": 8150,
+    "ce": 19230.010986328125,
+    "cat_ce": [
+     8503.52685546875,
+     4522.925964355469,
+     6172.783874511719,
+     30.77440094947815,
+     0.0
+    ],
+    "cat_n": [
+     2703,
+     2703,
+     2703,
+     41,
+     0
+    ],
+    "pitch_marg": 6281.881103515625,
+    "pitch_tok": 8503.52685546875,
+    "mean_ce": 2.3595105504697087
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/Street Of Dreams - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 5,
+    "tokens": 5083,
+    "ce": 13273.449951171875,
+    "cat_ce": [
+     5252.5587158203125,
+     3266.8833618164062,
+     4715.967468261719,
+     38.04042720794678,
+     0.0
+    ],
+    "cat_n": [
+     1679,
+     1679,
+     1679,
+     46,
+     0
+    ],
+    "pitch_marg": 3696.3030395507812,
+    "pitch_tok": 5252.5587158203125,
+    "mean_ce": 2.611341717720219
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/'Round Midnight - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 7,
+    "tokens": 6463,
+    "ce": 16153.213256835938,
+    "cat_ce": [
+     6538.80322265625,
+     3903.02099609375,
+     5676.569915771484,
+     34.81923818588257,
+     0.0
+    ],
+    "cat_n": [
+     2138,
+     2138,
+     2138,
+     49,
+     0
+    ],
+    "pitch_marg": 4690.241119384766,
+    "pitch_tok": 6538.80322265625,
+    "mean_ce": 2.499336725489082
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/I Fall In Love Too Easily - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 8,
+    "tokens": 8164,
+    "ce": 20432.6005859375,
+    "cat_ce": [
+     7920.927551269531,
+     5015.453857421875,
+     7454.4609375,
+     41.75858664512634,
+     0.0
+    ],
+    "cat_n": [
+     2698,
+     2698,
+     2698,
+     70,
+     0
+    ],
+    "pitch_marg": 5559.771301269531,
+    "pitch_tok": 7920.927551269531,
+    "mean_ce": 2.5027683226283073
+   },
+   {
+    "path": "live/James Williams/The Maybeck Recital Series, Vol. 42/Spiritual Medley -  Holy Holy Holy - Live At Maybeck Recital Hall, Berkeley, CA  August 27, 1995.midi",
+    "windows": 2,
+    "tokens": 1626,
+    "ce": 3800.62744140625,
+    "cat_ce": [
+     1366.6112670898438,
+     733.373779296875,
+     1694.2154541015625,
+     6.426849126815796,
+     0.0
+    ],
+    "cat_n": [
+     537,
+     537,
+     537,
+     15,
+     0
+    ],
+    "pitch_marg": 917.6178588867188,
+    "pitch_tok": 1366.6112670898438,
+    "mean_ce": 2.337409250557349
+   },
+   {
+    "path": "studio/Alan Pasqua/Soliloquy/In a Sentimental Mood.midi",
+    "windows": 7,
+    "tokens": 6271,
+    "ce": 15710.714324951172,
+    "cat_ce": [
+     6068.632675170898,
+     3323.8210372924805,
+     6280.285797119141,
+     37.97483170032501,
+     0.0
+    ],
+    "cat_n": [
+     2070,
+     2070,
+     2070,
+     61,
+     0
+    ],
+    "pitch_marg": 4414.048355102539,
+    "pitch_tok": 6068.632675170898,
+    "mean_ce": 2.5052964957664123
+   },
+   {
+    "path": "studio/Alan Pasqua/Soliloquy/Lotus Blossom.midi",
+    "windows": 7,
+    "tokens": 6339,
+    "ce": 15947.18505859375,
+    "cat_ce": [
+     5602.832702636719,
+     4478.677673339844,
+     5819.887603759766,
+     45.787087202072144,
+     0.0
+    ],
+    "cat_n": [
+     2087,
+     2087,
+     2087,
+     78,
+     0
+    ],
+    "pitch_marg": 3885.2305221557617,
+    "pitch_tok": 5602.832702636719,
+    "mean_ce": 2.5157256757522872
+   },
+   {
+    "path": "studio/Alan Pasqua/Day Dream/In the Wee Small Hours of the Morning  Smile.midi",
+    "windows": 6,
+    "tokens": 5983,
+    "ce": 15829.35888671875,
+    "cat_ce": [
+     5734.23046875,
+     3764.007080078125,
+     6288.257385253906,
+     42.863470792770386,
+     0.0
+    ],
+    "cat_n": [
+     1969,
+     1969,
+     1969,
+     76,
+     0
+    ],
+    "pitch_marg": 4137.468017578125,
+    "pitch_tok": 5734.23046875,
+    "mean_ce": 2.6457226954234914
+   },
+   {
+    "path": "studio/Alan Pasqua/Russian Peasant/The Dream.midi",
+    "windows": 7,
+    "tokens": 6449,
+    "ce": 17677.774658203125,
+    "cat_ce": [
+     5738.283172607422,
+     4081.2804260253906,
+     7814.071990966797,
+     44.13841795921326,
+     0.0
+    ],
+    "cat_n": [
+     2119,
+     2119,
+     2119,
+     92,
+     0
+    ],
+    "pitch_marg": 3926.273193359375,
+    "pitch_tok": 5738.283172607422,
+    "mean_ce": 2.7411652439452823
+   },
+   {
+    "path": "studio/Alan Pasqua/Solo/Improvisation 2.midi",
+    "windows": 7,
+    "tokens": 6771,
+    "ce": 17353.27978515625,
+    "cat_ce": [
+     6081.542236328125,
+     4089.1736450195312,
+     7126.08447265625,
+     56.479267597198486,
+     0.0
+    ],
+    "cat_n": [
+     2226,
+     2226,
+     2226,
+     93,
+     0
+    ],
+    "pitch_marg": 4180.809509277344,
+    "pitch_tok": 6081.542236328125,
+    "mean_ce": 2.5628828511528945
+   }
+  ]
+ }
+}

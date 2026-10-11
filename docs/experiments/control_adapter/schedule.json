@@ -1,0 +1,3996 @@
+{
+ "mode": "--schedule",
+ "arm": null,
+ "seed": null,
+ "checks": {
+  "inputs_match_1726_and_control_manifest": {
+   "ok": true,
+   "mismatches": []
+  },
+  "m0_schedule_equals_1726_run": {
+   "ok": true
+  },
+  "probe_has_no_duplicate_family": {
+   "ok": true
+  },
+  "val_has_10_families_12_recordings": {
+   "ok": true
+  },
+  "token_matched_budget_within_one_window": {
+   "ok": true,
+   "ratios": {
+    "0": 0.9975511909736732,
+    "1": 0.999075915215221,
+    "2": 0.9965149075044523
+   }
+  }
+ },
+ "phases": {},
+ "result": "schedule_done",
+ "stopped_at": null,
+ "inputs": {
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "mehldau_data_sha256": "8501d2aca038d763dbea2149e0ed1171ddcf0107d7d33d6a0d6e5da0c92bd5bb",
+  "mehldau_manifest_sha256": "0b075bceaa24b9b32818b96b36bf428bf3973525b5b79d51c8ea07eda619cf85",
+  "control_data_sha256": "4bd18eefddb5d199e63a2b487ce3358eec4f32c2dbc3bee272afd86d28a6cffc",
+  "control_manifest_sha256": "c6ecfe48e32e642013c7551e07fb9c4595df9800ce095cd916a03b921f7c223f",
+  "m0_lora_sha256": "0b634c8c10b1d48b865b9e26d8eb1f92e6c486d20958a5b90facda2d70896acb"
+ },
+ "schedules": {
+  "M0": {
+   "sha256": "ff2ada516a3610740dbebba07c5ee073760adcef2a1b552537fcf5b043ff3343",
+   "loss_targets": 119650,
+   "distinct_recordings": 48,
+   "steps": [
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Knives Out - Live.midi",
+     "window": 13,
+     "loss_targets": 1013
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+     "window": 0,
+     "loss_targets": 811
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 7,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Los Angeles II - Live.midi",
+     "window": 6,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+     "window": 30,
+     "loss_targets": 555
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/This Here - Live.midi",
+     "window": 5,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Martha My Dear - Live.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 2,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Dream Brother - Live.midi",
+     "window": 4,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+     "window": 3,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Goodbye Storyteller - for Fred Myrow.midi",
+     "window": 11,
+     "loss_targets": 883
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Resignation - Live.midi",
+     "window": 4,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+     "window": 1,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/This Here - Live.midi",
+     "window": 8,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+     "window": 1,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lilac Wine - Live.midi",
+     "window": 7,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/On the Street Where You Live - Live.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/II. stepping outside.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+     "window": 1,
+     "loss_targets": 201
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/I'm Old Fashioned - Live.midi",
+     "window": 1,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+     "window": 5,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XII. lullaby.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+     "window": 6,
+     "loss_targets": 401
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VII. - the day moves by -.midi",
+     "window": 2,
+     "loss_targets": 100
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/On the Street Where You Live - Live.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+     "window": 1,
+     "loss_targets": 201
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 7,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+     "window": 1,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lilac Wine - Live.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lilac Wine - Live.midi",
+     "window": 5,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Goodbye Storyteller - for Fred Myrow.midi",
+     "window": 3,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Resignation - Live.midi",
+     "window": 9,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/On the Street Where You Live - Live.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Resignation - Live.midi",
+     "window": 12,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Hey You - Live.midi",
+     "window": 9,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+     "window": 2,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XI. family harmony.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XI. family harmony.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/This Here - Live.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VII. - the day moves by -.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+     "window": 1,
+     "loss_targets": 201
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+     "window": 1,
+     "loss_targets": 573
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Exit Music (For a Film) - Live [Live].midi",
+     "window": 7,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/And I Love Her - Live.midi",
+     "window": 37,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation I - Lord Watch Over Me - Live.midi",
+     "window": 9,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Countdown - Live.midi",
+     "window": 14,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+     "window": 5,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+     "window": 1,
+     "loss_targets": 201
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+     "window": 5,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XII. lullaby.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/New York State of Mind.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Bittersweet Symphony  Waterloo Sunset - Live.midi",
+     "window": 23,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/How Long Has This Been Going On.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+     "window": 0,
+     "loss_targets": 811
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Storm - Live.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Resignation - Live.midi",
+     "window": 3,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Los Angeles II - Live.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/John Boy - Live.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+     "window": 0,
+     "loss_targets": 811
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XII. lullaby.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/This Here - Live.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+     "window": 12,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/II. stepping outside.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Goodbye Storyteller - for Fred Myrow.midi",
+     "window": 6,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Bittersweet Symphony  Waterloo Sunset - Live.midi",
+     "window": 4,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Things Behind the Sun - Live.midi",
+     "window": 9,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Interstate Love Song - Live.midi",
+     "window": 27,
+     "loss_targets": 1011
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XI. family harmony.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 7,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+     "window": 0,
+     "loss_targets": 811
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/How Long Has This Been Going On.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XII. lullaby.midi",
+     "window": 1,
+     "loss_targets": 439
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Interstate Love Song - Live.midi",
+     "window": 30,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lithium - Live.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/How Long Has This Been Going On.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Things Behind the Sun.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Exit Music (For a Film) - Live [Live].midi",
+     "window": 8,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/New York State of Mind.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/On the Street Where You Live - Live.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/Ron's Place.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+     "window": 6,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lithium - Live.midi",
+     "window": 8,
+     "loss_targets": 180
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+     "window": 20,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Interstate Love Song - Live.midi",
+     "window": 24,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Trailer Park Ghost - Live.midi",
+     "window": 8,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VII. - the day moves by -.midi",
+     "window": 2,
+     "loss_targets": 100
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/How Long Has This Been Going On.midi",
+     "window": 0,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Smells Like Teen Spirit - Live.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/I'm Old Fashioned - Live.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Goodbye Storyteller - for Fred Myrow.midi",
+     "window": 4,
+     "loss_targets": 1019
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/V. remembering before all this.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+     "window": 15,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Interstate Love Song - Live.midi",
+     "window": 39,
+     "loss_targets": 818
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Dream Brother - Live.midi",
+     "window": 21,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Interstate Love Song - Live.midi",
+     "window": 37,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Storm - Live.midi",
+     "window": 6,
+     "loss_targets": 903
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+     "window": 1,
+     "loss_targets": 573
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Knives Out - Live.midi",
+     "window": 13,
+     "loss_targets": 1013
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Things Behind the Sun - Live.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/Ron's Place.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XII. lullaby.midi",
+     "window": 1,
+     "loss_targets": 439
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Bittersweet Symphony  Waterloo Sunset - Live.midi",
+     "window": 28,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Knives Out - Live.midi",
+     "window": 22,
+     "loss_targets": 511
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+     "window": 9,
+     "loss_targets": 1022
+    }
+   ]
+  },
+  "M1": {
+   "sha256": "a234716bf122c75cf9ece37ccd743952c42d14465c95a85efc08f6a000979617",
+   "loss_targets": 121201,
+   "distinct_recordings": 47,
+   "steps": [
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/V. remembering before all this.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+     "window": 7,
+     "loss_targets": 183
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/This Here - Live.midi",
+     "window": 10,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Knives Out - Live.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+     "window": 1,
+     "loss_targets": 1017
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+     "window": 3,
+     "loss_targets": 301
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/How Long Has This Been Going On.midi",
+     "window": 7,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Countdown - Live.midi",
+     "window": 7,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Martha My Dear - Live.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Hey You - Live.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Things Behind the Sun - Live.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Knives Out - Live.midi",
+     "window": 21,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/And I Love Her - Live.midi",
+     "window": 27,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Exit Music (For a Film) - Live [Live].midi",
+     "window": 7,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+     "window": 14,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+     "window": 3,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Interstate Love Song - Live.midi",
+     "window": 14,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+     "window": 3,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+     "window": 14,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Dream Brother - Live.midi",
+     "window": 29,
+     "loss_targets": 592
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+     "window": 3,
+     "loss_targets": 301
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lilac Wine - Live.midi",
+     "window": 1,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XI. family harmony.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/New York State of Mind.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/I'm Old Fashioned - Live.midi",
+     "window": 3,
+     "loss_targets": 152
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 3,
+     "loss_targets": 1008
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+     "window": 9,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Martha My Dear - Live.midi",
+     "window": 7,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Martha My Dear - Live.midi",
+     "window": 0,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/This Here - Live.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Paranoid Android.midi",
+     "window": 25,
+     "loss_targets": 1015
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Los Angeles II - Live.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Trailer Park Ghost - Live.midi",
+     "window": 5,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/John Boy - Live.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+     "window": 1,
+     "loss_targets": 201
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Trailer Park Ghost - Live.midi",
+     "window": 16,
+     "loss_targets": 1017
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Exit Music (For a Film) - Live [Live].midi",
+     "window": 12,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/John Boy - Live.midi",
+     "window": 3,
+     "loss_targets": 825
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/This Here - Live.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+     "window": 22,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 4,
+     "loss_targets": 577
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Martha My Dear - Live.midi",
+     "window": 6,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Things Behind the Sun - Live.midi",
+     "window": 5,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/Ron's Place.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Goodbye Storyteller - for Fred Myrow.midi",
+     "window": 8,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Bittersweet Symphony  Waterloo Sunset - Live.midi",
+     "window": 25,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lithium - Live.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Smells Like Teen Spirit - Live.midi",
+     "window": 8,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Trailer Park Ghost - Live.midi",
+     "window": 17,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Resignation - Live.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Knives Out - Live.midi",
+     "window": 16,
+     "loss_targets": 1017
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/V. remembering before all this.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/This Here - Live.midi",
+     "window": 13,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/John Boy - Live.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+     "window": 5,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation I - Lord Watch Over Me - Live.midi",
+     "window": 5,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/Ron's Place.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Goodbye Storyteller - for Fred Myrow.midi",
+     "window": 9,
+     "loss_targets": 1010
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Smells Like Teen Spirit - Live.midi",
+     "window": 19,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Storm - Live.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lilac Wine - Live.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+     "window": 1,
+     "loss_targets": 201
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+     "window": 0,
+     "loss_targets": 811
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/On the Street Where You Live - Live.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+     "window": 8,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+     "window": 2,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/New York State of Mind.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XI. family harmony.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Dream Brother - Live.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+     "window": 4,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Things Behind the Sun - Live.midi",
+     "window": 9,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Smells Like Teen Spirit - Live.midi",
+     "window": 10,
+     "loss_targets": 1013
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+     "window": 7,
+     "loss_targets": 183
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/New York State of Mind.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+     "window": 12,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/I'm Old Fashioned - Live.midi",
+     "window": 3,
+     "loss_targets": 152
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XII. lullaby.midi",
+     "window": 1,
+     "loss_targets": 439
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+     "window": 1,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+     "window": 8,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/And I Love Her - Live.midi",
+     "window": 38,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Bittersweet Symphony  Waterloo Sunset - Live.midi",
+     "window": 1,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Los Angeles II - Live.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+     "window": 0,
+     "loss_targets": 811
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/On the Street Where You Live - Live.midi",
+     "window": 3,
+     "loss_targets": 1009
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Goodbye Storyteller - for Fred Myrow.midi",
+     "window": 3,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Storm - Live.midi",
+     "window": 6,
+     "loss_targets": 903
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/How Long Has This Been Going On.midi",
+     "window": 7,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Bittersweet Symphony  Waterloo Sunset - Live.midi",
+     "window": 33,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Things Behind the Sun - Live.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Los Angeles II - Live.midi",
+     "window": 5,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lithium - Live.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Trailer Park Ghost - Live.midi",
+     "window": 13,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/II. stepping outside.midi",
+     "window": 1,
+     "loss_targets": 876
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/V. remembering before all this.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/II. stepping outside.midi",
+     "window": 1,
+     "loss_targets": 876
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/III. keeping distance.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+     "window": 29,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+     "window": 23,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lithium - Live.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/V. remembering before all this.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lilac Wine - Live.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Martha My Dear - Live.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lithium - Live.midi",
+     "window": 7,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Knives Out - Live.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Interstate Love Song - Live.midi",
+     "window": 6,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/And I Love Her - Live.midi",
+     "window": 36,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+     "window": 14,
+     "loss_targets": 686
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+     "window": 4,
+     "loss_targets": 1020
+    }
+   ]
+  },
+  "M2": {
+   "sha256": "aba3c723dc59069cfd5354ecb16a646609dabb253c546a69410c93b071fd2374",
+   "loss_targets": 117357,
+   "distinct_recordings": 49,
+   "steps": [
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/II. stepping outside.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+     "window": 1,
+     "loss_targets": 201
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+     "window": 4,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/And I Love Her - Live.midi",
+     "window": 38,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+     "window": 0,
+     "loss_targets": 811
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+     "window": 5,
+     "loss_targets": 262
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Los Angeles II - Live.midi",
+     "window": 6,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+     "window": 13,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Goodbye Storyteller - for Fred Myrow.midi",
+     "window": 7,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 4,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+     "window": 0,
+     "loss_targets": 811
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/John Boy - Live.midi",
+     "window": 3,
+     "loss_targets": 825
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Hey You - Live.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Hey You - Live.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/V. remembering before all this.midi",
+     "window": 2,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 8,
+     "loss_targets": 693
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XI. family harmony.midi",
+     "window": 3,
+     "loss_targets": 826
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation I - Lord Watch Over Me - Live.midi",
+     "window": 8,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+     "window": 11,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Martha My Dear - Live.midi",
+     "window": 5,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/John Boy - Live.midi",
+     "window": 3,
+     "loss_targets": 825
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+     "window": 1,
+     "loss_targets": 573
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Things Behind the Sun - Live.midi",
+     "window": 7,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+     "window": 4,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+     "window": 5,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Trailer Park Ghost - Live.midi",
+     "window": 14,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Smells Like Teen Spirit - Live.midi",
+     "window": 11,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lithium - Live.midi",
+     "window": 8,
+     "loss_targets": 180
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+     "window": 7,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+     "window": 3,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Hey You - Live.midi",
+     "window": 13,
+     "loss_targets": 301
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/How Long Has This Been Going On.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Things Behind the Sun.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+     "window": 9,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+     "window": 1,
+     "loss_targets": 573
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+     "window": 23,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/And I Love Her - Live.midi",
+     "window": 31,
+     "loss_targets": 1013
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+     "window": 9,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/III. keeping distance.midi",
+     "window": 1,
+     "loss_targets": 756
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XII. lullaby.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/II. stepping outside.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Countdown - Live.midi",
+     "window": 7,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+     "window": 14,
+     "loss_targets": 686
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+     "window": 2,
+     "loss_targets": 273
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/V. remembering before all this.midi",
+     "window": 2,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+     "window": 6,
+     "loss_targets": 401
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/And I Love Her - Live.midi",
+     "window": 3,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+     "window": 5,
+     "loss_targets": 262
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+     "window": 1,
+     "loss_targets": 1015
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/II. stepping outside.midi",
+     "window": 1,
+     "loss_targets": 876
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/John Boy - Live.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+     "window": 5,
+     "loss_targets": 1017
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/New York State of Mind.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+     "window": 14,
+     "loss_targets": 175
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+     "window": 1,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Exit Music (For a Film) - Live [Live].midi",
+     "window": 22,
+     "loss_targets": 824
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/Ron's Place.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Martha My Dear - Live.midi",
+     "window": 0,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/I. waking up.midi",
+     "window": 0,
+     "loss_targets": 811
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Interstate Love Song - Live.midi",
+     "window": 39,
+     "loss_targets": 818
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Storm - Live.midi",
+     "window": 5,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Paranoid Android.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Dream Brother - Live.midi",
+     "window": 10,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/God Only Knows - Live.midi",
+     "window": 14,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Lilac Wine - Live.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+     "window": 3,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/This Here - Live.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+     "window": 1,
+     "loss_targets": 201
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/On the Street Where You Live - Live.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Exit Music (For a Film) - Live [Live].midi",
+     "window": 18,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Things Behind the Sun.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Waltz for J. B. - Live.midi",
+     "window": 5,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VII. - the day moves by -.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+     "window": 2,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Resignation - Live.midi",
+     "window": 13,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Things Behind the Sun - Live.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/How Long Has This Been Going On.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Trailer Park Ghost - Live.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/V. remembering before all this.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Smells Like Teen Spirit - Live.midi",
+     "window": 20,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Bittersweet Symphony  Waterloo Sunset - Live.midi",
+     "window": 32,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+     "window": 1,
+     "loss_targets": 573
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/III. keeping distance.midi",
+     "window": 1,
+     "loss_targets": 756
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/IX. waiting.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Secret Love - Live.midi",
+     "window": 4,
+     "loss_targets": 577
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Intro.midi",
+     "window": 1,
+     "loss_targets": 573
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+     "window": 5,
+     "loss_targets": 1008
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Exit Music (For a Film) - Live [Live].midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VII. - the day moves by -.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Knives Out - Live.midi",
+     "window": 13,
+     "loss_targets": 1013
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/VIII. yearning.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 1,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Blackbird - Live.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/XI. family harmony.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Brad Mehldau/Suite -  April 2020/Look for the Silver Lining.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/When I Fall In Love.midi",
+     "window": 3,
+     "loss_targets": 301
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Smells Like Teen Spirit - Live.midi",
+     "window": 9,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Goodbye Storyteller - for Fred Myrow.midi",
+     "window": 10,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Knives Out - Live.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Unrequited - Live.midi",
+     "window": 14,
+     "loss_targets": 686
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/River Man.midi",
+     "window": 6,
+     "loss_targets": 996
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Tokyo/Monk's Dream.midi",
+     "window": 12,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Brad Mehldau/10 Years Solo Live/Meditation II - Love Meditation - Live.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Brad Mehldau/Live in Marciac/Dat Dere - Live.midi",
+     "window": 0,
+     "loss_targets": 1020
+    }
+   ]
+  },
+  "C0": {
+   "sha256": "3672e49330789f66ec163c7609fc9a15890c86505406cd2d9be604336dadab19",
+   "loss_targets": 125456,
+   "distinct_recordings": 47,
+   "steps": [
+    {
+     "path": "live/John Colianni/The Maybeck Recital Series, Vol. 37/Basin Street Dreams - Live At Maybeck Recital Hall, Berkeley, CA  November 14-16, 1994.midi",
+     "window": 6,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+     "window": 4,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Teddy Wilson/Alone/Sweet Georgia Brown.midi",
+     "window": 2,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 5,
+     "loss_targets": 1016
+    },
+    {
+     "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+     "window": 6,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 1,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/McCoy Tyner/Things Ain’t What They Used To Be (Live)/Things Ain't What They Used To Be - Live At Merkin Hall, NYC  1989  Remastered.midi",
+     "window": 2,
+     "loss_targets": 1019
+    },
+    {
+     "path": "studio/George Shearing/The Shearing Piano/Stella By Starlight.midi",
+     "window": 0,
+     "loss_targets": 1012
+    },
+    {
+     "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+     "window": 1,
+     "loss_targets": 800
+    },
+    {
+     "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+     "window": 11,
+     "loss_targets": 276
+    },
+    {
+     "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Ralph Sutton/The Maybeck Recital Series, Vol. 30/Echo Of Spring - Live At Maybeck Recital Hall, Berkeley, CA  August 8, 1993.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 8,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Don Friedman/The Maybeck Recital Series, Vol. 33/How Deep Is The Ocean - Live At Maybeck Recital Hall, Berkeley, CA  September 5, 1993.midi",
+     "window": 5,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Kenny Drew Jr/The Maybeck Recital Series, Vol. 39/Waitin' For My Dearie - Live At Maybeck Recital Hall, Berkeley, CA  August 7, 1994.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Toshiko Akiyoshi/The Maybeck Recital Series, Vol. 36/Come Sunday - Live.midi",
+     "window": 6,
+     "loss_targets": 139
+    },
+    {
+     "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/George Cables/The Maybeck Recital Series, Vol. 35/Over The Rainbow - Live At Maybeck Recital Hall, Berkeley, CA  January 9, 1994.midi",
+     "window": 8,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/John Hicks/The Maybeck Recital Series, Vol. 7/Speak Low - Live At Maybeck Recital Hall, Berkeley, CA  August 1990.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+     "window": 1,
+     "loss_targets": 1011
+    },
+    {
+     "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+     "window": 5,
+     "loss_targets": 244
+    },
+    {
+     "path": "studio/Marcus Roberts/Marcus Roberts -  The Joy of Joplin/Everything's Cool - Instrumental.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+     "window": 1,
+     "loss_targets": 800
+    },
+    {
+     "path": "live/Allen Farnham/The Maybeck Recital Series, Vol. 41/The Carpal Tunnel Blues - Live At Maybeck Recital Hall, Berkeley, CA  June 12, 1994.midi",
+     "window": 3,
+     "loss_targets": 1014
+    },
+    {
+     "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+     "window": 1,
+     "loss_targets": 1011
+    },
+    {
+     "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Jaki Byard/The Maybeck Recital Series, Vol. 17/Family Suite - Live At Maybeck Recital Hall, Berkeley, CA  September 8, 1991.midi",
+     "window": 18,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Denny Zeitlin/The Maybeck Recital Series, Vol. 27/The Girl Next Door - Live At Maybeck Recital Hall, Berkeley, California  October 18, 1992.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Toshiko Akiyoshi/The Maybeck Recital Series, Vol. 36/Come Sunday - Live.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+     "window": 5,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+     "window": 4,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Kenny Drew Jr/The Maybeck Recital Series, Vol. 39/Waitin' For My Dearie - Live At Maybeck Recital Hall, Berkeley, CA  August 7, 1994.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Kenny Drew Jr/The Maybeck Recital Series, Vol. 39/Waitin' For My Dearie - Live At Maybeck Recital Hall, Berkeley, CA  August 7, 1994.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+     "window": 4,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+     "window": 9,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Toshiko Akiyoshi/The Maybeck Recital Series, Vol. 36/Come Sunday - Live.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+     "window": 3,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Joanne Brackeen/The Maybeck Recital Series, Vol. 1/The Most Beautiful Girl In The World.midi",
+     "window": 9,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Chick Corea/Solo Piano -  Standards/How Deep Is The Ocean - Live.midi",
+     "window": 4,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 0,
+     "loss_targets": 1016
+    },
+    {
+     "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+     "window": 1,
+     "loss_targets": 800
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 1,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+     "window": 10,
+     "loss_targets": 1017
+    },
+    {
+     "path": "studio/George Shearing/The Shearing Piano/Stella By Starlight.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Denny Zeitlin/The Maybeck Recital Series, Vol. 27/The Girl Next Door - Live At Maybeck Recital Hall, Berkeley, California  October 18, 1992.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+     "window": 11,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+     "window": 10,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Teddy Wilson/Alone/Sweet Georgia Brown.midi",
+     "window": 5,
+     "loss_targets": 574
+    },
+    {
+     "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+     "window": 12,
+     "loss_targets": 491
+    },
+    {
+     "path": "live/Chick Corea/Solo Piano -  Standards/How Deep Is The Ocean - Live.midi",
+     "window": 3,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+     "window": 2,
+     "loss_targets": 513
+    },
+    {
+     "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+     "window": 9,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Buddy Montgomery/The Maybeck Recital Series, Vol. 15/Soft Winds - Live At Maybeck Recital Hall, Berkeley, CA  1991.midi",
+     "window": 7,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+     "window": 10,
+     "loss_targets": 1017
+    },
+    {
+     "path": "studio/Duke Jordan/One For The Library/No Problem.midi",
+     "window": 2,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+     "window": 5,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+     "window": 9,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Marcus Roberts/Marcus Roberts -  The Joy of Joplin/Everything's Cool - Instrumental.midi",
+     "window": 2,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Jaki Byard/The Maybeck Recital Series, Vol. 17/Family Suite - Live At Maybeck Recital Hall, Berkeley, CA  September 8, 1991.midi",
+     "window": 7,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Alan Broadbent/The Maybeck Recital Series, Vol. 14/Peace - Live At Maybeck Recital Hall  Berkeley, CA.midi",
+     "window": 5,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Buddy Montgomery/The Maybeck Recital Series, Vol. 15/Soft Winds - Live At Maybeck Recital Hall, Berkeley, CA  1991.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Ellis Larkins/The Maybeck Recital Series, Vol. 22/Blue Skies - Live At Maybeck Recital Hall, Berkeley, CA  March 29, 1992.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Allen Farnham/The Maybeck Recital Series, Vol. 41/The Carpal Tunnel Blues - Live At Maybeck Recital Hall, Berkeley, CA  June 12, 1994.midi",
+     "window": 6,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/George Cables/The Maybeck Recital Series, Vol. 35/Over The Rainbow - Live At Maybeck Recital Hall, Berkeley, CA  January 9, 1994.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Denny Zeitlin/The Maybeck Recital Series, Vol. 27/The Girl Next Door - Live At Maybeck Recital Hall, Berkeley, California  October 18, 1992.midi",
+     "window": 5,
+     "loss_targets": 732
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 0,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Jessica Williams/The Maybeck Recital Series, Vol. 21/Kristen - Live At Maybeck Recital Hall, Berkeley, CA  February 16, 1992.midi",
+     "window": 10,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+     "window": 9,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+     "window": 0,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Alan Broadbent/The Maybeck Recital Series, Vol. 14/Peace - Live At Maybeck Recital Hall  Berkeley, CA.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Marcus Roberts/Marcus Roberts -  The Joy of Joplin/Everything's Cool - Instrumental.midi",
+     "window": 1,
+     "loss_targets": 1019
+    },
+    {
+     "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+     "window": 4,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Marian McPartland/Live At Maybeck Recital Hall/Turn Around - Live At Maybeck Recital Hall, Berkeley, CA  January 20, 1991.midi",
+     "window": 3,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+     "window": 5,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Marian McPartland/Live At Maybeck Recital Hall/Turn Around - Live At Maybeck Recital Hall, Berkeley, CA  January 20, 1991.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+     "window": 0,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Jaki Byard/The Maybeck Recital Series, Vol. 17/Family Suite - Live At Maybeck Recital Hall, Berkeley, CA  September 8, 1991.midi",
+     "window": 5,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 3,
+     "loss_targets": 1014
+    },
+    {
+     "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+     "window": 0,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+     "window": 6,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Duke Jordan/One For The Library/No Problem.midi",
+     "window": 2,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Gene Harris/The Maybeck Recital Series, Vol. 23/Penthouse Serenade - Live At Maybeck Recital Hall, Berkeley, CA  1993.midi",
+     "window": 6,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 0,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+     "window": 9,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Jaki Byard/The Maybeck Recital Series, Vol. 17/Family Suite - Live At Maybeck Recital Hall, Berkeley, CA  September 8, 1991.midi",
+     "window": 8,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Gene Harris/The Maybeck Recital Series, Vol. 23/Penthouse Serenade - Live At Maybeck Recital Hall, Berkeley, CA  1993.midi",
+     "window": 11,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 9,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Bill Cunliffe/Cunliffe, Bill -  Satisfaction/Polka Dots And Moonbeams.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+     "window": 0,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+     "window": 5,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Marian McPartland/Live At Maybeck Recital Hall/Turn Around - Live At Maybeck Recital Hall, Berkeley, CA  January 20, 1991.midi",
+     "window": 4,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Toshiko Akiyoshi/The Maybeck Recital Series, Vol. 36/Come Sunday - Live.midi",
+     "window": 5,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 0,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 10,
+     "loss_targets": 875
+    },
+    {
+     "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+     "window": 9,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Duke Jordan/One For The Library/No Problem.midi",
+     "window": 2,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/John Colianni/The Maybeck Recital Series, Vol. 37/Basin Street Dreams - Live At Maybeck Recital Hall, Berkeley, CA  November 14-16, 1994.midi",
+     "window": 4,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Denny Zeitlin/The Maybeck Recital Series, Vol. 27/The Girl Next Door - Live At Maybeck Recital Hall, Berkeley, California  October 18, 1992.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Chris Anderson/From the Heart/There's a Lull in My Life.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Kenny Werner/The Maybeck Recital Series, Vol. 34/Roberta Moon - Live At Maybeck Recital Hall, Berkeley, CA  February 27, 1994.midi",
+     "window": 11,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+     "window": 5,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Jed Distler/Quiet Now/Your Story.midi",
+     "window": 0,
+     "loss_targets": 1015
+    },
+    {
+     "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+     "window": 4,
+     "loss_targets": 1003
+    },
+    {
+     "path": "live/Barry Harris/The Maybeck Recital Series, Vol. 12/Would You Like To Take A Walk - Live At Maybeck Recital Hall, Berkeley, CA  March 12, 1990.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/George Shearing/The Shearing Piano/Stella By Starlight.midi",
+     "window": 3,
+     "loss_targets": 1021
+    }
+   ]
+  },
+  "C1": {
+   "sha256": "a245730fd366e6783c87095ef116bc8745e3f2dae6206e56f89bf800ca290b15",
+   "loss_targets": 124654,
+   "distinct_recordings": 47,
+   "steps": [
+    {
+     "path": "live/Barry Harris/The Maybeck Recital Series, Vol. 12/Would You Like To Take A Walk - Live At Maybeck Recital Hall, Berkeley, CA  March 12, 1990.midi",
+     "window": 0,
+     "loss_targets": 1015
+    },
+    {
+     "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+     "window": 7,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 10,
+     "loss_targets": 875
+    },
+    {
+     "path": "live/John Colianni/The Maybeck Recital Series, Vol. 37/Basin Street Dreams - Live At Maybeck Recital Hall, Berkeley, CA  November 14-16, 1994.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+     "window": 7,
+     "loss_targets": 320
+    },
+    {
+     "path": "live/Alan Broadbent/The Maybeck Recital Series, Vol. 14/Peace - Live At Maybeck Recital Hall  Berkeley, CA.midi",
+     "window": 6,
+     "loss_targets": 789
+    },
+    {
+     "path": "live/John Colianni/The Maybeck Recital Series, Vol. 37/Basin Street Dreams - Live At Maybeck Recital Hall, Berkeley, CA  November 14-16, 1994.midi",
+     "window": 6,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+     "window": 0,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Chris Anderson/From the Heart/There's a Lull in My Life.midi",
+     "window": 3,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Buddy Montgomery/The Maybeck Recital Series, Vol. 15/Soft Winds - Live At Maybeck Recital Hall, Berkeley, CA  1991.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+     "window": 3,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Joanne Brackeen/The Maybeck Recital Series, Vol. 1/The Most Beautiful Girl In The World.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Alan Broadbent/The Maybeck Recital Series, Vol. 14/Peace - Live At Maybeck Recital Hall  Berkeley, CA.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Duke Jordan/One For The Library/No Problem.midi",
+     "window": 4,
+     "loss_targets": 300
+    },
+    {
+     "path": "live/John Hicks/The Maybeck Recital Series, Vol. 7/Speak Low - Live At Maybeck Recital Hall, Berkeley, CA  August 1990.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+     "window": 0,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Don Friedman/The Maybeck Recital Series, Vol. 33/How Deep Is The Ocean - Live At Maybeck Recital Hall, Berkeley, CA  September 5, 1993.midi",
+     "window": 11,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Alan Broadbent/The Maybeck Recital Series, Vol. 14/Peace - Live At Maybeck Recital Hall  Berkeley, CA.midi",
+     "window": 4,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 7,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+     "window": 8,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/George Shearing/The Shearing Piano/Stella By Starlight.midi",
+     "window": 3,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/McCoy Tyner/Things Ain’t What They Used To Be (Live)/Things Ain't What They Used To Be - Live At Merkin Hall, NYC  1989  Remastered.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+     "window": 8,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Duke Jordan/One For The Library/No Problem.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 4,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Marian McPartland/Live At Maybeck Recital Hall/Turn Around - Live At Maybeck Recital Hall, Berkeley, CA  January 20, 1991.midi",
+     "window": 5,
+     "loss_targets": 217
+    },
+    {
+     "path": "live/Allen Farnham/The Maybeck Recital Series, Vol. 41/The Carpal Tunnel Blues - Live At Maybeck Recital Hall, Berkeley, CA  June 12, 1994.midi",
+     "window": 6,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 1,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Ralph Sutton/The Maybeck Recital Series, Vol. 30/Echo Of Spring - Live At Maybeck Recital Hall, Berkeley, CA  August 8, 1993.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+     "window": 15,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 3,
+     "loss_targets": 1014
+    },
+    {
+     "path": "studio/Jed Distler/Quiet Now/Your Story.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Ellis Larkins/The Maybeck Recital Series, Vol. 22/Blue Skies - Live At Maybeck Recital Hall, Berkeley, CA  March 29, 1992.midi",
+     "window": 8,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Chris Anderson/From the Heart/There's a Lull in My Life.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+     "window": 7,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Hank Jones/SOLO 1976 A Tribute to Duke Ellington/Satin Doll.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+     "window": 6,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Ellis Larkins/The Maybeck Recital Series, Vol. 22/Blue Skies - Live At Maybeck Recital Hall, Berkeley, CA  March 29, 1992.midi",
+     "window": 7,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Ralph Sutton/The Maybeck Recital Series, Vol. 30/Echo Of Spring - Live At Maybeck Recital Hall, Berkeley, CA  August 8, 1993.midi",
+     "window": 9,
+     "loss_targets": 174
+    },
+    {
+     "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+     "window": 18,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Teddy Wilson/Alone/Sweet Georgia Brown.midi",
+     "window": 5,
+     "loss_targets": 574
+    },
+    {
+     "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 1,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/John Hicks/The Maybeck Recital Series, Vol. 7/Speak Low - Live At Maybeck Recital Hall, Berkeley, CA  August 1990.midi",
+     "window": 3,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+     "window": 8,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 6,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Jessica Williams/The Maybeck Recital Series, Vol. 21/Kristen - Live At Maybeck Recital Hall, Berkeley, CA  February 16, 1992.midi",
+     "window": 5,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Kenny Werner/The Maybeck Recital Series, Vol. 34/Roberta Moon - Live At Maybeck Recital Hall, Berkeley, CA  February 27, 1994.midi",
+     "window": 4,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Hank Jones/SOLO 1976 A Tribute to Duke Ellington/Satin Doll.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Dave McKenna/Dave McKenna -  Solo/My Cherie Amour.midi",
+     "window": 0,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/John Colianni/The Maybeck Recital Series, Vol. 37/Basin Street Dreams - Live At Maybeck Recital Hall, Berkeley, CA  November 14-16, 1994.midi",
+     "window": 8,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Barry Harris/The Maybeck Recital Series, Vol. 12/Would You Like To Take A Walk - Live At Maybeck Recital Hall, Berkeley, CA  March 12, 1990.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Don Friedman/The Maybeck Recital Series, Vol. 33/How Deep Is The Ocean - Live At Maybeck Recital Hall, Berkeley, CA  September 5, 1993.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 5,
+     "loss_targets": 1016
+    },
+    {
+     "path": "live/Jessica Williams/The Maybeck Recital Series, Vol. 21/Kristen - Live At Maybeck Recital Hall, Berkeley, CA  February 16, 1992.midi",
+     "window": 8,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Jaki Byard/The Maybeck Recital Series, Vol. 17/Family Suite - Live At Maybeck Recital Hall, Berkeley, CA  September 8, 1991.midi",
+     "window": 16,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+     "window": 7,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Gene Harris/The Maybeck Recital Series, Vol. 23/Penthouse Serenade - Live At Maybeck Recital Hall, Berkeley, CA  1993.midi",
+     "window": 6,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Gene Harris/The Maybeck Recital Series, Vol. 23/Penthouse Serenade - Live At Maybeck Recital Hall, Berkeley, CA  1993.midi",
+     "window": 0,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+     "window": 8,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+     "window": 1,
+     "loss_targets": 800
+    },
+    {
+     "path": "live/Kenny Werner/The Maybeck Recital Series, Vol. 34/Roberta Moon - Live At Maybeck Recital Hall, Berkeley, CA  February 27, 1994.midi",
+     "window": 9,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Alan Broadbent/The Maybeck Recital Series, Vol. 14/Peace - Live At Maybeck Recital Hall  Berkeley, CA.midi",
+     "window": 6,
+     "loss_targets": 789
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 2,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Kenny Drew Jr/The Maybeck Recital Series, Vol. 39/Waitin' For My Dearie - Live At Maybeck Recital Hall, Berkeley, CA  August 7, 1994.midi",
+     "window": 4,
+     "loss_targets": 1011
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 1,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Kenny Drew Jr/The Maybeck Recital Series, Vol. 39/Waitin' For My Dearie - Live At Maybeck Recital Hall, Berkeley, CA  August 7, 1994.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+     "window": 10,
+     "loss_targets": 924
+    },
+    {
+     "path": "live/Roland Hanna/The Maybeck Recital Series, Vol. 32/Oleo - Live At Maybeck Recital Hall, Berkeley, CA  August 15, 1993.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Alan Broadbent/The Maybeck Recital Series, Vol. 14/Peace - Live At Maybeck Recital Hall  Berkeley, CA.midi",
+     "window": 3,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/John Hicks/The Maybeck Recital Series, Vol. 7/Speak Low - Live At Maybeck Recital Hall, Berkeley, CA  August 1990.midi",
+     "window": 4,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Chick Corea/Solo Piano -  Standards/How Deep Is The Ocean - Live.midi",
+     "window": 4,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Marian McPartland/Live At Maybeck Recital Hall/Turn Around - Live At Maybeck Recital Hall, Berkeley, CA  January 20, 1991.midi",
+     "window": 4,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/McCoy Tyner/Things Ain’t What They Used To Be (Live)/Things Ain't What They Used To Be - Live At Merkin Hall, NYC  1989  Remastered.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+     "window": 8,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+     "window": 4,
+     "loss_targets": 1017
+    },
+    {
+     "path": "studio/Duke Jordan/One For The Library/No Problem.midi",
+     "window": 2,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Kenny Werner/The Maybeck Recital Series, Vol. 34/Roberta Moon - Live At Maybeck Recital Hall, Berkeley, CA  February 27, 1994.midi",
+     "window": 11,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Joanne Brackeen/The Maybeck Recital Series, Vol. 1/The Most Beautiful Girl In The World.midi",
+     "window": 7,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 1,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Alan Broadbent/The Maybeck Recital Series, Vol. 14/Peace - Live At Maybeck Recital Hall  Berkeley, CA.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/John Colianni/The Maybeck Recital Series, Vol. 37/Basin Street Dreams - Live At Maybeck Recital Hall, Berkeley, CA  November 14-16, 1994.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+     "window": 8,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Kenny Barron/Live At Maybeck Recital Hall, Volume 10/Sunshower - Live At Maybeck Recital Hall, Berkeley, CA  December 3, 1990.midi",
+     "window": 9,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Don Friedman/The Maybeck Recital Series, Vol. 33/How Deep Is The Ocean - Live At Maybeck Recital Hall, Berkeley, CA  September 5, 1993.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 0,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Teddy Wilson/Alone/Sweet Georgia Brown.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+     "window": 2,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Toshiko Akiyoshi/The Maybeck Recital Series, Vol. 36/Come Sunday - Live.midi",
+     "window": 5,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Marcus Roberts/Marcus Roberts -  The Joy of Joplin/Everything's Cool - Instrumental.midi",
+     "window": 5,
+     "loss_targets": 1005
+    },
+    {
+     "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+     "window": 7,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 8,
+     "loss_targets": 1015
+    },
+    {
+     "path": "studio/Duke Jordan/One For The Library/No Problem.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Teddy Wilson/Alone/Sweet Georgia Brown.midi",
+     "window": 5,
+     "loss_targets": 574
+    },
+    {
+     "path": "live/Jessica Williams/The Maybeck Recital Series, Vol. 21/Kristen - Live At Maybeck Recital Hall, Berkeley, CA  February 16, 1992.midi",
+     "window": 5,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Hank Jones/SOLO 1976 A Tribute to Duke Ellington/Satin Doll.midi",
+     "window": 5,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Don Friedman/The Maybeck Recital Series, Vol. 33/How Deep Is The Ocean - Live At Maybeck Recital Hall, Berkeley, CA  September 5, 1993.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Jed Distler/Quiet Now/Your Story.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Barry Harris/The Maybeck Recital Series, Vol. 12/Would You Like To Take A Walk - Live At Maybeck Recital Hall, Berkeley, CA  March 12, 1990.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/George Cables/The Maybeck Recital Series, Vol. 35/Over The Rainbow - Live At Maybeck Recital Hall, Berkeley, CA  January 9, 1994.midi",
+     "window": 4,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Roland Hanna/The Maybeck Recital Series, Vol. 32/Oleo - Live At Maybeck Recital Hall, Berkeley, CA  August 15, 1993.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Ralph Sutton/The Maybeck Recital Series, Vol. 30/Echo Of Spring - Live At Maybeck Recital Hall, Berkeley, CA  August 8, 1993.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Jed Distler/Quiet Now/Your Story.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+     "window": 9,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+     "window": 2,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/John Hicks/The Maybeck Recital Series, Vol. 7/Speak Low - Live At Maybeck Recital Hall, Berkeley, CA  August 1990.midi",
+     "window": 8,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+     "window": 9,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Kenny Barron/Live At Maybeck Recital Hall, Volume 10/Sunshower - Live At Maybeck Recital Hall, Berkeley, CA  December 3, 1990.midi",
+     "window": 14,
+     "loss_targets": 599
+    },
+    {
+     "path": "live/Jessica Williams/The Maybeck Recital Series, Vol. 21/Kristen - Live At Maybeck Recital Hall, Berkeley, CA  February 16, 1992.midi",
+     "window": 7,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+     "window": 9,
+     "loss_targets": 502
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/John Colianni/The Maybeck Recital Series, Vol. 37/Basin Street Dreams - Live At Maybeck Recital Hall, Berkeley, CA  November 14-16, 1994.midi",
+     "window": 3,
+     "loss_targets": 1022
+    }
+   ]
+  },
+  "C2": {
+   "sha256": "61bdc2203f83475e2bac370ea88a24b41b2a68e6f240bd941434da5ed839c8a1",
+   "loss_targets": 124091,
+   "distinct_recordings": 45,
+   "steps": [
+    {
+     "path": "live/George Cables/The Maybeck Recital Series, Vol. 35/Over The Rainbow - Live At Maybeck Recital Hall, Berkeley, CA  January 9, 1994.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+     "window": 5,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+     "window": 4,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+     "window": 9,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Kenny Barron/Live At Maybeck Recital Hall, Volume 10/Sunshower - Live At Maybeck Recital Hall, Berkeley, CA  December 3, 1990.midi",
+     "window": 9,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+     "window": 9,
+     "loss_targets": 1019
+    },
+    {
+     "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+     "window": 0,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Don Friedman/The Maybeck Recital Series, Vol. 33/How Deep Is The Ocean - Live At Maybeck Recital Hall, Berkeley, CA  September 5, 1993.midi",
+     "window": 10,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Teddy Wilson/Alone/Sweet Georgia Brown.midi",
+     "window": 5,
+     "loss_targets": 574
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Oscar Peterson/Solo/Satin Doll - Live.midi",
+     "window": 7,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Ellis Larkins/The Maybeck Recital Series, Vol. 22/Blue Skies - Live At Maybeck Recital Hall, Berkeley, CA  March 29, 1992.midi",
+     "window": 7,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Joanne Brackeen/The Maybeck Recital Series, Vol. 1/The Most Beautiful Girl In The World.midi",
+     "window": 6,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Don Friedman/The Maybeck Recital Series, Vol. 33/How Deep Is The Ocean - Live At Maybeck Recital Hall, Berkeley, CA  September 5, 1993.midi",
+     "window": 8,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+     "window": 8,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 0,
+     "loss_targets": 1012
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 4,
+     "loss_targets": 985
+    },
+    {
+     "path": "live/Ellis Larkins/The Maybeck Recital Series, Vol. 22/Blue Skies - Live At Maybeck Recital Hall, Berkeley, CA  March 29, 1992.midi",
+     "window": 8,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+     "window": 2,
+     "loss_targets": 513
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 7,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+     "window": 8,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/George Shearing/The Shearing Piano/Stella By Starlight.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+     "window": 11,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Ellis Larkins/The Maybeck Recital Series, Vol. 22/Blue Skies - Live At Maybeck Recital Hall, Berkeley, CA  March 29, 1992.midi",
+     "window": 7,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+     "window": 5,
+     "loss_targets": 244
+    },
+    {
+     "path": "live/Kenny Werner/The Maybeck Recital Series, Vol. 34/Roberta Moon - Live At Maybeck Recital Hall, Berkeley, CA  February 27, 1994.midi",
+     "window": 10,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+     "window": 4,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+     "window": 8,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Hank Jones/SOLO 1976 A Tribute to Duke Ellington/Satin Doll.midi",
+     "window": 3,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Kenny Werner/The Maybeck Recital Series, Vol. 34/Roberta Moon - Live At Maybeck Recital Hall, Berkeley, CA  February 27, 1994.midi",
+     "window": 5,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Jessica Williams/The Maybeck Recital Series, Vol. 21/Kristen - Live At Maybeck Recital Hall, Berkeley, CA  February 16, 1992.midi",
+     "window": 8,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+     "window": 1,
+     "loss_targets": 1011
+    },
+    {
+     "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+     "window": 10,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Chris Anderson/From the Heart/There's a Lull in My Life.midi",
+     "window": 1,
+     "loss_targets": 1018
+    },
+    {
+     "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+     "window": 1,
+     "loss_targets": 800
+    },
+    {
+     "path": "studio/Bill Cunliffe/Cunliffe, Bill -  Satisfaction/Polka Dots And Moonbeams.midi",
+     "window": 3,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Ralph Sutton/The Maybeck Recital Series, Vol. 30/Echo Of Spring - Live At Maybeck Recital Hall, Berkeley, CA  August 8, 1993.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+     "window": 4,
+     "loss_targets": 1011
+    },
+    {
+     "path": "live/Kenny Drew Jr/The Maybeck Recital Series, Vol. 39/Waitin' For My Dearie - Live At Maybeck Recital Hall, Berkeley, CA  August 7, 1994.midi",
+     "window": 4,
+     "loss_targets": 1011
+    },
+    {
+     "path": "live/Steve Kuhn/The Maybeck Recital Series, Vol. 13/The Meaning Of The Blues - Live At Maybeck Recital Hall, Berkeley, CA  November 18, 1990.midi",
+     "window": 4,
+     "loss_targets": 985
+    },
+    {
+     "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+     "window": 13,
+     "loss_targets": 1015
+    },
+    {
+     "path": "live/Ralph Sutton/The Maybeck Recital Series, Vol. 30/Echo Of Spring - Live At Maybeck Recital Hall, Berkeley, CA  August 8, 1993.midi",
+     "window": 3,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+     "window": 8,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Ellis Larkins/The Maybeck Recital Series, Vol. 22/Blue Skies - Live At Maybeck Recital Hall, Berkeley, CA  March 29, 1992.midi",
+     "window": 9,
+     "loss_targets": 387
+    },
+    {
+     "path": "live/Roland Hanna/The Maybeck Recital Series, Vol. 32/Oleo - Live At Maybeck Recital Hall, Berkeley, CA  August 15, 1993.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Jaki Byard/The Maybeck Recital Series, Vol. 17/Family Suite - Live At Maybeck Recital Hall, Berkeley, CA  September 8, 1991.midi",
+     "window": 23,
+     "loss_targets": 432
+    },
+    {
+     "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Jessica Williams/The Maybeck Recital Series, Vol. 21/Kristen - Live At Maybeck Recital Hall, Berkeley, CA  February 16, 1992.midi",
+     "window": 10,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/George Cables/The Maybeck Recital Series, Vol. 35/Over The Rainbow - Live At Maybeck Recital Hall, Berkeley, CA  January 9, 1994.midi",
+     "window": 4,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+     "window": 7,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+     "window": 0,
+     "loss_targets": 1012
+    },
+    {
+     "path": "studio/George Shearing/The Shearing Piano/Stella By Starlight.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Barry Harris/The Maybeck Recital Series, Vol. 12/Would You Like To Take A Walk - Live At Maybeck Recital Hall, Berkeley, CA  March 12, 1990.midi",
+     "window": 2,
+     "loss_targets": 1015
+    },
+    {
+     "path": "live/Chick Corea/Solo Piano -  Standards/How Deep Is The Ocean - Live.midi",
+     "window": 3,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/George Cables/The Maybeck Recital Series, Vol. 35/Over The Rainbow - Live At Maybeck Recital Hall, Berkeley, CA  January 9, 1994.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/George Cables/The Maybeck Recital Series, Vol. 35/Over The Rainbow - Live At Maybeck Recital Hall, Berkeley, CA  January 9, 1994.midi",
+     "window": 5,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Ellis Larkins/The Maybeck Recital Series, Vol. 22/Blue Skies - Live At Maybeck Recital Hall, Berkeley, CA  March 29, 1992.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Chick Corea/Solo Piano -  Standards/How Deep Is The Ocean - Live.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+     "window": 1,
+     "loss_targets": 1015
+    },
+    {
+     "path": "live/Roland Hanna/The Maybeck Recital Series, Vol. 32/Oleo - Live At Maybeck Recital Hall, Berkeley, CA  August 15, 1993.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Ellis Larkins/The Maybeck Recital Series, Vol. 22/Blue Skies - Live At Maybeck Recital Hall, Berkeley, CA  March 29, 1992.midi",
+     "window": 4,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Barry Harris/The Maybeck Recital Series, Vol. 12/Would You Like To Take A Walk - Live At Maybeck Recital Hall, Berkeley, CA  March 12, 1990.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Jed Distler/Quiet Now/Your Story.midi",
+     "window": 1,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+     "window": 11,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/John Hicks/The Maybeck Recital Series, Vol. 7/Speak Low - Live At Maybeck Recital Hall, Berkeley, CA  August 1990.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Erroll Garner/Solitaire/Over The Rainbow.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Chick Corea/Solo Piano -  Standards/How Deep Is The Ocean - Live.midi",
+     "window": 2,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+     "window": 0,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Gene Harris/The Maybeck Recital Series, Vol. 23/Penthouse Serenade - Live At Maybeck Recital Hall, Berkeley, CA  1993.midi",
+     "window": 9,
+     "loss_targets": 1020
+    },
+    {
+     "path": "studio/Marcus Roberts/Marcus Roberts -  The Joy of Joplin/Everything's Cool - Instrumental.midi",
+     "window": 5,
+     "loss_targets": 1005
+    },
+    {
+     "path": "studio/Jed Distler/Quiet Now/Your Story.midi",
+     "window": 0,
+     "loss_targets": 1015
+    },
+    {
+     "path": "live/McCoy Tyner/Things Ain’t What They Used To Be (Live)/Things Ain't What They Used To Be - Live At Merkin Hall, NYC  1989  Remastered.midi",
+     "window": 5,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+     "window": 0,
+     "loss_targets": 1013
+    },
+    {
+     "path": "live/Ralph Sutton/The Maybeck Recital Series, Vol. 30/Echo Of Spring - Live At Maybeck Recital Hall, Berkeley, CA  August 8, 1993.midi",
+     "window": 7,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Kenny Drew Jr/The Maybeck Recital Series, Vol. 39/Waitin' For My Dearie - Live At Maybeck Recital Hall, Berkeley, CA  August 7, 1994.midi",
+     "window": 4,
+     "loss_targets": 1011
+    },
+    {
+     "path": "studio/Jed Distler/Quiet Now/Your Story.midi",
+     "window": 0,
+     "loss_targets": 1015
+    },
+    {
+     "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+     "window": 6,
+     "loss_targets": 1016
+    },
+    {
+     "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+     "window": 0,
+     "loss_targets": 1019
+    },
+    {
+     "path": "live/Jim McNeely/The Maybeck Recital Series, Vol. 20/There Will Never Be Another You - Live At Maybeck Recital Hall, Berkeley, CA  January 27, 1992.midi",
+     "window": 3,
+     "loss_targets": 1014
+    },
+    {
+     "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+     "window": 10,
+     "loss_targets": 1017
+    },
+    {
+     "path": "studio/Thelonious Monk/Thelonious Alone In San Francisco/Remember.midi",
+     "window": 1,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Toshiko Akiyoshi/The Maybeck Recital Series, Vol. 36/Come Sunday - Live.midi",
+     "window": 6,
+     "loss_targets": 139
+    },
+    {
+     "path": "live/Barry Harris/The Maybeck Recital Series, Vol. 12/Would You Like To Take A Walk - Live At Maybeck Recital Hall, Berkeley, CA  March 12, 1990.midi",
+     "window": 3,
+     "loss_targets": 368
+    },
+    {
+     "path": "live/Monty Alexander/The Maybeck Recital Series, Vol. 40/The Serpent - Live At Maybeck Recital Hall, Berkeley, CA  September 20, 1994.midi",
+     "window": 8,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Joanne Brackeen/The Maybeck Recital Series, Vol. 1/The Most Beautiful Girl In The World.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Allen Farnham/The Maybeck Recital Series, Vol. 41/The Carpal Tunnel Blues - Live At Maybeck Recital Hall, Berkeley, CA  June 12, 1994.midi",
+     "window": 4,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+     "window": 9,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Chris Anderson/From the Heart/There's a Lull in My Life.midi",
+     "window": 4,
+     "loss_targets": 1003
+    },
+    {
+     "path": "live/Barry Harris/The Maybeck Recital Series, Vol. 12/Would You Like To Take A Walk - Live At Maybeck Recital Hall, Berkeley, CA  March 12, 1990.midi",
+     "window": 0,
+     "loss_targets": 1015
+    },
+    {
+     "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Barry Harris/The Maybeck Recital Series, Vol. 12/Would You Like To Take A Walk - Live At Maybeck Recital Hall, Berkeley, CA  March 12, 1990.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Andy Laverne/The Maybeck Recital Series, Vol. 28/Beautiful Love - Live At Maybeck Recital Hall, Berkeley, CA  April 18, 1993.midi",
+     "window": 1,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Kenny Werner/The Maybeck Recital Series, Vol. 34/Roberta Moon - Live At Maybeck Recital Hall, Berkeley, CA  February 27, 1994.midi",
+     "window": 10,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 8,
+     "loss_targets": 1015
+    },
+    {
+     "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+     "window": 0,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Chick Corea/Solo Piano -  Standards/How Deep Is The Ocean - Live.midi",
+     "window": 3,
+     "loss_targets": 1021
+    },
+    {
+     "path": "studio/Lennie Tristano/Lennie Tristano  The New Tristano/Requiem.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Roland Hanna/The Maybeck Recital Series, Vol. 32/Oleo - Live At Maybeck Recital Hall, Berkeley, CA  August 15, 1993.midi",
+     "window": 4,
+     "loss_targets": 1018
+    },
+    {
+     "path": "live/Fred Hersch/In Amsterdam -  Live at the Bimhuis/A Lark.midi",
+     "window": 9,
+     "loss_targets": 1017
+    },
+    {
+     "path": "live/Michel Camilo/Live in London/The Frim Fram Sauce (Live).midi",
+     "window": 9,
+     "loss_targets": 504
+    },
+    {
+     "path": "studio/George Colligan/Nation Divided/Saddest of All Keys.midi",
+     "window": 1,
+     "loss_targets": 800
+    },
+    {
+     "path": "live/Mike Wofford/The Maybeck Recital Series, Vol. 18/Topsy - Live At Maybeck Recital Hall, Berkeley, CA  September 29, 1991.midi",
+     "window": 10,
+     "loss_targets": 719
+    },
+    {
+     "path": "live/Don Friedman/The Maybeck Recital Series, Vol. 33/How Deep Is The Ocean - Live At Maybeck Recital Hall, Berkeley, CA  September 5, 1993.midi",
+     "window": 4,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Kirk Lightsey/Lightsey Live/Pee Wee - Live.midi",
+     "window": 12,
+     "loss_targets": 491
+    },
+    {
+     "path": "live/John Hicks/The Maybeck Recital Series, Vol. 7/Speak Low - Live At Maybeck Recital Hall, Berkeley, CA  August 1990.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Stanley Cowell/The Maybeck Recital Series, Vol. 5/Django - Live At Maybeck Recital Hall, Berkeley, CA  1990.midi",
+     "window": 6,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Ellis Marsalis/Piano In E -  Solo Piano/Jitterbug Waltz.midi",
+     "window": 2,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Marian McPartland/Live At Maybeck Recital Hall/Turn Around - Live At Maybeck Recital Hall, Berkeley, CA  January 20, 1991.midi",
+     "window": 4,
+     "loss_targets": 1022
+    },
+    {
+     "path": "studio/Beegie Adair/By Myself/I'm a Fool to Want You.midi",
+     "window": 0,
+     "loss_targets": 1021
+    },
+    {
+     "path": "live/Chick Corea/Solo Piano -  Standards/How Deep Is The Ocean - Live.midi",
+     "window": 1,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+     "window": 0,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Ray Bryant/Alone At Montreux (Live)/Cubano Chant - Live.midi",
+     "window": 3,
+     "loss_targets": 1022
+    },
+    {
+     "path": "live/Dick Hyman/Music Of 1937 -  Maybeck Recital Hall Series (Vol. 3)/Where Or When - Live At The Maybeck Recital Hall, Berkeley, CA  February 14, 1990.midi",
+     "window": 3,
+     "loss_targets": 1020
+    },
+    {
+     "path": "live/Alan Broadbent/The Maybeck Recital Series, Vol. 14/Peace - Live At Maybeck Recital Hall  Berkeley, CA.midi",
+     "window": 4,
+     "loss_targets": 1014
+    }
+   ]
+  }
+ },
+ "token_ratio_C_over_M": {
+  "0": 1.0485248641872127,
+  "1": 1.0284898639450168,
+  "2": 1.057380471552613
+ },
+ "val_families": {
+  "from this moment on | live/Brad Mehldau/Live in Tokyo/From This Moment On.midi": [
+   "studio/Brad Mehldau/Marian McPartland's Piano Jazz with Brad Mehldau/From This Moment On.midi",
+   "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi"
+  ],
+  "dont let it bring you down | studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi": [
+   "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi"
+  ],
+  "iv stopping listening hearing | studio/Brad Mehldau/Suite -  April 2020/IV. stopping, listening -  hearing.midi": [
+   "studio/Brad Mehldau/Suite -  April 2020/IV. stopping, listening -  hearing.midi"
+  ],
+  "brahms intermezzo in bflat major op 76 no 4 | live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi": [
+   "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi"
+  ],
+  "get happy | live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi": [
+   "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi"
+  ],
+  "holland | live/Brad Mehldau/10 Years Solo Live/Holland - Live.midi": [
+   "live/Brad Mehldau/10 Years Solo Live/Holland - Live.midi"
+  ],
+  "jigsaw falling into place | live/Brad Mehldau/10 Years Solo Live/Jigsaw Falling into Place - Live.midi": [
+   "live/Brad Mehldau/10 Years Solo Live/Jigsaw Falling into Place - Live.midi"
+  ],
+  "my favorite things | live/Brad Mehldau/10 Years Solo Live/My Favorite Things - Live.midi": [
+   "live/Brad Mehldau/10 Years Solo Live/My Favorite Things - Live.midi",
+   "live/Brad Mehldau/Live in Marciac/My Favorite Things - Live.midi"
+  ],
+  "teardrop | live/Brad Mehldau/10 Years Solo Live/Teardrop - Live.midi": [
+   "live/Brad Mehldau/10 Years Solo Live/Teardrop - Live.midi"
+  ],
+  "its all right with me | live/Brad Mehldau/Live in Marciac/It's All Right With Me - Live.midi": [
+   "live/Brad Mehldau/Live in Marciac/It's All Right With Me - Live.midi"
+  ]
+ },
+ "probe_family_check": {
+  "recordings": 20,
+  "duplicate_titles": [],
+  "max_pair_containment": 0.0,
+  "pairs_at_or_above_threshold": []
+ },
+ "budgets": {
+  "rule": "C128 (same updates) and Ctok (first k updates with loss targets <= paired M); the registered signal counts only if met under both. Chosen by Claude without Astra (usage limit) after the +-5 % token check failed for seed 2, before any training.",
+  "C128_token_ratio": {
+   "0": 1.0485248641872127,
+   "1": 1.0284898639450168,
+   "2": 1.057380471552613
+  },
+  "Ctok": {
+   "0": {
+    "updates": 122,
+    "loss_targets": 119357,
+    "token_ratio": 0.9975511909736732,
+    "update_ratio": 0.953125
+   },
+   "1": {
+    "updates": 124,
+    "loss_targets": 121089,
+    "token_ratio": 0.999075915215221,
+    "update_ratio": 0.96875
+   },
+   "2": {
+    "updates": 121,
+    "loss_targets": 116948,
+    "token_ratio": 0.9965149075044523,
+    "update_ratio": 0.9453125
+   }
+  }
+ }
+}
