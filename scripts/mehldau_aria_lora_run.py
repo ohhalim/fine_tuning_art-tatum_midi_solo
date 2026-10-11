@@ -282,6 +282,8 @@ def main() -> None:
                     "ended_by_eos": new[-1] == eos_id if new else False, "notes": len(new_ev),
                     "pitch_range": [min(ps), max(ps)] if ps else None, "longest_repeat": longest_repeat(ps),
                     "max_polyphony": max_polyphony(new_ev) if new_ev else 0,
+                    # end extension, not the span of the new notes: max note-end after generation minus the
+                    # prompt's max note-end (a new note ending inside the prompt's last note counts as 0)
                     "music_seconds": round((max(e for _, e, _ in ev) - max((e for _, e, _ in note_events(pt)), default=0)) / 1000, 3) if new_ev else 0.0,
                     "train_16gram_hits": sum(1 for x in grams if x in train_grams), "16grams": len(grams), "ids": new}
 
