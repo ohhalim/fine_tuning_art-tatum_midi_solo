@@ -1,0 +1,388 @@
+{
+ "arm": "ckpt_off",
+ "fixed": {
+  "seq": 1024,
+  "rank": 16,
+  "alpha": 16,
+  "lr": 0.0001,
+  "seed": 0,
+  "targets": [
+   "mixed_qkv",
+   "att_proj_linear"
+  ],
+  "tolerance": 0.0,
+  "dtype": "float32",
+  "mode": "train (step), eval/no_grad (logit checks)"
+ },
+ "phases": {
+  "load": {
+   "wall_s": 4.7898,
+   "rss_now_bytes": 1789296640,
+   "rss_max_bytes": 5511888896,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 69%",
+   "mps_current_allocated_bytes": 2634436608,
+   "mps_driver_allocated_bytes": 3230007296
+  },
+  "after_step": {
+   "wall_s": 0.0378,
+   "rss_now_bytes": 594903040,
+   "rss_max_bytes": 5511888896,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 44%",
+   "mps_current_allocated_bytes": 2833666304,
+   "mps_driver_allocated_bytes": 7642710016
+  }
+ },
+ "checks": {
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "window_full_length": {
+   "ok": true,
+   "ids_total": 6856
+  },
+  "dropout_zero_by_structure": {
+   "ok": true
+  },
+  "lora_param_count": {
+   "ok": true,
+   "params": 2359296,
+   "pairs": 32
+  },
+  "init_equals_base": {
+   "ok": true,
+   "max_abs_diff": 0.0
+  },
+  "optimizer_only_lora": {
+   "ok": true,
+   "optimizer_params": 64
+  },
+  "every_B_grad_finite_nonzero": {
+   "ok": true,
+   "failing": []
+  },
+  "every_A_grad_zero_at_B0": {
+   "ok": true
+  },
+  "base_grads_none": {
+   "ok": true
+  },
+  "lora_B_changed_every_pair": {
+   "ok": true,
+   "changed": 32
+  },
+  "base_hash_unchanged": {
+   "ok": true,
+   "sha": "c312c20d6ab355d8"
+  },
+  "base_logits_unchanged": {
+   "ok": true,
+   "max_abs_diff": 0.0
+  },
+  "reload_equals_saved": {
+   "ok": true,
+   "max_abs_diff": 0.0,
+   "file_sha256": "8bc5c78a1b20ddf97ca67bca8861481e81a5021ceafa5a90c340641dc8d0432b"
+  }
+ },
+ "layers": [
+  {
+   "pair": "0_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.016525406390428543,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "0_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.020327633246779442,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "1_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.1030362993478775,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "1_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.06016380712389946,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "2_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.22296898066997528,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "2_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.09504286199808121,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "3_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.37101680040359497,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "3_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.08775400370359421,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "4_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.5009450912475586,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "4_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.10640816390514374,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "5_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.3824459910392761,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "5_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.12165702879428864,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "6_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.2499859780073166,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "6_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.12052988260984421,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "7_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.2119828462600708,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "7_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.09543728828430176,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "8_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.22257621586322784,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "8_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.11627941578626633,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "9_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.17406922578811646,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "9_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.09872791171073914,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "10_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.14515942335128784,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "10_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.08144295960664749,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "11_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.0754525288939476,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "11_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.04313242435455322,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "12_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.08202246576547623,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "12_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.05174098536372185,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "13_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.05653591826558113,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "13_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.033088114112615585,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "14_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.061366233974695206,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "14_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.035179637372493744,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "15_mixed_qkv",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.07635343074798584,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  },
+  {
+   "pair": "15_att_proj_linear",
+   "B_grad_none": false,
+   "A_grad_none": false,
+   "B_grad_norm": 0.037372659891843796,
+   "A_grad_norm": 0.0,
+   "B_grad_finite": true
+  }
+ ],
+ "result": "pass",
+ "stopped_at": null,
+ "input": {
+  "midi": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/midi_dataset/midi/studio/Art Tatum/The Art Tatum Solo Masterpieces, Vol. 2/Come Rain Or Come Shine.midi",
+  "midi_sha256": "cf85d660252e22cdaa9051c8062e35f8198e465e60121605f4eef9cb9056f25e",
+  "ids_sha256": "19c8c6f9d1206cd3d69410b4fe8b3ed06d7163646c6f80cf2cb7c997337c6762",
+  "tokens": 1024
+ },
+ "provenance": {
+  "checkpoint": "/Users/ohhalim/git_box/t3_aria/ckpt/model-gen.safetensors",
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "config": {
+   "d_model": 1536,
+   "n_heads": 24,
+   "n_layers": 16,
+   "ff_mult": 4,
+   "drop_p": 0.0,
+   "max_seq_len": 8192,
+   "vocab_size": 17727,
+   "grad_checkpoint": true
+  },
+  "vocab_size": 17727,
+  "tokenizer": "ariautils AbsTokenizer",
+  "torch": "2.14.1"
+ },
+ "dropout": {
+  "resid_dropout_values": [
+   0.0
+  ],
+  "attention_dropout": "none (SDPA called without dropout_p)"
+ },
+ "lora_init_sha256": "fbcb55fe1b9dbe54914b7b41d0eae9c60337e328b1374ea11945b8439b97889f",
+ "step": {
+  "loss": 2.940401077270508,
+  "forward_s": 1.4696,
+  "backward_s": 0.7398,
+  "optimizer_s": 0.0373,
+  "observed_max_driver_bytes_forward_backward": 7625932800,
+  "observed_max_driver_bytes_step": 7642710016,
+  "memory_note": "polling every 2 ms of driver_allocated_memory; observed maximum, not a true peak"
+ }
+}
