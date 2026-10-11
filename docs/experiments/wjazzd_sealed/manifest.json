@@ -1,0 +1,221 @@
+{
+ "purpose": "sealed held-out for one final evaluation after a development pass; never for training, development or tuning",
+ "seed": 20261011,
+ "take": 16,
+ "eligible_compositions": 211,
+ "excluded": {
+  "used_in_pilot": 40,
+  "title_or_template_shared_with_pilot": 3
+ },
+ "candidates_after_exclusion": 168,
+ "taken": 16,
+ "selected": [
+  {
+   "melid": 4,
+   "compid": 4,
+   "title": "In a Mellow Tone",
+   "instrument": "cl",
+   "performer": "Art Pepper",
+   "chunks": 4,
+   "pitch_targets": 501
+  },
+  {
+   "melid": 444,
+   "compid": 297,
+   "title": "April in Paris",
+   "instrument": "tp",
+   "performer": "Wynton Marsalis",
+   "chunks": 1,
+   "pitch_targets": 18
+  },
+  {
+   "melid": 175,
+   "compid": 139,
+   "title": "The Red Door",
+   "instrument": "bs",
+   "performer": "Gerry Mulligan",
+   "chunks": 3,
+   "pitch_targets": 307
+  },
+  {
+   "melid": 413,
+   "compid": 252,
+   "title": "Alone Together",
+   "instrument": "ss",
+   "performer": "Steve Lacy",
+   "chunks": 1,
+   "pitch_targets": 18
+  },
+  {
+   "melid": 353,
+   "compid": 256,
+   "title": "The Girl from East 9th Street",
+   "instrument": "as",
+   "performer": "Paul Desmond",
+   "chunks": 2,
+   "pitch_targets": 240
+  },
+  {
+   "melid": 148,
+   "compid": 121,
+   "title": "Johnny Come Lately",
+   "instrument": "tp",
+   "performer": "Don Ellis",
+   "chunks": 1,
+   "pitch_targets": 22
+  },
+  {
+   "melid": 99,
+   "compid": 86,
+   "title": "Perdido",
+   "instrument": "ts",
+   "performer": "Coleman Hawkins",
+   "chunks": 2,
+   "pitch_targets": 268
+  },
+  {
+   "melid": 13,
+   "compid": 10,
+   "title": "Sweet Lorraine",
+   "instrument": "as",
+   "performer": "Benny Carter",
+   "chunks": 2,
+   "pitch_targets": 95
+  },
+  {
+   "melid": 396,
+   "compid": 157,
+   "title": "Teapot",
+   "instrument": "ts",
+   "performer": "Sonny Stitt",
+   "chunks": 3,
+   "pitch_targets": 301
+  },
+  {
+   "melid": 36,
+   "compid": 32,
+   "title": "Second Sight",
+   "instrument": "ts",
+   "performer": "Bob Berg",
+   "chunks": 2,
+   "pitch_targets": 163
+  },
+  {
+   "melid": 33,
+   "compid": 29,
+   "title": "I Didn't Know What Time It Was",
+   "instrument": "ts",
+   "performer": "Bob Berg",
+   "chunks": 3,
+   "pitch_targets": 331
+  },
+  {
+   "melid": 442,
+   "compid": 296,
+   "title": "Stepping Stone",
+   "instrument": "cor",
+   "performer": "Woody Shaw",
+   "chunks": 1,
+   "pitch_targets": 134
+  },
+  {
+   "melid": 202,
+   "compid": 162,
+   "title": "Serenity",
+   "instrument": "ts",
+   "performer": "Joe Henderson",
+   "chunks": 1,
+   "pitch_targets": 21
+  },
+  {
+   "melid": 323,
+   "compid": 43,
+   "title": "So What",
+   "instrument": "tp",
+   "performer": "Miles Davis",
+   "chunks": 2,
+   "pitch_targets": 189
+  },
+  {
+   "melid": 21,
+   "compid": 17,
+   "title": "Bye Bye Blackbird",
+   "instrument": "ts",
+   "performer": "Ben Webster",
+   "chunks": 1,
+   "pitch_targets": 106
+  },
+  {
+   "melid": 341,
+   "compid": 250,
+   "title": "Along Came Betty",
+   "instrument": "g",
+   "performer": "Pat Martino",
+   "chunks": 6,
+   "pitch_targets": 755
+  }
+ ],
+ "skipped_in_order": [
+  {
+   "compid": 103,
+   "melid": 121,
+   "reason": "no_valid_chunk"
+  },
+  {
+   "compid": 288,
+   "melid": 426,
+   "reason": "no_valid_chunk"
+  },
+  {
+   "compid": 186,
+   "melid": 236,
+   "reason": "no_valid_chunk"
+  },
+  {
+   "compid": 125,
+   "melid": 154,
+   "reason": "no_valid_chunk"
+  },
+  {
+   "compid": 12,
+   "melid": 15,
+   "reason": "no_valid_chunk"
+  },
+  {
+   "compid": 164,
+   "melid": 204,
+   "reason": "no_valid_chunk"
+  },
+  {
+   "compid": 20,
+   "melid": 24,
+   "reason": "no_valid_chunk"
+  },
+  {
+   "compid": 111,
+   "melid": 132,
+   "reason": "no_valid_chunk"
+  },
+  {
+   "compid": 38,
+   "melid": 205,
+   "reason": "no_valid_chunk"
+  },
+  {
+   "compid": 66,
+   "melid": 114,
+   "reason": "no_valid_chunk"
+  },
+  {
+   "compid": 159,
+   "melid": 197,
+   "reason": "no_valid_chunk"
+  }
+ ],
+ "selection_sha256": "170a7c1204318341a1009ff8f690048c98d9e4a80a31fe9b296178039f57193c",
+ "sealed_data_sha256": "ffadc24c8fb523532cfbb16b45e6544c43fc9d07454835b7b19a148c3110a55c",
+ "pilot_data_sha256": "fc4e8ea2e91c1098a8caa09fcf5306fe22f454bb94ed6860ddfb129811e6157c",
+ "builder_sha256": "a34908dccbcda5f809c25cdb7e246eee839ab9be8fbd0ccde8f21660e1dcf232",
+ "script_sha256": "bc75ad59130a8b2de204be18dfee7fd35ac085919fcaf2865c73a6c39b570800",
+ "not_in_scope": "Blues / I Got Rhythm compositions (75) stay an unused separate candidate layer; the 6 piano solos stay outside"
+}

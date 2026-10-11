@@ -70,6 +70,100 @@ def plan_for(c, melid, t0):
     return plan
 
 
+def song_chunks_for(c, tok, MidiDict, melid, skipped, exclusions, excl_by_suffix):
+    """Valid-note runs, chunks, masks and v2 rows for one solo (the fixed pilot rules)."""
+    notes = c.execute("select onset, pitch, duration, bar, beat from melody where melid=? order by eventid", (melid,)).fetchall()
+    changes = c.execute("select onset, chord from beats where melid=? and chord!='' order by onset", (melid,)).fetchall()
+    beat_chord, cur_c = {}, None
+    for bar, beat, ch in c.execute("select bar, beat, chord from beats where melid=? order by onset", (melid,)):
+        cur_c = ch or cur_c
+        beat_chord[(bar, beat)] = cur_c
+    times = [t for t, _ in changes]
+    at = lambda t: changes[bisect.bisect_right(times, t) - 1][1] if bisect.bisect_right(times, t) > 0 else None
+
+    def nxt_after(t, cur):
+        j = bisect.bisect_right(times, t)
+        for tt, s in changes[j:]:
+            if cur is None or (key(s), status(s)) != (key(cur), status(cur)):
+                return s
+        return None
+
+    # valid notes (approximate prefix time = previous onset)
+    valid = []
+    prev = None
+    for i, (onset, pitch, dur, bar, beat) in enumerate(notes):
+        pt = onset if prev is None else prev
+        cur, on = at(pt), at(onset)
+        nx = nxt_after(pt, cur)
+        reasons = [f"current_{status(cur)}"] if status(cur) != "exact" else []
+        if nx is not None and status(nx) != "exact":
+            reasons.append(f"next_{status(nx)}")
+        if status(on) != "exact":
+            reasons.append(f"onset_{status(on)}")
+        valid.append(not reasons)
+        for rsn in reasons[:1]:
+            exclusions[rsn] += 1
+            bad = cur if rsn.startswith("current") else nx if rsn.startswith("next") else on
+            excl_by_suffix[(bad or "None")] += 1
+        prev = onset
+    runs, start = [], None
+    for i, v in enumerate(valid + [False]):
+        if v and start is None:
+            start = i
+        elif not v and start is not None:
+            runs.append((start, i))
+            start = None
+    song_chunks = []
+    for a, b in runs:
+        for s0 in range(a, b, MAX_NOTES):
+            s1 = min(b, s0 + MAX_NOTES)
+            if s1 - s0 < MIN_NOTES:
+                skipped["chunk_short"] += 1
+                continue
+            while True:
+                t0 = notes[s0][0]
+                seg = [(int(p), o - t0, o - t0 + d, VEL) for o, p, d, _, _ in notes[s0:s1]]
+                with tempfile.TemporaryDirectory() as d:
+                    path = os.path.join(d, "x.mid")
+                    write_notes(seg, path)
+                    toks = tok.tokenize(MidiDict.from_midi(path))
+                if len(toks) <= MAX_TOKENS or s1 - s0 <= MIN_NOTES:
+                    break
+                s1 -= 1
+            if len(toks) > MAX_TOKENS:
+                skipped["chunk_too_long"] += 1
+                continue
+            end = max(o + d for o, _, d, _, _ in notes) + 1.0
+            plan = []
+            for j, (t, s) in enumerate(changes):
+                tn = changes[j + 1][0] if j + 1 < len(changes) else end
+                plan.append(((t - t0) * 1000.0, (tn - t0) * 1000.0, (key(s), status(s))))
+            feats = features(toks, plan)
+            bad = [i for i, f in enumerate(feats) if f["current"] is None or f["current"][1] != "exact"
+                   or (f["next"] is not None and f["next"][1] != "exact")]
+            if bad:
+                skipped["chunk_condition_not_exact_after_tokenize"] += 1
+                continue
+            piano_idx = [i for i, t in enumerate(toks) if isinstance(t, tuple) and t[0] == "piano"]
+            first_target = piano_idx[PREFIX_NOTES]
+            mask = [(k + 1) >= first_target and toks[k + 1] != "<E>" for k in range(len(toks) - 1)]
+            strata = []
+            for n_i, i in enumerate(piano_idx):
+                if i < first_target:
+                    continue
+                onset_t = feats[i + 1]["t_ms"]
+                on = next((p[2] for p in plan if p[0] <= onset_t < p[1]), None)
+                cat = "current" if on == feats[i]["current"] else "boundary_first" if on == feats[i]["next"] else "not_represented"
+                o, _, _, bar, beat = notes[s0 + n_i]
+                metric = beat_chord.get((bar, beat))
+                strata.append({"pos": i, "stratum": cat,
+                               "anticipation": metric is not None and key(metric) != key(at(o))})
+            song_chunks.append({"melid": melid, "t0": t0, "s0": s0, "notes": s1 - s0, "token_ids": tok.encode(toks),
+                                "cond": [row(f) for f in feats], "mask": mask, "first_target": first_target,
+                                "targets": int(sum(mask)), "pitch_targets": strata})
+    return notes, valid, song_chunks
+
+
 def main() -> None:
     aria_repo, db, local_out, summary_out = sys.argv[1:5]
     sys.path.insert(0, aria_repo)
@@ -95,95 +189,7 @@ def main() -> None:
     for melid, compid, instr, sig, tmpl, performer, title in picks:
         if len(songs) == need:
             break
-        notes = c.execute("select onset, pitch, duration, bar, beat from melody where melid=? order by eventid", (melid,)).fetchall()
-        changes = c.execute("select onset, chord from beats where melid=? and chord!='' order by onset", (melid,)).fetchall()
-        beat_chord, cur_c = {}, None
-        for bar, beat, ch in c.execute("select bar, beat, chord from beats where melid=? order by onset", (melid,)):
-            cur_c = ch or cur_c
-            beat_chord[(bar, beat)] = cur_c
-        times = [t for t, _ in changes]
-        at = lambda t: changes[bisect.bisect_right(times, t) - 1][1] if bisect.bisect_right(times, t) > 0 else None
-
-        def nxt_after(t, cur):
-            j = bisect.bisect_right(times, t)
-            for tt, s in changes[j:]:
-                if cur is None or (key(s), status(s)) != (key(cur), status(cur)):
-                    return s
-            return None
-
-        # valid notes (approximate prefix time = previous onset)
-        valid = []
-        prev = None
-        for i, (onset, pitch, dur, bar, beat) in enumerate(notes):
-            pt = onset if prev is None else prev
-            cur, on = at(pt), at(onset)
-            nx = nxt_after(pt, cur)
-            reasons = [f"current_{status(cur)}"] if status(cur) != "exact" else []
-            if nx is not None and status(nx) != "exact":
-                reasons.append(f"next_{status(nx)}")
-            if status(on) != "exact":
-                reasons.append(f"onset_{status(on)}")
-            valid.append(not reasons)
-            for rsn in reasons[:1]:
-                exclusions[rsn] += 1
-                bad = cur if rsn.startswith("current") else nx if rsn.startswith("next") else on
-                excl_by_suffix[(bad or "None")] += 1
-            prev = onset
-        runs, start = [], None
-        for i, v in enumerate(valid + [False]):
-            if v and start is None:
-                start = i
-            elif not v and start is not None:
-                runs.append((start, i))
-                start = None
-        song_chunks = []
-        for a, b in runs:
-            for s0 in range(a, b, MAX_NOTES):
-                s1 = min(b, s0 + MAX_NOTES)
-                if s1 - s0 < MIN_NOTES:
-                    skipped["chunk_short"] += 1
-                    continue
-                while True:
-                    t0 = notes[s0][0]
-                    seg = [(int(p), o - t0, o - t0 + d, VEL) for o, p, d, _, _ in notes[s0:s1]]
-                    with tempfile.TemporaryDirectory() as d:
-                        path = os.path.join(d, "x.mid")
-                        write_notes(seg, path)
-                        toks = tok.tokenize(MidiDict.from_midi(path))
-                    if len(toks) <= MAX_TOKENS or s1 - s0 <= MIN_NOTES:
-                        break
-                    s1 -= 1
-                if len(toks) > MAX_TOKENS:
-                    skipped["chunk_too_long"] += 1
-                    continue
-                end = max(o + d for o, _, d, _, _ in notes) + 1.0
-                plan = []
-                for j, (t, s) in enumerate(changes):
-                    tn = changes[j + 1][0] if j + 1 < len(changes) else end
-                    plan.append(((t - t0) * 1000.0, (tn - t0) * 1000.0, (key(s), status(s))))
-                feats = features(toks, plan)
-                bad = [i for i, f in enumerate(feats) if f["current"] is None or f["current"][1] != "exact"
-                       or (f["next"] is not None and f["next"][1] != "exact")]
-                if bad:
-                    skipped["chunk_condition_not_exact_after_tokenize"] += 1
-                    continue
-                piano_idx = [i for i, t in enumerate(toks) if isinstance(t, tuple) and t[0] == "piano"]
-                first_target = piano_idx[PREFIX_NOTES]
-                mask = [(k + 1) >= first_target and toks[k + 1] != "<E>" for k in range(len(toks) - 1)]
-                strata = []
-                for n_i, i in enumerate(piano_idx):
-                    if i < first_target:
-                        continue
-                    onset_t = feats[i + 1]["t_ms"]
-                    on = next((p[2] for p in plan if p[0] <= onset_t < p[1]), None)
-                    cat = "current" if on == feats[i]["current"] else "boundary_first" if on == feats[i]["next"] else "not_represented"
-                    o, _, _, bar, beat = notes[s0 + n_i]
-                    metric = beat_chord.get((bar, beat))
-                    strata.append({"pos": i, "stratum": cat,
-                                   "anticipation": metric is not None and key(metric) != key(at(o))})
-                song_chunks.append({"melid": melid, "t0": t0, "s0": s0, "notes": s1 - s0, "token_ids": tok.encode(toks),
-                                    "cond": [row(f) for f in feats], "mask": mask, "first_target": first_target,
-                                    "targets": int(sum(mask)), "pitch_targets": strata})
+        notes, valid, song_chunks = song_chunks_for(c, tok, MidiDict, melid, skipped, exclusions, excl_by_suffix)
         if not song_chunks:
             skipped["song_without_valid_chunk"] += 1
             continue
