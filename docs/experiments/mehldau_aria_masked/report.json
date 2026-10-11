@@ -1,0 +1,811 @@
+{
+ "mode": "--generate",
+ "checks": {
+  "inputs_match_1726_train_report": {
+   "ok": true,
+   "mismatches": []
+  },
+  "unmasked_streams_in_same_order": {
+   "ok": true
+  },
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "multinomial_is_exponential_race_over_steps": {
+   "ok": true,
+   "matched": 32,
+   "of": 32
+  },
+  "precheck_done_on_same_inputs": {
+   "ok": true
+  },
+  "stream_0_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_1_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_2_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_3_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_4_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_5_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_6_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_7_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_8_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_9_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_10_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_11_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_12_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_13_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_14_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "stream_15_format_valid": {
+   "ok": true,
+   "first_error": null
+  },
+  "mask_implementation_all_valid": {
+   "ok": true,
+   "invalid": []
+  }
+ },
+ "phases": {
+  "load": {
+   "wall_s": 4.332,
+   "rss_now_bytes": 2321940480,
+   "rss_max_bytes": 5547638784,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 70%"
+  },
+  "generate": {
+   "wall_s": 954.7,
+   "rss_now_bytes": 1606418432,
+   "rss_max_bytes": 5547638784,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 68%"
+  }
+ },
+ "result": "generate_done",
+ "stopped_at": null,
+ "inputs": {
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "data_sha256": "8501d2aca038d763dbea2149e0ed1171ddcf0107d7d33d6a0d6e5da0c92bd5bb",
+  "manifest_sha256": "0b075bceaa24b9b32818b96b36bf428bf3973525b5b79d51c8ea07eda619cf85",
+  "lora_file_sha256": "0b634c8c10b1d48b865b9e26d8eb1f92e6c486d20958a5b90facda2d70896acb",
+  "unmasked_generations_sha256": "80bb8864ebe6ad3850034013caa8ff5ad4d5d6112f2f0cc532848656e55d544d",
+  "torch": "2.14.1"
+ },
+ "generations_masked_sha256": "99ebff90047254bfd35f25532e5ddb030c267c866c257f58851132da678eaa01",
+ "streams": [
+  {
+   "prompt_index": 0,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "seed": 1,
+   "adapter": false,
+   "new_tokens": 512,
+   "wall_s": 57.0,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 168,
+    "notes_before_first_error": 168,
+    "ended_by_eos": false,
+    "tail": null
+   },
+   "mask_changed_steps": 0,
+   "mask_changed_by_state": {},
+   "first_mask_change": null,
+   "pre_mask_allowed_min": 0.9987471699714661,
+   "steps_pre_mask_allowed_below_0.999": 1,
+   "pre_mask_disallowed_mean": 6.36163167655468e-05,
+   "unmasked_1726_valid": true,
+   "unmasked_1726_first_error": null,
+   "same_tokens_as_unmasked_until": 512,
+   "identical_to_unmasked": true,
+   "notes": 168,
+   "pitch_range": [
+    41,
+    87
+   ],
+   "longest_repeat": 0,
+   "max_polyphony": 11,
+   "end_extension_seconds": 41.0,
+   "new_span_seconds": 41.42,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 0,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "seed": 1,
+   "adapter": true,
+   "new_tokens": 512,
+   "wall_s": 63.8,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 166,
+    "notes_before_first_error": 166,
+    "ended_by_eos": false,
+    "tail": "incomplete_tail"
+   },
+   "mask_changed_steps": 1,
+   "mask_changed_by_state": {
+    "dur": 1
+   },
+   "first_mask_change": 39,
+   "pre_mask_allowed_min": 0.9507369995117188,
+   "steps_pre_mask_allowed_below_0.999": 265,
+   "pre_mask_disallowed_mean": 0.003046106197871268,
+   "unmasked_1726_valid": false,
+   "unmasked_1726_first_error": 39,
+   "same_tokens_as_unmasked_until": 39,
+   "identical_to_unmasked": false,
+   "notes": 166,
+   "pitch_range": [
+    38,
+    81
+   ],
+   "longest_repeat": 5,
+   "max_polyphony": 9,
+   "end_extension_seconds": 66.19,
+   "new_span_seconds": 66.63,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 0,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "seed": 2,
+   "adapter": false,
+   "new_tokens": 512,
+   "wall_s": 53.2,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 167,
+    "notes_before_first_error": 167,
+    "ended_by_eos": false,
+    "tail": "incomplete_tail"
+   },
+   "mask_changed_steps": 1,
+   "mask_changed_by_state": {
+    "onset": 1
+   },
+   "first_mask_change": 283,
+   "pre_mask_allowed_min": 0.9936684966087341,
+   "steps_pre_mask_allowed_below_0.999": 23,
+   "pre_mask_disallowed_mean": 0.00019942689687013626,
+   "unmasked_1726_valid": false,
+   "unmasked_1726_first_error": 283,
+   "same_tokens_as_unmasked_until": 283,
+   "identical_to_unmasked": false,
+   "notes": 167,
+   "pitch_range": [
+    26,
+    74
+   ],
+   "longest_repeat": 6,
+   "max_polyphony": 21,
+   "end_extension_seconds": 48.87,
+   "new_span_seconds": 49.26,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 0,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "seed": 2,
+   "adapter": true,
+   "new_tokens": 512,
+   "wall_s": 57.5,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 168,
+    "notes_before_first_error": 168,
+    "ended_by_eos": false,
+    "tail": null
+   },
+   "mask_changed_steps": 2,
+   "mask_changed_by_state": {
+    "dur": 1,
+    "onset": 1
+   },
+   "first_mask_change": 145,
+   "pre_mask_allowed_min": 0.9794402122497559,
+   "steps_pre_mask_allowed_below_0.999": 215,
+   "pre_mask_disallowed_mean": 0.001441811677068472,
+   "unmasked_1726_valid": false,
+   "unmasked_1726_first_error": 145,
+   "same_tokens_as_unmasked_until": 145,
+   "identical_to_unmasked": false,
+   "notes": 168,
+   "pitch_range": [
+    36,
+    88
+   ],
+   "longest_repeat": 2,
+   "max_polyphony": 10,
+   "end_extension_seconds": 42.49,
+   "new_span_seconds": 42.89,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 1,
+   "prompt": "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi",
+   "seed": 1,
+   "adapter": false,
+   "new_tokens": 512,
+   "wall_s": 69.2,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 169,
+    "notes_before_first_error": 169,
+    "ended_by_eos": false,
+    "tail": null
+   },
+   "mask_changed_steps": 0,
+   "mask_changed_by_state": {},
+   "first_mask_change": null,
+   "pre_mask_allowed_min": 0.9978434443473816,
+   "steps_pre_mask_allowed_below_0.999": 10,
+   "pre_mask_disallowed_mean": 0.00016720721032470465,
+   "unmasked_1726_valid": true,
+   "unmasked_1726_first_error": null,
+   "same_tokens_as_unmasked_until": 512,
+   "identical_to_unmasked": true,
+   "notes": 169,
+   "pitch_range": [
+    31,
+    86
+   ],
+   "longest_repeat": 4,
+   "max_polyphony": 11,
+   "end_extension_seconds": 22.41,
+   "new_span_seconds": 22.83,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 1,
+   "prompt": "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi",
+   "seed": 1,
+   "adapter": true,
+   "new_tokens": 512,
+   "wall_s": 68.4,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 167,
+    "notes_before_first_error": 167,
+    "ended_by_eos": false,
+    "tail": "incomplete_tail"
+   },
+   "mask_changed_steps": 1,
+   "mask_changed_by_state": {
+    "dur": 1
+   },
+   "first_mask_change": 152,
+   "pre_mask_allowed_min": 0.94914710521698,
+   "steps_pre_mask_allowed_below_0.999": 225,
+   "pre_mask_disallowed_mean": 0.002967067528516054,
+   "unmasked_1726_valid": false,
+   "unmasked_1726_first_error": 152,
+   "same_tokens_as_unmasked_until": 152,
+   "identical_to_unmasked": false,
+   "notes": 167,
+   "pitch_range": [
+    38,
+    88
+   ],
+   "longest_repeat": 9,
+   "max_polyphony": 10,
+   "end_extension_seconds": 50.15,
+   "new_span_seconds": 50.56,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 1,
+   "prompt": "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi",
+   "seed": 2,
+   "adapter": false,
+   "new_tokens": 512,
+   "wall_s": 64.6,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 169,
+    "notes_before_first_error": 169,
+    "ended_by_eos": false,
+    "tail": "incomplete_tail"
+   },
+   "mask_changed_steps": 0,
+   "mask_changed_by_state": {},
+   "first_mask_change": null,
+   "pre_mask_allowed_min": 0.9955694675445557,
+   "steps_pre_mask_allowed_below_0.999": 11,
+   "pre_mask_disallowed_mean": 0.0001466860994696617,
+   "unmasked_1726_valid": true,
+   "unmasked_1726_first_error": null,
+   "same_tokens_as_unmasked_until": 512,
+   "identical_to_unmasked": true,
+   "notes": 169,
+   "pitch_range": [
+    41,
+    86
+   ],
+   "longest_repeat": 10,
+   "max_polyphony": 10,
+   "end_extension_seconds": 20.62,
+   "new_span_seconds": 21.04,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 1,
+   "prompt": "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi",
+   "seed": 2,
+   "adapter": true,
+   "new_tokens": 512,
+   "wall_s": 67.0,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 161,
+    "notes_before_first_error": 161,
+    "ended_by_eos": false,
+    "tail": "incomplete_tail"
+   },
+   "mask_changed_steps": 2,
+   "mask_changed_by_state": {
+    "dur": 2
+   },
+   "first_mask_change": 283,
+   "pre_mask_allowed_min": 0.9784624576568604,
+   "steps_pre_mask_allowed_below_0.999": 267,
+   "pre_mask_disallowed_mean": 0.0028114333981648088,
+   "unmasked_1726_valid": false,
+   "unmasked_1726_first_error": 283,
+   "same_tokens_as_unmasked_until": 283,
+   "identical_to_unmasked": false,
+   "notes": 161,
+   "pitch_range": [
+    21,
+    96
+   ],
+   "longest_repeat": 3,
+   "max_polyphony": 10,
+   "end_extension_seconds": 133.52,
+   "new_span_seconds": 133.94,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 2,
+   "prompt": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+   "seed": 1,
+   "adapter": false,
+   "new_tokens": 512,
+   "wall_s": 49.8,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 168,
+    "notes_before_first_error": 168,
+    "ended_by_eos": false,
+    "tail": "incomplete_tail"
+   },
+   "mask_changed_steps": 0,
+   "mask_changed_by_state": {},
+   "first_mask_change": null,
+   "pre_mask_allowed_min": 0.9968470335006714,
+   "steps_pre_mask_allowed_below_0.999": 16,
+   "pre_mask_disallowed_mean": 0.0002051068004220724,
+   "unmasked_1726_valid": true,
+   "unmasked_1726_first_error": null,
+   "same_tokens_as_unmasked_until": 512,
+   "identical_to_unmasked": true,
+   "notes": 168,
+   "pitch_range": [
+    57,
+    87
+   ],
+   "longest_repeat": 2,
+   "max_polyphony": 41,
+   "end_extension_seconds": 33.41,
+   "new_span_seconds": 33.79,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 2,
+   "prompt": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+   "seed": 1,
+   "adapter": true,
+   "new_tokens": 512,
+   "wall_s": 51.8,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 167,
+    "notes_before_first_error": 167,
+    "ended_by_eos": false,
+    "tail": null
+   },
+   "mask_changed_steps": 1,
+   "mask_changed_by_state": {
+    "dur": 1
+   },
+   "first_mask_change": 152,
+   "pre_mask_allowed_min": 0.9832215309143066,
+   "steps_pre_mask_allowed_below_0.999": 243,
+   "pre_mask_disallowed_mean": 0.0018089718651026487,
+   "unmasked_1726_valid": false,
+   "unmasked_1726_first_error": 152,
+   "same_tokens_as_unmasked_until": 152,
+   "identical_to_unmasked": false,
+   "notes": 167,
+   "pitch_range": [
+    53,
+    101
+   ],
+   "longest_repeat": 8,
+   "max_polyphony": 11,
+   "end_extension_seconds": 54.57,
+   "new_span_seconds": 54.95,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 2,
+   "prompt": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+   "seed": 2,
+   "adapter": false,
+   "new_tokens": 512,
+   "wall_s": 49.6,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 166,
+    "notes_before_first_error": 166,
+    "ended_by_eos": false,
+    "tail": "incomplete_tail"
+   },
+   "mask_changed_steps": 1,
+   "mask_changed_by_state": {
+    "onset": 1
+   },
+   "first_mask_change": 145,
+   "pre_mask_allowed_min": 0.9968835115432739,
+   "steps_pre_mask_allowed_below_0.999": 22,
+   "pre_mask_disallowed_mean": 0.00025780382566154003,
+   "unmasked_1726_valid": false,
+   "unmasked_1726_first_error": 145,
+   "same_tokens_as_unmasked_until": 145,
+   "identical_to_unmasked": false,
+   "notes": 166,
+   "pitch_range": [
+    60,
+    99
+   ],
+   "longest_repeat": 2,
+   "max_polyphony": 13,
+   "end_extension_seconds": 58.78,
+   "new_span_seconds": 58.97,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 2,
+   "prompt": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+   "seed": 2,
+   "adapter": true,
+   "new_tokens": 512,
+   "wall_s": 51.9,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 166,
+    "notes_before_first_error": 166,
+    "ended_by_eos": false,
+    "tail": "incomplete_tail"
+   },
+   "mask_changed_steps": 4,
+   "mask_changed_by_state": {
+    "dur": 3,
+    "onset": 1
+   },
+   "first_mask_change": 41,
+   "pre_mask_allowed_min": 0.9404246807098389,
+   "steps_pre_mask_allowed_below_0.999": 226,
+   "pre_mask_disallowed_mean": 0.005393940373323858,
+   "unmasked_1726_valid": false,
+   "unmasked_1726_first_error": 41,
+   "same_tokens_as_unmasked_until": 41,
+   "identical_to_unmasked": false,
+   "notes": 166,
+   "pitch_range": [
+    38,
+    92
+   ],
+   "longest_repeat": 6,
+   "max_polyphony": 10,
+   "end_extension_seconds": 60.6,
+   "new_span_seconds": 60.92,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 3,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi",
+   "seed": 1,
+   "adapter": false,
+   "new_tokens": 512,
+   "wall_s": 61.6,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 169,
+    "notes_before_first_error": 169,
+    "ended_by_eos": false,
+    "tail": null
+   },
+   "mask_changed_steps": 0,
+   "mask_changed_by_state": {},
+   "first_mask_change": null,
+   "pre_mask_allowed_min": 0.9990202784538269,
+   "steps_pre_mask_allowed_below_0.999": 0,
+   "pre_mask_disallowed_mean": 6.99810916557908e-05,
+   "unmasked_1726_valid": true,
+   "unmasked_1726_first_error": null,
+   "same_tokens_as_unmasked_until": 512,
+   "identical_to_unmasked": true,
+   "notes": 169,
+   "pitch_range": [
+    52,
+    91
+   ],
+   "longest_repeat": 6,
+   "max_polyphony": 5,
+   "end_extension_seconds": 23.44,
+   "new_span_seconds": 23.44,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 3,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi",
+   "seed": 1,
+   "adapter": true,
+   "new_tokens": 512,
+   "wall_s": 63.9,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 169,
+    "notes_before_first_error": 169,
+    "ended_by_eos": false,
+    "tail": "incomplete_tail"
+   },
+   "mask_changed_steps": 0,
+   "mask_changed_by_state": {},
+   "first_mask_change": null,
+   "pre_mask_allowed_min": 0.999060332775116,
+   "steps_pre_mask_allowed_below_0.999": 0,
+   "pre_mask_disallowed_mean": 4.861911293119192e-05,
+   "unmasked_1726_valid": true,
+   "unmasked_1726_first_error": null,
+   "same_tokens_as_unmasked_until": 512,
+   "identical_to_unmasked": true,
+   "notes": 169,
+   "pitch_range": [
+    46,
+    66
+   ],
+   "longest_repeat": 8,
+   "max_polyphony": 2,
+   "end_extension_seconds": 20.89,
+   "new_span_seconds": 20.89,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 3,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi",
+   "seed": 2,
+   "adapter": false,
+   "new_tokens": 512,
+   "wall_s": 61.6,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 169,
+    "notes_before_first_error": 169,
+    "ended_by_eos": false,
+    "tail": "incomplete_tail"
+   },
+   "mask_changed_steps": 1,
+   "mask_changed_by_state": {
+    "note": 1
+   },
+   "first_mask_change": 145,
+   "pre_mask_allowed_min": 0.9991716146469116,
+   "steps_pre_mask_allowed_below_0.999": 0,
+   "pre_mask_disallowed_mean": 4.913331940770149e-05,
+   "unmasked_1726_valid": false,
+   "unmasked_1726_first_error": 145,
+   "same_tokens_as_unmasked_until": 145,
+   "identical_to_unmasked": false,
+   "notes": 169,
+   "pitch_range": [
+    48,
+    74
+   ],
+   "longest_repeat": 6,
+   "max_polyphony": 3,
+   "end_extension_seconds": 21.81,
+   "new_span_seconds": 21.81,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  },
+  {
+   "prompt_index": 3,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi",
+   "seed": 2,
+   "adapter": true,
+   "new_tokens": 512,
+   "wall_s": 63.9,
+   "valid": true,
+   "validity": {
+    "valid": true,
+    "first_error": null,
+    "cascade_errors": 0,
+    "complete_notes": 168,
+    "notes_before_first_error": 168,
+    "ended_by_eos": false,
+    "tail": "incomplete_tail"
+   },
+   "mask_changed_steps": 1,
+   "mask_changed_by_state": {
+    "dur": 1
+   },
+   "first_mask_change": 145,
+   "pre_mask_allowed_min": 0.9798542857170105,
+   "steps_pre_mask_allowed_below_0.999": 91,
+   "pre_mask_disallowed_mean": 0.0006140931509435177,
+   "unmasked_1726_valid": false,
+   "unmasked_1726_first_error": 145,
+   "same_tokens_as_unmasked_until": 145,
+   "identical_to_unmasked": false,
+   "notes": 168,
+   "pitch_range": [
+    29,
+    81
+   ],
+   "longest_repeat": 6,
+   "max_polyphony": 8,
+   "end_extension_seconds": 30.2,
+   "new_span_seconds": 30.21,
+   "ended_by_eos": false,
+   "train_16gram_hits": 0,
+   "16grams": 497
+  }
+ ],
+ "incomplete": null,
+ "summary": {
+  "base": {
+   "streams": 8,
+   "streams_mask_changed": 3,
+   "mask_changed_steps_total": 3,
+   "mask_changed_by_state": {
+    "onset": 2,
+    "note": 1
+   },
+   "identical_to_unmasked": 5,
+   "pre_mask_allowed_min": 0.9936684966087341,
+   "pre_mask_disallowed_mean": 0.00014487019507214427,
+   "train_16gram_hits": 0
+  },
+  "adapter": {
+   "streams": 8,
+   "streams_mask_changed": 7,
+   "mask_changed_steps_total": 12,
+   "mask_changed_by_state": {
+    "dur": 10,
+    "onset": 2
+   },
+   "identical_to_unmasked": 1,
+   "pre_mask_allowed_min": 0.9404246807098389,
+   "pre_mask_disallowed_mean": 0.0022665054129902273,
+   "train_16gram_hits": 0
+  }
+ }
+}
