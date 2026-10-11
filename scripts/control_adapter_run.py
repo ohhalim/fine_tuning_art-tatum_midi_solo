@@ -9,10 +9,13 @@ Evaluation: the #1726 val (12 recordings, 10 families) and probe (20) windows, p
 
 Modes (one per process):
   --schedule        no model. Window schedules and loss-target counts for every arm/seed, M0 against the #1726
-                    train_steps, C/M token ratio per seed within +-5 % (else stop: redesign before running),
-                    val families, probe duplicate check (titles + interval 16-gram containment >= 0.2).
+                    train_steps, val families, probe duplicate check (titles + interval 16-gram containment >= 0.2).
+                    Two budgets for C (redesign after the +-5 % token check failed for seed 2, before any training):
+                    C128 = same 128 updates; Ctok = the first k updates of the same run whose loss targets do not
+                    exceed the paired M. The registered signal counts only if it holds under both.
   --base            base and M0 on val/probe; per-recording CE must equal the #1726 report (|diff| <= 1e-5).
   --train ARM SEED  one adapter: checked training on the fixed schedule, reload-from-file check, val/probe eval.
+                    For C the LoRA after k (token-matched) updates is also saved and evaluated from its file.
   --analyze         family-weighted D_val, D_probe, S per seed, registered operating criteria, full tables.
 
   control_adapter_run.py <aria repo> <checkpoint> <mehldau data> <mehldau manifest> <control data> <control manifest>
@@ -37,7 +40,7 @@ from aria_cond_smoke import Stop, file_sha, pressure, rss  # noqa: E402
 from aria_lora import AriaLoRA, grad_problems, input_mismatches, named_lora, unchanged  # noqa: E402
 
 RANK, ALPHA, LR, UPDATES, SEEDS = 16, 16, 1e-4, 128, (0, 1, 2)
-TOKEN_TOLERANCE, BASE_TOLERANCE, RELOAD_TOLERANCE = 0.05, 1e-5, 0.0
+TOKEN_MATCH_MIN, BASE_TOLERANCE, RELOAD_TOLERANCE = 0.98, 1e-5, 0.0
 WALL = {"--schedule": 600, "--base": 900, "--train": 1200, "--analyze": 300}
 # registered operating criteria (Astra review of #1734); not a significance test
 CRIT = {"mean_D_val_max": -0.03, "mean_S_max": -0.02, "abs_mean_D_probe_max": 0.02, "families_M_better_min": 7}
@@ -53,6 +56,25 @@ def schedule(train_recs, seed):
         w = r["windows"][wi]
         out.append({"path": r["path"], "window": wi, "loss_targets": len(w["ids"]) - 1 - w["s_index"]})
     return out
+
+
+def token_matched_updates(c_steps, m_tokens):
+    cum = k = 0
+    for x in c_steps:
+        if cum + x["loss_targets"] > m_tokens:
+            break
+        cum, k = cum + x["loss_targets"], k + 1
+    return k, cum
+
+
+def thermal_level():
+    """macOS thermal pressure (0 Nominal, 1 Moderate, 2 Heavy, 3 Trapping, 4 Sleeping); recorded only."""
+    import subprocess
+    try:
+        return int(subprocess.run(["notifyutil", "-g", "com.apple.system.thermalpressurelevel"],
+                                  capture_output=True, text=True, timeout=5).stdout.split()[-1])
+    except Exception:
+        return None
 
 
 def sha_json(x):
@@ -130,8 +152,15 @@ def main() -> None:
                                          "max_pair_containment": max(x[2] for x in pairs), "pairs_at_or_above_threshold": close}
             check("probe_has_no_duplicate_family", not dup_titles and not close)
             check("val_has_10_families_12_recordings", len(val_fam) == 10 and sum(len(v) for v in val_fam.values()) == 12)
-            check("token_ratio_within_tolerance", all(abs(x - 1) <= TOKEN_TOLERANCE for x in ratios.values()),
-                  ratios=ratios, tolerance=TOKEN_TOLERANCE)
+            tm = {s: token_matched_updates(sched[f"C{s}"], tokens[f"M{s}"]) for s in SEEDS}
+            log["budgets"] = {"rule": "C128 (same updates) and Ctok (first k updates with loss targets <= paired M); "
+                                      "the registered signal counts only if met under both. Chosen by Claude without Astra "
+                                      "(usage limit) after the +-5 % token check failed for seed 2, before any training.",
+                              "C128_token_ratio": ratios,
+                              "Ctok": {s: {"updates": k, "loss_targets": c, "token_ratio": c / tokens[f"M{s}"], "update_ratio": k / UPDATES}
+                                       for s, (k, c) in tm.items()}}
+            check("token_matched_budget_within_one_window", all(TOKEN_MATCH_MIN <= c / tokens[f"M{s}"] <= 1 for s, (k, c) in tm.items()),
+                  ratios={s: c / tokens[f"M{s}"] for s, (k, c) in tm.items()})
             log["result"] = "schedule_done"
             return
 
@@ -152,56 +181,62 @@ def main() -> None:
                 check(f"eval_{k}_done", e.get("result") in ("base_done", "train_done") and e["inputs"] == inputs)
                 ev[k] = e
             rows = {"base": ev["base_M0"]["eval"]["base"], "M0": ev["base_M0"]["eval"]["M0"]}
-            for a in ("M", "C"):
-                for s in SEEDS:
-                    if (a, s) != ("M", 0):
-                        rows[f"{a}{s}"] = ev[f"{a}{s}"]["eval"]
+            for s in SEEDS:
+                if s:
+                    rows[f"M{s}"] = ev[f"M{s}"]["eval"]
+                rows[f"C128_{s}"] = ev[f"C{s}"]["eval"]
+                rows[f"Ctok_{s}"] = ev[f"C{s}"]["eval_tok"]
             fam = {split: collections.defaultdict(list) for split in ("val", "probe")}
             for split in ("val", "probe"):
                 for r in rows["base"][split]:
                     fam[split][meta[r["path"]]["group"] if split == "val" else r["path"]].append(r["path"])
-
-            def per_rec(k, split):
-                return {r["path"]: r["mean_ce"] for r in rows[k][split]}
-
-            base_ce = {sp: per_rec("base", sp) for sp in ("val", "probe")}
+            base_ce = {sp: {r["path"]: r["mean_ce"] for r in rows["base"][sp]} for sp in ("val", "probe")}
 
             def delta(k, split):
-                ce = per_rec(k, split)
-                return {p: ce[p] - base_ce[split][p] for p in ce}
+                return {r["path"]: r["mean_ce"] - base_ce[split][r["path"]] for r in rows[k][split]}
 
             def fam_mean(d, split):
                 return statistics.mean(statistics.mean(d[p] for p in ps) for ps in fam[split].values())
 
-            per_seed, fam_diff = {}, collections.defaultdict(list)
-            for s in SEEDS:
-                out = {}
-                for split in ("val", "probe"):
-                    dm, dc = delta(f"M{s}", split), delta(f"C{s}", split)
-                    out[split] = {"dM_family": fam_mean(dm, split), "dC_family": fam_mean(dc, split),
-                                  "dM_recording": statistics.mean(dm.values()), "dC_recording": statistics.mean(dc.values()),
-                                  "recordings_M_better": sum(dm[p] < dc[p] for p in dm), "recordings": len(dm)}
-                    out[split]["D_family"] = out[split]["dM_family"] - out[split]["dC_family"]
-                    out[split]["D_recording"] = out[split]["dM_recording"] - out[split]["dC_recording"]
-                    if split == "val":
-                        for g, ps in fam["val"].items():
-                            fam_diff[g].append(statistics.mean(dm[p] - dc[p] for p in ps))
-                out["S_family"] = out["val"]["D_family"] - out["probe"]["D_family"]
-                out["S_recording"] = out["val"]["D_recording"] - out["probe"]["D_recording"]
-                per_seed[s] = out
-            mean_d_val = statistics.mean(per_seed[s]["val"]["D_family"] for s in SEEDS)
-            mean_d_probe = statistics.mean(per_seed[s]["probe"]["D_family"] for s in SEEDS)
-            mean_s = statistics.mean(per_seed[s]["S_family"] for s in SEEDS)
-            fam_seed_mean = {g: statistics.mean(v) for g, v in fam_diff.items()}
-            fam_better = sum(v < 0 for v in fam_seed_mean.values())
-            crit = {"mean_D_val": mean_d_val <= CRIT["mean_D_val_max"], "mean_S": mean_s <= CRIT["mean_S_max"],
-                    "abs_mean_D_probe": abs(mean_d_probe) <= CRIT["abs_mean_D_probe_max"],
-                    "each_seed_D_val_negative": all(per_seed[s]["val"]["D_family"] < 0 for s in SEEDS),
-                    "each_seed_S_negative": all(per_seed[s]["S_family"] < 0 for s in SEEDS),
-                    "families_M_better": fam_better >= CRIT["families_M_better_min"]}
-            # explanatory only: token-weighted category deltas
+            def judge(variant):
+                per_seed, fam_diff = {}, collections.defaultdict(list)
+                for s in SEEDS:
+                    out = {}
+                    for split in ("val", "probe"):
+                        dm, dc = delta(f"M{s}", split), delta(f"{variant}_{s}", split)
+                        out[split] = {"dM_family": fam_mean(dm, split), "dC_family": fam_mean(dc, split),
+                                      "dM_recording": statistics.mean(dm.values()), "dC_recording": statistics.mean(dc.values()),
+                                      "recordings_M_better": sum(dm[p] < dc[p] for p in dm), "recordings": len(dm)}
+                        out[split]["D_family"] = out[split]["dM_family"] - out[split]["dC_family"]
+                        out[split]["D_recording"] = out[split]["dM_recording"] - out[split]["dC_recording"]
+                        if split == "val":
+                            for g, ps in fam["val"].items():
+                                fam_diff[g].append(statistics.mean(dm[p] - dc[p] for p in ps))
+                    out["S_family"] = out["val"]["D_family"] - out["probe"]["D_family"]
+                    out["S_recording"] = out["val"]["D_recording"] - out["probe"]["D_recording"]
+                    per_seed[s] = out
+                mean_d_val = statistics.mean(per_seed[s]["val"]["D_family"] for s in SEEDS)
+                mean_d_probe = statistics.mean(per_seed[s]["probe"]["D_family"] for s in SEEDS)
+                mean_s = statistics.mean(per_seed[s]["S_family"] for s in SEEDS)
+                fam_seed_mean = {g: statistics.mean(v) for g, v in fam_diff.items()}
+                fam_better = sum(v < 0 for v in fam_seed_mean.values())
+                crit = {"mean_D_val": mean_d_val <= CRIT["mean_D_val_max"], "mean_S": mean_s <= CRIT["mean_S_max"],
+                        "abs_mean_D_probe": abs(mean_d_probe) <= CRIT["abs_mean_D_probe_max"],
+                        "each_seed_D_val_negative": all(per_seed[s]["val"]["D_family"] < 0 for s in SEEDS),
+                        "each_seed_S_negative": all(per_seed[s]["S_family"] < 0 for s in SEEDS),
+                        "families_M_better": fam_better >= CRIT["families_M_better_min"]}
+                return {"per_seed": per_seed, "family_seed_mean_M_minus_C": fam_seed_mean,
+                        "summary": {"mean_D_val_family": mean_d_val, "mean_D_probe_family": mean_d_probe, "mean_S_family": mean_s,
+                                    "families_M_better": fam_better, "families": len(fam_seed_mean),
+                                    "D_val_range": [min(per_seed[s]["val"]["D_family"] for s in SEEDS), max(per_seed[s]["val"]["D_family"] for s in SEEDS)],
+                                    "S_range": [min(per_seed[s]["S_family"] for s in SEEDS), max(per_seed[s]["S_family"] for s in SEEDS)]},
+                        "criteria": crit, "met": all(crit.values())}
+
+            log["variants"] = {v: judge(v) for v in ("C128", "Ctok")}
+            log["verdict"] = "registered_specificity_signal_met" if all(x["met"] for x in log["variants"].values()) else "not_met_or_unclear"
+            # explanatory only: token-weighted category deltas (and arm-wide mean deltas)
             cats = {}
-            for k in [f"{a}{s}" for a in ("M", "C") for s in SEEDS]:
+            for k in [f"M{s}" for s in SEEDS] + [f"{v}_{s}" for v in ("C128", "Ctok") for s in SEEDS]:
                 cats[k] = {}
                 for split in ("val", "probe"):
                     def pooled(rs):
@@ -211,17 +246,11 @@ def main() -> None:
                                 "velocity_given_pitch": (sum(r["pitch_tok"] for r in rs) - sum(r["pitch_marg"] for r in rs)) / n[0]}
                     a_, b_ = pooled(rows[k][split]), pooled(rows["base"][split])
                     cats[k][split] = {c: a_[c] - b_[c] for c in a_}
-            log["per_seed"] = per_seed
-            log["family_seed_mean_M_minus_C"] = fam_seed_mean
-            log["summary"] = {"mean_D_val_family": mean_d_val, "mean_D_probe_family": mean_d_probe, "mean_S_family": mean_s,
-                              "families_M_better": fam_better, "families": len(fam_seed_mean),
-                              "D_val_range": [min(per_seed[s]["val"]["D_family"] for s in SEEDS), max(per_seed[s]["val"]["D_family"] for s in SEEDS)],
-                              "S_range": [min(per_seed[s]["S_family"] for s in SEEDS), max(per_seed[s]["S_family"] for s in SEEDS)]}
-            log["criteria"] = crit
-            log["verdict"] = "registered_specificity_signal_met" if all(crit.values()) else "not_met_or_unclear"
+                    cats[k][split]["mean_recording_delta"] = statistics.mean(delta(k, split).values())
+                    cats[k][split]["family_delta"] = fam_mean(delta(k, split), split)
             log["category_deltas_explanatory"] = cats
             log["token_budget"] = {"loss_targets": {k: v["loss_targets"] for k, v in sched_rep["schedules"].items()},
-                                   "ratio_C_over_M": sched_rep["token_ratio_C_over_M"]}
+                                   "C128_ratio": sched_rep["budgets"]["C128_token_ratio"], "Ctok": sched_rep["budgets"]["Ctok"]}
             log["result"] = "analysis_done"
             return
 
@@ -327,6 +356,8 @@ def main() -> None:
                 peak["v"] = max(peak["v"], torch.mps.driver_allocated_memory())
                 time.sleep(0.005)
 
+        k_tok = sched_rep["budgets"]["Ctok"][str(seed)]["updates"] if arm == "C" else None
+        tok_sd = None
         torch.manual_seed(seed)
         rng = random.Random(seed)
         init_sd = {n: p.detach().cpu().clone() for n, p in named_lora(lora)}
@@ -361,10 +392,13 @@ def main() -> None:
             if not all(bool(torch.isfinite(p).all()) for p in lora.parameters()):
                 raise Stop(f"non-finite LoRA parameter after step at update {u}")
             steps.append({"update": u, "path": r["path"], "window": wi, "loss": loss.item()})
+            if k_tok is not None and u + 1 == k_tok:
+                tok_sd = lora.state_dict()
         torch.mps.synchronize()
         peak["run"] = False
         th.join()
-        log["phases"]["train"] = {"wall_s": round(time.perf_counter() - t, 3), "observed_max_driver_bytes": peak["v"], **rss(), **pressure()}
+        log["phases"]["train"] = {"wall_s": round(time.perf_counter() - t, 3), "observed_max_driver_bytes": peak["v"],
+                                  "thermal_level": thermal_level(), **rss(), **pressure()}
         log["train_steps"] = steps
         check("updates_done_on_fixed_schedule", len(steps) == UPDATES)
         same = unchanged(lora, init_sd)
@@ -391,7 +425,20 @@ def main() -> None:
         check("checkpoint_sha_unchanged", file_sha(ckpt) == inputs["checkpoint_sha256"])
         t = time.perf_counter()
         log["eval"] = {"val": evaluate("val", True), "probe": evaluate("probe", True)}
-        log["phases"]["eval"] = {"wall_s": round(time.perf_counter() - t, 3), **rss(), **pressure()}
+        log["phases"]["eval"] = {"wall_s": round(time.perf_counter() - t, 3), "thermal_level": thermal_level(), **rss(), **pressure()}
+        if arm == "C":
+            check("token_matched_snapshot_taken", tok_sd is not None, k=k_tok)
+            tok_path = os.path.join(out_dir, f"lora_{arm}{seed}_tok.pt")
+            torch.save(tok_sd, tok_path)
+            log["lora_tok_file_sha256"], log["token_matched_updates"] = file_sha(tok_path), k_tok
+            lora.load_state_dict(torch.load(tok_path))
+            model.eval()
+            with torch.no_grad():
+                d_tok = (model(xw).float() - after).abs().max().item()
+            check("token_matched_snapshot_differs_from_final", d_tok > 0 or k_tok == UPDATES, max_abs_diff=d_tok)
+            t = time.perf_counter()
+            log["eval_tok"] = {"val": evaluate("val", True), "probe": evaluate("probe", True)}
+            log["phases"]["eval_tok"] = {"wall_s": round(time.perf_counter() - t, 3), "thermal_level": thermal_level(), **rss(), **pressure()}
         log["result"] = "train_done"
     except Stop as e:
         log["result"], log["stopped_at"] = "stopped", str(e)
