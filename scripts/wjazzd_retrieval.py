@@ -76,7 +76,7 @@ def place(notes, src, tgt, transpose):
     """Source DB notes [(onset, pitch, dur)] moved into the target window; counts the boundary notes."""
     scale = (tgt["end"] - tgt["start"]) / (src["end"] - src["start"])
     carry_in = sum(1 for o, _, d in notes if o < src["start"] < o + d)
-    adopted, cropped, cropped_s = [], 0, 0.0
+    adopted, rows, cropped, cropped_s = [], [], 0, 0.0
     for o, p, d in notes:
         if not (src["start"] <= o < src["end"]):
             continue
@@ -86,9 +86,34 @@ def place(notes, src, tgt, transpose):
             cropped_s += end - src["end"]
             end = src["end"]
         adopted.append((int(p) + transpose, (o - src["start"]) * scale, (end - src["start"]) * scale))
+        rows.append({"db_onset": o, "db_pitch": p, "db_duration": d, "cropped_duration": end - o})
     in_range = all(0 <= p <= 127 for p, _, _ in adopted)
-    return {"scale": scale, "notes": adopted, "carry_in_excluded": carry_in, "cropped_at_end": cropped,
+    return {"scale": scale, "notes": adopted, "rows": rows, "carry_in_excluded": carry_in, "cropped_at_end": cropped,
             "cropped_seconds": cropped_s, "in_range": in_range}
+
+
+def quantize_for_export(notes, window_s):
+    """Same grid as aria_t4b_sim.write_notes (tick = round(seconds * 1000), 1 tick = 1 ms).
+    A note whose onset tick is not below its end tick is excluded and reported, never lengthened or
+    moved. End ticks never pass the window end tick. Returns kept [(i, pitch, on, off)], excluded and
+    checks (negative onsets, order, same-pitch overlaps among kept notes)."""
+    end_tick = round(window_s * 1000)
+    kept, excluded = [], []
+    for i, (p, s, e) in enumerate(notes):
+        on, off = round(s * 1000), min(round(e * 1000), end_tick)
+        if on >= off:
+            excluded.append({"index": i, "pitch": p, "on_tick": on, "off_tick": off, "seconds": [s, e]})
+        else:
+            kept.append((i, p, on, off))
+    last_off = {}
+    overlap = 0
+    for _, p, on, off in sorted(kept, key=lambda k: (k[2], k[1])):
+        if p in last_off and on < last_off[p]:
+            overlap += 1
+        last_off[p] = max(off, last_off.get(p, 0))
+    checks = {"negative_onsets": sum(1 for k in kept if k[2] < 0), "past_window_end": sum(1 for k in kept if k[3] > end_tick),
+              "same_pitch_overlaps": overlap, "window_end_tick": end_tick}
+    return kept, excluded, checks
 
 
 def boundary_errors(src, tgt, scale):

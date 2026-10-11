@@ -1,0 +1,127 @@
+{
+ "rule": "first eligible window (exact chords, full 8 beats) with at least one chord change after merging repeats",
+ "melids": [
+  16,
+  347,
+  18,
+  25
+ ],
+ "targets": [
+  {
+   "melid": 16,
+   "status": "fixed",
+   "bar": 2,
+   "start": 5.239614512471656,
+   "end": 6.7988888888888885,
+   "chords": [
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab",
+    "F7",
+    "F7",
+    "F7",
+    "F7"
+   ],
+   "rel": [
+    [
+     0,
+     0,
+     "maj"
+    ],
+    [
+     4,
+     9,
+     "7"
+    ]
+   ]
+  },
+  {
+   "melid": 347,
+   "status": "fixed",
+   "bar": 2,
+   "start": 3.3639909297052153,
+   "end": 5.342539682539683,
+   "chords": [
+    "Bb",
+    "Bb",
+    "Bb",
+    "Bb",
+    "A-7",
+    "A-7",
+    "A-7",
+    "A-7"
+   ],
+   "rel": [
+    [
+     0,
+     0,
+     "maj"
+    ],
+    [
+     4,
+     11,
+     "m7"
+    ]
+   ]
+  },
+  {
+   "melid": 18,
+   "status": "fixed",
+   "bar": 6,
+   "start": 7.8428571428571425,
+   "end": 9.637551020408162,
+   "chords": [
+    "Ab",
+    "Ab",
+    "Ab",
+    "Ab",
+    "Eb7",
+    "Eb7",
+    "Eb7",
+    "Eb7"
+   ],
+   "rel": [
+    [
+     0,
+     0,
+     "maj"
+    ],
+    [
+     4,
+     7,
+     "7"
+    ]
+   ]
+  },
+  {
+   "melid": 25,
+   "status": "fixed",
+   "bar": 2,
+   "start": 9.485850340136054,
+   "end": 15.526167800453514,
+   "chords": [
+    "Abj7",
+    "Abj7",
+    "Abj7",
+    "Abj7",
+    "Abo7",
+    "Abo7",
+    "Abo7",
+    "Abo7"
+   ],
+   "rel": [
+    [
+     0,
+     0,
+     "maj7"
+    ],
+    [
+     4,
+     0,
+     "dim7"
+    ]
+   ]
+  }
+ ]
+}

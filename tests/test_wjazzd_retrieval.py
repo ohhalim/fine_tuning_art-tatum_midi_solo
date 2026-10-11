@@ -86,3 +86,46 @@ class RetrievalRulesTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ExportTest(unittest.TestCase):
+    def test_sub_tick_note_is_excluded_not_lengthened(self) -> None:
+        from scripts.wjazzd_retrieval import quantize_for_export
+        kept, excluded, _ = quantize_for_export([(77, 1.9431, 1.9433)], 1.9433)   # the 0.2 ms note of #1718
+        self.assertEqual(kept, [])
+        self.assertEqual(len(excluded), 1)
+
+    def test_one_tick_note_is_kept(self) -> None:
+        from scripts.wjazzd_retrieval import quantize_for_export
+        kept, excluded, _ = quantize_for_export([(60, 0.010, 0.011)], 1.0)
+        self.assertEqual((kept, excluded), ([(0, 60, 10, 11)], []))
+
+    def test_rounding_ties_follow_the_writer(self) -> None:
+        from scripts.wjazzd_retrieval import quantize_for_export
+        kept, excluded, _ = quantize_for_export([(60, 0.0015, 0.0025), (62, 0.0025, 0.0045)], 1.0)
+        self.assertEqual(round(1.5), 2)
+        self.assertEqual(round(2.5), 2)                    # Python rounds half to even, as write_notes does
+        self.assertEqual([e["pitch"] for e in excluded], [60])   # 2 >= 2: excluded
+        self.assertEqual(kept, [(1, 62, 2, 4)])
+
+    def test_end_never_passes_the_window_end_tick(self) -> None:
+        from scripts.wjazzd_retrieval import quantize_for_export
+        kept, _, checks = quantize_for_export([(60, 0.5, 1.0004)], 1.0)
+        self.assertEqual(kept[0][3], 1000)
+        self.assertEqual(checks["past_window_end"], 0)
+
+    def test_same_pitch_overlap_is_counted(self) -> None:
+        from scripts.wjazzd_retrieval import quantize_for_export
+        _, _, checks = quantize_for_export([(60, 0.0, 0.5), (60, 0.3, 0.6), (62, 0.0, 0.5)], 1.0)
+        self.assertEqual(checks["same_pitch_overlaps"], 1)
+
+    def test_kept_notes_survive_a_midi_round_trip_exactly(self) -> None:
+        import tempfile
+        from scripts.aria_t4b_sim import read_notes, write_notes
+        from scripts.wjazzd_retrieval import quantize_for_export
+        kept, _, _ = quantize_for_export([(60, 0.0123, 0.2), (64, 0.2, 0.2004), (67, 0.21, 0.5)], 0.5)
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "x.mid")
+            write_notes([(p, on / 1000, off / 1000, 80) for _, p, on, off in kept], path)
+            back = [(p, round(s * 1000), round(e * 1000)) for p, s, e, _ in read_notes(path)]
+        self.assertEqual(sorted(back), sorted((p, on, off) for _, p, on, off in kept))
