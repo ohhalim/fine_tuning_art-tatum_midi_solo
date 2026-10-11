@@ -1,0 +1,64 @@
+{
+ "mode": "--precheck",
+ "checks": {
+  "inputs_match_1726_train_report": {
+   "ok": true,
+   "mismatches": []
+  },
+  "unmasked_streams_in_same_order": {
+   "ok": true
+  },
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "multinomial_is_exponential_race_over_steps": {
+   "ok": true,
+   "matched": 32,
+   "of": 32
+  },
+  "mask_non_empty_in_every_state": {
+   "ok": true,
+   "between_notes": 1667,
+   "dur": 501,
+   "onset": 500,
+   "max_onset": 4990
+  },
+  "smoke_reference_is_valid_unmasked_stream": {
+   "ok": true
+  },
+  "smoke_equals_saved_unmasked_stream": {
+   "ok": true,
+   "matched": 24,
+   "of": 24,
+   "min_pre_mask_allowed": 0.9998883008956909
+  },
+  "midi_export": {
+   "ok": true,
+   "notes": 41
+  }
+ },
+ "phases": {
+  "load": {
+   "wall_s": 4.738,
+   "rss_now_bytes": 1663778816,
+   "rss_max_bytes": 5548933120,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 68%"
+  }
+ },
+ "result": "precheck_done",
+ "stopped_at": null,
+ "inputs": {
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "data_sha256": "8501d2aca038d763dbea2149e0ed1171ddcf0107d7d33d6a0d6e5da0c92bd5bb",
+  "manifest_sha256": "0b075bceaa24b9b32818b96b36bf428bf3973525b5b79d51c8ea07eda619cf85",
+  "lora_file_sha256": "0b634c8c10b1d48b865b9e26d8eb1f92e6c486d20958a5b90facda2d70896acb",
+  "unmasked_generations_sha256": "80bb8864ebe6ad3850034013caa8ff5ad4d5d6112f2f0cc532848656e55d544d",
+  "torch": "2.14.1"
+ },
+ "projection": {
+  "smoke_s_per_token_short_context": 0.0516,
+  "estimate_basis": "#1726 generation phase 2357.5 s for the same 16 x 512 steps without the mask",
+  "wall_limit_s": 3600
+ }
+}
