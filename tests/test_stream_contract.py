@@ -81,6 +81,31 @@ class TokenStreamTest(unittest.TestCase):
         self.s.mark_written(6)
         self.assertFalse(self.s.needs_full_prefill)
 
+    def test_tokens_after_eos_are_rejected(self):
+        s = TokenStream([])
+        s.append_sampled("<E>")
+        with self.assertRaises(ValueError):
+            s.append_sampled(("piano", 60, 80))
+        self.assertEqual(s.commit_until(1_000), [])
+        self.assertTrue(s.committed_ended)
+
+    def test_provisional_eos_is_undone_by_rollback(self):
+        for t in note(62, 500, 300):
+            self.s.append_sampled(t)
+        self.s.commit_until(10_000)
+        self.s.append_sampled("<E>")                       # provisional end
+        self.s.rollback_to_committed()
+        self.assertFalse(self.s.committed_ended)
+        self.s.append_sampled(("piano", 64, 80))           # generation can continue
+
+    def test_committed_eos_keeps_the_stream_ended(self):
+        self.s.append_sampled("<E>")
+        self.s.commit_until(10_000)
+        self.s.rollback_to_committed()
+        self.assertTrue(self.s.committed_ended)
+        with self.assertRaises(ValueError):
+            self.s.append_sampled(("piano", 64, 80))
+
 
 class SchedulerTest(unittest.TestCase):
     def setUp(self):
@@ -143,7 +168,31 @@ class SchedulerTest(unittest.TestCase):
         self.sch.tick(1_500)
         self.assertEqual(self.sch.sent, [(500, "on", 0, 62), (1_500, "off", 0, 62)])
 
+    def test_callback_then_tick_sends_once(self):
+        self.sch.schedule([Note(0, 60, 80, 100, 200)])
+        on = self.sch.pending[0]
+        self.assertTrue(self.sch.deliver(on, 100))
+        self.sch.tick(100)
+        self.sch.tick(200)
+        self.assertEqual(self.sch.sent, [(100, "on", 0, 60), (200, "off", 0, 60)])
+
+    def test_duplicate_callback_is_ignored(self):
+        self.sch.schedule([Note(0, 60, 80, 100, 200)])
+        on = self.sch.pending[0]
+        self.assertTrue(self.sch.deliver(on, 100))
+        self.assertFalse(self.sch.deliver(on, 101))
+
+    def test_late_duplicate_on_after_off_is_ignored(self):
+        self.sch.schedule([Note(0, 60, 80, 100, 200)])
+        on = self.sch.pending[0]
+        self.sch.tick(100)
+        self.sch.tick(200)
+        self.assertFalse(self.sch.deliver(on, 250))
+        self.assertEqual(self.sch.sounding, {})
+        self.assertEqual(len(self.sch.sent), 2)
+
     def test_same_pitch_overlap_offs_are_owned_per_note(self):
+        """Logical-event contract only: MIDI 1.0 note-off has no note id (retrigger policy needed for a real synth)."""
         self.sch.schedule([Note(0, 60, 80, 0, 1_000), Note(1, 60, 80, 500, 1_500)])
         for t in (0, 500, 1_000, 1_500):
             self.sch.tick(t)

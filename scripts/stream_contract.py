@@ -17,8 +17,10 @@ TokenStream (rules 1, 2, 3, 5, 6, 8 of the contract)
   committed context must be prefilled again.
 
 Scheduler (rules 4 and 7)
-- committed notes become note-on / note-off events tagged with the current generation; note-offs belong to the
-  scheduler, not to the model, so a rollback never touches them.
+- committed notes become note-on / note-off events tagged with the current generation and a unique event id;
+  each event is consumed once, whether by tick() or by a timer callback. note-offs belong to the scheduler, not to the
+  model, so a rollback never touches them. Ownership per note is a logical-event contract: MIDI 1.0 note-off carries
+  no note id, so a channel/pitch retrigger policy is still needed before a real synth is connected.
 - stop(): block new events, bump the generation (every pending event of an older generation is void), send
   note-off for every sounding note. restart(): accept events again with the new generation. Any callback that
   arrives with an older generation is ignored, also after a restart.
@@ -36,19 +38,23 @@ def _kind(t):
 
 @dataclass(frozen=True)
 class GrammarState:
-    expect: str = "note"        # "note" | "onset" | "dur"
+    expect: str = "note"        # "note" | "onset" | "dur" | "end" (after <E>: nothing more is accepted)
     last_onset: int = 0         # last onset inside the current segment
     segment: int = 0            # number of <T> seen
 
     def advance(self, t):
         k = _kind(t)
+        if self.expect == "end":
+            raise ValueError(f"stream ended at <E>: {t}")
         if self.expect == "note":
             if k == "<T>":
                 return GrammarState("note", 0, self.segment + 1)
             if k == "piano":
                 return GrammarState("onset", self.last_onset, self.segment)
-            if t in ("<D>", "<E>"):
+            if t == "<D>":
                 return self
+            if t == "<E>":
+                return GrammarState("end", self.last_onset, self.segment)
             raise ValueError(f"not allowed between notes: {t}")
         if self.expect == "onset":
             if k != "onset" or t[1] < self.last_onset:
@@ -99,6 +105,11 @@ class TokenStream:
         self.kv_valid_length = self.next_write_pos = upto
         if upto >= self.committed_end:
             self.needs_full_prefill = False
+
+    @property
+    def committed_ended(self):
+        """True once a committed <E> ends the stream; a provisional <E> is undone by a rollback."""
+        return self._state_at[self.committed_end].expect == "end"
 
     def grammar_state(self, upto=None):
         upto = len(self.tokens) if upto is None else upto
@@ -163,6 +174,7 @@ class Event:
     pitch: int
     velocity: int
     generation: int
+    event_id: int
 
 
 class Scheduler:
@@ -172,20 +184,25 @@ class Scheduler:
         self.pending = []      # Events not yet due
         self.sounding = {}     # note_id -> pitch
         self.sent = []         # (time_ms, kind, note_id, pitch) actually sent to the synth
+        self.consumed = set()  # event_ids already delivered: each event is consumed once, by tick or a callback
+        self._next_event_id = 0
 
     def schedule(self, notes):
         if not self.accepting:
             return 0
         for n in notes:
-            self.pending.append(Event(n.on_ms, "on", n.note_id, n.pitch, n.velocity, self.generation))
-            self.pending.append(Event(n.off_ms, "off", n.note_id, n.pitch, 0, self.generation))
+            for time_ms, kind, vel in ((n.on_ms, "on", n.velocity), (n.off_ms, "off", 0)):
+                self.pending.append(Event(time_ms, kind, n.note_id, n.pitch, vel, self.generation, self._next_event_id))
+                self._next_event_id += 1
         self.pending.sort(key=lambda e: (e.time_ms, e.kind == "on"))   # offs before ons at the same time
         return len(notes)
 
     def deliver(self, event, now_ms):
         """A timer callback. Events of an older generation are ignored (late callbacks after stop/restart)."""
-        if event.generation != self.generation:
+        if event.generation != self.generation or event.event_id in self.consumed:
             return False
+        self.consumed.add(event.event_id)
+        self.pending = [e for e in self.pending if e.event_id != event.event_id]
         if event.kind == "on":
             self.sounding[event.note_id] = event.pitch
         elif event.note_id in self.sounding:
@@ -197,7 +214,6 @@ class Scheduler:
 
     def tick(self, now_ms):
         due = [e for e in self.pending if e.time_ms <= now_ms]
-        self.pending = [e for e in self.pending if e.time_ms > now_ms]
         return [e for e in due if self.deliver(e, now_ms)]
 
     def stop(self, now_ms):
