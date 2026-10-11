@@ -47,6 +47,8 @@ frozen Aria에 LoRA를 붙여 Mehldau 녹음 일부로 128 update 학습하면,
 - 32음 미만인 꼬리는 버린다: 12개 녹음에서 169음
 - 창 시작 시점에 이미 울리던 음(앞 창에서 시작)은 창 안에 없다: 전체 3,507음. 기록만 한다
 - loss target은 `<S>` 다음 토큰부터다
+- 그래서 창마다 앞 문맥의 울리던 음이 빠진다. "피아노 문맥 전체를 손실 없이 보존"이 아니라 **"채택한 음을 재토큰화해 보존"**까지만 말한다
+- `<D>`·`<E>` 제거는 원 AbsTokenizer의 공개 옵션이며 vocab을 바꾸지 않는다. base와 adapter에 똑같이 적용한 전처리다. `<D>`가 들어 있던 과거 토큰 실험과 CE 수치를 직접 비교하지 않는다
 
 **생성 prompt**: val 묶음 키 정렬 앞 4개의 첫 녹음, 처음 8초의 음. 토큰 수 102, 180, 69, 159, 4개 모두 가용
 
@@ -57,10 +59,18 @@ frozen Aria에 LoRA를 붙여 Mehldau 녹음 일부로 128 update 학습하면,
 - Adam lr 1e-4, **정확히 128 update, 1회**. 매 update: `random.Random(0)`으로 train 녹음을 균등하게 고르고, 그 녹음의 창을 균등하게 고른다
 - warmup, 증강, lr sweep, 더 긴 학습은 없다
 
+**학습 중·후 검사** (아스트라 검토로 실행 전에 추가)
+- 매 update: backward 뒤 opt.step 전에 LoRA 64개 텐서의 grad가 None이 아니고 유한한지, base 파라미터에 grad가 없는지 본다. step 뒤 LoRA 파라미터가 유한한지 본다. 하나라도 어긋나면 그 자리에서 멈춘다
+  - 첫 update의 A grad는 B=0이라 0이 정상이다. 0은 실패로 보지 않고, None·비유한만 실패로 본다
+- 128 update 뒤: 64개 텐서 모두 초기값에서 바뀌었는지, base grad 없음, base 해시 불변, checkpoint 파일 SHA 불변을 확인한다
+- **파일 재로드:** 고정 train 검산 창(train 첫 녹음의 첫 창)에서 학습 직후 logits를 저장한다. 그다음 LoRA를 파일로 저장하고, 메모리의 LoRA를 0으로 지운 뒤(logits가 달라짐을 확인) 파일에서 다시 불러와 같은 조건으로 비교한다. **허용 오차 0**(실행 전 고정). adapter 평가는 이렇게 다시 불러온 가중치로 한다
+- `--test`는 train 보고서의 개발 판정 통과, test 보고서 부재에 더해 **checkpoint·data·manifest·LoRA 파일 SHA가 train 때와 같은지** 확인한 뒤에만 연다
+- 회귀: `tests/test_aria_lora_helpers.py` 6개(작은 가짜 모델로 grad 검사, 변화 검사, 파일 재로드, 입력 SHA 대조)
+
 ## 평가와 개발 판정
 
 - 같은 창에서 base(LoRA 끔)와 adapter를 비교한다. 녹음당 앞 8개 창까지 쓴다
-- **주지표:** 녹음별 continuation CE(녹음 안에서는 토큰 가중) 변화의 녹음 평균. 보조로 묶음 평균, 토큰 가중 평균, 토큰 종류별(pitch / onset / dur / `<T>`), pitch를 velocity에 대해 합친 pitch 주변 CE, pitch가 주어졌을 때의 velocity CE를 함께 낸다
+- **주지표:** 녹음별 continuation CE(녹음 안에서는 토큰 가중) 변화의 녹음 평균. 묶음 평균을 항상 함께 낸다. 대상(Mehldau 묶음)과 비대상(probe 20곡)은 섞지 않고 따로 낸다. 보조로 묶음 평균, 토큰 가중 평균, 토큰 종류별(pitch / onset / dur / `<T>`), pitch를 velocity에 대해 합친 pitch 주변 CE, pitch가 주어졌을 때의 velocity CE를 함께 낸다
 - **개발 판정 (모두 충족해야 통과)**
   1. val ΔCE(녹음 평균) < 0
   2. probe ΔCE(녹음 평균) ≤ +0.02 nat/token

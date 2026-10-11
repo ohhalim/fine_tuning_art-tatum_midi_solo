@@ -35,12 +35,13 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from aria_cond_smoke import Stop, file_sha, pressure, rss  # noqa: E402
-from aria_lora import AriaLoRA  # noqa: E402
+from aria_lora import AriaLoRA, grad_problems, input_mismatches, named_lora, unchanged  # noqa: E402
 from aria_token_validity import check as token_check  # noqa: E402
 
 SEED, RANK, ALPHA, LR, UPDATES = 0, 16, 16, 1e-4, 128
 GEN_SEEDS, GEN_TOKENS, TEMP = (1, 2), 512, 1.0
 VAL_MAX_DCE, PROBE_MAX_DCE = 0.0, 0.02
+RELOAD_TOLERANCE = 0.0      # fixed before the run
 WALL = {"--precheck": 900, "--train": 3600, "--test": 1200}
 NGRAM = 16
 
@@ -91,6 +92,12 @@ def main() -> None:
         dev = json.load(open(os.path.join(out_dir, "train_report.json")))
         assert dev.get("development", {}).get("pass") is True, "development verdict did not pass: test stays unopened"
         assert not os.path.exists(report_path), "test report exists: the test split is evaluated once"
+        cur = {"checkpoint_sha256": file_sha(ckpt), "data_sha256": file_sha(data_path),
+               "manifest_sha256": file_sha(manifest_path), "lora_file_sha256": file_sha(os.path.join(out_dir, "lora_u128.pt"))}
+        rec = {**{k: dev["provenance"].get(k) for k in ("checkpoint_sha256", "data_sha256", "manifest_sha256")},
+               "lora_file_sha256": dev.get("lora_file_sha256")}
+        bad = input_mismatches(rec, cur)
+        assert not bad, f"inputs differ from the train report: {bad}"
     log = {"mode": mode, "phases": {}, "checks": {}, "result": None, "stopped_at": None}
     import torch
 
@@ -147,6 +154,15 @@ def main() -> None:
         model.to(dev_)
         model.model.freqs_cis = None
         lora = AriaLoRA(model, rank=RANK, alpha=ALPHA, seed=SEED, device=dev_)
+
+        def base_sha():
+            h = hashlib.sha256()
+            for name, p in sorted(model.named_parameters()):
+                h.update(name.encode())
+                h.update(p.detach().cpu().contiguous().numpy().tobytes())
+            return h.hexdigest()
+
+        base_sha0 = base_sha()
         log["provenance"] = {"checkpoint_sha256": file_sha(ckpt), "data_sha256": manifest["data_sha256"],
                              "manifest_sha256": file_sha(manifest_path), "torch": torch.__version__,
                              "tokenizer": "ariautils AbsTokenizer", "config": cfg_dict, "lora_params": lora.n_params()}
@@ -336,6 +352,7 @@ def main() -> None:
             phase("base_eval", t)
             torch.manual_seed(SEED)
             rng = random.Random(SEED)
+            init_sd = {n: p.detach().cpu().clone() for n, p in named_lora(lora)}
             opt = torch.optim.Adam(lora.parameters(), lr=LR)
             check("optimizer_only_lora", {id(p) for g in opt.param_groups for p in g["params"]} == {id(p) for p in lora.parameters()})
             model.train()
@@ -356,17 +373,47 @@ def main() -> None:
                     raise Stop(f"non-finite loss at update {u}")
                 opt.zero_grad(set_to_none=True)
                 loss.backward()
+                bad = grad_problems(named_lora(lora))
+                if bad:
+                    raise Stop(f"LoRA grad problem before step at update {u}: {bad[:4]}")
+                if any(p.grad is not None for p in model.parameters()):
+                    raise Stop(f"base parameter received a grad at update {u}")
                 opt.step()
+                if not all(bool(torch.isfinite(p).all()) for p in lora.parameters()):
+                    raise Stop(f"non-finite LoRA parameter after step at update {u}")
                 steps.append({"update": u, "path": r["path"], "window": wi, "loss": loss.item()})
             torch.mps.synchronize()
             peak["run"] = False
             th.join()
             phase("train", t, observed_max_driver_bytes=peak["v"])
             log["train_steps"] = steps
+            check("updates_done", len(steps) == UPDATES, updates=len(steps))
+            same = unchanged(lora, init_sd)
+            check("every_lora_tensor_changed", not same, unchanged=same)
+            check("base_grads_none_after_training", all(p.grad is None for p in model.parameters()))
+            check("base_sha_unchanged_after_training", base_sha() == base_sha0, sha=base_sha0[:16])
+            # reload from the saved file only, compared on a fixed train window
+            probe_w = recs["train"][0]["windows"][0]
+            xw = torch.tensor([probe_w["ids"]], device=dev_)
+            model.eval()
+            with torch.no_grad():
+                before = model(xw).float()
             sd = lora.state_dict()
             lora_path = os.path.join(out_dir, "lora_u128.pt")
             torch.save(sd, lora_path)
             log["lora_file_sha256"] = file_sha(lora_path)
+            with torch.no_grad():
+                for p in lora.parameters():
+                    p.zero_()
+                zeroed = model(xw).float()
+            lora.load_state_dict(torch.load(lora_path))
+            with torch.no_grad():
+                after = model(xw).float()
+            d_reload, d_zero = (after - before).abs().max().item(), (zeroed - before).abs().max().item()
+            check("reload_from_file_equals_trained", d_reload <= RELOAD_TOLERANCE and d_zero > 0,
+                  max_abs_diff=d_reload, tolerance=RELOAD_TOLERANCE, zeroed_differs_by=d_zero,
+                  window=f"{recs['train'][0]['path']}#0", file_sha256=log["lora_file_sha256"])
+            check("checkpoint_sha_unchanged", file_sha(ckpt) == log["provenance"]["checkpoint_sha256"])
             t = time.perf_counter()
             ad_val, ad_probe = evaluate("val", True), evaluate("probe", True)
             phase("adapter_eval", t)

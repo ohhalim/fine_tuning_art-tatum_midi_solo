@@ -53,3 +53,28 @@ class AriaLoRA:
 
     def load_state_dict(self, sd):
         self.params.load_state_dict(sd)
+
+
+def grad_problems(named):
+    """Names of tensors whose grad is None or not finite. `named` is [(name, param)]."""
+    bad = []
+    for name, p in named:
+        if p.grad is None:
+            bad.append((name, "none"))
+        elif not bool(torch.isfinite(p.grad).all()):
+            bad.append((name, "non_finite"))
+    return bad
+
+
+def named_lora(lora):
+    return [(f"{k}.{t}", lora.params[k][t]) for k in lora.params for t in ("A", "B")]
+
+
+def unchanged(lora, init_sd):
+    """Names of LoRA tensors still equal to their initial value."""
+    return [n for n, p in named_lora(lora) if torch.equal(p.detach().cpu(), init_sd[n])]
+
+
+def input_mismatches(recorded: dict, current: dict):
+    """Keys whose recorded and current hashes differ or are missing on either side."""
+    return sorted(k for k in set(recorded) | set(current) if recorded.get(k) is None or recorded.get(k) != current.get(k))
