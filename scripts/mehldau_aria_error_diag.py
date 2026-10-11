@@ -309,15 +309,16 @@ def main() -> None:
                 return "unclear"
 
             med_s = [x["median_ratio"] for x in streams_s]
+            flipped = any(x["direction_flips"] for x in path_checks)
             reproduced = all(p["replay_reproduces_sample"] for p in points)
             log["reading"] = {
                 "R1_E": {"verdict": verdict(sum(r > 1 for r in r_e), sum(r < 1 for r in r_e), statistics.median(r_e), MAJORITY_E),
                          "adapter_higher": sum(r > 1 for r in r_e), "of": len(r_e), "median_ratio": statistics.median(r_e),
                          "per_error": [{"stream": p["stream"], "ratio": r, "base": p["base"]["p_non_piano"], "adapter": p["adapter"]["p_non_piano"]}
                                        for p, r in zip(e_pts, r_e)]},
-                "R1_S": {"verdict": verdict(sum(m > 1 for m in med_s), sum(m < 1 for m in med_s), statistics.median(med_s), MAJORITY_S),
+                "R1_S": {"verdict": "withheld" if flipped else verdict(sum(m > 1 for m in med_s), sum(m < 1 for m in med_s), statistics.median(med_s), MAJORITY_S),
                          "streams_adapter_higher": sum(m > 1 for m in med_s), "of": len(med_s), "median_of_stream_medians": statistics.median(med_s),
-                         "withheld_path_direction_flip": any(x["direction_flips"] for x in path_checks)},
+                         "withheld_path_direction_flip": flipped},
                 "R2": {"errors_with_p_selected_below": TAIL_P,
                        "count": sum(1 for p in e_pts if p[p["generator"]]["p_selected"] < TAIL_P), "of": len(e_pts)},
                 "R3": {"replay_reproduced_all": reproduced,
