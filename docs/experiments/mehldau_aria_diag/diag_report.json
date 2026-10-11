@@ -1,0 +1,1307 @@
+{
+ "mode": "--run",
+ "checks": {
+  "inputs_match_1726_train_report": {
+   "ok": true,
+   "mismatches": []
+  },
+  "generations_match_report": {
+   "ok": true
+  },
+  "plan_made_from_same_inputs": {
+   "ok": true
+  },
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "multinomial_is_exponential_race_over_steps": {
+   "ok": true,
+   "matched": 32,
+   "of": 32,
+   "torch": "2.14.1"
+  },
+  "forward_deterministic": {
+   "ok": true
+  },
+  "adapter_differs_from_base": {
+   "ok": true
+  },
+  "E_C_masses_ok": {
+   "ok": true,
+   "min_base": 9.073217370314524e-06,
+   "min_adapter": 1.0090215255331714e-05
+  },
+  "S_masses_ok_stream_0": {
+   "ok": true,
+   "min_base": 5.999230978659398e-08,
+   "min_adapter": 4.2642403741410817e-07
+  },
+  "S_masses_ok_stream_1": {
+   "ok": true,
+   "min_base": 1.5887485460552853e-06,
+   "min_adapter": 1.5727875961601967e-06
+  },
+  "S_masses_ok_stream_2": {
+   "ok": true,
+   "min_base": 1.573903745111238e-07,
+   "min_adapter": 9.420125479664421e-07
+  },
+  "S_masses_ok_stream_3": {
+   "ok": true,
+   "min_base": 4.72913228577454e-07,
+   "min_adapter": 4.228225520819251e-07
+  },
+  "S_masses_ok_stream_4": {
+   "ok": true,
+   "min_base": 4.963069386576535e-07,
+   "min_adapter": 6.797642981837271e-07
+  },
+  "S_masses_ok_stream_5": {
+   "ok": true,
+   "min_base": 1.2679986411967548e-06,
+   "min_adapter": 7.787219828969683e-07
+  },
+  "S_masses_ok_stream_6": {
+   "ok": true,
+   "min_base": 5.806405170005746e-07,
+   "min_adapter": 8.260533377324464e-07
+  },
+  "S_masses_ok_stream_7": {
+   "ok": true,
+   "min_base": 1.936556827786262e-06,
+   "min_adapter": 1.0849380487343296e-06
+  },
+  "S_masses_ok_stream_8": {
+   "ok": true,
+   "min_base": 1.873907876870362e-06,
+   "min_adapter": 2.1664823179889936e-06
+  },
+  "S_masses_ok_stream_9": {
+   "ok": true,
+   "min_base": 2.4477501483488595e-06,
+   "min_adapter": 1.6458849358969019e-06
+  },
+  "S_masses_ok_stream_10": {
+   "ok": true,
+   "min_base": 2.40482336266723e-06,
+   "min_adapter": 4.189321771264076e-06
+  },
+  "S_masses_ok_stream_11": {
+   "ok": true,
+   "min_base": 2.211312676081434e-06,
+   "min_adapter": 1.1679392173391534e-06
+  },
+  "S_masses_ok_stream_12": {
+   "ok": true,
+   "min_base": 5.585205258284986e-07,
+   "min_adapter": 4.738000711768109e-07
+  },
+  "S_masses_ok_stream_13": {
+   "ok": true,
+   "min_base": 2.3093875256563479e-07,
+   "min_adapter": 3.3737202898009855e-07
+  },
+  "S_masses_ok_stream_14": {
+   "ok": true,
+   "min_base": 6.496172773040598e-07,
+   "min_adapter": 2.1157650280656526e-06
+  },
+  "S_masses_ok_stream_15": {
+   "ok": true,
+   "min_base": 2.1387729702837532e-06,
+   "min_adapter": 3.2613586427032715e-06
+  }
+ },
+ "phases": {
+  "load": {
+   "wall_s": 4.875,
+   "rss_now_bytes": 1679851520,
+   "rss_max_bytes": 5519294464,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 71%"
+  },
+  "E_C": {
+   "wall_s": 4.099,
+   "rss_now_bytes": 1409155072,
+   "rss_max_bytes": 5519294464,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 67%"
+  },
+  "S": {
+   "wall_s": 4.097,
+   "rss_now_bytes": 1685815296,
+   "rss_max_bytes": 5519294464,
+   "vm_pressure_level": 1,
+   "free_percent_line": "System-wide memory free percentage: 68%"
+  }
+ },
+ "result": "run_done",
+ "stopped_at": null,
+ "inputs": {
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "data_sha256": "8501d2aca038d763dbea2149e0ed1171ddcf0107d7d33d6a0d6e5da0c92bd5bb",
+  "manifest_sha256": "0b075bceaa24b9b32818b96b36bf428bf3973525b5b79d51c8ea07eda619cf85",
+  "lora_file_sha256": "0b634c8c10b1d48b865b9e26d8eb1f92e6c486d20958a5b90facda2d70896acb",
+  "generations_sha256": "80bb8864ebe6ad3850034013caa8ff5ad4d5d6112f2f0cc532848656e55d544d"
+ },
+ "vocab": {
+  "size": 17727,
+  "non_piano": 15023,
+  "allowed_between_notes": 1667,
+  "dur": 501,
+  "onset": 500
+ },
+ "points": [
+  {
+   "stream": 1,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "seed": 1,
+   "generator": "adapter",
+   "where": "C",
+   "index": 36,
+   "state": "dur",
+   "token": "('dur', 800)",
+   "base": {
+    "p_non_piano": 6.806577584939077e-05,
+    "p_allowed": 0.9998641014099121,
+    "p_selected": 0.0038087416905909777,
+    "selected_rank": 54,
+    "top_non_piano": [
+     "('drum', 38)",
+     "('drum', 81)",
+     "('drum', 62)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.013597211800515652,
+    "p_allowed": 0.9776155948638916,
+    "p_selected": 0.02246246114373207,
+    "selected_rank": 7,
+    "top_non_piano": [
+     "('strings', 66, 80)",
+     "('strings', 57, 100)",
+     "('ensemble', 60, 60)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 434,
+   "noise_of_selected": 0.024465829133987427,
+   "other_model_pick": "('dur', 2570)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 1,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "seed": 1,
+   "generator": "adapter",
+   "where": "E",
+   "index": 39,
+   "state": "dur",
+   "token": "('synth_lead', 52, 90)",
+   "base": {
+    "p_non_piano": 2.7656533347908407e-05,
+    "p_allowed": 0.999940037727356,
+    "p_selected": 1.5459061808442698e-09,
+    "selected_rank": 15767,
+    "top_non_piano": [
+     "('drum', 62)",
+     "('drum', 38)",
+     "('drum', 81)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.023124469444155693,
+    "p_allowed": 0.9636392593383789,
+    "p_selected": 1.8925385347756674e-06,
+    "selected_rank": 3453,
+    "top_non_piano": [
+     "('strings', 57, 100)",
+     "('strings', 66, 80)",
+     "('strings', 67, 80)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 1,
+   "noise_of_selected": 2.3249281184689607e-06,
+   "other_model_pick": "('dur', 730)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 2,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "seed": 2,
+   "generator": "base",
+   "where": "C",
+   "index": 280,
+   "state": "onset",
+   "token": "('onset', 3040)",
+   "base": {
+    "p_non_piano": 7.739120337646455e-05,
+    "p_allowed": 0.9996975064277649,
+    "p_selected": 0.5862237811088562,
+    "selected_rank": 1,
+    "top_non_piano": [
+     "('drum', 46)",
+     "('brass', 60, 110)",
+     "('brass', 70, 110)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.00017716128786560148,
+    "p_allowed": 0.9980690479278564,
+    "p_selected": 0.3384300172328949,
+    "selected_rank": 1,
+    "top_non_piano": [
+     "('drum', 46)",
+     "('reed', 64, 120)",
+     "('strings', 82, 110)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 2673,
+   "noise_of_selected": 0.16013510525226593,
+   "other_model_pick": "('onset', 3040)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 2,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "seed": 2,
+   "generator": "base",
+   "where": "E",
+   "index": 283,
+   "state": "onset",
+   "token": "('ensemble', 70, 30)",
+   "base": {
+    "p_non_piano": 0.0001306100602960214,
+    "p_allowed": 0.9968888759613037,
+    "p_selected": 1.1908928065906821e-08,
+    "selected_rank": 3090,
+    "top_non_piano": [
+     "('brass', 58, 70)",
+     "('reed', 66, 120)",
+     "('reed', 54, 120)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.0001430138072464615,
+    "p_allowed": 0.9966613054275513,
+    "p_selected": 1.1855494363999242e-08,
+    "selected_rank": 3507,
+    "top_non_piano": [
+     "('brass', 58, 70)",
+     "('reed', 66, 120)",
+     "('brass', 70, 120)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 1,
+   "noise_of_selected": 6.8626295757212574e-09,
+   "other_model_pick": "('ensemble', 70, 30)",
+   "other_model_pick_allowed": false
+  },
+  {
+   "stream": 3,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "seed": 2,
+   "generator": "adapter",
+   "where": "C",
+   "index": 142,
+   "state": "dur",
+   "token": "('dur', 670)",
+   "base": {
+    "p_non_piano": 1.1164946045028046e-05,
+    "p_allowed": 0.9999765753746033,
+    "p_selected": 0.11633025109767914,
+    "selected_rank": 3,
+    "top_non_piano": [
+     "('drum', 62)",
+     "('drum', 81)",
+     "('drum', 38)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.00044042046647518873,
+    "p_allowed": 0.9992566108703613,
+    "p_selected": 0.6032214164733887,
+    "selected_rank": 1,
+    "top_non_piano": [
+     "('guitar', 55, 110)",
+     "('ensemble', 87, 100)",
+     "('guitar', 55, 100)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 2471,
+   "noise_of_selected": 0.1449350267648697,
+   "other_model_pick": "('dur', 670)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 3,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "seed": 2,
+   "generator": "adapter",
+   "where": "E",
+   "index": 145,
+   "state": "dur",
+   "token": "('organ', 117, 100)",
+   "base": {
+    "p_non_piano": 2.24343930312898e-05,
+    "p_allowed": 0.9999587535858154,
+    "p_selected": 1.4556981176028216e-09,
+    "selected_rank": 9972,
+    "top_non_piano": [
+     "('drum', 62)",
+     "('drum', 81)",
+     "('drum', 38)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.001682483358308673,
+    "p_allowed": 0.9973504543304443,
+    "p_selected": 1.0954795470752288e-07,
+    "selected_rank": 9530,
+    "top_non_piano": [
+     "('guitar', 56, 110)",
+     "('strings', 57, 100)",
+     "('guitar', 75, 110)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 1,
+   "noise_of_selected": 1.8504989762746504e-09,
+   "other_model_pick": "('dur', 640)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 5,
+   "prompt": "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi",
+   "seed": 1,
+   "generator": "adapter",
+   "where": "C",
+   "index": 149,
+   "state": "dur",
+   "token": "('dur', 1160)",
+   "base": {
+    "p_non_piano": 8.144279854604974e-05,
+    "p_allowed": 0.9998605251312256,
+    "p_selected": 0.001955043524503708,
+    "selected_rank": 110,
+    "top_non_piano": [
+     "('drum', 81)",
+     "('drum', 62)",
+     "('drum', 48)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.0076516359113156796,
+    "p_allowed": 0.9890031814575195,
+    "p_selected": 0.0019087980035692453,
+    "selected_rank": 84,
+    "top_non_piano": [
+     "('guitar', 56, 120)",
+     "('guitar', 71, 120)",
+     "('ensemble', 68, 50)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 38,
+   "noise_of_selected": 0.0023404329549521208,
+   "other_model_pick": "('dur', 1160)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 5,
+   "prompt": "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi",
+   "seed": 1,
+   "generator": "adapter",
+   "where": "E",
+   "index": 152,
+   "state": "dur",
+   "token": "('strings', 57, 30)",
+   "base": {
+    "p_non_piano": 8.609929500380531e-05,
+    "p_allowed": 0.9998632669448853,
+    "p_selected": 7.199634222132545e-09,
+    "selected_rank": 3105,
+    "top_non_piano": [
+     "('drum', 62)",
+     "('drum', 81)",
+     "('drum', 38)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.004167318344116211,
+    "p_allowed": 0.9935834407806396,
+    "p_selected": 2.8545230179588543e-07,
+    "selected_rank": 4459,
+    "top_non_piano": [
+     "('guitar', 58, 80)",
+     "('guitar', 51, 80)",
+     "('guitar', 58, 90)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 1,
+   "noise_of_selected": 1.199319399347587e-07,
+   "other_model_pick": "('dur', 400)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 7,
+   "prompt": "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi",
+   "seed": 2,
+   "generator": "adapter",
+   "where": "C",
+   "index": 280,
+   "state": "dur",
+   "token": "('dur', 160)",
+   "base": {
+    "p_non_piano": 3.023378667421639e-05,
+    "p_allowed": 0.9999468922615051,
+    "p_selected": 0.012802773155272007,
+    "selected_rank": 15,
+    "top_non_piano": [
+     "('drum', 62)",
+     "('drum', 81)",
+     "('drum', 38)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.0019357481505721807,
+    "p_allowed": 0.9967139959335327,
+    "p_selected": 0.027348509058356285,
+    "selected_rank": 8,
+    "top_non_piano": [
+     "('brass', 58, 80)",
+     "('strings', 57, 100)",
+     "('guitar', 58, 80)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 631,
+   "noise_of_selected": 0.03848651796579361,
+   "other_model_pick": "('dur', 880)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 7,
+   "prompt": "studio/Brad Mehldau/Suite -  April 2020/Don't Let It Bring You Down.midi",
+   "seed": 2,
+   "generator": "adapter",
+   "where": "E",
+   "index": 283,
+   "state": "dur",
+   "token": "('ensemble', 70, 30)",
+   "base": {
+    "p_non_piano": 8.520872506778687e-05,
+    "p_allowed": 0.9998675584793091,
+    "p_selected": 1.0111931736389579e-08,
+    "selected_rank": 1898,
+    "top_non_piano": [
+     "('drum', 81)",
+     "('drum', 62)",
+     "('drum', 38)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.003070841310545802,
+    "p_allowed": 0.9950359463691711,
+    "p_selected": 3.338513181461167e-07,
+    "selected_rank": 2234,
+    "top_non_piano": [
+     "('brass', 58, 80)",
+     "('guitar', 58, 80)",
+     "('strings', 57, 100)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 1,
+   "noise_of_selected": 6.8626295757212574e-09,
+   "other_model_pick": "('ensemble', 70, 30)",
+   "other_model_pick_allowed": false
+  },
+  {
+   "stream": 9,
+   "prompt": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+   "seed": 1,
+   "generator": "adapter",
+   "where": "C",
+   "index": 149,
+   "state": "dur",
+   "token": "('dur', 1160)",
+   "base": {
+    "p_non_piano": 6.91130044288002e-05,
+    "p_allowed": 0.999893307685852,
+    "p_selected": 0.007234911434352398,
+    "selected_rank": 36,
+    "top_non_piano": [
+     "('drum', 81)",
+     "('drum', 62)",
+     "('drum', 48)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.0032424847595393658,
+    "p_allowed": 0.995057225227356,
+    "p_selected": 0.0038401170168071985,
+    "selected_rank": 47,
+    "top_non_piano": [
+     "('strings', 57, 100)",
+     "('ensemble', 68, 50)",
+     "('guitar', 56, 120)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 38,
+   "noise_of_selected": 0.0023404329549521208,
+   "other_model_pick": "('dur', 1160)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 9,
+   "prompt": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+   "seed": 1,
+   "generator": "adapter",
+   "where": "E",
+   "index": 152,
+   "state": "dur",
+   "token": "('strings', 57, 30)",
+   "base": {
+    "p_non_piano": 2.5245592041756026e-05,
+    "p_allowed": 0.9999529123306274,
+    "p_selected": 2.032014778663438e-09,
+    "selected_rank": 3340,
+    "top_non_piano": [
+     "('drum', 62)",
+     "('drum', 81)",
+     "('drum', 38)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.003995584789663553,
+    "p_allowed": 0.9931971430778503,
+    "p_selected": 2.9577637405964197e-07,
+    "selected_rank": 4055,
+    "top_non_piano": [
+     "('guitar', 58, 80)",
+     "('guitar', 56, 80)",
+     "('guitar', 54, 80)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 1,
+   "noise_of_selected": 1.199319399347587e-07,
+   "other_model_pick": "('dur', 400)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 10,
+   "prompt": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+   "seed": 2,
+   "generator": "base",
+   "where": "C",
+   "index": 142,
+   "state": "onset",
+   "token": "('onset', 2840)",
+   "base": {
+    "p_non_piano": 0.00010026473319157958,
+    "p_allowed": 0.997827410697937,
+    "p_selected": 0.0057245721109211445,
+    "selected_rank": 54,
+    "top_non_piano": [
+     "('drum', 50)",
+     "('brass', 48, 80)",
+     "('brass', 48, 70)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.00013413473789114505,
+    "p_allowed": 0.9981414079666138,
+    "p_selected": 0.008258994668722153,
+    "selected_rank": 41,
+    "top_non_piano": [
+     "('brass', 70, 120)",
+     "('drum', 50)",
+     "('brass', 48, 80)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 49,
+   "noise_of_selected": 0.0030028591863811016,
+   "other_model_pick": "('onset', 2840)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 10,
+   "prompt": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+   "seed": 2,
+   "generator": "base",
+   "where": "E",
+   "index": 145,
+   "state": "onset",
+   "token": "('organ', 117, 100)",
+   "base": {
+    "p_non_piano": 2.1498957721632905e-05,
+    "p_allowed": 0.9999071359634399,
+    "p_selected": 1.3767850193247e-09,
+    "selected_rank": 6895,
+    "top_non_piano": [
+     "('reed', 75, 110)",
+     "('reed', 75, 120)",
+     "('reed', 76, 110)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 2.6275063646608032e-05,
+    "p_allowed": 0.9995978474617004,
+    "p_selected": 1.668307714197681e-09,
+    "selected_rank": 6871,
+    "top_non_piano": [
+     "('reed', 64, 120)",
+     "('reed', 75, 120)",
+     "('reed', 66, 120)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 1,
+   "noise_of_selected": 1.8504989762746504e-09,
+   "other_model_pick": "('onset', 3380)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 11,
+   "prompt": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+   "seed": 2,
+   "generator": "adapter",
+   "where": "C",
+   "index": 38,
+   "state": "dur",
+   "token": "('dur', 2500)",
+   "base": {
+    "p_non_piano": 5.822101957164705e-05,
+    "p_allowed": 0.9999010562896729,
+    "p_selected": 0.0008922994020394981,
+    "selected_rank": 238,
+    "top_non_piano": [
+     "('drum', 62)",
+     "('drum', 81)",
+     "('drum', 48)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.008096039295196533,
+    "p_allowed": 0.9866528511047363,
+    "p_selected": 0.0006172824651002884,
+    "selected_rank": 208,
+    "top_non_piano": [
+     "('guitar', 58, 80)",
+     "('brass', 58, 80)",
+     "('guitar', 58, 100)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 3,
+   "noise_of_selected": 0.00014852610183879733,
+   "other_model_pick": "('dur', 2500)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 11,
+   "prompt": "live/Brad Mehldau/Live in Tokyo/From This Moment On.midi",
+   "seed": 2,
+   "generator": "adapter",
+   "where": "E",
+   "index": 41,
+   "state": "dur",
+   "token": "('bass', 80, 0)",
+   "base": {
+    "p_non_piano": 2.8576832846738398e-05,
+    "p_allowed": 0.9999495148658752,
+    "p_selected": 1.8757919661993583e-09,
+    "selected_rank": 5191,
+    "top_non_piano": [
+     "('drum', 62)",
+     "('drum', 81)",
+     "('drum', 38)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.023415425792336464,
+    "p_allowed": 0.9634382128715515,
+    "p_selected": 1.5217699456115952e-06,
+    "selected_rank": 8164,
+    "top_non_piano": [
+     "('strings', 66, 80)",
+     "('strings', 57, 100)",
+     "('strings', 46, 80)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 1,
+   "noise_of_selected": 5.345464728634397e-07,
+   "other_model_pick": "('dur', 760)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 14,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi",
+   "seed": 2,
+   "generator": "base",
+   "where": "C",
+   "index": 142,
+   "state": "note",
+   "token": "('piano', 57, 70)",
+   "base": {
+    "p_non_piano": 1.0840241884579882e-05,
+    "p_allowed": 0.9999696016311646,
+    "p_selected": 0.01308499462902546,
+    "selected_rank": 17,
+    "top_non_piano": [
+     "('ensemble', 63, 60)",
+     "('ensemble', 63, 70)",
+     "('ensemble', 64, 60)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 1.1480829016363714e-05,
+    "p_allowed": 0.9999691247940063,
+    "p_selected": 0.011657947674393654,
+    "selected_rank": 24,
+    "top_non_piano": [
+     "('ensemble', 63, 60)",
+     "('ensemble', 63, 70)",
+     "('ensemble', 64, 60)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 64,
+   "noise_of_selected": 0.004053363110870123,
+   "other_model_pick": "('piano', 57, 70)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 14,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi",
+   "seed": 2,
+   "generator": "base",
+   "where": "E",
+   "index": 145,
+   "state": "note",
+   "token": "('organ', 117, 100)",
+   "base": {
+    "p_non_piano": 1.321599575021537e-05,
+    "p_allowed": 0.9999647736549377,
+    "p_selected": 8.419312469420959e-10,
+    "selected_rank": 6917,
+    "top_non_piano": [
+     "('strings', 53, 60)",
+     "('organ', 58, 90)",
+     "('ensemble', 53, 60)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 1.0090215255331714e-05,
+    "p_allowed": 0.9999728202819824,
+    "p_selected": 6.219757486825017e-10,
+    "selected_rank": 6649,
+    "top_non_piano": [
+     "('strings', 53, 60)",
+     "('ensemble', 60, 60)",
+     "('ensemble', 53, 60)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 1,
+   "noise_of_selected": 1.8504989762746504e-09,
+   "other_model_pick": "('piano', 60, 60)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 15,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi",
+   "seed": 2,
+   "generator": "adapter",
+   "where": "C",
+   "index": 142,
+   "state": "dur",
+   "token": "('dur', 150)",
+   "base": {
+    "p_non_piano": 1.4032441868039314e-05,
+    "p_allowed": 0.9999717473983765,
+    "p_selected": 0.00581697141751647,
+    "selected_rank": 40,
+    "top_non_piano": [
+     "('drum', 38)",
+     "('drum', 62)",
+     "('drum', 42)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.0005723026115447283,
+    "p_allowed": 0.9989604949951172,
+    "p_selected": 0.00372533337213099,
+    "selected_rank": 37,
+    "top_non_piano": [
+     "('brass', 58, 80)",
+     "('strings', 66, 80)",
+     "('strings', 67, 80)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 14,
+   "noise_of_selected": 0.0007997386273927987,
+   "other_model_pick": "('dur', 150)",
+   "other_model_pick_allowed": true
+  },
+  {
+   "stream": 15,
+   "prompt": "live/Brad Mehldau/10 Years Solo Live/Get Happy - Live.midi",
+   "seed": 2,
+   "generator": "adapter",
+   "where": "E",
+   "index": 145,
+   "state": "dur",
+   "token": "('organ', 117, 100)",
+   "base": {
+    "p_non_piano": 9.073217370314524e-06,
+    "p_allowed": 0.9999791383743286,
+    "p_selected": 5.776099598620021e-10,
+    "selected_rank": 6499,
+    "top_non_piano": [
+     "('drum', 62)",
+     "('drum', 38)",
+     "('drum', 81)"
+    ]
+   },
+   "adapter": {
+    "p_non_piano": 0.0003417405823711306,
+    "p_allowed": 0.9993166923522949,
+    "p_selected": 2.2041378500148312e-08,
+    "selected_rank": 8757,
+    "top_non_piano": [
+     "('guitar', 58, 80)",
+     "('ensemble', 67, 50)",
+     "('ensemble', 68, 50)"
+    ]
+   },
+   "replay_reproduces_sample": true,
+   "noise_rank_of_selected": 1,
+   "noise_of_selected": 1.8504989762746504e-09,
+   "other_model_pick": "('dur', 260)",
+   "other_model_pick_allowed": true
+  }
+ ],
+ "S": [
+  {
+   "stream": 0,
+   "generator": "base",
+   "positions": 512,
+   "median_ratio": 2.229518413543701,
+   "median_p_non_piano_base": 7.788008588249795e-06,
+   "median_p_non_piano_adapter": 2.0908635633531958e-05,
+   "positions_adapter_higher": 397,
+   "mean_p_non_piano_base": 1.3732724255532958e-05,
+   "mean_p_non_piano_adapter": 0.00019729429914150387,
+   "max_p_non_piano_base": 0.00032365447259508073,
+   "max_p_non_piano_adapter": 0.01103738322854042
+  },
+  {
+   "stream": 1,
+   "generator": "adapter",
+   "positions": 39,
+   "median_ratio": 3.1053600311279297,
+   "median_p_non_piano_base": 1.2362326742731966e-05,
+   "median_p_non_piano_adapter": 2.9103945053066127e-05,
+   "positions_adapter_higher": 33,
+   "mean_p_non_piano_base": 2.3075150238582864e-05,
+   "mean_p_non_piano_adapter": 0.00316087668761611,
+   "max_p_non_piano_base": 0.00010955438483506441,
+   "max_p_non_piano_adapter": 0.03590942919254303
+  },
+  {
+   "stream": 2,
+   "generator": "base",
+   "positions": 283,
+   "median_ratio": 2.0643250942230225,
+   "median_p_non_piano_base": 1.5872932635829784e-05,
+   "median_p_non_piano_adapter": 4.917092155665159e-05,
+   "positions_adapter_higher": 209,
+   "mean_p_non_piano_base": 4.0596580220153555e-05,
+   "mean_p_non_piano_adapter": 0.0004842730995733291,
+   "max_p_non_piano_base": 0.0008496391819790006,
+   "max_p_non_piano_adapter": 0.01471741497516632
+  },
+  {
+   "stream": 3,
+   "generator": "adapter",
+   "positions": 145,
+   "median_ratio": 2.06787371635437,
+   "median_p_non_piano_base": 1.0868880053749308e-05,
+   "median_p_non_piano_adapter": 2.9069455194985494e-05,
+   "positions_adapter_higher": 111,
+   "mean_p_non_piano_base": 1.8990527678397484e-05,
+   "mean_p_non_piano_adapter": 0.0008862790418788791,
+   "max_p_non_piano_base": 0.00021964756888337433,
+   "max_p_non_piano_adapter": 0.013206363655626774
+  },
+  {
+   "stream": 4,
+   "generator": "base",
+   "positions": 512,
+   "median_ratio": 1.902896225452423,
+   "median_p_non_piano_base": 3.443919922574423e-05,
+   "median_p_non_piano_adapter": 9.380937262903899e-05,
+   "positions_adapter_higher": 320,
+   "mean_p_non_piano_base": 4.5988213969394565e-05,
+   "mean_p_non_piano_adapter": 0.000592122261878103,
+   "max_p_non_piano_base": 0.0006436582189053297,
+   "max_p_non_piano_adapter": 0.006399584002792835
+  },
+  {
+   "stream": 5,
+   "generator": "adapter",
+   "positions": 152,
+   "median_ratio": 1.3693856000900269,
+   "median_p_non_piano_base": 3.420374559937045e-05,
+   "median_p_non_piano_adapter": 5.748507101088762e-05,
+   "positions_adapter_higher": 92,
+   "mean_p_non_piano_base": 4.8695375880924985e-05,
+   "mean_p_non_piano_adapter": 0.0022228488232940435,
+   "max_p_non_piano_base": 0.0005319968913681805,
+   "max_p_non_piano_adapter": 0.0336458720266819
+  },
+  {
+   "stream": 6,
+   "generator": "base",
+   "positions": 512,
+   "median_ratio": 1.9953118562698364,
+   "median_p_non_piano_base": 1.562500801810529e-05,
+   "median_p_non_piano_adapter": 4.351832467364147e-05,
+   "positions_adapter_higher": 330,
+   "mean_p_non_piano_base": 3.15891120408196e-05,
+   "mean_p_non_piano_adapter": 0.0002775993780232966,
+   "max_p_non_piano_base": 0.0007099905633367598,
+   "max_p_non_piano_adapter": 0.00527231115847826
+  },
+  {
+   "stream": 7,
+   "generator": "adapter",
+   "positions": 283,
+   "median_ratio": 1.3412251472473145,
+   "median_p_non_piano_base": 6.654612661805004e-05,
+   "median_p_non_piano_adapter": 0.000234436389291659,
+   "positions_adapter_higher": 172,
+   "mean_p_non_piano_base": 0.00016302437870763242,
+   "mean_p_non_piano_adapter": 0.0013812653487548232,
+   "max_p_non_piano_base": 0.001781942555680871,
+   "max_p_non_piano_adapter": 0.012770338915288448
+  },
+  {
+   "stream": 8,
+   "generator": "base",
+   "positions": 512,
+   "median_ratio": 1.4939376711845398,
+   "median_p_non_piano_base": 2.8523081709863618e-05,
+   "median_p_non_piano_adapter": 5.291384877637029e-05,
+   "positions_adapter_higher": 362,
+   "mean_p_non_piano_base": 4.0333528886549175e-05,
+   "mean_p_non_piano_adapter": 0.0004824507050216198,
+   "max_p_non_piano_base": 0.00044602289563044906,
+   "max_p_non_piano_adapter": 0.011683495715260506
+  },
+  {
+   "stream": 9,
+   "generator": "adapter",
+   "positions": 152,
+   "median_ratio": 1.8508719205856323,
+   "median_p_non_piano_base": 5.7384695537621155e-05,
+   "median_p_non_piano_adapter": 0.00014415531768463552,
+   "positions_adapter_higher": 125,
+   "mean_p_non_piano_base": 7.073561573633924e-05,
+   "mean_p_non_piano_adapter": 0.0011265070643275976,
+   "max_p_non_piano_base": 0.000302079162793234,
+   "max_p_non_piano_adapter": 0.007867678999900818
+  },
+  {
+   "stream": 10,
+   "generator": "base",
+   "positions": 145,
+   "median_ratio": 2.243065118789673,
+   "median_p_non_piano_base": 3.597213435568847e-05,
+   "median_p_non_piano_adapter": 0.00012289031292311847,
+   "positions_adapter_higher": 114,
+   "mean_p_non_piano_base": 4.6568831749027595e-05,
+   "mean_p_non_piano_adapter": 0.0008479607640765607,
+   "max_p_non_piano_base": 0.0003157263563480228,
+   "max_p_non_piano_adapter": 0.010384149849414825
+  },
+  {
+   "stream": 11,
+   "generator": "adapter",
+   "positions": 41,
+   "median_ratio": 2.2271265983581543,
+   "median_p_non_piano_base": 2.6400284696137533e-05,
+   "median_p_non_piano_adapter": 4.6961151383584365e-05,
+   "positions_adapter_higher": 30,
+   "mean_p_non_piano_base": 2.8619875592994504e-05,
+   "mean_p_non_piano_adapter": 0.0034270889591425657,
+   "max_p_non_piano_base": 7.432301936205477e-05,
+   "max_p_non_piano_adapter": 0.015959303826093674
+  },
+  {
+   "stream": 12,
+   "generator": "base",
+   "positions": 512,
+   "median_ratio": 1.2573375701904297,
+   "median_p_non_piano_base": 7.0271007643896155e-06,
+   "median_p_non_piano_adapter": 1.0801753887790255e-05,
+   "positions_adapter_higher": 332,
+   "mean_p_non_piano_base": 1.3584018233814277e-05,
+   "mean_p_non_piano_adapter": 1.9063700165133923e-05,
+   "max_p_non_piano_base": 0.0003140641492791474,
+   "max_p_non_piano_adapter": 0.0005200679297558963
+  },
+  {
+   "stream": 13,
+   "generator": "adapter",
+   "positions": 512,
+   "median_ratio": 1.1210095286369324,
+   "median_p_non_piano_base": 4.59418060927419e-06,
+   "median_p_non_piano_adapter": 6.5987078414764255e-06,
+   "positions_adapter_higher": 312,
+   "mean_p_non_piano_base": 5.699619578081183e-06,
+   "mean_p_non_piano_adapter": 1.3230652257334441e-05,
+   "max_p_non_piano_base": 4.563983384286985e-05,
+   "max_p_non_piano_adapter": 0.0005200679297558963
+  },
+  {
+   "stream": 14,
+   "generator": "base",
+   "positions": 145,
+   "median_ratio": 1.3543360233306885,
+   "median_p_non_piano_base": 6.750943157385336e-06,
+   "median_p_non_piano_adapter": 1.148083720181603e-05,
+   "positions_adapter_higher": 101,
+   "mean_p_non_piano_base": 9.241427505912725e-06,
+   "mean_p_non_piano_adapter": 2.6850033464143053e-05,
+   "max_p_non_piano_base": 4.3217682105023414e-05,
+   "max_p_non_piano_adapter": 0.0003364693548064679
+  },
+  {
+   "stream": 15,
+   "generator": "adapter",
+   "positions": 145,
+   "median_ratio": 2.2393569946289062,
+   "median_p_non_piano_base": 2.1982998077874072e-05,
+   "median_p_non_piano_adapter": 5.9534595493460074e-05,
+   "positions_adapter_higher": 92,
+   "mean_p_non_piano_base": 2.5659697712399065e-05,
+   "mean_p_non_piano_adapter": 0.00029904639814049006,
+   "max_p_non_piano_base": 0.00018407934112474322,
+   "max_p_non_piano_adapter": 0.003500671125948429
+  }
+ ],
+ "path_check_at_C": [
+  {
+   "stream": 1,
+   "C": 36,
+   "max_abs_diff_base": 0.0,
+   "max_abs_diff_adapter": 0.0,
+   "non_piano_diff_base": 0.0,
+   "non_piano_diff_adapter": 0.0,
+   "ratio_prefix": 199.76576525921365,
+   "ratio_full": 199.76576525921365,
+   "direction_flips": false
+  },
+  {
+   "stream": 2,
+   "C": 280,
+   "max_abs_diff_base": 5.960464477539063e-08,
+   "max_abs_diff_adapter": 5.960464477539063e-08,
+   "non_piano_diff_base": 1.4551915228366852e-11,
+   "non_piano_diff_adapter": -5.820766091346741e-11,
+   "ratio_prefix": 2.2891656950184864,
+   "ratio_full": 2.2891645124630426,
+   "direction_flips": false
+  },
+  {
+   "stream": 3,
+   "C": 142,
+   "max_abs_diff_base": 5.960464477539063e-08,
+   "max_abs_diff_adapter": 5.960464477539063e-08,
+   "non_piano_diff_base": -1.8189894035458565e-12,
+   "non_piano_diff_adapter": 5.820766091346741e-11,
+   "ratio_prefix": 39.44671695671257,
+   "ratio_full": 39.446728596790514,
+   "direction_flips": false
+  },
+  {
+   "stream": 5,
+   "C": 149,
+   "max_abs_diff_base": 7.450580596923828e-09,
+   "max_abs_diff_adapter": 7.450580596923828e-09,
+   "non_piano_diff_base": 7.275957614183426e-12,
+   "non_piano_diff_adapter": 1.3969838619232178e-09,
+   "ratio_prefix": 93.95104352890401,
+   "ratio_full": 93.95105228842603,
+   "direction_flips": false
+  },
+  {
+   "stream": 7,
+   "C": 280,
+   "max_abs_diff_base": 0.0,
+   "max_abs_diff_adapter": 2.9802322387695312e-08,
+   "non_piano_diff_base": 0.0,
+   "non_piano_diff_adapter": 4.656612873077393e-10,
+   "ratio_prefix": 64.02599090318388,
+   "ratio_full": 64.02600630520058,
+   "direction_flips": false
+  },
+  {
+   "stream": 9,
+   "C": 149,
+   "max_abs_diff_base": 0.0,
+   "max_abs_diff_adapter": 0.0,
+   "non_piano_diff_base": 0.0,
+   "non_piano_diff_adapter": 0.0,
+   "ratio_prefix": 46.91569678293691,
+   "ratio_full": 46.91569678293691,
+   "direction_flips": false
+  },
+  {
+   "stream": 10,
+   "C": 142,
+   "max_abs_diff_base": 7.450580596923828e-09,
+   "max_abs_diff_adapter": 0.0,
+   "non_piano_diff_base": 0.0,
+   "non_piano_diff_adapter": 0.0,
+   "ratio_prefix": 1.3378057630178777,
+   "ratio_full": 1.3378057630178777,
+   "direction_flips": false
+  },
+  {
+   "stream": 11,
+   "C": 38,
+   "max_abs_diff_base": 0.0,
+   "max_abs_diff_adapter": 0.0,
+   "non_piano_diff_base": 0.0,
+   "non_piano_diff_adapter": 0.0,
+   "ratio_prefix": 139.05698242253402,
+   "ratio_full": 139.05698242253402,
+   "direction_flips": false
+  },
+  {
+   "stream": 14,
+   "C": 142,
+   "max_abs_diff_base": 1.1920928955078125e-07,
+   "max_abs_diff_adapter": 8.195638656616211e-08,
+   "non_piano_diff_base": 7.275957614183426e-12,
+   "non_piano_diff_adapter": 8.185452315956354e-12,
+   "ratio_prefix": 1.0590934352392136,
+   "ratio_full": 1.0590934794755926,
+   "direction_flips": false
+  },
+  {
+   "stream": 15,
+   "C": 142,
+   "max_abs_diff_base": 1.4901161193847656e-08,
+   "max_abs_diff_adapter": 0.0,
+   "non_piano_diff_base": -9.094947017729282e-13,
+   "non_piano_diff_adapter": 0.0,
+   "ratio_prefix": 40.78424959295366,
+   "ratio_full": 40.7842522363326,
+   "direction_flips": false
+  }
+ ],
+ "reading": {
+  "R1_E": {
+   "verdict": "adapter_higher",
+   "adapter_higher": 9,
+   "of": 10,
+   "median_ratio": 43.033034643554586,
+   "per_error": [
+    {
+     "stream": 1,
+     "ratio": 836.1304417028296,
+     "base": 2.7656533347908407e-05,
+     "adapter": 0.023124469444155693
+    },
+    {
+     "stream": 2,
+     "ratio": 1.0949677760068988,
+     "base": 0.0001306100602960214,
+     "adapter": 0.0001430138072464615
+    },
+    {
+     "stream": 3,
+     "ratio": 74.99571554987344,
+     "base": 2.24343930312898e-05,
+     "adapter": 0.001682483358308673
+    },
+    {
+     "stream": 5,
+     "ratio": 48.401306235225604,
+     "base": 8.609929500380531e-05,
+     "adapter": 0.004167318344116211
+    },
+    {
+     "stream": 7,
+     "ratio": 36.03904773956925,
+     "base": 8.520872506778687e-05,
+     "adapter": 0.003070841310545802
+    },
+    {
+     "stream": 9,
+     "ratio": 158.26861113238638,
+     "base": 2.5245592041756026e-05,
+     "adapter": 0.003995584789663553
+    },
+    {
+     "stream": 10,
+     "ratio": 1.2221552312821782,
+     "base": 2.1498957721632905e-05,
+     "adapter": 2.6275063646608032e-05
+    },
+    {
+     "stream": 11,
+     "ratio": 819.3849163732282,
+     "base": 2.8576832846738398e-05,
+     "adapter": 0.023415425792336464
+    },
+    {
+     "stream": 14,
+     "ratio": 0.7634850559911297,
+     "base": 1.321599575021537e-05,
+     "adapter": 1.0090215255331714e-05
+    },
+    {
+     "stream": 15,
+     "ratio": 37.66476305188356,
+     "base": 9.073217370314524e-06,
+     "adapter": 0.0003417405823711306
+    }
+   ]
+  },
+  "R1_S": {
+   "verdict": "unclear",
+   "streams_adapter_higher": 16,
+   "of": 16,
+   "median_of_stream_medians": 1.9491040408611298,
+   "withheld_path_direction_flip": false
+  },
+  "R2": {
+   "errors_with_p_selected_below": 0.01,
+   "count": 10,
+   "of": 10
+  },
+  "R3": {
+   "replay_reproduced_all": true,
+   "adapter_errors_fixed_by_base": 6,
+   "adapter_errors": 7,
+   "base_errors_fixed_by_adapter": 2,
+   "base_errors": 3
+  }
+ }
+}
