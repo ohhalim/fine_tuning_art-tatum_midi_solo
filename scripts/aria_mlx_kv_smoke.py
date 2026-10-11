@@ -18,10 +18,15 @@ Checks (fixed before the run):
                    context 256/512/1024 (median of 64); a 24-token decode block after a 512-token prefix. Report only
   R  reference     MLX full-prefill logits vs the PyTorch MPS model on the same sequence. Report only
 
+Capacity (Astra review of #1738): the cache is sized to the largest position any check writes, every call asserts
+0 <= start and start + len <= capacity before the forward, and an out-of-range call is tested to be rejected.
+v1 of this run used a 750-position cache for the 1024-token latency rows; those rows are invalid.
+
   aria_mlx_kv_smoke.py <aria repo> <checkpoint> <masked generations json> <data json> <report json>
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import statistics
 import subprocess
@@ -29,6 +34,15 @@ import sys
 import time
 
 LOGIT_TOL, GREEDY_TOKENS = 1e-3, 128
+PREFILL_LENS, DECODE_CTX, BLOCK_PREFIX, BLOCK_TOKENS = (128, 256, 512, 1024), (256, 512, 1024), 512, 24
+
+
+def file_sha(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for b in iter(lambda: f.read(1 << 20), b""):
+            h.update(b)
+    return h.hexdigest()
 
 
 def thermal_level():
@@ -67,10 +81,20 @@ def main() -> None:
     model.load_weights(ckpt, strict=True)
     mx.eval(model.parameters())
     model.eval()
-    L = max(len(seq_a), len(seq_b)) + GREEDY_TOKENS + 8
+    # the largest position + 1 that any check writes
+    L = max(len(seq_a), len(seq_b), P + GREEDY_TOKENS, max(PREFILL_LENS), max(DECODE_CTX), BLOCK_PREFIX + BLOCK_TOKENS)
+    log["cache_capacity"] = L
+    import mlx
+    patch = subprocess.run(["git", "-C", aria_repo, "diff"], capture_output=True, text=True).stdout
+    log["provenance"] = {"checkpoint_sha256": file_sha(ckpt), "generations_sha256": file_sha(gens_path), "data_sha256": file_sha(data_path),
+                         "mlx": getattr(mx, "__version__", None) or getattr(mlx, "__version__", None),
+                         "aria_commit": subprocess.run(["git", "-C", aria_repo, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
+                         "aria_local_patch_sha256": hashlib.sha256(patch.encode()).hexdigest(), "aria_local_patch_lines": patch.count("\n")}
 
     def run(ids, start):
         """Write ids at positions start.. and return logits for those positions (float32 numpy)."""
+        if start < 0 or start + len(ids) > L:
+            raise ValueError(f"positions {start}..{start + len(ids) - 1} outside cache capacity {L}")
         idxs = mx.array([ids], dtype=mx.int32)
         pos = mx.arange(start, start + len(ids), dtype=mx.int32)
         out = model(idxs=idxs, input_pos=pos, offset=pos[0], max_kv_pos=start + len(ids) - 1)
@@ -79,6 +103,16 @@ def main() -> None:
 
     def fresh():
         model.setup_cache(batch_size=1, max_seq_len=L, dtype=mx.float32)
+
+    fresh()
+    log["cache_shape"] = {"k_cache": list(model.model.encode_layers[0].kv_cache.k_cache.shape),
+                          "causal_mask": list(model.model.causal_mask.shape)}
+    try:
+        run([seq_a[0]] * 2, L - 1)
+        rejected = False
+    except ValueError:
+        rejected = True
+    log["checks"]["out_of_range_rejected_before_forward"] = {"ok": rejected, "attempt": f"positions {L - 1}..{L} with capacity {L}"}
 
     def compare(name, got, ref, positions):
         d = np.abs(got - ref)
@@ -141,22 +175,24 @@ def main() -> None:
             ts.append(time.perf_counter() - t)
         return {"median_s": round(statistics.median(ts), 5), "max_s": round(max(ts), 5), "n": n}
 
-    long_seq = (seq_a + seq_b + seq_a)[:1024]
-    for n in (128, 256, 512, 1024):
+    long_seq = (seq_a + seq_b + seq_a)[:max(PREFILL_LENS)]
+    assert len(long_seq) == max(PREFILL_LENS)
+    for n in PREFILL_LENS:
         fresh()
         log["latency"][f"warm_prefill_{n}"] = timed(lambda: run(long_seq[:n], 0), 5)
-    for ctx in (256, 512, 1024):
+    for ctx in DECODE_CTX:
         fresh()
         run(long_seq[:ctx - 1], 0)
         log["latency"][f"warm_decode_one_at_{ctx}"] = timed(lambda: run([long_seq[ctx - 1]], ctx - 1), 64)
     fresh()
-    run(long_seq[:512], 0)
+    run(long_seq[:BLOCK_PREFIX], 0)
 
     def block():
-        for i in range(24):
-            run([long_seq[512 + i]], 512 + i)
+        for i in range(BLOCK_TOKENS):
+            run([long_seq[BLOCK_PREFIX + i]], BLOCK_PREFIX + i)
     log["latency"]["warm_decode_block_24_after_512"] = timed(block, 5)
-    log["latency"]["note"] = "128 BPM: 1 beat 0.469 s, half bar 0.9375 s. Previous runtime: PyTorch MPS full re-prefill 0.674 s per block"
+    log["latency"]["note"] = ("teacher-forced decode of saved tokens after an already prefilled prefix, including the sync "
+                              "and numpy copy; not block-ready time with prefill, not input-to-sound latency")
 
     # reference: PyTorch MPS on the same sequence (report only)
     try:
