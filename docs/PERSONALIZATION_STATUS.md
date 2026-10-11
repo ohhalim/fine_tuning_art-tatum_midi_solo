@@ -13,7 +13,7 @@
 | | **Tatum 완성** | **멜다우 완성** |
 |---|---|---|
 | 체크포인트 (gitignore) | `outputs/final_tatum/export/checkpoint_update518.pt` | `outputs/clean_base/c2_export/checkpoint_update128.pt` |
-| base | 공통 base(Tatum·멜다우를 둘 다 뺀 2,637곡) | 멜다우만 뺀 clean base(2,759곡) |
+| base | 공통 base(Tatum·멜다우 스튜디오를 뺀 2,637곡. 멜다우 라이브 54곡은 포함, #1722) | 멜다우 스튜디오만 뺀 clean base(2,759곡. 라이브 54곡 포함, #1722) |
 | 어댑터 | LoRA r16, out_proj + QKV | LoRA r16, out_proj |
 | 학습 자료 | Tatum 98곡 | 멜다우 16곡(자료를 더 늘릴 수 없음) |
 | 선택 방법 | val12에서 update 선택(518) | 곡 단위 4-fold CV(128) |
