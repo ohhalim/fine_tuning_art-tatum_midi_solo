@@ -10,6 +10,7 @@
 - 곡 단위 held-out은 대부분 유지된다. 스튜디오 18곡은 어느 base에도 없었다. 단, CV fold 3 held-out인 "From This Moment On"은 라이브 버전(Live in Tokyo)이 base에 있었다
 - Tatum 쪽 "Tatum 미학습"은 맞다. PiJAMA에 Tatum 라이브 녹음은 없고, 공통 base에 Tatum 122곡은 0곡이다
 - 이전 결과를 통째로 무효로 보지 않는다. 바뀌는 것은 **"연주자 미노출"에서 "스튜디오 곡 미노출"로의 해석 범위**다
+- 따라서 과거 멜다우·Tatum 결과로 **연주자 분리(performer-disjoint)**를 주장할 수 없다. 같은 곡 다른 녹음이 분할을 넘은 경우(멜다우 1곡, Tatum 5곡)가 있어 **곡 분리(composition-disjoint)**도 일부는 주장할 수 없다
 
 ## 어떻게 확인했나
 
@@ -35,7 +36,7 @@
 **일반 재즈 probe에도 섞였다** ("Tatum·멜다우 제외"로 만든 100곡 목록)
 - `outputs/tatum_diag/generic_probe_list.json`: probe 100곡 중 1곡, reference 100곡 중 2곡이 Mehldau 라이브
 - `outputs/mehldau_diag/style_validity_v1.json`(V1): probe 100곡 중 2곡, reference 100곡 중 1곡이 Mehldau 라이브
-- 1–2% 수준이라 특화도(ΔCE_대상 − ΔCE_일반)를 조금 흐리는 정도로 본다. 다시 재지 않았다
+- 그래서 이 목록으로 잰 특화도(ΔCE_대상 − ΔCE_일반)는 **"대상 연주자를 뺀 일반 재즈" 대조가 아니다.** 섞인 비율이 1–2%라도 그 해석은 제한된다. 섞인 곡을 빼고 다시 재지는 않았다
 
 ## 무엇이 바뀌나
 
