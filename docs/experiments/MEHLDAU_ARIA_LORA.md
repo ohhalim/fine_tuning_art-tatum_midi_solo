@@ -100,6 +100,60 @@ frozen Aria에 LoRA를 붙여 Mehldau 녹음 일부로 128 update 학습하면,
 - 즉시 중단: OOM, 유한하지 않은 loss, memory pressure level 4, MPS 미지원 연산. OOM이어도 창 길이를 자동으로 줄이거나 sweep하지 않는다
 - 새 유료 자원, 외부 다운로드, 공개 업로드 없음. LoRA와 생성 원자료는 저장소 밖 `/Users/ohhalim/git_box/mehldau_aria/run/`에만 둔다
 
-## 결과
+## 결과 — 개발 판정 **미달** (생성 유효성), test 미개봉
 
-(학습 후 작성)
+원자료: `mehldau_aria/train_report.json`(생성 토큰은 저장소 밖 `generations.json`). 실행 2026-10-11 21:54–22:37(43.6분, 상한 60분 안).
+
+**검사:** 학습 중·후 검사 9개 모두 통과했다(64 텐서 모두 변화, base grad 없음, base 해시·checkpoint SHA 불변, 파일 재로드 logits 차이 0). 학습 관측 최대 MPS 5.17 GiB, 128 update 120초. 학습 loss는 앞 8개 평균 2.453, 뒤 8개 평균 2.372다
+
+| 판정 | 값 | 기준 | 결과 |
+|---|---|---|---|
+| 1. val ΔCE (녹음 평균) | **-0.2974** (묶음 평균 -0.2978, 12/12 녹음 개선) | < 0 | 통과 |
+| 2. probe ΔCE (녹음 평균) | **-0.2833** (20/20 곡 개선) | ≤ +0.02 | 통과 |
+| 3. 생성 유효 표본 | adapter **1/8**, base 5/8 | adapter ≥ base | **미달** |
+
+**test는 열지 않는다.** 사전 등록대로 추가 예산, seed 탐색, 판정 재해석도 하지 않는다.
+
+**CE는 Mehldau만이 아니라 다른 피아니스트도 거의 똑같이 내려갔다**
+
+| ΔCE | 전체 | pitch | onset | dur | `<T>` | pitch 주변 | velocity\|pitch |
+|---|---|---|---|---|---|---|---|
+| val (Mehldau) | -0.297 | -0.130 | -0.194 | -0.556 | -0.083 | -0.078 | -0.052 |
+| probe (다른 4명) | -0.283 | -0.090 | -0.180 | -0.572 | -0.106 | -0.042 | -0.048 |
+
+- val과 probe의 차이는 -0.014에 그친다. 이득의 대부분은 Mehldau 고유 성향이 아니라 **두 집단에 공통인 변화**다
+- 가장 큰 몫은 duration(−0.56)이다. 후보 원인: PiJAMA 전사·페달 연장의 길이 분포, 또는 `<D>`·`<E>`를 뺀 창 형식에 맞춘 적응. 둘을 분리하지 않았다
+- pitch 주변 CE만 보면 Mehldau(−0.078)가 probe(−0.042)보다 조금 더 내려갔다. 이것만으로 연주자 특화를 말하지 않는다(사후 관찰, 작곡·전사 차이 통제 안 함)
+
+**생성 16개 (전량, 고르지 않음)**
+
+| prompt | seed | 모델 | 유효 | 첫 오류(위치: 토큰) | 음 | 최대 동시음 | 최장 반복 | 음악 시간(초) | train 16-gram |
+|---|---|---|---|---|---|---|---|---|---|
+| Brahms -  Intermezzo in B-fl | 1 | base | 유효 |  | 168 | 11 | 0 | 41.0 | 0 |
+| Brahms -  Intermezzo in B-fl | 1 | adapter | 무효 | 39: ('synth_lead', 52, 90) | 166 | 10 | 8 | 42.39 | 0 |
+| Brahms -  Intermezzo in B-fl | 2 | base | 무효 | 283: ('ensemble', 70, 30) | 166 | 19 | 6 | 53.24 | 0 |
+| Brahms -  Intermezzo in B-fl | 2 | adapter | 무효 | 145: ('organ', 117, 100) | 165 | 10 | 12 | 57.01 | 0 |
+| Don't Let It Bring You Down | 1 | base | 유효 |  | 169 | 11 | 4 | 22.41 | 0 |
+| Don't Let It Bring You Down | 1 | adapter | 무효 | 152: ('strings', 57, 30) | 166 | 11 | 7 | 51.27 | 0 |
+| Don't Let It Bring You Down | 2 | base | 유효 |  | 169 | 10 | 10 | 20.62 | 0 |
+| Don't Let It Bring You Down | 2 | adapter | 무효 | 283: ('ensemble', 70, 30) | 160 | 10 | 3 | 148.67 | 0 |
+| From This Moment On | 1 | base | 유효 |  | 168 | 41 | 2 | 33.41 | 0 |
+| From This Moment On | 1 | adapter | 무효 | 152: ('strings', 57, 30) | 166 | 10 | 10 | 55.98 | 0 |
+| From This Moment On | 2 | base | 무효 | 145: ('organ', 117, 100) | 165 | 7 | 6 | 68.44 | 0 |
+| From This Moment On | 2 | adapter | 무효 | 41: ('bass', 80, 0) | 164 | 15 | 5 | 37.72 | 0 |
+| Get Happy - Live | 1 | base | 유효 |  | 169 | 5 | 6 | 23.44 | 0 |
+| Get Happy - Live | 1 | adapter | 유효 |  | 169 | 2 | 8 | 20.89 | 0 |
+| Get Happy - Live | 2 | base | 무효 | 145: ('organ', 117, 100) | 168 | 18 | 13 | 20.45 | 0 |
+| Get Happy - Live | 2 | adapter | 무효 | 145: ('organ', 117, 100) | 166 | 12 | 5 | 29.16 | 0 |
+
+- 무효 표본의 첫 오류는 모두 **피아노가 아닌 악기 토큰**(organ, strings, ensemble, synth_lead, bass)이다. temperature 1, min_p 없이 전체 vocab(17,727)에서 뽑았기 때문에 꼬리 토큰이 나올 수 있다
+- 같은 seed는 prompt가 달라도 같은 위치·같은 토큰에서 오류가 났다(예: seed 2의 145번째 `('organ', 117, 100)`, 283번째 `('ensemble', 70, 30)`). 그 step의 난수가 분포의 꼬리(vocab 끝쪽)를 고른 것으로 보인다. **확인하지 않은 해석이다**
+- 이 오류는 base에서도 3/8 났다. adapter가 7/8로 더 많은 것은 꼬리 확률이 늘었기 때문일 수 있으나 재지 않았다
+- train 16-gram 일치는 16개 모두 0이다. 이것으로 "복사 위험 0"이라고 하지 않는다
+
+## 해석과 다음
+
+- **이 pilot이 보인 것:** 128 update LoRA는 PiJAMA 피아노 자료 쪽으로 CE를 크게 옮긴다. 다만 그 이동은 Mehldau 고유가 아니라 공통이고, 생성 유효성은 base보다 나빴다
+- **보이지 못한 것:** Mehldau 스타일 적응. 개발 판정 미달이라 test는 미개봉이다
+- **다음 결정은 아스트라와 한다.** 후보: (a) 공통 이동을 빼고 볼 비교 설계(예: 다른 피아니스트로 같은 예산 학습한 대조 어댑터), (b) 생성 조건 문제(악기 토큰 꼬리)를 판정과 분리할지. 이번 결과를 보고 판정 기준을 바꾸지 않는다
+- 비용 추정 실수: 생성은 예상 10분, 실제 39분이었다. KV 캐시 없이 토큰마다 문맥 전체를 다시 계산하는데, 짧은 문맥 측정값에 1.6배만 곱했다. 진행률 로그도 없어서 실행 중에 진행 상태를 볼 수 없었다
