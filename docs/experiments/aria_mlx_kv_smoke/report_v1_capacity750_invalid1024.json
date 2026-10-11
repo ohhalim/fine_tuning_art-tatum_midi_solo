@@ -1,0 +1,96 @@
+{
+ "checks": {
+  "E1_incremental_equals_full": {
+   "ok": true,
+   "positions": "101..612",
+   "max_abs_logit_diff": 0.00013065338134765625,
+   "mean_abs_logit_diff": 3.0647515814052895e-06,
+   "top1_agree": 512,
+   "of": 512
+  },
+  "E2_rollback_equals_fresh_full": {
+   "ok": true,
+   "positions": "101..612",
+   "max_abs_logit_diff": 6.580352783203125e-05,
+   "mean_abs_logit_diff": 2.8432302769942908e-06,
+   "top1_agree": 512,
+   "of": 512
+  },
+  "E3_reset_reuse_equals_full": {
+   "ok": true,
+   "positions": "0..613",
+   "max_abs_logit_diff": 0.0,
+   "mean_abs_logit_diff": 0.0,
+   "top1_agree": 614,
+   "of": 614
+  },
+  "E4_greedy_tokens_and_notes_identical": {
+   "ok": true,
+   "tokens": 128,
+   "first_token_difference": null,
+   "notes": 75
+  }
+ },
+ "latency": {
+  "cold_first_prefill_s": {
+   "tokens": 614,
+   "s": 0.2438
+  },
+  "warm_prefill_128": {
+   "median_s": 0.04235,
+   "max_s": 0.85232,
+   "n": 5
+  },
+  "warm_prefill_256": {
+   "median_s": 0.07257,
+   "max_s": 0.08893,
+   "n": 5
+  },
+  "warm_prefill_512": {
+   "median_s": 0.13311,
+   "max_s": 0.18685,
+   "n": 5
+  },
+  "warm_prefill_1024": {
+   "median_s": 0.27704,
+   "max_s": 0.39572,
+   "n": 5
+  },
+  "warm_decode_one_at_256": {
+   "median_s": 0.01032,
+   "max_s": 0.01143,
+   "n": 64
+  },
+  "warm_decode_one_at_512": {
+   "median_s": 0.01059,
+   "max_s": 0.01406,
+   "n": 64
+  },
+  "warm_decode_one_at_1024": {
+   "median_s": 0.01029,
+   "max_s": 0.01252,
+   "n": 64
+  },
+  "warm_decode_block_24_after_512": {
+   "median_s": 0.25178,
+   "max_s": 0.25502,
+   "n": 5
+  },
+  "note": "128 BPM: 1 beat 0.469 s, half bar 0.9375 s. Previous runtime: PyTorch MPS full re-prefill 0.674 s per block"
+ },
+ "reference": {
+  "max_abs_logit_diff_mlx_vs_mps": 0.00012493133544921875,
+  "mean_abs_logit_diff": 2.620841996758827e-06,
+  "top1_agree": 614,
+  "of": 614
+ },
+ "thermal_start": 0,
+ "result": "smoke_done",
+ "sequences": {
+  "prompt_tokens": 102,
+  "len_a": 614,
+  "len_b": 614,
+  "first_difference": 102
+ },
+ "thermal_end": 0
+}
