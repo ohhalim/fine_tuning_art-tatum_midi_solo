@@ -8,7 +8,7 @@ import unittest
 import torch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
-from aria_grammar_mask import GrammarMask, masked_pick  # noqa: E402
+from aria_grammar_mask import GrammarMask, MaskStop, masked_generate, masked_pick, run_streams  # noqa: E402
 from aria_token_validity import check  # noqa: E402
 
 VOCAB = [("piano", 60, 80), ("piano", 64, 70), ("onset", 0), ("onset", 10), ("onset", 20),
@@ -91,6 +91,73 @@ class GrammarMaskTest(unittest.TestCase):
             self.assertTrue(v["valid"], (new, v))
             tails.add(v["tail"])
         self.assertIn("incomplete_tail", tails)
+
+
+class Boom(Exception):
+    pass
+
+
+def fake_probs(seed, fail_after=None):
+    g, calls = torch.Generator().manual_seed(seed), [0]
+
+    def next_probs(seq):
+        calls[0] += 1
+        if fail_after is not None and calls[0] > fail_after:
+            raise Boom("wall limit")
+        return torch.softmax(torch.randn(len(VOCAB), generator=g) * 3, -1)
+    return next_probs
+
+
+class GenerateAndPreserveTest(unittest.TestCase):
+    def test_masked_generate_valid_and_same_noise_as_unmasked_sampler(self):
+        for seed in range(10):
+            buf = {"ids": [], "pre_mask_allowed": [], "mask_changed": []}
+            masked_generate(fake_probs(seed), PROMPT, [IDX[t] for t in PROMPT], VOCAB, seed, 12, IDX["<E>"], buf)
+            self.assertTrue(check(PROMPT, [VOCAB[i] for i in buf["ids"]])["valid"])
+            self.assertEqual(len(buf["pre_mask_allowed"]), len(buf["ids"]))
+            for c in buf["mask_changed"]:
+                self.assertNotEqual(c["unmasked_pick"], c["masked_pick"])
+
+    def test_zero_allowed_mass_stops_and_keeps_steps_so_far(self):
+        calls = [0]
+
+        def next_probs(seq):
+            calls[0] += 1
+            p = torch.zeros(len(VOCAB))
+            p[IDX[("organ", 60, 80)] if calls[0] > 3 else IDX[("piano", 60, 80)] if calls[0] == 1 else IDX[("onset", 20)] if calls[0] == 2 else IDX[("dur", 100)]] = 1.0
+            return p
+        buf = {"ids": [], "pre_mask_allowed": [], "mask_changed": []}
+        with self.assertRaises(MaskStop):
+            masked_generate(next_probs, PROMPT, [IDX[t] for t in PROMPT], VOCAB, 0, 12, IDX["<E>"], buf)
+        self.assertEqual(len(buf["ids"]), 3)
+
+    def test_stop_in_the_middle_keeps_incomplete_stream_apart_from_completed(self):
+        saved = []
+        specs = [{"n": 0}, {"n": 1}, {"n": 2}]
+        probs = {0: fake_probs(0), 1: fake_probs(1, fail_after=5), 2: fake_probs(2)}
+
+        def run_one(spec, buf):
+            masked_generate(probs[spec["n"]], PROMPT, [IDX[t] for t in PROMPT], VOCAB, spec["n"], 12, IDX["<E>"], buf)
+        with self.assertRaises(Boom):
+            run_streams(specs, run_one, lambda buf: None, saved.append)
+        self.assertEqual(len(saved), 1)
+        done, inc = saved[0]["completed"], saved[0]["incomplete"]
+        self.assertEqual([b["n"] for b in done], [0])
+        self.assertEqual(inc["n"], 1)
+        self.assertEqual(inc["stop_step"], 5)
+        self.assertEqual(len(inc["ids"]), 5)
+        self.assertEqual(len(inc["pre_mask_allowed"]), 5)
+        self.assertIn("wall limit", inc["stop_reason"])
+
+    def test_after_check_failure_keeps_stream_in_completed(self):
+        saved = []
+
+        def after(buf):
+            raise Boom("format invalid")
+        with self.assertRaises(Boom):
+            run_streams([{"n": 0}], lambda spec, buf: buf["ids"].append(1), after, saved.append)
+        self.assertEqual([b["n"] for b in saved[0]["completed"]], [0])
+        self.assertIsNone(saved[0]["incomplete"])
 
 
 if __name__ == "__main__":

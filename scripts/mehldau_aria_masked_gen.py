@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import collections
 import json
-import math
 import os
 import random
 import shutil
@@ -33,7 +32,7 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from aria_cond_smoke import Stop, file_sha, pressure, rss  # noqa: E402
-from aria_grammar_mask import GrammarMask, kind, masked_pick  # noqa: E402
+from aria_grammar_mask import GrammarMask, MaskStop, kind, masked_generate, run_streams  # noqa: E402
 from aria_lora import AriaLoRA, input_mismatches  # noqa: E402
 from aria_token_validity import check as token_check  # noqa: E402
 from mehldau_aria_lora_run import longest_repeat, max_polyphony, note_events  # noqa: E402
@@ -114,7 +113,8 @@ def main() -> None:
         if mode == "--render":
             rep = json.load(open(os.path.join(report_dir, "report.json")))
             check("generate_done_on_same_inputs", rep.get("result") == "generate_done" and rep["inputs"] == log["inputs"])
-            gens = json.load(open(os.path.join(out_dir, "generations_masked.json")))
+            gens = json.load(open(os.path.join(out_dir, "generations_masked.json")))["completed"]
+            check("sixteen_completed_streams", len(gens) == 16)
             check("generations_file_matches_report", file_sha(os.path.join(out_dir, "generations_masked.json")) == rep["generations_masked_sha256"])
             check("fluidsynth_and_soundfont", shutil.which("fluidsynth") is not None and os.path.exists(SF2), soundfont=SF2)
             mid_dir, lis_dir = os.path.join(out_dir, "midi"), os.path.join(out_dir, "listening")
@@ -185,35 +185,18 @@ def main() -> None:
             same += torch.multinomial(p, 1, generator=g1).item() == int(torch.argmax(p / torch.empty(V).exponential_(1, generator=g2)))
         check("multinomial_is_exponential_race_over_steps", same == 32, matched=same, of=32)
 
-        def generate(prompt_ids, seed, on, max_new, tag):
-            lora.on = on
-            gm = GrammarMask(vocab)
-            gm.start(tok.decode(list(prompt_ids)))
-            gen = torch.Generator().manual_seed(seed)
-            seq, new, pre_mass, changed = list(prompt_ids), [], [], []
+        def generate(prompt_ids, seed, on, max_new, tag, buf):
+            def next_probs(seq):
+                with torch.no_grad():
+                    return torch.softmax(model(torch.tensor([seq], device=dev_))[0, -1].float() / TEMP, -1).cpu()
+
             t = time.perf_counter()
-            with torch.no_grad():
-                for step in range(max_new):
-                    lg = model(torch.tensor([seq], device=dev_))[0, -1].float() / TEMP
-                    p = torch.softmax(lg, -1).cpu()
-                    ok = gm.allowed()
-                    a = p[ok].sum().item()
-                    if not bool(ok.any()) or not math.isfinite(a) or a <= 0:
-                        raise Stop(f"{tag} step {step}: allowed set empty or allowed mass {a} ({gm.expect}, last {gm.last})")
-                    q = torch.empty(V).exponential_(1, generator=gen)
-                    pick, free = masked_pick(p, ok, q)
-                    pre_mass.append(a)
-                    if pick != free:
-                        changed.append({"step": step, "state": gm.expect, "unmasked_pick": str(vocab[free]), "masked_pick": str(vocab[pick])})
-                    seq.append(pick)
-                    new.append(pick)
-                    if pick == eos_id:
-                        break
-                    gm.advance(vocab[pick])
-                    if (step + 1) % 128 == 0:
-                        say(f"{tag} {step + 1}/{max_new} tokens, {time.perf_counter() - t:.0f} s")
-            lora.on = True
-            return new, pre_mass, changed
+            lora.on = on
+            try:
+                masked_generate(next_probs, tok.decode(list(prompt_ids)), prompt_ids, vocab, seed, max_new, eos_id, buf,
+                                progress=lambda k: say(f"{tag} {k}/{max_new} tokens, {time.perf_counter() - t:.0f} s"))
+            finally:
+                lora.on = True
 
         old_by_key = {(o["prompt"], o["seed"], o["adapter"]): o for o in old}
         if mode == "--precheck":
@@ -223,7 +206,9 @@ def main() -> None:
             ref = old[0]
             check("smoke_reference_is_valid_unmasked_stream", ref["valid"] and not ref["adapter"])
             t = time.perf_counter()
-            new, pre_mass, changed = generate(prompts[0]["ids"], ref["seed"], False, SMOKE_TOKENS, "smoke")
+            buf = {"ids": [], "pre_mask_allowed": [], "mask_changed": []}
+            generate(prompts[0]["ids"], ref["seed"], False, SMOKE_TOKENS, "smoke", buf)
+            new, pre_mass, changed = buf["ids"], buf["pre_mask_allowed"], buf["mask_changed"]
             torch.mps.synchronize()
             s_tok = (time.perf_counter() - t) / len(new)
             check("smoke_equals_saved_unmasked_stream", new == ref["ids"][:SMOKE_TOKENS] and not changed,
@@ -244,49 +229,61 @@ def main() -> None:
                 for w in r["windows"]:
                     ids = w["ids"]
                     train_grams.update(tuple(ids[i:i + NGRAM]) for i in range(len(ids) - NGRAM + 1))
-        gens, rows = [], []
+        rows = []
         out_path = os.path.join(out_dir, "generations_masked.json")
         t_all = time.perf_counter()
-        try:
-            for n, (pi, s, on) in enumerate(order):
-                tag = f"[{n + 1}/16 p{pi} s{s} {'adapter' if on else 'base'}]"
-                say(f"{tag} start")
-                t = time.perf_counter()
-                new, pre_mass, changed = generate(prompts[pi]["ids"], s, on, GEN_TOKENS, tag)
-                wall = time.perf_counter() - t
-                pt, nt = tok.decode(list(prompts[pi]["ids"])), tok.decode(new)
-                v = token_check(pt, nt)
-                ev, pev, new_ev = note_events(pt + nt), note_events(pt), note_events(nt)
-                ps = [x[1] for x in nt if isinstance(x, tuple) and x[0] == "piano"]
-                abs_new = ev[len(pev):]
-                grams = [tuple(new[i:i + NGRAM]) for i in range(len(new) - NGRAM + 1)]
-                o = old_by_key[(prompts[pi]["path"], s, on)]
-                same_prefix = next((i for i, (a, b) in enumerate(zip(new, o["ids"])) if a != b), min(len(new), len(o["ids"])))
-                state_counts = collections.Counter(c["state"] for c in changed)
-                gens.append({"prompt_index": pi, "prompt": prompts[pi]["path"], "seed": s, "adapter": on, "ids": new,
-                             "pre_mask_allowed": pre_mass, "mask_changed": changed})
-                rows.append({"prompt_index": pi, "prompt": prompts[pi]["path"], "seed": s, "adapter": on, "new_tokens": len(new),
-                             "wall_s": round(wall, 1), "valid": v["valid"], "validity": v,
-                             "mask_changed_steps": len(changed), "mask_changed_by_state": dict(state_counts),
-                             "first_mask_change": changed[0]["step"] if changed else None,
-                             "pre_mask_allowed_min": min(pre_mass), "steps_pre_mask_allowed_below_0.999": sum(a < 0.999 for a in pre_mass),
-                             "pre_mask_disallowed_mean": sum(1 - a for a in pre_mass) / len(pre_mass),
-                             "unmasked_1726_valid": o["valid"],
-                             "unmasked_1726_first_error": o["validity"]["first_error"]["index"] if o["validity"]["first_error"] else None,
-                             "same_tokens_as_unmasked_until": same_prefix, "identical_to_unmasked": new == o["ids"],
-                             "notes": len(new_ev), "pitch_range": [min(ps), max(ps)] if ps else None,
-                             "longest_repeat": longest_repeat(ps), "max_polyphony": max_polyphony(new_ev) if new_ev else 0,
-                             "end_extension_seconds": round((max(e for _, e, _ in ev) - max((e for _, e, _ in pev), default=0)) / 1000, 3) if new_ev else 0.0,
-                             "new_span_seconds": round((max(e for _, e, _ in abs_new) - min(o_ for o_, _, _ in abs_new)) / 1000, 3) if abs_new else 0.0,
-                             "ended_by_eos": bool(new) and new[-1] == eos_id,
-                             "train_16gram_hits": sum(1 for x in grams if x in train_grams), "16grams": len(grams)})
-                say(f"{tag} done {len(new)} tokens {wall:.0f} s, valid={v['valid']}, mask changed {len(changed)} steps, total {time.perf_counter() - t_all:.0f} s")
-        finally:
+        specs = [{"n": n, "prompt_index": pi, "prompt": prompts[pi]["path"], "seed": s, "adapter": on}
+                 for n, (pi, s, on) in enumerate(order)]
+
+        def tag_of(spec):
+            return f"[{spec['n'] + 1}/16 p{spec['prompt_index']} s{spec['seed']} {'adapter' if spec['adapter'] else 'base'}]"
+
+        def run_one(spec, buf):
+            say(f"{tag_of(spec)} start")
+            buf["_t"] = time.perf_counter()
+            generate(prompts[spec["prompt_index"]]["ids"], spec["seed"], spec["adapter"], GEN_TOKENS, tag_of(spec), buf)
+
+        def after(buf):
+            wall = time.perf_counter() - buf.pop("_t")
+            pi, s, on, new, pre_mass, changed = buf["prompt_index"], buf["seed"], buf["adapter"], buf["ids"], buf["pre_mask_allowed"], buf["mask_changed"]
+            pt, nt = tok.decode(list(prompts[pi]["ids"])), tok.decode(new)
+            v = token_check(pt, nt)
+            ev, pev, new_ev = note_events(pt + nt), note_events(pt), note_events(nt)
+            ps = [x[1] for x in nt if isinstance(x, tuple) and x[0] == "piano"]
+            abs_new = ev[len(pev):]
+            grams = [tuple(new[i:i + NGRAM]) for i in range(len(new) - NGRAM + 1)]
+            o = old_by_key[(prompts[pi]["path"], s, on)]
+            same_prefix = next((i for i, (a, b) in enumerate(zip(new, o["ids"])) if a != b), min(len(new), len(o["ids"])))
+            rows.append({"prompt_index": pi, "prompt": prompts[pi]["path"], "seed": s, "adapter": on, "new_tokens": len(new),
+                         "wall_s": round(wall, 1), "valid": v["valid"], "validity": v,
+                         "mask_changed_steps": len(changed), "mask_changed_by_state": dict(collections.Counter(c["state"] for c in changed)),
+                         "first_mask_change": changed[0]["step"] if changed else None,
+                         "pre_mask_allowed_min": min(pre_mass), "steps_pre_mask_allowed_below_0.999": sum(a < 0.999 for a in pre_mass),
+                         "pre_mask_disallowed_mean": sum(1 - a for a in pre_mass) / len(pre_mass),
+                         "unmasked_1726_valid": o["valid"],
+                         "unmasked_1726_first_error": o["validity"]["first_error"]["index"] if o["validity"]["first_error"] else None,
+                         "same_tokens_as_unmasked_until": same_prefix, "identical_to_unmasked": new == o["ids"],
+                         "notes": len(new_ev), "pitch_range": [min(ps), max(ps)] if ps else None,
+                         "longest_repeat": longest_repeat(ps), "max_polyphony": max_polyphony(new_ev) if new_ev else 0,
+                         "end_extension_seconds": round((max(e for _, e, _ in ev) - max((e for _, e, _ in pev), default=0)) / 1000, 3) if new_ev else 0.0,
+                         "new_span_seconds": round((max(e for _, e, _ in abs_new) - min(o_ for o_, _, _ in abs_new)) / 1000, 3) if abs_new else 0.0,
+                         "ended_by_eos": bool(new) and new[-1] == eos_id,
+                         "train_16gram_hits": sum(1 for x in grams if x in train_grams), "16grams": len(grams)})
+            say(f"{tag_of(buf)} done {len(new)} tokens {wall:.0f} s, valid={v['valid']}, mask changed {len(changed)} steps, total {time.perf_counter() - t_all:.0f} s")
+            # a format-invalid masked stream is an implementation bug: stop now instead of spending the rest of the budget
+            check(f"stream_{buf['n']}_format_valid", v["valid"], first_error=v["first_error"])
+
+        def save(result):
+            for b in result["completed"] + ([result["incomplete"]] if result["incomplete"] else []):
+                b.pop("_t", None)
             with open(out_path, "w") as f:
-                json.dump(gens, f)
+                json.dump(result, f)
             log["generations_masked_sha256"] = file_sha(out_path)
             log["streams"] = rows
+            log["incomplete"] = {k: v for k, v in result["incomplete"].items() if k not in ("ids", "pre_mask_allowed")} if result["incomplete"] else None
             log["phases"]["generate"] = {"wall_s": round(time.perf_counter() - t_all, 1), **rss(), **pressure()}
+
+        run_streams(specs, run_one, after, save)
         check("mask_implementation_all_valid", len(rows) == 16 and all(r["valid"] for r in rows),
               invalid=[(r["prompt_index"], r["seed"], r["adapter"]) for r in rows if not r["valid"]])
         summary = {}
@@ -301,7 +298,7 @@ def main() -> None:
                             "train_16gram_hits": sum(r["train_16gram_hits"] for r in rs)}
         log["summary"] = summary
         log["result"] = "generate_done"
-    except Stop as e:
+    except (Stop, MaskStop) as e:
         log["result"], log["stopped_at"] = "stopped", str(e)
     except RuntimeError as e:
         log["result"], log["stopped_at"] = "error", f"{type(e).__name__}: {e}"[:500]

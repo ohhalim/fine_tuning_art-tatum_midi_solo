@@ -12,6 +12,8 @@ unmasked pick was already allowed, the masked pick is the same token.
 """
 from __future__ import annotations
 
+import math
+
 import torch
 
 from aria_token_validity import segment_state
@@ -63,3 +65,54 @@ def masked_pick(p, ok, q):
     free = int(torch.argmax(p / q))
     pick = int(torch.argmax(torch.where(ok, p, torch.zeros_like(p)) / q))
     return pick, free
+
+
+class MaskStop(Exception):
+    """The allowed set is empty or its pre-mask mass is not finite / not positive."""
+
+
+def masked_generate(next_probs, prompt_tokens, prompt_ids, vocab, seed, max_new, eos_id, buf, progress=None):
+    """Fill buf["ids"], buf["pre_mask_allowed"], buf["mask_changed"] in place, one step at a time, so a stop in
+    the middle (MaskStop, the wall alarm) leaves what was generated so far in buf.
+    next_probs(seq) -> CPU probability vector at temperature 1. One Exp(1) noise vector per step, as in #1726."""
+    gm = GrammarMask(vocab)
+    gm.start(prompt_tokens)
+    gen = torch.Generator().manual_seed(seed)
+    seq = list(prompt_ids)
+    for step in range(max_new):
+        p = next_probs(seq)
+        ok = gm.allowed()
+        a = p[ok].sum().item()
+        if not bool(ok.any()) or not math.isfinite(a) or a <= 0:
+            raise MaskStop(f"step {step}: allowed set empty or allowed mass {a} ({gm.expect}, last onset {gm.last})")
+        q = torch.empty(len(vocab)).exponential_(1, generator=gen)
+        pick, free = masked_pick(p, ok, q)
+        buf["pre_mask_allowed"].append(a)
+        if pick != free:
+            buf["mask_changed"].append({"step": step, "state": gm.expect, "unmasked_pick": str(vocab[free]), "masked_pick": str(vocab[pick])})
+        seq.append(pick)
+        buf["ids"].append(pick)
+        if pick == eos_id:
+            break
+        gm.advance(vocab[pick])
+        if progress and (step + 1) % 128 == 0:
+            progress(step + 1)
+
+
+def run_streams(specs, run_one, after, save):
+    """run_one(spec, buf) fills buf; after(buf) records and may raise. save({"completed", "incomplete"}) always
+    runs, also on a stop: the stream in progress is kept as "incomplete" with stop_step and stop_reason, apart
+    from the completed ones (Astra review of #1732)."""
+    completed, incomplete = [], None
+    try:
+        for spec in specs:
+            buf = {**spec, "ids": [], "pre_mask_allowed": [], "mask_changed": []}
+            try:
+                run_one(spec, buf)
+            except BaseException as e:
+                incomplete = {**buf, "stop_step": len(buf["ids"]), "stop_reason": f"{type(e).__name__}: {e}"}
+                raise
+            completed.append(buf)
+            after(buf)
+    finally:
+        save({"completed": completed, "incomplete": incomplete})

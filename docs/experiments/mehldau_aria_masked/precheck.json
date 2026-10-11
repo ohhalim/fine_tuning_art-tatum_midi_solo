@@ -39,11 +39,11 @@
  },
  "phases": {
   "load": {
-   "wall_s": 4.229,
-   "rss_now_bytes": 2318942208,
-   "rss_max_bytes": 5547343872,
+   "wall_s": 4.738,
+   "rss_now_bytes": 1663778816,
+   "rss_max_bytes": 5548933120,
    "vm_pressure_level": 1,
-   "free_percent_line": "System-wide memory free percentage: 72%"
+   "free_percent_line": "System-wide memory free percentage: 68%"
   }
  },
  "result": "precheck_done",
@@ -57,7 +57,7 @@
   "torch": "2.14.1"
  },
  "projection": {
-  "smoke_s_per_token_short_context": 0.0497,
+  "smoke_s_per_token_short_context": 0.0516,
   "estimate_basis": "#1726 generation phase 2357.5 s for the same 16 x 512 steps without the mask",
   "wall_limit_s": 3600
  }
