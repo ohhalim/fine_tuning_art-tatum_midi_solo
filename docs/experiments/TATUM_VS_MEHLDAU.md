@@ -18,6 +18,8 @@
 
 Tatum과 멜다우의 겹침은 0이다. **두 연주자를 모두 제외한 base가 없으므로 1회 재학습한다.**
 
+> **정정 (#1722, 2026-10-11):** 이 표와 아래 공통 base는 멜다우 **스튜디오** 18곡만 뺐다. 멜다우 라이브 녹음 54곡은 base 학습에 들어 있었다(해시 대조). "멜다우 미학습"·"처음 보는 멜다우"는 "멜다우 스튜디오 미학습"·"처음 보는 스튜디오 곡"으로 읽는다. `ARTIST_LEAK_AUDIT.md`
+
 ## 1. 공통 base (P0)
 - 데이터: `jazz_full`에서 Tatum 122곡과 멜다우 18곡을 해시로 제외 → `data/jazz_full_notatum_nomehldau`(manifest 기록)
 - 학습: armB 레시피(무작위 초기화, full model, 8 epoch, batch 4, accumulation 4, lr 3e-4, LS 0.1, seed 42, max_seq 1024, `legacy_batches`, `val_crop_seed -1`). MPS, 새 디렉터리, 기존 체크포인트 불변

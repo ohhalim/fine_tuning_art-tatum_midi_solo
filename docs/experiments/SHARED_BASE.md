@@ -6,7 +6,7 @@
 
 ## 문제
 두 완성 모델이 서로 다른 base 위에 있다.
-- Tatum 완성(#1509): **공통 base**(Tatum·멜다우 미학습) + out_proj+QKV
+- Tatum 완성(#1509): **공통 base**(Tatum 미학습, 멜다우 스튜디오 미학습·라이브 54곡 포함, #1722 정정) + out_proj+QKV
 - 멜다우 완성(#1497): **멜다우 제외 clean base**(Tatum 포함) + out_proj
 
 재설계 문서의 층 2 방향("base 1개 + 런타임 어댑터 스왑")을 따르려면 두 어댑터가 같은 base를 써야 한다. 공통 base 위의 멜다우 어댑터는 이미 있다(#1499/#1501 `outputs/tvm/cv_mehldau_fold{k}`, 최종 `outputs/tvm/export_mehldau/checkpoint_update128.pt`).

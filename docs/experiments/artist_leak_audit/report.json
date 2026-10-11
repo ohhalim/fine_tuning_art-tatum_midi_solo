@@ -1,0 +1,6020 @@
+{
+ "encoder": "archive/scripts/preprocess_jazz.py:process_midi_file",
+ "hash": "sha1 of int64 token array",
+ "set_sizes": {
+  "jazz_full": 2777,
+  "jazz_full_nomehldau": 2759,
+  "jazz_full_notatum_nomehldau": 2637,
+  "mehldau_full": 18,
+  "tatum_full": 122
+ },
+ "set_paths": {
+  "jazz_full": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/jazz_full",
+  "jazz_full_nomehldau": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/jazz_full_nomehldau",
+  "jazz_full_notatum_nomehldau": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/jazz_full_notatum_nomehldau",
+  "mehldau_full": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/data/mehldau_full",
+  "tatum_full": "/Users/ohhalim/orca/workspaces/fine_tuning_art-tatum_midi_solo/즉흥연주재-설계/data/tatum_full"
+ },
+ "reproduction_check": {
+  "mehldau_studio_in_mehldau_full": 18,
+  "mehldau_full_size": 18,
+  "tatum_studio_in_tatum_full": 122,
+  "tatum_full_size": 122
+ },
+ "summary": [
+  {
+   "tree": "midi",
+   "artist": "Brad Mehldau",
+   "kind": "studio",
+   "recordings": 18,
+   "not_encoded": 0,
+   "jazz_full/train": 17,
+   "jazz_full/val": 1,
+   "jazz_full_nomehldau/train": 0,
+   "jazz_full_nomehldau/val": 0,
+   "jazz_full_notatum_nomehldau/train": 0,
+   "jazz_full_notatum_nomehldau/val": 0,
+   "mehldau_full/train": 16,
+   "mehldau_full/val": 2,
+   "tatum_full/train": 0,
+   "tatum_full/val": 0,
+   "in_no_set": 0
+  },
+  {
+   "tree": "midi",
+   "artist": "Brad Mehldau",
+   "kind": "live",
+   "recordings": 54,
+   "not_encoded": 0,
+   "jazz_full/train": 45,
+   "jazz_full/val": 9,
+   "jazz_full_nomehldau/train": 45,
+   "jazz_full_nomehldau/val": 9,
+   "jazz_full_notatum_nomehldau/train": 45,
+   "jazz_full_notatum_nomehldau/val": 9,
+   "mehldau_full/train": 0,
+   "mehldau_full/val": 0,
+   "tatum_full/train": 0,
+   "tatum_full/val": 0,
+   "in_no_set": 0
+  },
+  {
+   "tree": "midi",
+   "artist": "Art Tatum",
+   "kind": "studio",
+   "recordings": 122,
+   "not_encoded": 0,
+   "jazz_full/train": 109,
+   "jazz_full/val": 13,
+   "jazz_full_nomehldau/train": 109,
+   "jazz_full_nomehldau/val": 13,
+   "jazz_full_notatum_nomehldau/train": 0,
+   "jazz_full_notatum_nomehldau/val": 0,
+   "mehldau_full/train": 0,
+   "mehldau_full/val": 0,
+   "tatum_full/train": 110,
+   "tatum_full/val": 12,
+   "in_no_set": 0
+  },
+  {
+   "tree": "midi_kong",
+   "artist": "Brad Mehldau",
+   "kind": "studio",
+   "recordings": 18,
+   "not_encoded": 0,
+   "jazz_full/train": 0,
+   "jazz_full/val": 0,
+   "jazz_full_nomehldau/train": 0,
+   "jazz_full_nomehldau/val": 0,
+   "jazz_full_notatum_nomehldau/train": 0,
+   "jazz_full_notatum_nomehldau/val": 0,
+   "mehldau_full/train": 0,
+   "mehldau_full/val": 0,
+   "tatum_full/train": 0,
+   "tatum_full/val": 0,
+   "in_no_set": 18
+  },
+  {
+   "tree": "midi_kong",
+   "artist": "Brad Mehldau",
+   "kind": "live",
+   "recordings": 54,
+   "not_encoded": 0,
+   "jazz_full/train": 0,
+   "jazz_full/val": 0,
+   "jazz_full_nomehldau/train": 0,
+   "jazz_full_nomehldau/val": 0,
+   "jazz_full_notatum_nomehldau/train": 0,
+   "jazz_full_notatum_nomehldau/val": 0,
+   "mehldau_full/train": 0,
+   "mehldau_full/val": 0,
+   "tatum_full/train": 0,
+   "tatum_full/val": 0,
+   "in_no_set": 54
+  },
+  {
+   "tree": "midi_kong",
+   "artist": "Art Tatum",
+   "kind": "studio",
+   "recordings": 122,
+   "not_encoded": 0,
+   "jazz_full/train": 0,
+   "jazz_full/val": 0,
+   "jazz_full_nomehldau/train": 0,
+   "jazz_full_nomehldau/val": 0,
+   "jazz_full_notatum_nomehldau/train": 0,
+   "jazz_full_notatum_nomehldau/val": 0,
+   "mehldau_full/train": 0,
+   "mehldau_full/val": 0,
+   "tatum_full/train": 0,
+   "tatum_full/val": 0,
+   "in_no_set": 122
+  }
+ ],
+ "same_title_recordings": {
+  "Brad Mehldau | from this moment on": [
+   "studio:Marian McPartland's Piano Jazz with Brad Mehldau/From This Moment On.midi",
+   "live:Live in Tokyo/From This Moment On.midi"
+  ],
+  "Art Tatum | september song": [
+   "studio:The Art Tatum Solo Masterpieces, Vol. 2/September Song.midi",
+   "studio:The Complete Capitol Recordings (Vol. One)/September Song.midi"
+  ],
+  "Art Tatum | tea for two": [
+   "studio:The Art Tatum Solo Masterpieces, Vol. 2/Tea For Two.midi",
+   "studio:The Complete Capitol Recordings (Vol. One)/Tea For Two.midi"
+  ],
+  "Art Tatum | if you hadnt gone away": [
+   "studio:The Art Tatum Solo Masterpieces, Vol. 3/If You Hadn't Gone Away.midi",
+   "studio:The Art Tatum Solo Masterpieces, Vol. 4/If You Hadn't Gone Away.midi"
+  ],
+  "Art Tatum | aunt hagars blues": [
+   "studio:The Art Tatum Solo Masterpieces, Vol. 4/Aunt Hagar's Blues.midi",
+   "studio:The Complete Capitol Recordings (Vol. One)/Aunt Hagar's Blues.midi"
+  ],
+  "Art Tatum | i cover the waterfront": [
+   "studio:The Art Tatum Solo Masterpieces, Vol. 5/I Cover The Waterfront.midi",
+   "studio:The Complete Capitol Recordings (Vol. One)/I Cover The Waterfront.midi"
+  ],
+  "Art Tatum | someone to watch over me": [
+   "studio:The Art Tatum Solo Masterpieces, Vol. 6/Someone To Watch Over Me.midi",
+   "studio:The Complete Capitol Recordings (Vol. One)/Someone To Watch Over Me.midi"
+  ],
+  "Art Tatum | out of nowhere": [
+   "studio:The Art Tatum Solo Masterpieces, Vol. 7/Out Of Nowhere.midi",
+   "studio:The Complete Capitol Recordings (Vol. One)/Out Of Nowhere.midi"
+  ],
+  "Art Tatum | somebody loves me": [
+   "studio:The Art Tatum Solo Masterpieces, Vol. 7/Somebody Loves Me.midi",
+   "studio:The Complete Capitol Recordings (Vol. One)/Somebody Loves Me.midi"
+  ],
+  "Art Tatum | willow weep for me": [
+   "studio:The Art Tatum Solo Masterpieces, Volume 1/Willow Weep For Me.midi",
+   "studio:The Complete Capitol Recordings (Vol. One)/Willow Weep For Me.midi"
+  ],
+  "Brad Mehldau | my favorite things": [
+   "live:10 Years Solo Live/My Favorite Things - Live.midi",
+   "live:Live in Marciac/My Favorite Things - Live.midi"
+  ],
+  "Brad Mehldau | things behind the sun": [
+   "live:Live in Marciac/Things Behind the Sun - Live.midi",
+   "live:Live in Tokyo/Things Behind the Sun.midi"
+  ]
+ },
+ "recordings": [
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Marian McPartland's Piano Jazz with Brad Mehldau",
+   "file": "From This Moment On.midi",
+   "title": "from this moment on",
+   "encoded": true,
+   "tokens": 10050,
+   "sha1": "c61783c03f0ca2795489245f8a67ae8f2126e56f",
+   "in": [
+    "jazz_full/train/02399.npy",
+    "mehldau_full/train/00004.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    3
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Marian McPartland's Piano Jazz with Brad Mehldau",
+   "file": "Ron's Place.midi",
+   "title": "rons place",
+   "encoded": true,
+   "tokens": 6720,
+   "sha1": "d99a06359a0d3eba8610410207205ddde9cabddf",
+   "in": [
+    "jazz_full/train/00162.npy",
+    "mehldau_full/train/00003.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    2
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Marian McPartland's Piano Jazz with Brad Mehldau",
+   "file": "When I Fall In Love.midi",
+   "title": "when i fall in love",
+   "encoded": true,
+   "tokens": 4270,
+   "sha1": "e2c6410130a89e4d9a483847d26abe9242fedc17",
+   "in": [
+    "jazz_full/train/01853.npy",
+    "mehldau_full/train/00000.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    0
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "Don't Let It Bring You Down.midi",
+   "title": "dont let it bring you down",
+   "encoded": true,
+   "tokens": 3142,
+   "sha1": "d7d2fe2e3b0945bcdfed80d793879bd9248ddad6",
+   "in": [
+    "jazz_full/train/00074.npy",
+    "mehldau_full/train/00008.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    2
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "I. waking up.midi",
+   "title": "i waking up",
+   "encoded": true,
+   "tokens": 1031,
+   "sha1": "4afc453f8d5f4dc1b8a629807e994a26de255c98",
+   "in": [
+    "jazz_full/train/00927.npy",
+    "mehldau_full/val/00000.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "II. stepping outside.midi",
+   "title": "ii stepping outside",
+   "encoded": true,
+   "tokens": 2514,
+   "sha1": "f53da021429aa28c316d248a8b8b4d2db9731aec",
+   "in": [
+    "jazz_full/train/00980.npy",
+    "mehldau_full/train/00013.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    0
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "III. keeping distance.midi",
+   "title": "iii keeping distance",
+   "encoded": true,
+   "tokens": 2542,
+   "sha1": "b90dd575a169d5cdbc5a41236c18866714ee3ff8",
+   "in": [
+    "jazz_full/val/00252.npy",
+    "mehldau_full/train/00005.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    2
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "IV. stopping, listening -  hearing.midi",
+   "title": "iv stopping listening hearing",
+   "encoded": true,
+   "tokens": 1572,
+   "sha1": "917bfd4d68172016edbf2e68e40c861200a06e84",
+   "in": [
+    "jazz_full/train/00831.npy",
+    "mehldau_full/train/00006.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    1
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "IX. waiting.midi",
+   "title": "ix waiting",
+   "encoded": true,
+   "tokens": 1525,
+   "sha1": "e2789b7f65d542ac3cf958b91810862fbc31b9e4",
+   "in": [
+    "jazz_full/train/00622.npy",
+    "mehldau_full/train/00007.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    1
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "Look for the Silver Lining.midi",
+   "title": "look for the silver lining",
+   "encoded": true,
+   "tokens": 2977,
+   "sha1": "9daaa3bef29fb42c473d53e73cd44bc882be71ef",
+   "in": [
+    "jazz_full/train/01071.npy",
+    "mehldau_full/train/00011.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    3
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "New York State of Mind.midi",
+   "title": "new york state of mind",
+   "encoded": true,
+   "tokens": 3851,
+   "sha1": "3e5743ed16131bed0bd48094437d3ae1a24111c0",
+   "in": [
+    "jazz_full/train/02342.npy",
+    "mehldau_full/train/00010.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    0
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "V. remembering before all this.midi",
+   "title": "v remembering before all this",
+   "encoded": true,
+   "tokens": 4464,
+   "sha1": "0d2c31bd7fc4a373601941f7842b115a6ae502dd",
+   "in": [
+    "jazz_full/train/02354.npy",
+    "mehldau_full/train/00001.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    3
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "VI. uncertainty.midi",
+   "title": "vi uncertainty",
+   "encoded": true,
+   "tokens": 3670,
+   "sha1": "5695eada165df1a432696064497e2260b1f6c834",
+   "in": [
+    "jazz_full/train/02141.npy",
+    "mehldau_full/train/00009.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    0
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "VII. - the day moves by -.midi",
+   "title": "vii the day moves by",
+   "encoded": true,
+   "tokens": 2640,
+   "sha1": "4cd45f5a443ca62d526324f0f63f8fda82f4f8f7",
+   "in": [
+    "jazz_full/train/02360.npy",
+    "mehldau_full/train/00012.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    3
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "VIII. yearning.midi",
+   "title": "viii yearning",
+   "encoded": true,
+   "tokens": 2595,
+   "sha1": "3fa0a71012084930e8712657fb85933b2618f671",
+   "in": [
+    "jazz_full/train/01738.npy",
+    "mehldau_full/train/00015.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    2
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "X. in the kitchen.midi",
+   "title": "x in the kitchen",
+   "encoded": true,
+   "tokens": 5367,
+   "sha1": "f977cac0a5c307ec660fc66f02c6d1ddd02f7e06",
+   "in": [
+    "jazz_full/train/00340.npy",
+    "mehldau_full/val/00001.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "XI. family harmony.midi",
+   "title": "xi family harmony",
+   "encoded": true,
+   "tokens": 5154,
+   "sha1": "a1d9a899a645aed2623e36ef518b4d92bf23108b",
+   "in": [
+    "jazz_full/train/00638.npy",
+    "mehldau_full/train/00014.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    1
+   ]
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "XII. lullaby.midi",
+   "title": "xii lullaby",
+   "encoded": true,
+   "tokens": 1968,
+   "sha1": "3990be723a5424c33e20070790ffbe75dc57506f",
+   "in": [
+    "jazz_full/train/01628.npy",
+    "mehldau_full/train/00002.npy"
+   ],
+   "mehldau_cv_held_out_fold": [
+    1
+   ]
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Come Rain Or Come Shine.midi",
+   "title": "come rain or come shine",
+   "encoded": true,
+   "tokens": 8734,
+   "sha1": "2fdd1a4497206f43e902ba1ae37571984f26119b",
+   "in": [
+    "jazz_full/val/00066.npy",
+    "jazz_full_nomehldau/val/00066.npy",
+    "tatum_full/train/00000.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Elegy.midi",
+   "title": "elegy",
+   "encoded": true,
+   "tokens": 10375,
+   "sha1": "9a9e4f244a685e064d638ae4c3a7175e6e3a5cb5",
+   "in": [
+    "jazz_full/train/02244.npy",
+    "jazz_full_nomehldau/train/02244.npy",
+    "tatum_full/train/00001.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Gone With The Wind.midi",
+   "title": "gone with the wind",
+   "encoded": true,
+   "tokens": 7081,
+   "sha1": "40659c26fbad43f359b4c454d64a170b6d9d8e2a",
+   "in": [
+    "jazz_full/train/01447.npy",
+    "jazz_full_nomehldau/train/01447.npy",
+    "tatum_full/train/00002.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Heat Wave.midi",
+   "title": "heat wave",
+   "encoded": true,
+   "tokens": 8486,
+   "sha1": "9ef9496b1da3e0e39cfacd94a223d581c095757d",
+   "in": [
+    "jazz_full/train/00601.npy",
+    "jazz_full_nomehldau/train/00601.npy",
+    "tatum_full/train/00003.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "I Didn't Know What Time It Was.midi",
+   "title": "i didnt know what time it was",
+   "encoded": true,
+   "tokens": 8245,
+   "sha1": "01dca735a3c11b6f9a740b170fc464735d981c5c",
+   "in": [
+    "jazz_full/train/01922.npy",
+    "jazz_full_nomehldau/train/01922.npy",
+    "tatum_full/train/00004.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "I Don't Stand A Ghost Of A Chance With You.midi",
+   "title": "i dont stand a ghost of a chance with you",
+   "encoded": true,
+   "tokens": 7920,
+   "sha1": "e3a4540927d883d8327fa41f84ce14c8d3ed7541",
+   "in": [
+    "jazz_full/train/01429.npy",
+    "jazz_full_nomehldau/train/01429.npy",
+    "tatum_full/train/00005.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "I'll See You In My Dreams.midi",
+   "title": "ill see you in my dreams",
+   "encoded": true,
+   "tokens": 9734,
+   "sha1": "1a69a081ce5762b6def1914af3beb5e90bff8fad",
+   "in": [
+    "jazz_full/train/00561.npy",
+    "jazz_full_nomehldau/train/00561.npy",
+    "tatum_full/train/00006.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Lover Come Back To Me.midi",
+   "title": "lover come back to me",
+   "encoded": true,
+   "tokens": 12745,
+   "sha1": "3d8f317ef3b6f5d303d0733aa2b2067a3f8c4a07",
+   "in": [
+    "jazz_full/train/00915.npy",
+    "jazz_full_nomehldau/train/00915.npy",
+    "tatum_full/train/00007.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Please Be Kind.midi",
+   "title": "please be kind",
+   "encoded": true,
+   "tokens": 12320,
+   "sha1": "76c28daf5c9ef58434448693b5f73a57c3c7f65b",
+   "in": [
+    "jazz_full/train/01760.npy",
+    "jazz_full_nomehldau/train/01760.npy",
+    "tatum_full/train/00008.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "September Song.midi",
+   "title": "september song",
+   "encoded": true,
+   "tokens": 8356,
+   "sha1": "1a260b2b49d17e55e458dd71872431043b6d7a2e",
+   "in": [
+    "jazz_full/train/01455.npy",
+    "jazz_full_nomehldau/train/01455.npy",
+    "tatum_full/val/00000.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Tea For Two.midi",
+   "title": "tea for two",
+   "encoded": true,
+   "tokens": 10434,
+   "sha1": "7140bddcf042fc1b0e0ccb841b6457b345de14ea",
+   "in": [
+    "jazz_full/train/01040.npy",
+    "jazz_full_nomehldau/train/01040.npy",
+    "tatum_full/train/00009.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "The Very Thought Of You.midi",
+   "title": "the very thought of you",
+   "encoded": true,
+   "tokens": 8414,
+   "sha1": "282d36f82072a141b39f64184d0a5719d6707224",
+   "in": [
+    "jazz_full/train/01617.npy",
+    "jazz_full_nomehldau/train/01617.npy",
+    "tatum_full/train/00010.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "There Will Never Be Another You.midi",
+   "title": "there will never be another you",
+   "encoded": true,
+   "tokens": 10909,
+   "sha1": "4240388ffdd9d0b72351c8e7366e776d7479b82a",
+   "in": [
+    "jazz_full/train/00505.npy",
+    "jazz_full_nomehldau/train/00505.npy",
+    "tatum_full/train/00011.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "This Can't Be Love.midi",
+   "title": "this cant be love",
+   "encoded": true,
+   "tokens": 7840,
+   "sha1": "5cbfdf870c1b4d55a863f7c8eb2ad3f60d5a2155",
+   "in": [
+    "jazz_full/train/01809.npy",
+    "jazz_full_nomehldau/train/01809.npy",
+    "tatum_full/train/00012.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Would You Like To Take A Walk.midi",
+   "title": "would you like to take a walk",
+   "encoded": true,
+   "tokens": 9594,
+   "sha1": "ea62fd588d37e2fdf727ad43f52bb09df4d74ba0",
+   "in": [
+    "jazz_full/train/00848.npy",
+    "jazz_full_nomehldau/train/00848.npy",
+    "tatum_full/train/00013.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "After You've Gone.midi",
+   "title": "after youve gone",
+   "encoded": true,
+   "tokens": 10706,
+   "sha1": "1916fdccbf2c4620db34c0e9165a31991ed9b78a",
+   "in": [
+    "jazz_full/train/02319.npy",
+    "jazz_full_nomehldau/train/02319.npy",
+    "tatum_full/train/00014.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "All The Things You Are.midi",
+   "title": "all the things you are",
+   "encoded": true,
+   "tokens": 13999,
+   "sha1": "4864b1692f61c332d0d8a6c7e276be3922fa8038",
+   "in": [
+    "jazz_full/train/02220.npy",
+    "jazz_full_nomehldau/train/02220.npy",
+    "tatum_full/train/00015.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Begin The Beguine.midi",
+   "title": "begin the beguine",
+   "encoded": true,
+   "tokens": 8325,
+   "sha1": "03c5193ad3fd1008f0950c122ade558cbdbb00c1",
+   "in": [
+    "jazz_full/train/00275.npy",
+    "jazz_full_nomehldau/train/00275.npy",
+    "tatum_full/train/00016.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Crazy Rhythm.midi",
+   "title": "crazy rhythm",
+   "encoded": true,
+   "tokens": 8858,
+   "sha1": "b0f74b785a4989f7af2ec81ae3c6bab613ee716e",
+   "in": [
+    "jazz_full/train/00936.npy",
+    "jazz_full_nomehldau/train/00936.npy",
+    "tatum_full/train/00017.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Deep Purple.midi",
+   "title": "deep purple",
+   "encoded": true,
+   "tokens": 10237,
+   "sha1": "79715b6db47ea69b662b8642e237ab8ca988d016",
+   "in": [
+    "jazz_full/val/00006.npy",
+    "jazz_full_nomehldau/val/00006.npy",
+    "tatum_full/train/00018.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Dixieland Band.midi",
+   "title": "dixieland band",
+   "encoded": true,
+   "tokens": 7839,
+   "sha1": "f2c485c0424f3ec99dd4741e0ad1de23a69e660a",
+   "in": [
+    "jazz_full/train/00935.npy",
+    "jazz_full_nomehldau/train/00935.npy",
+    "tatum_full/train/00019.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "I Can't Give You Anything But Love.midi",
+   "title": "i cant give you anything but love",
+   "encoded": true,
+   "tokens": 7633,
+   "sha1": "77cead959311c38943d29d90dde1f2d1dca720bb",
+   "in": [
+    "jazz_full/train/00176.npy",
+    "jazz_full_nomehldau/train/00176.npy",
+    "tatum_full/train/00020.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "I Surrender, Dear.midi",
+   "title": "i surrender dear",
+   "encoded": true,
+   "tokens": 7925,
+   "sha1": "c60343a972c733db6f12fe85bfdeefad31f7f906",
+   "in": [
+    "jazz_full/train/01297.npy",
+    "jazz_full_nomehldau/train/01297.npy",
+    "tatum_full/train/00021.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "If You Hadn't Gone Away.midi",
+   "title": "if you hadnt gone away",
+   "encoded": true,
+   "tokens": 9524,
+   "sha1": "9b69fbebe6c782c140fed6f22898507600c993ed",
+   "in": [
+    "jazz_full/train/01729.npy",
+    "jazz_full_nomehldau/train/01729.npy",
+    "tatum_full/train/00022.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Indiana (Back Home Again In Indiana).midi",
+   "title": "indiana",
+   "encoded": true,
+   "tokens": 9186,
+   "sha1": "5903c3c97e59ca4ecd231a298d4d2072f1a4cec9",
+   "in": [
+    "jazz_full/val/00118.npy",
+    "jazz_full_nomehldau/val/00118.npy",
+    "tatum_full/train/00023.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Jitterbug Waltz.midi",
+   "title": "jitterbug waltz",
+   "encoded": true,
+   "tokens": 7855,
+   "sha1": "eeb2893432ee5e07aa938686638c3f1ab80c90ee",
+   "in": [
+    "jazz_full/train/01578.npy",
+    "jazz_full_nomehldau/train/01578.npy",
+    "tatum_full/train/00024.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Love Me Or Leave Me.midi",
+   "title": "love me or leave me",
+   "encoded": true,
+   "tokens": 6944,
+   "sha1": "890217b047de88e40abfd50dd93baba88731c4ea",
+   "in": [
+    "jazz_full/train/01072.npy",
+    "jazz_full_nomehldau/train/01072.npy",
+    "tatum_full/train/00025.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Prisoner Of Love.midi",
+   "title": "prisoner of love",
+   "encoded": true,
+   "tokens": 9628,
+   "sha1": "8cee3084fda8ac9145c6e8644194a97c7ee118ad",
+   "in": [
+    "jazz_full/train/00735.npy",
+    "jazz_full_nomehldau/train/00735.npy",
+    "tatum_full/train/00026.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Tenderly.midi",
+   "title": "tenderly",
+   "encoded": true,
+   "tokens": 10916,
+   "sha1": "ab8528166d1700fae3ff42c33447fd28dc030ce2",
+   "in": [
+    "jazz_full/train/01699.npy",
+    "jazz_full_nomehldau/train/01699.npy",
+    "tatum_full/train/00027.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "When Your Lover Has Gone.midi",
+   "title": "when your lover has gone",
+   "encoded": true,
+   "tokens": 8281,
+   "sha1": "bc7fff3dc67317d780d26f73c90a8aae22cfe5ef",
+   "in": [
+    "jazz_full/train/02055.npy",
+    "jazz_full_nomehldau/train/02055.npy",
+    "tatum_full/train/00028.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Yesterdays.midi",
+   "title": "yesterdays",
+   "encoded": true,
+   "tokens": 8666,
+   "sha1": "7840bfa9a6cb471bcb4ace92be0538ec54cbe989",
+   "in": [
+    "jazz_full/val/00016.npy",
+    "jazz_full_nomehldau/val/00016.npy",
+    "tatum_full/val/00001.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Aunt Hagar's Blues.midi",
+   "title": "aunt hagars blues",
+   "encoded": true,
+   "tokens": 10910,
+   "sha1": "c565e371f19eb77b92e7cc3227cc47e86706b46a",
+   "in": [
+    "jazz_full/train/01814.npy",
+    "jazz_full_nomehldau/train/01814.npy",
+    "tatum_full/train/00029.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "I Hadn't Anyone Till You.midi",
+   "title": "i hadnt anyone till you",
+   "encoded": true,
+   "tokens": 6947,
+   "sha1": "f8be1599116713af41420629de5b3f2e01e3a411",
+   "in": [
+    "jazz_full/val/00037.npy",
+    "jazz_full_nomehldau/val/00037.npy",
+    "tatum_full/train/00030.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "I Only Have Eyes For You.midi",
+   "title": "i only have eyes for you",
+   "encoded": true,
+   "tokens": 7005,
+   "sha1": "af27d541f59b18efce09b07799852f521ae24376",
+   "in": [
+    "jazz_full/train/01392.npy",
+    "jazz_full_nomehldau/train/01392.npy",
+    "tatum_full/train/00031.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "I'll See You Again.midi",
+   "title": "ill see you again",
+   "encoded": true,
+   "tokens": 10161,
+   "sha1": "4aaa8d30f432fb80efe5cb41d652e39881e87714",
+   "in": [
+    "jazz_full/train/01464.npy",
+    "jazz_full_nomehldau/train/01464.npy",
+    "tatum_full/train/00032.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "I've Got The World On A String.midi",
+   "title": "ive got the world on a string",
+   "encoded": true,
+   "tokens": 8014,
+   "sha1": "49bbda3775b77c658199c2e4a9f3d43239af9b71",
+   "in": [
+    "jazz_full/train/02450.npy",
+    "jazz_full_nomehldau/train/02450.npy",
+    "tatum_full/train/00033.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "If You Hadn't Gone Away.midi",
+   "title": "if you hadnt gone away",
+   "encoded": true,
+   "tokens": 9543,
+   "sha1": "f8234fd157b741f15ac140aad5b1dd26058a4a19",
+   "in": [
+    "jazz_full/val/00245.npy",
+    "jazz_full_nomehldau/val/00245.npy",
+    "tatum_full/train/00034.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Ill Wind.midi",
+   "title": "ill wind",
+   "encoded": true,
+   "tokens": 10870,
+   "sha1": "26fe9042e60aa4b891ad4d5f125456b89802691f",
+   "in": [
+    "jazz_full/train/01306.npy",
+    "jazz_full_nomehldau/train/01306.npy",
+    "tatum_full/train/00035.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Isn't This A Lovely Day.midi",
+   "title": "isnt this a lovely day",
+   "encoded": true,
+   "tokens": 8570,
+   "sha1": "91f5345be0080e6f3c7d75afc217c233f09c3a03",
+   "in": [
+    "jazz_full/train/01065.npy",
+    "jazz_full_nomehldau/train/01065.npy",
+    "tatum_full/train/00036.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Mean To Me.midi",
+   "title": "mean to me",
+   "encoded": true,
+   "tokens": 6537,
+   "sha1": "7727f5633535dc1b405ec7c575275684af1932ce",
+   "in": [
+    "jazz_full/train/00825.npy",
+    "jazz_full_nomehldau/train/00825.npy",
+    "tatum_full/train/00037.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Stardust.midi",
+   "title": "stardust",
+   "encoded": true,
+   "tokens": 11138,
+   "sha1": "da450f0fde42a35c30ade9c1100d7f3eb38b0bca",
+   "in": [
+    "jazz_full/train/00063.npy",
+    "jazz_full_nomehldau/train/00063.npy",
+    "tatum_full/train/00038.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "The Man I Love.midi",
+   "title": "the man i love",
+   "encoded": true,
+   "tokens": 10625,
+   "sha1": "311b434838748cde7c8f22bd152df65d14740637",
+   "in": [
+    "jazz_full/train/00709.npy",
+    "jazz_full_nomehldau/train/00709.npy",
+    "tatum_full/train/00039.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "They Can't Take That Away From Me.midi",
+   "title": "they cant take that away from me",
+   "encoded": true,
+   "tokens": 9893,
+   "sha1": "37c95ae69626833842923e3d58f1c5650565da23",
+   "in": [
+    "jazz_full/train/00645.npy",
+    "jazz_full_nomehldau/train/00645.npy",
+    "tatum_full/train/00040.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "What's New.midi",
+   "title": "whats new",
+   "encoded": true,
+   "tokens": 8650,
+   "sha1": "4f6bffef852b07501afac503e6857c1bde701874",
+   "in": [
+    "jazz_full/train/01184.npy",
+    "jazz_full_nomehldau/train/01184.npy",
+    "tatum_full/train/00041.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Without A Song.midi",
+   "title": "without a song",
+   "encoded": true,
+   "tokens": 11022,
+   "sha1": "ca6489b3bc5e114fdecff1fcbb0ebefda79b76b2",
+   "in": [
+    "jazz_full/train/00016.npy",
+    "jazz_full_nomehldau/train/00016.npy",
+    "tatum_full/train/00042.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "You're Mine You.midi",
+   "title": "youre mine you",
+   "encoded": true,
+   "tokens": 9714,
+   "sha1": "67cd700a6d9e0905b5ab784aee45001c1a9bceba",
+   "in": [
+    "jazz_full/train/00059.npy",
+    "jazz_full_nomehldau/train/00059.npy",
+    "tatum_full/train/00043.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Blue Moon.midi",
+   "title": "blue moon",
+   "encoded": true,
+   "tokens": 11252,
+   "sha1": "003b43acc93ad034be0a588c9fad05f8f8ed2584",
+   "in": [
+    "jazz_full/train/01350.npy",
+    "jazz_full_nomehldau/train/01350.npy",
+    "tatum_full/train/00044.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Don't Worry 'Bout Me.midi",
+   "title": "dont worry bout me",
+   "encoded": true,
+   "tokens": 8743,
+   "sha1": "1a7d81baf87ddf76cbf0973aa2b26c13a4853c5d",
+   "in": [
+    "jazz_full/train/00481.npy",
+    "jazz_full_nomehldau/train/00481.npy",
+    "tatum_full/train/00045.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Fine And Dandy.midi",
+   "title": "fine and dandy",
+   "encoded": true,
+   "tokens": 8990,
+   "sha1": "4b126e4a9fbc12a660f4df7e17d4aa6a5b55549c",
+   "in": [
+    "jazz_full/train/00460.npy",
+    "jazz_full_nomehldau/train/00460.npy",
+    "tatum_full/train/00046.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "I Cover The Waterfront.midi",
+   "title": "i cover the waterfront",
+   "encoded": true,
+   "tokens": 9840,
+   "sha1": "fad0bccbc02bcf164367cee9b7a2d7877ed2e5f6",
+   "in": [
+    "jazz_full/val/00132.npy",
+    "jazz_full_nomehldau/val/00132.npy",
+    "tatum_full/train/00047.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "I Gotta Right To Sing The Blues.midi",
+   "title": "i gotta right to sing the blues",
+   "encoded": true,
+   "tokens": 8564,
+   "sha1": "3cab789305b73a4f1d5a6f1063569438f195f099",
+   "in": [
+    "jazz_full/train/01226.npy",
+    "jazz_full_nomehldau/train/01226.npy",
+    "tatum_full/train/00048.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Louise.midi",
+   "title": "louise",
+   "encoded": true,
+   "tokens": 9824,
+   "sha1": "d384e1aab54c06aff48320ace2a1fd2d6496e5d5",
+   "in": [
+    "jazz_full/train/00120.npy",
+    "jazz_full_nomehldau/train/00120.npy",
+    "tatum_full/train/00049.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Lullaby In Rhythm.midi",
+   "title": "lullaby in rhythm",
+   "encoded": true,
+   "tokens": 9068,
+   "sha1": "a9fd81c1e89e4681f50c60ed5363ff3e389f68bf",
+   "in": [
+    "jazz_full/train/00940.npy",
+    "jazz_full_nomehldau/train/00940.npy",
+    "tatum_full/train/00050.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Makin' Whoopee.midi",
+   "title": "makin whoopee",
+   "encoded": true,
+   "tokens": 8343,
+   "sha1": "45c7a1206c23b7e698e331b3b48fa9bbb768db6c",
+   "in": [
+    "jazz_full/train/02382.npy",
+    "jazz_full_nomehldau/train/02382.npy",
+    "tatum_full/train/00051.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Memories Of You.midi",
+   "title": "memories of you",
+   "encoded": true,
+   "tokens": 10913,
+   "sha1": "9ddfbcb6d18ae9a36b5d8412981ba7175f4ca981",
+   "in": [
+    "jazz_full/train/01006.npy",
+    "jazz_full_nomehldau/train/01006.npy",
+    "tatum_full/train/00052.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "S'posin'.midi",
+   "title": "sposin",
+   "encoded": true,
+   "tokens": 8941,
+   "sha1": "eb937fdc08568dc2cba333c18c8cb05f7771b590",
+   "in": [
+    "jazz_full/val/00009.npy",
+    "jazz_full_nomehldau/val/00009.npy",
+    "tatum_full/val/00002.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Stars Fell On Alabama.midi",
+   "title": "stars fell on alabama",
+   "encoded": true,
+   "tokens": 9871,
+   "sha1": "0214f931d402d4be7c7bb9dd44835b2827a17baa",
+   "in": [
+    "jazz_full/train/01402.npy",
+    "jazz_full_nomehldau/train/01402.npy",
+    "tatum_full/train/00053.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Stompin' At The Savoy.midi",
+   "title": "stompin at the savoy",
+   "encoded": true,
+   "tokens": 8739,
+   "sha1": "6b3b1b1d17353a16226772a12a7449041b987dc7",
+   "in": [
+    "jazz_full/train/01709.npy",
+    "jazz_full_nomehldau/train/01709.npy",
+    "tatum_full/train/00054.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "That Old Feeling.midi",
+   "title": "that old feeling",
+   "encoded": true,
+   "tokens": 9077,
+   "sha1": "0f5427abeb5a235c4de067170e591f58ddd26c04",
+   "in": [
+    "jazz_full/train/00960.npy",
+    "jazz_full_nomehldau/train/00960.npy",
+    "tatum_full/train/00055.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "The Moon Is Low.midi",
+   "title": "the moon is low",
+   "encoded": true,
+   "tokens": 8945,
+   "sha1": "6fc5616e561bcf4ab78b38d309133506037bec4f",
+   "in": [
+    "jazz_full/train/00393.npy",
+    "jazz_full_nomehldau/train/00393.npy",
+    "tatum_full/train/00056.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "You're Driving Me Crazy.midi",
+   "title": "youre driving me crazy",
+   "encoded": true,
+   "tokens": 7003,
+   "sha1": "d8e4002a414c0e6b13504004e797cd834a09b442",
+   "in": [
+    "jazz_full/train/02175.npy",
+    "jazz_full_nomehldau/train/02175.npy",
+    "tatum_full/train/00057.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Ain't Misbehavin'.midi",
+   "title": "aint misbehavin",
+   "encoded": true,
+   "tokens": 7455,
+   "sha1": "b6e7a96fe5d8f8afb489d2d0319381949f5e254a",
+   "in": [
+    "jazz_full/train/01662.npy",
+    "jazz_full_nomehldau/train/01662.npy",
+    "tatum_full/train/00058.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Boulevard Of Broken Dreams.midi",
+   "title": "boulevard of broken dreams",
+   "encoded": true,
+   "tokens": 12597,
+   "sha1": "1e57c057623e6ff8ee651f55cce8d97ebfe9ac48",
+   "in": [
+    "jazz_full/train/01035.npy",
+    "jazz_full_nomehldau/train/01035.npy",
+    "tatum_full/val/00003.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Cherokee.midi",
+   "title": "cherokee",
+   "encoded": true,
+   "tokens": 10096,
+   "sha1": "4b1a713028e94719ffc755873d4beacb777c176f",
+   "in": [
+    "jazz_full/train/00501.npy",
+    "jazz_full_nomehldau/train/00501.npy",
+    "tatum_full/train/00059.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Danny Boy.midi",
+   "title": "danny boy",
+   "encoded": true,
+   "tokens": 7914,
+   "sha1": "cd54fbb970bfb02d43d931b03db9bbf797b303df",
+   "in": [
+    "jazz_full/train/02047.npy",
+    "jazz_full_nomehldau/train/02047.npy",
+    "tatum_full/train/00060.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Do Nothing Till You Hear From Me.midi",
+   "title": "do nothing till you hear from me",
+   "encoded": true,
+   "tokens": 10621,
+   "sha1": "17a6ed571c678d526c8665d3babf73c370a11f94",
+   "in": [
+    "jazz_full/train/00142.npy",
+    "jazz_full_nomehldau/train/00142.npy",
+    "tatum_full/train/00061.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Happy Feet.midi",
+   "title": "happy feet",
+   "encoded": true,
+   "tokens": 8038,
+   "sha1": "f656a264d2d646d10f1173c7ef3b849322e6ee55",
+   "in": [
+    "jazz_full/train/00981.npy",
+    "jazz_full_nomehldau/train/00981.npy",
+    "tatum_full/train/00062.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "I'm Comin' Virginia.midi",
+   "title": "im comin virginia",
+   "encoded": true,
+   "tokens": 7148,
+   "sha1": "8e1c8d3d38435534617e08d2608b9ff52e21a1fa",
+   "in": [
+    "jazz_full/train/01140.npy",
+    "jazz_full_nomehldau/train/01140.npy",
+    "tatum_full/val/00004.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "I've Got A Crush On You.midi",
+   "title": "ive got a crush on you",
+   "encoded": true,
+   "tokens": 7193,
+   "sha1": "204785f4471e5d91e236ba028ceb4e1371720bab",
+   "in": [
+    "jazz_full/train/00014.npy",
+    "jazz_full_nomehldau/train/00014.npy",
+    "tatum_full/train/00063.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Just Like A Butterfly That's Caught In The Rain.midi",
+   "title": "just like a butterfly thats caught in the rain",
+   "encoded": true,
+   "tokens": 7968,
+   "sha1": "1ed188356ca33a81e38ac5f1560eba9e9e207521",
+   "in": [
+    "jazz_full/train/02021.npy",
+    "jazz_full_nomehldau/train/02021.npy",
+    "tatum_full/train/00064.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Night And Day.midi",
+   "title": "night and day",
+   "encoded": true,
+   "tokens": 9092,
+   "sha1": "11ba0c3646872f91514a107a8c9b92040042241e",
+   "in": [
+    "jazz_full/train/01180.npy",
+    "jazz_full_nomehldau/train/01180.npy",
+    "tatum_full/train/00065.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Over The Rainbow.midi",
+   "title": "over the rainbow",
+   "encoded": true,
+   "tokens": 8618,
+   "sha1": "49892ae265441350338634e7ec5741e69928b4dc",
+   "in": [
+    "jazz_full/train/00443.npy",
+    "jazz_full_nomehldau/train/00443.npy",
+    "tatum_full/train/00066.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Someone To Watch Over Me.midi",
+   "title": "someone to watch over me",
+   "encoded": true,
+   "tokens": 8776,
+   "sha1": "358994914112f23cfda67bc1981bd0fe171ff503",
+   "in": [
+    "jazz_full/train/00439.npy",
+    "jazz_full_nomehldau/train/00439.npy",
+    "tatum_full/train/00067.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "The Way You Look Tonight.midi",
+   "title": "the way you look tonight",
+   "encoded": true,
+   "tokens": 13203,
+   "sha1": "21971a3139f157f5030424100d98cb93cc20fafd",
+   "in": [
+    "jazz_full/train/01004.npy",
+    "jazz_full_nomehldau/train/01004.npy",
+    "tatum_full/train/00068.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "There's A Small Hotel.midi",
+   "title": "theres a small hotel",
+   "encoded": true,
+   "tokens": 10132,
+   "sha1": "fd4cd8ac831d94e58fba3a7f56c4fdd408a238f2",
+   "in": [
+    "jazz_full/train/02234.npy",
+    "jazz_full_nomehldau/train/02234.npy",
+    "tatum_full/train/00069.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "You're Blase.midi",
+   "title": "youre blase",
+   "encoded": true,
+   "tokens": 9247,
+   "sha1": "28f4e62d132033418b848e4e3024ee9631439a5d",
+   "in": [
+    "jazz_full/train/01553.npy",
+    "jazz_full_nomehldau/train/01553.npy",
+    "tatum_full/train/00070.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Dancing In The Dark.midi",
+   "title": "dancing in the dark",
+   "encoded": true,
+   "tokens": 9180,
+   "sha1": "8140f8c034aa64bc5447d51cf0c4e2d14f8f4008",
+   "in": [
+    "jazz_full/train/02090.npy",
+    "jazz_full_nomehldau/train/02090.npy",
+    "tatum_full/train/00071.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Humoresque.midi",
+   "title": "humoresque",
+   "encoded": true,
+   "tokens": 10828,
+   "sha1": "8840c2bcaaf879cb9a17504b27fcc95f9cea4615",
+   "in": [
+    "jazz_full/train/00879.npy",
+    "jazz_full_nomehldau/train/00879.npy",
+    "tatum_full/train/00072.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Isn't It Romantic.midi",
+   "title": "isnt it romantic",
+   "encoded": true,
+   "tokens": 10078,
+   "sha1": "4500dd373a76f0511c27d99f10b305afd893bbfe",
+   "in": [
+    "jazz_full/train/01355.npy",
+    "jazz_full_nomehldau/train/01355.npy",
+    "tatum_full/train/00073.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Japanese Sandman.midi",
+   "title": "japanese sandman",
+   "encoded": true,
+   "tokens": 7949,
+   "sha1": "552193d3d9329a23fc2073ab2f28152b320126f0",
+   "in": [
+    "jazz_full/train/02056.npy",
+    "jazz_full_nomehldau/train/02056.npy",
+    "tatum_full/val/00005.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Judy.midi",
+   "title": "judy",
+   "encoded": true,
+   "tokens": 8879,
+   "sha1": "635f7a1fa745b4a4c1349c4ff0498502bb0777b8",
+   "in": [
+    "jazz_full/train/00346.npy",
+    "jazz_full_nomehldau/train/00346.npy",
+    "tatum_full/train/00074.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Mighty Like A Rose.midi",
+   "title": "mighty like a rose",
+   "encoded": true,
+   "tokens": 13779,
+   "sha1": "776c749e0dfff4413d0ad0eace4b475ada355226",
+   "in": [
+    "jazz_full/train/00055.npy",
+    "jazz_full_nomehldau/train/00055.npy",
+    "tatum_full/train/00075.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Moon Song.midi",
+   "title": "moon song",
+   "encoded": true,
+   "tokens": 10297,
+   "sha1": "0bc91eac1c1f98222f02153e0f8be8e5e82b2c75",
+   "in": [
+    "jazz_full/train/00033.npy",
+    "jazz_full_nomehldau/train/00033.npy",
+    "tatum_full/train/00076.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Moonlight On The Ganges.midi",
+   "title": "moonlight on the ganges",
+   "encoded": true,
+   "tokens": 6086,
+   "sha1": "66c64ec6c68a49fa3ba289d0859cb11ba1945d01",
+   "in": [
+    "jazz_full/train/01813.npy",
+    "jazz_full_nomehldau/train/01813.npy",
+    "tatum_full/train/00077.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Out Of Nowhere.midi",
+   "title": "out of nowhere",
+   "encoded": true,
+   "tokens": 9382,
+   "sha1": "887b50f3915f8a8588cd7de11aa0cf4ef2cd29dd",
+   "in": [
+    "jazz_full/train/00534.npy",
+    "jazz_full_nomehldau/train/00534.npy",
+    "tatum_full/train/00078.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Smoke Gets In Your Eyes.midi",
+   "title": "smoke gets in your eyes",
+   "encoded": true,
+   "tokens": 8631,
+   "sha1": "0cba9adf6a51f933b4cd438626fced7e853c06bd",
+   "in": [
+    "jazz_full/train/01091.npy",
+    "jazz_full_nomehldau/train/01091.npy",
+    "tatum_full/val/00006.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "So Beats My Heart For You.midi",
+   "title": "so beats my heart for you",
+   "encoded": true,
+   "tokens": 12124,
+   "sha1": "88f04638ca3b6123d114995e3c7b26e0a81f566a",
+   "in": [
+    "jazz_full/train/00646.npy",
+    "jazz_full_nomehldau/train/00646.npy",
+    "tatum_full/train/00079.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Somebody Loves Me.midi",
+   "title": "somebody loves me",
+   "encoded": true,
+   "tokens": 9276,
+   "sha1": "43420cdd9cff0834d23aa6da195bea36757d8a0a",
+   "in": [
+    "jazz_full/train/01907.npy",
+    "jazz_full_nomehldau/train/01907.npy",
+    "tatum_full/train/00080.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Taboo.midi",
+   "title": "taboo",
+   "encoded": true,
+   "tokens": 9549,
+   "sha1": "480cc23cb542c6d3d49374eb4a87eb0bdec0fde5",
+   "in": [
+    "jazz_full/val/00192.npy",
+    "jazz_full_nomehldau/val/00192.npy",
+    "tatum_full/train/00081.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "What Does It Take.midi",
+   "title": "what does it take",
+   "encoded": true,
+   "tokens": 8833,
+   "sha1": "079c7c3005bbb9b43157adc62c4a39562754ffff",
+   "in": [
+    "jazz_full/train/01255.npy",
+    "jazz_full_nomehldau/train/01255.npy",
+    "tatum_full/train/00082.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Where Or When.midi",
+   "title": "where or when",
+   "encoded": true,
+   "tokens": 12373,
+   "sha1": "bd5e80f778e0a8af5b38e828381ac6a3dae91c07",
+   "in": [
+    "jazz_full/train/01779.npy",
+    "jazz_full_nomehldau/train/01779.npy",
+    "tatum_full/train/00083.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Wrap Your Troubles In Dreams.midi",
+   "title": "wrap your troubles in dreams",
+   "encoded": true,
+   "tokens": 7911,
+   "sha1": "4eab1115edf68f33b1e925afce5ff2548b19037d",
+   "in": [
+    "jazz_full/train/02351.npy",
+    "jazz_full_nomehldau/train/02351.npy",
+    "tatum_full/train/00084.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Blue Lou.midi",
+   "title": "blue lou",
+   "encoded": true,
+   "tokens": 7999,
+   "sha1": "2bb746f84ef8dbfc3d5771b12df02918245b9e04",
+   "in": [
+    "jazz_full/train/00771.npy",
+    "jazz_full_nomehldau/train/00771.npy",
+    "tatum_full/train/00085.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Body And Soul.midi",
+   "title": "body and soul",
+   "encoded": true,
+   "tokens": 12303,
+   "sha1": "72ea7b441c844a9da4ed5abcc788063430f7709b",
+   "in": [
+    "jazz_full/val/00145.npy",
+    "jazz_full_nomehldau/val/00145.npy",
+    "tatum_full/train/00086.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Embraceable You.midi",
+   "title": "embraceable you",
+   "encoded": true,
+   "tokens": 9280,
+   "sha1": "95af3f40db34f8a6102d4026576a898c0cfb26fd",
+   "in": [
+    "jazz_full/train/00400.npy",
+    "jazz_full_nomehldau/train/00400.npy",
+    "tatum_full/train/00087.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Everything I Have Is Yours.midi",
+   "title": "everything i have is yours",
+   "encoded": true,
+   "tokens": 13389,
+   "sha1": "889db473c502d9561cc0291f8840c5e73e301ec9",
+   "in": [
+    "jazz_full/train/02285.npy",
+    "jazz_full_nomehldau/train/02285.npy",
+    "tatum_full/train/00088.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Have You Met Miss Jones.midi",
+   "title": "have you met miss jones",
+   "encoded": true,
+   "tokens": 10945,
+   "sha1": "9672d5a11979c49ce96bd0267a1daeb751fbaa3a",
+   "in": [
+    "jazz_full/train/00543.npy",
+    "jazz_full_nomehldau/train/00543.npy",
+    "tatum_full/train/00089.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "I'm In The Mood For Love.midi",
+   "title": "im in the mood for love",
+   "encoded": true,
+   "tokens": 9939,
+   "sha1": "767c4dadd208dba89c97de117208ddd449e7ac8c",
+   "in": [
+    "jazz_full/val/00202.npy",
+    "jazz_full_nomehldau/val/00202.npy",
+    "tatum_full/train/00090.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "It's Only A Paper Moon.midi",
+   "title": "its only a paper moon",
+   "encoded": true,
+   "tokens": 7667,
+   "sha1": "c7555c31dbdbe6a5765b8d2137832c3bf96f1fda",
+   "in": [
+    "jazz_full/train/01866.npy",
+    "jazz_full_nomehldau/train/01866.npy",
+    "tatum_full/val/00007.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Just A-Sittin' And A-Rockin'.midi",
+   "title": "just asittin and arockin",
+   "encoded": true,
+   "tokens": 9447,
+   "sha1": "f5727dbd228c6981b6b4c105b3ff451ac7032fb7",
+   "in": [
+    "jazz_full/train/01327.npy",
+    "jazz_full_nomehldau/train/01327.npy",
+    "tatum_full/val/00008.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Love For Sale.midi",
+   "title": "love for sale",
+   "encoded": true,
+   "tokens": 12244,
+   "sha1": "0c02d457b9395c1dc86d6844b00a71e813184c92",
+   "in": [
+    "jazz_full/train/01837.npy",
+    "jazz_full_nomehldau/train/01837.npy",
+    "tatum_full/train/00091.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Moon Glow.midi",
+   "title": "moon glow",
+   "encoded": true,
+   "tokens": 8368,
+   "sha1": "9eebfcb65ee28a4a06e3433022cf2537b26499e2",
+   "in": [
+    "jazz_full/val/00174.npy",
+    "jazz_full_nomehldau/val/00174.npy",
+    "tatum_full/train/00092.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "My Last Affair.midi",
+   "title": "my last affair",
+   "encoded": true,
+   "tokens": 6054,
+   "sha1": "857a0d26c672d278e4fb0241ae734e5c030ff2fa",
+   "in": [
+    "jazz_full/train/00290.npy",
+    "jazz_full_nomehldau/train/00290.npy",
+    "tatum_full/train/00093.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Sophisticated Lady.midi",
+   "title": "sophisticated lady",
+   "encoded": true,
+   "tokens": 8160,
+   "sha1": "7499c272ac5137fd4e09450a72905aafff02bc16",
+   "in": [
+    "jazz_full/val/00091.npy",
+    "jazz_full_nomehldau/val/00091.npy",
+    "tatum_full/train/00094.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Stay As Sweet As You Are.midi",
+   "title": "stay as sweet as you are",
+   "encoded": true,
+   "tokens": 11975,
+   "sha1": "d5637cb3e249847b22297b8232a5cf07ae38606b",
+   "in": [
+    "jazz_full/train/00900.npy",
+    "jazz_full_nomehldau/train/00900.npy",
+    "tatum_full/train/00095.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Too Marvelous For Words.midi",
+   "title": "too marvelous for words",
+   "encoded": true,
+   "tokens": 8967,
+   "sha1": "29ee2d569b8c21871c0423572bf7e2a1d8eabd73",
+   "in": [
+    "jazz_full/train/00976.npy",
+    "jazz_full_nomehldau/train/00976.npy",
+    "tatum_full/train/00096.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Willow Weep For Me.midi",
+   "title": "willow weep for me",
+   "encoded": true,
+   "tokens": 10768,
+   "sha1": "d2f334b83eef08422bdd3746f12a2bcf06dad123",
+   "in": [
+    "jazz_full/train/00334.npy",
+    "jazz_full_nomehldau/train/00334.npy",
+    "tatum_full/train/00097.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "You Took Advantage Of Me.midi",
+   "title": "you took advantage of me",
+   "encoded": true,
+   "tokens": 7943,
+   "sha1": "ecd29649ab19344915b780a04954e07b826fcbf3",
+   "in": [
+    "jazz_full/train/02495.npy",
+    "jazz_full_nomehldau/train/02495.npy",
+    "tatum_full/train/00098.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Aunt Hagar's Blues.midi",
+   "title": "aunt hagars blues",
+   "encoded": true,
+   "tokens": 5488,
+   "sha1": "6532bbab6bcd190a786856b3e4b3799cfb463212",
+   "in": [
+    "jazz_full/train/01353.npy",
+    "jazz_full_nomehldau/train/01353.npy",
+    "tatum_full/train/00099.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Dardanella.midi",
+   "title": "dardanella",
+   "encoded": true,
+   "tokens": 8607,
+   "sha1": "b7923cc60a79fd857042080be698018d9ea927af",
+   "in": [
+    "jazz_full/train/01434.npy",
+    "jazz_full_nomehldau/train/01434.npy",
+    "tatum_full/train/00100.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Don't Blame Me.midi",
+   "title": "dont blame me",
+   "encoded": true,
+   "tokens": 6428,
+   "sha1": "0fa10d8d655eb5a6c6fe7a3482722497b7b3a2bb",
+   "in": [
+    "jazz_full/train/02273.npy",
+    "jazz_full_nomehldau/train/02273.npy",
+    "tatum_full/train/00101.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "I Cover The Waterfront.midi",
+   "title": "i cover the waterfront",
+   "encoded": true,
+   "tokens": 5859,
+   "sha1": "e2cf2f83d46afe4d196ad5c790e1fc29cc371c80",
+   "in": [
+    "jazz_full/train/00700.npy",
+    "jazz_full_nomehldau/train/00700.npy",
+    "tatum_full/val/00009.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Melody In F, Opus 3, No. 1.midi",
+   "title": "melody in f opus 3 no 1",
+   "encoded": true,
+   "tokens": 13298,
+   "sha1": "7c184337888d415e6ab3718c85a863aee262ab9d",
+   "in": [
+    "jazz_full/train/02048.npy",
+    "jazz_full_nomehldau/train/02048.npy",
+    "tatum_full/train/00102.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Nice Work If You Can Get It.midi",
+   "title": "nice work if you can get it",
+   "encoded": true,
+   "tokens": 7270,
+   "sha1": "7eae456d3de8b0b154e89942d4cf08131d3aab4e",
+   "in": [
+    "jazz_full/train/01558.npy",
+    "jazz_full_nomehldau/train/01558.npy",
+    "tatum_full/train/00103.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Out Of Nowhere.midi",
+   "title": "out of nowhere",
+   "encoded": true,
+   "tokens": 10392,
+   "sha1": "e2893b058abc06596ea4710091a66f6eb88b619d",
+   "in": [
+    "jazz_full/train/01457.npy",
+    "jazz_full_nomehldau/train/01457.npy",
+    "tatum_full/train/00104.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "September Song.midi",
+   "title": "september song",
+   "encoded": true,
+   "tokens": 9512,
+   "sha1": "f9cf193300d282fc712aa50ef19d88b197e69a5a",
+   "in": [
+    "jazz_full/train/00907.npy",
+    "jazz_full_nomehldau/train/00907.npy",
+    "tatum_full/train/00105.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Somebody Loves Me.midi",
+   "title": "somebody loves me",
+   "encoded": true,
+   "tokens": 7369,
+   "sha1": "ced0073237362783bf6dfc45cccb968e87dbf385",
+   "in": [
+    "jazz_full/train/00440.npy",
+    "jazz_full_nomehldau/train/00440.npy",
+    "tatum_full/val/00010.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Someone To Watch Over Me.midi",
+   "title": "someone to watch over me",
+   "encoded": true,
+   "tokens": 7466,
+   "sha1": "2febd599b147d50f4b3e5b1505ec7011f564c5b1",
+   "in": [
+    "jazz_full/train/00964.npy",
+    "jazz_full_nomehldau/train/00964.npy",
+    "tatum_full/train/00106.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Sweet Lorraine.midi",
+   "title": "sweet lorraine",
+   "encoded": true,
+   "tokens": 7588,
+   "sha1": "0d465ba4f6250b91e51f5d0b3498241a88998f37",
+   "in": [
+    "jazz_full/train/02160.npy",
+    "jazz_full_nomehldau/train/02160.npy",
+    "tatum_full/train/00107.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Tea For Two.midi",
+   "title": "tea for two",
+   "encoded": true,
+   "tokens": 12625,
+   "sha1": "440a81893bfe312974b7c86e1f31f75546b473b8",
+   "in": [
+    "jazz_full/train/01303.npy",
+    "jazz_full_nomehldau/train/01303.npy",
+    "tatum_full/train/00108.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Time On My Hands (You In My Arms).midi",
+   "title": "time on my hands",
+   "encoded": true,
+   "tokens": 6923,
+   "sha1": "e8ebc0b0dea5785fbf7a2ceda4261f6d7b26dc3e",
+   "in": [
+    "jazz_full/train/00456.npy",
+    "jazz_full_nomehldau/train/00456.npy",
+    "tatum_full/train/00109.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Willow Weep For Me.midi",
+   "title": "willow weep for me",
+   "encoded": true,
+   "tokens": 7071,
+   "sha1": "a5dc9451823855c9ecb2fe4cb1916bceb0bd5c3a",
+   "in": [
+    "jazz_full/train/02001.npy",
+    "jazz_full_nomehldau/train/02001.npy",
+    "tatum_full/val/00011.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "And I Love Her - Live.midi",
+   "title": "and i love her",
+   "encoded": true,
+   "tokens": 46146,
+   "sha1": "922dd5a7c94f97680e61b0a296e4a3f66a59b492",
+   "in": [
+    "jazz_full/train/00043.npy",
+    "jazz_full_nomehldau/train/00043.npy",
+    "jazz_full_notatum_nomehldau/train/00043.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Bittersweet Symphony  Waterloo Sunset - Live.midi",
+   "title": "bittersweet symphony waterloo sunset",
+   "encoded": true,
+   "tokens": 44718,
+   "sha1": "e6a45246c5f1999bf9574101f30fc5e43824a1f5",
+   "in": [
+    "jazz_full/train/01237.npy",
+    "jazz_full_nomehldau/train/01237.npy",
+    "jazz_full_notatum_nomehldau/train/01237.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Blackbird - Live.midi",
+   "title": "blackbird",
+   "encoded": true,
+   "tokens": 8362,
+   "sha1": "a34cfda8e74324c8a7ad081a0cf0c99a8119557d",
+   "in": [
+    "jazz_full/train/01246.npy",
+    "jazz_full_nomehldau/train/01246.npy",
+    "jazz_full_notatum_nomehldau/train/01246.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "title": "brahms intermezzo in bflat major op 76 no 4",
+   "encoded": true,
+   "tokens": 3427,
+   "sha1": "5e2ae238479974bcd3421dc28d4ad6ec3e6a15e8",
+   "in": [
+    "jazz_full/train/00091.npy",
+    "jazz_full_nomehldau/train/00091.npy",
+    "jazz_full_notatum_nomehldau/train/00091.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+   "title": "brahms intermezzo in e minor op 119 no 2",
+   "encoded": true,
+   "tokens": 7580,
+   "sha1": "5a17d4171add9342956d4b79eb45bbd0fbedca5b",
+   "in": [
+    "jazz_full/train/02084.npy",
+    "jazz_full_nomehldau/train/02084.npy",
+    "jazz_full_notatum_nomehldau/train/02084.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Countdown - Live.midi",
+   "title": "countdown",
+   "encoded": true,
+   "tokens": 21449,
+   "sha1": "cd26e81a2f7a4831c67c594d29a0316f4c83736f",
+   "in": [
+    "jazz_full/train/00989.npy",
+    "jazz_full_nomehldau/train/00989.npy",
+    "jazz_full_notatum_nomehldau/train/00989.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Dream Brother - Live.midi",
+   "title": "dream brother",
+   "encoded": true,
+   "tokens": 34106,
+   "sha1": "a7cb117580124144e4379d7c7d03351e01505c9b",
+   "in": [
+    "jazz_full/train/00570.npy",
+    "jazz_full_nomehldau/train/00570.npy",
+    "jazz_full_notatum_nomehldau/train/00570.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Get Happy - Live.midi",
+   "title": "get happy",
+   "encoded": true,
+   "tokens": 30989,
+   "sha1": "80f184b5aef17d77eb048059b6c735460a4de069",
+   "in": [
+    "jazz_full/train/01369.npy",
+    "jazz_full_nomehldau/train/01369.npy",
+    "jazz_full_notatum_nomehldau/train/01369.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "God Only Knows - Live.midi",
+   "title": "god only knows",
+   "encoded": true,
+   "tokens": 36950,
+   "sha1": "87299cff038e349b6d6eee7330c920985f02decd",
+   "in": [
+    "jazz_full/train/00725.npy",
+    "jazz_full_nomehldau/train/00725.npy",
+    "jazz_full_notatum_nomehldau/train/00725.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Hey You - Live.midi",
+   "title": "hey you",
+   "encoded": true,
+   "tokens": 16895,
+   "sha1": "520c0806b13daef3760f2f41369b1ce7aa7207c1",
+   "in": [
+    "jazz_full/train/01330.npy",
+    "jazz_full_nomehldau/train/01330.npy",
+    "jazz_full_notatum_nomehldau/train/01330.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Holland - Live.midi",
+   "title": "holland",
+   "encoded": true,
+   "tokens": 25600,
+   "sha1": "a067fe15409df0afc9687f8f6f978758d4a1b5b2",
+   "in": [
+    "jazz_full/train/02176.npy",
+    "jazz_full_nomehldau/train/02176.npy",
+    "jazz_full_notatum_nomehldau/train/02176.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "I'm Old Fashioned - Live.midi",
+   "title": "im old fashioned",
+   "encoded": true,
+   "tokens": 4237,
+   "sha1": "47318dee6b41add79c0d99e3bba4c48df08dd9c5",
+   "in": [
+    "jazz_full/train/01279.npy",
+    "jazz_full_nomehldau/train/01279.npy",
+    "jazz_full_notatum_nomehldau/train/01279.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Interstate Love Song - Live.midi",
+   "title": "interstate love song",
+   "encoded": true,
+   "tokens": 45909,
+   "sha1": "a1332671985fc7a64966836f3ff0cac2ee0b430a",
+   "in": [
+    "jazz_full/train/00626.npy",
+    "jazz_full_nomehldau/train/00626.npy",
+    "jazz_full_notatum_nomehldau/train/00626.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Jigsaw Falling into Place - Live.midi",
+   "title": "jigsaw falling into place",
+   "encoded": true,
+   "tokens": 27582,
+   "sha1": "235378573144ebccb464eabe60c1707a3e981caf",
+   "in": [
+    "jazz_full/train/01649.npy",
+    "jazz_full_nomehldau/train/01649.npy",
+    "jazz_full_notatum_nomehldau/train/01649.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "John Boy - Live.midi",
+   "title": "john boy",
+   "encoded": true,
+   "tokens": 5172,
+   "sha1": "92b909554ae92c918756e43e13e1e0a8f905242d",
+   "in": [
+    "jazz_full/train/02410.npy",
+    "jazz_full_nomehldau/train/02410.npy",
+    "jazz_full_notatum_nomehldau/train/02410.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Junk - Live.midi",
+   "title": "junk",
+   "encoded": true,
+   "tokens": 6381,
+   "sha1": "d7663fc92ef110e82b7d2bc906fc77b9c89f1708",
+   "in": [
+    "jazz_full/val/00028.npy",
+    "jazz_full_nomehldau/val/00028.npy",
+    "jazz_full_notatum_nomehldau/val/00028.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Knives Out - Live.midi",
+   "title": "knives out",
+   "encoded": true,
+   "tokens": 27979,
+   "sha1": "53f7100a83549c6133bec169e7244f5678579b3e",
+   "in": [
+    "jazz_full/val/00219.npy",
+    "jazz_full_nomehldau/val/00219.npy",
+    "jazz_full_notatum_nomehldau/val/00219.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Knives Out 2 - Live.midi",
+   "title": "knives out 2",
+   "encoded": true,
+   "tokens": 16041,
+   "sha1": "5de8b7e49fed78cf572cbbfb88cfe8e6d0ed3ca7",
+   "in": [
+    "jazz_full/train/01570.npy",
+    "jazz_full_nomehldau/train/01570.npy",
+    "jazz_full_notatum_nomehldau/train/01570.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Le Mémoire et la Mer - Live.midi",
+   "title": "le mmoire et la mer",
+   "encoded": true,
+   "tokens": 20372,
+   "sha1": "2aa6dcc8be7553abf8499ba3dc54f891178e9fb0",
+   "in": [
+    "jazz_full/train/01166.npy",
+    "jazz_full_nomehldau/train/01166.npy",
+    "jazz_full_notatum_nomehldau/train/01166.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Los Angeles II - Live.midi",
+   "title": "los angeles ii",
+   "encoded": true,
+   "tokens": 9746,
+   "sha1": "cd7df0d3dc7ec9b8185c6b00bcc5860649b1ddc1",
+   "in": [
+    "jazz_full/val/00090.npy",
+    "jazz_full_nomehldau/val/00090.npy",
+    "jazz_full_notatum_nomehldau/val/00090.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Lost Chords - Live.midi",
+   "title": "lost chords",
+   "encoded": true,
+   "tokens": 29032,
+   "sha1": "5541c249b9283106e6548ee11e8e32a2ee072ecc",
+   "in": [
+    "jazz_full/train/00303.npy",
+    "jazz_full_nomehldau/train/00303.npy",
+    "jazz_full_notatum_nomehldau/train/00303.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Meditation I - Lord Watch Over Me - Live.midi",
+   "title": "meditation i lord watch over me",
+   "encoded": true,
+   "tokens": 13459,
+   "sha1": "8a57536b3904ed609aa247fc5dca84a982e3158a",
+   "in": [
+    "jazz_full/train/00792.npy",
+    "jazz_full_nomehldau/train/00792.npy",
+    "jazz_full_notatum_nomehldau/train/00792.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Meditation II - Love Meditation - Live.midi",
+   "title": "meditation ii love meditation",
+   "encoded": true,
+   "tokens": 6715,
+   "sha1": "8675f1b7b32bb75ce764eddb534eba47dec70cca",
+   "in": [
+    "jazz_full/train/02446.npy",
+    "jazz_full_nomehldau/train/02446.npy",
+    "jazz_full_notatum_nomehldau/train/02446.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Medley -  Zingaro  Paris - Live.midi",
+   "title": "medley zingaro paris",
+   "encoded": true,
+   "tokens": 16106,
+   "sha1": "8eed50008ff0dbe74d244c86210c52ee68c4df7f",
+   "in": [
+    "jazz_full/train/02333.npy",
+    "jazz_full_nomehldau/train/02333.npy",
+    "jazz_full_notatum_nomehldau/train/02333.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Monk's Mood - Live.midi",
+   "title": "monks mood",
+   "encoded": true,
+   "tokens": 7100,
+   "sha1": "bd6086ffe2183d9bef71d943b45d93b14e229744",
+   "in": [
+    "jazz_full/val/00051.npy",
+    "jazz_full_nomehldau/val/00051.npy",
+    "jazz_full_notatum_nomehldau/val/00051.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "My Favorite Things - Live.midi",
+   "title": "my favorite things",
+   "encoded": true,
+   "tokens": 23939,
+   "sha1": "e5e9ab8eadb0adbb199a7ab072855f35d140e46b",
+   "in": [
+    "jazz_full/train/02174.npy",
+    "jazz_full_nomehldau/train/02174.npy",
+    "jazz_full_notatum_nomehldau/train/02174.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "On the Street Where You Live - Live.midi",
+   "title": "on the street where you",
+   "encoded": true,
+   "tokens": 5305,
+   "sha1": "8adc44e108ac61695bf2d0853d53c48e7d5cc15d",
+   "in": [
+    "jazz_full/train/01623.npy",
+    "jazz_full_nomehldau/train/01623.npy",
+    "jazz_full_notatum_nomehldau/train/01623.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Smells Like Teen Spirit - Live.midi",
+   "title": "smells like teen spirit",
+   "encoded": true,
+   "tokens": 25216,
+   "sha1": "f4c5cfc21fb104cc9acd6aeab0588474b5e9f573",
+   "in": [
+    "jazz_full/train/01569.npy",
+    "jazz_full_nomehldau/train/01569.npy",
+    "jazz_full_notatum_nomehldau/train/01569.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Teardrop - Live.midi",
+   "title": "teardrop",
+   "encoded": true,
+   "tokens": 22493,
+   "sha1": "06dbd5583db09519b4a91fe2a99b83f01998ca38",
+   "in": [
+    "jazz_full/train/01321.npy",
+    "jazz_full_nomehldau/train/01321.npy",
+    "jazz_full_notatum_nomehldau/train/01321.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Think of One - Live.midi",
+   "title": "think of one",
+   "encoded": true,
+   "tokens": 14478,
+   "sha1": "5afb334fb017dff115c1a7a3cc2ca0e0425d7522",
+   "in": [
+    "jazz_full/train/01788.npy",
+    "jazz_full_nomehldau/train/01788.npy",
+    "jazz_full_notatum_nomehldau/train/01788.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "This Here - Live.midi",
+   "title": "this here",
+   "encoded": true,
+   "tokens": 17460,
+   "sha1": "be591b7eaa6ecc57d814cd286f6cd9dcb5adb050",
+   "in": [
+    "jazz_full/train/00704.npy",
+    "jazz_full_nomehldau/train/00704.npy",
+    "jazz_full_notatum_nomehldau/train/00704.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Waltz for J. B. - Live.midi",
+   "title": "waltz for j b",
+   "encoded": true,
+   "tokens": 8480,
+   "sha1": "3eb819966daea5ec89cbe1c86f58cea9e207ce2c",
+   "in": [
+    "jazz_full/train/01477.npy",
+    "jazz_full_nomehldau/train/01477.npy",
+    "jazz_full_notatum_nomehldau/train/01477.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Dat Dere - Live.midi",
+   "title": "dat dere",
+   "encoded": true,
+   "tokens": 11119,
+   "sha1": "54df37e2210f46e805b5218e5a4ca5b0d2dcf4f2",
+   "in": [
+    "jazz_full/train/00515.npy",
+    "jazz_full_nomehldau/train/00515.npy",
+    "jazz_full_notatum_nomehldau/train/00515.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Exit Music (For a Film) - Live [Live].midi",
+   "title": "exit music",
+   "encoded": true,
+   "tokens": 26062,
+   "sha1": "97f11ebd11f5f3b41e10deda7b1134f34268ad33",
+   "in": [
+    "jazz_full/val/00215.npy",
+    "jazz_full_nomehldau/val/00215.npy",
+    "jazz_full_notatum_nomehldau/val/00215.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Goodbye Storyteller - for Fred Myrow.midi",
+   "title": "goodbye storyteller for fred myrow",
+   "encoded": true,
+   "tokens": 13742,
+   "sha1": "ad664649db3f8eec159d028fcac3735626583947",
+   "in": [
+    "jazz_full/train/01602.npy",
+    "jazz_full_nomehldau/train/01602.npy",
+    "jazz_full_notatum_nomehldau/train/01602.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "It's All Right With Me - Live.midi",
+   "title": "its all right with me",
+   "encoded": true,
+   "tokens": 11699,
+   "sha1": "e073799eb05f3c53e38b20fa74fefacb5da39732",
+   "in": [
+    "jazz_full/train/01289.npy",
+    "jazz_full_nomehldau/train/01289.npy",
+    "jazz_full_notatum_nomehldau/train/01289.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Lilac Wine - Live.midi",
+   "title": "lilac wine",
+   "encoded": true,
+   "tokens": 10828,
+   "sha1": "2bfc24306db99d8c8ba28898bc10f1d9930bed3b",
+   "in": [
+    "jazz_full/train/01620.npy",
+    "jazz_full_nomehldau/train/01620.npy",
+    "jazz_full_notatum_nomehldau/train/01620.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Lithium - Live.midi",
+   "title": "lithium",
+   "encoded": true,
+   "tokens": 10928,
+   "sha1": "eca6f1d7a76db33143554a2817e0f6b4a8746456",
+   "in": [
+    "jazz_full/train/02349.npy",
+    "jazz_full_nomehldau/train/02349.npy",
+    "jazz_full_notatum_nomehldau/train/02349.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Martha My Dear - Live.midi",
+   "title": "martha my dear",
+   "encoded": true,
+   "tokens": 15921,
+   "sha1": "a7c9ebe891db0abe2b1335dd348d45521482501d",
+   "in": [
+    "jazz_full/train/01193.npy",
+    "jazz_full_nomehldau/train/01193.npy",
+    "jazz_full_notatum_nomehldau/train/01193.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "My Favorite Things - Live.midi",
+   "title": "my favorite things",
+   "encoded": true,
+   "tokens": 10179,
+   "sha1": "a41f7728b7e70c7129457a856cd8984160e9200a",
+   "in": [
+    "jazz_full/train/01409.npy",
+    "jazz_full_nomehldau/train/01409.npy",
+    "jazz_full_notatum_nomehldau/train/01409.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Resignation - Live.midi",
+   "title": "resignation",
+   "encoded": true,
+   "tokens": 20825,
+   "sha1": "bb91203ad8fe66be450c54163e6770c2154ed15d",
+   "in": [
+    "jazz_full/train/00809.npy",
+    "jazz_full_nomehldau/train/00809.npy",
+    "jazz_full_notatum_nomehldau/train/00809.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Secret Love - Live.midi",
+   "title": "secret love",
+   "encoded": true,
+   "tokens": 6117,
+   "sha1": "21c4c81bfd9287089bf861c2a33c05e162b49596",
+   "in": [
+    "jazz_full/train/01037.npy",
+    "jazz_full_nomehldau/train/01037.npy",
+    "jazz_full_notatum_nomehldau/train/01037.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Storm - Live.midi",
+   "title": "storm",
+   "encoded": true,
+   "tokens": 9374,
+   "sha1": "8c13519c749c85017fbc369370a671c1158a90bd",
+   "in": [
+    "jazz_full/train/00839.npy",
+    "jazz_full_nomehldau/train/00839.npy",
+    "jazz_full_notatum_nomehldau/train/00839.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Things Behind the Sun - Live.midi",
+   "title": "things behind the sun",
+   "encoded": true,
+   "tokens": 19913,
+   "sha1": "1461c838b02b4478d695558f89d9ef7dcf634c95",
+   "in": [
+    "jazz_full/val/00212.npy",
+    "jazz_full_nomehldau/val/00212.npy",
+    "jazz_full_notatum_nomehldau/val/00212.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Trailer Park Ghost - Live.midi",
+   "title": "trailer park ghost",
+   "encoded": true,
+   "tokens": 26083,
+   "sha1": "ee160b2ed07271ee87ed975debcac85f2c6b744e",
+   "in": [
+    "jazz_full/train/00221.npy",
+    "jazz_full_nomehldau/train/00221.npy",
+    "jazz_full_notatum_nomehldau/train/00221.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Unrequited - Live.midi",
+   "title": "unrequited",
+   "encoded": true,
+   "tokens": 19611,
+   "sha1": "a81fe05f00223049e1bbd56cc4e1726ff93d61d7",
+   "in": [
+    "jazz_full/train/01675.npy",
+    "jazz_full_nomehldau/train/01675.npy",
+    "jazz_full_notatum_nomehldau/train/01675.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "From This Moment On.midi",
+   "title": "from this moment on",
+   "encoded": true,
+   "tokens": 16576,
+   "sha1": "98e5761ed1f48ecf1efda6189d397ea69a5db6ae",
+   "in": [
+    "jazz_full/train/00397.npy",
+    "jazz_full_nomehldau/train/00397.npy",
+    "jazz_full_notatum_nomehldau/train/00397.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "How Long Has This Been Going On.midi",
+   "title": "how long has this been going on",
+   "encoded": true,
+   "tokens": 10295,
+   "sha1": "572a1fc69d200027a9f603ae104960aa09bc73d1",
+   "in": [
+    "jazz_full/train/01781.npy",
+    "jazz_full_nomehldau/train/01781.npy",
+    "jazz_full_notatum_nomehldau/train/01781.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "Intro.midi",
+   "title": "intro",
+   "encoded": true,
+   "tokens": 2042,
+   "sha1": "6eba90ba93a8c347bccf057bd88132b3161ad7cc",
+   "in": [
+    "jazz_full/train/00686.npy",
+    "jazz_full_nomehldau/train/00686.npy",
+    "jazz_full_notatum_nomehldau/train/00686.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "Monk's Dream.midi",
+   "title": "monks dream",
+   "encoded": true,
+   "tokens": 18456,
+   "sha1": "2a4503052c5790fe8bb6af819fe25a15c5a7a3c3",
+   "in": [
+    "jazz_full/val/00176.npy",
+    "jazz_full_nomehldau/val/00176.npy",
+    "jazz_full_notatum_nomehldau/val/00176.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "Paranoid Android.midi",
+   "title": "paranoid android",
+   "encoded": true,
+   "tokens": 34666,
+   "sha1": "e779f793027ef8ac0db96e6a6bcc52bd2c2c8d3a",
+   "in": [
+    "jazz_full/train/00673.npy",
+    "jazz_full_nomehldau/train/00673.npy",
+    "jazz_full_notatum_nomehldau/train/00673.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "River Man.midi",
+   "title": "river man",
+   "encoded": true,
+   "tokens": 19730,
+   "sha1": "756848837e09164012f92af770d50fca66d4a875",
+   "in": [
+    "jazz_full/val/00156.npy",
+    "jazz_full_nomehldau/val/00156.npy",
+    "jazz_full_notatum_nomehldau/val/00156.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "Someone to Watch over Me.midi",
+   "title": "someone to watch over me",
+   "encoded": true,
+   "tokens": 12587,
+   "sha1": "f6fa8f722a0134f027e437447c1ce9d30fce7ee1",
+   "in": [
+    "jazz_full/val/00026.npy",
+    "jazz_full_nomehldau/val/00026.npy",
+    "jazz_full_notatum_nomehldau/val/00026.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "Things Behind the Sun.midi",
+   "title": "things behind the sun",
+   "encoded": true,
+   "tokens": 8408,
+   "sha1": "f3fc97d9db3e79e97435bfcdaad945485b3be6df",
+   "in": [
+    "jazz_full/train/00190.npy",
+    "jazz_full_nomehldau/train/00190.npy",
+    "jazz_full_notatum_nomehldau/train/00190.npy"
+   ],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Marian McPartland's Piano Jazz with Brad Mehldau",
+   "file": "From This Moment On.midi",
+   "title": "from this moment on",
+   "encoded": true,
+   "tokens": 12016,
+   "sha1": "6267935593f06379ae7818aa4b8417f95e1c863a",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Marian McPartland's Piano Jazz with Brad Mehldau",
+   "file": "Ron's Place.midi",
+   "title": "rons place",
+   "encoded": true,
+   "tokens": 8093,
+   "sha1": "0768737068f95de8f935995942613173ed36bcb4",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Marian McPartland's Piano Jazz with Brad Mehldau",
+   "file": "When I Fall In Love.midi",
+   "title": "when i fall in love",
+   "encoded": true,
+   "tokens": 5306,
+   "sha1": "5be40b6e92cc98ba8cc54f987968a17830213000",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "Don't Let It Bring You Down.midi",
+   "title": "dont let it bring you down",
+   "encoded": true,
+   "tokens": 4330,
+   "sha1": "9089dec78f24b5a69d720f2d2957c6f85fdd4e5e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "I. waking up.midi",
+   "title": "i waking up",
+   "encoded": true,
+   "tokens": 1215,
+   "sha1": "7d16b977fe4b59662610ea79f79567912e215f0c",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "II. stepping outside.midi",
+   "title": "ii stepping outside",
+   "encoded": true,
+   "tokens": 2874,
+   "sha1": "7680dcd78776e01f53f49b40b3f2e1d58bb5f6a8",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "III. keeping distance.midi",
+   "title": "iii keeping distance",
+   "encoded": true,
+   "tokens": 3083,
+   "sha1": "e1053a0d8b4b1c2f49eb8196238f7eb96477d64c",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "IV. stopping, listening -  hearing.midi",
+   "title": "iv stopping listening hearing",
+   "encoded": true,
+   "tokens": 2009,
+   "sha1": "0ddc413565d0234e8f620d47b86b30ffc967199e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "IX. waiting.midi",
+   "title": "ix waiting",
+   "encoded": true,
+   "tokens": 1941,
+   "sha1": "55e8d2350be9fd1958c85dd853a13d4ecee0b528",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "Look for the Silver Lining.midi",
+   "title": "look for the silver lining",
+   "encoded": true,
+   "tokens": 3798,
+   "sha1": "b43cf25ddcc76a276ef88f335f440bc7beba93d8",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "New York State of Mind.midi",
+   "title": "new york state of mind",
+   "encoded": true,
+   "tokens": 5064,
+   "sha1": "ff218a84b4ebe57faba158a10431b478b4325ef5",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "V. remembering before all this.midi",
+   "title": "v remembering before all this",
+   "encoded": true,
+   "tokens": 5931,
+   "sha1": "300ddd3d83e19f3b014227d69b30090fef1e0fb0",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "VI. uncertainty.midi",
+   "title": "vi uncertainty",
+   "encoded": true,
+   "tokens": 5508,
+   "sha1": "d3d54a736c8b6966f7e592ca4ab6eb9a172a8852",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "VII. - the day moves by -.midi",
+   "title": "vii the day moves by",
+   "encoded": true,
+   "tokens": 3423,
+   "sha1": "ff68edc0d71e5bd7f477cb6360915583105e7215",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "VIII. yearning.midi",
+   "title": "viii yearning",
+   "encoded": true,
+   "tokens": 3222,
+   "sha1": "2b73cf16297c170a111be7235f743e9ea1e6177f",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "X. in the kitchen.midi",
+   "title": "x in the kitchen",
+   "encoded": true,
+   "tokens": 6202,
+   "sha1": "cd66882a13982c1b17299e98da44f8384697efd8",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "XI. family harmony.midi",
+   "title": "xi family harmony",
+   "encoded": true,
+   "tokens": 5999,
+   "sha1": "71c9b5923835b519e0b1f3e890ee167f513a7d43",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "Suite -  April 2020",
+   "file": "XII. lullaby.midi",
+   "title": "xii lullaby",
+   "encoded": true,
+   "tokens": 2482,
+   "sha1": "a5aa54a340150965abb68e70597ddda6a185cfda",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Come Rain Or Come Shine.midi",
+   "title": "come rain or come shine",
+   "encoded": true,
+   "tokens": 10515,
+   "sha1": "248650f3db22287eb67bc9ded4e9619aacd6c01c",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Elegy.midi",
+   "title": "elegy",
+   "encoded": true,
+   "tokens": 13941,
+   "sha1": "6b680014b8a9722b5460a6f2e06c3519c1776476",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Gone With The Wind.midi",
+   "title": "gone with the wind",
+   "encoded": true,
+   "tokens": 8515,
+   "sha1": "9f5a960f09f4c2c01f5d0aa42c1c1ed40801c6b7",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Heat Wave.midi",
+   "title": "heat wave",
+   "encoded": true,
+   "tokens": 10196,
+   "sha1": "0a7900c76296f2b2e840c8e7a3df3f6fadea9af1",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "I Didn't Know What Time It Was.midi",
+   "title": "i didnt know what time it was",
+   "encoded": true,
+   "tokens": 10108,
+   "sha1": "764f58b1ff1d442ef97619fb6e08ea041c393e79",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "I Don't Stand A Ghost Of A Chance With You.midi",
+   "title": "i dont stand a ghost of a chance with you",
+   "encoded": true,
+   "tokens": 9451,
+   "sha1": "b1f8761eacbb1edf0f4c199210b81e27cb5db2b0",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "I'll See You In My Dreams.midi",
+   "title": "ill see you in my dreams",
+   "encoded": true,
+   "tokens": 11997,
+   "sha1": "c05d461fe08c5d9b29ff25a58768b334b4b6faf8",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Lover Come Back To Me.midi",
+   "title": "lover come back to me",
+   "encoded": true,
+   "tokens": 15168,
+   "sha1": "77ba80cee2677814cb7a1af704b9f270788f6e9e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Please Be Kind.midi",
+   "title": "please be kind",
+   "encoded": true,
+   "tokens": 15164,
+   "sha1": "5b1c8683939fb30b1cdf0d8d9ea05b48e3c3cb3e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "September Song.midi",
+   "title": "september song",
+   "encoded": true,
+   "tokens": 9891,
+   "sha1": "319f293388aae7ac841f4a131fee95f73ad76d6d",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Tea For Two.midi",
+   "title": "tea for two",
+   "encoded": true,
+   "tokens": 12939,
+   "sha1": "57e69aa686b44414952eea45adfa30d16c3f5cb7",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "The Very Thought Of You.midi",
+   "title": "the very thought of you",
+   "encoded": true,
+   "tokens": 9969,
+   "sha1": "7855477d640bd8d23ee23c614843db96842eff07",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "There Will Never Be Another You.midi",
+   "title": "there will never be another you",
+   "encoded": true,
+   "tokens": 12664,
+   "sha1": "9b71b845f8c60dbec2f96925a7642a75505d1aae",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "This Can't Be Love.midi",
+   "title": "this cant be love",
+   "encoded": true,
+   "tokens": 9750,
+   "sha1": "9cfd4b2a2a921c3039e860f831225c62deec2843",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 2",
+   "file": "Would You Like To Take A Walk.midi",
+   "title": "would you like to take a walk",
+   "encoded": true,
+   "tokens": 11493,
+   "sha1": "2ea14d6e51b00b1d7e84fc5f3aeed5741e6dd490",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "After You've Gone.midi",
+   "title": "after youve gone",
+   "encoded": true,
+   "tokens": 13091,
+   "sha1": "ef7f3f77cb1cc2bf2ca06eaf7499f78a93ce67a7",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "All The Things You Are.midi",
+   "title": "all the things you are",
+   "encoded": true,
+   "tokens": 16677,
+   "sha1": "ab8eff5c8a710d09b1fbb23975ee44de33c672b8",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Begin The Beguine.midi",
+   "title": "begin the beguine",
+   "encoded": true,
+   "tokens": 10233,
+   "sha1": "671cac8f46cb21554768c224f84b608100a4cd17",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Crazy Rhythm.midi",
+   "title": "crazy rhythm",
+   "encoded": true,
+   "tokens": 10932,
+   "sha1": "e843dc8340d96b8ac5682312472fd11106e4ac9c",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Deep Purple.midi",
+   "title": "deep purple",
+   "encoded": true,
+   "tokens": 12431,
+   "sha1": "9da3f2dda215a472ca99ba1836e6fb580c73da04",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Dixieland Band.midi",
+   "title": "dixieland band",
+   "encoded": true,
+   "tokens": 9755,
+   "sha1": "3e6c7952653039e939e841d3b2bf28abfc883839",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "I Can't Give You Anything But Love.midi",
+   "title": "i cant give you anything but love",
+   "encoded": true,
+   "tokens": 9235,
+   "sha1": "c9b3800238fa70f1a455ea6ee42698cbada57171",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "I Surrender, Dear.midi",
+   "title": "i surrender dear",
+   "encoded": true,
+   "tokens": 9846,
+   "sha1": "43bb31476f373d19df8bf73f062f5209d40193cd",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "If You Hadn't Gone Away.midi",
+   "title": "if you hadnt gone away",
+   "encoded": true,
+   "tokens": 11641,
+   "sha1": "8339b6bbc803010131c68d64e0bb5d506002eb61",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Indiana (Back Home Again In Indiana).midi",
+   "title": "indiana",
+   "encoded": true,
+   "tokens": 11296,
+   "sha1": "8e023960ebad985f0cf38c9d7f060df438d3cce9",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Jitterbug Waltz.midi",
+   "title": "jitterbug waltz",
+   "encoded": true,
+   "tokens": 9328,
+   "sha1": "fc4cccef479e05088d797ac9ad9ffcfeb902489c",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Love Me Or Leave Me.midi",
+   "title": "love me or leave me",
+   "encoded": true,
+   "tokens": 8285,
+   "sha1": "98a67a403f04949dbff5f0e91f09f5ff09cdce34",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Prisoner Of Love.midi",
+   "title": "prisoner of love",
+   "encoded": true,
+   "tokens": 12009,
+   "sha1": "188777a78ee08d05ead0dddc15dfa42c449a66fd",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Tenderly.midi",
+   "title": "tenderly",
+   "encoded": true,
+   "tokens": 12794,
+   "sha1": "5cd820058fc25ebb2d1f89fa0ad8bbddcce326d5",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "When Your Lover Has Gone.midi",
+   "title": "when your lover has gone",
+   "encoded": true,
+   "tokens": 10060,
+   "sha1": "b034f0e23a1adb110f4e68e9b43105b1e40fb526",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 3",
+   "file": "Yesterdays.midi",
+   "title": "yesterdays",
+   "encoded": true,
+   "tokens": 10405,
+   "sha1": "03a72738b26448ef669b9a3b0c57341c38ebc95a",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Aunt Hagar's Blues.midi",
+   "title": "aunt hagars blues",
+   "encoded": true,
+   "tokens": 13298,
+   "sha1": "432caf4322b94459b727679cf0f0070c4284538e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "I Hadn't Anyone Till You.midi",
+   "title": "i hadnt anyone till you",
+   "encoded": true,
+   "tokens": 8446,
+   "sha1": "58b52a408d1389ef02f4a8d57e536c9eb5d17a8a",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "I Only Have Eyes For You.midi",
+   "title": "i only have eyes for you",
+   "encoded": true,
+   "tokens": 8757,
+   "sha1": "8b76fcd4ad873425f65c98d107b4a8ea50f74e29",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "I'll See You Again.midi",
+   "title": "ill see you again",
+   "encoded": true,
+   "tokens": 11812,
+   "sha1": "52bbb5637a3ad78a1ffbea8b8a93ae4a85950378",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "I've Got The World On A String.midi",
+   "title": "ive got the world on a string",
+   "encoded": true,
+   "tokens": 9366,
+   "sha1": "d349d16dbe143cdd5e0156a54d341f5f06fbfffa",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "If You Hadn't Gone Away.midi",
+   "title": "if you hadnt gone away",
+   "encoded": true,
+   "tokens": 11799,
+   "sha1": "27e1e19cffd7b695ae63f2454a4d808e8542cf37",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Ill Wind.midi",
+   "title": "ill wind",
+   "encoded": true,
+   "tokens": 12764,
+   "sha1": "d4227999e7686a5e5d8cefc80c24bed3c3460b08",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Isn't This A Lovely Day.midi",
+   "title": "isnt this a lovely day",
+   "encoded": true,
+   "tokens": 10242,
+   "sha1": "b4a2c9716dc2e0c39b3036097cadfa3926cd2c9c",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Mean To Me.midi",
+   "title": "mean to me",
+   "encoded": true,
+   "tokens": 8074,
+   "sha1": "e312528989230015b0231d63f234ace2456ff122",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Stardust.midi",
+   "title": "stardust",
+   "encoded": true,
+   "tokens": 13140,
+   "sha1": "75464071d024e72405a562659abde27e64c8f307",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "The Man I Love.midi",
+   "title": "the man i love",
+   "encoded": true,
+   "tokens": 12510,
+   "sha1": "411bd09422961a62fa62d4822d74ffee12f08ef1",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "They Can't Take That Away From Me.midi",
+   "title": "they cant take that away from me",
+   "encoded": true,
+   "tokens": 11759,
+   "sha1": "c7dc274907dde589d30b15a92072d28578105a17",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "What's New.midi",
+   "title": "whats new",
+   "encoded": true,
+   "tokens": 10432,
+   "sha1": "deb67c7176484755e77669a38b6adc52318d66ca",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "Without A Song.midi",
+   "title": "without a song",
+   "encoded": true,
+   "tokens": 13075,
+   "sha1": "50cb4f9d04bb13e85ff8bf156654b70fce46ed5b",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 4",
+   "file": "You're Mine You.midi",
+   "title": "youre mine you",
+   "encoded": true,
+   "tokens": 11879,
+   "sha1": "db4202e1342407f7ae9115ab6f3a1ad518387fc9",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Blue Moon.midi",
+   "title": "blue moon",
+   "encoded": true,
+   "tokens": 13672,
+   "sha1": "de587f8454709e4fe2a4715ce9e14250b91c159f",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Don't Worry 'Bout Me.midi",
+   "title": "dont worry bout me",
+   "encoded": true,
+   "tokens": 10808,
+   "sha1": "521bb47c9a856a99bb85f9129c6f3fd448666ee3",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Fine And Dandy.midi",
+   "title": "fine and dandy",
+   "encoded": true,
+   "tokens": 10902,
+   "sha1": "f8ac9b7592be1c8ef2acf94c3bac223bd66ce375",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "I Cover The Waterfront.midi",
+   "title": "i cover the waterfront",
+   "encoded": true,
+   "tokens": 11951,
+   "sha1": "d8941a2693f5988467709747c28d4381fa779737",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "I Gotta Right To Sing The Blues.midi",
+   "title": "i gotta right to sing the blues",
+   "encoded": true,
+   "tokens": 10661,
+   "sha1": "c4367235fce7f7862baaf7bd9304b117ad77b8ed",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Louise.midi",
+   "title": "louise",
+   "encoded": true,
+   "tokens": 12132,
+   "sha1": "291144df79df1594234cf4240cdbd7876ff9b636",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Lullaby In Rhythm.midi",
+   "title": "lullaby in rhythm",
+   "encoded": true,
+   "tokens": 10985,
+   "sha1": "53a441052575d4a3fb34bce73ea28dbb327f6fbd",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Makin' Whoopee.midi",
+   "title": "makin whoopee",
+   "encoded": true,
+   "tokens": 10185,
+   "sha1": "ec12da7d7bb395e4ffbef65edbb502f729470e80",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Memories Of You.midi",
+   "title": "memories of you",
+   "encoded": true,
+   "tokens": 12862,
+   "sha1": "98dc8c31b8c26597e0178a5e55c6b0dc45d1ab40",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "S'posin'.midi",
+   "title": "sposin",
+   "encoded": true,
+   "tokens": 11165,
+   "sha1": "95ecca5cd4d8de69c1eb4f50b5c76b6422976d79",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Stars Fell On Alabama.midi",
+   "title": "stars fell on alabama",
+   "encoded": true,
+   "tokens": 12026,
+   "sha1": "138aaa9fe93266848f5a78175d3ee7aa84ff9a29",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "Stompin' At The Savoy.midi",
+   "title": "stompin at the savoy",
+   "encoded": true,
+   "tokens": 10562,
+   "sha1": "0ef69691b6ef2e069475382d55fdd03acca8cde5",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "That Old Feeling.midi",
+   "title": "that old feeling",
+   "encoded": true,
+   "tokens": 11266,
+   "sha1": "93f2815acab7f9ba20408dcaa292f6bf7a01461e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "The Moon Is Low.midi",
+   "title": "the moon is low",
+   "encoded": true,
+   "tokens": 10853,
+   "sha1": "d3e4977a1aa56f5cbaee3a43f176084153b15f6f",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 5",
+   "file": "You're Driving Me Crazy.midi",
+   "title": "youre driving me crazy",
+   "encoded": true,
+   "tokens": 8449,
+   "sha1": "fe68cba717fd34be15a1d5fa9dc0776d953d6950",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Ain't Misbehavin'.midi",
+   "title": "aint misbehavin",
+   "encoded": true,
+   "tokens": 9309,
+   "sha1": "5b11cabba09be318322c2498eaaf8e50b3ecbb3d",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Boulevard Of Broken Dreams.midi",
+   "title": "boulevard of broken dreams",
+   "encoded": true,
+   "tokens": 15145,
+   "sha1": "bce3f3eb6d7607214f56837ca52f504f1ec1e489",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Cherokee.midi",
+   "title": "cherokee",
+   "encoded": true,
+   "tokens": 12332,
+   "sha1": "a4bd535df45b38935f6c82b4ccce9a352f516c1c",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Danny Boy.midi",
+   "title": "danny boy",
+   "encoded": true,
+   "tokens": 9461,
+   "sha1": "6e2450e64d35538227aa7f3306a4fa749a4d50a1",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Do Nothing Till You Hear From Me.midi",
+   "title": "do nothing till you hear from me",
+   "encoded": true,
+   "tokens": 13062,
+   "sha1": "3e68debb865c985aead220b984c347e9590b6571",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Happy Feet.midi",
+   "title": "happy feet",
+   "encoded": true,
+   "tokens": 9750,
+   "sha1": "ef9fdbe093306adf6ad50b8709816e87687a8635",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "I'm Comin' Virginia.midi",
+   "title": "im comin virginia",
+   "encoded": true,
+   "tokens": 8611,
+   "sha1": "315d2a23d9a62c10b3d8f1726c5722f57243e926",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "I've Got A Crush On You.midi",
+   "title": "ive got a crush on you",
+   "encoded": true,
+   "tokens": 8645,
+   "sha1": "03193f4d612ab2eeb48441c310bd26b661fdc68b",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Just Like A Butterfly That's Caught In The Rain.midi",
+   "title": "just like a butterfly thats caught in the rain",
+   "encoded": true,
+   "tokens": 9428,
+   "sha1": "067bbba4a8fb0c16f5d3218d1919c086a15f7838",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Night And Day.midi",
+   "title": "night and day",
+   "encoded": true,
+   "tokens": 10848,
+   "sha1": "4f5bd05d6e898bbe30668e063f9107a97153d122",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Over The Rainbow.midi",
+   "title": "over the rainbow",
+   "encoded": true,
+   "tokens": 10304,
+   "sha1": "38b96f24754d7a8130483b4485cdc3b4becaf32d",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "Someone To Watch Over Me.midi",
+   "title": "someone to watch over me",
+   "encoded": true,
+   "tokens": 10230,
+   "sha1": "6343cbea047bc247c4f25bc820ad1efb8e210669",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "The Way You Look Tonight.midi",
+   "title": "the way you look tonight",
+   "encoded": true,
+   "tokens": 16094,
+   "sha1": "c75cd653728c04da95debefca3db7da9851c78d9",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "There's A Small Hotel.midi",
+   "title": "theres a small hotel",
+   "encoded": true,
+   "tokens": 12375,
+   "sha1": "b6df3d302aad66a3eb156a17b4ba18c100ec5cc2",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 6",
+   "file": "You're Blase.midi",
+   "title": "youre blase",
+   "encoded": true,
+   "tokens": 11411,
+   "sha1": "01dbfc798562c3d13cf6f369338995b6be113e55",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Dancing In The Dark.midi",
+   "title": "dancing in the dark",
+   "encoded": true,
+   "tokens": 10937,
+   "sha1": "3c8d526f37f587e4c85a4b3c09f1bd2aeb5820df",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Humoresque.midi",
+   "title": "humoresque",
+   "encoded": true,
+   "tokens": 14077,
+   "sha1": "b902e8a2fe57ba034268cc28e7ca8a7763894b67",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Isn't It Romantic.midi",
+   "title": "isnt it romantic",
+   "encoded": true,
+   "tokens": 12445,
+   "sha1": "88b31b1ad7e8e5fd7d60bce611a00f1fff2996c2",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Japanese Sandman.midi",
+   "title": "japanese sandman",
+   "encoded": true,
+   "tokens": 9474,
+   "sha1": "ec92979bf4f448c88189bee84fde832012ba9d69",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Judy.midi",
+   "title": "judy",
+   "encoded": true,
+   "tokens": 10698,
+   "sha1": "1a08254ceeb125eba4907f13dc8055ca9467f596",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Mighty Like A Rose.midi",
+   "title": "mighty like a rose",
+   "encoded": true,
+   "tokens": 16507,
+   "sha1": "66c7fc9220cfeef8fefc859e30d62796f708e581",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Moon Song.midi",
+   "title": "moon song",
+   "encoded": true,
+   "tokens": 12429,
+   "sha1": "894465f8faaf6389e43f800ae874225ade2ee07c",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Moonlight On The Ganges.midi",
+   "title": "moonlight on the ganges",
+   "encoded": true,
+   "tokens": 7581,
+   "sha1": "d19beb6a55504b5489993c3a94c3cc97d06f0ee8",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Out Of Nowhere.midi",
+   "title": "out of nowhere",
+   "encoded": true,
+   "tokens": 11613,
+   "sha1": "c0f161bb05184f636046b8eac2235fe5ed25d36f",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Smoke Gets In Your Eyes.midi",
+   "title": "smoke gets in your eyes",
+   "encoded": true,
+   "tokens": 10203,
+   "sha1": "64037808179f35cef3495d309496061122802246",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "So Beats My Heart For You.midi",
+   "title": "so beats my heart for you",
+   "encoded": true,
+   "tokens": 14824,
+   "sha1": "f0fb066fdddc377f8384235bd2d4b8470908b689",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Somebody Loves Me.midi",
+   "title": "somebody loves me",
+   "encoded": true,
+   "tokens": 11211,
+   "sha1": "5f74a66a8aaf0353d50b6a1aca6ccfa078af109f",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Taboo.midi",
+   "title": "taboo",
+   "encoded": true,
+   "tokens": 11424,
+   "sha1": "d6161db9de231e60261089b58e5f126892a0a1cd",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "What Does It Take.midi",
+   "title": "what does it take",
+   "encoded": true,
+   "tokens": 10668,
+   "sha1": "b91ca16f63cf1e88458d709796e36ff500702af4",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Where Or When.midi",
+   "title": "where or when",
+   "encoded": true,
+   "tokens": 14536,
+   "sha1": "72869b0effc51e5c63c1e9b6e5b627f9b2f35cb6",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Vol. 7",
+   "file": "Wrap Your Troubles In Dreams.midi",
+   "title": "wrap your troubles in dreams",
+   "encoded": true,
+   "tokens": 9539,
+   "sha1": "c2eff38f19582a67af42a2b510da127c44729f18",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Blue Lou.midi",
+   "title": "blue lou",
+   "encoded": true,
+   "tokens": 9621,
+   "sha1": "850efcf72aaf0cf5f6e97e2c31646e66c26cab1b",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Body And Soul.midi",
+   "title": "body and soul",
+   "encoded": true,
+   "tokens": 14618,
+   "sha1": "72b69dbcc9264d5e0344943a31e1cb7d7321c09e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Embraceable You.midi",
+   "title": "embraceable you",
+   "encoded": true,
+   "tokens": 11536,
+   "sha1": "892af27b56b886f552332f428ee902d34c4aeffe",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Everything I Have Is Yours.midi",
+   "title": "everything i have is yours",
+   "encoded": true,
+   "tokens": 16361,
+   "sha1": "c37e7d11300be7d864c9ae54380d59c289642c06",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Have You Met Miss Jones.midi",
+   "title": "have you met miss jones",
+   "encoded": true,
+   "tokens": 13095,
+   "sha1": "fb6512c85baaf1c910ca096775ee44b43f6962e1",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "I'm In The Mood For Love.midi",
+   "title": "im in the mood for love",
+   "encoded": true,
+   "tokens": 11675,
+   "sha1": "f558f85e4b87c2f595d287aa0553233253b52b82",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "It's Only A Paper Moon.midi",
+   "title": "its only a paper moon",
+   "encoded": true,
+   "tokens": 9826,
+   "sha1": "3e3ac0ef144cfaa0c5c580d992b86b27be0b937e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Just A-Sittin' And A-Rockin'.midi",
+   "title": "just asittin and arockin",
+   "encoded": true,
+   "tokens": 11413,
+   "sha1": "bc8893309cdcac0da8659be7ae71fa462df3323a",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Love For Sale.midi",
+   "title": "love for sale",
+   "encoded": true,
+   "tokens": 14509,
+   "sha1": "a13b1fb974d8db52973207edf7c0f89eefa76b5f",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Moon Glow.midi",
+   "title": "moon glow",
+   "encoded": true,
+   "tokens": 10217,
+   "sha1": "d9b4a13ee5639b7f27c6ef6e7faff8de656ebf0b",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "My Last Affair.midi",
+   "title": "my last affair",
+   "encoded": true,
+   "tokens": 7005,
+   "sha1": "9a8915b2f861905ea2feac967407f036c5b98d83",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Sophisticated Lady.midi",
+   "title": "sophisticated lady",
+   "encoded": true,
+   "tokens": 9960,
+   "sha1": "2f33cd1d0143ec5a23708618885f3409784b8e46",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Stay As Sweet As You Are.midi",
+   "title": "stay as sweet as you are",
+   "encoded": true,
+   "tokens": 14012,
+   "sha1": "ab168c9fdb0e67694f15ac8625773f4a2526dc3a",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Too Marvelous For Words.midi",
+   "title": "too marvelous for words",
+   "encoded": true,
+   "tokens": 10705,
+   "sha1": "88e7197c8189e6116ba4848cc15e2cf5ccdbcb39",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "Willow Weep For Me.midi",
+   "title": "willow weep for me",
+   "encoded": true,
+   "tokens": 13122,
+   "sha1": "bb7aebbb28da4bf17966e3ddf19fd8e0014427cd",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Art Tatum Solo Masterpieces, Volume 1",
+   "file": "You Took Advantage Of Me.midi",
+   "title": "you took advantage of me",
+   "encoded": true,
+   "tokens": 9544,
+   "sha1": "bdf74aaba3b29eca6eb2c0a3fdb502d1b2bcecc8",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Aunt Hagar's Blues.midi",
+   "title": "aunt hagars blues",
+   "encoded": true,
+   "tokens": 6483,
+   "sha1": "6cd418e6c6f5e67ddae05834416abd497617d8ee",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Dardanella.midi",
+   "title": "dardanella",
+   "encoded": true,
+   "tokens": 10250,
+   "sha1": "92acacc1d2f5e8e2281700b01529e41e4faf9063",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Don't Blame Me.midi",
+   "title": "dont blame me",
+   "encoded": true,
+   "tokens": 7443,
+   "sha1": "4931c05fa4cd933f91ad64e5c0d30263198ab0d6",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "I Cover The Waterfront.midi",
+   "title": "i cover the waterfront",
+   "encoded": true,
+   "tokens": 7066,
+   "sha1": "69576d6e1d5755d9fd10046e4194bff6bc8276bc",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Melody In F, Opus 3, No. 1.midi",
+   "title": "melody in f opus 3 no 1",
+   "encoded": true,
+   "tokens": 16509,
+   "sha1": "ff4e2a9716f8b115b870e9e3ff298896636517e2",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Nice Work If You Can Get It.midi",
+   "title": "nice work if you can get it",
+   "encoded": true,
+   "tokens": 8905,
+   "sha1": "ece25b85e98218478d48dc385da2984bdb9aed6d",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Out Of Nowhere.midi",
+   "title": "out of nowhere",
+   "encoded": true,
+   "tokens": 13502,
+   "sha1": "ec32d876c3233b640ce287c924effe3eccf0c628",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "September Song.midi",
+   "title": "september song",
+   "encoded": true,
+   "tokens": 11455,
+   "sha1": "ede5c13eb71646c036bea3eec6d07553552649be",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Somebody Loves Me.midi",
+   "title": "somebody loves me",
+   "encoded": true,
+   "tokens": 8961,
+   "sha1": "0cd0058b42315ad98fe3ef143476269110e401c6",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Someone To Watch Over Me.midi",
+   "title": "someone to watch over me",
+   "encoded": true,
+   "tokens": 8866,
+   "sha1": "4f7876cdbd6bd090bf23f008bf77fa8281d2a0a4",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Sweet Lorraine.midi",
+   "title": "sweet lorraine",
+   "encoded": true,
+   "tokens": 9396,
+   "sha1": "df7da34aefe6e85ed7780b7f7403b237f6a0f799",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Tea For Two.midi",
+   "title": "tea for two",
+   "encoded": true,
+   "tokens": 15639,
+   "sha1": "61bddf670d57d82a767472d4692a4b1a8a62af37",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Time On My Hands (You In My Arms).midi",
+   "title": "time on my hands",
+   "encoded": true,
+   "tokens": 8383,
+   "sha1": "a0a33bf718b747d464b59170c9bd89ec763b759d",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Art Tatum",
+   "tree": "midi_kong",
+   "kind": "studio",
+   "album": "The Complete Capitol Recordings (Vol. One)",
+   "file": "Willow Weep For Me.midi",
+   "title": "willow weep for me",
+   "encoded": true,
+   "tokens": 8646,
+   "sha1": "265d101a913405f6076acd30275aaae675968d07",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "And I Love Her - Live.midi",
+   "title": "and i love her",
+   "encoded": true,
+   "tokens": 58657,
+   "sha1": "cc5f59370d3470918468b5b3b74d39afae76b842",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Bittersweet Symphony  Waterloo Sunset - Live.midi",
+   "title": "bittersweet symphony waterloo sunset",
+   "encoded": true,
+   "tokens": 64543,
+   "sha1": "6ba95fcf6f185480a55ea9f43475193f1e4e1019",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Blackbird - Live.midi",
+   "title": "blackbird",
+   "encoded": true,
+   "tokens": 10104,
+   "sha1": "8e97ad7bd48b85198c96a3576f3142562d52aad5",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Brahms -  Intermezzo in B-flat major, Op. 76 -  No. 4 - Live.midi",
+   "title": "brahms intermezzo in bflat major op 76 no 4",
+   "encoded": true,
+   "tokens": 4095,
+   "sha1": "3af66c04c2412d5f4dca96737d9e1a63a6841aab",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Brahms -  Intermezzo in E minor, Op. 119 -  No. 2 - Live.midi",
+   "title": "brahms intermezzo in e minor op 119 no 2",
+   "encoded": true,
+   "tokens": 9233,
+   "sha1": "f03bc9813069a67e4dc01208f1e6b2eaadd2bbd7",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Countdown - Live.midi",
+   "title": "countdown",
+   "encoded": true,
+   "tokens": 25450,
+   "sha1": "cea851a260c0e01799d492d55243126ca11d25e8",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Dream Brother - Live.midi",
+   "title": "dream brother",
+   "encoded": true,
+   "tokens": 43443,
+   "sha1": "7a2f8690bdc533201d7d89c728e44fc21609287f",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Get Happy - Live.midi",
+   "title": "get happy",
+   "encoded": true,
+   "tokens": 42315,
+   "sha1": "4903930e81a7055d1dc67f33d741deeee133283e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "God Only Knows - Live.midi",
+   "title": "god only knows",
+   "encoded": true,
+   "tokens": 52599,
+   "sha1": "97f5038912be8100e4758876898f3e23154b2468",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Hey You - Live.midi",
+   "title": "hey you",
+   "encoded": true,
+   "tokens": 22142,
+   "sha1": "849f94104d1b565962fd64b8b6b0a54e9a53367d",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Holland - Live.midi",
+   "title": "holland",
+   "encoded": true,
+   "tokens": 29714,
+   "sha1": "fd9505d3cfbc2be9804a814f98e868e6d289dfca",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "I'm Old Fashioned - Live.midi",
+   "title": "im old fashioned",
+   "encoded": true,
+   "tokens": 5013,
+   "sha1": "f71f03d0e77b936707a1424fc603d1b259b313fa",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Interstate Love Song - Live.midi",
+   "title": "interstate love song",
+   "encoded": true,
+   "tokens": 56450,
+   "sha1": "cca4bad0639aaf9493db44efb55a3fe5d02fc68e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Jigsaw Falling into Place - Live.midi",
+   "title": "jigsaw falling into place",
+   "encoded": true,
+   "tokens": 35875,
+   "sha1": "0b53ca35b10a884ce460303fef798a1c2877f357",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "John Boy - Live.midi",
+   "title": "john boy",
+   "encoded": true,
+   "tokens": 6528,
+   "sha1": "73d70ee825bcfcb877b836684b488f3bd5a9a115",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Junk - Live.midi",
+   "title": "junk",
+   "encoded": true,
+   "tokens": 7887,
+   "sha1": "2bc8f1ce2f1ee3ef653dec0782a9cebd4c16b4cf",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Knives Out - Live.midi",
+   "title": "knives out",
+   "encoded": true,
+   "tokens": 42018,
+   "sha1": "35308112a777d49cfdaf2c2c24d2f300270b953e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Knives Out 2 - Live.midi",
+   "title": "knives out 2",
+   "encoded": true,
+   "tokens": 20347,
+   "sha1": "a5b0109ca64c51798ed56d779bca779581ead5c2",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Le Mémoire et la Mer - Live.midi",
+   "title": "le mmoire et la mer",
+   "encoded": true,
+   "tokens": 32979,
+   "sha1": "dbfe2877801fe007d898b5385fa0441fdefad78d",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Los Angeles II - Live.midi",
+   "title": "los angeles ii",
+   "encoded": true,
+   "tokens": 11500,
+   "sha1": "cfb629af016d8039378f2fb169d7aed0825ca216",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Lost Chords - Live.midi",
+   "title": "lost chords",
+   "encoded": true,
+   "tokens": 38288,
+   "sha1": "47a7d4aa3072ae2fa987e3b7829ad82468cd2f78",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Meditation I - Lord Watch Over Me - Live.midi",
+   "title": "meditation i lord watch over me",
+   "encoded": true,
+   "tokens": 16678,
+   "sha1": "41f6638501e5806ed832884151e90f3d09c06105",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Meditation II - Love Meditation - Live.midi",
+   "title": "meditation ii love meditation",
+   "encoded": true,
+   "tokens": 8092,
+   "sha1": "7bf63de5edda155e2a2fa3bef8ae188db28e66ce",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Medley -  Zingaro  Paris - Live.midi",
+   "title": "medley zingaro paris",
+   "encoded": true,
+   "tokens": 19606,
+   "sha1": "3357684d4791514d96a36f805a6bbb7c596dc8e0",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Monk's Mood - Live.midi",
+   "title": "monks mood",
+   "encoded": true,
+   "tokens": 8655,
+   "sha1": "2f914395bd2279d1f1daa96bbaa1784fa683d10c",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "My Favorite Things - Live.midi",
+   "title": "my favorite things",
+   "encoded": true,
+   "tokens": 30226,
+   "sha1": "9ffacab13e9aa8ee3b6304cac40d4ec6a03906e0",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "On the Street Where You Live - Live.midi",
+   "title": "on the street where you",
+   "encoded": true,
+   "tokens": 6368,
+   "sha1": "abc952be94cc555ed8d2b98a0892ed9ecdf750da",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Smells Like Teen Spirit - Live.midi",
+   "title": "smells like teen spirit",
+   "encoded": true,
+   "tokens": 34751,
+   "sha1": "f15f1b271fa6c27432bbd5fce29f2d98115d5dbb",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Teardrop - Live.midi",
+   "title": "teardrop",
+   "encoded": true,
+   "tokens": 29504,
+   "sha1": "40a2289d351e6124540294017c9840d29ef773ca",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Think of One - Live.midi",
+   "title": "think of one",
+   "encoded": true,
+   "tokens": 18424,
+   "sha1": "c78586e69800379ea6447b005bb393f81eadd165",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "This Here - Live.midi",
+   "title": "this here",
+   "encoded": true,
+   "tokens": 22146,
+   "sha1": "b04ae71dc71c5bc9d6cd39e1c36f22820e64f013",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "10 Years Solo Live",
+   "file": "Waltz for J. B. - Live.midi",
+   "title": "waltz for j b",
+   "encoded": true,
+   "tokens": 11237,
+   "sha1": "5d6c92a26046e0553f401d5a9cdfdc47e70a68ba",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Dat Dere - Live.midi",
+   "title": "dat dere",
+   "encoded": true,
+   "tokens": 12670,
+   "sha1": "22d8c7b2a0e7f5839218b98f5a45d71d69917e13",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Exit Music (For a Film) - Live [Live].midi",
+   "title": "exit music",
+   "encoded": true,
+   "tokens": 29840,
+   "sha1": "3058fd89424aa6a7088d616f3de487f8b8078f31",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Goodbye Storyteller - for Fred Myrow.midi",
+   "title": "goodbye storyteller for fred myrow",
+   "encoded": true,
+   "tokens": 16060,
+   "sha1": "2595dd76283baa0bfa5bad07ae6ec2df11ceee57",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "It's All Right With Me - Live.midi",
+   "title": "its all right with me",
+   "encoded": true,
+   "tokens": 13753,
+   "sha1": "68be4292beb841d0af56b88b838e0ccdc18755b8",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Lilac Wine - Live.midi",
+   "title": "lilac wine",
+   "encoded": true,
+   "tokens": 12954,
+   "sha1": "37d6ed621c6c39af36cbb8478e3aa67526ca758e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Lithium - Live.midi",
+   "title": "lithium",
+   "encoded": true,
+   "tokens": 12842,
+   "sha1": "d07c5e0b44ad3f6ee48aac223f54333d01c7d4f3",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Martha My Dear - Live.midi",
+   "title": "martha my dear",
+   "encoded": true,
+   "tokens": 17817,
+   "sha1": "1c7d346b4f59ed0441867bbffffaef74df3ccd34",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "My Favorite Things - Live.midi",
+   "title": "my favorite things",
+   "encoded": true,
+   "tokens": 12377,
+   "sha1": "49a64ddfbfa1b70b7256b07f11e47edeffaf6c3f",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Resignation - Live.midi",
+   "title": "resignation",
+   "encoded": true,
+   "tokens": 24542,
+   "sha1": "b799504b7f4369672612eb991328dce85e8f47a6",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Secret Love - Live.midi",
+   "title": "secret love",
+   "encoded": true,
+   "tokens": 6527,
+   "sha1": "50d242462170687d3aacdf738e07f39b265adaa1",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Storm - Live.midi",
+   "title": "storm",
+   "encoded": true,
+   "tokens": 11580,
+   "sha1": "fb94b9e69e37f5730ac29f51444914fae13d9b79",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Things Behind the Sun - Live.midi",
+   "title": "things behind the sun",
+   "encoded": true,
+   "tokens": 24390,
+   "sha1": "8efcf38a44e3ce6262e5143926143fa03d949afe",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Trailer Park Ghost - Live.midi",
+   "title": "trailer park ghost",
+   "encoded": true,
+   "tokens": 30346,
+   "sha1": "4df933fbcc8fc0df72d11184941e6ac431b11e41",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Marciac",
+   "file": "Unrequited - Live.midi",
+   "title": "unrequited",
+   "encoded": true,
+   "tokens": 22941,
+   "sha1": "df24b4a7e405dd8bda4a2bca48b21f9d39102ed0",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "From This Moment On.midi",
+   "title": "from this moment on",
+   "encoded": true,
+   "tokens": 19150,
+   "sha1": "d4fdaa2592840fd02b2c30177d56821b79981051",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "How Long Has This Been Going On.midi",
+   "title": "how long has this been going on",
+   "encoded": true,
+   "tokens": 11557,
+   "sha1": "55bbca55ffb6f2a05088ea7c0d45ac8fa32cbc1e",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "Intro.midi",
+   "title": "intro",
+   "encoded": true,
+   "tokens": 2278,
+   "sha1": "ad74f61fb3806eeb4265f0789da00c62f38682ed",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "Monk's Dream.midi",
+   "title": "monks dream",
+   "encoded": true,
+   "tokens": 21462,
+   "sha1": "c61e7b6c13bd62929d151434dd999a70d6a03ef2",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "Paranoid Android.midi",
+   "title": "paranoid android",
+   "encoded": true,
+   "tokens": 41949,
+   "sha1": "e9ece089f0a1ff0bcabd12a1845d01a9182c3c1c",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "River Man.midi",
+   "title": "river man",
+   "encoded": true,
+   "tokens": 22981,
+   "sha1": "b98c2ef192df1fe64db738166cbbc4c6c136f3cf",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "Someone to Watch over Me.midi",
+   "title": "someone to watch over me",
+   "encoded": true,
+   "tokens": 14977,
+   "sha1": "19d6fbd28d02cbd7591154ca655ea3811ecb9415",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  },
+  {
+   "artist": "Brad Mehldau",
+   "tree": "midi_kong",
+   "kind": "live",
+   "album": "Live in Tokyo",
+   "file": "Things Behind the Sun.midi",
+   "title": "things behind the sun",
+   "encoded": true,
+   "tokens": 9973,
+   "sha1": "f56815f981f76eb0b487c6c20da2a171382d2c66",
+   "in": [],
+   "mehldau_cv_held_out_fold": []
+  }
+ ]
+}

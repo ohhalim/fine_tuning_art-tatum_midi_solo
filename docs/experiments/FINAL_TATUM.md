@@ -8,7 +8,7 @@
 실제로 쓸 Tatum 개인화 모델을 만든다. 16곡 비교용 모델(#1499)이 아니라 가능한 자료를 다 쓰고, 검증된 구성을 적용한다.
 
 ## 구성
-- base: 공통 base(`outputs/tvm/common_base/checkpoint_epoch8.pt`, Tatum·멜다우 미학습, 누출 교집합 0)
+- base: 공통 base(`outputs/tvm/common_base/checkpoint_epoch8.pt`, Tatum 미학습, 멜다우는 스튜디오만 제외·라이브 54곡 포함(#1722 정정))
 - 어댑터: out_proj + **QKV** LoRA r16. 110곡에서 out_proj보다 우세했고(#1493), seed 3개에서 강건했다(#1496)
 - 데이터: **학습 98곡** = `tatum_full/train` 110곡 − fresh12. **선택용 val12** = `tatum_full/val`. **최종 평가 fresh12**는 학습·선택 모두에 쓰지 않는다
 - 학습: lr 3e-4, batch 4, accumulation 4(epoch당 7 update), cosine 518 update(74 epoch), LS 0.1, seed 42, MPS. snapshot 0 / 70 / 133 / 259 / 385 / 518

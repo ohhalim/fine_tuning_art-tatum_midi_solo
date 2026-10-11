@@ -36,7 +36,7 @@
 
 > **개인화 현황 한 장 요약:** [docs/PERSONALIZATION_STATUS.md](docs/PERSONALIZATION_STATUS.md). 바로 연주: `python scripts/play_personalized.py --preset tatum|mehldau|swap`
 
-최종 목표는 여기에 **연주자 스타일 적응**을 얹는 것입니다. 멜다우는 **가능도 수준 개인화 완료**(멜다우를 한 번도 안 본 base에서 처음 보는 멜다우 곡 예측이 개선, 청취 미검증, #1497). 멜다우·Art Tatum으로
+최종 목표는 여기에 **연주자 스타일 적응**을 얹는 것입니다. 멜다우는 **가능도 수준 개인화 완료**(멜다우 스튜디오 곡을 안 본 base에서 처음 보는 스튜디오 곡 예측이 개선, 청취 미검증, #1497. base는 멜다우 라이브 54곡을 학습했다 — #1722). 멜다우·Art Tatum으로
 시험한 결과, 어댑터는 모델 수치상 대상 스타일로 특화됩니다(Tatum은 학습하지 않은 곡까지).
 다만 귀로 들리는 차이는 아직 확인하지 못했습니다(§5).
 
@@ -213,8 +213,8 @@ flowchart LR
 |---|---|---|
 | 멜다우 u128 | `outputs/mehldau_lora_v2/u128/checkpoint_update128.pt` | 8/8, 오류 0, 생성 p50 404 ms |
 | 멜다우 u64 (이전 후보, armB 위) | `outputs/mehldau_apply/export_outproj_u64/checkpoint_update64.pt` | 128 BPM 8/8, fallback 0, 생성 p50 355 ms. val 2곡 기준 사전 규칙으로 선정(val −0.023, 일반 −0.012). QKV 확장은 16곡에서 과적합해 기준 미달(#1495) |
-| **Tatum 완성 모델 (기본)** | `outputs/final_tatum/export/checkpoint_update518.pt` | 공통 base(Tatum·멜다우 미학습) + out_proj+QKV, Tatum 98곡, val12로 선택. **미학습 Tatum fresh12 CE −0.126**(16곡 모델의 2.3배), 일반 재즈 +0.009, 멜다우 곡 +0.052(Tatum 특이적). 검사 샘플 exact 16-gram 미검출, 128 BPM 16마디 fallback 0(#1509) |
-| **멜다우 개인화 (완료 판정)** | `outputs/clean_base/c2_export/checkpoint_update128.pt` | **멜다우 미학습 base** + out_proj LoRA 128 update. 미학습 멜다우 곡 CE −0.046(4-fold 4/4), 재사용 holdout 2곡 −0.047·특화도 −0.021, 검사 샘플 exact 16-gram 미검출, 128 BPM 8/8. 가능도 수준 완료, 청취 미검증(#1497). 학습량 확장 CV(64–384, #1511)에서도 held-out 개선이 64–128에서 포화해 이 모델을 유지. 공통 base 멜다우보다 절대 CE가 0.028 낮아(16/16곡) base 통합도 하지 않음(#1517) |
+| **Tatum 완성 모델 (기본)** | `outputs/final_tatum/export/checkpoint_update518.pt` | 공통 base(Tatum 미학습, 멜다우 라이브 54곡 포함 — #1722) + out_proj+QKV, Tatum 98곡, val12로 선택. **미학습 Tatum fresh12 CE −0.126**(16곡 모델의 2.3배), 일반 재즈 +0.009, 멜다우 곡 +0.052(Tatum 특이적). 검사 샘플 exact 16-gram 미검출, 128 BPM 16마디 fallback 0(#1509) |
+| **멜다우 개인화 (완료 판정)** | `outputs/clean_base/c2_export/checkpoint_update128.pt` | **멜다우 스튜디오 미학습 base**(라이브 54곡은 포함 — #1722) + out_proj LoRA 128 update. 미학습 멜다우 곡 CE −0.046(4-fold 4/4), 재사용 holdout 2곡 −0.047·특화도 −0.021, 검사 샘플 exact 16-gram 미검출, 128 BPM 8/8. 가능도 수준 완료, 청취 미검증(#1497). 학습량 확장 CV(64–384, #1511)에서도 held-out 개선이 64–128에서 포화해 이 모델을 유지. 공통 base 멜다우보다 절대 CE가 0.028 낮아(16/16곡) base 통합도 하지 않음(#1517) |
 | **Tatum vs 멜다우 비교용 (공통 base)** | `outputs/tvm/export_{tatum,mehldau}/checkpoint_update128.pt` | 두 연주자 모두 제외한 공통 base + 같은 out_proj LoRA·16곡·128 update. 둘 다 자기 연주자 미학습 곡 개선·일반 대비 특화(3×3 교차 평가). 우열은 가중 방식에 따라 뒤집혀 미확정(멜다우 holdout 2곡). 128 BPM 8/8(#1499) |
 
 **연주 중 전환과 입력 반영 지연 (#1525, #1526):**
