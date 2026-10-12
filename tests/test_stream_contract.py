@@ -81,6 +81,12 @@ class TokenStreamTest(unittest.TestCase):
         self.s.mark_written(6)
         self.assertFalse(self.s.needs_full_prefill)
 
+    def test_real_prompt_header_is_accepted(self):
+        s = TokenStream([("prefix", "instrument", "piano"), "<S>"] + PREFIX)
+        self.assertEqual(s.grammar_state(), GrammarState("note", 0, 0))
+        with self.assertRaises(ValueError):
+            s.append_sampled(("onset", 10))                # the header does not relax the note grammar
+
     def test_tokens_after_eos_are_rejected(self):
         s = TokenStream([])
         s.append_sampled("<E>")

@@ -51,7 +51,7 @@ class GrammarState:
                 return GrammarState("note", 0, self.segment + 1)
             if k == "piano":
                 return GrammarState("onset", self.last_onset, self.segment)
-            if t == "<D>":
+            if t in ("<D>", "<S>") or k == "prefix":    # sequence header tokens of a real Aria prompt
                 return self
             if t == "<E>":
                 return GrammarState("end", self.last_onset, self.segment)
