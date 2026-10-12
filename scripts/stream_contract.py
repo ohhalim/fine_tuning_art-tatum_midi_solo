@@ -20,7 +20,10 @@ Scheduler (rules 4 and 7)
 - committed notes become note-on / note-off events tagged with the current generation and a unique event id;
   each event is consumed once, whether by tick() or by a timer callback. note-offs belong to the scheduler, not to the
   model, so a rollback never touches them. Ownership per note is a logical-event contract: MIDI 1.0 note-off carries
-  no note id, so a channel/pitch retrigger policy is still needed before a real synth is connected.
+  no note id. The MIDI stream (`midi_out`, one channel) therefore follows a retrigger policy (issue #1745): a
+  note-on on a pitch that is already sounding first sends note-off for it and takes over the pitch; the scheduled
+  note-off of the note that lost the pitch is not sent; stop() sends note-off for every owned pitch. Per pitch the
+  MIDI events alternate on, off.
 - stop(): block new events, bump the generation (every pending event of an older generation is void), send
   note-off for every sounding note. restart(): accept events again with the new generation. Any callback that
   arrives with an older generation is ignored, also after a restart.
@@ -187,6 +190,8 @@ class Scheduler:
         self.consumed = set()  # event_ids already delivered: each event is consumed once, by tick or a callback
         self.last_tick_ms = float("-inf")
         self._next_event_id = 0
+        self.midi_out = []     # (time_ms, "on"|"off", pitch, velocity): what goes to the synth on one channel
+        self.pitch_owner = {}  # pitch -> note_id that currently owns it in the MIDI stream
 
     def schedule(self, notes):
         if not self.accepting:
@@ -211,7 +216,20 @@ class Scheduler:
         else:
             return False       # the note was already turned off (e.g. by stop)
         self.sent.append((now_ms, event.kind, event.note_id, event.pitch))
+        self._to_midi(event, now_ms)
         return True
+
+    def _to_midi(self, event, now_ms):
+        p = event.pitch
+        if event.kind == "on":
+            if p in self.pitch_owner:                      # retrigger: end the sounding note on this pitch first
+                self.midi_out.append((now_ms, "off", p, 0))
+            self.midi_out.append((now_ms, "on", p, event.velocity))
+            self.pitch_owner[p] = event.note_id
+        elif self.pitch_owner.get(p) == event.note_id:
+            self.midi_out.append((now_ms, "off", p, 0))
+            del self.pitch_owner[p]
+        # else: this note lost its pitch to a retrigger; its note-off is not sent
 
     def tick(self, now_ms):
         if now_ms < self.last_tick_ms:
@@ -227,6 +245,9 @@ class Scheduler:
         for note_id, pitch in sorted(self.sounding.items()):
             self.sent.append((now_ms, "off", note_id, pitch))
         self.sounding.clear()
+        for p in sorted(self.pitch_owner):
+            self.midi_out.append((now_ms, "off", p, 0))
+        self.pitch_owner.clear()
 
     def restart(self):
         self.accepting = True
