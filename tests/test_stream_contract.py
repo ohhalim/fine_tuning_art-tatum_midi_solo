@@ -8,7 +8,7 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 import random  # noqa: E402
 
-from stream_contract import GrammarState, Note, Scheduler, TokenStream  # noqa: E402
+from stream_contract import MIN_DUR_MS, GrammarState, Note, Scheduler, TokenStream, playable  # noqa: E402
 
 PREFIX = [("piano", 60, 80), ("onset", 0), ("dur", 400)]
 
@@ -278,6 +278,30 @@ class MidiRetriggerTest(unittest.TestCase):
             sch.stop(7_001)
             self.assertTrue(midi_alternates(sch.midi_out), trial)
             self.assertEqual(sum(1 for m in sch.midi_out if m[1] == "on"), len(notes))
+
+
+
+class PlayableTest(unittest.TestCase):
+    def test_velocity_zero_dropped_and_zero_length_extended(self):
+        kept, dropped = playable([Note(0, 60, 0, 0, 100), Note(1, 62, 80, 200, 200), Note(2, 64, 70, 300, 400)])
+        self.assertEqual([n.note_id for n in dropped], [0])
+        self.assertEqual([(n.note_id, n.on_ms, n.off_ms) for n in kept], [(1, 200, 200 + MIN_DUR_MS), (2, 300, 400)])
+
+    def test_schedule_rejects_unplayable_batch_as_a_whole(self):
+        sch = Scheduler()
+        for bad in (Note(1, 60, 80, 100, 100), Note(1, 60, 0, 0, 100), Note(1, 60, 128, 0, 100), Note(1, 128, 80, 0, 100)):
+            with self.assertRaises(ValueError):
+                sch.schedule([Note(0, 62, 80, 0, 50), bad])
+            self.assertEqual(sch.pending, [])
+
+    def test_zero_length_note_does_not_stay_on_after_playable(self):
+        sch = Scheduler()
+        kept, _ = playable([Note(0, 60, 80, 100, 100)])
+        sch.schedule(kept)
+        for t in range(0, 300, 10):
+            sch.tick(t)
+        self.assertEqual(sch.sounding, {})
+        self.assertEqual([m[1] for m in sch.midi_out], ["on", "off"])
 
 
 if __name__ == "__main__":
