@@ -81,6 +81,12 @@ class TokenStreamTest(unittest.TestCase):
         self.s.mark_written(6)
         self.assertFalse(self.s.needs_full_prefill)
 
+    def test_real_prompt_header_is_accepted(self):
+        s = TokenStream([("prefix", "instrument", "piano"), "<S>"] + PREFIX)
+        self.assertEqual(s.grammar_state(), GrammarState("note", 0, 0))
+        with self.assertRaises(ValueError):
+            s.append_sampled(("onset", 10))                # the header does not relax the note grammar
+
     def test_tokens_after_eos_are_rejected(self):
         s = TokenStream([])
         s.append_sampled("<E>")
@@ -117,6 +123,11 @@ class SchedulerTest(unittest.TestCase):
         self.sch.tick(1_500)
         self.assertEqual(self.sch.sent, [(1_000, "on", 0, 60), (1_500, "off", 0, 60)])
         self.assertEqual(self.sch.sounding, {})
+
+    def test_clock_cannot_go_back(self):
+        self.sch.tick(1_000)
+        with self.assertRaises(ValueError):
+            self.sch.tick(500)
 
     def test_stop_before_a_scheduled_note_on(self):
         self.sch.schedule([Note(0, 60, 80, 10_000, 11_000)])
