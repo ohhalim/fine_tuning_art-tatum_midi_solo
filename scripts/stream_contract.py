@@ -185,6 +185,7 @@ class Scheduler:
         self.sounding = {}     # note_id -> pitch
         self.sent = []         # (time_ms, kind, note_id, pitch) actually sent to the synth
         self.consumed = set()  # event_ids already delivered: each event is consumed once, by tick or a callback
+        self.last_tick_ms = float("-inf")
         self._next_event_id = 0
 
     def schedule(self, notes):
@@ -213,6 +214,9 @@ class Scheduler:
         return True
 
     def tick(self, now_ms):
+        if now_ms < self.last_tick_ms:
+            raise ValueError(f"clock went back: tick({now_ms}) after tick({self.last_tick_ms})")
+        self.last_tick_ms = now_ms
         due = [e for e in self.pending if e.time_ms <= now_ms]
         return [e for e in due if self.deliver(e, now_ms)]
 

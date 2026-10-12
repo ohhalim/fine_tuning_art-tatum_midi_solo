@@ -124,6 +124,11 @@ class SchedulerTest(unittest.TestCase):
         self.assertEqual(self.sch.sent, [(1_000, "on", 0, 60), (1_500, "off", 0, 60)])
         self.assertEqual(self.sch.sounding, {})
 
+    def test_clock_cannot_go_back(self):
+        self.sch.tick(1_000)
+        with self.assertRaises(ValueError):
+            self.sch.tick(500)
+
     def test_stop_before_a_scheduled_note_on(self):
         self.sch.schedule([Note(0, 60, 80, 10_000, 11_000)])
         self.sch.stop(9_000)

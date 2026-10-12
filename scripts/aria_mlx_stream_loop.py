@@ -5,10 +5,11 @@ only simulated as a rollback of the provisional tokens), no bias, reranking, CFG
 
 Loop, 128 BPM: block B = half bar 937.5 ms, beat 468.75 ms. At block k (virtual time now = t0 + k*B):
   - if k is a chord-input block: rollback_to_committed() (provisional tokens dropped, grammar restored)
-  - generate until the last complete note reaches the commit horizon H = now + B + beat ("needed" time, deadline:
-    1 beat, because notes before now + beat were committed by the previous block), then keep generating one more
-    block speculatively (until H + B); at most CAP tokens per block
-  - commit_until(H), schedule the committed notes, tick the scheduler to now
+  - fill_block(): generate until the last complete note reaches the commit horizon H = now + B + beat, then at once
+    commit_until(H) and schedule ("ready"; deadline 1 beat, because notes before now + beat were committed by the
+    previous block), then keep generating one more block speculatively (until H + B); at most CAP tokens per block,
+    and the coverage after the last sample is checked too (Astra review of #1744)
+  - tick the scheduler to now
 Sampling: the #1726 sampler (one Exp(1) noise vector per step, temperature 1, no min_p) restricted by the format
 mask (aria_grammar_mask). <D> and <E> are also masked out: a live partner keeps playing (operating condition).
 
@@ -54,6 +55,28 @@ def thermal_level():
 def nearest_rank(xs, q):
     s = sorted(xs)
     return s[min(len(s) - 1, max(0, math.ceil(q * len(s)) - 1))]
+
+
+def fill_block(sample_one, coverage, on_ready, h, h_spec, cap, clock=time.perf_counter):
+    """Generate until coverage() >= h, call on_ready() (commit + schedule) right then, and continue speculatively
+    until coverage() >= h_spec, with at most `cap` samples. The coverage is checked again after the last sample.
+    If h is never reached, on_ready() is still called once at the end (whatever is complete gets committed)."""
+    t = clock()
+    n, ready_s = 0, None
+    while True:
+        c = coverage()
+        if ready_s is None and c >= h:
+            on_ready()
+            ready_s = clock() - t
+        if c >= h_spec or n >= cap:
+            break
+        sample_one()
+        n += 1
+    reached = ready_s is not None
+    if not reached:
+        on_ready()
+        ready_s = clock() - t
+    return {"tokens": n, "reached": reached, "ready_s": ready_s, "block_s": clock() - t}
 
 
 def main() -> None:
@@ -133,37 +156,38 @@ def main() -> None:
     t0 = coverage()
     log["t0_ms"] = t0
     blocks, committed_snap, mask_changes = [], [], 0
-    stopped_reason = None
+    stopped_reason, last_tick = None, t0
     try:
         for k in range(N_BLOCKS):
             now = t0 + k * BLOCK
             h = now + BLOCK + BEAT
             dropped = stream.rollback_to_committed() if k in CHORD_BLOCKS else 0
-            t = time.perf_counter()
-            n_tok, t_need, reached = 0, None, False
-            while n_tok < CAP:
-                c = coverage()
-                if c >= h and not reached:
-                    t_need, reached = time.perf_counter() - t, True
-                if c >= h + BLOCK:
-                    break
-                mask_changes += sample_one()
-                n_tok += 1
-            if t_need is None:
-                t_need = time.perf_counter() - t
-            t_block = time.perf_counter() - t
-            notes = stream.commit_until(h)
-            sched.schedule(notes)
+            committed = []
+            changed = [0]
+
+            def on_ready():
+                committed.extend(stream.commit_until(h))
+                sched.schedule(committed)
+
+            def sample():
+                changed[0] += sample_one()
+
+            res = fill_block(sample, coverage, on_ready, h, h + BLOCK, CAP)
+            mask_changes += changed[0]
             sched.tick(now)
+            last_tick = now
             committed_snap.append(list(stream.tokens[:stream.committed_end]))
-            blocks.append({"block": k, "now_ms": now, "horizon_ms": h, "chord_input": k in CHORD_BLOCKS, "dropped_tokens": dropped,
-                           "tokens_generated": n_tok, "reached_horizon": reached,
-                           "time_to_horizon_s": round(t_need, 4), "block_s": round(t_block, 4), "notes_committed": len(notes),
+            blocks.append({"block": k, "now_ms": now, "horizon_ms": h, "earliest_changed_onset_ms": now + BEAT,
+                           "chord_input": k in CHORD_BLOCKS, "dropped_tokens": dropped,
+                           "tokens_generated": res["tokens"], "reached_horizon": res["reached"],
+                           "ready_s": round(res["ready_s"], 4), "block_s": round(res["block_s"], 4), "notes_committed": len(committed),
                            "kv_valid_length": stream.kv_valid_length, "tokens": len(stream.tokens)})
     except (ValueError, RuntimeError) as e:
         stopped_reason = f"{type(e).__name__}: {e}"[:300]
     end_ms = t0 + len(blocks) * BLOCK + 10_000
-    for x in range(int(t0), int(end_ms) + 1, 50):
+    x = last_tick
+    while x < end_ms:                                      # drain forward from the last tick (monotonic clock)
+        x = min(end_ms, x + 50)
         sched.tick(x)
     sounding_before_stop = dict(sched.sounding)
     sched.stop(end_ms)
@@ -194,14 +218,16 @@ def main() -> None:
                 "max_s": round(max(xs), 4)} if xs else None
 
     log["latency"] = {
-        "cold_first_block": {"time_to_horizon_s": blocks[0]["time_to_horizon_s"], "block_s": blocks[0]["block_s"]} if blocks else None,
-        "warm_time_to_horizon": dist([b["time_to_horizon_s"] for b in warm]),
+        "cold_first_block_no_prebuffer": {"ready_s": blocks[0]["ready_s"], "block_s": blocks[0]["block_s"]} if blocks else None,
+        "warm_ready": dist([b["ready_s"] for b in warm]),
         "warm_block_incl_speculative": dist([b["block_s"] for b in warm]),
-        "chord_input_time_to_horizon": dist([b["time_to_horizon_s"] for b in chord]),
-        "deadline_misses_vs_beat": sum(1 for b in blocks[1:] if b["time_to_horizon_s"] > BEAT / 1000),
-        "deadline_misses_vs_block": sum(1 for b in blocks[1:] if b["time_to_horizon_s"] > BLOCK / 1000),
-        "note": "p99 by nearest rank; with n < 100 it equals one of the largest observations. Virtual clock: generation "
-                "time is measured, music time is simulated. Not input-to-sound latency."}
+        "chord_input_ready": dist([b["ready_s"] for b in chord]),
+        "deadline_misses_vs_beat_after_cold": sum(1 for b in blocks[1:] if b["ready_s"] > BEAT / 1000),
+        "deadline_misses_vs_block_after_cold": sum(1 for b in blocks[1:] if b["ready_s"] > BLOCK / 1000),
+        "note": "ready = commit + schedule done (deadline judged on it). Generation overlaps the 1-beat wait: the earliest "
+                "note a chord input can change starts at now + beat, and ready must come before that. p99 by nearest rank; "
+                "with n < 100 it equals one of the largest observations. Virtual clock: generation time measured, music "
+                "time simulated. Not input-to-sound latency."}
     log["blocks"] = blocks
     log["totals"] = {"tokens": len(stream.tokens) - len(prompt), "committed_tokens": stream.committed_end - len(prompt),
                      "notes_sent": len(ons), "mask_changed_steps": mask_changes}
