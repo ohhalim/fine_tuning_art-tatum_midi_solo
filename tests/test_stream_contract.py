@@ -6,6 +6,8 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
+import random  # noqa: E402
+
 from stream_contract import GrammarState, Note, Scheduler, TokenStream  # noqa: E402
 
 PREFIX = [("piano", 60, 80), ("onset", 0), ("dur", 400)]
@@ -208,6 +210,74 @@ class SchedulerTest(unittest.TestCase):
         for t in (0, 500, 1_000, 1_500):
             self.sch.tick(t)
         self.assertEqual([x[1:3] for x in self.sch.sent], [("on", 0), ("on", 1), ("off", 0), ("off", 1)])
+
+
+
+def midi_alternates(midi_out):
+    """Per pitch the MIDI events go on, off, on, off ... and every pitch ends off."""
+    state = {}
+    for _, kind, p, _ in midi_out:
+        if kind == "on":
+            if state.get(p):
+                return False
+            state[p] = True
+        else:
+            if not state.get(p):
+                return False
+            state[p] = False
+    return not any(state.values())
+
+
+class MidiRetriggerTest(unittest.TestCase):
+    def setUp(self):
+        self.sch = Scheduler()
+
+    def run_all(self, until):
+        for t in range(0, until + 1, 50):
+            self.sch.tick(t)
+
+    def test_overlap_on_same_pitch_retriggers(self):
+        self.sch.schedule([Note(0, 60, 80, 0, 1_000), Note(1, 60, 70, 500, 1_500)])
+        self.run_all(1_500)
+        self.assertEqual(self.sch.midi_out, [(0, "on", 60, 80), (500, "off", 60, 0), (500, "on", 60, 70), (1_500, "off", 60, 0)])
+        self.assertTrue(midi_alternates(self.sch.midi_out))
+
+    def test_same_time_off_then_on_is_not_a_retrigger(self):
+        self.sch.schedule([Note(0, 60, 80, 0, 500), Note(1, 60, 80, 500, 1_000)])
+        self.run_all(1_000)
+        self.assertEqual([m[:3] for m in self.sch.midi_out], [(0, "on", 60), (500, "off", 60), (500, "on", 60), (1_000, "off", 60)])
+
+    def test_stop_turns_off_each_owned_pitch_once(self):
+        self.sch.schedule([Note(0, 60, 80, 0, 1_000), Note(1, 60, 80, 500, 1_500), Note(2, 64, 80, 0, 2_000)])
+        self.run_all(700)
+        self.sch.stop(700)
+        self.run_all_after = [self.sch.tick(t) for t in range(750, 2_100, 50)]
+        self.assertEqual(sorted(m[2] for m in self.sch.midi_out if m[0] == 700), [60, 64])
+        self.assertTrue(midi_alternates(self.sch.midi_out))
+
+    def test_late_old_generation_callback_sends_no_midi(self):
+        self.sch.schedule([Note(0, 60, 80, 1_000, 2_000)])
+        stale = list(self.sch.pending)
+        self.sch.stop(500)
+        self.sch.restart()
+        for e in stale:
+            self.sch.deliver(e, e.time_ms)
+        self.assertEqual(self.sch.midi_out, [])
+
+    def test_random_overlaps_keep_midi_alternating(self):
+        rng = random.Random(0)
+        for trial in range(50):
+            sch = Scheduler()
+            notes = []
+            for i in range(30):
+                on = rng.randrange(0, 5_000, 10)
+                notes.append(Note(i, rng.choice([60, 62, 64]), 80, on, on + rng.randrange(10, 2_000, 10)))
+            sch.schedule(notes)
+            for t in range(0, 7_001, 10):
+                sch.tick(t)
+            sch.stop(7_001)
+            self.assertTrue(midi_alternates(sch.midi_out), trial)
+            self.assertEqual(sum(1 for m in sch.midi_out if m[1] == "on"), len(notes))
 
 
 if __name__ == "__main__":
