@@ -83,6 +83,17 @@ def run_scenario(name, cfg, t3_py, aria_repo, ckpt, data, out_dir):
     sender.wait(timeout=120)
     open(f["stop"], "w").close()
     capture.wait(timeout=30)
+    with open(os.path.join(d, "run_meta.json"), "w") as m:
+        json.dump({"port": port, "producer_returncode": producer.returncode, "sender_returncode": sender.returncode,
+                   "capture_returncode": capture.returncode, "killed_at_block": killed_at}, m)
+    return analyze(name, d)
+
+
+def analyze(name, d):
+    """Everything below reads only the saved files, so a report can be rebuilt without running again."""
+    f = {k: os.path.join(d, v) for k, v in {"cap": "capture.json", "snd": "sender.json", "prog": "producer_progress.jsonl",
+                                             "prod": "producer.json", "meta": "run_meta.json"}.items()}
+    meta = json.load(open(f["meta"])) if os.path.exists(f["meta"]) else None
     snd, cap = json.load(open(f["snd"])), json.load(open(f["cap"]))
     prod = json.load(open(f["prod"])) if os.path.exists(f["prod"]) else None
     prog = [json.loads(x) for x in open(f["prog"]) if x.strip()]
@@ -100,7 +111,8 @@ def run_scenario(name, cfg, t3_py, aria_repo, ckpt, data, out_dir):
     warm = [b for b in prog if b["block"] > 0 and not b.get("chord_input")]
     chord = [b for b in prog if b.get("chord_input")]
     return {
-        "port": port, "producer_returncode": producer.returncode, "killed_at_block": killed_at,
+        "run_meta": meta, "producer_finished_report": prod is not None,
+        "producer_last_progress_block": prog[-1]["block"] if prog else None,
         "sender": {"end": snd["end"], "error": snd["error"], "port_closed": snd.get("port_closed"), "pending_at_stop": snd["pending_at_stop"],
                    "sounding_at_stop": snd["sounding_at_stop"], "dropped_velocity0": snd["dropped_velocity0"],
                    "extended_zero_length": snd["extended_zero_length"], "blocks_received": len(snd["received_blocks"])},
@@ -111,7 +123,9 @@ def run_scenario(name, cfg, t3_py, aria_repo, ckpt, data, out_dir):
                                         "on": len(ons), "off": len(offs)},
             "A3_producer_contract": {"ok": None if prod is None else all(prod["checks"].values()),
                                      "detail": None if prod is None else prod["checks"]},
-            "sender_clean_exit": {"ok": snd["error"] is None and snd.get("port_closed") is True and sender.returncode == 0},
+            "sender_clean_exit": {"ok": snd["error"] is None and snd.get("port_closed") is True
+                                        and (meta is None or meta["sender_returncode"] == 0),
+                                  "returncode_recorded": meta is not None},
         },
         "timing": timing,
         "producer": {"cold_prebuffer_s": prog[0]["cold_s"] if prog else None,
@@ -126,10 +140,13 @@ def run_scenario(name, cfg, t3_py, aria_repo, ckpt, data, out_dir):
 
 def main() -> None:
     t3_py, aria_repo, ckpt, data, out_dir, report_path = sys.argv[1:7]
-    report = {"scenarios": {}, "note": "time.monotonic_ns in all three processes (system-wide on macOS). p99 by nearest rank; "
+    analyze_only = len(sys.argv) > 7 and sys.argv[7] == "--analyze-only"
+    os.makedirs(os.path.dirname(os.path.abspath(report_path)), exist_ok=True)
+    report = {"analyze_only": analyze_only, "scenarios": {}, "note": "time.monotonic_ns in all three processes (system-wide on macOS). p99 by nearest rank; "
                                        "with few events it equals one of the largest. Virtual MIDI only, no synth or audio."}
     for name, cfg in SCENARIOS.items():
-        report["scenarios"][name] = run_scenario(name, cfg, t3_py, aria_repo, ckpt, data, out_dir)
+        report["scenarios"][name] = (analyze(name, os.path.join(out_dir, name)) if analyze_only
+                                     else run_scenario(name, cfg, t3_py, aria_repo, ckpt, data, out_dir))
         print(name, json.dumps({k: v["ok"] for k, v in report["scenarios"][name]["checks"].items()}), flush=True)
     with open(report_path, "w") as f:
         json.dump(report, f, ensure_ascii=False, indent=1)
