@@ -229,6 +229,9 @@ def main() -> None:
                 "with n < 100 it equals one of the largest observations. Virtual clock: generation time measured, music "
                 "time simulated. Not input-to-sound latency."}
     log["blocks"] = blocks
+    log["token_sha256"] = {
+        "all": hashlib.sha256(json.dumps([to_id[t] for t in stream.tokens]).encode()).hexdigest(),
+        "committed": hashlib.sha256(json.dumps([to_id[t] for t in stream.tokens[:stream.committed_end]]).encode()).hexdigest()}
     log["totals"] = {"tokens": len(stream.tokens) - len(prompt), "committed_tokens": stream.committed_end - len(prompt),
                      "notes_sent": len(ons), "mask_changed_steps": mask_changes}
     log["thermal_end"] = thermal_level()
