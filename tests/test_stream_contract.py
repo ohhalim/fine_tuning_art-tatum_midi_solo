@@ -264,6 +264,13 @@ class MidiRetriggerTest(unittest.TestCase):
             self.sch.deliver(e, e.time_ms)
         self.assertEqual(self.sch.midi_out, [])
 
+    def test_midi_due_keeps_scheduled_time_when_delivered_late(self):
+        self.sch.schedule([Note(0, 60, 80, 100, 200), Note(1, 60, 80, 150, 300)])
+        self.sch.tick(1_000)                               # everything delivered late, at once
+        self.assertEqual([m[0] for m in self.sch.midi_out], [1_000] * 4)
+        self.assertEqual(self.sch.midi_due, [100, 150, 150, 300])
+        self.assertEqual(len(self.sch.midi_due), len(self.sch.midi_out))
+
     def test_random_overlaps_keep_midi_alternating(self):
         rng = random.Random(0)
         for trial in range(50):

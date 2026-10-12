@@ -208,6 +208,7 @@ class Scheduler:
         self.last_tick_ms = float("-inf")
         self._next_event_id = 0
         self.midi_out = []     # (time_ms, "on"|"off", pitch, velocity): what goes to the synth on one channel
+        self.midi_due = []     # the scheduled (event) time of each midi_out entry; midi_out holds the delivery time
         self.pitch_owner = {}  # pitch -> note_id that currently owns it in the MIDI stream
 
     def schedule(self, notes):
@@ -246,10 +247,13 @@ class Scheduler:
         if event.kind == "on":
             if p in self.pitch_owner:                      # retrigger: end the sounding note on this pitch first
                 self.midi_out.append((now_ms, "off", p, 0))
+                self.midi_due.append(event.time_ms)
             self.midi_out.append((now_ms, "on", p, event.velocity))
+            self.midi_due.append(event.time_ms)
             self.pitch_owner[p] = event.note_id
         elif self.pitch_owner.get(p) == event.note_id:
             self.midi_out.append((now_ms, "off", p, 0))
+            self.midi_due.append(event.time_ms)
             del self.pitch_owner[p]
         # else: this note lost its pitch to a retrigger; its note-off is not sent
 
@@ -269,6 +273,7 @@ class Scheduler:
         self.sounding.clear()
         for p in sorted(self.pitch_owner):
             self.midi_out.append((now_ms, "off", p, 0))
+            self.midi_due.append(now_ms)                 # a stop flush is due when it happens
         self.pitch_owner.clear()
 
     def restart(self):
