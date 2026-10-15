@@ -7,8 +7,8 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
-from lh_role_proxy import (LEAD_MS, RULES, Note, assign_g3, assign_grid300, assign_top50, offline_condition,  # noqa: E402
-                           online_condition, pcs, prefix_view)
+from lh_role_proxy import (LEAD_MS, RECENT_MS, RULES, Note, assign_g3, assign_grid300, assign_top50,  # noqa: E402
+                           offline_condition, online_condition, pcs, prefix_view, recent_condition, replay)
 
 
 def ids(cond):
@@ -73,6 +73,41 @@ class FixtureTest(unittest.TestCase):
         self.assertTrue(all(n.on > d for n in offline_condition(notes, roles, 1000)))
 
 
+class RecentConditionTest(unittest.TestCase):
+    def test_short_comping_hit_released_before_d_is_still_recent(self):
+        notes = [Note(0, 48, 0, 120), Note(1, 72, 1000, 1200)]           # staccato chord tone, gone by d
+        roles = assign_g3(notes)
+        d = 1000 - LEAD_MS
+        self.assertEqual(ids(online_condition(notes, roles, d)), [])
+        self.assertEqual(ids(recent_condition(notes, roles, d)), [0])
+
+    def test_recent_window_edges(self):
+        notes = [Note(0, 48, 0, 50), Note(1, 50, 100, 150)]
+        roles = assign_g3(notes)
+        self.assertEqual(ids(recent_condition(notes, roles, RECENT_MS)), [0, 1])          # on = d - w: inside
+        self.assertEqual(ids(recent_condition(notes, roles, RECENT_MS + 1)), [1])
+        self.assertEqual(ids(recent_condition(notes, roles, 99)), [0])                    # 100 not started yet
+
+    def test_recent_waits_for_the_window_to_close(self):
+        notes = [Note(0, 48, 0, 30), Note(1, 52, 10, 30), Note(2, 64, 20, 30)]
+        roles = assign_top50(notes)
+        self.assertEqual(ids(recent_condition(notes, roles, 49)), [])
+        self.assertEqual(ids(recent_condition(notes, roles, 50)), [0, 1])
+
+
+class ReplayTest(unittest.TestCase):
+    def test_replay_matches_batch_on_fixtures(self):
+        notes = [Note(0, 48, 0, 1000), Note(1, 52, 20, 1000), Note(2, 64, 40, 1000), Note(3, 67, 60, 1000),
+                 Note(4, 40, 300, 310), Note(5, 72, 300, 900), Note(6, 72, 300, 900), Note(7, 50, 310, 310)]
+        qs = [-10, 0, 45, 50, 55, 109, 110, 299, 300, 305, 310, 350, 600, 999, 1000, 2000]
+        for name, rule in RULES.items():
+            roles = rule(notes)
+            got = replay(notes, name, qs)
+            for d, (snd, rec) in zip(qs, got):
+                self.assertEqual(sorted(snd), ids(online_condition(notes, roles, d)), (name, d))
+                self.assertEqual(sorted(rec), ids(recent_condition(notes, roles, d)), (name, d))
+
+
 class CausalityTest(unittest.TestCase):
     def random_notes(self, rng, n=200):
         out = []
@@ -102,6 +137,26 @@ class CausalityTest(unittest.TestCase):
                 a = online_condition(notes, rule(notes), d)
                 b = online_condition(past + future, rule(past + future), d)
                 self.assertEqual(ids(a), ids(b), (name, trial))
+
+    def test_replay_matches_batch_on_random_notes(self):
+        rng = random.Random(3)
+        for name, rule in RULES.items():
+            for trial in range(10):
+                notes = self.random_notes(rng)
+                roles = rule(notes)
+                qs = [rng.uniform(-500, 21_000) for _ in range(60)] + [n.on for n in notes[:20]] + [n.off for n in notes[:20]]
+                for d, (snd, rec) in zip(qs, replay(notes, name, qs)):
+                    self.assertEqual(sorted(snd), ids(online_condition(notes, roles, d)), (name, trial, d))
+                    self.assertEqual(sorted(rec), ids(recent_condition(notes, roles, d)), (name, trial, d))
+
+    def test_recent_condition_from_prefix_only_equals_full(self):
+        rng = random.Random(4)
+        for name, rule in RULES.items():
+            for trial in range(20):
+                notes = self.random_notes(rng)
+                d = rng.uniform(1000, 19_000)
+                pre = prefix_view(notes, d)
+                self.assertEqual(ids(recent_condition(notes, rule(notes), d)), ids(recent_condition(pre, rule(pre), d)), (name, trial))
 
     def test_no_note_is_both_condition_and_target(self):
         rng = random.Random(2)
