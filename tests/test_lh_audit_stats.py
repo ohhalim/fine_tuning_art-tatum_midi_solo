@@ -9,7 +9,7 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 import pretty_midi  # noqa: E402
 
-from lh_audit_stats import (CONDS, LEADS, NONEMPTY_FLOOR, audit_song, future_release_drops, leak_counts,  # noqa: E402
+from lh_audit_stats import (CONDS, LEADS, audit_song, check_counts, future_release_drops, leak_counts,  # noqa: E402
                             sha1_file, verdicts)
 from lh_role_proxy import LEAD_MS, Note, assign_g3  # noqa: E402
 
@@ -122,18 +122,31 @@ class PositiveControlTest(unittest.TestCase):
 
 
 class VerdictTest(unittest.TestCase):
-    def agg(self, ne, leak=0, songs_ok=10):
-        st = {"K1": 0, "K2": leak, "K3": 0, "replay_mismatch": 0, "nonempty_ratio": ne}
+    def agg(self, nonempty, targets=25000, leak=0, songs_ok=10):
+        st = {"K1": 0, "K2": leak, "K3": 0, "replay_mismatch": 0, "nonempty": nonempty, "targets": targets,
+              "nonempty_ratio": round(nonempty / targets, 4) if targets else None}
         return {"songs": 10, "songs_ok": songs_ok, "note_count_mismatch": 0,
                 "rules": {"g3": {"online": {ln: {c: dict(st) for c in CONDS} for ln in LEADS},
                                  "invariance": {"samples": 5, "prefix_mismatch": 0, "prefix_finite_off_exposed": 0, "suffix_mismatch": 0}}}}
 
-    def test_floor_and_construction(self):
-        self.assertEqual(verdicts(self.agg(NONEMPTY_FLOOR))["g3"]["conditions"]["sounding"]["verdict"], "causal pairs constructible")
-        self.assertEqual(verdicts(self.agg(NONEMPTY_FLOOR - 0.01))["g3"]["conditions"]["sounding"]["verdict"],
-                         "constructible but almost always empty")
-        self.assertEqual(verdicts(self.agg(0.9, leak=1))["g3"]["conditions"]["recent"]["verdict"], "construction failed")
-        self.assertEqual(verdicts(self.agg(0.9, songs_ok=9))["g3"]["conditions"]["recent"]["verdict"], "construction failed")
+    def verdict(self, *a, **k):
+        return verdicts(self.agg(*a, **k))["g3"]["conditions"]["sounding"]["verdict"]
+
+    def test_floor_is_judged_on_raw_counts_not_the_rounded_ratio(self):
+        self.assertEqual(self.agg(2499)["rules"]["g3"]["online"]["lead1beat"]["sounding"]["nonempty_ratio"], 0.1)  # .09996 shown as .1
+        self.assertEqual(self.verdict(2499), "constructible but almost always empty")       # just below
+        self.assertEqual(self.verdict(2500), "causal pairs constructible")                  # exactly the floor
+        self.assertEqual(self.verdict(2501), "causal pairs constructible")                  # just above
+        self.assertEqual(self.verdict(0, targets=0), "constructible but almost always empty")
+
+    def test_construction_failures(self):
+        self.assertEqual(self.verdict(20000, leak=1), "construction failed")
+        self.assertEqual(self.verdict(20000, songs_ok=9), "construction failed")
+
+    def test_exploratory_counts_carry_no_verdict(self):
+        cc = check_counts(self.agg(2500))["g3"]
+        self.assertNotIn("verdict", cc)
+        self.assertNotIn("construction_ok", cc)
 
 
 if __name__ == "__main__":

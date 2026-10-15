@@ -95,6 +95,40 @@ class RecentConditionTest(unittest.TestCase):
         self.assertEqual(ids(recent_condition(notes, roles, 50)), [0, 1])
 
 
+class BoundaryTest(unittest.TestCase):
+    """Window ends and releases exactly at d, checked on the batch functions and the replay alike."""
+
+    def both(self, notes, name, d):
+        roles = RULES[name](notes)
+        (snd, rec), = replay(notes, name, [d])
+        self.assertEqual(sorted(snd), ids(online_condition(notes, roles, d)))
+        self.assertEqual(sorted(rec), ids(recent_condition(notes, roles, d)))
+        return ids(online_condition(notes, roles, d))
+
+    def test_top50_window_end(self):
+        notes = [Note(0, 48, 1000, 3000), Note(1, 64, 1010, 3000)]            # window [1000, 1050)
+        self.assertEqual(self.both(notes, "top50", 1049.999), [])
+        self.assertEqual(self.both(notes, "top50", 1050), [0])
+        self.assertEqual(self.both(notes, "top50", 1050.001), [0])
+
+    def test_top50_note_at_the_window_end_starts_a_new_group(self):
+        notes = [Note(0, 48, 1000, 3000), Note(1, 64, 1050, 3000)]
+        roles = assign_top50(notes)
+        self.assertEqual((roles[0].role, roles[1].role), ("excluded", "target"))   # each alone, 48 below G3
+        self.assertEqual(self.both(notes, "top50", 1200), [])
+
+    def test_grid300_window_end(self):
+        notes = [Note(0, 45, 610, 3000), Note(1, 48, 620, 3000), Note(2, 67, 630, 3000)]   # window [600, 900)
+        self.assertEqual(self.both(notes, "grid300", 899.999), [])
+        self.assertEqual(self.both(notes, "grid300", 900), [0, 1])
+        self.assertEqual(self.both(notes, "grid300", 900.001), [0, 1])
+
+    def test_release_exactly_at_d_is_gone_and_after_d_is_sounding(self):
+        notes = [Note(0, 48, 0, 500), Note(1, 50, 0, 500.001)]
+        self.assertEqual(self.both(notes, "g3", 500), [1])                      # off == d: released; off > d: sounding
+        self.assertEqual(self.both(notes, "g3", 500.001), [])
+
+
 class ReplayTest(unittest.TestCase):
     def test_replay_matches_batch_on_fixtures(self):
         notes = [Note(0, 48, 0, 1000), Note(1, 52, 20, 1000), Note(2, 64, 40, 1000), Note(3, 67, 60, 1000),

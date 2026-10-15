@@ -32,18 +32,19 @@ import statistics
 import subprocess
 import sys
 import time
+from fractions import Fraction
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from lh_role_proxy import (GRID_MIN, GRID_MS, GROUP_MS, INF, LEAD_MS, RECENT_MS, RULES, SPLIT_PITCH, Note,  # noqa: E402
                            offline_condition, online_condition, prefix_view, recent_condition, replay)
 
-LEADS = {"lead0": 0.0, "lead1beat": LEAD_MS}
+LEADS = {"lead0": 0.0, "lead1beat": LEAD_MS}   # per-note ideal decision time d = onset - L, not the runtime block snapshot
 CONDS = ("sounding", "recent")
 PREFIX_SAMPLES = 64              # targets per song and rule for the prefix / suffix checks (evenly spaced)
 DONOR_SPAN_MS = 30_000.0         # the replacement future: the next song's first 30 s, starting 1 us after d
 DONOR_ID_BASE = 10_000_000
-NONEMPTY_FLOOR = 0.10            # sanity floor at lead1beat: below it the pairs are "almost always unconditioned"
+NONEMPTY_FLOOR = Fraction(1, 10)  # sanity floor at lead1beat, judged on the raw counts (rounded ratios are display only)
 DUP_MS = 1.0
 
 
@@ -310,24 +311,36 @@ def groups(results, meta, key):
     return {g: {k: {"songs": v[2], "targets": v[0], "nonempty_ratio": ratio(v[1], v[0])} for k, v in d.items()} for g, d in out.items()}
 
 
-def verdicts(agg):
-    """Registered decision (CAUSAL_LH_AUDIT.md): per rule, construction = data intact + online leaks 0 + replay,
-    prefix and suffix checks 0; per rule and condition, non-degenerate = pooled lead1beat nonempty >= floor."""
-    data_ok = agg["songs_ok"] == agg["songs"] and agg.get("note_count_mismatch", 0) == 0
+def check_counts(agg):
+    """The raw check numbers per rule. The exploratory stratum reports only these (no eligibility verdict)."""
     out = {}
     for rule, t in agg["rules"].items():
         on = [t["online"][ln][c] for ln in LEADS for c in CONDS]
-        leaks = {k: sum(s[k] for s in on) for k in ("K1", "K2", "K3")}
-        inv = t["invariance"]
-        construct = (data_ok and not any(leaks.values()) and sum(s["replay_mismatch"] for s in on) == 0
-                     and inv["prefix_mismatch"] == 0 and inv["prefix_finite_off_exposed"] == 0 and inv["suffix_mismatch"] == 0)
-        out[rule] = {"data_ok": data_ok, "online_leaks": leaks, "replay_mismatch": sum(s["replay_mismatch"] for s in on),
-                     **inv, "construction_ok": construct, "conditions": {}}
+        out[rule] = {"online_leaks": {k: sum(s[k] for s in on) for k in ("K1", "K2", "K3")},
+                     "replay_mismatch": sum(s["replay_mismatch"] for s in on), **t["invariance"]}
+    return out
+
+
+def nondegenerate(nonempty, targets):
+    return targets > 0 and Fraction(nonempty, targets) >= NONEMPTY_FLOOR
+
+
+def verdicts(agg):
+    """Registered decision (CAUSAL_LH_AUDIT.md), main stratum only: per rule, construction = data intact + online
+    leaks 0 + replay, prefix and suffix checks 0; per rule and condition, non-degenerate = pooled lead1beat
+    nonempty / targets >= floor on the raw counts."""
+    data_ok = agg["songs_ok"] == agg["songs"] and agg.get("note_count_mismatch", 0) == 0
+    out = {}
+    for rule, cc in check_counts(agg).items():
+        construct = (data_ok and not any(cc["online_leaks"].values()) and cc["replay_mismatch"] == 0
+                     and cc["prefix_mismatch"] == 0 and cc["prefix_finite_off_exposed"] == 0 and cc["suffix_mismatch"] == 0)
+        out[rule] = {"data_ok": data_ok, **cc, "construction_ok": construct, "conditions": {}}
         for c in CONDS:
-            ne = t["online"]["lead1beat"][c]["nonempty_ratio"]
-            nondeg = ne is not None and ne >= NONEMPTY_FLOOR
-            out[rule]["conditions"][c] = {"lead1beat_nonempty_ratio": ne, "nondegenerate": nondeg,
-                                          "verdict": ("causal pairs constructible" if construct and nondeg else
+            st = agg["rules"][rule]["online"]["lead1beat"][c]
+            nd = nondegenerate(st["nonempty"], st["targets"])
+            out[rule]["conditions"][c] = {"lead1beat_nonempty": st["nonempty"], "lead1beat_targets": st["targets"],
+                                          "lead1beat_nonempty_ratio_display": st["nonempty_ratio"], "nondegenerate": nd,
+                                          "verdict": ("causal pairs constructible" if construct and nd else
                                                       "constructible but almost always empty" if construct else "construction failed")}
     return out
 
@@ -380,7 +393,9 @@ def main() -> None:
                       "raw_targets": raw_path, "raw_targets_sha256": None},
               "params": {"split_pitch": SPLIT_PITCH, "group_ms": GROUP_MS, "grid_ms": GRID_MS, "grid_min": GRID_MIN, "leads_ms": LEADS,
                          "recent_ms": RECENT_MS, "prefix_samples": PREFIX_SAMPLES, "donor_span_ms": DONOR_SPAN_MS,
-                         "nonempty_floor": NONEMPTY_FLOOR, "dup_ms": DUP_MS, "units": "ms from pretty_midi seconds x 1000 (tempo map applied)"},
+                         "nonempty_floor": str(NONEMPTY_FLOOR), "dup_ms": DUP_MS,
+                         "lead_semantics": "per-note ideal decision time d = target onset - L (diagnostic); the runtime block "
+                                           "snapshot (now = t0 + k*937.5) is not verified here (#1750 review M2)", "units": "ms from pretty_midi seconds x 1000 (tempo map applied)"},
               "strata": {}}
     for st in ("main", "afable"):
         rs = [r for r in results if r["stratum"] == st]
@@ -396,17 +411,21 @@ def main() -> None:
                                           **{f"{c}_lead1beat_nonempty": ratio(r["rules"][rule]["online"]["lead1beat"][c]["nonempty"],
                                                                               r["rules"][rule]["online"]["lead1beat"][c]["targets"]) for c in CONDS}}
                                    for rule in RULES} if r["error"] is None else {})} for r in rs]
-        agg["verdicts"] = verdicts(agg)
-        if st == "afable":
-            agg["note"] = "exploratory stress stratum: never pooled with the main stratum, never used for reference selection or style validation"
+        if st == "main":
+            agg["verdicts"] = verdicts(agg)
+        else:
+            agg["checks"] = check_counts(agg)
+            agg["note"] = ("exploratory stress stratum: check numbers and statistics only, no eligibility verdict; never pooled "
+                           "with the main stratum, never used for reference selection or style validation")
         report["strata"][st] = agg
     report["run"]["raw_targets_sha256"] = sha256_file(raw_path)
     report["run"]["seconds"] = round(time.time() - t0, 1)
     os.makedirs(os.path.dirname(os.path.abspath(report_path)), exist_ok=True)
     with open(report_path, "w") as f:
         json.dump(report, f, ensure_ascii=False, indent=1)
-    for st, agg in report["strata"].items():
-        print(st, json.dumps({rule: {c: v["conditions"][c]["verdict"] for c in CONDS} for rule, v in agg["verdicts"].items()}, ensure_ascii=False))
+    main_v = report["strata"]["main"]["verdicts"]
+    print("main", json.dumps({rule: {c: v["conditions"][c]["verdict"] for c in CONDS} for rule, v in main_v.items()}, ensure_ascii=False))
+    print("afable checks", json.dumps(report["strata"]["afable"]["checks"], ensure_ascii=False))
 
 
 if __name__ == "__main__":
