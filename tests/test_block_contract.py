@@ -9,7 +9,9 @@ import unittest
 
 HERE = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(HERE, "..", "scripts"))
-from block_contract import BEAT, BLOCK, PREBUFFER_LEAD_MS, WORST_LEAD_MS, block_of, horizon, snapshot  # noqa: E402
+from block_contract import (BEAT, BLOCK, PREBUFFER_LEAD_MS, WORST_LEAD_MS, block_of, block_start, horizon,  # noqa: E402
+                            must_regenerate, snapshot)
+from lh_role_proxy import INF, Note, assign_g3, online_condition, recent_condition  # noqa: E402
 from stream_contract import SEGMENT_MS, TokenStream  # noqa: E402
 
 
@@ -82,6 +84,54 @@ class CommitWalkTest(unittest.TestCase):
         self.assertIsNone(block_of(99.9, 100))
         self.assertIsNone(snapshot(99.9, 100))
         self.assertEqual(block_of(100, 100), 0)
+
+
+class RegenerationRuleTest(unittest.TestCase):
+    """The rollback rule compares the whole condition representation, not input events (#1755 review M1)."""
+
+    def test_recent_window_expiry_needs_regeneration_without_any_new_event(self):
+        notes = [Note(0, 40, 500, 600)]                       # g3 condition note, released long before block 2
+        roles = assign_g3(notes)
+        s1, s2 = block_start(1, 0), block_start(2, 0)         # 937.5, 1875
+        events = [t for n in notes for t in (n.on, n.off, roles[n.nid].available_at) if s1 < t <= s2]
+        self.assertEqual(events, [])                          # an event-only rule sees no change here
+
+        def recent_ids(s):
+            return frozenset(n.nid for n in recent_condition(notes, roles, s))
+        self.assertEqual((recent_ids(s1), recent_ids(s2)), (frozenset({0}), frozenset()))
+        self.assertTrue(must_regenerate(2, 0, recent_ids))
+
+    def test_an_age_feature_changes_the_representation_of_the_same_held_note(self):
+        notes = [Note(0, 40, 500, INF)]                       # still held: the sounding set stays {0}
+        roles = assign_g3(notes)
+
+        def ids(s):
+            return frozenset(n.nid for n in online_condition(notes, roles, s))
+
+        def ids_and_age(s):
+            return frozenset((n.nid, int((s - n.on) // BEAT)) for n in online_condition(notes, roles, s))
+        self.assertFalse(must_regenerate(2, 0, ids))
+        self.assertTrue(must_regenerate(2, 0, ids_and_age))
+
+    def test_block_zero_has_nothing_to_drop(self):
+        self.assertFalse(must_regenerate(0, 0, lambda s: s))
+
+
+class ColdBlockTest(unittest.TestCase):
+    """Block 0 observes no later than t0 - 1000 ms. For the audited phases that is before 0 (#1755 review Q2)."""
+
+    def test_cold_conditions_are_empty_for_the_audited_phases(self):
+        rng = random.Random(2)
+        notes = [Note(i, rng.randint(30, 90), on, on + rng.choice([50.0, 400.0, INF]))
+                 for i, on in enumerate(sorted(rng.uniform(0, 3000) for _ in range(300)))]
+        roles = assign_g3(notes)
+        for t0 in (0.0, BLOCK / 4, BLOCK / 2, 3 * BLOCK / 4):
+            self.assertLess(block_start(0, t0), 0)
+            cold = [n for n in notes if block_of(n.on, t0) == 0]
+            self.assertTrue(cold)
+            for n in cold:
+                d = snapshot(n.on, t0)
+                self.assertEqual((online_condition(notes, roles, d), recent_condition(notes, roles, d)), ([], []))
 
 
 if __name__ == "__main__":

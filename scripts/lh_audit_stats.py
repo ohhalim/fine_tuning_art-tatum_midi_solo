@@ -16,7 +16,8 @@ The offline shortcut (notes sounding at the target onset) is measured, not used.
 
 Decision sets: "ideal" (default, #1750): d = onset - 0 and onset - 1 beat. "runtime_block" (#1754,
 docs/experiments/BLOCK_SNAPSHOT_LH_AUDIT.md): d = the block snapshot of scripts/block_contract.py at four block phases,
-plus the phase-free worst lead (onset - 1406.25 ms). Onsets before t0 (the primer) are left out of that decision.
+plus a fixed-delay diagnostic at the largest warm gap (onset - 1406.25 ms). Onsets before t0 (the primer) are left out
+of that decision. Targets of the cold block 0 are also counted on their own (cold vs warm, #1755 review Q2).
 
 Main stratum: the manifest's train songs only (val/test are never opened). A Fable: separate exploratory stratum.
 """
@@ -41,7 +42,7 @@ from fractions import Fraction
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from block_contract import BEAT, BLOCK, PREBUFFER_LEAD_MS, WORST_LEAD_MS  # noqa: E402
+from block_contract import BEAT, BLOCK, PREBUFFER_LEAD_MS, WORST_LEAD_MS, block_of  # noqa: E402
 from block_contract import snapshot as block_snapshot  # noqa: E402
 from lh_role_proxy import (GRID_MIN, GRID_MS, GROUP_MS, INF, LEAD_MS, RECENT_MS, RULES, SPLIT_PITCH, Note,  # noqa: E402
                            offline_condition, online_condition, prefix_view, recent_condition, replay)
@@ -55,6 +56,11 @@ NONEMPTY_FLOOR = Fraction(1, 10)  # sanity floor at lead1beat, judged on the raw
 DUP_MS = 1.0
 FABLE_SONGS = 13                 # A Fable track count, registered; a different count stops the run
 PHASES = (0.0, BLOCK / 4, BLOCK / 2, 3 * BLOCK / 4)   # t0 of the block grid inside a song (#1754)
+# Every cold snapshot (t0 - 1000 ms) is then before 0, so with onsets >= 0 a cold target's condition is empty. The audit
+# counts cold targets and cold nonempty conditions on their own; a nonempty cold condition breaks construction (review Q2).
+assert max(PHASES) < PREBUFFER_LEAD_MS
+CONSTRUCTIBLE = {"ideal": "causal pairs constructible",
+                 "runtime_block": "causal pairs constructible under the proposed block contract"}   # rollback rule not built (Q3)
 
 
 def decision_set(name):
@@ -66,6 +72,14 @@ def decision_set(name):
         ds["lead_worst"] = lambda t: t - WORST_LEAD_MS
         return ds, tuple(f"block_p{i}" for i in range(len(PHASES)))
     raise ValueError(name)
+
+
+def cold_rule(ln):
+    """For a block decision: onset -> True when the cold block 0 commits it. None for every other decision."""
+    if not ln.startswith("block_p"):
+        return None
+    t0 = PHASES[int(ln[len("block_p"):])]
+    return lambda t: block_of(t, t0) == 0
 
 
 def list_midi(root):
@@ -234,6 +248,14 @@ def audit_song(job):
         if set_name != "ideal":
             r["primer_excluded"] = {ln: sum(1 for t in targets if (ln, t.nid) not in dmap) for ln in decisions}
             r["lead_ms"] = {ln: [t.on - dmap[(ln, t.nid)] for t in targets if (ln, t.nid) in dmap] for ln in decisions}
+            r["cold"] = {}
+            for ln in decisions:
+                is_cold = cold_rule(ln)
+                if is_cold is None:
+                    continue
+                cold = [t for t in targets if (ln, t.nid) in dmap and is_cold(t.on)]
+                r["cold"][ln] = {c: {"targets": len(cold), "nonempty": sum(bool(cache[(ln, t.nid)][i]) for t in cold)}
+                                 for i, c in enumerate(CONDS)}
             for t in targets:
                 row = [job["stratum"], job["idx"], rule_name, t.nid, round(t.on, 3), t.pitch]
                 for ln in decisions:
@@ -344,6 +366,17 @@ def aggregate(results, label, names=tuple(LEADS)):
         if rr and "primer_excluded" in rr[0]:
             tab["primer_excluded"] = {ln: sum(x["primer_excluded"][ln] for x in rr) for ln in names}
             tab["time_lead_ms"] = {ln: dist([v for x in rr for v in x["lead_ms"][ln]]) for ln in names}
+        if rr and "cold" in rr[0]:
+            tab["cold"], tab["warm"] = {}, {}
+            for ln in rr[0]["cold"]:
+                tab["cold"][ln], tab["warm"][ln] = {}, {}
+                for c in CONDS:
+                    ct = sum(x["cold"][ln][c]["targets"] for x in rr)
+                    cn = sum(x["cold"][ln][c]["nonempty"] for x in rr)
+                    on = tab["online"][ln][c]
+                    tab["cold"][ln][c] = {"targets": ct, "nonempty": cn}
+                    tab["warm"][ln][c] = {"targets": on["targets"] - ct, "nonempty": on["nonempty"] - cn,
+                                          "nonempty_ratio": ratio(on["nonempty"] - cn, on["targets"] - ct)}
         agg["rules"][rule] = tab
     return agg
 
@@ -372,6 +405,8 @@ def check_counts(agg):
         on = [t["online"][ln][c] for ln in t["online"] for c in CONDS]
         out[rule] = {"online_leaks": {k: sum(s[k] for s in on) for k in ("K1", "K2", "K3")},
                      "replay_mismatch": sum(s["replay_mismatch"] for s in on), **t["invariance"]}
+        if "cold" in t:
+            out[rule]["cold_nonempty"] = sum(t["cold"][ln][c]["nonempty"] for ln in t["cold"] for c in CONDS)
     return out
 
 
@@ -379,15 +414,17 @@ def nondegenerate(nonempty, targets):
     return targets > 0 and Fraction(nonempty, targets) >= NONEMPTY_FLOOR
 
 
-def verdicts(agg, judged=("lead1beat",)):
+def verdicts(agg, judged=("lead1beat",), constructible=CONSTRUCTIBLE["ideal"]):
     """Registered decision (CAUSAL_LH_AUDIT.md, BLOCK_SNAPSHOT_LH_AUDIT.md), main stratum only: per rule,
-    construction = data intact + online leaks 0 + replay, prefix and suffix checks 0 (all decisions); per rule and
-    condition, non-degenerate = pooled nonempty / targets >= floor on the raw counts at every judged decision."""
+    construction = data intact + online leaks 0 + replay, prefix and suffix checks 0 (all decisions) + no nonempty
+    cold condition (block decisions only); per rule and condition, non-degenerate = pooled nonempty / targets >= floor
+    on the raw counts at every judged decision."""
     data_ok = agg["songs_ok"] == agg["songs"] and agg.get("note_count_mismatch", 0) == 0
     out = {}
     for rule, cc in check_counts(agg).items():
         construct = (data_ok and not any(cc["online_leaks"].values()) and cc["replay_mismatch"] == 0
-                     and cc["prefix_mismatch"] == 0 and cc["prefix_finite_off_exposed"] == 0 and cc["suffix_mismatch"] == 0)
+                     and cc["prefix_mismatch"] == 0 and cc["prefix_finite_off_exposed"] == 0 and cc["suffix_mismatch"] == 0
+                     and cc.get("cold_nonempty", 0) == 0)
         out[rule] = {"data_ok": data_ok, **cc, "construction_ok": construct, "conditions": {}}
         for c in CONDS:
             row, nd = {}, True
@@ -397,7 +434,7 @@ def verdicts(agg, judged=("lead1beat",)):
                             f"{dn}_nonempty_ratio_display": st["nonempty_ratio"]})
                 nd = nd and nondegenerate(st["nonempty"], st["targets"])
             out[rule]["conditions"][c] = {**row, "nondegenerate": nd,
-                                          "verdict": ("causal pairs constructible" if construct and nd else
+                                          "verdict": (constructible if construct and nd else
                                                       "constructible but almost always empty" if construct else "construction failed")}
     return out
 
@@ -480,12 +517,15 @@ def main() -> None:
         report["params"].pop("leads_ms")
         report["params"]["decision_set"] = set_name
         report["params"]["decisions"] = {**{f"block_p{i}": f"block snapshot (block_contract.snapshot) with t0 = {p} ms" for i, p in enumerate(PHASES)},
-                                         "lead_worst": f"onset - {WORST_LEAD_MS} ms (phase-free bound for blocks k >= 1)"}
+                                         "lead_worst": f"onset - {WORST_LEAD_MS} ms: fixed-delay diagnostic at the largest gap of warm "
+                                                       "blocks (k >= 1). Not a lower bound of any phase's coverage (conditions are "
+                                                       "not monotone in d) and not a model of the cold block 0"}
         report["params"]["judged"] = list(judged)
         report["params"].update({"block_ms": BLOCK, "beat_ms": BEAT, "prebuffer_lead_ms": PREBUFFER_LEAD_MS, "worst_lead_ms": WORST_LEAD_MS})
-        report["params"]["lead_semantics"] = ("runtime block snapshot contract (#1754): block k >= 1 observes at t0 + k*B and commits "
-                                              "onsets in [t0 + k*B + beat, t0 + (k+1)*B + beat); block 0 observes at t0 - 1000 ms; "
-                                              "requires rollback whenever the condition state changed between snapshots")
+        report["params"]["lead_semantics"] = ("proposed runtime block snapshot contract (#1754): block k >= 1 observes at t0 + k*B and "
+                                              "commits onsets in [t0 + k*B + beat, t0 + (k+1)*B + beat); block 0 observes no later than "
+                                              "t0 - 1000 ms (an upper bound); requires regeneration whenever the whole condition "
+                                              "representation at a block start differs from the previous one (not implemented)")
     for st in ("main", "afable"):
         rs = [r for r in results if r["stratum"] == st]
         agg = aggregate(rs, st, names)
@@ -503,7 +543,7 @@ def main() -> None:
                                              for dn in judged for c in CONDS}}
                                    for rule in RULES} if r["error"] is None else {})} for r in rs]
         if st == "main":
-            agg["verdicts"] = verdicts(agg, judged)
+            agg["verdicts"] = verdicts(agg, judged, CONSTRUCTIBLE[set_name])
         else:
             agg["checks"] = check_counts(agg)
             agg["note"] = ("exploratory stress stratum: check numbers and statistics only, no eligibility verdict; never pooled "

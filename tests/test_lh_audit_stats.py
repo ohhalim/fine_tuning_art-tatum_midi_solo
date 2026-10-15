@@ -9,8 +9,9 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 import pretty_midi  # noqa: E402
 
-from lh_audit_stats import (CONDS, LEADS, PHASES, aggregate, audit_song, check_counts, decision_set,  # noqa: E402
-                            future_release_drops, leak_counts, list_midi, load_notes, sha1_file, verdicts, write_rows)
+from lh_audit_stats import (CONDS, CONSTRUCTIBLE, LEADS, PHASES, aggregate, audit_song, check_counts,  # noqa: E402
+                            decision_set, future_release_drops, leak_counts, list_midi, load_notes, sha1_file, verdicts,
+                            write_rows)
 from lh_role_proxy import LEAD_MS, Note, assign_g3  # noqa: E402
 
 
@@ -206,6 +207,37 @@ class RuntimeBlockSetTest(unittest.TestCase):
         st = agg["rules"]["g3"]["online"]["block_p2"]["sounding"]
         st["nonempty"] = st["targets"] // 20                                          # one phase below the floor
         self.assertEqual(verdicts(agg, judged)["g3"]["conditions"]["sounding"]["verdict"], "constructible but almost always empty")
+
+    def agg(self):
+        r = {k: v for k, v in self.res.items() if k != "rows"}
+        agg = aggregate([r], "main", tuple(decision_set("runtime_block")[0]))
+        agg["note_count_mismatch"] = 0
+        return agg
+
+    def test_cold_and_warm_are_counted_apart(self):
+        agg = self.agg()
+        t = agg["rules"]["g3"]
+        self.assertEqual(set(t["cold"]), set(PHASES_NAMES))                          # no cold split for lead_worst
+        for ln in PHASES_NAMES:
+            for c in CONDS:
+                cold, warm, on = t["cold"][ln][c], t["warm"][ln][c], t["online"][ln][c]
+                self.assertGreater(cold["targets"], 0)
+                self.assertEqual(cold["nonempty"], 0)                                 # cold snapshot < 0: nothing observed
+                self.assertEqual((cold["targets"] + warm["targets"], warm["nonempty"]), (on["targets"], on["nonempty"]))
+        self.assertEqual(check_counts(agg)["g3"]["cold_nonempty"], 0)
+
+    def test_runtime_verdict_says_it_is_under_the_proposed_contract(self):
+        agg = self.agg()
+        judged = decision_set("runtime_block")[1]
+        v = verdicts(agg, judged, CONSTRUCTIBLE["runtime_block"])["g3"]
+        self.assertEqual(v["conditions"]["sounding"]["verdict"], "causal pairs constructible under the proposed block contract")
+        agg["rules"]["g3"]["cold"]["block_p1"]["recent"]["nonempty"] = 1               # a cold condition saw something
+        v = verdicts(agg, judged, CONSTRUCTIBLE["runtime_block"])["g3"]
+        self.assertFalse(v["construction_ok"])
+        self.assertEqual(v["conditions"]["sounding"]["verdict"], "construction failed")
+
+
+PHASES_NAMES = tuple(f"block_p{i}" for i in range(len(PHASES)))
 
 
 class WriteRowsTest(unittest.TestCase):
