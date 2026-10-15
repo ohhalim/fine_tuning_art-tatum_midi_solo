@@ -64,10 +64,12 @@ def sha256_file(path):
 
 
 def load_notes(path):
-    """Notes in ms from pretty_midi (tempo map applied). Ids follow (onset, pitch, offset, velocity) order."""
+    """Notes in ms from pretty_midi (tempo map applied). Ids follow (onset, pitch, offset, velocity) order.
+    pretty_midi gives numpy float64 times; they become plain floats (same value) so every count stays a Python int."""
     import pretty_midi
     pm = pretty_midi.PrettyMIDI(path)
-    raw = sorted((x.start * 1000.0, x.pitch, x.end * 1000.0, x.velocity) for ins in pm.instruments if not ins.is_drum for x in ins.notes)
+    raw = sorted((float(x.start) * 1000.0, int(x.pitch), float(x.end) * 1000.0, int(x.velocity))
+                 for ins in pm.instruments if not ins.is_drum for x in ins.notes)
     info = {"instruments": len(pm.instruments), "drum_tracks": sum(1 for i in pm.instruments if i.is_drum),
             "pedal_cc64": sum(1 for i in pm.instruments for c in i.control_changes if c.number == 64),
             "nonpositive_length": sum(1 for on, _, off, _ in raw if off <= on)}
@@ -153,7 +155,7 @@ def audit_song(job):
                     st = r["online"][ln][c]
                     k1, k2, k3, dup = leak_counts(cond, d, roles, target_ids, t)
                     st["targets"] += 1
-                    st["negative_d"] += d < 0
+                    st["negative_d"] += bool(d < 0)
                     st["nonempty"] += bool(cond)
                     st["entries"] += len(cond)
                     st["sizes"].append(len(cond))

@@ -9,8 +9,8 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 import pretty_midi  # noqa: E402
 
-from lh_audit_stats import (CONDS, LEADS, audit_song, check_counts, future_release_drops, leak_counts,  # noqa: E402
-                            sha1_file, verdicts)
+from lh_audit_stats import (CONDS, LEADS, aggregate, audit_song, check_counts, future_release_drops,  # noqa: E402
+                            leak_counts, load_notes, sha1_file, verdicts)
 from lh_role_proxy import LEAD_MS, Note, assign_g3  # noqa: E402
 
 
@@ -90,6 +90,18 @@ class AuditSongTest(unittest.TestCase):
 
     def test_rows_are_one_per_target_and_rule(self):
         self.assertEqual(len(self.res["rows"]), sum(x["targets"] for x in self.res["rules"].values()))
+
+    def test_report_tables_are_json_serializable(self):
+        import copy
+        import json
+        r = copy.deepcopy(self.res)
+        r.pop("rows")
+        agg = aggregate([r], "main")
+        agg["note_count_mismatch"] = 0
+        agg["verdicts"] = verdicts(agg)
+        json.dumps(agg)                                                                     # first run died here (#1750)
+        notes, _ = load_notes(self.a)
+        self.assertIs(type(notes[0].on), float)
 
     def test_sha1_mismatch_is_recorded_not_read(self):
         r = audit_song({"idx": 1, "stratum": "main", "path": self.a, "sha1": "0" * 40, "donor_path": self.b})
