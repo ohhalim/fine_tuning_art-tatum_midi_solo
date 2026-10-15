@@ -5,6 +5,8 @@ Creates a virtual MIDI output, reads the producer's JSON lines from stdin on a r
 music ms -> time.monotonic_ns() via the producer's start message, Scheduler.tick(music now), and each new midi_out entry
 is sent once. Whatever ends the run (end message, EOF when the producer dies, a broken input line, a send error), the
 cleanup turns off what it can and always closes the port and writes the record (Astra review of #1747):
+- an abnormal end (EOF without end, a broken input line) is acted on before the next tick, so a due note-on is not
+  sent after it; a normal end still plays out what is scheduled
 - every remaining note-off is tried once on its own; a failed send is recorded, not retried in a loop
 - a note-on that was not sent before the stop is cancelled and recorded, never sent (no note starts after a stop)
 - the port close and the record write are each guarded, so one failure does not skip the other
@@ -42,6 +44,15 @@ def reader(lines, q):
         q.put({"type": "reader_error", "error": f"{type(e).__name__}: {e}"[:300]})
     finally:
         q.put({"type": "eof"})
+
+
+def drain(q):
+    out = []
+    try:
+        while True:
+            out.append(q.get_nowait())
+    except queue.Empty:
+        return out
 
 
 class Sender:
@@ -100,6 +111,17 @@ class Sender:
                 continue
             self.log["sent"].append({"index": i, "kind": kind, "pitch": pitch, "velocity": vel, "tick_ms": ms, "due_ms": due,
                                      "scheduled_ns": self.scheduled_ns(due), "send_return_ns": self.clock_ns()})
+
+    def process(self, msgs):
+        """One clock-loop iteration (the main loop calls only this): handle the drained input, then tick and send.
+        An abnormal end (EOF without end, broken input) stops before any tick, so no note starts after the stop is
+        known (Astra re-review of #1749); a normal end keeps playing out what is scheduled. Returns True when done."""
+        for m in msgs:
+            self.handle(m)
+        if self.end in ("eof", "reader_error"):
+            return True
+        self.step()
+        return self.done()
 
     def step(self):
         if self.origin is not None:
@@ -165,14 +187,10 @@ def main() -> None:
             time.sleep(0.005)
         last = time.monotonic()
         while True:
-            try:
-                while True:
-                    s.handle(q.get_nowait())
-                    last = time.monotonic()
-            except queue.Empty:
-                pass
-            s.step()
-            if s.done():
+            msgs = drain(q)
+            if msgs:
+                last = time.monotonic()
+            if s.process(msgs):
                 break
             if s.end is None and time.monotonic() - last > IDLE_S:
                 raise RuntimeError(f"no input for {IDLE_S:.0f} s")

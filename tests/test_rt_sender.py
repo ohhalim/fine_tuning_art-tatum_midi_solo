@@ -9,7 +9,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
-from rt_sender import Sender, reader  # noqa: E402
+from rt_sender import Sender, drain, reader  # noqa: E402
 from rt_smoke_run import analyze  # noqa: E402
 
 
@@ -136,6 +136,64 @@ class SenderTest(unittest.TestCase):
         self.assertEqual(log["error"], "JSONDecodeError")
         self.assertEqual(log["end"], "reader_error")
         self.assertEqual(sorted(m[1] for m in port.sent if m[0] == "note_off"), [60, 64])
+
+
+class MainLoopPathTest(unittest.TestCase):
+    """The same path as main(): reader -> queue -> drain -> Sender.process -> cleanup."""
+
+    def run_lines(self, lines, clock_ns, port):
+        clock = Clock()
+        clock.ns = clock_ns
+        s = Sender(port, clock)
+        q = queue.Queue()
+        reader(lines, q)
+        done = s.process(drain(q))
+        return s, done
+
+    def lines(self, tail):
+        return ['{"type": "start", "music_origin_ms": 0, "wall_origin_ns": 0}\n',
+                '{"type": "notes", "block": 0, "notes": [[0, 60, 80, 0, 1000]]}\n'] + tail
+
+    def test_eof_with_a_due_note_starts_no_note(self):
+        port = FakePort()
+        s, done = self.run_lines(self.lines([]), int(10e6), port)       # note due, then EOF without end
+        self.assertTrue(done)
+        log = s.cleanup()
+        self.assertEqual([m for m in port.sent if m[0] == "note_on"], [])
+        self.assertEqual(log["end"], "eof")
+
+    def test_broken_line_with_a_due_note_starts_no_note(self):
+        port = FakePort()
+        s, done = self.run_lines(self.lines(['{"type": "no']), int(10e6), port)
+        self.assertTrue(done)
+        s.cleanup()
+        self.assertEqual([m for m in port.sent if m[0] == "note_on"], [])
+
+    def test_eof_after_a_sounding_note_turns_it_off(self):
+        clock = Clock()
+        port = FakePort()
+        s = Sender(port, clock)
+        q = queue.Queue()
+        reader(self.lines([]), q)
+        msgs = drain(q)
+        eof = msgs.pop()                                                  # deliver start + notes first
+        clock.ns = int(10e6)
+        self.assertFalse(s.process(msgs))                                 # note-on sent
+        self.assertTrue(s.process([eof]))
+        s.cleanup()
+        self.assertEqual(port.sent, [("note_on", 60, 80), ("note_off", 60, 0)])
+
+    def test_normal_end_drains_scheduled_notes(self):
+        clock = Clock()
+        port = FakePort()
+        s = Sender(port, clock)
+        q = queue.Queue()
+        reader(self.lines(['{"type": "end"}\n']), q)
+        clock.ns = int(10e6)
+        self.assertFalse(s.process(drain(q)))                             # end + eof, note still playing
+        clock.ns = int(1500e6)
+        self.assertTrue(s.process([]))
+        self.assertEqual(port.sent, [("note_on", 60, 80), ("note_off", 60, 0)])
 
 
 class AnalyzeTest(unittest.TestCase):
