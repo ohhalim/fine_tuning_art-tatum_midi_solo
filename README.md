@@ -1,5 +1,7 @@
 # 실시간 재즈 MIDI 즉흥연주
 
+> **읽기 전에 (2026-10-15, #1752).** 이 문서의 결과는 **13.4M Music Transformer 시기(~2026-09)**의 것이다. 2026-10의 작업은 **Aria-medium(약 6.6억 파라미터) 기반 실시간 파트너**로 옮겨 갔다. 방향과 리뷰 상태는 [REALTIME_PARTNER_RESEARCH](docs/experiments/REALTIME_PARTNER_RESEARCH.md) 맨 앞에 있다. 최근 실험은 [T3C_ARIA_TIGRAN](docs/experiments/T3C_ARIA_TIGRAN.md), [MEHLDAU_ARIA_LORA](docs/experiments/MEHLDAU_ARIA_LORA.md), [CONTROL_ADAPTER_DESIGN](docs/experiments/CONTROL_ADAPTER_DESIGN.md), [ARIA_MLX_STREAM_LOOP](docs/experiments/ARIA_MLX_STREAM_LOOP.md), [REALTIME_MIDI_SMOKE](docs/experiments/REALTIME_MIDI_SMOKE.md)이다. 아래 수치를 Aria 작업의 결과로 읽지 않는다.
+
 사람이 건반을 치면, 방금 친 것과 코드 진행을 문맥으로 **다음 마디의 재즈 솔로를
 만들어 MIDI 로 내보내는** 로컬 실험 프로젝트입니다. 내보낸 MIDI 를 DAW 악기에
 연결하면 소리가 납니다.
