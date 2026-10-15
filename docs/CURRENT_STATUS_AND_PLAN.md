@@ -1,5 +1,7 @@
 # Current Status and Plan
 
+> **읽기 전에 (2026-10-15, #1752).** 이 문서의 결과는 **13.4M Music Transformer 시기(~2026-09)**의 것이다. 2026-10의 작업은 **Aria-medium(약 6.6억 파라미터) 기반 실시간 파트너**로 옮겨 갔다. 방향과 리뷰 상태는 [REALTIME_PARTNER_RESEARCH](experiments/REALTIME_PARTNER_RESEARCH.md) 맨 앞에 있다. 최근 실험은 [T3C_ARIA_TIGRAN](experiments/T3C_ARIA_TIGRAN.md), [MEHLDAU_ARIA_LORA](experiments/MEHLDAU_ARIA_LORA.md), [CONTROL_ADAPTER_DESIGN](experiments/CONTROL_ADAPTER_DESIGN.md), [ARIA_MLX_STREAM_LOOP](experiments/ARIA_MLX_STREAM_LOOP.md), [REALTIME_MIDI_SMOKE](experiments/REALTIME_MIDI_SMOKE.md)이다. 아래 수치를 Aria 작업의 결과로 읽지 않는다.
+
 작성일: 2026-06-11
 
 최신 로컬 갱신: 2026-06-13

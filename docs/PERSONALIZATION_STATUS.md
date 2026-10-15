@@ -1,5 +1,7 @@
 # 개인화 솔로 모델 현황 — Art Tatum · Brad Mehldau
 
+> **읽기 전에 (2026-10-15, #1752).** 이 문서의 결과는 **13.4M Music Transformer 시기(~2026-09)**의 것이다. 2026-10의 작업은 **Aria-medium(약 6.6억 파라미터) 기반 실시간 파트너**로 옮겨 갔다. 방향과 리뷰 상태는 [REALTIME_PARTNER_RESEARCH](experiments/REALTIME_PARTNER_RESEARCH.md) 맨 앞에 있다. 최근 실험은 [T3C_ARIA_TIGRAN](experiments/T3C_ARIA_TIGRAN.md), [MEHLDAU_ARIA_LORA](experiments/MEHLDAU_ARIA_LORA.md), [CONTROL_ADAPTER_DESIGN](experiments/CONTROL_ADAPTER_DESIGN.md), [ARIA_MLX_STREAM_LOOP](experiments/ARIA_MLX_STREAM_LOOP.md), [REALTIME_MIDI_SMOKE](experiments/REALTIME_MIDI_SMOKE.md)이다. 아래 수치를 Aria 작업의 결과로 읽지 않는다.
+
 작성 2026-09-29. `style_verified: false` · `musical_quality_verified: false` · 청취로 판정한 적 없음
 
 이 문서는 두 연주자 개인화의 최종 상태를 한 곳에 모은 것이다. 근거 수치는 링크한 실험 문서에 있다. 판정 기준은 실험 전에 등록했다. 다만 1차 기준에 미달해 후속 실험을 새로 등록한 경우가 있다(#1531 시작 예산, #1545 블록 지표). 이 경우 1차 미달은 그대로 두고, 후속은 원인 분리 탐색으로만 표시한다.
@@ -25,7 +27,7 @@
 | 성립 템포 (fallback·미스 0) | 128–240 BPM | 128–240 BPM |
 | 근거 | [FINAL_TATUM](experiments/FINAL_TATUM.md) | [MEHLDAU_CLEAN_BASE](experiments/MEHLDAU_CLEAN_BASE.md), [FINAL_MEHLDAU](experiments/FINAL_MEHLDAU.md) |
 
-**"개인화 완료"의 뜻(가능도 수준):** 해당 연주자를 한 번도 보지 않은 base에서 출발해, 그 연주자의 **처음 보는 곡**을 더 잘 예측하게 됐다. 일반 재즈 능력은 거의 잃지 않았고, 검사한 생성 샘플에서 학습곡 exact 16-gram이 나오지 않았으며, 가상 포트 조건에서 실시간으로 돈다. **들리는 스타일은 검증하지 않았다**(§5).
+**"개인화 완료"의 뜻(가능도 수준):** 그 연주자의 대상 곡을 보지 않은 base에서 출발해, 그 연주자의 **처음 보는 곡**을 더 잘 예측하게 됐다. base가 본 범위는 연주자마다 다르다([ARTIST_LEAK_AUDIT](experiments/ARTIST_LEAK_AUDIT.md), #1722). Tatum 공통 base에는 Tatum 곡이 0곡이다(연주자 미노출). 멜다우 base는 스튜디오 18곡을 뺐지만 **라이브 54곡을 학습했다**(스튜디오 곡 미노출, 연주자 노출). 그래서 멜다우 결과로 "연주자를 처음 만난 모델의 적응"을 주장하지 않는다. 일반 재즈 능력은 거의 잃지 않았고, 검사한 생성 샘플에서 학습곡 exact 16-gram이 나오지 않았으며, 가상 포트 조건에서 실시간으로 돈다. **들리는 스타일은 검증하지 않았다**(§5).
 
 ## 2. 쓰는 법
 
