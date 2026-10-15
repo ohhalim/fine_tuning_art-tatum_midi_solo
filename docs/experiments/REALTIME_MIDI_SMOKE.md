@@ -122,3 +122,5 @@
 **회귀:** `tests/test_rt_sender.py` 9개 추가. 전체 46개 통과(송출 계약 33, fill_block 4, 송출기·분석 9)
 - 송출기: 정리 중 off 실패에도 포트 닫힘·기록 반환, 실행 중 실패 이벤트를 정리에서 다시 보내지 않음, 포트 닫기 실패에도 기록 반환, 정상 정리, 정상 end 뒤 EOF 무시, 깨진 줄 → reader_error → EOF, reader_error 시 정리
 - 분석: 한 쌍 통째 누락 검출, 반환 코드 없으면 종료 판정 null
+
+**재리뷰 반영 (아스트라 #1749 재리뷰 MEDIUM):** 정리 단계의 best-effort flush가 남은 off뿐 아니라 아직 안 보낸 note-on까지 보냈다. 같은 tick에서 on60 성공 → on64 실패 → on67 미시도 상태로 정리하면 `[on67, off60, off64, off67]`이 나갔다. 정지 뒤에 새 음이 시작된 것이다. 이제 정리 단계는 안 보낸 note-on을 보내지 않고 `cancelled_unsent_on`에 기록하며, off만 보낸다. 이 경우 `clean_stop = false`이고, 분석의 예상↔송출 비교(A1a)에 실패·취소 수를 함께 적는다. 3음 회귀를 더했다(전체 47개).

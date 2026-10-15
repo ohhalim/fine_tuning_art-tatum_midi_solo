@@ -140,10 +140,13 @@ def analyze(name, d):
         "scheduler_expected_saved": exp is not None,
         "sender": {"end": snd["end"], "error": snd["error"], "port_closed": snd.get("port_closed"), "pending_at_stop": snd["pending_at_stop"],
                    "sounding_at_stop": snd["sounding_at_stop"], "send_failures": len(snd.get("send_failures", [])),
+                   "cancelled_unsent_on": len(snd.get("cancelled_unsent_on", [])),
                    "clean_stop": snd.get("clean_stop"), "dropped_velocity0": snd["dropped_velocity0"],
                    "extended_zero_length": snd["extended_zero_length"], "blocks_received": len(snd["received_blocks"])},
         "checks": {
-            "A1a_scheduler_expected_equals_sent": cmp(exp, sent) if exp is not None else {"ok": None, "reason": "expected MIDI stream not saved in this run"},
+            "A1a_scheduler_expected_equals_sent": ({**cmp(exp, sent), "send_failures": len(snd.get("send_failures", [])),
+                                                    "cancelled_unsent_on": len(snd.get("cancelled_unsent_on", []))}
+                                                   if exp is not None else {"ok": None, "reason": "expected MIDI stream not saved in this run"}),
             "A1b_sent_equals_capture": cmp(sent, got3),
             "A2_capture_alternates_per_pitch": {"ok": alternates([g[:2] for g in got])},
             "A3_logical_on_off_pairs": {"ok": len({x[2] for x in ons}) == len(ons) and sorted(x[2] for x in ons) == sorted(x[2] for x in offs),

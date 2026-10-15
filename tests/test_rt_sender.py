@@ -69,6 +69,21 @@ class SenderTest(unittest.TestCase):
         self.assertTrue(port.closed)
         self.assertFalse(log["clean_stop"])
 
+    def test_cleanup_cancels_unsent_note_on_and_sends_only_offs(self):
+        clock = Clock()
+        port = FakePort(fail=lambda m: m == ("note_on", 64, 80))
+        s = Sender(port, clock)
+        s.handle({"type": "start", "music_origin_ms": 0, "wall_origin_ns": 0})
+        s.handle({"type": "notes", "block": 0, "notes": [[0, 60, 80, 0, 1000], [1, 64, 80, 0, 1000], [2, 67, 80, 0, 1000]]})
+        clock.ns = int(10e6)
+        with self.assertRaises(OSError):
+            s.step()                                     # on60 sent, on64 failed, on67 not tried
+        port.tries.clear()
+        log = s.cleanup()
+        self.assertEqual(port.tries, [("note_off", 60, 0), ("note_off", 64, 0), ("note_off", 67, 0)])
+        self.assertEqual([c["pitch"] for c in log["cancelled_unsent_on"]], [67])
+        self.assertFalse(log["clean_stop"])
+
     def test_close_failure_still_returns_record(self):
         clock = Clock()
         port = FakePort()

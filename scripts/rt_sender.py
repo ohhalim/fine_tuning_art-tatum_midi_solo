@@ -5,7 +5,8 @@ Creates a virtual MIDI output, reads the producer's JSON lines from stdin on a r
 music ms -> time.monotonic_ns() via the producer's start message, Scheduler.tick(music now), and each new midi_out entry
 is sent once. Whatever ends the run (end message, EOF when the producer dies, a broken input line, a send error), the
 cleanup turns off what it can and always closes the port and writes the record (Astra review of #1747):
-- every remaining MIDI event is tried once on its own; a failed send is recorded, not retried in a loop
+- every remaining note-off is tried once on its own; a failed send is recorded, not retried in a loop
+- a note-on that was not sent before the stop is cancelled and recorded, never sent (no note starts after a stop)
 - the port close and the record write are each guarded, so one failure does not skip the other
 - if any note-off failed, the record says the stop was not clean (silence is not claimed)
 
@@ -50,7 +51,7 @@ class Sender:
         self.origin = None                 # (music_origin_ms, wall_origin_ns)
         self.sent_upto = 0
         self.end = None                    # "end" | "eof" | "reader_error"
-        self.log = {"sent": [], "send_failures": [], "received_blocks": [], "scheduled_notes": 0, "dropped_velocity0": 0,
+        self.log = {"sent": [], "send_failures": [], "cancelled_unsent_on": [], "received_blocks": [], "scheduled_notes": 0, "dropped_velocity0": 0,
                     "extended_zero_length": 0, "end": None, "error": None, "origin": None}
 
     def music_now(self):
@@ -79,14 +80,17 @@ class Sender:
             self.end = t                   # an eof after a normal end is the producer exiting: ignored
 
     def flush(self, best_effort=False):
-        """Send midi_out entries not sent yet, once each. Normal mode raises on a failed send (the run stops);
-        best_effort records the failure and goes on with the next event."""
+        """Send midi_out entries not sent yet, once each. Normal mode raises on a failed send (the run stops).
+        best_effort (cleanup after the stop) cancels unsent note-ons, records failed note-offs and goes on."""
         while self.sent_upto < len(self.sch.midi_out):
             i = self.sent_upto
             self.sent_upto += 1            # never retry the same event
             ms, kind, pitch, vel = self.sch.midi_out[i]
             due = self.sch.midi_due[i]
             msg_on = kind == "on"
+            if best_effort and msg_on:
+                self.log["cancelled_unsent_on"].append({"index": i, "pitch": pitch})
+                continue
             try:
                 self.port.send(("note_on", pitch, vel) if msg_on else ("note_off", pitch, 0))
             except Exception as e:
@@ -126,8 +130,8 @@ class Sender:
                 self.log["port_closed"] = False
                 self.log["close_error"] = f"{type(e).__name__}: {e}"[:200]
         self.log["end"] = self.end
-        self.log["clean_stop"] = (not self.log["send_failures"] and self.log.get("port_closed") is True
-                                  and "cleanup_error" not in self.log)
+        self.log["clean_stop"] = (not self.log["send_failures"] and not self.log["cancelled_unsent_on"]
+                                  and self.log.get("port_closed") is True and "cleanup_error" not in self.log)
         self.log["expected_midi"] = [[k, p, v, d] for (_, k, p, v), d in zip(self.sch.midi_out, self.sch.midi_due)]
         self.log["logical_sent"] = self.sch.sent
         return self.log
