@@ -1,5 +1,7 @@
 # Docs Index
 
+> **읽기 전에 (2026-10-15, #1752).** 이 문서의 결과는 **13.4M Music Transformer 시기(~2026-09)**의 것이다. 2026-10의 작업은 **Aria-medium(약 6.6억 파라미터) 기반 실시간 파트너**로 옮겨 갔다. 방향과 리뷰 상태는 [REALTIME_PARTNER_RESEARCH](experiments/REALTIME_PARTNER_RESEARCH.md) 맨 앞에 있다. 최근 실험은 [T3C_ARIA_TIGRAN](experiments/T3C_ARIA_TIGRAN.md), [MEHLDAU_ARIA_LORA](experiments/MEHLDAU_ARIA_LORA.md), [CONTROL_ADAPTER_DESIGN](experiments/CONTROL_ADAPTER_DESIGN.md), [ARIA_MLX_STREAM_LOOP](experiments/ARIA_MLX_STREAM_LOOP.md), [REALTIME_MIDI_SMOKE](experiments/REALTIME_MIDI_SMOKE.md)이다. 아래 수치를 Aria 작업의 결과로 읽지 않는다.
+
 작성일: 2026-05-20
 
 이 디렉터리는 현재 jazz piano MIDI fine-tuning probe를 진행하기 위한 기준 문서만 전면에 둔다. 백엔드/API/ERD/제품 MVP 문서는 `docs/archive/`로 이동했다.
