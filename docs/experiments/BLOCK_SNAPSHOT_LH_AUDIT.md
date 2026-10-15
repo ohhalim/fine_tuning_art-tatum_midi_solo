@@ -60,8 +60,9 @@
 - **계약 ↔ producer 대조**(`tests/test_block_contract.py`): 무작위 onset으로 실제 `TokenStream.commit_until`을 producer의 horizon 순서대로 불렀을 때, 블록마다 확정된 음이 `block_of()`와 같다(t0 다섯 가지). 상수와 산식은 `rt_producer.py`·`aria_mlx_stream_loop.py` 원문과 대조한다. horizon과 같은 onset은 다음 블록이다
 - **변형 시험 4/4 검출:** floor 대신 ceil, 1박 빼기 누락, prebuffer 관측을 t0로 둠, primer 포함
 - **결정 묶음 시험**(`tests/test_lh_audit_stats.py`): 다섯 결정 모두 누출·불일치 0, primer 제외 수, onset − d 범위, 행 형식, 위상 하나라도 하한 미달이면 판정 미달. 아스트라 M2의 예(t0 = 0, 타깃 2200 → 관측 937.5)를 그대로 시험한다
+- **결과 표는 보고 파일에서만 만든다**(`scripts/lh_audit_tables.py`). 같은 스크립트가 #1750 문서의 표를 글자 그대로 재현함을 확인했다
 - 원자료 gzip은 이름 없이 mtime 0으로 쓴다. 같은 행이면 같은 파일 바이트가 나온다(#1750 실행본은 헤더 시각 때문에 gz 해시가 실행마다 달랐다. 압축을 푼 내용은 같았다)
-- 시험 46개 통과
+- 시험 47개 통과
 - **기본 묶음 동일성:** 일반화한 스크립트로 `ideal`을 실제 자료에 다시 돌려 #1750 보고와 비교한다(결과는 아래 실행 기록)
 
 ## 실행
