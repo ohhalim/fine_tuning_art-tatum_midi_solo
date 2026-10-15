@@ -33,6 +33,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 SEGMENT_MS = 5000
+MIN_DUR_MS = 10           # the tokenizer's time step: a zero-length note gets this length (issue #1747)
 
 
 def _kind(t):
@@ -75,6 +76,22 @@ class Note:
     velocity: int
     on_ms: int
     off_ms: int
+
+
+def playable(notes):
+    """Notes the MIDI layer can send (issue #1747). Aria has dur 0 and velocity 0 tokens.
+    - velocity 0 is dropped: a MIDI note-on with velocity 0 means note-off
+    - dur 0 becomes MIN_DUR_MS; otherwise its note-off would sort before its note-on and leave the note sounding
+    Returns (kept, dropped)."""
+    kept, dropped = [], []
+    for n in notes:
+        if n.velocity <= 0:
+            dropped.append(n)
+        elif n.off_ms <= n.on_ms:
+            kept.append(Note(n.note_id, n.pitch, n.velocity, n.on_ms, n.on_ms + MIN_DUR_MS))
+        else:
+            kept.append(n)
+    return kept, dropped
 
 
 @dataclass
@@ -191,9 +208,15 @@ class Scheduler:
         self.last_tick_ms = float("-inf")
         self._next_event_id = 0
         self.midi_out = []     # (time_ms, "on"|"off", pitch, velocity): what goes to the synth on one channel
+        self.midi_due = []     # the scheduled (event) time of each midi_out entry; midi_out holds the delivery time
         self.pitch_owner = {}  # pitch -> note_id that currently owns it in the MIDI stream
 
     def schedule(self, notes):
+        """Notes must be playable: 0 <= pitch <= 127, 1 <= velocity <= 127, off_ms > on_ms. A batch with any bad note
+        is rejected as a whole before anything is queued (use playable() first)."""
+        bad = [n for n in notes if not (0 <= n.pitch <= 127 and 1 <= n.velocity <= 127 and n.off_ms > n.on_ms)]
+        if bad:
+            raise ValueError(f"unplayable notes: {bad[:3]}")
         if not self.accepting:
             return 0
         for n in notes:
@@ -224,10 +247,13 @@ class Scheduler:
         if event.kind == "on":
             if p in self.pitch_owner:                      # retrigger: end the sounding note on this pitch first
                 self.midi_out.append((now_ms, "off", p, 0))
+                self.midi_due.append(event.time_ms)
             self.midi_out.append((now_ms, "on", p, event.velocity))
+            self.midi_due.append(event.time_ms)
             self.pitch_owner[p] = event.note_id
         elif self.pitch_owner.get(p) == event.note_id:
             self.midi_out.append((now_ms, "off", p, 0))
+            self.midi_due.append(event.time_ms)
             del self.pitch_owner[p]
         # else: this note lost its pitch to a retrigger; its note-off is not sent
 
@@ -247,6 +273,7 @@ class Scheduler:
         self.sounding.clear()
         for p in sorted(self.pitch_owner):
             self.midi_out.append((now_ms, "off", p, 0))
+            self.midi_due.append(now_ms)                 # a stop flush is due when it happens
         self.pitch_owner.clear()
 
     def restart(self):
