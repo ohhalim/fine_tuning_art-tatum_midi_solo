@@ -1,0 +1,270 @@
+{
+ "analyze_only": true,
+ "scenarios": {
+  "A_normal": {
+   "run_meta": null,
+   "producer_finished_report": true,
+   "producer_last_progress_block": 31,
+   "scheduler_expected_saved": false,
+   "sender": {
+    "end": "end",
+    "error": null,
+    "port_closed": true,
+    "pending_at_stop": 0,
+    "sounding_at_stop": 0,
+    "send_failures": 0,
+    "clean_stop": null,
+    "dropped_velocity0": 0,
+    "extended_zero_length": 0,
+    "blocks_received": 32
+   },
+   "checks": {
+    "A1a_scheduler_expected_equals_sent": {
+     "ok": null,
+     "reason": "expected MIDI stream not saved in this run"
+    },
+    "A1b_sent_equals_capture": {
+     "ok": true,
+     "left": 270,
+     "right": 270,
+     "first_difference": null
+    },
+    "A2_capture_alternates_per_pitch": {
+     "ok": true
+    },
+    "A3_logical_on_off_pairs": {
+     "ok": true,
+     "on": 135,
+     "off": 135
+    },
+    "A3_midi_on_equals_logical_on": {
+     "ok": true,
+     "midi_on": 135,
+     "logical_on": 135
+    },
+    "A3_scheduled_notes_accounted": {
+     "ok": null,
+     "scheduled": null,
+     "delivered_on": 135,
+     "cancelled_on_at_stop": null
+    },
+    "A3_producer_contract": {
+     "ok": true,
+     "detail": {
+      "committed_prefix_never_changed": true,
+      "committed_tokens_format_valid": true,
+      "every_block_reached_horizon": true
+     }
+    },
+    "sender_exit": {
+     "ok": null,
+     "recorded_ok": true,
+     "process_exit_verified": false
+    }
+   },
+   "timing": {
+    "send_return_minus_scheduled_ms": {
+     "n": 270,
+     "median": 0.686,
+     "p99_nearest_rank": 2.975,
+     "max": 5.908,
+     "min": 0.07
+    },
+    "capture_minus_send_return_ms": {
+     "n": 270,
+     "median": 0.117,
+     "p99_nearest_rank": 0.374,
+     "max": 1.744,
+     "min": -0.104
+    },
+    "capture_minus_scheduled_ms": {
+     "n": 270,
+     "median": 0.836,
+     "p99_nearest_rank": 3.214,
+     "max": 6.148,
+     "min": 0.159
+    }
+   },
+   "sender_schedule": {
+    "margin_to_deadline_ms": {
+     "n": 31,
+     "median": 467.363,
+     "p99_nearest_rank": 468.133,
+     "max": 468.133,
+     "min": 236.624
+    },
+    "block0_ms_before_W": 999.712,
+    "deadline_misses": 0
+   },
+   "producer": {
+    "cold_prebuffer_s": 0.5359,
+    "warm_ready_margin_ms": {
+     "n": 28,
+     "median": 468.166,
+     "p99_nearest_rank": 468.624,
+     "max": 468.624,
+     "min": 466.299
+    },
+    "chord_ready_margin_ms": {
+     "n": 3,
+     "median": 362.474,
+     "p99_nearest_rank": 362.668,
+     "max": 362.668,
+     "min": 236.742
+    },
+    "warm_ready_s": {
+     "n": 28,
+     "median": 0.0,
+     "p99_nearest_rank": 0.002,
+     "max": 0.002,
+     "min": 0.0
+    },
+    "chord_ready_s": {
+     "n": 3,
+     "median": 0.106,
+     "p99_nearest_rank": 0.232,
+     "max": 0.232,
+     "min": 0.106
+    },
+    "late_block_start_ms": {
+     "n": 31,
+     "median": 0.301,
+     "p99_nearest_rank": 1.758,
+     "max": 1.758,
+     "min": 0.023
+    },
+    "deadline_misses": 0,
+    "blocks_reported": 32,
+    "committed_token_sha256": "5f738344771ed41a8e37f2de77769df3390bfa452fef806855f55aad49c0857b"
+   }
+  },
+  "B_producer_killed": {
+   "run_meta": null,
+   "producer_finished_report": false,
+   "producer_last_progress_block": 16,
+   "scheduler_expected_saved": false,
+   "sender": {
+    "end": "eof",
+    "error": null,
+    "port_closed": true,
+    "pending_at_stop": 13,
+    "sounding_at_stop": 1,
+    "send_failures": 0,
+    "clean_stop": null,
+    "dropped_velocity0": 0,
+    "extended_zero_length": 0,
+    "blocks_received": 17
+   },
+   "checks": {
+    "A1a_scheduler_expected_equals_sent": {
+     "ok": null,
+     "reason": "expected MIDI stream not saved in this run"
+    },
+    "A1b_sent_equals_capture": {
+     "ok": true,
+     "left": 148,
+     "right": 148,
+     "first_difference": null
+    },
+    "A2_capture_alternates_per_pitch": {
+     "ok": true
+    },
+    "A3_logical_on_off_pairs": {
+     "ok": true,
+     "on": 74,
+     "off": 74
+    },
+    "A3_midi_on_equals_logical_on": {
+     "ok": true,
+     "midi_on": 74,
+     "logical_on": 74
+    },
+    "A3_scheduled_notes_accounted": {
+     "ok": null,
+     "scheduled": null,
+     "delivered_on": 74,
+     "cancelled_on_at_stop": null
+    },
+    "A3_producer_contract": {
+     "ok": null,
+     "detail": null
+    },
+    "sender_exit": {
+     "ok": null,
+     "recorded_ok": true,
+     "process_exit_verified": false
+    }
+   },
+   "timing": {
+    "send_return_minus_scheduled_ms": {
+     "n": 148,
+     "median": 0.738,
+     "p99_nearest_rank": 6.621,
+     "max": 6.721,
+     "min": 0.047
+    },
+    "capture_minus_send_return_ms": {
+     "n": 148,
+     "median": 0.108,
+     "p99_nearest_rank": 0.441,
+     "max": 0.756,
+     "min": -0.081
+    },
+    "capture_minus_scheduled_ms": {
+     "n": 148,
+     "median": 0.86,
+     "p99_nearest_rank": 6.859,
+     "max": 6.942,
+     "min": 0.131
+    }
+   },
+   "sender_schedule": {
+    "margin_to_deadline_ms": null,
+    "block0_ms_before_W": null,
+    "deadline_misses": null
+   },
+   "producer": {
+    "cold_prebuffer_s": 0.5262,
+    "warm_ready_margin_ms": {
+     "n": 14,
+     "median": 468.025,
+     "p99_nearest_rank": 468.451,
+     "max": 468.451,
+     "min": 466.89
+    },
+    "chord_ready_margin_ms": {
+     "n": 2,
+     "median": 281.786,
+     "p99_nearest_rank": 367.719,
+     "max": 367.719,
+     "min": 195.853
+    },
+    "warm_ready_s": {
+     "n": 14,
+     "median": 0.0,
+     "p99_nearest_rank": 0.001,
+     "max": 0.001,
+     "min": 0.0
+    },
+    "chord_ready_s": {
+     "n": 2,
+     "median": 0.187,
+     "p99_nearest_rank": 0.272,
+     "max": 0.272,
+     "min": 0.101
+    },
+    "late_block_start_ms": {
+     "n": 16,
+     "median": 0.327,
+     "p99_nearest_rank": 0.512,
+     "max": 0.512,
+     "min": 0.163
+    },
+    "deadline_misses": 0,
+    "blocks_reported": 17,
+    "committed_token_sha256": null
+   }
+  }
+ },
+ "note": "time.monotonic_ns in all three processes (system-wide on macOS). p99 by nearest rank; with few events it equals one of the largest. Virtual MIDI only, no synth or audio."
+}
