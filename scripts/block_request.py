@@ -53,7 +53,8 @@ def primer_end(tokens, t0):
 
 
 def request_table(tokens, t0):
-    """One row per request until every note is committed. Rows hold token indexes (end-exclusive):
+    """One row per request until every token before <E> is committed (a stream cut after a <T> ends with that <T>).
+    Rows hold token indexes (end-exclusive):
     ctx_end (= the context length), win_end (the window ends), cont_end (the boundary ends)."""
     p_end = primer_end(tokens, t0)
     stream = TokenStream(list(tokens[:p_end]))
@@ -64,9 +65,8 @@ def request_table(tokens, t0):
         st = st.advance(t)
     stream.tokens.extend(rest)
     body = stream.tokens
-    last_note_end = max((i + 3 for i, t in enumerate(body) if _kind(t) == "piano" and i >= p_end), default=p_end)
     rows, ctx_end, k = [], p_end, 0
-    while ctx_end < last_note_end:
+    while ctx_end < len(body):
         h = horizon(k, t0)
         stream.commit_until(h)
         win_end = j = stream.committed_end
@@ -131,11 +131,10 @@ def simulate_kv(tokens, t0, human_notes, spec_ms=None):
     spec_ms = BLOCK if spec_ms is None else spec_ms
     p_end = primer_end(tokens, t0)
     body = [t for t in tokens[:next((i for i, t in enumerate(tokens) if t == "<E>"), len(tokens))]]
-    last_note_end = max((i + 3 for i, t in enumerate(body) if _kind(t) == "piano" and i >= p_end), default=p_end)
     stream = TokenStream(list(body[:p_end]))
     kv = [COLD] * (p_end - 1)             # the primer is prefilled; its last position is fed by request 0
     out, prev, k = {}, None, 0
-    while stream.committed_end < last_note_end:
+    while stream.committed_end < len(body):
         c = payload(human_notes, block_start(k, t0), k)
         if prev is not None and c != prev:
             stream.rollback_to_committed()

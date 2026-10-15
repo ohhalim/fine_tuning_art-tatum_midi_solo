@@ -171,6 +171,18 @@ class HistoryTest(unittest.TestCase):
                     want = [COLD if j < 0 else payload(humans, block_start(j, t0), j) for j in owner]
                     self.assertEqual(kv[r["k"]], want, (seed, t0, r["k"]))
 
+    def test_a_stream_cut_after_a_segment_boundary_commits_that_boundary(self):
+        toks = aria_tokens([(60, 0, 100, 80), (62, 4000, 100, 80), (64, 6000, 100, 80)])
+        rows = request_table(toks, 0.0)
+        k = next(r["k"] for r in rows if toks[r["ctx_end"] - 1] == "<T>")       # a context that ends with <T>
+        cut = rows[k]["ctx_end"]
+        pre = request_table(list(toks[:cut]) + ["<E>"], 0.0)
+        self.assertEqual(committing_request(pre, cut), committing_request(rows, cut))
+        self.assertEqual(pre[-1]["win_end"], cut)
+        self.assertFalse(pre[-1]["boundary"])
+        kv = simulate_kv(list(toks[:cut]) + ["<E>"], 0.0, [])
+        self.assertEqual(sorted(kv), [r["k"] for r in pre])
+
     def test_windows_follow_the_producer_horizons(self):
         toks = aria_tokens([(60 + i % 30, 10 * i * 37, 100, 64) for i in range(60)])
         rows = request_table(toks, 0.0)
