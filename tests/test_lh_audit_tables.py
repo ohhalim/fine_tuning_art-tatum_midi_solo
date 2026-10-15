@@ -33,9 +33,10 @@ class RuntimeTablesTest(unittest.TestCase):
         md = runtime_tables({"params": {"decision_set": "runtime_block"}, "strata": {"main": main, "afable": fable}})
         self.assertIn("| `g3` | sounding | – |", md)                       # no #1750 report given: comparison column empty
         self.assertIn("| Test Pianist | 1 |", md)
-        self.assertEqual(md.count("| `top50` | block_p"), 4)
+        self.assertEqual(md.count("| `top50` | block_p"), 4 + 4)                      # gaps table and offline table
         self.assertIn("**cold(블록 0)와 warm (주대상)**", md)
         self.assertEqual(md.count("| `grid300` | recent | "), 2)                    # coverage row and cold/warm row
+        self.assertNotIn("| `g3` | #1750 음별 1박 |", md)                                   # no ideal report: no reference rows
 
 
 if __name__ == "__main__":

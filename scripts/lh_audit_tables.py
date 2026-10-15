@@ -124,6 +124,20 @@ def runtime_tables(r, ideal=None):
                        + f" | {sum(t['cold'][p][c]['nonempty'] for p in PHASES)} | "
                        + " · ".join(pct(t["warm"][p][c]["nonempty_ratio"]) for p in PHASES)
                        + f" | {w['nonempty']:,}/{w['targets']:,} ({wm[-2:]}) |")
+    out += ["\n**오프라인 지름길과의 차이 (주대상, 결정별)** — 타깃 onset에 울리는 조건 음 묶음과 비교. 판정과 무관\n",
+            "| 규칙 | 결정 | 오프라인 항목 중 d 뒤 시작 (K2) | 누출 있는 타깃 | 미래 떼기로 뺀 음이 있는 타깃 (K4) | 온라인 sounding과 Jaccard 중앙 | 오프라인만 있고 sounding은 빈 타깃 |",
+            "|---|---|---|---|---|---|---|"]
+    for k in R:
+        if ideal:
+            o = ideal["strata"]["main"]["rules"][k]["offline"]["lead1beat"]
+            out.append(f"| `{k}` | #1750 음별 1박 | {pct(o['entries_future_onset_share'])} | {pct(o['targets_with_leak_share'])} | "
+                       f"{pct(o['targets_with_K4_share'])} | {o['jaccard_vs_sounding']['median']} | "
+                       f"{pct(o['offline_nonempty_online_sounding_empty'] / o['targets'])} |")
+        for ln in PHASES + ("lead_worst",):
+            o = m["rules"][k]["offline"][ln]
+            out.append(f"| `{k}` | {ln} | {pct(o['entries_future_onset_share'])} | {pct(o['targets_with_leak_share'])} | "
+                       f"{pct(o['targets_with_K4_share'])} | {o['jaccard_vs_sounding']['median']} | "
+                       f"{pct(o['offline_nonempty_online_sounding_empty'] / o['targets'])} |")
     out += ["\n**연주자별 (주대상, 위상 네 개 중 최소 비율)** — 곡 수가 적은 연주자는 몇 곡에 좌우된다\n",
             "| 연주자 | 곡 | g3 sounding | g3 recent | top50 sounding | top50 recent | grid300 sounding | grid300 recent |",
             "|---|---|---|---|---|---|---|---|"]
