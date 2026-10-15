@@ -34,6 +34,8 @@ class RuntimeTablesTest(unittest.TestCase):
         self.assertIn("| `g3` | sounding | – |", md)                       # no #1750 report given: comparison column empty
         self.assertIn("| Test Pianist | 1 |", md)
         self.assertEqual(md.count("| `top50` | block_p"), 4)
+        self.assertIn("**cold(블록 0)와 warm (주대상)**", md)
+        self.assertEqual(md.count("| `grid300` | recent | "), 2)                    # coverage row and cold/warm row
 
 
 if __name__ == "__main__":

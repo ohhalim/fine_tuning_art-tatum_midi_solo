@@ -112,6 +112,18 @@ def runtime_tables(r, ideal=None):
             ag, ps = s["time_age_from_onset_ms"], s["per_song_nonempty_ratio"]
             out.append(f"| `{k}` | {ln} | {t['primer_excluded'][ln]:,} | {ld['median']:.0f} · {ld['p90']:.0f} · {ld['max']:.0f} | "
                        f"{ag['median']:.0f} · {ag['p90']:.0f} | {t['online'][ln]['recent']['mean_size']} | {pct(ps['min'])} · {pct(ps['median'])} |")
+    out += ["\n**cold(블록 0)와 warm (주대상)** — cold 관측은 0 ms 앞이라 조건이 비어야 한다\n",
+            "| 규칙 | 조건 | cold 타깃 (위상 0 · 1 · 2 · 3) | cold 비어 있지 않음 | warm 위상 0 · 1 · 2 · 3 | warm 위상 최소 (원래 개수) |",
+            "|---|---|---|---|---|---|"]
+    for k in R:
+        t = m["rules"][k]
+        for c in CONDS:
+            wm = min(PHASES, key=lambda p: t["warm"][p][c]["nonempty"] / t["warm"][p][c]["targets"] if t["warm"][p][c]["targets"] else 0)
+            w = t["warm"][wm][c]
+            out.append(f"| `{k}` | {c} | " + " · ".join(f"{t['cold'][p][c]['targets']:,}" for p in PHASES)
+                       + f" | {sum(t['cold'][p][c]['nonempty'] for p in PHASES)} | "
+                       + " · ".join(pct(t["warm"][p][c]["nonempty_ratio"]) for p in PHASES)
+                       + f" | {w['nonempty']:,}/{w['targets']:,} ({wm[-2:]}) |")
     out += ["\n**연주자별 (주대상, 위상 네 개 중 최소 비율)** — 곡 수가 적은 연주자는 몇 곡에 좌우된다\n",
             "| 연주자 | 곡 | g3 sounding | g3 recent | top50 sounding | top50 recent | grid300 sounding | grid300 recent |",
             "|---|---|---|---|---|---|---|---|"]
