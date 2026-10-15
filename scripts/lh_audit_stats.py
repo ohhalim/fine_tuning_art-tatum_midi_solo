@@ -46,6 +46,12 @@ DONOR_SPAN_MS = 30_000.0         # the replacement future: the next song's first
 DONOR_ID_BASE = 10_000_000
 NONEMPTY_FLOOR = Fraction(1, 10)  # sanity floor at lead1beat, judged on the raw counts (rounded ratios are display only)
 DUP_MS = 1.0
+FABLE_SONGS = 13                 # A Fable track count, registered; a different count stops the run
+
+
+def list_midi(root):
+    """MIDI files under root at any depth (PiJAMA keeps songs in <pianist>/<album>/)."""
+    return sorted(os.path.join(d, f) for d, _, fs in os.walk(root) for f in fs if f.lower().endswith((".mid", ".midi")))
 
 
 def sha1_file(path):
@@ -366,7 +372,8 @@ def main() -> None:
     manifest = json.load(open(manifest_path))
     train = [s for s in manifest["songs"] if s["split"] == "train"]
     assert len(train) == 189, len(train)
-    fable = sorted(os.path.join(fable_dir, f) for f in os.listdir(fable_dir) if f.lower().endswith((".mid", ".midi")))
+    fable = list_midi(fable_dir)
+    assert len(fable) == FABLE_SONGS, (len(fable), fable_dir)   # run 2 silently read 0 songs from the album folder
     jobs, meta = [], {}
     for i, s in enumerate(train):
         rec = "live" if "/midi/live/" in s["source"] else "studio" if "/midi/studio/" in s["source"] else "other"

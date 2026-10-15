@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 import pretty_midi  # noqa: E402
 
 from lh_audit_stats import (CONDS, LEADS, aggregate, audit_song, check_counts, future_release_drops,  # noqa: E402
-                            leak_counts, load_notes, sha1_file, verdicts)
+                            leak_counts, list_midi, load_notes, sha1_file, verdicts)
 from lh_role_proxy import LEAD_MS, Note, assign_g3  # noqa: E402
 
 
@@ -131,6 +131,15 @@ class PositiveControlTest(unittest.TestCase):
         x = r["rules"]["top50"]
         self.assertGreater(x["online"]["lead0"]["sounding"]["replay_mismatch"], 0)
         self.assertGreater(x["invariance"]["suffix_mismatch"], 0)
+
+
+class ListMidiTest(unittest.TestCase):
+    def test_songs_one_folder_down_are_found(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "Album"))
+            for name in ("Album/a.midi", "Album/b.MID", "notes.txt"):
+                open(os.path.join(tmp, name), "w").close()
+            self.assertEqual([os.path.relpath(p, tmp) for p in list_midi(tmp)], ["Album/a.midi", "Album/b.MID"])
 
 
 class VerdictTest(unittest.TestCase):
