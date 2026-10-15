@@ -111,4 +111,6 @@
   - strata(주대상·A Fable 모든 표)와 params가 완전히 같다
   - 원자료는 압축을 푼 내용의 sha256이 같다
   - 출력은 `/Users/ohhalim/git_box/lh_audit/identity_check2/`에 있다
-- 블록 기준(`runtime_block`) 통계는 아직 돌리지 않았다. 아스트라 설계 리뷰 뒤 한 번 돌린다
+- **리뷰 반영 뒤 기본 묶음 동일성 재확인:** 리뷰를 반영한 스크립트(84fdae25, stats sha256 b7f37c54…)로 `ideal`을 다시 돌렸다(573초). 이번에도 #1750 보고와 strata·params가 완전히 같고, 원자료를 압축 해제한 내용의 sha256(3654f71a…)도 같다. 출력은 `/Users/ohhalim/git_box/lh_audit/identity_check3/`에 있다
+  - 보고의 git_head는 26576cd6이다. 실행 중에 문서·표 스크립트만 커밋했고, 통계 스크립트는 84fdae25와 같다
+- 블록 기준(`runtime_block`) 통계는 이 기록을 커밋한 뒤 한 번 돌린다. 실행 중에는 커밋하지 않는다
