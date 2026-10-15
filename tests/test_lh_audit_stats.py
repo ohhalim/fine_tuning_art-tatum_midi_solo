@@ -9,8 +9,9 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 import pretty_midi  # noqa: E402
 
-from lh_audit_stats import (CONDS, LEADS, aggregate, audit_song, check_counts, future_release_drops,  # noqa: E402
-                            leak_counts, list_midi, load_notes, sha1_file, verdicts)
+from lh_audit_stats import (CONDS, CONSTRUCTIBLE, LEADS, PHASES, aggregate, audit_song, check_counts,  # noqa: E402
+                            decision_set, future_release_drops, leak_counts, list_midi, load_notes, sha1_file, verdicts,
+                            write_rows)
 from lh_role_proxy import LEAD_MS, Note, assign_g3  # noqa: E402
 
 
@@ -140,6 +141,119 @@ class ListMidiTest(unittest.TestCase):
             for name in ("Album/a.midi", "Album/b.MID", "notes.txt"):
                 open(os.path.join(tmp, name), "w").close()
             self.assertEqual([os.path.relpath(p, tmp) for p in list_midi(tmp)], ["Album/a.midi", "Album/b.MID"])
+
+
+class RuntimeBlockSetTest(unittest.TestCase):
+    """The #1754 decision set: block snapshots at four phases and the worst lead."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.a, cls.b = os.path.join(cls.tmp.name, "a.mid"), os.path.join(cls.tmp.name, "b.mid")
+        write_midi(cls.a, song())
+        write_midi(cls.b, song(0.13))
+        cls.res = audit_song({"idx": 0, "stratum": "main", "path": cls.a, "sha1": None, "donor_path": cls.b,
+                              "decisions": "runtime_block"})
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_decision_functions(self):
+        ideal, judged = decision_set("ideal")
+        self.assertEqual((list(ideal), judged), (["lead0", "lead1beat"], ("lead1beat",)))
+        self.assertEqual(ideal["lead1beat"](1000.0), 1000.0 - LEAD_MS)
+        rb, judged = decision_set("runtime_block")
+        self.assertEqual(list(rb), ["block_p0", "block_p1", "block_p2", "block_p3", "lead_worst"])
+        self.assertEqual(judged, ("block_p0", "block_p1", "block_p2", "block_p3"))
+        self.assertEqual(PHASES, (0.0, 234.375, 468.75, 703.125))
+        self.assertEqual(rb["block_p0"](2200.0), 937.5)                    # Astra's example: snapshot 937.5, not 1731.25
+        self.assertIsNone(rb["block_p1"](100.0))                           # before t0 = 234.375: primer
+        self.assertEqual(rb["lead_worst"](2000.0), 2000.0 - 1406.25)
+
+    def test_no_leak_and_all_checks_hold_at_every_decision(self):
+        for rule, x in self.res["rules"].items():
+            for ln in decision_set("runtime_block")[0]:
+                for c in CONDS:
+                    st = x["online"][ln][c]
+                    self.assertEqual((st["K1"], st["K2"], st["K3"], st["replay_mismatch"]), (0, 0, 0, 0), (rule, ln, c))
+            inv = x["invariance"]
+            self.assertEqual((inv["prefix_mismatch"], inv["prefix_finite_off_exposed"], inv["suffix_mismatch"]), (0, 0, 0), rule)
+
+    def test_primer_targets_are_left_out_and_counted(self):
+        x = self.res["rules"]["g3"]
+        self.assertEqual(x["primer_excluded"]["block_p0"], 0)
+        self.assertGreater(x["primer_excluded"]["block_p3"], 0)
+        self.assertEqual(x["online"]["block_p3"]["sounding"]["targets"] + x["primer_excluded"]["block_p3"], x["targets"])
+
+    def test_leads_follow_the_contract(self):
+        for ln in ("block_p0", "block_p1", "block_p2", "block_p3"):
+            leads = self.res["rules"]["g3"]["lead_ms"][ln]
+            self.assertTrue(all(LEAD_MS <= v < 1000.0 + 1406.25 for v in leads), ln)
+            self.assertTrue(any(v >= 1000.0 for v in leads), ln)                     # block 0 (prebuffer) present
+
+    def test_rows_have_every_decision(self):
+        rows = self.res["rows"]
+        self.assertEqual(len(rows), sum(x["targets"] for x in self.res["rules"].values()))
+        self.assertTrue(all(len(r) == 6 + 5 * 5 for r in rows))
+
+    def test_verdict_needs_every_phase(self):
+        r = {k: v for k, v in self.res.items() if k != "rows"}
+        names, judged = tuple(decision_set("runtime_block")[0]), decision_set("runtime_block")[1]
+        agg = aggregate([r], "main", names)
+        agg["note_count_mismatch"] = 0
+        v = verdicts(agg, judged)["g3"]["conditions"]["sounding"]
+        self.assertTrue(all(f"{dn}_nonempty" in v for dn in judged))
+        st = agg["rules"]["g3"]["online"]["block_p2"]["sounding"]
+        st["nonempty"] = st["targets"] // 20                                          # one phase below the floor
+        self.assertEqual(verdicts(agg, judged)["g3"]["conditions"]["sounding"]["verdict"], "constructible but almost always empty")
+
+    def agg(self):
+        r = {k: v for k, v in self.res.items() if k != "rows"}
+        agg = aggregate([r], "main", tuple(decision_set("runtime_block")[0]))
+        agg["note_count_mismatch"] = 0
+        return agg
+
+    def test_cold_and_warm_are_counted_apart(self):
+        agg = self.agg()
+        t = agg["rules"]["g3"]
+        self.assertEqual(set(t["cold"]), set(PHASES_NAMES))                          # no cold split for lead_worst
+        for ln in PHASES_NAMES:
+            for c in CONDS:
+                cold, warm, on = t["cold"][ln][c], t["warm"][ln][c], t["online"][ln][c]
+                self.assertGreater(cold["targets"], 0)
+                self.assertEqual(cold["nonempty"], 0)                                 # cold snapshot < 0: nothing observed
+                self.assertEqual((cold["targets"] + warm["targets"], warm["nonempty"]), (on["targets"], on["nonempty"]))
+        self.assertEqual(check_counts(agg)["g3"]["cold_nonempty"], 0)
+
+    def test_runtime_verdict_says_it_is_under_the_proposed_contract(self):
+        agg = self.agg()
+        judged = decision_set("runtime_block")[1]
+        v = verdicts(agg, judged, CONSTRUCTIBLE["runtime_block"])["g3"]
+        self.assertEqual(v["conditions"]["sounding"]["verdict"], "causal pairs constructible under the proposed block contract")
+        agg["rules"]["g3"]["cold"]["block_p1"]["recent"]["nonempty"] = 1               # a cold condition saw something
+        v = verdicts(agg, judged, CONSTRUCTIBLE["runtime_block"])["g3"]
+        self.assertFalse(v["construction_ok"])
+        self.assertEqual(v["conditions"]["sounding"]["verdict"], "construction failed")
+
+
+PHASES_NAMES = tuple(f"block_p{i}" for i in range(len(PHASES)))
+
+
+class WriteRowsTest(unittest.TestCase):
+    def test_same_rows_give_the_same_bytes_under_any_file_name(self):
+        import gzip
+        import hashlib
+        with tempfile.TemporaryDirectory() as tmp:
+            shas = []
+            for name in ("a.csv.gz", "b.csv.gz"):
+                p = os.path.join(tmp, name)
+                write_rows(p, ["x", "y"], iter([[1, 2], [3, 4]]))
+                with open(p, "rb") as f:
+                    shas.append(hashlib.sha256(f.read()).hexdigest())
+            self.assertEqual(shas[0], shas[1])
+            with gzip.open(p, "rt") as f:
+                self.assertEqual(f.read().splitlines(), ["x,y", "1,2", "3,4"])
 
 
 class VerdictTest(unittest.TestCase):
