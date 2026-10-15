@@ -12,7 +12,11 @@ Every count keeps its denominator (targets, condition entries). The same targets
 an independent event replay (all targets), prefix-only extraction and a different future suffix (sampled targets).
 The offline shortcut (notes sounding at the target onset) is measured, not used.
 
-  lh_audit_stats.py <bebop_rh manifest> <A Fable dir> <raw out dir> <report json> [--workers N]
+  lh_audit_stats.py <bebop_rh manifest> <A Fable dir> <raw out dir> <report json> [--workers N] [--decisions SET]
+
+Decision sets: "ideal" (default, #1750): d = onset - 0 and onset - 1 beat. "runtime_block" (#1754,
+docs/experiments/BLOCK_SNAPSHOT_LH_AUDIT.md): d = the block snapshot of scripts/block_contract.py at four block phases,
+plus the phase-free worst lead (onset - 1406.25 ms). Onsets before t0 (the primer) are left out of that decision.
 
 Main stratum: the manifest's train songs only (val/test are never opened). A Fable: separate exploratory stratum.
 """
@@ -23,6 +27,7 @@ import collections
 import csv
 import gzip
 import hashlib
+import io
 import json
 import math
 import multiprocessing
@@ -36,6 +41,8 @@ from fractions import Fraction
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+from block_contract import BEAT, BLOCK, PREBUFFER_LEAD_MS, WORST_LEAD_MS  # noqa: E402
+from block_contract import snapshot as block_snapshot  # noqa: E402
 from lh_role_proxy import (GRID_MIN, GRID_MS, GROUP_MS, INF, LEAD_MS, RECENT_MS, RULES, SPLIT_PITCH, Note,  # noqa: E402
                            offline_condition, online_condition, prefix_view, recent_condition, replay)
 
@@ -47,6 +54,18 @@ DONOR_ID_BASE = 10_000_000
 NONEMPTY_FLOOR = Fraction(1, 10)  # sanity floor at lead1beat, judged on the raw counts (rounded ratios are display only)
 DUP_MS = 1.0
 FABLE_SONGS = 13                 # A Fable track count, registered; a different count stops the run
+PHASES = (0.0, BLOCK / 4, BLOCK / 2, 3 * BLOCK / 4)   # t0 of the block grid inside a song (#1754)
+
+
+def decision_set(name):
+    """({decision: onset -> d, or None when the onset is not generated}, decisions the verdict is judged on)."""
+    if name == "ideal":
+        return {"lead0": lambda t: t - 0.0, "lead1beat": lambda t: t - LEAD_MS}, ("lead1beat",)
+    if name == "runtime_block":
+        ds = {f"block_p{i}": (lambda t, p=p: block_snapshot(t, p)) for i, p in enumerate(PHASES)}
+        ds["lead_worst"] = lambda t: t - WORST_LEAD_MS
+        return ds, tuple(f"block_p{i}" for i in range(len(PHASES)))
+    raise ValueError(name)
 
 
 def list_midi(root):
@@ -133,6 +152,8 @@ def audit_song(job):
     out["notes"] = len(notes)
     out["duration_s"] = round(max((n.off for n in notes), default=0.0) / 1000.0, 3)
     out["rules"], rows = {}, []
+    set_name = job.get("decisions", "ideal")
+    decisions, _ = decision_set(set_name)
     span = max(max((n.off - n.on for n in notes), default=0.0), RECENT_MS) + 1.0
     for rule_name, rule in RULES.items():
         roles = rule(notes)
@@ -148,12 +169,17 @@ def audit_song(job):
         target_ids = {n.nid for n in targets}
         r = {"role_counts": collections.Counter(f"{x.role}:{x.reason}" if x.reason else x.role for x in roles.values()),
              "cond_role_delay": [roles[n.nid].available_at - n.on for n in notes if roles[n.nid].role == "cond"],
-             "online": {ln: {c: new_cond_stats() for c in CONDS} for ln in LEADS}, "offline": {}}
-        cache = {}
-        for ln, lead in LEADS.items():
-            ds = [t.on - lead for t in targets]
+             "online": {ln: {c: new_cond_stats() for c in CONDS} for ln in decisions}, "offline": {}}
+        cache, dmap = {}, {}
+        for ln, dfun in decisions.items():
+            for t in targets:
+                d = dfun(t.on)
+                if d is not None:
+                    dmap[(ln, t.nid)] = d
+            gen = [t for t in targets if (ln, t.nid) in dmap]
+            ds = [dmap[(ln, t.nid)] for t in gen]
             rep = replay(notes, rule_name, ds)
-            for t, d, (rs, rr) in zip(targets, ds, rep):
+            for t, d, (rs, rr) in zip(gen, ds, rep):
                 cand = near(d)
                 cs, cr = online_condition(cand, roles, d), recent_condition(cand, roles, d)
                 cache[(ln, t.nid)] = (cs, cr)
@@ -173,12 +199,14 @@ def audit_song(job):
                     st["age_from_available"].extend(d - roles[n.nid].available_at for n in cond)
                     st["age_from_onset"].extend(d - n.on for n in cond)
                     st["replay_mismatch"] += frozenset(n.nid for n in cond) != rid
-        for ln, lead in LEADS.items():
+        for ln in decisions:
             off = {"targets": 0, "nonempty": 0, "entries": 0, "K1": 0, "K2": 0, "K3": 0, "dup_of_target": 0, "targets_with_leak": 0,
                    "K4_future_release_drops": 0, "targets_with_K4": 0, "offline_nonempty_online_sounding_empty": 0,
                    "offline_nonempty_online_recent_empty": 0, "jaccard_vs_sounding": [], "jaccard_vs_recent": [], "pcmasks": []}
             for t in targets:
-                d = t.on - lead
+                if (ln, t.nid) not in dmap:
+                    continue
+                d = dmap[(ln, t.nid)]
                 co = offline_condition(near(t.on), roles, t.on)
                 k1, k2, k3, dup = leak_counts(co, d, roles, target_ids, t)
                 k4 = future_release_drops(near(d), roles, d, t.on)
@@ -199,16 +227,30 @@ def audit_song(job):
                         off[f"offline_nonempty_online_{key}_empty"] += 1
                     if ido or idc:
                         off[f"jaccard_vs_{key}"].append(len(ido & idc) / len(ido | idc))
-                if ln == "lead1beat":
+                if set_name == "ideal" and ln == "lead1beat":
                     rows.append([job["stratum"], job["idx"], rule_name, t.nid, round(t.on, 3), t.pitch, len(cache[("lead0", t.nid)][0]),
                                  len(cs), len(cr), len(co), pcmask(cs), pcmask(cr), pcmask(co), k2, k3, k4])
             r["offline"][ln] = off
+        if set_name != "ideal":
+            r["primer_excluded"] = {ln: sum(1 for t in targets if (ln, t.nid) not in dmap) for ln in decisions}
+            r["lead_ms"] = {ln: [t.on - dmap[(ln, t.nid)] for t in targets if (ln, t.nid) in dmap] for ln in decisions}
+            for t in targets:
+                row = [job["stratum"], job["idx"], rule_name, t.nid, round(t.on, 3), t.pitch]
+                for ln in decisions:
+                    if (ln, t.nid) in dmap:
+                        cs, cr = cache[(ln, t.nid)]
+                        row += [round(dmap[(ln, t.nid)], 3), len(cs), len(cr), pcmask(cs), pcmask(cr)]
+                    else:
+                        row += ["", "", "", "", ""]
+                rows.append(row)
         # prefix-only extraction and a replaced future, on evenly spaced targets
         chk = {"samples": 0, "prefix_mismatch": 0, "prefix_finite_off_exposed": 0, "suffix_mismatch": 0}
         for i in sample_indices(len(targets)):
             t = targets[i]
-            for ln, lead in LEADS.items():
-                d = t.on - lead
+            for ln in decisions:
+                if (ln, t.nid) not in dmap:
+                    continue
+                d = dmap[(ln, t.nid)]
                 cs, cr = cache[(ln, t.nid)]
                 full = (sorted(n.nid for n in cs), sorted(n.nid for n in cr))
                 pre = prefix_view(notes, d)
@@ -226,6 +268,7 @@ def audit_song(job):
         r["targets"] = len(targets)
         out["rules"][rule_name] = r
     out["rows"] = rows
+    out["decisions"] = list(decisions)
     return out
 
 
@@ -255,7 +298,7 @@ def ratio(a, b):
     return round(a / b, 4) if b else None
 
 
-def aggregate(results, label):
+def aggregate(results, label, names=tuple(LEADS)):
     """Pool per-song results of one stratum into the report tables."""
     ok = [r for r in results if r["error"] is None]
     agg = {"songs": len(results), "songs_ok": len(ok), "errors": [{"idx": r["idx"], "error": r["error"]} for r in results if r["error"]],
@@ -269,7 +312,7 @@ def aggregate(results, label):
         tab = {"role_counts": dict(roles), "targets": sum(x["targets"] for x in rr),
                "target_share_of_notes": ratio(sum(x["targets"] for x in rr), agg["notes"]),
                "time_cond_role_delay_ms": dist([v for x in rr for v in x["cond_role_delay"]]), "online": {}, "offline": {}}
-        for ln in LEADS:
+        for ln in names:
             tab["online"][ln] = {}
             for c in CONDS:
                 sts = [x["online"][ln][c] for x in rr]
@@ -298,12 +341,15 @@ def aggregate(results, label):
                                   "pc_diversity": pc_diversity([m for o in offs for m in o["pcmasks"]])}
         inv = {k: sum(x["invariance"][k] for x in rr) for k in ("samples", "prefix_mismatch", "prefix_finite_off_exposed", "suffix_mismatch")}
         tab["invariance"] = inv
+        if rr and "primer_excluded" in rr[0]:
+            tab["primer_excluded"] = {ln: sum(x["primer_excluded"][ln] for x in rr) for ln in names}
+            tab["time_lead_ms"] = {ln: dist([v for x in rr for v in x["lead_ms"][ln]]) for ln in names}
         agg["rules"][rule] = tab
     return agg
 
 
-def groups(results, meta, key):
-    """Pooled nonempty ratio at lead1beat per pianist / recording type."""
+def groups(results, meta, key, dn="lead1beat"):
+    """Pooled nonempty ratio at one decision per pianist / recording type."""
     out = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, 0]))
     for r in results:
         if r["error"]:
@@ -311,7 +357,7 @@ def groups(results, meta, key):
         g = meta[r["idx"]][key]
         for rule in RULES:
             for c in CONDS:
-                st = r["rules"][rule]["online"]["lead1beat"][c]
+                st = r["rules"][rule]["online"][dn][c]
                 acc = out[g][f"{rule}/{c}"]
                 acc[0] += st["targets"]
                 acc[1] += st["nonempty"]
@@ -323,7 +369,7 @@ def check_counts(agg):
     """The raw check numbers per rule. The exploratory stratum reports only these (no eligibility verdict)."""
     out = {}
     for rule, t in agg["rules"].items():
-        on = [t["online"][ln][c] for ln in LEADS for c in CONDS]
+        on = [t["online"][ln][c] for ln in t["online"] for c in CONDS]
         out[rule] = {"online_leaks": {k: sum(s[k] for s in on) for k in ("K1", "K2", "K3")},
                      "replay_mismatch": sum(s["replay_mismatch"] for s in on), **t["invariance"]}
     return out
@@ -333,10 +379,10 @@ def nondegenerate(nonempty, targets):
     return targets > 0 and Fraction(nonempty, targets) >= NONEMPTY_FLOOR
 
 
-def verdicts(agg):
-    """Registered decision (CAUSAL_LH_AUDIT.md), main stratum only: per rule, construction = data intact + online
-    leaks 0 + replay, prefix and suffix checks 0; per rule and condition, non-degenerate = pooled lead1beat
-    nonempty / targets >= floor on the raw counts."""
+def verdicts(agg, judged=("lead1beat",)):
+    """Registered decision (CAUSAL_LH_AUDIT.md, BLOCK_SNAPSHOT_LH_AUDIT.md), main stratum only: per rule,
+    construction = data intact + online leaks 0 + replay, prefix and suffix checks 0 (all decisions); per rule and
+    condition, non-degenerate = pooled nonempty / targets >= floor on the raw counts at every judged decision."""
     data_ok = agg["songs_ok"] == agg["songs"] and agg.get("note_count_mismatch", 0) == 0
     out = {}
     for rule, cc in check_counts(agg).items():
@@ -344,13 +390,26 @@ def verdicts(agg):
                      and cc["prefix_mismatch"] == 0 and cc["prefix_finite_off_exposed"] == 0 and cc["suffix_mismatch"] == 0)
         out[rule] = {"data_ok": data_ok, **cc, "construction_ok": construct, "conditions": {}}
         for c in CONDS:
-            st = agg["rules"][rule]["online"]["lead1beat"][c]
-            nd = nondegenerate(st["nonempty"], st["targets"])
-            out[rule]["conditions"][c] = {"lead1beat_nonempty": st["nonempty"], "lead1beat_targets": st["targets"],
-                                          "lead1beat_nonempty_ratio_display": st["nonempty_ratio"], "nondegenerate": nd,
+            row, nd = {}, True
+            for dn in judged:
+                st = agg["rules"][rule]["online"][dn][c]
+                row.update({f"{dn}_nonempty": st["nonempty"], f"{dn}_targets": st["targets"],
+                            f"{dn}_nonempty_ratio_display": st["nonempty_ratio"]})
+                nd = nd and nondegenerate(st["nonempty"], st["targets"])
+            out[rule]["conditions"][c] = {**row, "nondegenerate": nd,
                                           "verdict": ("causal pairs constructible" if construct and nd else
                                                       "constructible but almost always empty" if construct else "construction failed")}
     return out
+
+
+def write_rows(path, header, rows):
+    """gzip CSV with no name and mtime 0 in the header, so the same rows always give the same file bytes."""
+    with open(path, "wb") as fb, gzip.GzipFile(filename="", fileobj=fb, mode="wb", mtime=0) as gz, \
+            io.TextIOWrapper(gz, newline="") as f:
+        w = csv.writer(f)
+        w.writerow(header)
+        for row in rows:
+            w.writerow(row)
 
 
 def git_head():
@@ -362,7 +421,13 @@ def git_head():
 
 def main() -> None:
     args = sys.argv[1:]
-    workers = 6
+    workers, set_name = 6, "ideal"
+    if "--decisions" in args:
+        i = args.index("--decisions")
+        set_name = args[i + 1]
+        del args[i:i + 2]
+    decisions, judged = decision_set(set_name)
+    names = tuple(decisions)
     if "--workers" in args:
         i = args.index("--workers")
         workers = int(args[i + 1])
@@ -378,23 +443,27 @@ def main() -> None:
     for i, s in enumerate(train):
         rec = "live" if "/midi/live/" in s["source"] else "studio" if "/midi/studio/" in s["source"] else "other"
         meta[("main", i)] = {"pianist": s["pianist"], "rec": rec, "manifest_notes": s["all_notes"], "source": s["source"], "sha1": s["sha1"]}
-        jobs.append({"idx": i, "stratum": "main", "path": s["source"], "sha1": s["sha1"], "donor_path": train[(i + 1) % len(train)]["source"]})
+        jobs.append({"idx": i, "stratum": "main", "path": s["source"], "sha1": s["sha1"], "donor_path": train[(i + 1) % len(train)]["source"],
+                     "decisions": set_name})
     for i, p in enumerate(fable):
         meta[("afable", i)] = {"pianist": "Tigran Hamasyan", "rec": "studio", "manifest_notes": None, "source": p, "sha1": None}
-        jobs.append({"idx": i, "stratum": "afable", "path": p, "sha1": None, "donor_path": fable[(i + 1) % len(fable)]})
+        jobs.append({"idx": i, "stratum": "afable", "path": p, "sha1": None, "donor_path": fable[(i + 1) % len(fable)],
+                     "decisions": set_name})
     with multiprocessing.get_context("spawn").Pool(workers) as pool:
         results = pool.map(audit_song, jobs, chunksize=1)
     os.makedirs(raw_dir, exist_ok=True)
-    raw_path = os.path.join(raw_dir, "targets_lead1beat.csv.gz")
-    with gzip.open(raw_path, "wt", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["stratum", "song_idx", "rule", "target_nid", "target_on_ms", "target_pitch", "n_sounding_lead0", "n_sounding",
-                    "n_recent", "n_offline", "pcmask_sounding", "pcmask_recent", "pcmask_offline", "offline_K2_future_onset",
-                    "offline_K3_role_unknown", "offline_K4_future_release_drops"])
-        for r in results:
-            for row in r.pop("rows", []):
-                w.writerow(row)
-    report = {"issue": 1750, "doc": "docs/experiments/CAUSAL_LH_AUDIT.md", "quality_claimed": False,
+    raw_path = os.path.join(raw_dir, "targets_lead1beat.csv.gz" if set_name == "ideal" else f"targets_{set_name}.csv.gz")
+    if set_name == "ideal":
+        header = ["stratum", "song_idx", "rule", "target_nid", "target_on_ms", "target_pitch", "n_sounding_lead0", "n_sounding",
+                  "n_recent", "n_offline", "pcmask_sounding", "pcmask_recent", "pcmask_offline", "offline_K2_future_onset",
+                  "offline_K3_role_unknown", "offline_K4_future_release_drops"]
+    else:
+        header = (["stratum", "song_idx", "rule", "target_nid", "target_on_ms", "target_pitch"]
+                  + [f"{ln}_{k}" for ln in names for k in ("d_ms", "n_sounding", "n_recent", "pcmask_sounding", "pcmask_recent")])
+    write_rows(raw_path, header, (row for r in results for row in r.pop("rows", [])))
+    ideal = set_name == "ideal"
+    report = {"issue": 1750 if ideal else 1754,
+              "doc": "docs/experiments/CAUSAL_LH_AUDIT.md" if ideal else "docs/experiments/BLOCK_SNAPSHOT_LH_AUDIT.md", "quality_claimed": False,
               "run": {"git_head": git_head(), "lh_role_proxy_sha256": sha256_file(os.path.join(HERE, "lh_role_proxy.py")),
                       "stats_script_sha256": sha256_file(os.path.abspath(__file__)), "python": platform.python_version(),
                       "pretty_midi": __import__("pretty_midi").__version__, "workers": workers, "seconds": None,
@@ -406,28 +475,43 @@ def main() -> None:
                          "lead_semantics": "per-note ideal decision time d = target onset - L (diagnostic); the runtime block "
                                            "snapshot (now = t0 + k*937.5) is not verified here (#1750 review M2)", "units": "ms from pretty_midi seconds x 1000 (tempo map applied)"},
               "strata": {}}
+    if not ideal:
+        report["run"]["block_contract_sha256"] = sha256_file(os.path.join(HERE, "block_contract.py"))
+        report["params"].pop("leads_ms")
+        report["params"]["decision_set"] = set_name
+        report["params"]["decisions"] = {**{f"block_p{i}": f"block snapshot (block_contract.snapshot) with t0 = {p} ms" for i, p in enumerate(PHASES)},
+                                         "lead_worst": f"onset - {WORST_LEAD_MS} ms (phase-free bound for blocks k >= 1)"}
+        report["params"]["judged"] = list(judged)
+        report["params"].update({"block_ms": BLOCK, "beat_ms": BEAT, "prebuffer_lead_ms": PREBUFFER_LEAD_MS, "worst_lead_ms": WORST_LEAD_MS})
+        report["params"]["lead_semantics"] = ("runtime block snapshot contract (#1754): block k >= 1 observes at t0 + k*B and commits "
+                                              "onsets in [t0 + k*B + beat, t0 + (k+1)*B + beat); block 0 observes at t0 - 1000 ms; "
+                                              "requires rollback whenever the condition state changed between snapshots")
     for st in ("main", "afable"):
         rs = [r for r in results if r["stratum"] == st]
-        agg = aggregate(rs, st)
+        agg = aggregate(rs, st, names)
         if st == "main":
             agg["note_count_mismatch"] = sum(1 for r in rs if r["error"] is None and r["notes"] != meta[("main", r["idx"])]["manifest_notes"])
-        agg["per_pianist_lead1beat"] = groups(rs, {r["idx"]: meta[(st, r["idx"])] for r in rs}, "pianist")
-        agg["per_recording_type_lead1beat"] = groups(rs, {r["idx"]: meta[(st, r["idx"])] for r in rs}, "rec")
+        for dn in judged:
+            agg[f"per_pianist_{dn}"] = groups(rs, {r["idx"]: meta[(st, r["idx"])] for r in rs}, "pianist", dn)
+            agg[f"per_recording_type_{dn}"] = groups(rs, {r["idx"]: meta[(st, r["idx"])] for r in rs}, "rec", dn)
         agg["songs_table"] = [{"idx": r["idx"], "sha1": r.get("sha1"), "pianist": meta[(st, r["idx"])]["pianist"],
                                "rec": meta[(st, r["idx"])]["rec"], "source": meta[(st, r["idx"])]["source"], "error": r["error"],
                                "notes": r.get("notes"), "duration_s": r.get("duration_s"),
                                **({rule: {"targets": r["rules"][rule]["targets"],
-                                          **{f"{c}_lead1beat_nonempty": ratio(r["rules"][rule]["online"]["lead1beat"][c]["nonempty"],
-                                                                              r["rules"][rule]["online"]["lead1beat"][c]["targets"]) for c in CONDS}}
+                                          **{f"{c}_{dn}_nonempty": ratio(r["rules"][rule]["online"][dn][c]["nonempty"],
+                                                                         r["rules"][rule]["online"][dn][c]["targets"])
+                                             for dn in judged for c in CONDS}}
                                    for rule in RULES} if r["error"] is None else {})} for r in rs]
         if st == "main":
-            agg["verdicts"] = verdicts(agg)
+            agg["verdicts"] = verdicts(agg, judged)
         else:
             agg["checks"] = check_counts(agg)
             agg["note"] = ("exploratory stress stratum: check numbers and statistics only, no eligibility verdict; never pooled "
                            "with the main stratum, never used for reference selection or style validation")
         report["strata"][st] = agg
     report["run"]["raw_targets_sha256"] = sha256_file(raw_path)
+    with gzip.open(raw_path, "rb") as f:
+        report["run"]["raw_targets_content_sha256"] = hashlib.sha256(f.read()).hexdigest()
     report["run"]["seconds"] = round(time.time() - t0, 1)
     os.makedirs(os.path.dirname(os.path.abspath(report_path)), exist_ok=True)
     with open(report_path, "w") as f:
