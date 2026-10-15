@@ -1,0 +1,164 @@
+"""Regression for the real-clock sender and the smoke analysis (issue #1747, Astra post-review). Fake port, fake clock."""
+from __future__ import annotations
+
+import json
+import os
+import queue
+import sys
+import tempfile
+import unittest
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
+from rt_sender import Sender, reader  # noqa: E402
+from rt_smoke_run import analyze  # noqa: E402
+
+
+class FakePort:
+    def __init__(self, fail=lambda m: False):
+        self.fail, self.sent, self.tries, self.closed = fail, [], [], False
+
+    def send(self, m):
+        self.tries.append(m)
+        if self.fail(m):
+            raise OSError("send failed")
+        self.sent.append(m)
+
+    def close(self):
+        self.closed = True
+
+
+class Clock:
+    def __init__(self):
+        self.ns = 0
+
+    def __call__(self):
+        return self.ns
+
+
+def start(s, clock):
+    s.handle({"type": "start", "music_origin_ms": 0, "wall_origin_ns": 0})
+    s.handle({"type": "notes", "block": 0, "notes": [[0, 60, 80, 0, 1000], [1, 64, 80, 0, 2000]]})
+    clock.ns = int(10e6)
+    s.step()                                         # both notes sounding
+
+
+class SenderTest(unittest.TestCase):
+    def test_off_failure_in_cleanup_still_closes_port_and_writes_record(self):
+        clock = Clock()
+        port = FakePort(fail=lambda m: m[0] == "note_off")
+        s = Sender(port, clock)
+        start(s, clock)
+        log = s.cleanup()
+        self.assertTrue(port.closed)
+        self.assertTrue(log["port_closed"])
+        self.assertEqual(log["stop_offs_failed"], 2)
+        self.assertFalse(log["clean_stop"])
+        self.assertEqual(sum(1 for m in port.tries if m[0] == "note_off"), 2)   # each off tried once, no retry loop
+
+    def test_send_failure_during_run_is_not_retried_by_cleanup(self):
+        clock = Clock()
+        port = FakePort(fail=lambda m: m == ("note_on", 64, 80))
+        s = Sender(port, clock)
+        s.handle({"type": "start", "music_origin_ms": 0, "wall_origin_ns": 0})
+        s.handle({"type": "notes", "block": 0, "notes": [[0, 60, 80, 0, 1000], [1, 64, 80, 0, 2000]]})
+        clock.ns = int(10e6)
+        with self.assertRaises(OSError):
+            s.step()
+        log = s.cleanup()
+        self.assertEqual(port.tries.count(("note_on", 64, 80)), 1)
+        self.assertTrue(port.closed)
+        self.assertFalse(log["clean_stop"])
+
+    def test_close_failure_still_returns_record(self):
+        clock = Clock()
+        port = FakePort()
+
+        def bad_close():
+            raise OSError("close failed")
+        port.close = bad_close
+        s = Sender(port, clock)
+        start(s, clock)
+        log = s.cleanup()
+        self.assertFalse(log["port_closed"])
+        self.assertFalse(log["clean_stop"])
+
+    def test_clean_stop_turns_off_sounding_notes(self):
+        clock = Clock()
+        port = FakePort()
+        s = Sender(port, clock)
+        start(s, clock)
+        log = s.cleanup()
+        self.assertTrue(log["clean_stop"])
+        self.assertEqual(sorted(m[1] for m in port.sent if m[0] == "note_off"), [60, 64])
+        self.assertEqual(len(log["expected_midi"]), 4)
+
+    def test_normal_end_waits_for_pending_and_ignores_the_following_eof(self):
+        clock = Clock()
+        s = Sender(FakePort(), clock)
+        start(s, clock)
+        s.handle({"type": "end"})
+        s.handle({"type": "eof"})
+        self.assertEqual(s.end, "end")
+        self.assertFalse(s.done())                   # notes still pending
+        clock.ns = int(2500e6)
+        s.step()
+        self.assertTrue(s.done())
+
+    def test_reader_turns_a_broken_line_into_an_error_then_eof(self):
+        q = queue.Queue()
+        reader(['{"type": "start", "music_origin_ms": 0, "wall_origin_ns": 0}\n', '{"type": "no'], q)
+        msgs = [q.get_nowait() for _ in range(q.qsize())]
+        self.assertEqual([m["type"] for m in msgs], ["start", "reader_error", "eof"])
+
+    def test_reader_error_stops_the_run_and_cleanup_turns_off(self):
+        clock = Clock()
+        port = FakePort()
+        s = Sender(port, clock)
+        start(s, clock)
+        s.handle({"type": "reader_error", "error": "JSONDecodeError"})
+        self.assertTrue(s.done())
+        log = s.cleanup()
+        self.assertEqual(log["error"], "JSONDecodeError")
+        self.assertEqual(log["end"], "reader_error")
+        self.assertEqual(sorted(m[1] for m in port.sent if m[0] == "note_off"), [60, 64])
+
+
+class AnalyzeTest(unittest.TestCase):
+    def write(self, d, sender, capture):
+        json.dump(sender, open(os.path.join(d, "sender.json"), "w"))
+        json.dump({"messages": capture}, open(os.path.join(d, "capture.json"), "w"))
+        open(os.path.join(d, "producer_progress.jsonl"), "w").write(json.dumps({"block": 0, "cold_s": 0.1}) + "\n")
+
+    def sender_log(self, sent, expected, logical, scheduled):
+        return {"sent": sent, "expected_midi": expected, "logical_sent": logical, "scheduled_notes": scheduled,
+                "pending_on_at_stop": 0, "received_blocks": [], "end": "end", "error": None, "port_closed": True,
+                "pending_at_stop": 0, "sounding_at_stop": 0, "dropped_velocity0": 0, "extended_zero_length": 0,
+                "send_failures": [], "clean_stop": True, "origin": None}
+
+    def test_a_pair_missing_from_both_sent_and_capture_is_detected(self):
+        sent = [{"kind": "on", "pitch": 60, "velocity": 80, "scheduled_ns": 0, "send_return_ns": 1},
+                {"kind": "off", "pitch": 60, "velocity": 0, "scheduled_ns": 10, "send_return_ns": 11}]
+        expected = [["on", 60, 80, 0], ["on", 64, 80, 0], ["off", 60, 0, 10], ["off", 64, 0, 20]]
+        capture = [{"capture_ns": 2, "bytes": [0x90, 60, 80]}, {"capture_ns": 12, "bytes": [0x80, 60, 0]}]
+        logical = [[0, "on", 0, 60], [10, "off", 0, 60]]
+        with tempfile.TemporaryDirectory() as d:
+            self.write(d, self.sender_log(sent, expected, logical, 2), capture)
+            r = analyze("t", d)
+        self.assertTrue(r["checks"]["A1b_sent_equals_capture"]["ok"])
+        self.assertFalse(r["checks"]["A1a_scheduler_expected_equals_sent"]["ok"])
+        self.assertFalse(r["checks"]["A3_scheduled_notes_accounted"]["ok"])
+
+    def test_without_return_codes_exit_is_not_claimed(self):
+        sent = [{"kind": "on", "pitch": 60, "velocity": 80, "scheduled_ns": 0, "send_return_ns": 1},
+                {"kind": "off", "pitch": 60, "velocity": 0, "scheduled_ns": 10, "send_return_ns": 11}]
+        capture = [{"capture_ns": 2, "bytes": [0x90, 60, 80]}, {"capture_ns": 12, "bytes": [0x80, 60, 0]}]
+        with tempfile.TemporaryDirectory() as d:
+            self.write(d, self.sender_log(sent, [["on", 60, 80, 0], ["off", 60, 0, 10]], [[0, "on", 0, 60], [10, "off", 0, 60]], 1), capture)
+            r = analyze("t", d)
+        self.assertIsNone(r["checks"]["sender_exit"]["ok"])
+        self.assertTrue(r["checks"]["sender_exit"]["recorded_ok"])
+        self.assertTrue(r["checks"]["A1a_scheduler_expected_equals_sent"]["ok"])
+
+
+if __name__ == "__main__":
+    unittest.main()
