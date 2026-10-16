@@ -4,17 +4,17 @@
  "quality_claimed": false,
  "training": false,
  "run": {
-  "git_head": "4285bc512baec10373715dbb41a758440231e140",
-  "crop_contract_sha256": "74caa5862598c04a0b3826342d9eeb3e95f26f235dd1d8636dbc417198dbe146",
-  "check_script_sha256": "1bb99554f29b28729f0263b07d74bc40737ea5b4912f634ae7088441a64a2383",
+  "git_head": "351943961b7047e1e0d722539bcd96aabaf49c37",
+  "crop_contract_sha256": "077093d1a882e9152236754d4a46ff4f671d95b83cc70bbda96160f09298dbd9",
+  "check_script_sha256": "6eda02f846e81cd5b32171cb8b6aaab1f47d1171fa95e53a84ae117188e7656d",
   "export_dir": "/Users/ohhalim/git_box/lh_request_export_run3",
-  "seconds": 201.0
+  "seconds": 200.3
  },
  "params": {
   "cap": 64,
   "capacity": 4096,
   "keep_target": 2048,
-  "decision": "committed_len + 2*CAP > CAPACITY"
+  "decision": "committed_len + 2*CAP + 3 > CAPACITY"
  },
  "checks": {
   "capacity_failure": 0,
@@ -25,36 +25,36 @@
  "all_checks_zero": true,
  "songs_checked": 189,
  "requests": 56487,
- "crops": 235,
+ "crops": 236,
  "requests_with_crop_share": 0.0042,
  "crops_per_song": {
   "n": 189,
-  "mean": 1.24,
+  "mean": 1.25,
   "min": 0,
   "median": 1,
   "p90": 3,
   "max": 5
  },
- "songs_with_a_crop": 127,
+ "songs_with_a_crop": 128,
  "session_ctx_len": {
   "n": 56487,
-  "mean": 2069.99,
+  "mean": 2069.01,
   "min": 2,
-  "median": 2197,
-  "p90": 3523,
-  "max": 3968
+  "median": 2196,
+  "p90": 3521,
+  "max": 3965
  },
  "kept_len_after_crop": {
-  "n": 235,
-  "mean": 1989.51,
-  "min": 1826,
-  "median": 1994,
-  "p90": 2039,
+  "n": 236,
+  "mean": 1987.45,
+  "min": 1816,
+  "median": 1992,
+  "p90": 2035,
   "max": 2048
  },
  "base_ms_at_song_end": {
   "n": 189,
-  "mean": 123306.88,
+  "mean": 123730.16,
   "min": 0.0,
   "median": 105000.0,
   "p90": 290000.0,
@@ -226,7 +226,7 @@
   {
    "idx": 18,
    "requests": 208,
-   "crops": 0,
+   "crops": 1,
    "capacity_failure": 0,
    "r2": 0,
    "r3": 0,
