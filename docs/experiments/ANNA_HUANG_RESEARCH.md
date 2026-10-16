@@ -209,13 +209,13 @@ MIT 발표회의 Rachel Loh "Visualizing the Internal State of Music Models for 
 | 라이선스 | MIT. RL 부분은 OpenRLHF v0.6.1.post1에서 가져온 코드라 Apache 2.0 |
 | 생성·최근 갱신 | 2025-11-18 생성, 2026-05-11 마지막 푸시, 별 16개 |
 | 포함 | ReaLchords, ReaLJam(서버·웹 화면·ONNX·MLX), GAPT, 멜로디 모델 RL |
-| 체크포인트 | Hugging Face `lukewys/realchords-pytorch`에 35개 폴더. `gapt`, `realchords`, `decoder_only_online_melody_4_datasets`, `enc_dec_base_melody_4_datasets`, **`rl_melody_gail_4_datasets`**, 각 보상 모델 |
+| 체크포인트 | Hugging Face `lukewys/realchords-pytorch`에 35개 폴더. `gapt`·`realchords`·**`rl_melody_gail_4_datasets`** 각 79.3 MB, `decoder_only_online_melody_4_datasets` 475.8 MB(학습 상태 포함), ReaLJam용 온라인 158.6 MB·오프라인 338.7 MB, 각 보상 모델 |
 | 데이터 | Hooktheory 19,086곡, POP909 909곡, Nottingham 1,019곡, Wikifonia 약 6,000곡. 멜로디 모델 혼합 비율 0.5 / 0.2 / 0.2 / 0.1 |
 | 토큰 | 박당 4프레임(16분음표 격자). 멜로디는 프레임마다 한 음: SILENCE, NOTE_p(지속), NOTE_ON_p(시작). 코드는 CHORD_이름(지속), CHORD_ON_이름(시작). 최대 길이 512 |
-| 모델 | 디코더 512차원, 8층, 8헤드, dropout 0.1, bf16, 30,000스텝, 배치 64. 약 2,500만 파라미터 [판단, 설정값으로 계산] |
+| 모델 | 디코더 512차원, 8층, 8헤드, dropout 0.1, bf16, 30,000스텝, 배치 64. RL 결과 `actor.pth`가 79.3 MB라 fp32 기준 약 2,000만 파라미터 [판단, 파일 크기로 환산] |
 | 증강 | ±6반음 전조(13배) |
 | RL | 단일 GPU, 48 GB VRAM 기준. rollout 배치 384, 1,000스텝, 100스텝마다 저장·평가 |
-| ReaLJam | `pip install realjam`, `realjam-start-server --mlx`(Apple Silicon). 체크포인트는 실행 시 자동 다운로드 |
+| ReaLJam | PyPI `realjam` 1.0.1(MIT, 휠 0.06 MB). 의존성에 torch, x-transformers 2.1.2, note_seq, onnxruntime 1.21.0, numpy<2.0 등. `realjam-start-server --mlx`(Apple Silicon). 체크포인트는 실행 시 자동 다운로드 |
 
 ---
 
@@ -228,7 +228,7 @@ MIT 발표회의 Rachel Loh "Visualizing the Internal State of Music Models for 
 | 시간 | 16분음표 격자 프레임 | Aria 토큰(ms 단위 시간) + 블록 계약(4/4·128 BPM 반 마디 937.5 ms) |
 | 데이터 | 리드시트 약 27,000곡 | 재즈 피아노 train 189곡 |
 | 스타일 | 팝·포크 | 티그랑·비밥, 스윙 아님, 홀수 박자 포함 |
-| 모델 | 약 2,500만, 처음부터 학습 | Aria 사전학습 모델 + adapter |
+| 모델 | 약 2,000만, 처음부터 학습 | Aria 사전학습 모델 + adapter |
 | 학습 | MLE → 보상 모델 → RL + 판별자 | teacher-forced CE(#1760) |
 | 자원 | 48 GB GPU | Mac 로컬, 유료 GPU 없음 |
 
@@ -259,7 +259,7 @@ MIT 발표회의 Rachel Loh "Visualizing the Internal State of Music Models for 
 기존 결정과 충돌하는 점
 
 - **증강**: ReaLchords는 ±6반음 전조 증강을 씁니다. 우리 D1 Arm E는 ×12 증강이 재붕괴를 일으켜 증강을 기각했습니다. F3은 증강 없이 하는 것을 기본으로 합니다. 증강을 쓰려면 별도 질문으로 등록합니다
-- **모델 크기**: 저장소 모델은 약 2,500만 파라미터라 "모델 키우지 않는다"(D0)와 충돌하지 않습니다
+- **모델 크기**: 저장소 모델은 약 2,000만 파라미터라 "모델 키우지 않는다"(D0)와 충돌하지 않습니다
 - **RL 자원**: 저장소 RL은 48 GB GPU 기준입니다. Mac에서는 rollout 배치를 크게 줄여야 합니다. RL 단계는 MLE 단계에서 조건 사용이 확인된 뒤에 검토합니다
 - **스타일**: 저장소 데이터는 팝·포크 리드시트입니다. F1 결과의 음악 품질은 판단하지 않습니다. 확인하는 것은 조건을 따라가는지뿐입니다
 
