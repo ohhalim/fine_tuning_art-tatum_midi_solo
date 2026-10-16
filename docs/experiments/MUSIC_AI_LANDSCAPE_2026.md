@@ -270,6 +270,56 @@
 
 ---
 
+## 6.5 Google 음악 연구 계보와 안나 황(Cheng-Zhi Anna Huang) 교수
+
+사용자 질문으로 따로 조사했습니다. 안나 황 교수는 Music Transformer를 만든 분이고, 사용자가 이 분야에서 가장 존경하는 연구자입니다.
+
+### 6.5.1 Google 쪽 계보 — 이름이 비슷해서 헷갈리는 모델들
+
+| 시기 | 이름 | 무엇인가 | 실시간 | 공개 | 확인 |
+|---|---|---|---|---|---|
+| 2018–2022 | Magenta(Google Brain) | Music Transformer(2018), Coconet·Bach Doodle(2019), MIDI-DDSP(2022) 등. 안나 황 교수가 이 시기 핵심 저자 | — | 논문·코드 | [직접 홈페이지] |
+| 2023 | MusicLM | 텍스트 → 음악 오디오. 이후 철회됐다는 보도 | 아님 | 비공개 | [요약] |
+| 2024 | **MusicFX DJ**(Google Labs) | **Lyria RealTime의 첫 공개 실험** 앱 | 예 | 앱 | [직접 Magenta 페이지] |
+| 2025-04 | Lyria 2 | Music AI Sandbox, 48 kHz | 아님 | 비공개 | [요약] |
+| 2025-05/06 | **Lyria RealTime API** | 텍스트 프롬프트 혼합 + 템포·키·악기군 끄기·음 밀도·밝기·"chaos" 제어. 변경이 최대 2초 안에 반영. 데모 PromptDJ, PromptDJ MIDI, PromptDJ Pad, DAW용 VST "The Infinite Crate". "Lyria team" | 예 | 실험 API | [직접 Magenta 페이지·Gemini 문서] |
+| 2025-06 | **Magenta RealTime**(1) | 800M 자기회귀 Transformer, 스톡 음악 약 19만 시간(주로 기악), 가중치 CC BY 4.0, 코드 Apache 2.0. 2초 블록, 제어 지연 약 3초. **Lyria RealTime의 공개 가중치 사촌** | 예 | 공개 가중치 | [요약] + [논문 직접] |
+| 2025-08 | **Live Music Models** 논문(arXiv 2508.04651) | Magenta RT(공개)와 Lyria RT(API)를 소개. 저자 35명 "Lyria Team"에 **안나 황**, Chris Donahue, Jesse Engel, Ian Simon, Adam Roberts, Douglas Eck 등 | — | 논문 | [직접 저자 목록] |
+| 2026-02·03·07 | Lyria 3 → 3 Pro → 3.5 | 텍스트 → 보컬 포함 완성곡(최대 약 3분). Gemini 앱·API | 아님 | 비공개 | [요약] |
+| 2026-06 | **Magenta RealTime 2** | 230M·2.4B, Apple Silicon MLX, 프레임 40 ms, 제어 지연 약 200 ms, MIDI 음(128채널 피아노롤) 입력, 출력은 오디오, 미세조정 예정 | 예 | 공개 가중치 | [직접 공식] |
+
+- **Music Arena 기악 점수**: Lyria 3 Pro 1394(1위), Lyria 3 Clip 1003, Magenta RealTime Large 911(9위), Magenta RealTime 2 Base 809(13위) [사용자 화면]
+- **정리:** "Lyria 3 Pro"는 오프라인 노래 생성기라 즉흥 모델이 아닙니다. 실시간 계열은 Lyria RealTime(API)과 Magenta RealTime(공개)입니다. 둘 다 사용자의 연주를 듣고 솔로로 받아치지는 않습니다. MRT2는 MIDI 음을 따라가지만 출력이 오디오입니다
+
+### 6.5.2 안나 황 교수 — 현재와 연구 흐름
+
+- **현재:** 2024년 가을부터 MIT 부교수입니다(EECS와 음악·연극 MTA 겸임). 새 "Music Technology and Computation" 대학원 프로그램을 시작했고, 첫 학생들이 2026-05-13에 연구 발표회를 했습니다. 2025–26 Radcliffe 펠로우이고, 몬트리올대 겸임 교수입니다. 그 전에 Google Brain/DeepMind Magenta에서 약 8년 있었고, Mila CIFAR AI Chair였습니다 [직접 홈페이지] + [요약]
+- **연구 관심(홈페이지 원문 요지):** 상호작용 중심 생성 AI, 음악 이론·인지로 모델 해석과 제어, 음악가가 모델을 이해·조종하는 인터페이스, 사회적·다중 에이전트 RL과 음악가와 에이전트가 함께 즉흥하는 "jam space", 실시간 악기와 공동 즉흥을 위한 효율적 ML [직접]
+
+| 논문 | 연도·학회 | 내용 | 안나 황 | 확인 |
+|---|---|---|---|---|
+| Music Transformer | ICLR 2019 | 상대 위치 attention으로 긴 기호 음악 생성. 이 저장소의 출발점(13.4M 시기) | 1저자 | [기록] |
+| Coconet / Bach Doodle | 2017 / 2019 | 바흐 코랄 화성 붙이기, 대중용 상호작용 | 핵심 저자 | [직접 홈페이지] |
+| **ReaLchords** | ICML 2024 | 멜로디에 실시간 코드 반주. MLE 사전학습 → RL(화성·시간 일관성 보상 + 미래를 보는 교사 증류) | 마지막 저자 | [직접 저자] |
+| **ReaLJam** | CHI EA 2025 | ReaLchords 기반 실시간 잼 인터페이스. **anticipation**: 에이전트가 앞으로의 계획을 예측해 화면에 보여 줌. 숙련 연주자 사용자 연구 | 마지막 저자 | [직접 저자] |
+| **GAPT** | ICLR 2026 | RL 사후학습의 보상 해킹(단조로운 코드)을 판별자로 해결. 다양성·화성·적응 속도·주도감 개선 | 마지막 저자 | [직접 저자] |
+| Live Music Models | 2025 | Magenta RT·Lyria RT | 공동저자 | [직접 저자] |
+| **StreamMusicGen** | 2025 | 오디오 스트리밍 반주. 미래 가시성(t_f)과 출력 청크 길이(k)의 절충. 단순 MLE로는 부족 | 마지막 저자 | [직접 저자] |
+| jam_bot | ISMIR 2025 | MIT Media Lab, Jordan Rudess와 실시간 자유 즉흥(AMT) | 공동저자 | [기록] |
+| **LMDM** | 2026 | 오디오 디퓨전 스트리밍, ARC-Forcing. UCSD(McAuley, Berg-Kirkpatrick)와 공동 | 마지막 저자 | [직접 저자] |
+| H2H Music Improv | 2026 | 전문 즉흥 듀오의 소통 모델 + 6시간 시청각 데이터셋(연주자별 의도 주석) | 공동저자 | [직접 저자] |
+
+### 6.5.3 이 프로젝트와의 연결 (Claude 판단)
+
+- 안나 황 교수의 최근 연구 흐름("실시간으로 사람과 함께 연주하는 에이전트")은 이 프로젝트 목표와 가장 가까운 연구 계보입니다. CLAUDE.md §3.5에 적어 둔 "jam space" 구상도 같은 줄기입니다
+- **바로 가져올 교훈**
+  - **온라인 모델은 MLE만으로는 부족하다:** ReaLchords(RL + 미래를 보는 교사 증류), GAPT(판별자로 단조로움 방지), StreamMusicGen(단순 MLE 스트리밍 부족)이 모두 같은 방향입니다. #1760 adapter가 teacher-forced CE만 쓴 것과 바로 연결됩니다
+  - **미래 가시성과 청크 길이의 절충:** StreamMusicGen의 t_f·k는 우리 블록 계약의 1박 앞섬(BEAT)·블록 길이(B)와 같은 축입니다. 우리 블록 설계를 그 틀로 다시 볼 수 있습니다
+  - **계획을 보여 주는 상호작용:** ReaLJam의 anticipation 화면은 "연주자가 AI가 어디로 갈지 안다"는 설계입니다. 실시간 데모 설계 참고
+  - **소통 설계:** H2H의 의도·지각 주석 체계는 상호작용 평가 설계에 쓸 수 있습니다
+- **방향 차이:** ReaLchords·GAPT는 사람이 멜로디, AI가 코드입니다. 우리는 사람이 코드, AI가 솔로라 방향이 반대입니다. 하지만 학습 레시피(MLE 사전학습 → 일관성 보상 RL + 미래 교사 증류 + 판별자)는 그대로 옮길 수 있습니다(미검증)
+- GAPT 코드 저장소 이름이 `realchords-pytorch`로 알려져 있습니다 [요약, 미확인]
+
 ## 7. 이 프로젝트에 적용할 후보 (Claude 제안, 아스트라와 논의할 것)
 
 순서는 비용이 낮고 정보가 큰 것부터입니다.
@@ -350,6 +400,16 @@
 - StemGen: https://arxiv.org/abs/2312.08723 · STAGE: https://arxiv.org/abs/2504.05690 · DARC: https://arxiv.org/abs/2601.02357
 - Diff-A-Riff: https://arxiv.org/abs/2406.08384 · 후속: https://arxiv.org/abs/2410.23005
 - S2Accompanist: https://arxiv.org/abs/2605.17414
+
+**Google 계보·안나 황**
+- Live Music Models: https://arxiv.org/abs/2508.04651
+- Magenta RealTime: https://magenta.tensorflow.org/magenta-realtime · https://simonwillison.net/2025/Jun/20/magenta-realtime
+- Lyria RealTime: https://magenta.tensorflow.org/lyria-realtime · https://techcrunch.com/2025/05/20/google-brings-a-music-generating-ai-model-to-its-api-with-lyria-realtime
+- Lyria 2: https://alternativeto.net/news/2025/4/google-expands-music-ai-sandbox-toolset-with-lyria-2-model-for-professional-music-creation/
+- 안나 황 홈페이지: https://czhuang.github.io/ · MIT MTA: https://mta.mit.edu/node/14797 · Radcliffe: https://www.radcliffe.harvard.edu/people/cheng-zhi-anna-huang · MIT 음악기술 발표회: https://www.media.mit.edu/articles/inaugural-music-technology-research-showcase-celebrates-work-of-new-graduate-program-s-initial-students/
+- ReaLchords: https://proceedings.mlr.press/v235/wu24c.html · ReaLJam: https://arxiv.org/abs/2502.21267
+- GAPT: https://proceedings.iclr.cc/paper_files/paper/2026/hash/e6731a1d3eddafeb8c94669a1d82fc5d-Abstract-Conference.html
+- H2H Music Improv: https://arxiv.org/abs/2608.13957
 
 **실시간·상호작용**
 - jam_bot: https://www.media.mit.edu/publications/the-jam_bot-a-real-time-system-for-collaborative-free-improvisation-with-music-language-models/
