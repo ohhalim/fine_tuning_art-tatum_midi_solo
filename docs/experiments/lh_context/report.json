@@ -1,0 +1,113 @@
+{
+ "issue": 1772,
+ "songs": [
+  44,
+  68,
+  185,
+  134
+ ],
+ "w_ms": 7500.0,
+ "checks": {
+  "L1": 0,
+  "L1t": 0,
+  "L1f": 0,
+  "L2": 0,
+  "L3": 0,
+  "L4": 0,
+  "L5": 0,
+  "L6": 0,
+  "L7": 0,
+  "L8": 0
+ },
+ "contract_ok": true,
+ "counts": {
+  "requests": 1314,
+  "cold": 4,
+  "empty": 4,
+  "held": 867,
+  "released": 443,
+  "donor_missing": 11,
+  "ineligible_c": 11,
+  "b_equals_c": 0,
+  "extra_crop": 9,
+  "capacity_failure": 0,
+  "contract_violation": 0,
+  "lh_end_past_s": 1255,
+  "lh_dur_capped": 43,
+  "l7_zero_length_skipped": 1
+ },
+ "l7_notes_compared": 16525,
+ "l7_mismatch_examples": [],
+ "session_length": {
+  "a": {
+   "n": 1314,
+   "mean": 1827.88,
+   "median": 1815.0
+  },
+  "b": {
+   "n": 1314,
+   "mean": 1859.97,
+   "median": 1849.0
+  },
+  "c": {
+   "n": 1303,
+   "mean": 1859.87,
+   "median": 1847
+  }
+ },
+ "b_vs_c_summary": {
+  "b_mean_pitch": {
+   "n": 1299,
+   "mean": 46.27,
+   "median": 46.53846153846154
+  },
+  "c_mean_pitch": {
+   "n": 1299,
+   "mean": 46.1,
+   "median": 46.5
+  },
+  "b_mean_vel": {
+   "n": 1299,
+   "mean": 44.86,
+   "median": 44.333333333333336
+  },
+  "c_mean_vel": {
+   "n": 1299,
+   "mean": 45.67,
+   "median": 44.9
+  },
+  "b_total_ms": {
+   "n": 1299,
+   "mean": 6996.5,
+   "median": 6916
+  },
+  "c_total_ms": {
+   "n": 1299,
+   "mean": 7091.28,
+   "median": 6933
+  }
+ },
+ "inputs": {
+  "export": "/Users/ohhalim/git_box/lh_request_export_run3",
+  "velocity_manifest_sha256": "3506e550d90d1bb5794fd8e7ebb766e5110be78e049e153184e7fb4538d6d987",
+  "ariautils_absolute_py_sha256": "f31b85d28d34da9d1339fee3219214b3eae6ddbf1bca2d4daa729b72f6977b76"
+ },
+ "per_song": [
+  {
+   "idx": 44,
+   "requests": 248
+  },
+  {
+   "idx": 68,
+   "requests": 299
+  },
+  {
+   "idx": 185,
+   "requests": 219
+  },
+  {
+   "idx": 134,
+   "requests": 548
+  }
+ ]
+}
