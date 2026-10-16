@@ -1,0 +1,31 @@
+{
+ "issue": 1760,
+ "step": "diagnostic 3",
+ "alpha": {
+  "sounding": 1.15,
+  "recent": 1.09
+ },
+ "train_requests": 1050,
+ "results": {
+  "dev": {
+   "requests": 628,
+   "notes": 3007,
+   "mean_set_size": {
+    "sounding": 1.487,
+    "recent": 1.807
+   },
+   "gain_sounding_nats_per_note": 0.00237,
+   "gain_recent_nats_per_note": 0.00277
+  },
+  "all189": {
+   "requests": 31336,
+   "notes": 187703,
+   "mean_set_size": {
+    "sounding": 1.488,
+    "recent": 2.042
+   },
+   "gain_sounding_nats_per_note": 0.00317,
+   "gain_recent_nats_per_note": 0.00248
+  }
+ }
+}
