@@ -236,7 +236,7 @@ JPS 본체 비교(보고만 함):
 ### 10.5 청취 묶음
 
 - 위치: `/Users/ohhalim/git_box/jps_compare_run1/listening/`
-  - 쌍마다 `pairNN_A.m4a`·`pairNN_B.m4a`(생성 부분만, 약 23초)
+  - 쌍마다 `pairNN_A.m4a`·`pairNN_B.m4a`(생성 부분만, 23.0–27.3초. 마지막 음을 길게 끄는 칸은 파일이 더 깁니다)
   - 프라이머를 포함한 파일은 `with_primer/`
   - 답안지는 `ANSWER_SHEET.md`
 - 먼저 들을 쌍: 01, 03, 08, 09
