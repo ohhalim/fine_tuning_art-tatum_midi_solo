@@ -1,0 +1,5140 @@
+{
+ "issue": 1756,
+ "doc": "docs/experiments/LH_BLOCK_REQUEST_INPUT.md",
+ "quality_claimed": false,
+ "training": false,
+ "run": {
+  "git_head": "505570f7e64be9b2051d16a8e5b828d31d9034d7",
+  "block_request_sha256": "6b14081c8159f0dfd5e0c60c8192f4d5ac53ceef57e21d120190d78de0b70096",
+  "export_script_sha256": "efb3b8eb3ce23f9961600daa4f925c67c102776fc1c8986e6fb977b37bdd92c7",
+  "out_dir": "/Users/ohhalim/git_box/lh_request_export_run3",
+  "ariautils_version": "0.0.1",
+  "ariautils_absolute_py_sha256": "f31b85d28d34da9d1339fee3219214b3eae6ddbf1bca2d4daa729b72f6977b76",
+  "ariautils_midi_py_sha256": "856a98f6b628d4468e00c93c176b9e4c262ecdde1c250f774b4b7bf29163b946",
+  "tokenizer_config": {
+   "name": "abs",
+   "bos_tok": "<S>",
+   "eos_tok": "<E>",
+   "pad_tok": "<P>",
+   "unk_tok": "<U>",
+   "dim_tok": "<D>",
+   "vocab_size": 17727,
+   "pad_id": 2,
+   "abs_time_step_ms": 5000,
+   "max_dur_ms": 5000,
+   "time_step_ms": 10,
+   "velocity_step": 10,
+   "max_velocity": 120,
+   "include_drums": true,
+   "time_tok": "<T>",
+   "include_pedal": false,
+   "ped_on_tok": "<PED_ON>",
+   "ped_off_tok": "<PED_OFF>",
+   "include_delimiter": false,
+   "delimiter_tok": "<X>"
+  },
+  "manifest_sha256": "0b878763e7a25ee3b17e41ce647046476bf6814d036744fcd1e882cdf8f5fe18",
+  "seconds": 521.7
+ },
+ "params": {
+  "phases": [
+   0.0,
+   234.375,
+   468.75,
+   703.125
+  ],
+  "t0_rule": "PHASES[song index % 4]",
+  "payload": "g3 sounding at s_k, 12-PC multihot + available",
+  "capacity_tokens": 4096,
+  "cap_tokens_per_block": 64,
+  "split_pitch": 55,
+  "tokenize_kwargs": {
+   "remove_preceding_silence": false,
+   "add_dim_tok": false,
+   "add_eos_tok": true
+  },
+  "align_ms": 10.0
+ },
+ "checks": {
+  "c1_replay_mismatch": 0,
+  "c2_prefix_mismatch": 0,
+  "c3_observed_only_mismatch": 0,
+  "c4_low_pitch_tokens": 0,
+  "c5_misaligned_notes": 0,
+  "c6_dim_tokens": 0
+ },
+ "all_checks_zero": true,
+ "complete": true,
+ "contract_ok": true,
+ "note_changes": {
+  "matched": 333662,
+  "dur_over_cap": 843,
+  "dur_changed_other": 0,
+  "velocity_changed": 300266
+ },
+ "boundary_lead_ms": {
+  "n": 56298,
+  "mean": 269.011,
+  "min": 0.0,
+  "median": 147.5,
+  "p90": 636.25,
+  "max": 7278.125
+ },
+ "boundary_reuse": {
+  "n": 53570,
+  "mean": 1.051,
+  "min": 1,
+  "median": 1,
+  "p90": 1,
+  "max": 8
+ },
+ "totals": {
+  "c1_replay_mismatch": 0,
+  "c2_prefix_mismatch": 0,
+  "c3_observed_only_mismatch": 0,
+  "c4_low_pitch_tokens": 0,
+  "c5_misaligned_notes": 0,
+  "c6_dim_tokens": 0,
+  "requests": 56487,
+  "cold_requests": 189,
+  "warm_requests": 56298,
+  "warm_nonempty_payload": 38407,
+  "empty_windows": 2283,
+  "no_boundary": 189,
+  "windows_over_cap": 107,
+  "requests_over_capacity": 14891,
+  "tokens": 1012063,
+  "token_notes": 333662,
+  "target_notes": 333662,
+  "requests_horizon_reached_by_T": 2637
+ },
+ "warm_nonempty_ratio": 0.6822,
+ "distinct_pc12_sets_warm_nonempty": 446,
+ "top5_pc12_sets": [
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   3572
+  ],
+  [
+   [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   2568
+  ],
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   2560
+  ],
+  [
+   [
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   2463
+  ],
+  [
+   [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   2129
+  ]
+ ],
+ "context_tokens": {
+  "n": 56487,
+  "mean": 3000.422,
+  "min": 2,
+  "median": 2432,
+  "p90": 6421,
+  "max": 14288
+ },
+ "window_tokens": {
+  "n": 56487,
+  "mean": 17.899,
+  "min": 0,
+  "median": 16,
+  "p90": 33,
+  "max": 102
+ },
+ "boundary_tokens": {
+  "n": 56487,
+  "mean": 3.037,
+  "min": 0,
+  "median": 3,
+  "p90": 3,
+  "max": 4
+ },
+ "songs": [
+  {
+   "idx": 0,
+   "pianist": "Barry Harris",
+   "t0": 0.0,
+   "tokens": 7033,
+   "token_notes": 2325,
+   "target_notes": 2325,
+   "requests": 296,
+   "warm_nonempty_ratio": 0.6034,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2325,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2102
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "0af2b1ef0912cf166ec976ceb2d8b39aa10fac1805aebec4b2f16ffbc910ea59"
+  },
+  {
+   "idx": 1,
+   "pianist": "Barry Harris",
+   "t0": 234.375,
+   "tokens": 6855,
+   "token_notes": 2266,
+   "target_notes": 2266,
+   "requests": 292,
+   "warm_nonempty_ratio": 0.4948,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2266,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2067
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "be80d0569c7754abafe9f5183b6c3381dc6e69b533fc9d52b367bc4864b1a1a4"
+  },
+  {
+   "idx": 2,
+   "pianist": "Barry Harris",
+   "t0": 468.75,
+   "tokens": 4011,
+   "token_notes": 1318,
+   "target_notes": 1318,
+   "requests": 288,
+   "warm_nonempty_ratio": 0.6551,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1318,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1187
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "ab192cbf37922fa89a152137fb04b27c194776509fc3a6eeb1349ad3c862a3e1"
+  },
+  {
+   "idx": 3,
+   "pianist": "Barry Harris",
+   "t0": 703.125,
+   "tokens": 6994,
+   "token_notes": 2304,
+   "target_notes": 2304,
+   "requests": 421,
+   "warm_nonempty_ratio": 0.6952,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2304,
+    "dur_over_cap": 8,
+    "dur_changed_other": 0,
+    "velocity_changed": 2075
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "af95914ec655157faf8eb7aef0170ef874e3a87e46f59a69338c6a8bcd54cf4e"
+  },
+  {
+   "idx": 4,
+   "pianist": "Barry Harris",
+   "t0": 0.0,
+   "tokens": 7033,
+   "token_notes": 2309,
+   "target_notes": 2309,
+   "requests": 551,
+   "warm_nonempty_ratio": 0.7018,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2309,
+    "dur_over_cap": 11,
+    "dur_changed_other": 0,
+    "velocity_changed": 2065
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "d0794444b7b6dd492d8fd979a045b7ae7cb42435ce94cafa8c6a3df93fe7da9c"
+  },
+  {
+   "idx": 5,
+   "pianist": "Barry Harris",
+   "t0": 234.375,
+   "tokens": 4492,
+   "token_notes": 1483,
+   "target_notes": 1483,
+   "requests": 214,
+   "warm_nonempty_ratio": 0.4366,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1483,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1320
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "f39cc0e4cb64a088fb0f1da82fa205a03bc94c9096be5afc33dceb84578f8b82"
+  },
+  {
+   "idx": 6,
+   "pianist": "Barry Harris",
+   "t0": 468.75,
+   "tokens": 8978,
+   "token_notes": 2958,
+   "target_notes": 2958,
+   "requests": 541,
+   "warm_nonempty_ratio": 0.6907,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2958,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 2629
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "290497b9caf9d92ded0f94168ef109402738a2a1b0ece50bb9d316084ef6086e"
+  },
+  {
+   "idx": 7,
+   "pianist": "Barry Harris",
+   "t0": 703.125,
+   "tokens": 3641,
+   "token_notes": 1194,
+   "target_notes": 1194,
+   "requests": 299,
+   "warm_nonempty_ratio": 0.7383,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1194,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1052
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "43511d7652cb5508908d10daf562ae98f18a5069204597357241df57498f0398"
+  },
+  {
+   "idx": 8,
+   "pianist": "Barry Harris",
+   "t0": 0.0,
+   "tokens": 2921,
+   "token_notes": 961,
+   "target_notes": 961,
+   "requests": 187,
+   "warm_nonempty_ratio": 0.5108,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 961,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 860
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "aea704db37f3444132530ce7c984d61f2dd60a84a70f6e41e18f5005c513564d"
+  },
+  {
+   "idx": 9,
+   "pianist": "Barry Harris",
+   "t0": 234.375,
+   "tokens": 4524,
+   "token_notes": 1488,
+   "target_notes": 1488,
+   "requests": 308,
+   "warm_nonempty_ratio": 0.5993,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1488,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1338
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "75e2db31975184e3b3f4275f540bf052d870df8d337463ca5e4036e6ebb522bc"
+  },
+  {
+   "idx": 10,
+   "pianist": "Barry Harris",
+   "t0": 468.75,
+   "tokens": 5697,
+   "token_notes": 1883,
+   "target_notes": 1883,
+   "requests": 242,
+   "warm_nonempty_ratio": 0.7967,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1883,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1680
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "726e1ff8f778336eec56a5775bfe9360c1600bf216999d9f73a6a45ecb0ec038"
+  },
+  {
+   "idx": 11,
+   "pianist": "Barry Harris",
+   "t0": 703.125,
+   "tokens": 4286,
+   "token_notes": 1412,
+   "target_notes": 1412,
+   "requests": 252,
+   "warm_nonempty_ratio": 0.7928,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1412,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1273
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "301df3d04fc8d2e898fd480503da065d769f888c3090f1bb5508c8b832b7e662"
+  },
+  {
+   "idx": 12,
+   "pianist": "Barry Harris",
+   "t0": 0.0,
+   "tokens": 3419,
+   "token_notes": 1126,
+   "target_notes": 1126,
+   "requests": 205,
+   "warm_nonempty_ratio": 0.6324,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1126,
+    "dur_over_cap": 5,
+    "dur_changed_other": 0,
+    "velocity_changed": 1023
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "f55e5b0cea8d2c3ffebd4b99899d4d0b5d56806d2249a811a4c1cd617f84f0b6"
+  },
+  {
+   "idx": 13,
+   "pianist": "Barry Harris",
+   "t0": 234.375,
+   "tokens": 4624,
+   "token_notes": 1526,
+   "target_notes": 1526,
+   "requests": 234,
+   "warm_nonempty_ratio": 0.5536,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1526,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1382
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "4b6f8abd34eaf70862d59c8796ab0c0c852f8743af9366da5ea61d976d508b53"
+  },
+  {
+   "idx": 14,
+   "pianist": "Barry Harris",
+   "t0": 468.75,
+   "tokens": 3475,
+   "token_notes": 1141,
+   "target_notes": 1141,
+   "requests": 264,
+   "warm_nonempty_ratio": 0.6426,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1141,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 1024
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "117d1e86a609ce737c39954f1245bfedd715a69325374510e888e29a6aff29f1"
+  },
+  {
+   "idx": 15,
+   "pianist": "Barry Harris",
+   "t0": 703.125,
+   "tokens": 3499,
+   "token_notes": 1149,
+   "target_notes": 1149,
+   "requests": 264,
+   "warm_nonempty_ratio": 0.5741,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1149,
+    "dur_over_cap": 21,
+    "dur_changed_other": 0,
+    "velocity_changed": 1034
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "e8791c01ee3996f3b3cc8e19a7804626d8da002eb8b65489993fa66e462ea00c"
+  },
+  {
+   "idx": 16,
+   "pianist": "Barry Harris",
+   "t0": 0.0,
+   "tokens": 7168,
+   "token_notes": 2367,
+   "target_notes": 2367,
+   "requests": 346,
+   "warm_nonempty_ratio": 0.5739,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2367,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2147
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "6cdf645a1f315d087917d985032f4c0c10e6d627a1423d072b0b7d965fc60872"
+  },
+  {
+   "idx": 17,
+   "pianist": "Barry Harris",
+   "t0": 234.375,
+   "tokens": 5363,
+   "token_notes": 1762,
+   "target_notes": 1762,
+   "requests": 396,
+   "warm_nonempty_ratio": 0.7316,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1762,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 1591
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "14fb30574bdf29e880d5e36a84ca469ce4e8ed79922217c2637fd7a4d4d9995f"
+  },
+  {
+   "idx": 18,
+   "pianist": "Barry Harris",
+   "t0": 468.75,
+   "tokens": 3978,
+   "token_notes": 1312,
+   "target_notes": 1312,
+   "requests": 208,
+   "warm_nonempty_ratio": 0.4831,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1312,
+    "dur_over_cap": 13,
+    "dur_changed_other": 0,
+    "velocity_changed": 1176
+   },
+   "boundary_reuse_max": 1,
+   "file_sha256": "bb8b80908a5b94d2554b81d161248d8288e54e63147e0f7af48f543a1f4358f0"
+  },
+  {
+   "idx": 19,
+   "pianist": "Barry Harris",
+   "t0": 703.125,
+   "tokens": 3637,
+   "token_notes": 1198,
+   "target_notes": 1198,
+   "requests": 214,
+   "warm_nonempty_ratio": 0.6385,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1198,
+    "dur_over_cap": 16,
+    "dur_changed_other": 0,
+    "velocity_changed": 1079
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "205da6778682386984631dd7689e5709322c05d2b68c52dd533e1231d223539f"
+  },
+  {
+   "idx": 20,
+   "pianist": "Barry Harris",
+   "t0": 0.0,
+   "tokens": 4377,
+   "token_notes": 1445,
+   "target_notes": 1445,
+   "requests": 209,
+   "warm_nonempty_ratio": 0.4856,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1445,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1290
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "76dffc32b0c4c07cc464946fed5637f1fb6ff81b53ffe6d3441973f7530ae4f4"
+  },
+  {
+   "idx": 21,
+   "pianist": "Barry Harris",
+   "t0": 234.375,
+   "tokens": 6572,
+   "token_notes": 2161,
+   "target_notes": 2161,
+   "requests": 460,
+   "warm_nonempty_ratio": 0.6362,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2161,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1934
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "0b75aad24836d20136bbd6145d445d66fd08316881dfcaf3df14ce6765c75a9e"
+  },
+  {
+   "idx": 22,
+   "pianist": "Barry Harris",
+   "t0": 468.75,
+   "tokens": 4805,
+   "token_notes": 1576,
+   "target_notes": 1576,
+   "requests": 397,
+   "warm_nonempty_ratio": 0.7197,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1576,
+    "dur_over_cap": 15,
+    "dur_changed_other": 0,
+    "velocity_changed": 1395
+   },
+   "boundary_reuse_max": 6,
+   "file_sha256": "b7223973ead045be56b99eb126a1567a1f47017968510e19c3997bdb687389bc"
+  },
+  {
+   "idx": 23,
+   "pianist": "Barry Harris",
+   "t0": 703.125,
+   "tokens": 4267,
+   "token_notes": 1406,
+   "target_notes": 1406,
+   "requests": 247,
+   "warm_nonempty_ratio": 0.6504,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1406,
+    "dur_over_cap": 5,
+    "dur_changed_other": 0,
+    "velocity_changed": 1238
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "d2ee6e3f842fa83745f5483c7232bad56f0594633c4a42a286ec1b8fb0dba337"
+  },
+  {
+   "idx": 24,
+   "pianist": "Barry Harris",
+   "t0": 0.0,
+   "tokens": 3937,
+   "token_notes": 1300,
+   "target_notes": 1300,
+   "requests": 186,
+   "warm_nonempty_ratio": 0.6595,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1300,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1180
+   },
+   "boundary_reuse_max": 1,
+   "file_sha256": "61f4b2919562cc06d0c8cf1c83264d8e76c1ecf662950fb481b7160550049123"
+  },
+  {
+   "idx": 25,
+   "pianist": "Barry Harris",
+   "t0": 234.375,
+   "tokens": 5199,
+   "token_notes": 1708,
+   "target_notes": 1708,
+   "requests": 385,
+   "warm_nonempty_ratio": 0.6719,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1708,
+    "dur_over_cap": 11,
+    "dur_changed_other": 0,
+    "velocity_changed": 1560
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "d797cacb0ed27087b4faa5e9b6cf539c96dccf471e1abdd0003ff55dd20f575d"
+  },
+  {
+   "idx": 26,
+   "pianist": "Barry Harris",
+   "t0": 468.75,
+   "tokens": 3185,
+   "token_notes": 1048,
+   "target_notes": 1048,
+   "requests": 204,
+   "warm_nonempty_ratio": 0.6502,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1048,
+    "dur_over_cap": 8,
+    "dur_changed_other": 0,
+    "velocity_changed": 939
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "9836f895aa1714d14bd94236eca206e3bd725ba997b7cecd5c11a72d86055feb"
+  },
+  {
+   "idx": 27,
+   "pianist": "Cedar Walton",
+   "t0": 703.125,
+   "tokens": 4786,
+   "token_notes": 1577,
+   "target_notes": 1577,
+   "requests": 278,
+   "warm_nonempty_ratio": 0.6065,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1577,
+    "dur_over_cap": 5,
+    "dur_changed_other": 0,
+    "velocity_changed": 1419
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "03044c9ae4bb24c6c7e08f9ae4460ed3688d85c2845b82b7f127dc34d1a641c6"
+  },
+  {
+   "idx": 28,
+   "pianist": "Cedar Walton",
+   "t0": 0.0,
+   "tokens": 6123,
+   "token_notes": 2020,
+   "target_notes": 2020,
+   "requests": 324,
+   "warm_nonempty_ratio": 0.6594,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2020,
+    "dur_over_cap": 11,
+    "dur_changed_other": 0,
+    "velocity_changed": 1813
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "863d190c4d7ffa74b9fe78a5f585b0baf59065bfd988ab91c2f7a54697b43b3b"
+  },
+  {
+   "idx": 29,
+   "pianist": "Cedar Walton",
+   "t0": 234.375,
+   "tokens": 6982,
+   "token_notes": 2306,
+   "target_notes": 2306,
+   "requests": 327,
+   "warm_nonempty_ratio": 0.6626,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2306,
+    "dur_over_cap": 2,
+    "dur_changed_other": 0,
+    "velocity_changed": 2085
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "6688ba1f2141935d257e2c438a837ade7c7504c3fdf5c11bbf924424b4b2c6bc"
+  },
+  {
+   "idx": 30,
+   "pianist": "Cedar Walton",
+   "t0": 468.75,
+   "tokens": 4120,
+   "token_notes": 1357,
+   "target_notes": 1357,
+   "requests": 247,
+   "warm_nonempty_ratio": 0.7154,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1357,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1213
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "72e0e1ee2882c13203603e4038fe1daa1d7f5a459fc6ef67b2d312feaa27cc2a"
+  },
+  {
+   "idx": 31,
+   "pianist": "Cedar Walton",
+   "t0": 703.125,
+   "tokens": 8404,
+   "token_notes": 2778,
+   "target_notes": 2778,
+   "requests": 358,
+   "warm_nonempty_ratio": 0.5042,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2778,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2505
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "540f6533b123db667740ac106dc9da554025f7e47741b114f646030ec3a2e416"
+  },
+  {
+   "idx": 32,
+   "pianist": "Cedar Walton",
+   "t0": 0.0,
+   "tokens": 6709,
+   "token_notes": 2212,
+   "target_notes": 2212,
+   "requests": 376,
+   "warm_nonempty_ratio": 0.6773,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2212,
+    "dur_over_cap": 27,
+    "dur_changed_other": 0,
+    "velocity_changed": 1984
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "19f372bec84d092e624c9e6f43034733a438115b2ab91c6c92ce74a345e0a9ce"
+  },
+  {
+   "idx": 33,
+   "pianist": "Cedar Walton",
+   "t0": 234.375,
+   "tokens": 4839,
+   "token_notes": 1597,
+   "target_notes": 1597,
+   "requests": 243,
+   "warm_nonempty_ratio": 0.6198,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1597,
+    "dur_over_cap": 6,
+    "dur_changed_other": 0,
+    "velocity_changed": 1463
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "1baa1786f8df601975da4fad71aac5cb54a17febef7e1132ce7fb57147dcb9d3"
+  },
+  {
+   "idx": 34,
+   "pianist": "Cedar Walton",
+   "t0": 468.75,
+   "tokens": 5007,
+   "token_notes": 1652,
+   "target_notes": 1652,
+   "requests": 257,
+   "warm_nonempty_ratio": 0.5352,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1652,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1468
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "c913d9287d8e307c660fbbd983ecba7194773e72c4d781461e03b45a5e32e57e"
+  },
+  {
+   "idx": 35,
+   "pianist": "Cedar Walton",
+   "t0": 703.125,
+   "tokens": 3228,
+   "token_notes": 1059,
+   "target_notes": 1059,
+   "requests": 260,
+   "warm_nonempty_ratio": 0.8031,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1059,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 962
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "7aa85d0d6b92e30ca5b60b58b59d70795e7b518b2d2cc8213b3b4fced1d7e060"
+  },
+  {
+   "idx": 36,
+   "pianist": "Cedar Walton",
+   "t0": 0.0,
+   "tokens": 4558,
+   "token_notes": 1502,
+   "target_notes": 1502,
+   "requests": 266,
+   "warm_nonempty_ratio": 0.6377,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1502,
+    "dur_over_cap": 3,
+    "dur_changed_other": 0,
+    "velocity_changed": 1356
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "b7a58ee13eb9dbec61d3c065f123dea87100a8846b41370e7edd871665297a26"
+  },
+  {
+   "idx": 37,
+   "pianist": "Cedar Walton",
+   "t0": 234.375,
+   "tokens": 3593,
+   "token_notes": 1182,
+   "target_notes": 1182,
+   "requests": 239,
+   "warm_nonempty_ratio": 0.6723,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1182,
+    "dur_over_cap": 4,
+    "dur_changed_other": 0,
+    "velocity_changed": 1055
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "26e7c279eed3932255f8cab6226816acd5e8bcabcb4d7dec2d97f166b73a0b6c"
+  },
+  {
+   "idx": 38,
+   "pianist": "Cedar Walton",
+   "t0": 468.75,
+   "tokens": 4531,
+   "token_notes": 1489,
+   "target_notes": 1489,
+   "requests": 327,
+   "warm_nonempty_ratio": 0.9018,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1489,
+    "dur_over_cap": 24,
+    "dur_changed_other": 0,
+    "velocity_changed": 1352
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "aea49822e1c6d819ceb146de2eb6cf3204d088169b7108243c70ed49752d4bba"
+  },
+  {
+   "idx": 39,
+   "pianist": "Cedar Walton",
+   "t0": 703.125,
+   "tokens": 7287,
+   "token_notes": 2408,
+   "target_notes": 2408,
+   "requests": 322,
+   "warm_nonempty_ratio": 0.6417,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2408,
+    "dur_over_cap": 11,
+    "dur_changed_other": 0,
+    "velocity_changed": 2208
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "8695900e517b340f6f68a9db15bbf86cad163c377b86dadbe317a259a411f17c"
+  },
+  {
+   "idx": 40,
+   "pianist": "Cedar Walton",
+   "t0": 0.0,
+   "tokens": 3314,
+   "token_notes": 1092,
+   "target_notes": 1092,
+   "requests": 192,
+   "warm_nonempty_ratio": 0.5969,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1092,
+    "dur_over_cap": 2,
+    "dur_changed_other": 0,
+    "velocity_changed": 986
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "bda37ee959899c682d811ba2144a47e5530f371eded621e3ef6de0e646ca2d7e"
+  },
+  {
+   "idx": 41,
+   "pianist": "Cedar Walton",
+   "t0": 234.375,
+   "tokens": 3172,
+   "token_notes": 1042,
+   "target_notes": 1042,
+   "requests": 234,
+   "warm_nonempty_ratio": 0.8712,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1042,
+    "dur_over_cap": 18,
+    "dur_changed_other": 0,
+    "velocity_changed": 928
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "999c198ec59a511011284c9d26426d28c95f8e3d330117181da241d2e9ddee56"
+  },
+  {
+   "idx": 42,
+   "pianist": "Cedar Walton",
+   "t0": 468.75,
+   "tokens": 2826,
+   "token_notes": 928,
+   "target_notes": 928,
+   "requests": 210,
+   "warm_nonempty_ratio": 0.7943,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 928,
+    "dur_over_cap": 21,
+    "dur_changed_other": 0,
+    "velocity_changed": 856
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "9f0e790144e7a4ad6b5bc5cf1a0d93ee1347b859713f1d1efadb059d835780c1"
+  },
+  {
+   "idx": 43,
+   "pianist": "Cedar Walton",
+   "t0": 703.125,
+   "tokens": 3665,
+   "token_notes": 1206,
+   "target_notes": 1206,
+   "requests": 235,
+   "warm_nonempty_ratio": 0.6538,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1206,
+    "dur_over_cap": 7,
+    "dur_changed_other": 0,
+    "velocity_changed": 1074
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "ac79d98e1ebe2413c62564818ce74d4bae56985ad14576961f45b45db9f14a40"
+  },
+  {
+   "idx": 44,
+   "pianist": "Cedar Walton",
+   "t0": 0.0,
+   "tokens": 3550,
+   "token_notes": 1167,
+   "target_notes": 1167,
+   "requests": 248,
+   "warm_nonempty_ratio": 0.7773,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1167,
+    "dur_over_cap": 5,
+    "dur_changed_other": 0,
+    "velocity_changed": 1039
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "b99d11b35c7fd2924e3ed040cdd8ae3bf99247a590c2493a919c7a04a6bd0394"
+  },
+  {
+   "idx": 45,
+   "pianist": "Cedar Walton",
+   "t0": 234.375,
+   "tokens": 5993,
+   "token_notes": 1972,
+   "target_notes": 1972,
+   "requests": 397,
+   "warm_nonempty_ratio": 0.6818,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1972,
+    "dur_over_cap": 3,
+    "dur_changed_other": 0,
+    "velocity_changed": 1780
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "9d19536fb689a077a19c09f0d25a0c1aec0fc9fb000630d414f72080e8cdb5d0"
+  },
+  {
+   "idx": 46,
+   "pianist": "Cedar Walton",
+   "t0": 468.75,
+   "tokens": 4055,
+   "token_notes": 1332,
+   "target_notes": 1332,
+   "requests": 299,
+   "warm_nonempty_ratio": 0.6678,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1332,
+    "dur_over_cap": 15,
+    "dur_changed_other": 0,
+    "velocity_changed": 1191
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "c9098983186302dc5e2aad7fdc58fbc1e0c62dd0f1c018393e74ea07ad95eaf1"
+  },
+  {
+   "idx": 47,
+   "pianist": "Cedar Walton",
+   "t0": 703.125,
+   "tokens": 5812,
+   "token_notes": 1910,
+   "target_notes": 1910,
+   "requests": 422,
+   "warm_nonempty_ratio": 0.6722,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1910,
+    "dur_over_cap": 7,
+    "dur_changed_other": 0,
+    "velocity_changed": 1719
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "181b315f06235a483a36cea69a698329b0ae476f653dc8b3ed91ff27aa2e23dc"
+  },
+  {
+   "idx": 48,
+   "pianist": "Cedar Walton",
+   "t0": 0.0,
+   "tokens": 4880,
+   "token_notes": 1609,
+   "target_notes": 1609,
+   "requests": 271,
+   "warm_nonempty_ratio": 0.4741,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1609,
+    "dur_over_cap": 2,
+    "dur_changed_other": 0,
+    "velocity_changed": 1463
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "3a6380ce6349ffdc25039b80f225d3acec4762038bc8cf2be392cfb8c180f541"
+  },
+  {
+   "idx": 49,
+   "pianist": "Cedar Walton",
+   "t0": 234.375,
+   "tokens": 5644,
+   "token_notes": 1858,
+   "target_notes": 1858,
+   "requests": 362,
+   "warm_nonempty_ratio": 0.5734,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1858,
+    "dur_over_cap": 17,
+    "dur_changed_other": 0,
+    "velocity_changed": 1689
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "15e68c504c5507e1862ae6719be381fae38d08b10092d2596cdebbaeba75e9f3"
+  },
+  {
+   "idx": 50,
+   "pianist": "Cedar Walton",
+   "t0": 468.75,
+   "tokens": 4366,
+   "token_notes": 1436,
+   "target_notes": 1436,
+   "requests": 296,
+   "warm_nonempty_ratio": 0.6576,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1436,
+    "dur_over_cap": 32,
+    "dur_changed_other": 0,
+    "velocity_changed": 1290
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "336e52a6e5669ca8e17090c3effd872fada85d37af2e4986a772ddaabf86be44"
+  },
+  {
+   "idx": 51,
+   "pianist": "Cedar Walton",
+   "t0": 703.125,
+   "tokens": 4384,
+   "token_notes": 1443,
+   "target_notes": 1443,
+   "requests": 281,
+   "warm_nonempty_ratio": 0.6571,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1443,
+    "dur_over_cap": 8,
+    "dur_changed_other": 0,
+    "velocity_changed": 1297
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "e30d07c6a43b2a8c9673eeab5e9d47caf6a1957799f51a250368accef90e57fc"
+  },
+  {
+   "idx": 52,
+   "pianist": "Cedar Walton",
+   "t0": 0.0,
+   "tokens": 5511,
+   "token_notes": 1814,
+   "target_notes": 1814,
+   "requests": 354,
+   "warm_nonempty_ratio": 0.5666,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1814,
+    "dur_over_cap": 17,
+    "dur_changed_other": 0,
+    "velocity_changed": 1638
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "e6c677e38021e50330b658f8a9639058e61ffa6833e969eb2012db1dea3de365"
+  },
+  {
+   "idx": 53,
+   "pianist": "Cedar Walton",
+   "t0": 234.375,
+   "tokens": 3802,
+   "token_notes": 1244,
+   "target_notes": 1244,
+   "requests": 362,
+   "warm_nonempty_ratio": 0.867,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1244,
+    "dur_over_cap": 34,
+    "dur_changed_other": 0,
+    "velocity_changed": 1096
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "367a06a094a75c93a5c6fa463b3d911a652a8d7e003f129ab72e6f8037097e62"
+  },
+  {
+   "idx": 54,
+   "pianist": "Hank Jones",
+   "t0": 468.75,
+   "tokens": 6031,
+   "token_notes": 1989,
+   "target_notes": 1989,
+   "requests": 326,
+   "warm_nonempty_ratio": 0.7108,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1989,
+    "dur_over_cap": 7,
+    "dur_changed_other": 0,
+    "velocity_changed": 1796
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "b7b38e2ea23b2a46030d393ee030386366d54d42a17f509f5ebb08b5708d46c0"
+  },
+  {
+   "idx": 55,
+   "pianist": "Hank Jones",
+   "t0": 703.125,
+   "tokens": 4105,
+   "token_notes": 1349,
+   "target_notes": 1349,
+   "requests": 295,
+   "warm_nonempty_ratio": 0.8401,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1349,
+    "dur_over_cap": 13,
+    "dur_changed_other": 0,
+    "velocity_changed": 1210
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "448e71e1d606cb041311e3ff8861227c47464de2b3db7aa07ce497c8d10eee10"
+  },
+  {
+   "idx": 56,
+   "pianist": "Hank Jones",
+   "t0": 0.0,
+   "tokens": 6503,
+   "token_notes": 2148,
+   "target_notes": 2148,
+   "requests": 302,
+   "warm_nonempty_ratio": 0.7143,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2148,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1937
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "b8828466834cc04ff233db93d55004b745b9d65738e890e21c59722607097bbb"
+  },
+  {
+   "idx": 57,
+   "pianist": "Hank Jones",
+   "t0": 234.375,
+   "tokens": 4801,
+   "token_notes": 1587,
+   "target_notes": 1587,
+   "requests": 199,
+   "warm_nonempty_ratio": 0.5657,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1587,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1431
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "7044730ccf3247f084c3a2865901d0d7919a655aa7f250e11e3e2a9a91a6b93a"
+  },
+  {
+   "idx": 58,
+   "pianist": "Hank Jones",
+   "t0": 468.75,
+   "tokens": 6000,
+   "token_notes": 1982,
+   "target_notes": 1982,
+   "requests": 277,
+   "warm_nonempty_ratio": 0.6413,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1982,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1768
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "4bc0530b093ad4c7d7aa252653bac0dd7c6b14c871ba5bab0843487ee30298be"
+  },
+  {
+   "idx": 59,
+   "pianist": "Hank Jones",
+   "t0": 703.125,
+   "tokens": 5595,
+   "token_notes": 1849,
+   "target_notes": 1849,
+   "requests": 241,
+   "warm_nonempty_ratio": 0.6333,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1849,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1667
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "89204654edb0a73431c49b3b63271bf92f999ef700a28f62def45f3c44b8b334"
+  },
+  {
+   "idx": 60,
+   "pianist": "Hank Jones",
+   "t0": 0.0,
+   "tokens": 4878,
+   "token_notes": 1605,
+   "target_notes": 1605,
+   "requests": 324,
+   "warm_nonempty_ratio": 0.6966,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1605,
+    "dur_over_cap": 5,
+    "dur_changed_other": 0,
+    "velocity_changed": 1434
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "ea713c55ffd39293b7eb38f8f953e8d2c21b8cb95f9b5bc7c9c932a9743949d5"
+  },
+  {
+   "idx": 61,
+   "pianist": "Hank Jones",
+   "t0": 234.375,
+   "tokens": 7443,
+   "token_notes": 2462,
+   "target_notes": 2462,
+   "requests": 292,
+   "warm_nonempty_ratio": 0.5808,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2462,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2219
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "563b86c1ba9056b19fd2922504816dbc9d92fb9563c43310fe7bc2331fe8d6eb"
+  },
+  {
+   "idx": 62,
+   "pianist": "Hank Jones",
+   "t0": 468.75,
+   "tokens": 4142,
+   "token_notes": 1365,
+   "target_notes": 1365,
+   "requests": 237,
+   "warm_nonempty_ratio": 0.6314,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1365,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1239
+   },
+   "boundary_reuse_max": 8,
+   "file_sha256": "e79a2f0f79a3646eea6992f7a79f3f0874702d7c44dcb8a30dd0fba2e9b63cba"
+  },
+  {
+   "idx": 63,
+   "pianist": "Hank Jones",
+   "t0": 703.125,
+   "tokens": 4278,
+   "token_notes": 1412,
+   "target_notes": 1412,
+   "requests": 212,
+   "warm_nonempty_ratio": 0.6256,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1412,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1270
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "f2b82cb40355142b3783b05954599820f32dac721e54be2b27be1fa27b2989f3"
+  },
+  {
+   "idx": 64,
+   "pianist": "Hank Jones",
+   "t0": 0.0,
+   "tokens": 4767,
+   "token_notes": 1574,
+   "target_notes": 1574,
+   "requests": 227,
+   "warm_nonempty_ratio": 0.6504,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1574,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1424
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "948ff6c94e031d3289afa913f39a7cac901f5145b03911f0fe461a25af260767"
+  },
+  {
+   "idx": 65,
+   "pianist": "Hank Jones",
+   "t0": 234.375,
+   "tokens": 5351,
+   "token_notes": 1769,
+   "target_notes": 1769,
+   "requests": 219,
+   "warm_nonempty_ratio": 0.4541,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1769,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1602
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "802bbcf01b1a586a9066d6ba28a327ec9c2ecede8c5dce45d9419b20cf071529"
+  },
+  {
+   "idx": 66,
+   "pianist": "Hank Jones",
+   "t0": 468.75,
+   "tokens": 4847,
+   "token_notes": 1602,
+   "target_notes": 1602,
+   "requests": 206,
+   "warm_nonempty_ratio": 0.5561,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1602,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 1436
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "834f3113aa6a4de14fb3aed243a8dabbef7bd307456f6bbd9282caf08c3c7d2c"
+  },
+  {
+   "idx": 67,
+   "pianist": "Hank Jones",
+   "t0": 703.125,
+   "tokens": 4885,
+   "token_notes": 1618,
+   "target_notes": 1618,
+   "requests": 153,
+   "warm_nonempty_ratio": 0.4605,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1618,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1447
+   },
+   "boundary_reuse_max": 1,
+   "file_sha256": "5d6f09bf6572d6c2fffa39164888f0ebd077d42a48eb6993d859d2c17f0577e3"
+  },
+  {
+   "idx": 68,
+   "pianist": "Hank Jones",
+   "t0": 0.0,
+   "tokens": 6122,
+   "token_notes": 2021,
+   "target_notes": 2021,
+   "requests": 299,
+   "warm_nonempty_ratio": 0.5738,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2021,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 1836
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "fa09f55380e8bf22a7e556dd98ec3d22f329ad2c10a320902740e60effd316a5"
+  },
+  {
+   "idx": 69,
+   "pianist": "Hank Jones",
+   "t0": 234.375,
+   "tokens": 5850,
+   "token_notes": 1929,
+   "target_notes": 1929,
+   "requests": 320,
+   "warm_nonempty_ratio": 0.7335,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1929,
+    "dur_over_cap": 3,
+    "dur_changed_other": 0,
+    "velocity_changed": 1729
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "6c5ea123bbe2f8a375e06264321386396f2948411ef2a8f4b122a5ebbd375327"
+  },
+  {
+   "idx": 70,
+   "pianist": "Hank Jones",
+   "t0": 468.75,
+   "tokens": 5349,
+   "token_notes": 1770,
+   "target_notes": 1770,
+   "requests": 197,
+   "warm_nonempty_ratio": 0.5459,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1770,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1603
+   },
+   "boundary_reuse_max": 1,
+   "file_sha256": "efd58d661d0105d6f70edf5e012495b6d5b72f717757911113b55f406827aa37"
+  },
+  {
+   "idx": 71,
+   "pianist": "Hank Jones",
+   "t0": 703.125,
+   "tokens": 4681,
+   "token_notes": 1546,
+   "target_notes": 1546,
+   "requests": 213,
+   "warm_nonempty_ratio": 0.7311,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1546,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1386
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "00487f687a5e4e1070d610d7cb8d740f42e6f591c42e6f021f741cc60aace7ba"
+  },
+  {
+   "idx": 72,
+   "pianist": "Hank Jones",
+   "t0": 0.0,
+   "tokens": 4587,
+   "token_notes": 1515,
+   "target_notes": 1515,
+   "requests": 213,
+   "warm_nonempty_ratio": 0.6981,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1515,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1372
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "1de53262f5b46740654fff7abfdf9d0c840142f76a6bfd1465bc7fb01ed313d5"
+  },
+  {
+   "idx": 73,
+   "pianist": "Hank Jones",
+   "t0": 234.375,
+   "tokens": 4899,
+   "token_notes": 1621,
+   "target_notes": 1621,
+   "requests": 178,
+   "warm_nonempty_ratio": 0.5593,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1621,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1450
+   },
+   "boundary_reuse_max": 1,
+   "file_sha256": "c3ed705069b00af09f8c29fa54f40c23b15bda3f4d5fd01e7ac6b48eef20ff88"
+  },
+  {
+   "idx": 74,
+   "pianist": "Hank Jones",
+   "t0": 468.75,
+   "tokens": 3776,
+   "token_notes": 1244,
+   "target_notes": 1244,
+   "requests": 219,
+   "warm_nonempty_ratio": 0.7844,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1244,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1115
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "31b931460916379326d59cc61eda54d55de7b42aebdc464f40386d17d5f146cb"
+  },
+  {
+   "idx": 75,
+   "pianist": "Hank Jones",
+   "t0": 703.125,
+   "tokens": 5989,
+   "token_notes": 1975,
+   "target_notes": 1975,
+   "requests": 326,
+   "warm_nonempty_ratio": 0.7846,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1975,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1790
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "a2e726ef84416265d0b8ab5b54282437cb7ad3d4d978dd5df2aa23e246c152cc"
+  },
+  {
+   "idx": 76,
+   "pianist": "Hank Jones",
+   "t0": 0.0,
+   "tokens": 3281,
+   "token_notes": 1084,
+   "target_notes": 1084,
+   "requests": 144,
+   "warm_nonempty_ratio": 0.6853,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1084,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 974
+   },
+   "boundary_reuse_max": 1,
+   "file_sha256": "6bfc227a366585259735d861d3aea3cec50cb4378cfd76c1d2fd2225a674197d"
+  },
+  {
+   "idx": 77,
+   "pianist": "Hank Jones",
+   "t0": 234.375,
+   "tokens": 4213,
+   "token_notes": 1390,
+   "target_notes": 1390,
+   "requests": 218,
+   "warm_nonempty_ratio": 0.7696,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1390,
+    "dur_over_cap": 2,
+    "dur_changed_other": 0,
+    "velocity_changed": 1258
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "181fa067482aabe80d604bb84329f4c6978721e7ddb0567fa4bf7a1ece8a6d4a"
+  },
+  {
+   "idx": 78,
+   "pianist": "Hank Jones",
+   "t0": 468.75,
+   "tokens": 4527,
+   "token_notes": 1494,
+   "target_notes": 1494,
+   "requests": 227,
+   "warm_nonempty_ratio": 0.708,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1494,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1364
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "c3c5ca32442ca634fb32bd58fa494d9aac4c279e039f83724e3a7d775e9e0d21"
+  },
+  {
+   "idx": 79,
+   "pianist": "Hank Jones",
+   "t0": 703.125,
+   "tokens": 3738,
+   "token_notes": 1234,
+   "target_notes": 1234,
+   "requests": 180,
+   "warm_nonempty_ratio": 0.8101,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1234,
+    "dur_over_cap": 10,
+    "dur_changed_other": 0,
+    "velocity_changed": 1122
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "d6cbbd36104b47cdf73a55cac62c9bda07f5e2e12174c5e2ffe87de69c2137b7"
+  },
+  {
+   "idx": 80,
+   "pianist": "Hank Jones",
+   "t0": 0.0,
+   "tokens": 3363,
+   "token_notes": 1109,
+   "target_notes": 1109,
+   "requests": 178,
+   "warm_nonempty_ratio": 0.7571,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1109,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 1002
+   },
+   "boundary_reuse_max": 1,
+   "file_sha256": "dd72fbf33fe6f283aede4172a8f89b66b03f555af7fa57bdb9e814f962d34dea"
+  },
+  {
+   "idx": 81,
+   "pianist": "Hank Jones",
+   "t0": 234.375,
+   "tokens": 4139,
+   "token_notes": 1365,
+   "target_notes": 1365,
+   "requests": 221,
+   "warm_nonempty_ratio": 0.7545,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1365,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1213
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "95d39d2b117222b5cb6b143d1d81053bdfa9e0a48d5c6efcb8e4d3e5a26b5714"
+  },
+  {
+   "idx": 82,
+   "pianist": "Hank Jones",
+   "t0": 468.75,
+   "tokens": 3023,
+   "token_notes": 997,
+   "target_notes": 997,
+   "requests": 159,
+   "warm_nonempty_ratio": 0.8291,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 997,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 893
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "8ba1e310842aa9d7dd0e2352cb2d0ea03b33b06dccfe5d510ead4ce14b98b876"
+  },
+  {
+   "idx": 83,
+   "pianist": "Hank Jones",
+   "t0": 703.125,
+   "tokens": 4960,
+   "token_notes": 1637,
+   "target_notes": 1637,
+   "requests": 249,
+   "warm_nonempty_ratio": 0.8347,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1637,
+    "dur_over_cap": 4,
+    "dur_changed_other": 0,
+    "velocity_changed": 1477
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "39c8cfe5152965372cbd422b7516fa01dea81d19d2f744aefa110cd4af06edf5"
+  },
+  {
+   "idx": 84,
+   "pianist": "Hank Jones",
+   "t0": 0.0,
+   "tokens": 4717,
+   "token_notes": 1557,
+   "target_notes": 1557,
+   "requests": 230,
+   "warm_nonempty_ratio": 0.69,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1557,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1408
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "10c9dbaedcf941d74e17a76c9498f4982eb53a4e4515c802f1ef74076dc7b9d6"
+  },
+  {
+   "idx": 85,
+   "pianist": "Hank Jones",
+   "t0": 234.375,
+   "tokens": 2376,
+   "token_notes": 778,
+   "target_notes": 778,
+   "requests": 213,
+   "warm_nonempty_ratio": 0.9245,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 778,
+    "dur_over_cap": 24,
+    "dur_changed_other": 0,
+    "velocity_changed": 698
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "fcd52edfaf7520355900d6fe5e376d367bdfd1abc67a2dca9f2311dfeaf8726b"
+  },
+  {
+   "idx": 86,
+   "pianist": "Hank Jones",
+   "t0": 468.75,
+   "tokens": 4438,
+   "token_notes": 1464,
+   "target_notes": 1464,
+   "requests": 231,
+   "warm_nonempty_ratio": 0.8,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1464,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1328
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "e443429c6536bbbf9b9f83200a002d17aabe7aa9202019753f39011f12c2f2e5"
+  },
+  {
+   "idx": 87,
+   "pianist": "Duke Jordan",
+   "t0": 703.125,
+   "tokens": 3281,
+   "token_notes": 1080,
+   "target_notes": 1080,
+   "requests": 203,
+   "warm_nonempty_ratio": 0.901,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1080,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 953
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "d7d64c8e2745f06cc93c986b28c70b7f33b11fa3a8832856e659546e5ae34b2b"
+  },
+  {
+   "idx": 88,
+   "pianist": "Duke Jordan",
+   "t0": 0.0,
+   "tokens": 7897,
+   "token_notes": 2606,
+   "target_notes": 2606,
+   "requests": 409,
+   "warm_nonempty_ratio": 0.7819,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2606,
+    "dur_over_cap": 5,
+    "dur_changed_other": 0,
+    "velocity_changed": 2399
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "79e2f557d9d7a7680e7697943bcf950b84776924251cbdceac271904062ef813"
+  },
+  {
+   "idx": 89,
+   "pianist": "Duke Jordan",
+   "t0": 234.375,
+   "tokens": 4044,
+   "token_notes": 1337,
+   "target_notes": 1337,
+   "requests": 164,
+   "warm_nonempty_ratio": 0.8466,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1337,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1207
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "e411a20b12986fda11a6930a0839d6e68b1d15580a91851c1a573a5ff759d9fe"
+  },
+  {
+   "idx": 90,
+   "pianist": "Duke Jordan",
+   "t0": 468.75,
+   "tokens": 3218,
+   "token_notes": 1059,
+   "target_notes": 1059,
+   "requests": 203,
+   "warm_nonempty_ratio": 0.9059,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1059,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 933
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "4d76b53b593f50e9110fb6d6017b853f6fa8e0add64dab4162433b58509ead84"
+  },
+  {
+   "idx": 91,
+   "pianist": "Duke Jordan",
+   "t0": 703.125,
+   "tokens": 3165,
+   "token_notes": 1040,
+   "target_notes": 1040,
+   "requests": 226,
+   "warm_nonempty_ratio": 0.8178,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1040,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 952
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "62678e49bc9bbb6462d0efb31e55a8bdd6e9ba5d7d0df6255d492e234546c75e"
+  },
+  {
+   "idx": 92,
+   "pianist": "Duke Jordan",
+   "t0": 0.0,
+   "tokens": 3030,
+   "token_notes": 996,
+   "target_notes": 996,
+   "requests": 209,
+   "warm_nonempty_ratio": 0.9519,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 996,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 898
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "8ce04b24d8e871fc9e0dc63f50b399182c3def678d9fcb83c21421ef1b9e9679"
+  },
+  {
+   "idx": 93,
+   "pianist": "Duke Jordan",
+   "t0": 234.375,
+   "tokens": 3745,
+   "token_notes": 1233,
+   "target_notes": 1233,
+   "requests": 233,
+   "warm_nonempty_ratio": 0.9052,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1233,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1119
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "0044b206b96046e19f918658d078809fee7a7428a10fe6bdbbb1dee4296b2e73"
+  },
+  {
+   "idx": 94,
+   "pianist": "Duke Jordan",
+   "t0": 468.75,
+   "tokens": 2916,
+   "token_notes": 963,
+   "target_notes": 963,
+   "requests": 130,
+   "warm_nonempty_ratio": 0.8295,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 963,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 882
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "e4634310c61cd55bc434df039dcc2c818b4347b24e589cb91b136318fd13a067"
+  },
+  {
+   "idx": 95,
+   "pianist": "Duke Jordan",
+   "t0": 703.125,
+   "tokens": 2328,
+   "token_notes": 762,
+   "target_notes": 762,
+   "requests": 208,
+   "warm_nonempty_ratio": 0.9275,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 762,
+    "dur_over_cap": 2,
+    "dur_changed_other": 0,
+    "velocity_changed": 673
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "c4e3f0a0eccdd94913f157115ec1033aefd5680e28cfb33fc1e3b98098ff0464"
+  },
+  {
+   "idx": 96,
+   "pianist": "Duke Jordan",
+   "t0": 0.0,
+   "tokens": 5403,
+   "token_notes": 1783,
+   "target_notes": 1783,
+   "requests": 277,
+   "warm_nonempty_ratio": 0.8696,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1783,
+    "dur_over_cap": 3,
+    "dur_changed_other": 0,
+    "velocity_changed": 1615
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "1f2fa1109a3c64543177f15d7786f067b2a35094c6e9856aad8fe587248eb848"
+  },
+  {
+   "idx": 97,
+   "pianist": "Duke Jordan",
+   "t0": 234.375,
+   "tokens": 4050,
+   "token_notes": 1335,
+   "target_notes": 1335,
+   "requests": 225,
+   "warm_nonempty_ratio": 0.9152,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1335,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1163
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "a6bea3688d28987e2433cf80a45a56b5825e69a7a1fdeb31854cf97803d80985"
+  },
+  {
+   "idx": 98,
+   "pianist": "Duke Jordan",
+   "t0": 468.75,
+   "tokens": 2413,
+   "token_notes": 793,
+   "target_notes": 793,
+   "requests": 169,
+   "warm_nonempty_ratio": 0.9226,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 793,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 708
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "ec3170610a81eeeb1884dec69ad6620c6d7f46cf5707310fe87e7e21507903df"
+  },
+  {
+   "idx": 99,
+   "pianist": "Duke Jordan",
+   "t0": 703.125,
+   "tokens": 3610,
+   "token_notes": 1188,
+   "target_notes": 1188,
+   "requests": 232,
+   "warm_nonempty_ratio": 0.8918,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1188,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1056
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "95884e11b86b1390a72da89934ad3d141974a7b18b064cf8f277c6f175980af4"
+  },
+  {
+   "idx": 100,
+   "pianist": "Duke Jordan",
+   "t0": 0.0,
+   "tokens": 4787,
+   "token_notes": 1581,
+   "target_notes": 1581,
+   "requests": 223,
+   "warm_nonempty_ratio": 0.8919,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1581,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1366
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "4388af9bd8082591471f7f1ffde8c8bc9dff069251a4d64036e5932aead15d94"
+  },
+  {
+   "idx": 101,
+   "pianist": "Duke Jordan",
+   "t0": 234.375,
+   "tokens": 4075,
+   "token_notes": 1345,
+   "target_notes": 1345,
+   "requests": 198,
+   "warm_nonempty_ratio": 0.7208,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1345,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1225
+   },
+   "boundary_reuse_max": 1,
+   "file_sha256": "b6568cf9a4520e6ea95583674429b163d598a89c5d9c34c687beaed1d624ce73"
+  },
+  {
+   "idx": 102,
+   "pianist": "Duke Jordan",
+   "t0": 468.75,
+   "tokens": 2220,
+   "token_notes": 728,
+   "target_notes": 728,
+   "requests": 177,
+   "warm_nonempty_ratio": 0.9375,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 728,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 661
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "8cde937bf0a1e6105324d3e0094ddc5ebbdfdc73289141acfabc5c83b4b70b66"
+  },
+  {
+   "idx": 103,
+   "pianist": "Duke Jordan",
+   "t0": 703.125,
+   "tokens": 4016,
+   "token_notes": 1321,
+   "target_notes": 1321,
+   "requests": 266,
+   "warm_nonempty_ratio": 0.9057,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1321,
+    "dur_over_cap": 4,
+    "dur_changed_other": 0,
+    "velocity_changed": 1179
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "18353feed7bf960eb9e7a311b8c41da296f31bd27dfffdde78108d15257e888d"
+  },
+  {
+   "idx": 104,
+   "pianist": "Duke Jordan",
+   "t0": 0.0,
+   "tokens": 1878,
+   "token_notes": 615,
+   "target_notes": 615,
+   "requests": 165,
+   "warm_nonempty_ratio": 0.9207,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 615,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 545
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "4baeb70a940296086383ee5e105dc84fcf0048a436a8f996292ef4a9ce575194"
+  },
+  {
+   "idx": 105,
+   "pianist": "Duke Jordan",
+   "t0": 234.375,
+   "tokens": 3588,
+   "token_notes": 1180,
+   "target_notes": 1180,
+   "requests": 243,
+   "warm_nonempty_ratio": 0.8471,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1180,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1066
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "6a4049aa5c2b17f99c5f16308197eee73a23540060796f71d607ffa219a61c0a"
+  },
+  {
+   "idx": 106,
+   "pianist": "Duke Jordan",
+   "t0": 468.75,
+   "tokens": 1641,
+   "token_notes": 539,
+   "target_notes": 539,
+   "requests": 115,
+   "warm_nonempty_ratio": 0.8596,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 539,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 488
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "420ba33965f30b0ed8ed014a9418e288c946b617f5f745bedf72fd9d12b09b74"
+  },
+  {
+   "idx": 107,
+   "pianist": "Duke Jordan",
+   "t0": 703.125,
+   "tokens": 2200,
+   "token_notes": 722,
+   "target_notes": 722,
+   "requests": 167,
+   "warm_nonempty_ratio": 0.8133,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 722,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 646
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "248e89c978fb1c6c6377fcc3b541c3d04d9a1407c4fbaa8c189a97191655e742"
+  },
+  {
+   "idx": 108,
+   "pianist": "Duke Jordan",
+   "t0": 0.0,
+   "tokens": 3272,
+   "token_notes": 1077,
+   "target_notes": 1077,
+   "requests": 205,
+   "warm_nonempty_ratio": 0.799,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1077,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 939
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "cea9b8574704f8fdf99d46291fd4f59eb1a2d867d52fc9b5a2658746b98aaa18"
+  },
+  {
+   "idx": 109,
+   "pianist": "Duke Jordan",
+   "t0": 234.375,
+   "tokens": 3376,
+   "token_notes": 1105,
+   "target_notes": 1105,
+   "requests": 311,
+   "warm_nonempty_ratio": 0.8839,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1105,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 997
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "e2d6fb574a8e95594ef20b7f00db20b5c4e43e2b3c9eb1261cfb650c2da13d31"
+  },
+  {
+   "idx": 110,
+   "pianist": "Duke Jordan",
+   "t0": 468.75,
+   "tokens": 2377,
+   "token_notes": 781,
+   "target_notes": 781,
+   "requests": 169,
+   "warm_nonempty_ratio": 0.8155,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 781,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 716
+   },
+   "boundary_reuse_max": 1,
+   "file_sha256": "9c4afffb95cd9a0618ab6d62b1013936277492303bc3701a820fd4d4f1bb3060"
+  },
+  {
+   "idx": 111,
+   "pianist": "Duke Jordan",
+   "t0": 703.125,
+   "tokens": 1929,
+   "token_notes": 626,
+   "target_notes": 626,
+   "requests": 260,
+   "warm_nonempty_ratio": 0.8031,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 626,
+    "dur_over_cap": 2,
+    "dur_changed_other": 0,
+    "velocity_changed": 571
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "50e93d6c8c6dd58c337639e6867353cd8aa91575b5fb0ee9c9145caae92d755e"
+  },
+  {
+   "idx": 112,
+   "pianist": "Duke Jordan",
+   "t0": 0.0,
+   "tokens": 1783,
+   "token_notes": 580,
+   "target_notes": 580,
+   "requests": 215,
+   "warm_nonempty_ratio": 0.9299,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 580,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 509
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "c18230b6bb4bf0fa53ee1913e6b3938f63d95b831d90050023005b0db2bc60f0"
+  },
+  {
+   "idx": 113,
+   "pianist": "Duke Jordan",
+   "t0": 234.375,
+   "tokens": 3516,
+   "token_notes": 1156,
+   "target_notes": 1156,
+   "requests": 241,
+   "warm_nonempty_ratio": 0.8708,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1156,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1028
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "51cf28a1339c3e00ca1ce08911fe258d1492a6fd79036c6cd1eb577b9103388b"
+  },
+  {
+   "idx": 114,
+   "pianist": "Duke Jordan",
+   "t0": 468.75,
+   "tokens": 2111,
+   "token_notes": 688,
+   "target_notes": 688,
+   "requests": 238,
+   "warm_nonempty_ratio": 0.8819,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 688,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 611
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "299940dc5fcc9b3210ca247ba2bf3542397cd708157794cb1287f4d505d4062c"
+  },
+  {
+   "idx": 115,
+   "pianist": "Duke Jordan",
+   "t0": 703.125,
+   "tokens": 860,
+   "token_notes": 280,
+   "target_notes": 280,
+   "requests": 91,
+   "warm_nonempty_ratio": 0.8889,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 280,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 256
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "c23d827940f10479e297156c4c79f6b7ad6fc9a56422592261569535c964e19e"
+  },
+  {
+   "idx": 116,
+   "pianist": "Duke Jordan",
+   "t0": 0.0,
+   "tokens": 2195,
+   "token_notes": 721,
+   "target_notes": 721,
+   "requests": 159,
+   "warm_nonempty_ratio": 0.7911,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 721,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 640
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "939915c690c5676d08bb1a61d831cac0d9a64e6ef80e04cc7f29c89f206d68d5"
+  },
+  {
+   "idx": 117,
+   "pianist": "Duke Jordan",
+   "t0": 234.375,
+   "tokens": 1594,
+   "token_notes": 520,
+   "target_notes": 520,
+   "requests": 168,
+   "warm_nonempty_ratio": 0.8323,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 520,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 467
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "0547eae81d6b6d3ee10a6f1d86e0221902a01d0690d5100f76d5fef07b943b6b"
+  },
+  {
+   "idx": 118,
+   "pianist": "Kenny Barron",
+   "t0": 468.75,
+   "tokens": 10139,
+   "token_notes": 3357,
+   "target_notes": 3357,
+   "requests": 350,
+   "warm_nonempty_ratio": 0.3181,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3357,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2995
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "801680dbebc5d7b71d7932615e824413beb3eb08de0a24062b191094cad668af"
+  },
+  {
+   "idx": 119,
+   "pianist": "Kenny Barron",
+   "t0": 703.125,
+   "tokens": 8142,
+   "token_notes": 2684,
+   "target_notes": 2684,
+   "requests": 466,
+   "warm_nonempty_ratio": 0.6452,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2684,
+    "dur_over_cap": 7,
+    "dur_changed_other": 0,
+    "velocity_changed": 2390
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "46456975c059a8f5d1965f8e2476306658e0ac8b16f252ea3174e96ae1e79fbb"
+  },
+  {
+   "idx": 120,
+   "pianist": "Kenny Barron",
+   "t0": 0.0,
+   "tokens": 9413,
+   "token_notes": 3103,
+   "target_notes": 3103,
+   "requests": 541,
+   "warm_nonempty_ratio": 0.5852,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3103,
+    "dur_over_cap": 6,
+    "dur_changed_other": 0,
+    "velocity_changed": 2790
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "3eae06e1f09231ecb1890cc02d04e8ddab78f65a9c4e407a52288787352717c2"
+  },
+  {
+   "idx": 121,
+   "pianist": "Kenny Barron",
+   "t0": 234.375,
+   "tokens": 8319,
+   "token_notes": 2729,
+   "target_notes": 2729,
+   "requests": 691,
+   "warm_nonempty_ratio": 0.8435,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2729,
+    "dur_over_cap": 4,
+    "dur_changed_other": 0,
+    "velocity_changed": 2464
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "52baa7c8edad062b18fb0954fb19203ade60335c04a0d080e625a8163cd1fee7"
+  },
+  {
+   "idx": 122,
+   "pianist": "Kenny Barron",
+   "t0": 468.75,
+   "tokens": 11963,
+   "token_notes": 3947,
+   "target_notes": 3947,
+   "requests": 635,
+   "warm_nonempty_ratio": 0.7019,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3947,
+    "dur_over_cap": 2,
+    "dur_changed_other": 0,
+    "velocity_changed": 3592
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "81216b15615dca4b260a07f21930c7f94cc375af96170e083c585edaac3269fb"
+  },
+  {
+   "idx": 123,
+   "pianist": "Kenny Barron",
+   "t0": 703.125,
+   "tokens": 11160,
+   "token_notes": 3692,
+   "target_notes": 3692,
+   "requests": 435,
+   "warm_nonempty_ratio": 0.4401,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3692,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 3318
+   },
+   "boundary_reuse_max": 8,
+   "file_sha256": "3e93361c0ba13849e5988aff15c2df5ec7a85bc6ba572bc7d15e4f4b9752664e"
+  },
+  {
+   "idx": 124,
+   "pianist": "Kenny Barron",
+   "t0": 0.0,
+   "tokens": 12885,
+   "token_notes": 4259,
+   "target_notes": 4259,
+   "requests": 565,
+   "warm_nonempty_ratio": 0.6064,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 4259,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 3797
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "64fca8cc71b816a599a6ed52bd1f9af644602f9078bcd3e042d88005e1c79730"
+  },
+  {
+   "idx": 125,
+   "pianist": "Kenny Barron",
+   "t0": 234.375,
+   "tokens": 8854,
+   "token_notes": 2923,
+   "target_notes": 2923,
+   "requests": 438,
+   "warm_nonempty_ratio": 0.5217,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2923,
+    "dur_over_cap": 8,
+    "dur_changed_other": 0,
+    "velocity_changed": 2619
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "a8291d008a98eb7d4dc441a2a3d4a97be24a2ae3faa31cff476d2d4a60ae2197"
+  },
+  {
+   "idx": 126,
+   "pianist": "Kenny Barron",
+   "t0": 468.75,
+   "tokens": 8117,
+   "token_notes": 2681,
+   "target_notes": 2681,
+   "requests": 380,
+   "warm_nonempty_ratio": 0.8628,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2681,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2446
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "0f19287d8380abd1754d769108f33bdb3d254cf34469391593d97135d2df725c"
+  },
+  {
+   "idx": 127,
+   "pianist": "Kenny Barron",
+   "t0": 703.125,
+   "tokens": 4859,
+   "token_notes": 1603,
+   "target_notes": 1603,
+   "requests": 251,
+   "warm_nonempty_ratio": 0.696,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1603,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1428
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "275af0845f3f5c1bfc428b048882a693f3c46445c51393458b5d257b1f3f0b80"
+  },
+  {
+   "idx": 128,
+   "pianist": "Kenny Barron",
+   "t0": 0.0,
+   "tokens": 5905,
+   "token_notes": 1943,
+   "target_notes": 1943,
+   "requests": 391,
+   "warm_nonempty_ratio": 0.8462,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1943,
+    "dur_over_cap": 3,
+    "dur_changed_other": 0,
+    "velocity_changed": 1741
+   },
+   "boundary_reuse_max": 1,
+   "file_sha256": "fa1344f26d6e6388703d2c8a47589d061f3c04555dc6381e0664d03e26e42829"
+  },
+  {
+   "idx": 129,
+   "pianist": "Kenny Barron",
+   "t0": 234.375,
+   "tokens": 6236,
+   "token_notes": 2047,
+   "target_notes": 2047,
+   "requests": 492,
+   "warm_nonempty_ratio": 0.5418,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2047,
+    "dur_over_cap": 11,
+    "dur_changed_other": 0,
+    "velocity_changed": 1860
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "f82185b6ad3d6b896e93f9c9f883791c08b017bbf4aac50a44de4e9092337e2d"
+  },
+  {
+   "idx": 130,
+   "pianist": "Kenny Barron",
+   "t0": 468.75,
+   "tokens": 8035,
+   "token_notes": 2655,
+   "target_notes": 2655,
+   "requests": 360,
+   "warm_nonempty_ratio": 0.4986,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2655,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2396
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "8cebaabe1ec486b4dc392c0abf1e75691bee766c71702a7a766306355f574532"
+  },
+  {
+   "idx": 131,
+   "pianist": "Kenny Barron",
+   "t0": 703.125,
+   "tokens": 8500,
+   "token_notes": 2799,
+   "target_notes": 2799,
+   "requests": 536,
+   "warm_nonempty_ratio": 0.8486,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2799,
+    "dur_over_cap": 5,
+    "dur_changed_other": 0,
+    "velocity_changed": 2537
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "9d5f80d48c9c1991be8607d2782d92a66b9a87199fbb46463195ffc8573c386f"
+  },
+  {
+   "idx": 132,
+   "pianist": "Kenny Barron",
+   "t0": 0.0,
+   "tokens": 6019,
+   "token_notes": 1985,
+   "target_notes": 1985,
+   "requests": 329,
+   "warm_nonempty_ratio": 0.5427,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1985,
+    "dur_over_cap": 14,
+    "dur_changed_other": 0,
+    "velocity_changed": 1782
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "5152884629db10c6f82c3603b5cc66af0a12a336cc4420deb8845ae15084d1f1"
+  },
+  {
+   "idx": 133,
+   "pianist": "Kenny Barron",
+   "t0": 234.375,
+   "tokens": 10811,
+   "token_notes": 3566,
+   "target_notes": 3566,
+   "requests": 587,
+   "warm_nonempty_ratio": 0.5358,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3566,
+    "dur_over_cap": 9,
+    "dur_changed_other": 0,
+    "velocity_changed": 3213
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "5add28eb74214789a596a34dec3daef526d04b0d53c8ac3e8356d3f4568e2b59"
+  },
+  {
+   "idx": 134,
+   "pianist": "Kenny Barron",
+   "t0": 468.75,
+   "tokens": 6222,
+   "token_notes": 2039,
+   "target_notes": 2039,
+   "requests": 548,
+   "warm_nonempty_ratio": 0.6106,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2039,
+    "dur_over_cap": 6,
+    "dur_changed_other": 0,
+    "velocity_changed": 1844
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "e78cfe3fcd0d4b9ad12b4c135c50bb5721d567238f684bf219e9d9d5bb29f9f0"
+  },
+  {
+   "idx": 135,
+   "pianist": "Kenny Barron",
+   "t0": 703.125,
+   "tokens": 5204,
+   "token_notes": 1714,
+   "target_notes": 1714,
+   "requests": 317,
+   "warm_nonempty_ratio": 0.4652,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1714,
+    "dur_over_cap": 2,
+    "dur_changed_other": 0,
+    "velocity_changed": 1553
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "9e33720446271c58ae5cf5afa3043303d7e3d3b767ce9bfaa51409225583af25"
+  },
+  {
+   "idx": 136,
+   "pianist": "Kenny Barron",
+   "t0": 0.0,
+   "tokens": 10160,
+   "token_notes": 3354,
+   "target_notes": 3354,
+   "requests": 511,
+   "warm_nonempty_ratio": 0.5039,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3354,
+    "dur_over_cap": 6,
+    "dur_changed_other": 0,
+    "velocity_changed": 3041
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "e80c8659ce063533c25fba0a6b803df451d237d156959b660d53386b1c9f8321"
+  },
+  {
+   "idx": 137,
+   "pianist": "Kenny Barron",
+   "t0": 234.375,
+   "tokens": 7382,
+   "token_notes": 2433,
+   "target_notes": 2433,
+   "requests": 429,
+   "warm_nonempty_ratio": 0.7921,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2433,
+    "dur_over_cap": 14,
+    "dur_changed_other": 0,
+    "velocity_changed": 2191
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "c68b81823749a788d8c2291b6f85a4b4715b014af5de6de2f42a96ae45dffb77"
+  },
+  {
+   "idx": 138,
+   "pianist": "Tommy Flanagan",
+   "t0": 468.75,
+   "tokens": 3026,
+   "token_notes": 996,
+   "target_notes": 996,
+   "requests": 190,
+   "warm_nonempty_ratio": 0.8836,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 996,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 903
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "28902d75ceefc809ec741d8199a728a65bae6a9489bc5e2e6a67280723af61b2"
+  },
+  {
+   "idx": 139,
+   "pianist": "Tommy Flanagan",
+   "t0": 703.125,
+   "tokens": 3216,
+   "token_notes": 1058,
+   "target_notes": 1058,
+   "requests": 210,
+   "warm_nonempty_ratio": 0.7656,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1058,
+    "dur_over_cap": 16,
+    "dur_changed_other": 0,
+    "velocity_changed": 940
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "4e9ccfee93f769b2c3045ebe77d39e76384c7774b863094a3470092827000813"
+  },
+  {
+   "idx": 140,
+   "pianist": "Tommy Flanagan",
+   "t0": 0.0,
+   "tokens": 3617,
+   "token_notes": 1191,
+   "target_notes": 1191,
+   "requests": 221,
+   "warm_nonempty_ratio": 0.75,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1191,
+    "dur_over_cap": 16,
+    "dur_changed_other": 0,
+    "velocity_changed": 1066
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "f79f08054999e90839286acd7e4d9dde5561b1b76b8338e8eccf2d84941b3c9e"
+  },
+  {
+   "idx": 141,
+   "pianist": "Tommy Flanagan",
+   "t0": 234.375,
+   "tokens": 3314,
+   "token_notes": 1093,
+   "target_notes": 1093,
+   "requests": 171,
+   "warm_nonempty_ratio": 0.8,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1093,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 985
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "e681a6b2917da51c2495ba38e46536de37f12b548ca61bb09cef0a2595a68d43"
+  },
+  {
+   "idx": 142,
+   "pianist": "Tommy Flanagan",
+   "t0": 468.75,
+   "tokens": 5558,
+   "token_notes": 1838,
+   "target_notes": 1838,
+   "requests": 223,
+   "warm_nonempty_ratio": 0.6802,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1838,
+    "dur_over_cap": 5,
+    "dur_changed_other": 0,
+    "velocity_changed": 1643
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "9dd5a2232be3827ffbfa067d542f3641cbb3de56d727078d8758240f26b322b0"
+  },
+  {
+   "idx": 143,
+   "pianist": "Tommy Flanagan",
+   "t0": 703.125,
+   "tokens": 5595,
+   "token_notes": 1846,
+   "target_notes": 1846,
+   "requests": 291,
+   "warm_nonempty_ratio": 0.6793,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1846,
+    "dur_over_cap": 3,
+    "dur_changed_other": 0,
+    "velocity_changed": 1649
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "1b1d45a494d1eaf4a26f62aa8f688cbb00a1c46046f7feffbed6947862dd62c6"
+  },
+  {
+   "idx": 144,
+   "pianist": "Tommy Flanagan",
+   "t0": 0.0,
+   "tokens": 10865,
+   "token_notes": 3574,
+   "target_notes": 3574,
+   "requests": 750,
+   "warm_nonempty_ratio": 0.7997,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3574,
+    "dur_over_cap": 9,
+    "dur_changed_other": 0,
+    "velocity_changed": 3190
+   },
+   "boundary_reuse_max": 7,
+   "file_sha256": "69a145ceb14706fef67840eebe6758ab960f796c4d05e739f62c25cc5b2de86c"
+  },
+  {
+   "idx": 145,
+   "pianist": "Tommy Flanagan",
+   "t0": 234.375,
+   "tokens": 4227,
+   "token_notes": 1398,
+   "target_notes": 1398,
+   "requests": 164,
+   "warm_nonempty_ratio": 0.5399,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1398,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1247
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "61716c0268b01085161f31c00647767afcbeb36e830c68fc1c62380a638e605b"
+  },
+  {
+   "idx": 146,
+   "pianist": "Tommy Flanagan",
+   "t0": 468.75,
+   "tokens": 3994,
+   "token_notes": 1317,
+   "target_notes": 1317,
+   "requests": 215,
+   "warm_nonempty_ratio": 0.6308,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1317,
+    "dur_over_cap": 10,
+    "dur_changed_other": 0,
+    "velocity_changed": 1186
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "b4d5ed2011587a5562061055627803d1d32346bed2ee8dbd26894196ef10187f"
+  },
+  {
+   "idx": 147,
+   "pianist": "Junior Mance",
+   "t0": 703.125,
+   "tokens": 8264,
+   "token_notes": 2727,
+   "target_notes": 2727,
+   "requests": 429,
+   "warm_nonempty_ratio": 0.6963,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2727,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 2460
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "874f9eb872941a6e142979948360c4bdd068e511cdfe2c9a42534f6b01c4f4bf"
+  },
+  {
+   "idx": 148,
+   "pianist": "Junior Mance",
+   "t0": 0.0,
+   "tokens": 6529,
+   "token_notes": 2155,
+   "target_notes": 2155,
+   "requests": 327,
+   "warm_nonempty_ratio": 0.6135,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2155,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1918
+   },
+   "boundary_reuse_max": 7,
+   "file_sha256": "54b2f279c0d8e26d89f2208dde712a2ad2b6a56e03df22425187656a63f0043e"
+  },
+  {
+   "idx": 149,
+   "pianist": "Junior Mance",
+   "t0": 234.375,
+   "tokens": 7655,
+   "token_notes": 2527,
+   "target_notes": 2527,
+   "requests": 378,
+   "warm_nonempty_ratio": 0.634,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2527,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2277
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "2bfdef2eb475ac92e66c5ccd013041905393f34089fd4892b3e3755ed08b4ec6"
+  },
+  {
+   "idx": 150,
+   "pianist": "Junior Mance",
+   "t0": 468.75,
+   "tokens": 7504,
+   "token_notes": 2475,
+   "target_notes": 2475,
+   "requests": 406,
+   "warm_nonempty_ratio": 0.5827,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2475,
+    "dur_over_cap": 11,
+    "dur_changed_other": 0,
+    "velocity_changed": 2255
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "9f996b332de486bae391f3d3413234a82cedbbe4c3f7d24be96e17944014448b"
+  },
+  {
+   "idx": 151,
+   "pianist": "Junior Mance",
+   "t0": 703.125,
+   "tokens": 10250,
+   "token_notes": 3387,
+   "target_notes": 3387,
+   "requests": 462,
+   "warm_nonempty_ratio": 0.6659,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3387,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 3085
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "a2bad5f4c6825d7918aa460e4ad44ba07c7cdfa9b34ff7b388d16d7b9bdbd8ef"
+  },
+  {
+   "idx": 152,
+   "pianist": "Junior Mance",
+   "t0": 0.0,
+   "tokens": 9283,
+   "token_notes": 3066,
+   "target_notes": 3066,
+   "requests": 438,
+   "warm_nonempty_ratio": 0.5835,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3066,
+    "dur_over_cap": 5,
+    "dur_changed_other": 0,
+    "velocity_changed": 2770
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "812b11113a8568367d74e73469cb85f5919614639b8dee4124410f079d05ea6a"
+  },
+  {
+   "idx": 153,
+   "pianist": "Junior Mance",
+   "t0": 234.375,
+   "tokens": 6874,
+   "token_notes": 2267,
+   "target_notes": 2267,
+   "requests": 375,
+   "warm_nonempty_ratio": 0.7594,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2267,
+    "dur_over_cap": 12,
+    "dur_changed_other": 0,
+    "velocity_changed": 2071
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "2e20879f9b57b9aae663b227070eeb9ae5c6df2e2f9dda078b119f19586fd94c"
+  },
+  {
+   "idx": 154,
+   "pianist": "Junior Mance",
+   "t0": 468.75,
+   "tokens": 3482,
+   "token_notes": 1145,
+   "target_notes": 1145,
+   "requests": 234,
+   "warm_nonempty_ratio": 0.6867,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1145,
+    "dur_over_cap": 4,
+    "dur_changed_other": 0,
+    "velocity_changed": 1042
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "2a279f3d4147dd2ea1f661bf0d3b2550a9444b409cd97c6f98076da76cc4c8a7"
+  },
+  {
+   "idx": 155,
+   "pianist": "Junior Mance",
+   "t0": 703.125,
+   "tokens": 7187,
+   "token_notes": 2370,
+   "target_notes": 2370,
+   "requests": 398,
+   "warm_nonempty_ratio": 0.7506,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2370,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2146
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "17117a959715868214e0d61696df32c840976309bdcbfd391603885057430a64"
+  },
+  {
+   "idx": 156,
+   "pianist": "Harold Mabern",
+   "t0": 0.0,
+   "tokens": 14295,
+   "token_notes": 4731,
+   "target_notes": 4731,
+   "requests": 533,
+   "warm_nonempty_ratio": 0.5921,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 4731,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 4234
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "44881f046825bb8b254ab14206feaef9d7e3c8840af0a3b289fca585901572e3"
+  },
+  {
+   "idx": 157,
+   "pianist": "Harold Mabern",
+   "t0": 234.375,
+   "tokens": 12134,
+   "token_notes": 4013,
+   "target_notes": 4013,
+   "requests": 492,
+   "warm_nonempty_ratio": 0.7312,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 4013,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 3584
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "e44d67ceb019d005c9abf1db3ce2671dc8569dc063dc469fae9f4d4d2cfce899"
+  },
+  {
+   "idx": 158,
+   "pianist": "Harold Mabern",
+   "t0": 468.75,
+   "tokens": 9789,
+   "token_notes": 3239,
+   "target_notes": 3239,
+   "requests": 369,
+   "warm_nonempty_ratio": 0.5516,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3239,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2906
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "69af0036cf5909f32a476d843f56b2e7eaca3d9efa0ab3580059f3486181df60"
+  },
+  {
+   "idx": 159,
+   "pianist": "Harold Mabern",
+   "t0": 703.125,
+   "tokens": 8354,
+   "token_notes": 2760,
+   "target_notes": 2760,
+   "requests": 378,
+   "warm_nonempty_ratio": 0.6048,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2760,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2476
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "5f9c79e61a4b9efb313e60ea9b56d253cdb0e1026fb64ac69448d7040b15f7a8"
+  },
+  {
+   "idx": 160,
+   "pianist": "Harold Mabern",
+   "t0": 0.0,
+   "tokens": 5599,
+   "token_notes": 1851,
+   "target_notes": 1851,
+   "requests": 230,
+   "warm_nonempty_ratio": 0.5459,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1851,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1694
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "bb2bf954f8b5eef3160d56e098bed73276aafd674fd61b1d7671288270758649"
+  },
+  {
+   "idx": 161,
+   "pianist": "Harold Mabern",
+   "t0": 234.375,
+   "tokens": 11943,
+   "token_notes": 3956,
+   "target_notes": 3956,
+   "requests": 387,
+   "warm_nonempty_ratio": 0.5,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3956,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 3506
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "3340f3675e4b5955f7b8e403a937d281778d32d938f3d299a9fa9a151f4cdced"
+  },
+  {
+   "idx": 162,
+   "pianist": "Harold Mabern",
+   "t0": 468.75,
+   "tokens": 10126,
+   "token_notes": 3347,
+   "target_notes": 3347,
+   "requests": 439,
+   "warm_nonempty_ratio": 0.6164,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3347,
+    "dur_over_cap": 11,
+    "dur_changed_other": 0,
+    "velocity_changed": 3004
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "8cefb207682d8d32438b9099c2b27b74cbd83f021bf685b8b69f7ca5dac329d0"
+  },
+  {
+   "idx": 163,
+   "pianist": "Mulgrew Miller",
+   "t0": 703.125,
+   "tokens": 9249,
+   "token_notes": 3056,
+   "target_notes": 3056,
+   "requests": 421,
+   "warm_nonempty_ratio": 0.7095,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3056,
+    "dur_over_cap": 7,
+    "dur_changed_other": 0,
+    "velocity_changed": 2749
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "e21ffd665095d8678fd93d2fe8231df78bfd1d5850b9541ee9faca5bd4a105e9"
+  },
+  {
+   "idx": 164,
+   "pianist": "Mulgrew Miller",
+   "t0": 0.0,
+   "tokens": 10159,
+   "token_notes": 3352,
+   "target_notes": 3352,
+   "requests": 536,
+   "warm_nonempty_ratio": 0.8131,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3352,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 3032
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "3d9dcb21e61a4ebda610b15b352846bc495dd1283590e7cc3f84521b3f14acd6"
+  },
+  {
+   "idx": 165,
+   "pianist": "Mulgrew Miller",
+   "t0": 234.375,
+   "tokens": 11426,
+   "token_notes": 3770,
+   "target_notes": 3770,
+   "requests": 604,
+   "warm_nonempty_ratio": 0.7894,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3770,
+    "dur_over_cap": 19,
+    "dur_changed_other": 0,
+    "velocity_changed": 3419
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "9245fe01ae18cc05b555778f1cefd6560626c4a7da03471b0a20ed25ba356f98"
+  },
+  {
+   "idx": 166,
+   "pianist": "Mulgrew Miller",
+   "t0": 468.75,
+   "tokens": 3844,
+   "token_notes": 1265,
+   "target_notes": 1265,
+   "requests": 248,
+   "warm_nonempty_ratio": 0.8097,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1265,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1141
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "6d10acd1a1782a2df411cd0b35a4a13da474ab7c0ec482872e89d82a3f84d8c8"
+  },
+  {
+   "idx": 167,
+   "pianist": "Mulgrew Miller",
+   "t0": 703.125,
+   "tokens": 6796,
+   "token_notes": 2246,
+   "target_notes": 2246,
+   "requests": 294,
+   "warm_nonempty_ratio": 0.5392,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2246,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2006
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "3418d32b579ac6473f14ca7996630abf6b39c7cdd54d5cbbeebdec7aba4148d3"
+  },
+  {
+   "idx": 168,
+   "pianist": "Mulgrew Miller",
+   "t0": 0.0,
+   "tokens": 8557,
+   "token_notes": 2825,
+   "target_notes": 2825,
+   "requests": 425,
+   "warm_nonempty_ratio": 0.5354,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2825,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2552
+   },
+   "boundary_reuse_max": 6,
+   "file_sha256": "f9f14bbcee734346fa9f80212094cba222bfe6c7eb0a059383e3a7490ec89abb"
+  },
+  {
+   "idx": 169,
+   "pianist": "Mulgrew Miller",
+   "t0": 234.375,
+   "tokens": 9275,
+   "token_notes": 3064,
+   "target_notes": 3064,
+   "requests": 428,
+   "warm_nonempty_ratio": 0.4543,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 3064,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 2792
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "a2e24302637aac7da6399afea22dfa6c3bbfe7e5148edeff904788de0645614d"
+  },
+  {
+   "idx": 170,
+   "pianist": "Red Garland",
+   "t0": 468.75,
+   "tokens": 3516,
+   "token_notes": 1157,
+   "target_notes": 1157,
+   "requests": 226,
+   "warm_nonempty_ratio": 0.6756,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1157,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1050
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "99f8e69d37fbf77124043f05cafcdacdb012d70be90c8ca4ce4de4190fdacdeb"
+  },
+  {
+   "idx": 171,
+   "pianist": "Red Garland",
+   "t0": 703.125,
+   "tokens": 5520,
+   "token_notes": 1818,
+   "target_notes": 1818,
+   "requests": 340,
+   "warm_nonempty_ratio": 0.6962,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1818,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 1632
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "c39a2fb6570306e638d5f9b154faddabf4e57b52c162f71f7203b58b1641cc30"
+  },
+  {
+   "idx": 172,
+   "pianist": "Red Garland",
+   "t0": 0.0,
+   "tokens": 4106,
+   "token_notes": 1348,
+   "target_notes": 1348,
+   "requests": 315,
+   "warm_nonempty_ratio": 0.7038,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1348,
+    "dur_over_cap": 3,
+    "dur_changed_other": 0,
+    "velocity_changed": 1220
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "84fb88f75f57f6b7cec58aae392ba560507eef3072105d0689e25d17e59aff8a"
+  },
+  {
+   "idx": 173,
+   "pianist": "Red Garland",
+   "t0": 234.375,
+   "tokens": 6573,
+   "token_notes": 2170,
+   "target_notes": 2170,
+   "requests": 320,
+   "warm_nonempty_ratio": 0.6677,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2170,
+    "dur_over_cap": 13,
+    "dur_changed_other": 0,
+    "velocity_changed": 1949
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "f54f43c0b318cd44473fe336851423637f6b104a06986e76055b64d559a13c0f"
+  },
+  {
+   "idx": 174,
+   "pianist": "Red Garland",
+   "t0": 468.75,
+   "tokens": 5007,
+   "token_notes": 1648,
+   "target_notes": 1648,
+   "requests": 321,
+   "warm_nonempty_ratio": 0.6844,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1648,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 1485
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "bbe614ee46cbd6795595ae56cf275caa983bc63a12ee699438b77c3646794411"
+  },
+  {
+   "idx": 175,
+   "pianist": "Red Garland",
+   "t0": 703.125,
+   "tokens": 7708,
+   "token_notes": 2542,
+   "target_notes": 2542,
+   "requests": 422,
+   "warm_nonempty_ratio": 0.7007,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2542,
+    "dur_over_cap": 1,
+    "dur_changed_other": 0,
+    "velocity_changed": 2262
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "a3f4979cf08ac11b25cd34e48ddaa44220b1016ccf0321d8ac9f3111e006ebba"
+  },
+  {
+   "idx": 176,
+   "pianist": "Red Garland",
+   "t0": 0.0,
+   "tokens": 5509,
+   "token_notes": 1817,
+   "target_notes": 1817,
+   "requests": 297,
+   "warm_nonempty_ratio": 0.6993,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1817,
+    "dur_over_cap": 3,
+    "dur_changed_other": 0,
+    "velocity_changed": 1624
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "2e96380f17f31c971239e7b0f8df5c2b2d284924b98340ab902b5c6e84f3793a"
+  },
+  {
+   "idx": 177,
+   "pianist": "Benny Green",
+   "t0": 234.375,
+   "tokens": 4655,
+   "token_notes": 1539,
+   "target_notes": 1539,
+   "requests": 187,
+   "warm_nonempty_ratio": 0.414,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1539,
+    "dur_over_cap": 0,
+    "dur_changed_other": 0,
+    "velocity_changed": 1393
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "79c45e8cd0bf6a2f658ebb36f545f355a28221dabf72cc4738b1a5552a30ec10"
+  },
+  {
+   "idx": 178,
+   "pianist": "Benny Green",
+   "t0": 468.75,
+   "tokens": 3576,
+   "token_notes": 1169,
+   "target_notes": 1169,
+   "requests": 354,
+   "warm_nonempty_ratio": 0.8385,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1169,
+    "dur_over_cap": 7,
+    "dur_changed_other": 0,
+    "velocity_changed": 1079
+   },
+   "boundary_reuse_max": 7,
+   "file_sha256": "c340a3455ca2ee871d84917c0d5a362db7eacc00acb424cfea709787bea4a28f"
+  },
+  {
+   "idx": 179,
+   "pianist": "Benny Green",
+   "t0": 703.125,
+   "tokens": 2830,
+   "token_notes": 926,
+   "target_notes": 926,
+   "requests": 264,
+   "warm_nonempty_ratio": 0.8479,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 926,
+    "dur_over_cap": 26,
+    "dur_changed_other": 0,
+    "velocity_changed": 827
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "9124bca542ebb5f20b7270adad99c7fac99788b1bfccbe2dba6b93e94546f516"
+  },
+  {
+   "idx": 180,
+   "pianist": "Benny Green",
+   "t0": 0.0,
+   "tokens": 4158,
+   "token_notes": 1365,
+   "target_notes": 1365,
+   "requests": 322,
+   "warm_nonempty_ratio": 0.6106,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1365,
+    "dur_over_cap": 10,
+    "dur_changed_other": 0,
+    "velocity_changed": 1221
+   },
+   "boundary_reuse_max": 6,
+   "file_sha256": "65b7be286f310cf880121c663cc6e76f53ad6db63a007b565abb3b7ca6f65cec"
+  },
+  {
+   "idx": 181,
+   "pianist": "Kenny Drew",
+   "t0": 234.375,
+   "tokens": 2149,
+   "token_notes": 704,
+   "target_notes": 704,
+   "requests": 185,
+   "warm_nonempty_ratio": 0.7337,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 704,
+    "dur_over_cap": 18,
+    "dur_changed_other": 0,
+    "velocity_changed": 632
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "4c1ed60d01765ff624aa55544c44131add29409b388abd3559fb4606c42b26db"
+  },
+  {
+   "idx": 182,
+   "pianist": "Kenny Drew",
+   "t0": 468.75,
+   "tokens": 3965,
+   "token_notes": 1304,
+   "target_notes": 1304,
+   "requests": 269,
+   "warm_nonempty_ratio": 0.6455,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1304,
+    "dur_over_cap": 5,
+    "dur_changed_other": 0,
+    "velocity_changed": 1181
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "91d64a2d3a49d2b189e11cf46cd76c38601298454564023e481fd91cf86a9682"
+  },
+  {
+   "idx": 183,
+   "pianist": "Kenny Drew",
+   "t0": 703.125,
+   "tokens": 5383,
+   "token_notes": 1778,
+   "target_notes": 1778,
+   "requests": 248,
+   "warm_nonempty_ratio": 0.4575,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1778,
+    "dur_over_cap": 2,
+    "dur_changed_other": 0,
+    "velocity_changed": 1579
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "362ee8d4610e45db8cd99079fac787fc7336238962c80d125fd49dfd9e5dedcf"
+  },
+  {
+   "idx": 184,
+   "pianist": "Kenny Drew",
+   "t0": 0.0,
+   "tokens": 6644,
+   "token_notes": 2192,
+   "target_notes": 2192,
+   "requests": 350,
+   "warm_nonempty_ratio": 0.5473,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 2192,
+    "dur_over_cap": 19,
+    "dur_changed_other": 0,
+    "velocity_changed": 1995
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "3f3b3d2ec6054bd7645a7303eb8815b7372da00da376c191db0290e80e0666a2"
+  },
+  {
+   "idx": 185,
+   "pianist": "Bill Charlap",
+   "t0": 234.375,
+   "tokens": 1712,
+   "token_notes": 556,
+   "target_notes": 556,
+   "requests": 219,
+   "warm_nonempty_ratio": 0.789,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 556,
+    "dur_over_cap": 4,
+    "dur_changed_other": 0,
+    "velocity_changed": 489
+   },
+   "boundary_reuse_max": 5,
+   "file_sha256": "9fe72ea2c73557d3e7d4cf65e67317528188440eef117f7b067074c9abfc089c"
+  },
+  {
+   "idx": 186,
+   "pianist": "Bill Charlap",
+   "t0": 468.75,
+   "tokens": 3281,
+   "token_notes": 1081,
+   "target_notes": 1081,
+   "requests": 191,
+   "warm_nonempty_ratio": 0.3579,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1081,
+    "dur_over_cap": 2,
+    "dur_changed_other": 0,
+    "velocity_changed": 960
+   },
+   "boundary_reuse_max": 2,
+   "file_sha256": "90709acf9844947366fe3edcb2cff69742d181b1afae22a53d0e6faeb8d2291f"
+  },
+  {
+   "idx": 187,
+   "pianist": "Bill Charlap",
+   "t0": 703.125,
+   "tokens": 2417,
+   "token_notes": 792,
+   "target_notes": 792,
+   "requests": 203,
+   "warm_nonempty_ratio": 0.6436,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 792,
+    "dur_over_cap": 11,
+    "dur_changed_other": 0,
+    "velocity_changed": 707
+   },
+   "boundary_reuse_max": 3,
+   "file_sha256": "0e09f0cf427e41aa2b5b3a7858d042e7a46cbe6378c0e6ec89bcec1692c75369"
+  },
+  {
+   "idx": 188,
+   "pianist": "Bill Charlap",
+   "t0": 0.0,
+   "tokens": 3760,
+   "token_notes": 1239,
+   "target_notes": 1239,
+   "requests": 215,
+   "warm_nonempty_ratio": 0.3131,
+   "checks": {
+    "c1_replay_mismatch": 0,
+    "c2_prefix_mismatch": 0,
+    "c3_observed_only_mismatch": 0,
+    "c4_low_pitch_tokens": 0,
+    "c5_misaligned_notes": 0,
+    "c6_dim_tokens": 0
+   },
+   "note_changes": {
+    "matched": 1239,
+    "dur_over_cap": 4,
+    "dur_changed_other": 0,
+    "velocity_changed": 1121
+   },
+   "boundary_reuse_max": 4,
+   "file_sha256": "26298419bad8452b76896c475d58da9326a14c916f72dd4048843835c699e6b3"
+  }
+ ]
+}
