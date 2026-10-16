@@ -45,9 +45,27 @@
   - 비0 가중치면 logit이 바뀌고, 한 토큰씩 넣어도 전체 계산과 같다
   - 위치를 새 조건으로 다시 쓰면 처음부터 계산한 것과 같다
 
+### F 실행 기록과 결과
+
+- 42a28bee에서 한 번 돌렸다. 128초가 걸렸고, 열 압력은 0, 이탈은 없었다. 아스트라 사용량 한도 중이라 Claude가 혼자 실행했고, 사후 리뷰 대상이다
+- **통과.** 두 곡에서 비교한 3,668개 위치 모두 top-1이 같았다. 최대 |logit 차|는 9.3e-5(0번 곡)와 5.1e-5(7번 곡)로, 기준 1e-3 안이다
+- 주입은 실제로 작동했다. 실제 조건과 0 조건의 최대 logit 차가 11.8과 10.5다
+- 비교 구간에 crop 11번, 조건 변경 154번, cold 2번, warm-empty 67번이 들어 있었다
+- 보고는 `docs/experiments/cond_adapter_min/kv_check.json`에 있다
+- 이것은 작은 용량(384) 설정에서 MLX 모델로 한 검증이다. 실시간 producer에는 아직 조건 주입이 없다
+
+## B. 곡 선정 (메타데이터만 보고 고정) — `scripts/cond_adapter_split.py`
+
+- 규칙: train 189곡을 sha1 순으로 보면서, 이미 고른 제목은 건너뛴다. 앞 8곡은 학습용, 다음 4곡은 확인용이다. val/test는 열지 않는다
+- 학습용: 129 misterioso(Kenny Barron), 26 tribute to duke(Barry Harris), 8 would you like to take a walk(Barry Harris), 149 i got it bad and that ain't good(Junior Mance), 79 don't blame me(Hank Jones), 115 my heart skips a beat(Duke Jordan), 15 blue monk(Barry Harris), 75 what did i do to be so black and blue(Hank Jones)
+- 확인용: 44 con alma(Cedar Walton), 68 honeysuckle rose(Hank Jones), 185 announcement(Bill Charlap), 134 ballad for benny carter(Kenny Barron)
+- **불확실한 점:** 185번 "Announcement"는 제목만 보면 연주가 아닐 수도 있다. 하지만 앨범이 "Oscar, With Love — The Songs of Oscar Peterson"이고, 음 742개(초당 1.2음)로 manifest 상태는 ok다. 정해 둔 규칙을 결과를 보고 바꾸지 않으려고 그대로 두었다. 아스트라 판단을 받는다
+- 결과: `docs/experiments/cond_adapter_min/split.json`
+
 ## 이후 단계 (F 통과 뒤 수치를 채워 다시 고정)
 
-- **E. 메모리·시간:** 가장 긴 허용 입력(세션 문맥 최대 3,965 + window)으로 batch 1, fp32 forward/backward/1 step을 확인한다
+- **E. 메모리·시간(`scripts/cond_adapter_smoke.py`, 지금 고정):** 위 12곡의 요청 중 가장 긴 허용 입력(세션 문맥 + window, CAP 초과 window는 빼고 수를 적는다)으로 한 번 돌린다. batch 1, fp32, MPS다. window CE → adapter만 backward → Adam 1 step(LR 1e-3, 기존 레시피). 손실값은 읽지 않는다
+  - 통과 조건: 손실이 유한하고, adapter 가중치가 바뀌었고, base 해시가 그대로이고, 옵티마이저에 adapter만 있고, 15분 안에 끝난다
   - 조건이 마지막 층에만 들어가므로, 아래 15층은 기울기 없이 계산할 수 있다(Claude 판단, 검토 대상)
   - OOM이나 시간 상한에 걸리면 기록하고 설계를 바꾼다. 긴 예제를 몰래 지우지 않는다
 - **데이터(B):** train 189곡 안에서 학습 8곡과 확인용 4곡을 고른다. 고르는 규칙은 출력을 보기 전에 정한다(같은 곡 제목은 한쪽에만 둔다). val/test는 열지 않는다. 빈 window와 CAP 초과 요청은 빼고 수를 적는다. boundary에는 loss를 걸지 않는다
