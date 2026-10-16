@@ -12,7 +12,9 @@ Pass: at every compared position top-1 agrees and max |logit diff| <= 1e-3 (the 
 also reports how many requests changed condition, cropped, were cold or warm-empty, and checks that the injection is
 live (real vs zero condition differ). Run with the Aria venv:
 
-  aria_mlx_cond_kv_check.py <aria repo> <checkpoint> <#1756 export dir> <report json>
+  aria_mlx_cond_kv_check.py <aria repo> <checkpoint> <#1756 export dir> <report json> [<adapter weight .npy>]
+
+With a weight file (a trained adapter, d_model x 13) the same check runs with that weight instead of the fixed random one.
 """
 from __future__ import annotations
 
@@ -62,6 +64,7 @@ def excerpt(tokens, ids, n_notes):
 
 def main() -> None:
     aria_repo, ckpt, export_dir, report_path = sys.argv[1:5]
+    weight_path = sys.argv[5] if len(sys.argv) > 5 else None
     sys.path.insert(0, aria_repo)
     import mlx.core as mx
     import numpy as np
@@ -78,8 +81,12 @@ def main() -> None:
     model.load_weights(ckpt, strict=True)
     mx.eval(model.parameters())
     model.eval()
-    mx.random.seed(WEIGHT_SEED)
-    weight = mx.random.normal((cfg.d_model, COND_DIM)) * WEIGHT_SCALE
+    if weight_path:
+        weight = mx.array(np.load(weight_path).astype(np.float32))
+        assert weight.shape == (cfg.d_model, COND_DIM), weight.shape
+    else:
+        mx.random.seed(WEIGHT_SEED)
+        weight = mx.random.normal((cfg.d_model, COND_DIM)) * WEIGHT_SCALE
     mx.eval(weight)
 
     def fresh():
@@ -96,7 +103,9 @@ def main() -> None:
 
     report = {"issue": 1760, "step": "F", "doc": "docs/experiments/COND_ADAPTER_MIN.md", "training": False, "quality_claimed": False,
               "params": {"songs": SONGS, "excerpt_notes": EXCERPT_NOTES, "cap": CAP, "capacity": CAPACITY, "keep_target": KEEP,
-                         "weight_seed": WEIGHT_SEED, "weight_scale": WEIGHT_SCALE, "logit_tol": LOGIT_TOL},
+                         "weight_seed": None if weight_path else WEIGHT_SEED, "weight_scale": None if weight_path else WEIGHT_SCALE,
+                         "weight_file": weight_path, "weight_file_sha256": sha256_file(weight_path) if weight_path else None,
+                         "logit_tol": LOGIT_TOL},
               "run": {"git_head": subprocess.run(["git", "-C", HERE, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
                       "checkpoint_sha256": sha256_file(ckpt), "mlx": mx.__version__,
                       "cond_module_sha256": sha256_file(os.path.join(HERE, "aria_mlx_cond.py")),
