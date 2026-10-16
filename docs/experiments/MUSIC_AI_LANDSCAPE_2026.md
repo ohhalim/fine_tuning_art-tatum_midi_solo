@@ -317,8 +317,84 @@
   - **미래 가시성과 청크 길이의 절충:** StreamMusicGen의 t_f·k는 우리 블록 계약의 1박 앞섬(BEAT)·블록 길이(B)와 같은 축입니다. 우리 블록 설계를 그 틀로 다시 볼 수 있습니다
   - **계획을 보여 주는 상호작용:** ReaLJam의 anticipation 화면은 "연주자가 AI가 어디로 갈지 안다"는 설계입니다. 실시간 데모 설계 참고
   - **소통 설계:** H2H의 의도·지각 주석 체계는 상호작용 평가 설계에 쓸 수 있습니다
-- **방향 차이:** ReaLchords·GAPT는 사람이 멜로디, AI가 코드입니다. 우리는 사람이 코드, AI가 솔로라 방향이 반대입니다. 하지만 학습 레시피(MLE 사전학습 → 일관성 보상 RL + 미래 교사 증류 + 판별자)는 그대로 옮길 수 있습니다(미검증)
-- GAPT 코드 저장소 이름이 `realchords-pytorch`로 알려져 있습니다 [요약, 미확인]
+- **방향 (정정, 2026-10-16):** 처음에는 "ReaLchords·GAPT는 사람이 멜로디, AI가 코드라 우리와 방향이 반대"라고 적었습니다. 공식 저장소 `lukewys/realchords-pytorch`(MIT)를 열어 보니 코드를 받아 멜로디를 내는 온라인 모델의 학습 레시피("RL Training for Melody Model")와 체크포인트 `rl_melody_gail_4_datasets`가 이미 있습니다. 남은 차이는 표현입니다(16분음표 격자, 단선율, 코드 기호 어휘) [직접 저장소]. 자세한 내용은 `ANNA_HUANG_RESEARCH.md`(#1766, PR #1767)
+- ReaLJam 로컬 실행과 지연 측정은 #1768에서 진행 중입니다
+
+## 6.6 2026-10 추가: 구글과 주요 회사가 공개한 프로그램·모델
+
+사용자 질문("구글에서 최신 나온 프로그램이나 모델 또 있어?", "수노나 udio 등 잘 만드는 곳에서 뿌린 것")으로 2026-10-16에 추가 조사했습니다. 6.5와 2절 표에 없는 것, 또는 더 자세히 확인한 것만 적습니다.
+
+### 6.6.1 Magenta RealTime 2(MRT2)는 무엇을 하나 [직접 공식 페이지 2곳]
+
+한 줄 요약: MIDI 건반이나 글로 지시하면 그에 맞는 **오디오를 끊김 없이 계속 만드는 "AI 악기"**입니다. 완성곡을 한 번에 뽑지 않고, 연주하는 동안 계속 반응합니다.
+
+| 항목 | 내용 |
+|---|---|
+| 공개 | 2026-06-04, 공개 가중치. 코드 github.com/magenta/magenta-realtime, 가중치 huggingface.co/google/magenta-realtime-2, `pip install magenta-rt`(JAX/MLX) |
+| 라이선스 | 공식 페이지에는 적혀 있지 않음. 2차 기사는 가중치 CC BY 4.0, 코드 Apache 2.0이라고 함 [요약] |
+| 입력 | 스타일: 텍스트 또는 오디오 조각(MusicCoCa 임베딩). MIDI: 128채널 피아노롤(음높이마다 1채널) + 드럼 켜기/끄기 |
+| 출력 | 48 kHz 스테레오 오디오(SpectroStream 코덱, 25 Hz 토큰 프레임, 프레임당 RVQ 12토큰). MIDI 출력은 없음 |
+| 크기 | Base 2.4B, Small 230M |
+| 속도 | 프레임 40 ms, 제어 지연 약 200 ms(1세대: 2초 청크, 약 3초). 실제 지연은 입출력 버퍼에 따라 늘어남 |
+| 하드웨어 | C++ + MLX 엔진. Base 실시간은 M3 Pro·M2 Max 이상, Small은 모든 Apple Silicon. **이 Mac(M1 Max)은 Base 실시간 조건 목록에 없음** |
+| 구조 | 디코더 전용, 프레임 단위 자기회귀, 슬라이딩 윈도 주의(KV 캐시 크기 고정), 학습형 attention sink, NoPE |
+| 제어 | Auto-Strum(사람이 어떤 음이 켜져 있는지만 주면 모델이 시작 시점을 정함) / Auto-Strum 끔(시작 시점까지 지정, 4토큰 어휘). onset masking으로 한 모델이 두 방식을 모두 지원. 피아노롤 음역 마스킹으로 화음 추가 허용 정도 조절. 신호별 classifier-free guidance |
+| 미세조정 | "예정"이라고만 되어 있음. 공개된 근거는 찾지 못함 [요약 검색] |
+| 번들 | Jam(연주 앱, 스타일 프리셋), Collider(2D 면에서 프롬프트 섞기), MRT2(AU 플러그인 겸 앱: MIDI 화음 따라 합주, 텍스트로 악기 만들기, 오디오 조각 복제, 카메라·LFO 제스처 조절), Max/PD/SuperCollider 확장. 첫 실행 때 가중치 받음(Base 약 2.5 GB, Small 약 450 MB) |
+
+- 사용자가 이 번들을 `~/Downloads/음악작업들/MRT2 Bundle`에 받아 두었습니다. macOS 권한 때문에 Claude는 폴더를 열지 못해 내용은 확인하지 못했습니다
+- **이 프로젝트와의 관계 [판단]:** 사람이 코드를 누르면 그 화음에 맞는 소리를 냅니다. MIDI 솔로는 내보내지 않으므로 솔로 생성기가 아니라 우리 솔로 뒤에 깔 반주·음색 엔진 후보입니다. Small(230M)이라면 이 Mac에서도 실시간으로 돌아갑니다
+
+### 6.6.2 구글이 2025-06 이후 공개한 것 [직접 Magenta 블로그 목록] + [요약]
+
+| 날짜 | 이름 | 무엇 | 확인 |
+|---|---|---|---|
+| 2025-06-12 | Lyria RealTime API | 텍스트와 음악 파라미터로 실시간 음악 생성 실험 API | [직접 블로그 목록] |
+| 2025-06-20 | Magenta RealTime 1 | 공개 가중치 실시간 모델 1세대 | [직접 블로그 목록] |
+| 2025-07-09 | The Infinite Crate | Lyria RealTime을 DAW에 넣는 플러그인 시제품. **2026-03-09 Apache 2.0으로 전체 오픈소스** | [직접 블로그 목록] |
+| 2025-11-03 | Space DJ | 장르 별이 있는 은하를 우주선으로 날면 음악이 바뀌는 웹앱(Lyria RealTime) | [직접 블로그 목록] |
+| 2025-12-03 | Lyria Camera | Gemini 이미지 이해 + Lyria RealTime으로 주변 풍경에 맞춘 음악 | [직접 블로그 목록] |
+| 2026-02-18 | Lyria 3 | Gemini 앱, 30초 곡 | [요약] |
+| 2026-02-24 | ProducerAI(옛 Riffusion) 구글 랩스 합류 | | [요약 TechCrunch] |
+| 2026-03 | Lyria 3 Pro | 최대 약 3분 | [요약] |
+| 2026-04-18 | **Flow Music** | ProducerAI를 바꾼 구글 랩스 음악 스튜디오(Lyria 3 기반) | [요약] |
+| 2026-06-04 | **MRT2** | 6.6.1 | [직접] |
+| 2026-07 | Flow Music Spaces 확장 | 곡 생성·편집, stem 분리, 이미지·가사·영상 생성("vibe coding" 도구) | [요약] |
+| 2026-07-24 | MRT2 커뮤니티 정리 | 해커톤·악기 사례 모음. 새 출시 아님 | [직접 블로그 목록] |
+| 2026-07-29 | Lyria 3.5 | Flow Music에 먼저, Gemini API는 9월이라는 보도 | [요약] |
+| 2026-10-06 | **Flow Music Spaces → VST3/AU 내보내기** | 자연어로 만든 악기·효과를 DAW 플러그인으로 내보냄 | [요약, 구글 블로그 검색 결과] |
+
+- MusicFX·MusicFX DJ 종료(2026-07-31)와 Music AI Sandbox 신규 접수 중단은 2차 사이트 보도뿐이고 구글 공식 발표는 찾지 못했습니다 [요약]
+- Lyria RealTime API의 2026년 변경은 찾지 못했습니다
+
+### 6.6.3 다른 회사가 공개한 프로그램·모델
+
+| 회사 | 공개한 것 | 형태 | 이 프로젝트에 쓸 수 있나 [판단] | 확인 |
+|---|---|---|---|---|
+| **Suno** | v6·v6-wild·v6-mini(2026-09). Studio 2.0(2026-08-13): 웹 DAW에 MIDI 녹음·편집, 웨이브테이블 신스, 대화형 도우미, 사용자 이펙트, 자동화, stem 분리 | 웹, 최상위 요금제. VST 호스팅·DAW 동기화·데스크톱 설치 없음. MIDI 내보내기는 출처마다 다름 | 실시간 솔로 아님. 참고용 | [직접 릴리스 노트(2절)] + [요약] |
+| **Udio** | 2025-10 UMG, 2025-11 WMG와 합의. 라이선스 플랫폼 "2026 출시" 발표 | 실제 출시 근거 못 찾음. 2025-03 이후 새 모델 없음 | 아니오 | [요약] |
+| **Stability AI** | Stable Audio 3(2026-05-20). Small Music·Small SFX(459M, CPU, 최대 2분)·Medium(1.4B) 가중치 공개, Large는 API. 보컬 없음, 학습 데이터 라이선스 주장. Mac AU/VST3 플러그인 초기 베타 | 공개 가중치 + 플러그인 | 기악 공개 가중치 최고 점수(Arena 2위). 오디오 출력이라 솔로 생성기로는 못 씀 | [요약 공식 발표 검색] |
+| **ElevenLabs** | Music v2(2026-05-26, 곡 중간 장르 전환, 구간 재생성, API 가격 최대 50% 인하), v2.5(2026-09). stem 분리 API(2·4·6 stem) | API. 플러그인 없음 | 아니오 | [요약] |
+| **Mureka**(쿤룬) | V9.5(2026-08). 보컬 순위 3위 | 서비스·API | 아니오 | [요약] |
+| **MiniMax** | Music 3.0 | API | 아니오 | [직접 벤치마크(2절)] |
+| **ACE-Step** | 1.5(2026-01-28). XL 4B까지 base·sft·turbo(8스텝) 공개. MLX·GGUF 변환판 있음. 12 GB 이상 VRAM 권장 | 공개 가중치 | 오디오 노래 생성. 아니오 | [직접 HF 목록] |
+| **HeartMuLa** | 3B(2026-02), MuLaCover 커버·리믹스(2026-09) | 공개 가중치 | 아니오 | [요약, 자체 주장] |
+| **YuE2** | 약 3B, 편집 가능한 멜로디·코드 악보 | 공개 가중치(CC-BY-NC) | 아니오 | [요약] |
+| **Splice** | Variations·Craft·Magic Fit: 샘플 라이브러리 위 생성 기능 | 서비스 | 아니오 | [요약] |
+| **MIDI Agent** | LLM으로 MIDI를 만드는 플러그인. VST3/AU/AAX/단독 앱, v1.3.0(2026-09), 49달러. 사용자가 LLM 공급자 선택 | 플러그인. 음악 전용 학습 모델 아님 | MIDI는 내지만 실시간 반응 솔로 아님 | [요약, 판매사 페이지] |
+| **MIDI Lab AI** | 브라우저에서 프롬프트 → MIDI, Web MIDI로 신스·DAW 전송, 여러 명 잼 세션 | 웹 | 확인 필요 | [요약, 판매사 페이지] |
+| **Hookpad Aria**(Hooktheory) | 멜로디·코드 리드시트 생성. 안나 황 교수 팀 MIDI-LLM(ISMIR 2026)이 이 제품 사용자 58명, 생성 4,002개로 실사용 평가 | 웹 | 리드시트용. 실시간 아님 | [직접 MIDI-LLM 초록] |
+| NVIDIA·Meta | 2026년 새 음악 가중치 공개를 찾지 못함 | — | — | [요약 검색] |
+| Apple Logic Session Players, Ableton, Yamaha | 2026 변경을 찾지 못함(한 번 검색) | — | — | [요약 검색] |
+
+### 6.6.4 정리 [판단]
+
+- 잘 만드는 회사들이 공개한 것은 거의 전부 **오디오를 출력하는 노래·반주 생성기**입니다
+- **사람 연주를 듣고 실시간으로 MIDI 솔로를 받아치는 제품이나 공개 모델은 찾지 못했습니다.** 가장 가까운 것은 MRT2(MIDI 입력, 오디오 출력)와 ReaLJam(MIDI, 코드 반주)입니다. 우리가 노리는 자리가 비어 있다는 근거는 되지만, 이번 조사가 완전하다는 뜻은 아닙니다
+- 바로 쓸 만한 것
+  1. ReaLJam 구조를 솔로 방향으로 옮기기(#1766 F0~F4)
+  2. MRT2 Small을 우리 MIDI 솔로 뒤의 반주·음색 엔진으로 붙여 보기(나중)
+- 판매용 MIDI 플러그인(MIDI Agent 등)은 범용 LLM 기반이라 우리 기준(코드 조건 사용, 실시간)과 다릅니다
 
 ## 7. 이 프로젝트에 적용할 후보 (Claude 제안, 아스트라와 논의할 것)
 
@@ -410,6 +486,22 @@
 - ReaLchords: https://proceedings.mlr.press/v235/wu24c.html · ReaLJam: https://arxiv.org/abs/2502.21267
 - GAPT: https://proceedings.iclr.cc/paper_files/paper/2026/hash/e6731a1d3eddafeb8c94669a1d82fc5d-Abstract-Conference.html
 - H2H Music Improv: https://arxiv.org/abs/2608.13957
+
+**2026-10 추가 조사(6.6)**
+- MRT2: https://magenta.withgoogle.com/magenta-realtime-2 · 번들: https://magenta.withgoogle.com/mrt2
+- Magenta 블로그 목록: https://magenta.withgoogle.com/blog/
+- Flow Music 플러그인 내보내기: https://blog.google/innovation-and-ai/models-and-research/google-labs/create-music-production-plugins-google-flow/
+- Flow Music Spaces 확장: https://www.musicbusinessworldwide.com/googles-flow-music-adds-song-generation-editing-and-stem-splitting-to-spaces-its-vibe-coding-tool/
+- ProducerAI 구글 랩스 합류: https://techcrunch.com/2026/02/24/music-generator-producerai-joins-google-labs/
+- Lyria 3.5: https://www.techtimes.com/articles/322113/20260729/googles-lyria-35-sharpens-vocals-lyrics-while-rivals-fight-court.htm
+- Suno Studio 2.0: https://routenote.com/radar/suno-studio-2-0-launches-with-midi-support-ai-chat-and-advanced-stem-separation/
+- UMG–Udio: https://www.musicbusinessworldwide.com/universal-music-settles-udio-lawsuit-strikes-deal-for-licensed-ai-music-platform/ · WMG–Udio: https://www.musicbusinessworldwide.com/warner-music-settles-udio-lawsuit-strikes-licensing-deal-with-ai-platform/
+- Stable Audio 3: https://stability.ai/news-updates/meet-stable-audio-3-the-model-family-built-for-artistic-experimentation-with-open-weight-models
+- ElevenLabs Music v2 API: https://www.createwith.com/tool/elevenlabs/updates/elevenlabs-opens-music-v2-api-for-developers-to-embed-ai-music-generation
+- ACE-Step 1.5: https://github.com/ace-step/ACE-Step-1.5 · https://huggingface.co/papers/2602.00744
+- HeartMuLa: https://github.com/HeartMuLa/heartlib
+- MIDI Agent: https://www.midiagent.com/ · MIDI Lab AI: https://www.midilab.ai/
+- Splice 등: https://resources.rework.com/tools/ai-tools/best-ai-tools-for-music-production-2026
 
 **실시간·상호작용**
 - jam_bot: https://www.media.mit.edu/publications/the-jam_bot-a-real-time-system-for-collaborative-free-improvisation-with-music-language-models/
