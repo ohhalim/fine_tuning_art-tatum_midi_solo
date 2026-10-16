@@ -2,6 +2,8 @@
 
 #1766에서 정한 따라가기 F0입니다. 안나 황 교수 그룹의 ReaLJam을 이 Mac에서 돌리고, 한 번 생성하는 데 걸리는 시간을 잽니다.
 
+#1735 조사(`realtime_partner_research/jazz_chord_conditioned_generation_and_eval.md` 561행)가 "ReaLchords 멜로디 모델과 GAPT의 M1 Max(MLX) 실측 지연은 미확인"으로 남긴 빈칸 중 GAPT·ReaLchords(코드 모델) 지연을 이번에 쟀습니다. 멜로디 모델 지연과 학습 시간은 아직 재지 않았습니다.
+
 ## 1. 설치
 
 - 위치: `/Users/ohhalim/git_box/realjam/`
