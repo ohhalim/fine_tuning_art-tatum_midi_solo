@@ -44,8 +44,9 @@ def make_melody(n_frames, seed):
 
 
 def notes_until(events, frame):
-    """frame 시점까지 브라우저가 알고 있는 이벤트만 남긴다."""
-    return [e for e in events if e["frame"] <= frame]
+    """요청 frame 직전까지 브라우저가 알고 있는 이벤트만 남긴다.
+    브라우저는 curFrame + 1을 요청 frame으로 보내므로 frame 미만만 안다."""
+    return [e for e in events if e["frame"] < frame]
 
 
 def run_session(agent, model, la, ca, silence, n_frames, temp, events):
