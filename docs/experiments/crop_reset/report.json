@@ -1,0 +1,1766 @@
+{
+ "issue": 1758,
+ "doc": "docs/experiments/CROP_RESET_CONTRACT.md",
+ "quality_claimed": false,
+ "training": false,
+ "run": {
+  "git_head": "351943961b7047e1e0d722539bcd96aabaf49c37",
+  "crop_contract_sha256": "077093d1a882e9152236754d4a46ff4f671d95b83cc70bbda96160f09298dbd9",
+  "check_script_sha256": "6eda02f846e81cd5b32171cb8b6aaab1f47d1171fa95e53a84ae117188e7656d",
+  "export_dir": "/Users/ohhalim/git_box/lh_request_export_run3",
+  "seconds": 200.3
+ },
+ "params": {
+  "cap": 64,
+  "capacity": 4096,
+  "keep_target": 2048,
+  "decision": "committed_len + 2*CAP + 3 > CAPACITY"
+ },
+ "checks": {
+  "capacity_failure": 0,
+  "r2_time_mismatch": 0,
+  "r3_replay_mismatch": 0,
+  "r4_unsafe": 0
+ },
+ "all_checks_zero": true,
+ "songs_checked": 189,
+ "requests": 56487,
+ "crops": 236,
+ "requests_with_crop_share": 0.0042,
+ "crops_per_song": {
+  "n": 189,
+  "mean": 1.25,
+  "min": 0,
+  "median": 1,
+  "p90": 3,
+  "max": 5
+ },
+ "songs_with_a_crop": 128,
+ "session_ctx_len": {
+  "n": 56487,
+  "mean": 2069.01,
+  "min": 2,
+  "median": 2196,
+  "p90": 3521,
+  "max": 3965
+ },
+ "kept_len_after_crop": {
+  "n": 236,
+  "mean": 1987.45,
+  "min": 1816,
+  "median": 1992,
+  "p90": 2035,
+  "max": 2048
+ },
+ "base_ms_at_song_end": {
+  "n": 189,
+  "mean": 123730.16,
+  "min": 0.0,
+  "median": 105000.0,
+  "p90": 290000.0,
+  "max": 505000.0
+ },
+ "songs": [
+  {
+   "idx": 0,
+   "requests": 296,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 1,
+   "requests": 292,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 2,
+   "requests": 288,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 3,
+   "requests": 421,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 4,
+   "requests": 551,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 5,
+   "requests": 214,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 6,
+   "requests": 541,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 7,
+   "requests": 299,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 8,
+   "requests": 187,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 9,
+   "requests": 308,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 10,
+   "requests": 242,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 11,
+   "requests": 252,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 12,
+   "requests": 205,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 13,
+   "requests": 234,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 14,
+   "requests": 264,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 15,
+   "requests": 264,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 16,
+   "requests": 346,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 17,
+   "requests": 396,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 18,
+   "requests": 208,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 19,
+   "requests": 214,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 20,
+   "requests": 209,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 21,
+   "requests": 460,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 22,
+   "requests": 397,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 23,
+   "requests": 247,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 24,
+   "requests": 186,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 25,
+   "requests": 385,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 26,
+   "requests": 204,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 27,
+   "requests": 278,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 28,
+   "requests": 324,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 29,
+   "requests": 327,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 30,
+   "requests": 247,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 31,
+   "requests": 358,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 32,
+   "requests": 376,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 33,
+   "requests": 243,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 34,
+   "requests": 257,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 35,
+   "requests": 260,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 36,
+   "requests": 266,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 37,
+   "requests": 239,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 38,
+   "requests": 327,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 39,
+   "requests": 322,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 40,
+   "requests": 192,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 41,
+   "requests": 234,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 42,
+   "requests": 210,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 43,
+   "requests": 235,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 44,
+   "requests": 248,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 45,
+   "requests": 397,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 46,
+   "requests": 299,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 47,
+   "requests": 422,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 48,
+   "requests": 271,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 49,
+   "requests": 362,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 50,
+   "requests": 296,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 51,
+   "requests": 281,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 52,
+   "requests": 354,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 53,
+   "requests": 362,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 54,
+   "requests": 326,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 55,
+   "requests": 295,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 56,
+   "requests": 302,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 57,
+   "requests": 199,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 58,
+   "requests": 277,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 59,
+   "requests": 241,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 60,
+   "requests": 324,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 61,
+   "requests": 292,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 62,
+   "requests": 237,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 63,
+   "requests": 212,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 64,
+   "requests": 227,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 65,
+   "requests": 219,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 66,
+   "requests": 206,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 67,
+   "requests": 153,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 68,
+   "requests": 299,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 69,
+   "requests": 320,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 70,
+   "requests": 197,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 71,
+   "requests": 213,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 72,
+   "requests": 213,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 73,
+   "requests": 178,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 74,
+   "requests": 219,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 75,
+   "requests": 326,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 76,
+   "requests": 144,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 77,
+   "requests": 218,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 78,
+   "requests": 227,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 79,
+   "requests": 180,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 80,
+   "requests": 178,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 81,
+   "requests": 221,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 82,
+   "requests": 159,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 83,
+   "requests": 249,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 84,
+   "requests": 230,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 85,
+   "requests": 213,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 86,
+   "requests": 231,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 87,
+   "requests": 203,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 88,
+   "requests": 409,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 89,
+   "requests": 164,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 90,
+   "requests": 203,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 91,
+   "requests": 226,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 92,
+   "requests": 209,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 93,
+   "requests": 233,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 94,
+   "requests": 130,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 95,
+   "requests": 208,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 96,
+   "requests": 277,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 97,
+   "requests": 225,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 98,
+   "requests": 169,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 99,
+   "requests": 232,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 100,
+   "requests": 223,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 101,
+   "requests": 198,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 102,
+   "requests": 177,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 103,
+   "requests": 266,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 104,
+   "requests": 165,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 105,
+   "requests": 243,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 106,
+   "requests": 115,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 107,
+   "requests": 167,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 108,
+   "requests": 205,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 109,
+   "requests": 311,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 110,
+   "requests": 169,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 111,
+   "requests": 260,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 112,
+   "requests": 215,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 113,
+   "requests": 241,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 114,
+   "requests": 238,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 115,
+   "requests": 91,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 116,
+   "requests": 159,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 117,
+   "requests": 168,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 118,
+   "requests": 350,
+   "crops": 4,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 119,
+   "requests": 466,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 120,
+   "requests": 541,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 121,
+   "requests": 691,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 122,
+   "requests": 635,
+   "crops": 5,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 123,
+   "requests": 435,
+   "crops": 4,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 124,
+   "requests": 565,
+   "crops": 5,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 125,
+   "requests": 438,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 126,
+   "requests": 380,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 127,
+   "requests": 251,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 128,
+   "requests": 391,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 129,
+   "requests": 492,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 130,
+   "requests": 360,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 131,
+   "requests": 536,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 132,
+   "requests": 329,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 133,
+   "requests": 587,
+   "crops": 4,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 134,
+   "requests": 548,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 135,
+   "requests": 317,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 136,
+   "requests": 511,
+   "crops": 4,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 137,
+   "requests": 429,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 138,
+   "requests": 190,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 139,
+   "requests": 210,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 140,
+   "requests": 221,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 141,
+   "requests": 171,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 142,
+   "requests": 223,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 143,
+   "requests": 291,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 144,
+   "requests": 750,
+   "crops": 4,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 145,
+   "requests": 164,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 146,
+   "requests": 215,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 147,
+   "requests": 429,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 148,
+   "requests": 327,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 149,
+   "requests": 378,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 150,
+   "requests": 406,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 151,
+   "requests": 462,
+   "crops": 4,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 152,
+   "requests": 438,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 153,
+   "requests": 375,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 154,
+   "requests": 234,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 155,
+   "requests": 398,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 156,
+   "requests": 533,
+   "crops": 5,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 157,
+   "requests": 492,
+   "crops": 5,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 158,
+   "requests": 369,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 159,
+   "requests": 378,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 160,
+   "requests": 230,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 161,
+   "requests": 387,
+   "crops": 4,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 162,
+   "requests": 439,
+   "crops": 4,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 163,
+   "requests": 421,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 164,
+   "requests": 536,
+   "crops": 4,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 165,
+   "requests": 604,
+   "crops": 4,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 166,
+   "requests": 248,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 167,
+   "requests": 294,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 168,
+   "requests": 425,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 169,
+   "requests": 428,
+   "crops": 3,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 170,
+   "requests": 226,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 171,
+   "requests": 340,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 172,
+   "requests": 315,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 173,
+   "requests": 320,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 174,
+   "requests": 321,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 175,
+   "requests": 422,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 176,
+   "requests": 297,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 177,
+   "requests": 187,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 178,
+   "requests": 354,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 179,
+   "requests": 264,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 180,
+   "requests": 322,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 181,
+   "requests": 185,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 182,
+   "requests": 269,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 183,
+   "requests": 248,
+   "crops": 1,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 184,
+   "requests": 350,
+   "crops": 2,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 185,
+   "requests": 219,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 186,
+   "requests": 191,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 187,
+   "requests": 203,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  },
+  {
+   "idx": 188,
+   "requests": 215,
+   "crops": 0,
+   "capacity_failure": 0,
+   "r2": 0,
+   "r3": 0,
+   "r4": 0
+  }
+ ]
+}
