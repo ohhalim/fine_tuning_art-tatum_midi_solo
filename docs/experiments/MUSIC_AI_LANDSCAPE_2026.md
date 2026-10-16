@@ -14,6 +14,7 @@
 - **[요약]** 웹 검색 결과 요약만 본 것. 틀릴 수 있습니다
 - **[기록]** 이 저장소 문서에 원문 확인 기록이 있는 것(CLAUDE.md, `REALTIME_PARTNER_RESEARCH.md`)
 - **[실험]** 이 저장소에서 직접 잰 것
+- **[사용자 화면]** 사용자가 브라우저에서 열어 붙여 준 화면 내용
 
 ---
 
@@ -99,7 +100,51 @@
 | Fugatto(NVIDIA, 2024 발표) | 2.5B, 공개 안 됨 | [요약] |
 
 - **독립 블라인드 청취 연구**(A Thousand Listeners, 청취자 1,000명, 2026-08, 중국어 프롬프트): Mureka 65.6% ≈ Suno 62.5%(맞대결 52.4%로 사실상 동률) > Happy Shrimp > MiniMax > Lyria [직접]
-- 공식 Music Arena 순위표는 확인 시점에 서버 오류였습니다
+- **공식 Music Arena 기악 순위**(CMU G-CLef 운영, 2026-07-31까지의 투표, 30표 이상만) [사용자 화면]
+
+| 순위 | 모델 | Arena Score | 95% CI | 표 | 속도(RTF) | 공개 |
+|---|---|---|---|---|---|---|
+| 1 | Lyria 3 Pro (Google) | 1394 | ±58 | 241 | 4.57 | 비공개 |
+| 2 | **Stable Audio 3 Medium** (Stability) | 1333 | ±38 | 444 | 20.67 | **공개 가중치** |
+| 3 | Riffusion FUZZ v1.0 (Producer.ai) | 1225 | ±66 | 220 | 9.04 | 비공개 |
+| 4 | Sonauto v2.2 | 1150 | ±41 | 469 | 2.79 | 비공개 |
+| 5 | Riffusion FUZZ v1.1 | 1119 | ±43 | 452 | 6.3 | 비공개 |
+| 6 | ElevenLabs Music v1 | 1055 | ±40 | 330 | 2.35 | 비공개 |
+| 7 | Lyria 3 Clip | 1003 | ±74 | 85 | 3.22 | 비공개 |
+| 8 | Sonauto v3 Preview | 950 | ±95 | 41 | 1 | 비공개 |
+| 9 | **Magenta RealTime (Large)** | 911 | ±26 | 829 | 1.06 | 공개 가중치 |
+| 10 | ACE-Step 1.5 Turbo (1.7B) | 894 | ±55 | 176 | 2.43 | 공개 가중치 |
+| 11 | Stable Audio Open | 842 | ±30 | 694 | 2.62 | 공개 가중치 |
+| 12 | MusicGen Medium | 838 | ±31 | 569 | 0.45 | 공개 가중치 |
+| 13 | **Magenta RealTime 2 (Base)** | 809 | ±69 | 200 | 0.86 | 공개 가중치 |
+| 14 | MusicGen Small | 794 | ±35 | 463 | 0.87 | 공개 가중치 |
+| 15 | Stable Audio Open Small | 682 | ±44 | 435 | 14.51 | 공개 가중치 |
+
+  - 붙여 준 화면 첫 줄에 "10 ACE-Step 1.5 Turbo … 1394 ±58 241 20.67"이라는 줄이 하나 더 있었습니다. 다른 줄의 값이 섞인 화면 표시 오류로 보고 뺐습니다. 보컬 탭은 받지 못했습니다
+  - RTF는 생성 시간 대비 오디오 길이로 보입니다(클수록 빠름). 공식 정의는 확인하지 않았습니다
+
+- **Artificial Analysis 보컬 순위**(AA-Music-Vocal v1.1, 검증된 비공개 평가자의 블라인드 선호, MiniMax Music 3.0 = 1000 기준) [사용자 화면]
+
+| 순위 | 모델 | Elo | ±95% | 표본 |
+|---|---|---|---|---|
+| 1 (1–2) | **Suno v6** | 1146 | ±20 | 2,458 |
+| 2 (1–2) | Suno v6-mini | 1130 | ±20 | 2,585 |
+| 3 | **Mureka V9.5** | 1107 | ±20 | 2,499 |
+| 4 (4–6) | Mureka V9 | 1057 | ±20 | 2,536 |
+| 5 (4–6) | Lyria 3.5 | 1052 | ±19 | 2,548 |
+| 6 (4–6) | Lyria 3 Pro | 1051 | ±19 | 2,586 |
+| 7 | Eleven Music v2.5 | 1012 | ±19 | 2,656 |
+| 8 | MiniMax Music 3.0 | 1000 | 기준 | 2,692 |
+| 9–11 | Eleven Music v2 · Eleven Music · MiniMax 2.6 | 999 · 999 · 998 | ±19 | 약 2,600 |
+| 12 | MiniMax Music 2.5+ | 985 | ±19 | 2,730 |
+| 13 | Sonauto Melodia v3 | 972 | ±20 | 2,679 |
+
+  - 기악 탭은 받지 못했습니다
+
+- **세 평가를 합친 읽기**
+  - **보컬(노래)은 Suno v6가 1위**이고, Mureka V9.5가 바로 뒤입니다. 독립 청취 연구(Mureka ≈ Suno)와 방향이 같습니다
+  - **기악은 Lyria 3 Pro가 1위**입니다. **공개 가중치 중 최고는 Stable Audio 3 Medium**(2위, 1333)입니다
+  - **실시간 모델은 품질 점수가 낮습니다.** Magenta RealTime Large 911(9위), Magenta RealTime 2 Base 809(13위)입니다. 실시간으로 이어 생성할 수 있는(RTF 약 1) 대신 품질을 내준 것으로 보입니다. MRT2 Base가 MRT1 Large보다 낮은데, 표가 200개이고 구간(±69)이 넓어 확정하기 어렵습니다
 
 ### 2.2 노래·기악 생성 — 공개
 
@@ -252,7 +297,7 @@
 ## 8. 확인하지 못한 것과 한계
 
 - [요약] 항목은 원문을 열지 않았습니다. 특히 SAGE-Music(철회 표시), YuE2(제3자 위키), Mureka·Lyria·ElevenLabs의 세부 수치는 원문 확인이 필요합니다
-- 공식 Music Arena 순위표가 서버 오류라 공식 Elo를 확인하지 못했습니다
+- 공식 Music Arena 순위표는 제 도구로는 열리지 않아(서버 오류, JavaScript 페이지) 사용자가 열어 붙여 준 화면으로 반영했습니다. 공식 순위표의 보컬 탭과 Artificial Analysis의 기악 탭은 받지 못했습니다
 - Notochord Homunculus PDF는 글자를 추출하지 못했습니다. Somax2 원문 페이지는 405 오류였습니다
 - 이 문서의 어떤 모델도 돌려 보거나 들어 보지 않았습니다. 순위는 공개 구현과 과제 적합성에 대한 판단입니다
 - 아스트라 노트(`research_notes/2026 개인화 피아노 모델 비교/`)의 NanoMaestro, Magenta RT2, LK_Jam, FIGARO 조사는 아스트라가 직접 확인한 것입니다
