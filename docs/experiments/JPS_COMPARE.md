@@ -1,0 +1,150 @@
+# Aria base와 Jazz Pianist Style 소형 비교 (#1774)
+
+작성 2026-10-17. 아스트라와 합의한 P1-a 단위입니다(합의 기록: 로컬 `output/product-plan-20261016/05-DESIGN-REVIEW-20261017.md`, 회신 msg_d57aeec27ee3·msg_c58cfd2772b3·msg_32a6cf75782b). 이 문서의 1–9절은 생성 전에 커밋하고, 결과는 10절 뒤에 붙입니다.
+
+## 1. 질문 (하나)
+
+같은 프라이머에서 공개 Jazz Pianist Style(JPS) 생성기가 Aria base보다 사용자가 고른 솔로 특징에 가까운 출력을 내는가? 같은 JPS에서 조건 A와 B를 바꾸면 귀로 구별되는 차이가 생기는가?
+
+이 비교는 탐색입니다. 개인화 성공이나 티그랑 재현을 주장하지 않습니다. 사용자가 듣기 전에는 음악 품질을 주장하지 않습니다(`quality_claimed: false`).
+
+## 2. 모델과 출처
+
+| | 파일 | 확인 |
+|---|---|---|
+| Aria base | `/Users/ohhalim/git_box/t3_aria/ckpt/model-gen.safetensors`, `aria.config` medium | #1726/#1732/#1760과 같은 체크포인트. sha256는 실행 때 기록 |
+| JPS 생성기 | HF `drewbie/jazz-pianist-style-generator` revision `4687443559f9`, `model.safetensors` sha256 `78a21df7…`, `artist_embeddings.safetensors` sha256 `559f7468…` | Aria-medium 16층 중 8–15층에 교차 주의, 연주자 12명 × 문맥 벡터 4개. Apache-2.0 |
+| JPS 코드 | GitHub `almostimplemented/jazz-pianist-style` @ `ec3cd30c` | 모델 클래스(`llama_pijama.models`)만 import. 저자 `generate.py`는 쓰지 않음 |
+
+- 실행 환경은 기존 t3_aria venv입니다. 새로 설치한 것은 없습니다
+  - aria 저장소가 `c2f67bc90b49`로, JPS가 고정한 버전과 같습니다
+  - ariautils는 `7c81575`로, JPS 고정본 `4ed0749`보다 1커밋 뒤입니다. 그 커밋은 `ariautils/midi.py`의 `get_duration_ms` 템포 조회만 고쳤습니다. 어휘는 17,727개로 두 모델 config와 같습니다
+- 출처 기록: `/Users/ohhalim/git_box/jps/PROVENANCE.json`
+
+### 조건 번호와 연주자 이름
+
+JPS 체크포인트와 HF에는 이름→번호 표가 없습니다. 근거는 다음과 같습니다.
+
+- 저자 README의 빌드 명령은 `data/pijama12.csv`로 `data/pijama12_4096`를 만들고, 학습 명령은 그 결과를 읽습니다
+- `build_dataset.py`는 `sorted(df["artist"].unique())` 순서로 번호를 매깁니다
+- `pijama12.csv`의 마지막 변경은 2026-08-18(`b97a0b1`)이고, 체크포인트 최종 수정은 2026-09-30입니다
+- 저자 결과 파일 `results/pijama12_*_clf_eval.json`의 `artists` 순서도 이름 정렬 순서와 같습니다. 다만 이것은 분류기 결과라서 생성기의 표는 아닙니다
+
+배포된 표로 직접 확인한 것은 아니므로, **결과는 익명 조건 번호로 보고하고 이름은 "문서상 유도"로만 붙입니다**(아스트라 msg_32a6cf75782b). 분류기 출력으로 표를 인증하지 않습니다.
+
+| 팔 | 조건 | 문서상 유도된 이름 |
+|---|---|---|
+| `base` | Aria base, 문맥 없음 | — |
+| `jps0` | JPS, 연주자 문맥을 0으로(저자 `--mode ablation`과 같음, mask는 유지) | — |
+| `jpsA` | JPS, 조건 번호 8 | Hank Jones |
+| `jpsB` | JPS, 조건 번호 2 | Art Tatum |
+
+- A/B는 에이전트가 고른 탐색 후보입니다. 사용자 선호를 확정한 것이 아닙니다
+  - A는 사용자가 좋다고 고른 기준 클립 18(Barry Harris, "비밥처럼 이어지는 릭")에서 비밥 계열로 골랐습니다
+  - B는 기준 클립 22(Tatum Elegy, "긴 릭은 좋았고 스타일은 별로")에서 골랐습니다
+- 두 연주자의 스타일 차이가 커 보인다고 해서, "차이 없음" 결과의 검정력이 커졌다고 주장하지 않습니다
+- 출력을 보고 다시 고르지 않습니다
+- `jps0`은 원본 Aria도, 별도로 학습한 일반 재즈 대조군도 아닙니다. 원본 Aria와의 차이로 "재즈 적응 자체"의 효과를 분리하지 않습니다
+
+## 3. 입력
+
+- 기준 클립 MIDI: `/Users/ohhalim/git_box/listening/reference_candidates/06.mid`(Tigran Hamasyan — Looking For The Block), `18.mid`(Barry Harris — All God's Chillun Got Rhythm)
+  - 로컬 PiJAMA 원곡에서 25% 지점부터 30초를 자른 구간입니다(#1763)
+  - 두 연주자 모두 JPS 학습 12명에 없습니다
+- 프라이머: 각 클립의 처음 8초
+  - 토큰화 설정: `AbsTokenizer.tokenize(remove_preceding_silence=False, add_dim_tok=False, add_eos_tok=False)`
+  - 자르는 규칙: onset ≥ 8,000 ms인 첫 음의 앞에서 자릅니다
+  - 프라이머 음의 dur는 그대로 둡니다
+- canonical 토큰은 `scripts/jps_compare_primers.py`로 만들고 sha256를 고정합니다. 모든 팔에 같은 토큰 ID를 직접 넣습니다
+  - 06: 219토큰, 72음, `<T>` 1개, ids sha256 `3d540aab268ea859…`
+  - 18: 303토큰, 100음, `<T>` 1개, ids sha256 `fc8837c2e379e41b…`
+  - 토큰 파일은 원곡 전사의 일부라서 저장소 밖 `/Users/ohhalim/git_box/jps_compare_run1/primers.json`에 둡니다(sha256 `ec6f35b7…`)
+  - 라이브러리 기본값으로 토큰화하면 시간 원점이 바뀌고 `<D>`가 들어가기 때문입니다(아스트라 msg_c58cfd2772b3 3항, 실측 확인)
+
+## 4. 생성 설정 (모든 팔 동일)
+
+- PyTorch, float32, MPS, batch 1, `PYTORCH_ENABLE_MPS_FALLBACK` 없음
+- 매 스텝 전체 재계산입니다. KV 캐시를 쓰지 않으므로 KV 동등성 검사는 하지 않습니다
+- 샘플러는 #1726/#1732와 같습니다
+  - temperature 1, top-k·top-p·min_p 없음
+  - 스텝마다 Exp(1) 잡음 벡터 하나로 argmax(p/q)
+  - `aria_grammar_mask`의 형식 마스크를 씁니다
+- 연속 생성 계약으로 `<D>`와 `<E>`를 허용 집합에서 뺍니다. 그 외 내용은 제한하지 않습니다
+- seed는 1과 2입니다. 칸마다 `torch.Generator().manual_seed(seed)`를 새로 만듭니다. 팔끼리 한 난수열을 나눠 쓰지 않습니다
+- 종료 기준은 **프라이머 경계** 기준입니다. 생성 창은 클립 시간 [8,000, 28,000) ms, 즉 새 생성 20초입니다
+  - 생성한 음의 onset이 28,000 ms 이상이 되면 멈추고, 그 음은 버립니다
+  - `<T>`만으로 시간이 28,000 ms에 닿아도 멈춥니다
+  - 새 토큰 1,024개에 먼저 닿으면 멈추고, 끝의 미완성 음은 버립니다. 이 칸은 "길이 부족"으로 기록하고 다시 뽑지 않습니다
+- 음 끝 정책
+  - 남긴 음의 dur는 자르지 않습니다. 창 끝을 넘어 울리는 꼬리도 그대로 둡니다
+  - 부분 음(note 토큰만 있고 onset·dur가 없는 것)은 버립니다
+- 렌더
+  - GeneralUser GS v1.471 + fluidsynth, 44.1 kHz, 모든 팔 같은 음색
+  - 스윙·반주·pitch 교정 같은 후처리는 하지 않습니다
+
+## 5. 칸 (16개, 실행 전 고정)
+
+프라이머 [06, 18] × seed [1, 2] × 팔 [base, jps0, jpsA, jpsB].
+
+- smoke는 칸 (06, seed 1, jpsA)입니다. smoke도 16칸 중 하나이며 다시 뽑지 않습니다
+- 나머지 15칸은 프라이머 → seed → 팔 순서로 생성합니다
+
+## 6. 상한과 예산 (smoke 전 고정)
+
+- 칸 하나의 벽시계 상한: 900초. 넘으면 그 칸은 "시간 초과"로 기록하고 부분 결과를 보존합니다
+- 프로세스 RSS 상한: 24 GB. 넘으면 즉시 멈춥니다
+- 총예산: smoke 시간을 T₁이라 할 때
+  - T₁ × 15 × 1.25 > 180분이면 나머지를 시작하지 않습니다
+  - 생성 도중 누적 180분을 넘으면 그 시점에서 멈춥니다
+  - 칸 수를 줄이거나 seed를 바꾸지 않습니다. 완료·실패·미실행 수를 전부 공개합니다
+- 발열은 칸 사이마다 `notifyutil -g com.apple.system.thermalpressurelevel`로 기록합니다. heavy 이상이면 내려갈 때까지 최대 10분 기다리고, 기다린 시간을 기록합니다
+
+## 7. 사전 검사 (precheck, 생성 전)
+
+1. 입력 sha256: Aria·JPS 가중치, canonical 프라이머 토큰
+2. 어휘 크기 17,727이 두 모델 config와 토크나이저에서 같은지
+3. 샘플러 동등성: `torch.multinomial`과 Exp(1) 경쟁이 32스텝 연속 같은지
+4. JPS 모델과 연주자 임베딩을 `strict=True`로 로드
+5. 같은 프라이머에서 첫 스텝 logits가 `jps0`≠`jpsA`, `jpsA`≠`jpsB`인지(최대 절대 차이 > 1e-3)
+6. JPS 본체(교차 주의 외) 가중치와 Aria base의 층별 상대 차이. 보고만 합니다
+7. 결정성: 팔마다 같은 seed로 24토큰을 두 번 생성해 같은지
+8. 24토큰 결과가 MIDI로 저장되는지
+
+하나라도 실패하면 생성을 시작하지 않습니다.
+
+## 8. 사용자 전 자동 점검 (품질 판정 아님)
+
+- 형식 유효성, 길이 부족, 가장 긴 반복, 최대 동시음 수
+- 기준 클립 특징과 같은 정의(#1763 `REFERENCE_CLIPS_DECISION.md`)로 계산합니다
+  - 50 ms 안 3음 이상 묶음 수(초당), 저음(<48) 비율, 고음(≥84) 비율, 초당 음 수
+  - 단음열 릭 길이: 다음 음까지 250 ms 이하로 이어지는 음 수의 중앙값과 p90
+- 복사 검사(보고만 함): 생성 구간 음높이열이 아래 자료와 가장 길게 겹치는 길이를 잽니다
+  - 로컬 PiJAMA의 Art Tatum 123곡, Hank Jones 44곡
+  - 프라이머의 원곡 전체
+- 점검에 걸린 출력도 숨기지 않습니다. 표시만 합니다
+
+## 9. 청취와 결과 읽기
+
+- 산출물은 저장소 밖 `/Users/ohhalim/git_box/jps_compare_run1/`에 둡니다. 원곡 전사의 연속이라 저장소에 올리지 않습니다
+  - 칸마다 생성 구간만 담은 MIDI/오디오와 프라이머 포함본
+- 블라인드 쌍: 프라이머 × seed 4칸마다 세 비교, 총 12쌍
+  - (base, jpsA), (base, jpsB), (jpsA, jpsB)
+  - 쌍 안의 A/B 순서는 `random.Random(1774)`로 섞습니다. 답(key)은 청취 폴더 밖에 둡니다
+- 첫 화면은 4쌍입니다. 나머지 8쌍도 전부 열어 볼 수 있습니다
+  - 06·seed 1: (base, jpsA), (jpsA, jpsB)
+  - 18·seed 1: (base, jpsB), (jpsA, jpsB)
+- 평가표: 03 G1 6항목 + "스윙감이 거슬리는가"
+- 청취 시간은 약속하지 않습니다
+
+| 관측 | 말할 수 있는 것 | 말하지 않는 것 |
+|---|---|---|
+| base 대 JPS 8쌍 중 JPS 선호가 절반 미만 | 이번 후보 우선순위를 낮춤(운영 판단) | JPS가 일반적으로 못하다 |
+| jpsA·jpsB 4쌍에서 구별되지 않음 | 이 조건에서 감지 못함 | 새 연주자 임베딩이 불가능하다 |
+| JPS 선호 | 이 개발 조건에서 사용자가 JPS를 더 선호 | 개인화 성공, 티그랑 재현, 통계적 우열 |
+
+- 같은 팔이 여러 비교에 들어갑니다. 분모는 비교마다 따로 적습니다(base 대 jpsA 4쌍, base 대 jpsB 4쌍, jpsA 대 jpsB 4쌍)
+- 청취가 없으면 미평가로 둡니다
+
+## 10. 결과
+
+(생성 뒤 추가)
