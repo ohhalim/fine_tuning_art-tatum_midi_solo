@@ -199,15 +199,29 @@ class ExportSongTest(unittest.TestCase):
         notes = [(rng.randint(55, 95), 10 * rng.randint(0, 2500), 10 * rng.randint(1, 80), 64) for _ in range(160)]
         humans = human(*[(rng.randint(28, 54), on, on + rng.choice([60, 400, 1500])) for on in
                          sorted(rng.uniform(0, 25000) for _ in range(60))])
+        target = [(p, float(on), float(on + d), v) for p, on, d, v in notes]
         for idx in range(4):
-            res = build_song(idx, aria_tokens(notes), humans)
-            self.assertEqual(res["checks"], {"c1_replay_mismatch": 0, "c2_prefix_mismatch": 0,
-                                             "c3_observed_only_mismatch": 0, "c4_low_pitch_tokens": 0})
+            res = build_song(idx, aria_tokens(notes), humans, target)
+            self.assertEqual(res["checks"], {"c1_replay_mismatch": 0, "c2_prefix_mismatch": 0, "c3_observed_only_mismatch": 0,
+                                             "c4_low_pitch_tokens": 0, "c5_misaligned_notes": 0, "c6_dim_tokens": 0})
             reqs = res["requests"]
             self.assertEqual(reqs[0]["available"], 0)
             self.assertTrue(all(r["available"] == 1 for r in reqs[1:]))
             self.assertTrue(any(any(r["pc12"]) for r in reqs))
             self.assertEqual(sum(r["window_tokens"] for r in reqs), len(aria_tokens(notes)) - 1 - res["primer_end"])
+
+    def test_a_shifted_time_origin_and_a_dim_token_are_caught(self):
+        """Deviation 2: AbsTokenizer's defaults shift every onset by the first note and insert <D>."""
+        from lh_request_export import build_song, misaligned_notes
+        notes = [(60, 700, 100, 64), (62, 1500, 100, 64), (64, 6200, 100, 64)]
+        target = [(p, float(on), float(on + d), v) for p, on, d, v in notes]
+        self.assertEqual(misaligned_notes(aria_tokens(notes), target), 0)
+        shifted = aria_tokens([(p, on - 700, d, v) for p, on, d, v in notes])         # remove_preceding_silence
+        self.assertEqual(misaligned_notes(shifted, target), 3)
+        self.assertEqual(misaligned_notes(aria_tokens(notes[:2]), target), 1)          # a dropped note counts
+        with_dim = aria_tokens(notes)
+        with_dim.insert(len(with_dim) - 4, "<D>")
+        self.assertEqual(build_song(0, with_dim, [], target)["checks"]["c6_dim_tokens"], 1)
 
     def test_a_low_note_in_the_model_stream_is_counted(self):
         from lh_request_export import build_song

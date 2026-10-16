@@ -5,9 +5,10 @@ No model, no training. Two stages because the note loader (pretty_midi) and the 
   split  (main venv):  lh_request_export.py split <bebop_rh manifest> <out dir>
          train songs only (val/test never opened, SHA1 checked). g3 split: pitch < 55 is the human condition history,
          pitch >= 55 the model's target stream. Writes <out>/songs/NNN.target.mid (target notes only, original velocity,
-         no pedal CC) and NNN.human.json (human notes in ms, the audit's loader)
+         no pedal CC) and NNN.notes.json (human and target notes in ms, the audit's loader)
   build  (Aria venv):  lh_request_export.py build <out dir> <aria repo> <report json>
-         tokenizes each target MIDI with ariautils AbsTokenizer, builds the request table (scripts/block_request.py) with
+         tokenizes each target MIDI with ariautils AbsTokenizer (TOKENIZE_KW: keep the original time origin, no random
+         <D> token; deviation 2 of the doc), builds the request table (scripts/block_request.py) with
          t0 = PHASES[song index % 4], the payload of every request, and runs the checks below on every song. Writes
          <out>/requests/NNN.json.gz and the summary report
 
@@ -15,6 +16,8 @@ Checks (registered before the run): C1 every request's context payloads equal th
 (simulate_kv); C2 a prefix-only stream (tokens before the request's context end, then <E>) gives the same committing
 requests for the context; C3 the payload from human notes observed up to s_k only (later notes dropped, releases after
 s_k unknown) equals the payload from all human notes; C4 every token pitch is >= 55 (no human note in the model stream).
+Added after run 2 (deviation 2): C5 every token note's absolute onset matches an original target note of the same pitch
+within ALIGN_MS (token time and human time share one origin); C6 no <D> token.
 The tokenizer may merge or drop notes; the token note count against the target note count is reported, not judged.
 """
 from __future__ import annotations
@@ -39,6 +42,10 @@ from lh_role_proxy import INF, SPLIT_PITCH, Note  # noqa: E402
 
 PHASES = (0.0, BLOCK / 4, BLOCK / 2, 3 * BLOCK / 4)
 CAPACITY, CAP = 4096, 64          # scripts/rt_producer.py cache capacity, scripts/aria_mlx_stream_loop.py tokens per block
+# AbsTokenizer defaults shift every onset by the first note (remove_preceding_silence) and insert <D> at a random
+# position near the end (add_dim_tok, random.randint): runs 1-2 had both. Human notes stay in the original ms.
+TOKENIZE_KW = {"remove_preceding_silence": False, "add_dim_tok": False}
+ALIGN_MS = 10.0                   # 10 ms onset grid (5 ms rounding) + MIDI tick (1/440 s at 120 BPM, 220 tpq)
 
 
 def sha256_file(path):
@@ -70,8 +77,9 @@ def split(manifest_path, out_dir):
         pm.write(os.path.join(out_dir, "songs", f"{i:03d}.target.mid"))
         rec = {"idx": i, "source": s["source"], "sha1": s["sha1"], "pianist": s["pianist"], "notes": len(notes),
                "target_notes": len(tgt), "human_notes": len(hum), "nonpositive_length": info["nonpositive_length"]}
-        with open(os.path.join(out_dir, "songs", f"{i:03d}.human.json"), "w") as f:
-            json.dump({**rec, "human": [[n.nid, n.pitch, n.on, n.off] for n in hum]}, f)
+        with open(os.path.join(out_dir, "songs", f"{i:03d}.notes.json"), "w") as f:
+            json.dump({**rec, "human": [[n.nid, n.pitch, n.on, n.off] for n in hum],
+                       "target": [[n.pitch, n.on, n.off, n.vel] for n in tgt]}, f)
         meta.append(rec)
     with open(os.path.join(out_dir, "songs", "split_meta.json"), "w") as f:
         json.dump({"manifest": manifest_path, "manifest_sha256": sha256_file(manifest_path), "split_pitch": SPLIT_PITCH,
@@ -94,7 +102,33 @@ def observed_only(humans, s):
     return [Note(n.nid, n.pitch, n.on, n.off if n.off <= s else INF) for n in humans if n.on <= s]
 
 
-def build_song(idx, toks, humans):
+def token_notes(toks):
+    """(absolute onset ms, pitch) of every note in a token stream."""
+    out, seg = [], 0
+    for i, t in enumerate(toks):
+        if t == "<T>":
+            seg += 1
+        elif isinstance(t, tuple) and t[0] == "piano":
+            out.append((seg * 5000 + toks[i + 1][1], t[1]))
+    return out
+
+
+def misaligned_notes(toks, target):
+    """Token notes whose absolute onset is more than ALIGN_MS from the original target note of the same pitch (matched
+    in onset order per pitch; rounding keeps the order within a pitch). A count difference counts every extra note."""
+    by_tok, by_orig = collections.defaultdict(list), collections.defaultdict(list)
+    for on, p in token_notes(toks):
+        by_tok[p].append(on)
+    for p, on, _off, _vel in target:
+        by_orig[p].append(on)
+    bad = 0
+    for p in set(by_tok) | set(by_orig):
+        a, b = sorted(by_tok[p]), sorted(by_orig[p])
+        bad += abs(len(a) - len(b)) + sum(1 for x, y in zip(a, b) if abs(x - y) > ALIGN_MS)
+    return bad
+
+
+def build_song(idx, toks, humans, target=None):
     t0 = PHASES[idx % len(PHASES)]
     rows = request_table(toks, t0)
     pays = {r["k"]: payload(humans, r["s"], r["k"]) for r in rows}
@@ -109,6 +143,9 @@ def build_song(idx, toks, humans):
         chk["c3_observed_only_mismatch"] += payload(observed_only(humans, r["s"]), r["s"], k) != pays[k]
     piano = [t for t in toks if isinstance(t, tuple) and t[0] == "piano"]
     chk["c4_low_pitch_tokens"] = sum(1 for t in piano if t[1] < 55)
+    if target is not None:
+        chk["c5_misaligned_notes"] = misaligned_notes(toks, target)
+    chk["c6_dim_tokens"] = sum(1 for t in toks if t == "<D>")
     reqs = []
     for r in rows:
         pc, avail = pays[r["k"]]
@@ -130,10 +167,10 @@ def build(out_dir, aria_repo, report_path):
     ctx_lens, win_toks, bnd_toks, pc_sets = [], [], [], collections.Counter()
     for rec in meta["songs"]:
         i = rec["idx"]
-        hj = json.load(open(os.path.join(out_dir, "songs", f"{i:03d}.human.json")))
+        hj = json.load(open(os.path.join(out_dir, "songs", f"{i:03d}.notes.json")))
         humans = [Note(nid, p, on, off) for nid, p, on, off in hj["human"]]
-        toks = tok.tokenize(MidiDict.from_midi(os.path.join(out_dir, "songs", f"{i:03d}.target.mid")))
-        res = build_song(i, toks, humans)
+        toks = tok.tokenize(MidiDict.from_midi(os.path.join(out_dir, "songs", f"{i:03d}.target.mid")), **TOKENIZE_KW)
+        res = build_song(i, toks, humans, hj["target"])
         out = {"idx": i, "source": rec["source"], "sha1": rec["sha1"], "pianist": rec["pianist"], "t0": res["t0"],
                "primer_end": res["primer_end"], "tokens": [list(t) if isinstance(t, tuple) else t for t in toks],
                "token_ids": tok.encode(toks), "requests": res["requests"]}
@@ -163,14 +200,16 @@ def build(out_dir, aria_repo, report_path):
                       "target_notes": rec["target_notes"], "requests": len(reqs),
                       "warm_nonempty_ratio": round(sum(1 for r in warm if any(r["pc12"])) / len(warm), 4) if warm else None,
                       "checks": res["checks"], "file_sha256": sha256_file(path)})
-    checks = {k: totals[k] for k in ("c1_replay_mismatch", "c2_prefix_mismatch", "c3_observed_only_mismatch", "c4_low_pitch_tokens")}
+    checks = {k: totals[k] for k in ("c1_replay_mismatch", "c2_prefix_mismatch", "c3_observed_only_mismatch", "c4_low_pitch_tokens",
+                                     "c5_misaligned_notes", "c6_dim_tokens")}
     report = {"issue": 1756, "doc": "docs/experiments/LH_BLOCK_REQUEST_INPUT.md", "quality_claimed": False, "training": False,
               "run": {"git_head": subprocess.run(["git", "-C", HERE, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
                       "block_request_sha256": sha256_file(os.path.join(HERE, "block_request.py")),
                       "export_script_sha256": sha256_file(os.path.abspath(__file__)), "out_dir": out_dir,
                       "manifest_sha256": meta["manifest_sha256"], "seconds": round(time.time() - t_start, 1)},
               "params": {"phases": PHASES, "t0_rule": "PHASES[song index % 4]", "payload": "g3 sounding at s_k, 12-PC multihot + available",
-                         "capacity_tokens": CAPACITY, "cap_tokens_per_block": CAP, "split_pitch": SPLIT_PITCH},
+                         "capacity_tokens": CAPACITY, "cap_tokens_per_block": CAP, "split_pitch": SPLIT_PITCH,
+                         "tokenize_kwargs": TOKENIZE_KW, "align_ms": ALIGN_MS},
               "checks": checks, "all_checks_zero": not any(checks.values()),
               "totals": dict(totals),
               "warm_nonempty_ratio": round(totals["warm_nonempty_payload"] / totals["warm_requests"], 4) if totals["warm_requests"] else None,
