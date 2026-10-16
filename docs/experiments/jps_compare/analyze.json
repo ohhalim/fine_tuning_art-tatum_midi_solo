@@ -1,0 +1,736 @@
+{
+ "issue": 1774,
+ "mode": "--analyze",
+ "checks": {
+  "features_blob": {
+   "ok": true
+  }
+ },
+ "result": "analyze_done",
+ "stopped_at": null,
+ "inputs": {
+  "primers_json_sha256": "ec6f35b7ce04cee67f63864bbec43d3732c1dc35f950a5b0c5a8e632bb872ca9",
+  "primer_ids_sha256": {
+   "06": "3d540aab268ea85982c5c71c4442c98be8f8b43b06b80fc2d3361ee3a6154b4a",
+   "18": "fc8837c2e379e41b765e15bc6f199a30407ff556c70dc0a3f025639d5874c811"
+  }
+ },
+ "corpora": {
+  "Art Tatum": {
+   "files": 122,
+   "notes": 297845
+  },
+  "Hank Jones": {
+   "files": 44,
+   "notes": 86874
+  },
+  "source_06": {
+   "files": 1,
+   "notes": 3118
+  },
+  "source_18": {
+   "files": 1,
+   "notes": 3213
+  }
+ },
+ "cells": {
+  "p06_s1_base": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 757,
+   "wall_s": 127.9,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 251,
+   "reached_ms": 27960,
+   "short": false,
+   "longest_repeat": 6,
+   "max_polyphony": 4,
+   "mask_changed_n": 0,
+   "pre_mask_allowed_min": 0.999214,
+   "notes": 251,
+   "low_share": 0.1912,
+   "high_share": 0.0,
+   "comping_per_s": 0.45,
+   "lick_len_median": 31.5,
+   "lick_len_p90": 97,
+   "semitone_step_share": 0.2976,
+   "notes_per_s": 12.55,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 6,
+     "interval": 6
+    },
+    "Hank Jones": {
+     "pitch": 4,
+     "interval": 5
+    },
+    "source_06": {
+     "pitch": 5,
+     "interval": 5
+    },
+    "source_18": {
+     "pitch": 4,
+     "interval": 4
+    }
+   }
+  },
+  "p06_s1_jps0": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 712,
+   "wall_s": 120.1,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 236,
+   "reached_ms": 27960,
+   "short": false,
+   "longest_repeat": 10,
+   "max_polyphony": 6,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.989326,
+   "notes": 236,
+   "low_share": 0.1314,
+   "high_share": 0.0,
+   "comping_per_s": 1.1,
+   "lick_len_median": 4,
+   "lick_len_p90": 25,
+   "semitone_step_share": 0.2435,
+   "notes_per_s": 11.8,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 8,
+     "interval": 10
+    },
+    "Hank Jones": {
+     "pitch": 6,
+     "interval": 10
+    },
+    "source_06": {
+     "pitch": 6,
+     "interval": 5
+    },
+    "source_18": {
+     "pitch": 4,
+     "interval": 5
+    }
+   }
+  },
+  "p06_s1_jpsA": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 535,
+   "wall_s": 80.9,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 177,
+   "reached_ms": 27910,
+   "short": false,
+   "longest_repeat": 10,
+   "max_polyphony": 4,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.98019,
+   "notes": 177,
+   "low_share": 0.1469,
+   "high_share": 0.0,
+   "comping_per_s": 0.05,
+   "lick_len_median": 9,
+   "lick_len_p90": 49,
+   "semitone_step_share": 0.3525,
+   "notes_per_s": 8.85,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 4,
+     "interval": 5
+    },
+    "Hank Jones": {
+     "pitch": 3,
+     "interval": 6
+    },
+    "source_06": {
+     "pitch": 9,
+     "interval": 8
+    },
+    "source_18": {
+     "pitch": 2,
+     "interval": 4
+    }
+   }
+  },
+  "p06_s1_jpsB": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 658,
+   "wall_s": 106.0,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 218,
+   "reached_ms": 27840,
+   "short": false,
+   "longest_repeat": 12,
+   "max_polyphony": 6,
+   "mask_changed_n": 2,
+   "pre_mask_allowed_min": 0.983362,
+   "notes": 218,
+   "low_share": 0.1055,
+   "high_share": 0.0367,
+   "comping_per_s": 1.05,
+   "lick_len_median": 2.0,
+   "lick_len_p90": 16,
+   "semitone_step_share": 0.1633,
+   "notes_per_s": 10.9,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 6,
+     "interval": 6
+    },
+    "Hank Jones": {
+     "pitch": 5,
+     "interval": 6
+    },
+    "source_06": {
+     "pitch": 4,
+     "interval": 4
+    },
+    "source_18": {
+     "pitch": 4,
+     "interval": 4
+    }
+   }
+  },
+  "p06_s2_base": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 367,
+   "wall_s": 45.9,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 121,
+   "reached_ms": 27990,
+   "short": false,
+   "longest_repeat": 6,
+   "max_polyphony": 3,
+   "mask_changed_n": 0,
+   "pre_mask_allowed_min": 0.998971,
+   "notes": 121,
+   "low_share": 0.1818,
+   "high_share": 0.0,
+   "comping_per_s": 0.0,
+   "lick_len_median": 5,
+   "lick_len_p90": 14,
+   "semitone_step_share": 0.413,
+   "notes_per_s": 6.05,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 5,
+     "interval": 7
+    },
+    "Hank Jones": {
+     "pitch": 4,
+     "interval": 6
+    },
+    "source_06": {
+     "pitch": 6,
+     "interval": 5
+    },
+    "source_18": {
+     "pitch": 3,
+     "interval": 5
+    }
+   }
+  },
+  "p06_s2_jps0": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 466,
+   "wall_s": 67.1,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 154,
+   "reached_ms": 27920,
+   "short": false,
+   "longest_repeat": 17,
+   "max_polyphony": 5,
+   "mask_changed_n": 0,
+   "pre_mask_allowed_min": 0.993306,
+   "notes": 154,
+   "low_share": 0.0974,
+   "high_share": 0.0,
+   "comping_per_s": 0.05,
+   "lick_len_median": 9,
+   "lick_len_p90": 58,
+   "semitone_step_share": 0.5985,
+   "notes_per_s": 7.7,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 4,
+     "interval": 17
+    },
+    "Hank Jones": {
+     "pitch": 3,
+     "interval": 11
+    },
+    "source_06": {
+     "pitch": 9,
+     "interval": 8
+    },
+    "source_18": {
+     "pitch": 2,
+     "interval": 4
+    }
+   }
+  },
+  "p06_s2_jpsA": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 616,
+   "wall_s": 97.1,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 204,
+   "reached_ms": 27970,
+   "short": false,
+   "longest_repeat": 12,
+   "max_polyphony": 8,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.980662,
+   "notes": 204,
+   "low_share": 0.1324,
+   "high_share": 0.0,
+   "comping_per_s": 1.0,
+   "lick_len_median": 7,
+   "lick_len_p90": 17,
+   "semitone_step_share": 0.2845,
+   "notes_per_s": 10.2,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 5,
+     "interval": 6
+    },
+    "Hank Jones": {
+     "pitch": 5,
+     "interval": 6
+    },
+    "source_06": {
+     "pitch": 5,
+     "interval": 6
+    },
+    "source_18": {
+     "pitch": 4,
+     "interval": 5
+    }
+   }
+  },
+  "p06_s2_jpsB": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 676,
+   "wall_s": 110.9,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 224,
+   "reached_ms": 27980,
+   "short": false,
+   "longest_repeat": 14,
+   "max_polyphony": 5,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.988434,
+   "notes": 224,
+   "low_share": 0.0893,
+   "high_share": 0.0,
+   "comping_per_s": 0.4,
+   "lick_len_median": 25,
+   "lick_len_p90": 144,
+   "semitone_step_share": 0.3333,
+   "notes_per_s": 11.2,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 6,
+     "interval": 7
+    },
+    "Hank Jones": {
+     "pitch": 6,
+     "interval": 6
+    },
+    "source_06": {
+     "pitch": 7,
+     "interval": 6
+    },
+    "source_18": {
+     "pitch": 5,
+     "interval": 8
+    }
+   }
+  },
+  "p18_s1_base": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 700,
+   "wall_s": 124.0,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 232,
+   "reached_ms": 27850,
+   "short": false,
+   "longest_repeat": 8,
+   "max_polyphony": 27,
+   "mask_changed_n": 0,
+   "pre_mask_allowed_min": 0.992832,
+   "notes": 232,
+   "low_share": 0.1509,
+   "high_share": 0.0,
+   "comping_per_s": 1.2,
+   "lick_len_median": 2,
+   "lick_len_p90": 7,
+   "semitone_step_share": 0.1321,
+   "notes_per_s": 11.6,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 7,
+     "interval": 7
+    },
+    "Hank Jones": {
+     "pitch": 6,
+     "interval": 5
+    },
+    "source_06": {
+     "pitch": 3,
+     "interval": 5
+    },
+    "source_18": {
+     "pitch": 5,
+     "interval": 4
+    }
+   }
+  },
+  "p18_s1_jps0": {
+   "status": "done",
+   "stop": "token_cap",
+   "new_tokens": 1024,
+   "wall_s": 242.0,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 340,
+   "reached_ms": 25240,
+   "short": true,
+   "longest_repeat": 12,
+   "max_polyphony": 12,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.988627,
+   "notes": 340,
+   "low_share": 0.2029,
+   "high_share": 0.0588,
+   "comping_per_s": 2.55,
+   "lick_len_median": 1.5,
+   "lick_len_p90": 14,
+   "semitone_step_share": 0.0714,
+   "notes_per_s": 17.0,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 6,
+     "interval": 7
+    },
+    "Hank Jones": {
+     "pitch": 6,
+     "interval": 6
+    },
+    "source_06": {
+     "pitch": 4,
+     "interval": 4
+    },
+    "source_18": {
+     "pitch": 5,
+     "interval": 4
+    }
+   }
+  },
+  "p18_s1_jpsA": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 793,
+   "wall_s": 161.7,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 263,
+   "reached_ms": 27770,
+   "short": false,
+   "longest_repeat": 2,
+   "max_polyphony": 10,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.981607,
+   "notes": 263,
+   "low_share": 0.1293,
+   "high_share": 0.0,
+   "comping_per_s": 1.35,
+   "lick_len_median": 2,
+   "lick_len_p90": 10,
+   "semitone_step_share": 0.0638,
+   "notes_per_s": 13.15,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 6,
+     "interval": 7
+    },
+    "Hank Jones": {
+     "pitch": 7,
+     "interval": 6
+    },
+    "source_06": {
+     "pitch": 3,
+     "interval": 5
+    },
+    "source_18": {
+     "pitch": 5,
+     "interval": 5
+    }
+   }
+  },
+  "p18_s1_jpsB": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 925,
+   "wall_s": 204.9,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 307,
+   "reached_ms": 27910,
+   "short": false,
+   "longest_repeat": 4,
+   "max_polyphony": 8,
+   "mask_changed_n": 2,
+   "pre_mask_allowed_min": 0.984622,
+   "notes": 307,
+   "low_share": 0.0912,
+   "high_share": 0.0065,
+   "comping_per_s": 2.0,
+   "lick_len_median": 1.0,
+   "lick_len_p90": 23,
+   "semitone_step_share": 0.1786,
+   "notes_per_s": 15.35,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 6,
+     "interval": 7
+    },
+    "Hank Jones": {
+     "pitch": 7,
+     "interval": 6
+    },
+    "source_06": {
+     "pitch": 3,
+     "interval": 4
+    },
+    "source_18": {
+     "pitch": 9,
+     "interval": 8
+    }
+   }
+  },
+  "p18_s2_base": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 736,
+   "wall_s": 136.2,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 244,
+   "reached_ms": 27660,
+   "short": false,
+   "longest_repeat": 4,
+   "max_polyphony": 8,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.994982,
+   "notes": 244,
+   "low_share": 0.1189,
+   "high_share": 0.0082,
+   "comping_per_s": 1.95,
+   "lick_len_median": 3,
+   "lick_len_p90": 13,
+   "semitone_step_share": 0.0943,
+   "notes_per_s": 12.2,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 8,
+     "interval": 8
+    },
+    "Hank Jones": {
+     "pitch": 6,
+     "interval": 8
+    },
+    "source_06": {
+     "pitch": 4,
+     "interval": 4
+    },
+    "source_18": {
+     "pitch": 4,
+     "interval": 4
+    }
+   }
+  },
+  "p18_s2_jps0": {
+   "status": "done",
+   "stop": "token_cap",
+   "new_tokens": 1024,
+   "wall_s": 238.6,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 340,
+   "reached_ms": 27500,
+   "short": true,
+   "longest_repeat": 6,
+   "max_polyphony": 7,
+   "mask_changed_n": 2,
+   "pre_mask_allowed_min": 0.993614,
+   "notes": 340,
+   "low_share": 0.4176,
+   "high_share": 0.0,
+   "comping_per_s": 3.05,
+   "lick_len_median": 3,
+   "lick_len_p90": 14,
+   "semitone_step_share": 0.1304,
+   "notes_per_s": 17.0,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 6,
+     "interval": 9
+    },
+    "Hank Jones": {
+     "pitch": 5,
+     "interval": 7
+    },
+    "source_06": {
+     "pitch": 3,
+     "interval": 5
+    },
+    "source_18": {
+     "pitch": 4,
+     "interval": 7
+    }
+   }
+  },
+  "p18_s2_jpsA": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 790,
+   "wall_s": 160.0,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 262,
+   "reached_ms": 27870,
+   "short": false,
+   "longest_repeat": 6,
+   "max_polyphony": 7,
+   "mask_changed_n": 2,
+   "pre_mask_allowed_min": 0.979755,
+   "notes": 262,
+   "low_share": 0.2252,
+   "high_share": 0.0,
+   "comping_per_s": 1.8,
+   "lick_len_median": 1.0,
+   "lick_len_p90": 13,
+   "semitone_step_share": 0.1127,
+   "notes_per_s": 13.1,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 6,
+     "interval": 10
+    },
+    "Hank Jones": {
+     "pitch": 5,
+     "interval": 5
+    },
+    "source_06": {
+     "pitch": 5,
+     "interval": 5
+    },
+    "source_18": {
+     "pitch": 6,
+     "interval": 5
+    }
+   }
+  },
+  "p18_s2_jpsB": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 871,
+   "wall_s": 186.9,
+   "format_valid": true,
+   "format_first_error": null,
+   "gen_notes": 289,
+   "reached_ms": 27960,
+   "short": false,
+   "longest_repeat": 6,
+   "max_polyphony": 11,
+   "mask_changed_n": 2,
+   "pre_mask_allowed_min": 0.980013,
+   "notes": 289,
+   "low_share": 0.1557,
+   "high_share": 0.0623,
+   "comping_per_s": 2.2,
+   "lick_len_median": 1.0,
+   "lick_len_p90": 11,
+   "semitone_step_share": 0.1905,
+   "notes_per_s": 14.45,
+   "copy": {
+    "Art Tatum": {
+     "pitch": 7,
+     "interval": 10
+    },
+    "Hank Jones": {
+     "pitch": 6,
+     "interval": 6
+    },
+    "source_06": {
+     "pitch": 3,
+     "interval": 5
+    },
+    "source_18": {
+     "pitch": 5,
+     "interval": 4
+    }
+   }
+  }
+ },
+ "median_by_arm": {
+  "base": {
+   "gen_notes": 238.0,
+   "notes_per_s": 11.899999999999999,
+   "comping_per_s": 0.825,
+   "low_share": 0.16635,
+   "high_share": 0.0,
+   "lick_len_p90": 13.5,
+   "longest_repeat": 6.0,
+   "max_polyphony": 6.0
+  },
+  "jps0": {
+   "gen_notes": 288.0,
+   "notes_per_s": 14.4,
+   "comping_per_s": 1.825,
+   "low_share": 0.16715,
+   "high_share": 0.0,
+   "lick_len_p90": 19.5,
+   "longest_repeat": 11.0,
+   "max_polyphony": 6.5
+  },
+  "jpsA": {
+   "gen_notes": 233.0,
+   "notes_per_s": 11.649999999999999,
+   "comping_per_s": 1.175,
+   "low_share": 0.13965,
+   "high_share": 0.0,
+   "lick_len_p90": 15.0,
+   "longest_repeat": 8.0,
+   "max_polyphony": 7.5
+  },
+  "jpsB": {
+   "gen_notes": 256.5,
+   "notes_per_s": 12.825,
+   "comping_per_s": 1.525,
+   "low_share": 0.09834999999999999,
+   "high_share": 0.0216,
+   "lick_len_p90": 19.5,
+   "longest_repeat": 9.0,
+   "max_polyphony": 7.0
+  }
+ }
+}

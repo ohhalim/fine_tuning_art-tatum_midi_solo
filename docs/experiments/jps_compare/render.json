@@ -1,0 +1,122 @@
+{
+ "issue": 1774,
+ "mode": "--render",
+ "checks": {
+  "generate_done": {
+   "ok": true,
+   "result": "generate_done"
+  },
+  "fluidsynth_and_soundfont": {
+   "ok": true
+  },
+  "sixteen_cells": {
+   "ok": true,
+   "statuses": {
+    "p06_s1_base": "done",
+    "p06_s1_jps0": "done",
+    "p06_s1_jpsA": "done",
+    "p06_s1_jpsB": "done",
+    "p06_s2_base": "done",
+    "p06_s2_jps0": "done",
+    "p06_s2_jpsA": "done",
+    "p06_s2_jpsB": "done",
+    "p18_s1_base": "done",
+    "p18_s1_jps0": "done",
+    "p18_s1_jpsA": "done",
+    "p18_s1_jpsB": "done",
+    "p18_s2_base": "done",
+    "p18_s2_jps0": "done",
+    "p18_s2_jpsA": "done",
+    "p18_s2_jpsB": "done"
+   }
+  },
+  "listening_dir_empty": {
+   "ok": true
+  }
+ },
+ "result": "render_done",
+ "stopped_at": null,
+ "inputs": {
+  "primers_json_sha256": "ec6f35b7ce04cee67f63864bbec43d3732c1dc35f950a5b0c5a8e632bb872ca9",
+  "primer_ids_sha256": {
+   "06": "3d540aab268ea85982c5c71c4442c98be8f8b43b06b80fc2d3361ee3a6154b4a",
+   "18": "fc8837c2e379e41b765e15bc6f199a30407ff556c70dc0a3f025639d5874c811"
+  }
+ },
+ "render": {
+  "files": {
+   "p06_s1_base": {
+    "gen_notes": 251,
+    "shift_ms": 8000
+   },
+   "p06_s1_jps0": {
+    "gen_notes": 236,
+    "shift_ms": 8000
+   },
+   "p06_s1_jpsA": {
+    "gen_notes": 177,
+    "shift_ms": 8000
+   },
+   "p06_s1_jpsB": {
+    "gen_notes": 218,
+    "shift_ms": 8000
+   },
+   "p06_s2_base": {
+    "gen_notes": 121,
+    "shift_ms": 8000
+   },
+   "p06_s2_jps0": {
+    "gen_notes": 154,
+    "shift_ms": 8000
+   },
+   "p06_s2_jpsA": {
+    "gen_notes": 204,
+    "shift_ms": 8000
+   },
+   "p06_s2_jpsB": {
+    "gen_notes": 224,
+    "shift_ms": 8000
+   },
+   "p18_s1_base": {
+    "gen_notes": 232,
+    "shift_ms": 8000
+   },
+   "p18_s1_jps0": {
+    "gen_notes": 340,
+    "shift_ms": 8000
+   },
+   "p18_s1_jpsA": {
+    "gen_notes": 263,
+    "shift_ms": 8000
+   },
+   "p18_s1_jpsB": {
+    "gen_notes": 307,
+    "shift_ms": 8000
+   },
+   "p18_s2_base": {
+    "gen_notes": 244,
+    "shift_ms": 8000
+   },
+   "p18_s2_jps0": {
+    "gen_notes": 340,
+    "shift_ms": 8000
+   },
+   "p18_s2_jpsA": {
+    "gen_notes": 262,
+    "shift_ms": 8000
+   },
+   "p18_s2_jpsB": {
+    "gen_notes": 289,
+    "shift_ms": 8000
+   }
+  },
+  "pairs": 12,
+  "first_screen": [
+   1,
+   3,
+   8,
+   9
+  ],
+  "key_sha256": "d19b28cbd5ad4e2a18c38c8b3e8534c98a72a0dec5d7479f3aef0b23ecb5ce0c"
+ }
+}
