@@ -1,0 +1,45 @@
+{
+ "issue": 1760,
+ "step": "E",
+ "training_result_read": false,
+ "params": {
+  "lr": 0.001,
+  "dtype": "float32",
+  "batch": 1
+ },
+ "example": {
+  "song": 134,
+  "k": 353,
+  "tokens": 3989,
+  "ctx_len": 3962,
+  "window": 27,
+  "skipped_over_cap": 1
+ },
+ "phases": {
+  "load": {
+   "s": 4.15,
+   "vm_pressure_level": 1,
+   "thermal": 0
+  },
+  "forward_backward_step": {
+   "s": 1.99,
+   "mps_current_allocated_gib": 2.72,
+   "mps_driver_allocated_gib": 9.33,
+   "rss_max_gib": 5.11,
+   "vm_pressure_level": 1,
+   "thermal": 0
+  }
+ },
+ "checks": {
+  "loss_finite": true,
+  "adapter_grad_nonzero": true,
+  "base_unchanged": true,
+  "only_adapter_in_optimizer": true
+ },
+ "pass": true,
+ "run": {
+  "git_head": "768ef8a916e16c0be2d50d381dbb3553f9a1d217",
+  "torch": "2.14.1",
+  "seconds": 8.7
+ }
+}
