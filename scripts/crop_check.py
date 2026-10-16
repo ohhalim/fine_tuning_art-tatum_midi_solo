@@ -9,7 +9,8 @@ checks, registered before the run:
   R2 every request's kept context notes keep their original absolute (onset, pitch, dur) after base_ms is added back
   R3 every request's session position payloads equal the sequential session replay (simulate_session_kv), and both
      give the same base_ms and cut
-  R4 no request's session context fails the safety bound after its crop
+  R4 no request's session context fails the configured bound after its crop (the same needs_crop: "the setting holds",
+     not a proof that real calls stay below capacity; that is the CAP-aware real fill_block fixtures' job)
 Reported only: crops per song, base_ms, session context length, requests with a crop, kept length after a crop.
 """
 from __future__ import annotations
@@ -107,7 +108,7 @@ def main() -> None:
                       "crop_contract_sha256": sha256_file(os.path.join(HERE, "crop_contract.py")),
                       "check_script_sha256": sha256_file(os.path.abspath(__file__)), "export_dir": export_dir,
                       "seconds": round(time.time() - t_start, 1)},
-              "params": {"cap": CAP, "capacity": CAPACITY, "keep_target": KEEP_TARGET, "decision": "committed_len + 2*CAP > CAPACITY"},
+              "params": {"cap": CAP, "capacity": CAPACITY, "keep_target": KEEP_TARGET, "decision": "committed_len + 2*CAP + 3 > CAPACITY"},
               "checks": checks, "all_checks_zero": not any(checks.values()), "songs_checked": len(songs),
               "requests": totals["requests"], "crops": totals["crops"],
               "requests_with_crop_share": round(totals["crops"] / totals["requests"], 4) if totals["requests"] else None,

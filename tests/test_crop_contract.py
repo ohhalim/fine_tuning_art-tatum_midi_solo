@@ -10,8 +10,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 sys.path.insert(0, os.path.dirname(__file__))
 from block_contract import block_start  # noqa: E402
 from block_request import COLD, committing_request, payload  # noqa: E402
-from crop_contract import (HEADER, CapacityFailure, absolute_times, choose_cut, needs_crop, session_position_requests,  # noqa: E402
-                           session_requests, session_tokens, simulate_session_kv)
+from aria_mlx_stream_loop import fill_block  # noqa: E402
+from crop_contract import (CAP, CAPACITY, HEADER, CapacityFailure, absolute_times, choose_cut, needs_crop, reserve,  # noqa: E402
+                           session_position_requests, session_requests, session_tokens, simulate_session_kv)
+from stream_contract import TokenStream  # noqa: E402
 from lh_role_proxy import Note  # noqa: E402
 from test_block_request import aria_tokens  # noqa: E402
 
@@ -35,10 +37,11 @@ def humans(seed, span=60000):
 
 class DecisionTest(unittest.TestCase):
     def test_exact_capacity_boundary_and_one_more(self):
-        self.assertFalse(needs_crop(60 - 2 * 4, 4, 60))
-        self.assertTrue(needs_crop(60 - 2 * 4 + 1, 4, 60))
-        self.assertFalse(needs_crop(4096 - 128))
-        self.assertTrue(needs_crop(4096 - 127))
+        self.assertEqual(reserve(4), 2 * 4 + 3)
+        self.assertFalse(needs_crop(60 - 11, 4, 60))
+        self.assertTrue(needs_crop(60 - 10, 4, 60))
+        self.assertFalse(needs_crop(4096 - 131))
+        self.assertTrue(needs_crop(4096 - 130))
 
     def test_cut_policy(self):
         n = ("piano", 60, 64), ("onset", 0), ("dur", 10)
@@ -47,9 +50,11 @@ class DecisionTest(unittest.TestCase):
         t1, t2 = sess.index("<T>"), ce - 1 - 6
         self.assertEqual(choose_cut(sess, ce, 4, 60, 30), t1)                     # earliest <T> under the target
         self.assertEqual(choose_cut(sess, ce, 4, 60, 10), t2)                     # only the later <T> is under 10
-        self.assertEqual(choose_cut(sess, ce, 4, 18, 5), t2)                      # target missed, the latest safe <T>
+        self.assertEqual(choose_cut(sess, ce, 4, 19, 5), t2)                      # target missed, the latest safe <T>
         with self.assertRaises(CapacityFailure):
-            choose_cut(sess, ce, 4, 15, 5)                                        # no <T> makes room
+            choose_cut(sess, ce, 4, 18, 5)                                        # no <T> makes room
+        with self.assertRaises(ValueError):
+            choose_cut(sess, ce, 4, 40, 30)                                       # keep_target itself is not safe
         with self.assertRaises(CapacityFailure):
             choose_cut(list(HEADER) + list(n) * 30, 92, 4, 60, 30)                # no <T> at all
 
@@ -124,7 +129,7 @@ class SessionTest(unittest.TestCase):
     def test_empty_kept_history_makes_the_start_token_p0(self):
         dense = [(60 + i % 30, 5000 + 40 * i, 30, 64) for i in range(20)]           # 60 tokens in one segment
         toks = aria_tokens([(60, 0, 50, 64)] + dense + [(70, 12000, 50, 64)])
-        srows = session_requests(toks, 0.0, cap=4, capacity=74, keep_target=30)   # crop when 67 tokens end on <T>(10 s)
+        srows = session_requests(toks, 0.0, cap=4, capacity=77, keep_target=30)   # crop first when 67 tokens end on <T>(10 s)
         empty = [r for r in srows if r["crop"] and r["ctx_len"] == len(HEADER)]
         self.assertTrue(empty)
         for r in empty:
@@ -160,6 +165,82 @@ class SessionTest(unittest.TestCase):
             after = absolute_times(session_tokens(toks, r)[:r["ctx_len"]], r["base_ms"])
             self.assertTrue(set(after) <= set(before) | set(absolute_times(list(toks[:r["ctx_end"]]), 0.0)))
             self.assertEqual(after, absolute_times(list(toks[:r["ctx_end"]]), 0.0)[-len(after):] if after else [])
+
+
+
+class RealCallSafetyTest(unittest.TestCase):
+    """#1759 review H1: with the real fill_block over consecutive calls, a call that starts with needs_crop(committed)
+    false never feeds a position >= capacity. The sampler is adversarial within the grammar."""
+
+    @staticmethod
+    def coverage_of(stream):
+        st = stream.grammar_state()
+        return st.segment * 5000 + st.last_onset if st.expect == "note" else -1
+
+    @staticmethod
+    def history(length):
+        """A committed history of exactly `length` tokens: 3-token notes, padded with <D> (a no-op in the grammar)."""
+        notes = (length - len(HEADER)) // 3
+        return list(HEADER) + [("piano", 60, 64), ("onset", 0), ("dur", 10)] * notes + ["<D>"] * (length - len(HEADER) - 3 * notes)
+
+    def test_review_counterexample_is_now_safe_and_the_old_bound_was_not(self):
+        cap, capacity = CAP, CAPACITY
+        for committed, crop_expected in ((capacity - reserve(cap), False), (capacity - reserve(cap) + 1, True)):
+            s = TokenStream(self.history(committed))
+            self.assertEqual(s.committed_end, committed)
+            self.assertEqual(needs_crop(s.committed_end, cap, capacity), crop_expected)
+            for t in (("piano", 61, 64), ("onset", 1200), ("dur", 10)):                # a boundary note past h
+                s.append_sampled(t)
+            fed = []
+
+            def same_onset():
+                exp = s.grammar_state().expect
+                fed.append(len(s.tokens) - 1)
+                s.append_sampled({"note": ("piano", 62, 64), "onset": ("onset", 1200), "dur": ("dur", 10)}[exp])
+            fill_block(same_onset, lambda: self.coverage_of(s), lambda: s.commit_until(1000), 1000, 1937.5, cap)
+            self.assertEqual(len(s.tokens) - s.committed_end, 3 + cap)                 # provisional 67
+            fill_block(same_onset, lambda: self.coverage_of(s), lambda: s.commit_until(1937.5), 1937.5, 2875.0, cap)
+            if not crop_expected:
+                self.assertLess(max(fed), capacity)
+                self.assertEqual(max(fed), committed + (3 + cap) + cap - 2)
+        old_committed = capacity - 2 * cap                                             # run 1's bound let this through
+        self.assertGreaterEqual(old_committed + (3 + cap) + cap - 2, capacity)
+
+    def test_fuzz_consecutive_calls(self):
+        beat, block = 468.75, 937.5
+        worst, calls = float("-inf"), 0
+        for seed in range(300):
+            rng = random.Random(seed)
+            cap = rng.choice([3, 4, 5, 7])
+            capacity = rng.choice([60, 80, 120])
+            s = TokenStream(list(HEADER))
+            fed = []
+
+            def sample():
+                st = s.grammar_state()
+                fed.append(len(s.tokens) - 1)
+                if st.expect == "note":
+                    s.append_sampled("<T>" if rng.random() < 0.1 else ("piano", rng.randint(55, 90), 64))
+                elif st.expect == "onset":
+                    step = rng.choice([0, 0, 0, 10, 470, 940, 1900])               # often the same onset (stall)
+                    s.append_sampled(("onset", st.last_onset + step if st.last_onset + step <= 4990 else st.last_onset))
+                else:
+                    s.append_sampled(("dur", 10 * rng.randint(1, 50)))
+            for k in range(400):
+                h = (k + 1) * block + beat
+                if needs_crop(s.committed_end, cap, capacity):
+                    break                                                           # the crop path takes over here
+                self.assertLessEqual(len(s.tokens) - s.committed_end, cap + 3, (seed, k))   # provisional bound
+                if rng.random() < 0.2:
+                    s.rollback_to_committed()                                       # a condition change
+                fed.clear()
+                fill_block(sample, lambda: self.coverage_of(s), lambda h=h: s.commit_until(h), h, h + block, cap)
+                if fed:
+                    self.assertLess(max(fed), capacity, (seed, k))
+                    worst = max(worst, max(fed) - capacity)
+                calls += 1
+        self.assertGreater(calls, 3000)
+        self.assertLess(worst, 0)
 
 
 if __name__ == "__main__":

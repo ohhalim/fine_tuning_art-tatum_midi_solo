@@ -6,12 +6,20 @@ and prefill again (stream_contract.TokenStream.request_full_reset). Only <T> bou
 Aria abs onsets are relative to their 5 s segment, so cutting right after a <T> keeps every kept token unchanged.
 Cutting at a note boundary would also be possible with a separately kept segment origin; that is left out here.
 
-  decision   needs_crop(committed_len): committed_len + 2 * CAP > CAPACITY. Only the committed length is used, never
-             the provisional or future tokens: in a training replay those are ground-truth future tokens, and the cut,
-             offset and payload must not change when the future suffix changes (#1758 review 5). One fill_block call
-             samples at most CAP tokens (ready + speculative); provisional tokens kept from the previous call are at most
-             the CAP that call sampled. So committed_len + 2 * CAP <= CAPACITY keeps every fed position below CAPACITY
-             (the last sampled token is fed by the next call, which checks again first)
+  decision   needs_crop(committed_len): committed_len + RESERVE > CAPACITY with RESERVE = 2 * CAP + NOTE_TOKENS. Only
+             the committed length is used, never the provisional or future tokens: in a training replay those are
+             ground-truth future tokens, and the cut, offset and payload must not change when the future suffix changes
+             (#1758 review 5). Why RESERVE (run 1 used 2 * CAP, which was wrong: #1759 review H1, provisional 67):
+               - one fill_block call samples at most CAP tokens and stops speculating at the first coverage >= h_spec,
+                 and h_spec of request k is h of request k + 1. So past the next horizon at most one element is left:
+                 one note (NOTE_TOKENS = 3: piano, onset, dur) or one <T>
+               - provisional tokens at a call start are therefore at most CAP (sampled in the previous call) + 3 (the
+                 element that crossed in the call before), by induction; a rollback or a crop only lowers this
+               - during the call at most CAP more are sampled, and the fed positions stay below
+                 committed + (CAP + 3) + CAP - 1, so committed + RESERVE <= CAPACITY keeps them below CAPACITY
+             This holds for the current grammar (3-token notes), horizons and fill_block; another grammar, end rule or
+             retry needs a new bound. The forward guard (positions < CAPACITY) stays. tests/test_crop_contract.py fuzzes
+             the real fill_block over consecutive calls and checks every fed index
   crop path  provisional tokens are dropped (as in a rollback) and regenerated after the reset, in training as in the
              runtime. The cut <T> is chosen by choose_cut():
                1. the earliest <T> that leaves header + kept <= KEEP_TARGET (keep the most history under the target)
@@ -34,6 +42,7 @@ from block_contract import block_start, horizon
 from stream_contract import SEGMENT_MS, TokenStream
 
 CAP, CAPACITY, KEEP_TARGET = 64, 4096, 2048    # tokens per fill_block call, KV positions, kept length after a crop
+NOTE_TOKENS = 3                                # piano, onset, dur
 HEADER = (("prefix", "instrument", "piano"), "<S>")
 
 
@@ -41,12 +50,23 @@ class CapacityFailure(Exception):
     """No <T> boundary can bring the committed history under the safety bound."""
 
 
+def reserve(cap=CAP):
+    return 2 * cap + NOTE_TOKENS
+
+
 def needs_crop(committed_len, cap=CAP, capacity=CAPACITY):
-    return committed_len + 2 * cap > capacity
+    return committed_len + reserve(cap) > capacity
+
+
+def check_settings(cap=CAP, capacity=CAPACITY, keep_target=KEEP_TARGET):
+    """Preconditions of choose_cut (#1759 review LOW): a kept length at the target must itself be safe."""
+    if needs_crop(keep_target, cap, capacity) or needs_crop(len(HEADER), cap, capacity):
+        raise ValueError(f"keep_target {keep_target} or the header does not fit capacity {capacity} with reserve {reserve(cap)}")
 
 
 def choose_cut(session, committed_end, cap=CAP, capacity=CAPACITY, keep_target=KEEP_TARGET):
     """Index j of the <T> to cut after: session[:j + 1] is removed, session[j + 1:committed_end] is kept."""
+    check_settings(cap, capacity, keep_target)
     sizes = {j: len(HEADER) + committed_end - (j + 1) for j in range(committed_end) if session[j] == "<T>"}
     within = [j for j, n in sizes.items() if n <= keep_target]
     if within:
@@ -111,7 +131,9 @@ def absolute_times(session, base_ms):
 
 
 def simulate_session_kv(tokens, t0, human_notes, cap=CAP, capacity=CAPACITY, keep_target=KEEP_TARGET, spec_ms=None):
-    """Second, sequential implementation (for the checks): block_request.simulate_kv with the crop path. At each
+    """Second, sequential implementation of the position provenance only (for the checks). It does not stop generation at
+    CAP, so it says nothing about fed-position safety (#1759 review H1; see the real fill_block fixtures for that).
+    block_request.simulate_kv with the crop path. At each
     request start: payload; capacity check on the committed length; on a crop drop the provisional tokens, rebuild
     [prefix, <S>] + kept, carry the kept positions' tags over (the <S> position takes the cut <T> position's tag) and
     shift the clock by the removed <T> tokens; else roll back on a payload change as before. Returns
