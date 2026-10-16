@@ -6,19 +6,21 @@ No model, no training. Two stages because the note loader (pretty_midi) and the 
          train songs only (val/test never opened, SHA1 checked). g3 split: pitch < 55 is the human condition history,
          pitch >= 55 the model's target stream. Writes <out>/songs/NNN.target.mid (target notes only, original velocity,
          no pedal CC) and NNN.notes.json (human and target notes in ms, the audit's loader)
-  build  (Aria venv):  lh_request_export.py build <out dir> <aria repo> <report json>
+  build  (Aria venv):  lh_request_export.py build <bebop_rh manifest> <out dir> <aria repo> <report json>
          tokenizes each target MIDI with ariautils AbsTokenizer (TOKENIZE_KW: keep the original time origin, no random
          <D> token; deviation 2 of the doc), builds the request table (scripts/block_request.py) with
          t0 = PHASES[song index % 4], the payload of every request, and runs the checks below on every song. Writes
-         <out>/requests/NNN.json.gz and the summary report
+         <out>/requests/NNN.json.gz and the summary report. The split set must be exactly the manifest's 189 train songs
+         (source, sha1), checked before the first song and again on the processed set (review M1)
 
 Checks (registered before the run): C1 every request's context payloads equal the sequential runtime replay
 (simulate_kv); C2 a prefix-only stream (tokens before the request's context end, then <E>) gives the same committing
 requests for the context; C3 the payload from human notes observed up to s_k only (later notes dropped, releases after
 s_k unknown) equals the payload from all human notes; C4 every token pitch is >= 55 (no human note in the model stream).
 Added after run 2 (deviation 2): C5 every token note's absolute onset matches an original target note of the same pitch
-within ALIGN_MS (token time and human time share one origin); C6 no <D> token.
-The tokenizer may merge or drop notes; the token note count against the target note count is reported, not judged.
+within ALIGN_MS, and the note counts per pitch agree (token time and human time share one origin); C6 no <D> token.
+C5 checks pitch, onset and count only. Durations (10 ms grid, 5 s cap) and velocities (10 steps) are quantized by the
+tokenizer: the model labels are the tokenized values, the original ms stay in notes.json, and the change is reported.
 """
 from __future__ import annotations
 
@@ -44,7 +46,7 @@ PHASES = (0.0, BLOCK / 4, BLOCK / 2, 3 * BLOCK / 4)
 CAPACITY, CAP = 4096, 64          # scripts/rt_producer.py cache capacity, scripts/aria_mlx_stream_loop.py tokens per block
 # AbsTokenizer defaults shift every onset by the first note (remove_preceding_silence) and insert <D> at a random
 # position near the end (add_dim_tok, random.randint): runs 1-2 had both. Human notes stay in the original ms.
-TOKENIZE_KW = {"remove_preceding_silence": False, "add_dim_tok": False}
+TOKENIZE_KW = {"remove_preceding_silence": False, "add_dim_tok": False, "add_eos_tok": True}
 ALIGN_MS = 10.0                   # 10 ms onset grid (5 ms rounding) + MIDI tick (1/440 s at 120 BPM, 220 tpq)
 
 
@@ -128,6 +130,73 @@ def misaligned_notes(toks, target):
     return bad
 
 
+def note_changes(toks, target):
+    """How the tokenizer changed matched notes (per pitch, onset order): durations over the 5 s cap, other duration
+    changes over ALIGN_MS, velocity changes. Reported only."""
+    tok, orig = collections.defaultdict(list), collections.defaultdict(list)
+    seg = 0
+    for i, t in enumerate(toks):
+        if t == "<T>":
+            seg += 1
+        elif isinstance(t, tuple) and t[0] == "piano":
+            tok[t[1]].append((seg * 5000 + toks[i + 1][1], toks[i + 2][1], t[2]))
+    for p, on, off, vel in target:
+        orig[p].append((on, off - on, vel))
+    out = {"matched": 0, "dur_over_cap": 0, "dur_changed_other": 0, "velocity_changed": 0}
+    for p in tok:
+        for (_, td, tv), (_, od, ov) in zip(sorted(tok[p]), sorted(orig[p])):
+            out["matched"] += 1
+            if od > 5000:
+                out["dur_over_cap"] += 1
+            elif abs(td - od) > ALIGN_MS:
+                out["dur_changed_other"] += 1
+            out["velocity_changed"] += tv != ov
+    return out
+
+
+def boundary_stats(toks, rows):
+    """Per request with a boundary: the boundary note's lead past h, whether a <T> reaches h before that note (an
+    uncommitted <T> always starts a segment after h, so the producer's coverage passes h with no note completed), and
+    how often each boundary note is reused across requests."""
+    seg_at, seg = [], 0
+    for t in toks:
+        seg_at.append(seg)
+        seg += t == "<T>"
+    leads, by_t, reuse = [], 0, collections.Counter()
+    for r in rows:
+        if not r["boundary"]:
+            continue
+        b = r["cont_end"] - 3
+        reuse[b] += 1
+        leads.append(seg_at[b] * 5000 + toks[b + 1][1] - r["h"])
+        by_t += any(toks[j] == "<T>" for j in range(r["win_end"], b))
+    return {"leads_ms": leads, "requests_horizon_reached_by_T": by_t, "boundary_reuse": list(reuse.values())}
+
+
+def train_songs(manifest_path):
+    songs = [s for s in json.load(open(manifest_path))["songs"] if s["split"] == "train"]
+    return [(i, s["source"], s["sha1"]) for i, s in enumerate(songs)]
+
+
+def validate_song_set(expected, meta_songs, n=189):
+    """The split meta must hold exactly the manifest's train songs: n of them, no duplicate index, source or sha1,
+    the same (index, source, sha1) triples. Raises ValueError before anything is built (review M1)."""
+    got = [(m["idx"], m["source"], m["sha1"]) for m in meta_songs]
+    problems = []
+    if len(expected) != n:
+        problems.append(f"manifest has {len(expected)} train songs, not {n}")
+    if len(got) != n:
+        problems.append(f"split meta has {len(got)} songs, not {n}")
+    for k, name in ((0, "index"), (1, "source"), (2, "sha1")):
+        dup = [x for x, c in collections.Counter(g[k] for g in got).items() if c > 1]
+        if dup:
+            problems.append(f"duplicate {name}: {dup[:3]}")
+    if set(got) != set(expected):
+        problems.append(f"missing {sorted(set(expected) - set(got))[:3]}, unexpected {sorted(set(got) - set(expected))[:3]}")
+    if problems:
+        raise ValueError("; ".join(problems))
+
+
 def build_song(idx, toks, humans, target=None):
     t0 = PHASES[idx % len(PHASES)]
     rows = request_table(toks, t0)
@@ -146,28 +215,41 @@ def build_song(idx, toks, humans, target=None):
     if target is not None:
         chk["c5_misaligned_notes"] = misaligned_notes(toks, target)
     chk["c6_dim_tokens"] = sum(1 for t in toks if t == "<D>")
+    changes = note_changes(toks, target) if target is not None else None
     reqs = []
     for r in rows:
         pc, avail = pays[r["k"]]
         _, classes = loss_class(rows, r["k"])
         reqs.append({**r, "pc12": list(pc), "available": avail, "window_tokens": classes.count("window"),
                      "boundary_tokens": classes.count("boundary")})
-    return {"t0": t0, "primer_end": primer_end(toks, t0), "token_notes": len(piano), "requests": reqs, "checks": chk}
+    return {"t0": t0, "primer_end": primer_end(toks, t0), "token_notes": len(piano), "requests": reqs, "checks": chk,
+            "note_changes": changes, "boundary": boundary_stats(toks, rows)}
 
 
-def build(out_dir, aria_repo, report_path):
+def build(manifest_path, out_dir, aria_repo, report_path):
     sys.path.insert(0, aria_repo)
+    import importlib.metadata
+    import ariautils.midi
+    import ariautils.tokenizer.absolute
     from ariautils.midi import MidiDict
     from ariautils.tokenizer import AbsTokenizer
     tok = AbsTokenizer()
     t_start = time.time()
     meta = json.load(open(os.path.join(out_dir, "songs", "split_meta.json")))
+    expected = train_songs(manifest_path)
+    validate_song_set(expected, meta["songs"])
+    if meta["manifest_sha256"] != sha256_file(manifest_path):
+        raise ValueError("split meta was made from a different manifest")
     os.makedirs(os.path.join(out_dir, "requests"), exist_ok=True)
     songs, totals = [], collections.Counter()
     ctx_lens, win_toks, bnd_toks, pc_sets = [], [], [], collections.Counter()
+    leads, reuse, changes, processed = [], [], collections.Counter(), []
     for rec in meta["songs"]:
         i = rec["idx"]
         hj = json.load(open(os.path.join(out_dir, "songs", f"{i:03d}.notes.json")))
+        if (hj["idx"], hj["source"], hj["sha1"]) != (i, rec["source"], rec["sha1"]):
+            raise ValueError(f"notes file {i} does not belong to song {rec['source']}")
+        processed.append((hj["idx"], hj["source"], hj["sha1"]))
         humans = [Note(nid, p, on, off) for nid, p, on, off in hj["human"]]
         toks = tok.tokenize(MidiDict.from_midi(os.path.join(out_dir, "songs", f"{i:03d}.target.mid")), **TOKENIZE_KW)
         res = build_song(i, toks, humans, hj["target"])
@@ -196,21 +278,34 @@ def build(out_dir, aria_repo, report_path):
         win_toks += [r["window_tokens"] for r in reqs]
         bnd_toks += [r["boundary_tokens"] for r in reqs]
         pc_sets.update(tuple(r["pc12"]) for r in warm if any(r["pc12"]))
+        changes.update(res["note_changes"])
+        leads += res["boundary"]["leads_ms"]
+        reuse += res["boundary"]["boundary_reuse"]
+        totals["requests_horizon_reached_by_T"] += res["boundary"]["requests_horizon_reached_by_T"]
         songs.append({"idx": i, "pianist": rec["pianist"], "t0": res["t0"], "tokens": len(toks), "token_notes": res["token_notes"],
                       "target_notes": rec["target_notes"], "requests": len(reqs),
                       "warm_nonempty_ratio": round(sum(1 for r in warm if any(r["pc12"])) / len(warm), 4) if warm else None,
-                      "checks": res["checks"], "file_sha256": sha256_file(path)})
+                      "checks": res["checks"], "note_changes": res["note_changes"],
+                      "boundary_reuse_max": max(res["boundary"]["boundary_reuse"], default=0), "file_sha256": sha256_file(path)})
     checks = {k: totals[k] for k in ("c1_replay_mismatch", "c2_prefix_mismatch", "c3_observed_only_mismatch", "c4_low_pitch_tokens",
                                      "c5_misaligned_notes", "c6_dim_tokens")}
+    complete = len(processed) == len(expected) == 189 and set(processed) == set(expected)
     report = {"issue": 1756, "doc": "docs/experiments/LH_BLOCK_REQUEST_INPUT.md", "quality_claimed": False, "training": False,
               "run": {"git_head": subprocess.run(["git", "-C", HERE, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
                       "block_request_sha256": sha256_file(os.path.join(HERE, "block_request.py")),
                       "export_script_sha256": sha256_file(os.path.abspath(__file__)), "out_dir": out_dir,
+                      "ariautils_version": importlib.metadata.version("ariautils"),
+                      "ariautils_absolute_py_sha256": sha256_file(ariautils.tokenizer.absolute.__file__),
+                      "ariautils_midi_py_sha256": sha256_file(ariautils.midi.__file__),
+                      "tokenizer_config": {k: v for k, v in vars(tok).items() if isinstance(v, (int, float, str, bool))},
                       "manifest_sha256": meta["manifest_sha256"], "seconds": round(time.time() - t_start, 1)},
               "params": {"phases": PHASES, "t0_rule": "PHASES[song index % 4]", "payload": "g3 sounding at s_k, 12-PC multihot + available",
                          "capacity_tokens": CAPACITY, "cap_tokens_per_block": CAP, "split_pitch": SPLIT_PITCH,
                          "tokenize_kwargs": TOKENIZE_KW, "align_ms": ALIGN_MS},
-              "checks": checks, "all_checks_zero": not any(checks.values()),
+              "checks": checks, "all_checks_zero": not any(checks.values()), "complete": complete,
+              "contract_ok": complete and not any(checks.values()),
+              "note_changes": dict(changes),
+              "boundary_lead_ms": dist(leads), "boundary_reuse": dist(reuse),
               "totals": dict(totals),
               "warm_nonempty_ratio": round(totals["warm_nonempty_payload"] / totals["warm_requests"], 4) if totals["warm_requests"] else None,
               "distinct_pc12_sets_warm_nonempty": len(pc_sets), "top5_pc12_sets": [[list(k), v] for k, v in pc_sets.most_common(5)],
@@ -219,7 +314,8 @@ def build(out_dir, aria_repo, report_path):
     os.makedirs(os.path.dirname(os.path.abspath(report_path)), exist_ok=True)
     with open(report_path, "w") as f:
         json.dump(report, f, ensure_ascii=False, indent=1)
-    print(json.dumps({"checks": checks, "requests": totals["requests"], "seconds": report["run"]["seconds"]}))
+    print(json.dumps({"checks": checks, "complete": complete, "contract_ok": report["contract_ok"], "requests": totals["requests"],
+                      "seconds": report["run"]["seconds"]}))
 
 
 if __name__ == "__main__":

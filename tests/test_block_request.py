@@ -229,5 +229,41 @@ class ExportSongTest(unittest.TestCase):
         self.assertEqual(res["checks"]["c4_low_pitch_tokens"], 1)
 
 
+
+class SongSetTest(unittest.TestCase):
+    """Review M1: build must refuse a split set that is not exactly the manifest's train songs."""
+
+    def setUp(self):
+        self.expected = [(i, f"/m/{i}.mid", f"sha{i}") for i in range(189)]
+        self.meta = [{"idx": i, "source": src, "sha1": sha} for i, src, sha in self.expected]
+
+    def test_exact_set_passes(self):
+        from lh_request_export import validate_song_set
+        validate_song_set(self.expected, self.meta)
+
+    def test_empty_missing_duplicate_and_foreign_sets_are_refused(self):
+        from lh_request_export import validate_song_set
+        dup = self.meta[:188] + [dict(self.meta[0])]
+        foreign = self.meta[:188] + [{"idx": 188, "source": "/m/188.mid", "sha1": "other"}]
+        for bad in ([], self.meta[:188], dup, foreign):
+            with self.assertRaises(ValueError):
+                validate_song_set(self.expected, bad)
+        with self.assertRaises(ValueError):
+            validate_song_set(self.expected[:188], self.meta[:188])          # a manifest without 189 train songs
+
+
+class ReportedStatsTest(unittest.TestCase):
+    def test_note_changes_and_boundary_stats(self):
+        from lh_request_export import boundary_stats, note_changes
+        toks = aria_tokens([(60, 0, 5000, 80), (62, 300, 120, 80), (64, 9000, 100, 80)])
+        target = [(60, 0.0, 6000.0, 83), (62, 300.0, 420.0, 80), (64, 9000.0, 9100.0, 80)]
+        self.assertEqual(note_changes(toks, target), {"matched": 3, "dur_over_cap": 1, "dur_changed_other": 0,
+                                                       "velocity_changed": 1})
+        b = boundary_stats(toks, request_table(toks, 0.0))
+        self.assertGreater(max(b["boundary_reuse"]), 1)                       # the 9000 note is the boundary of many requests
+        self.assertGreater(b["requests_horizon_reached_by_T"], 0)            # a <T> at 5000 passes h before the 9000 note
+        self.assertTrue(all(x >= 0 for x in b["leads_ms"]))
+
+
 if __name__ == "__main__":
     unittest.main()

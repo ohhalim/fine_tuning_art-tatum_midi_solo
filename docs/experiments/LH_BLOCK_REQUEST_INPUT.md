@@ -31,6 +31,7 @@
 | payload | 타깃 이력이 아니라 **인간 음**(pitch < 55)으로 만든다. s_k의 g3 sounding을 12-PC multihot으로 나타내고, `available`을 붙인다 |
 
 - **boundary를 넣는 이유:** boundary가 없으면 빈 window에는 label이 없다. 그러면 모델이 "이 조건에서는 쉰다"를 배우지 못한다
+  - **boundary는 저장만 하고, loss에 자동으로 넣지 않는다**(아스트라 Q2). 긴 쉼 동안에는 같은 다음 음이 여러 요청의 boundary로 반복된다. 여기에 일반 CE를 주면 그 음이 과가중된다. onset까지만 자르는 안은 pitch→onset→dur 문법에서 미완성 샘플을 만들기 때문에 쓰지 않는다. `<T>`만으로 horizon에 닿는 경우와 음 하나를 끝까지 생성해야 하는 경우도 loss 설계에서 나눈다
   - boundary 음은 다음 요청에서 window나 boundary로 다시 나올 수 있고, 그때 조건이 다를 수 있다. 실시간에서 투기 생성한 뒤, 조건이 바뀌면 다시 생성하는 구조와 같다
   - `loss_class`로 window와 boundary를 나눠 내보낸다. 어느 쪽에 loss를 걸지는 학습 설계에서 고른다
 - **문맥 위치의 조건:** 되돌리기 규칙을 지키면, R_k가 시작할 때 KV에 남아 있는 값이 이것이다. 이 값들은 과거에 확정된 사실이라 누출이 아니다
@@ -52,7 +53,9 @@
 - `build`(Aria venv): 실제 `AbsTokenizer`로 타깃 MIDI를 토큰화하고, 요청 표와 payload를 붙인다. 토큰화 인자는 `remove_preceding_silence=False, add_dim_tok=False`다(이탈 2 뒤)
   - t0 = PHASES[곡 번호 % 4]이고, 위상은 #1754와 같다
   - 곡마다 `requests/NNN.json.gz`(토큰, 토큰 ID, 요청 표)를 쓴다. 위치별 조건은 `position_requests` 규칙으로 다시 만든다
-- 산출물은 repo 밖 `/Users/ohhalim/git_box/lh_request_export/`, 보고는 `docs/experiments/lh_block_request/report.json`이다
+- 산출물은 repo 밖이다. 3회차는 새 폴더 `/Users/ohhalim/git_box/lh_request_export_run3/`에 쓴다. 1·2회차 폴더 `/Users/ohhalim/git_box/lh_request_export/`는 덮어쓰지 않고 남긴다. 보고는 `docs/experiments/lh_block_request/report.json`이다
+- build는 시작 전에 split 집합이 원 manifest의 train 189곡 (source, sha1)과 정확히 같은지 검사한다. 빈 집합, 누락, 중복, 다른 sha1, 다른 manifest면 거절한다. 끝나면 처리한 집합도 다시 대조한다(아스트라 M1)
+- 데이터에서 말하는 인간과 모델은 각각 g3 역할 대리와 teacher-forced 채택 이력이다
 
 ## 검사와 판정 (실행 전 고정)
 
@@ -62,10 +65,10 @@
 | C2 | 요청의 문맥 끝까지만 남긴 토큰열(뒤에 `<E>`)도 문맥의 확정 요청 배정이 같다. 타깃 미래가 문맥 조건을 바꾸지 못한다 | 불일치 0 |
 | C3 | s_k까지 관측한 인간 음만으로 만든 payload가, 인간 음 전체로 만든 payload와 같다. 뒤의 note-on은 빼고, s_k 뒤의 떼기는 모르는 것으로 둔다 | 불일치 0 |
 | C4 | 토큰열에 pitch < 55인 음이 없다 | 0 |
-| C5 (이탈 2로 추가) | 토큰 음마다 절대 onset이 같은 pitch의 원래 타깃 음과 10 ms 안에서 맞는다. 토큰 시간과 인간 시간의 원점이 같다는 검사다 | 어긋난 음 0 |
+| C5 (이탈 2로 추가) | 토큰 음마다 절대 onset이 같은 pitch의 원래 타깃 음과 10 ms 안에서 맞고, pitch별 음 수가 같다. 토큰 시간과 인간 시간의 원점이 같다는 검사다. dur·velocity 보존은 보지 않는다 | 어긋난 음 0 |
 | C6 (이탈 2로 추가) | `<D>` 토큰이 없다 | 0 |
 
-- **입력 계약 구현 완료** = 189곡 모두 처리 + C1–C6 모두 0
+- **입력 계약 구현 완료** = 189곡 모두 처리 + C1–C6 모두 0. 보고의 `contract_ok`(= `complete` ∧ `all_checks_zero`)로 기계 판정한다. `complete`는 처리한 (index, source, sha1) 집합이 manifest train 189곡과 같다는 뜻이다
 - 하나라도 0이 아니면 검사기나 계약의 버그로 보고 조사한다. 고친 뒤 다시 돌리면 이탈로 기록한다. 계약과 payload 정의는 바꾸지 않는다
 
 ## 함께 보고 (판정과 무관)
@@ -75,6 +78,9 @@
 - 문맥 길이 분포, 4096 토큰(`rt_producer.py` 캐시 용량)을 넘는 요청 수
 - window + boundary가 블록당 64 토큰(`CAP`)을 넘는 요청 수
 - 토큰 음 수 대 타깃 음 수(토큰화기가 합치거나 버린 음)
+- 토큰화로 바뀐 음: 5 s 상한을 넘어 잘린 dur, 그 밖에 10 ms 넘게 바뀐 dur, 바뀐 velocity(10단계). 실패로 보지 않고 범위만 적는다
+- boundary: 선행 간격(boundary 음 onset − h), 같은 boundary 음이 여러 요청에 다시 쓰인 횟수(곡별 최대 포함), `<T>`만으로 h를 넘는 요청 수(이때는 음 하나를 끝까지 생성하지 않아도 horizon에 닿는다)
+- ariautils 버전, `absolute.py`·`midi.py` sha256, 토큰화기 설정
 
 ## 검사기 검증 (실행 전에 마침)
 
@@ -91,9 +97,10 @@
 ## 실행
 
 ```
-/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/.venv/bin/python scripts/lh_request_export.py split data/bebop_rh/manifest.json /Users/ohhalim/git_box/lh_request_export
-/Users/ohhalim/git_box/t3_aria/.venv/bin/python scripts/lh_request_export.py build /Users/ohhalim/git_box/lh_request_export /Users/ohhalim/git_box/t3_aria/aria docs/experiments/lh_block_request/report.json
+/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/.venv/bin/python scripts/lh_request_export.py split data/bebop_rh/manifest.json /Users/ohhalim/git_box/lh_request_export_run3
+/Users/ohhalim/git_box/t3_aria/.venv/bin/python scripts/lh_request_export.py build data/bebop_rh/manifest.json /Users/ohhalim/git_box/lh_request_export_run3 /Users/ohhalim/git_box/t3_aria/aria docs/experiments/lh_block_request/report.json
 ```
+(1·2회차는 build에 manifest 인자가 없었고, 폴더도 `/Users/ohhalim/git_box/lh_request_export`였다)
 
 - 한 번만 돌린다(약 15분 예상). 열 압력을 실행 전후로 확인한다
 
@@ -101,7 +108,8 @@
 
 - **teacher forcing:** 요청 안의 정답 오른손 토큰에는, s_k 뒤 인간 입력에 대한 연주자의 반응이 담겨 있을 수 있다. 조건 누출은 아니지만, 실시간에는 없는 정보를 입력 토큰으로 보는 노출 편향이다
 - CAP(블록당 64 토큰)과 4096 용량은 모델링하지 않고 수만 보고한다. 문맥을 다듬는 방식은 학습 설계에서 정한다
-- 타깃 음의 dur는 원 note 길이다(페달 미적용). #1750의 sounding 정의와 같다
+- 모델 label은 토큰화된 값이다. onset과 dur는 10 ms 단위, dur 상한은 5 s, velocity는 10단계다. 원래 ms는 `notes.json`에 남긴다. 타깃 MIDI에 페달 CC가 없으므로 `extend_note_durations_with_pedal`(기본 True)은 효과가 없다. 이것을 False로 두면 `include_pedal=False` 설정에서 assert가 실패하므로 그대로 둔다
+- `simulate_kv`는 조건 태그를 재연할 뿐이다. 실제 모델 KV나 logits를 검증하지 않는다
 - 되돌리기 규칙과 조건 주입은 구현하지 않았다. 이 내보내기는 그것이 구현됐을 때 학습이 맞춰야 할 입력을 만든다
 - 화성 정답, 손 정확도, 스타일, 음악성, 학습 효과는 다루지 않는다
 
@@ -138,3 +146,19 @@
   - 계약, payload 정의, 판정 기준은 바꾸지 않았다. 판정 범위만 C1–C4에서 C1–C6으로 넓혔다
 - **실제 곡으로 확인(실행 전):** 다섯 곡을 별도 프로세스에서 두 번 토큰화했다. 출력이 같았고 `<D>`는 0개였다. 첫 토큰 음 시각은 원래 시각과 5 ms 안에서 맞았다
 - 3회차는 아스트라 검토 뒤 `split`부터 다시 돌린다
+
+## 실행 전 리뷰 (아스트라, 3회차 전)
+
+BLOCKER/HIGH 없음. 아스트라가 시험 13개를 직접 돌려 통과를 확인했다. 지적은 MEDIUM 1, LOW 2, 질문 답 4개다. 모두 3회차 전에 반영했다.
+
+| 항목 | 아스트라 | 반영 |
+|---|---|---|
+| M1 | build가 manifest의 189곡 집합을 검증하지 않아, 빈 split_meta도 `all_checks_zero=true`로 끝났다 | 시작 전 집합 검사(빈·누락·중복·다른 sha1·다른 manifest 거절), 처리 집합 재대조, `complete`·`contract_ok` 추가. 아스트라의 재현 방법으로 거절되는 것을 확인 |
+| LOW1 | "dur는 원 note 길이"는 틀렸다. 양자화와 5 s 상한이 있다. C5는 dur·vel 검사가 아니다 | 문구 고침, 바뀐 음 범위를 기술 통계로 추가 |
+| LOW2 | 새 폴더에 쓰고, `add_eos_tok=True`를 명시하고, ariautils 버전과 해시를 남겨라 | 반영 |
+| Q1 | 문맥 위치 provenance는 제안 계약 아래에서 맞다. `simulate_kv`는 태그 재연이다 | 한계에 적음 |
+| Q2 | boundary는 저장하되 loss에 자동으로 넣지 말 것. 재사용 횟수와 선행 간격을 기록할 것 | 반영 |
+| Q3 | 수정은 맞다. pedal 인자는 끄지 말 것. 실제 토큰화기 fixture를 둘 것 | `tests/test_lh_request_tokenizer.py`(Aria venv): 첫 음 > 5 s, 6 s 음, 10 s 경계 양쪽 음, 기본값이면 원점이 옮겨지고 `<D>`가 생기는 대조군 |
+| Q4 | split부터 3회차에 동의. 버린 1·2회차 통계로 정책을 고르지 말 것. 4096 초과는 기술 통계만 | 따름. crop + full-reset 계약은 다음 학습 단위에서 정한다 |
+
+- 시험: `tests/test_block_request.py` 16개(본체 venv), `tests/test_lh_request_tokenizer.py` 2개(Aria venv) 통과
