@@ -1,0 +1,43 @@
+{
+ "issue": 1760,
+ "step": "diagnostic",
+ "doc": "docs/experiments/COND_ADAPTER_MIN.md",
+ "by_set_size": {
+  "1": {
+   "requests": 21460,
+   "notes": 129177,
+   "pooled_in_real": 0.1052,
+   "pooled_in_wrong": 0.0652,
+   "pooled_chance": 0.0833,
+   "request_mean_in_real": 0.1065,
+   "request_mean_in_wrong": 0.0641
+  },
+  "all": {
+   "requests": 36250,
+   "notes": 211724,
+   "pooled_in_real": 0.1564,
+   "pooled_in_wrong": 0.0958,
+   "pooled_chance": 0.1222,
+   "request_mean_in_real": 0.1595,
+   "request_mean_in_wrong": 0.0967
+  },
+  "2": {
+   "requests": 12290,
+   "notes": 68716,
+   "pooled_in_real": 0.214,
+   "pooled_in_wrong": 0.1314,
+   "pooled_chance": 0.1667,
+   "request_mean_in_real": 0.2141,
+   "request_mean_in_wrong": 0.1308
+  },
+  "3+": {
+   "requests": 2500,
+   "notes": 13831,
+   "pooled_in_real": 0.3489,
+   "pooled_in_wrong": 0.205,
+   "pooled_chance": 0.2648,
+   "request_mean_in_real": 0.3466,
+   "request_mean_in_wrong": 0.2089
+  }
+ }
+}
