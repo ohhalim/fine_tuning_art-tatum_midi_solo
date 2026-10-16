@@ -58,7 +58,7 @@ def longest_request(export_dir, song_idxs):
                 best = (n, idx, r, tokens, d["token_ids"], hum, d["t0"], srows)
     n, idx, r, tokens, ids, hum, t0, srows = best
     sess = list(ids[:r["win_end"]]) if r["keep_from"] is None else list(ids[:len(HEADER)]) + list(ids[r["keep_from"]:r["win_end"]])
-    tags = session_position_requests(tokens, srows, r["k"])[:len(sess)]
+    tags = session_position_requests(tokens, srows, r["k"])[:len(sess) - 1]     # one per input position (the last token is only a label)
     pays = {j: payload(hum, block_start(j, t0), j) for j in set(tags) if j >= 0}
     return {"song": idx, "k": r["k"], "tokens": n, "ctx_len": r["ctx_len"], "window": r["win_end"] - r["ctx_end"],
             "ids": sess, "rows": cond_rows(tags, pays), "skipped_over_cap": skipped}
@@ -103,6 +103,7 @@ def main() -> None:
     adapter = torch.nn.Linear(COND_DIM, cfg.d_model, bias=False).to(dev)
     torch.nn.init.zeros_(adapter.weight)
     cond = torch.tensor([ex["rows"]], dtype=torch.float32, device=dev)
+    assert cond.shape[1] == len(ex["ids"]) - 1, (cond.shape, len(ex["ids"]))
 
     def pre_hook(_mod, args, kwargs):
         return (args[0] + adapter(cond),) + args[1:], kwargs
