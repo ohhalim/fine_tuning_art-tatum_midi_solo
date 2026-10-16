@@ -1,0 +1,67 @@
+{
+ "issue": 1760,
+ "step": "F",
+ "doc": "docs/experiments/COND_ADAPTER_MIN.md",
+ "training": false,
+ "quality_claimed": false,
+ "params": {
+  "songs": [
+   0,
+   7
+  ],
+  "excerpt_notes": 500,
+  "cap": 16,
+  "capacity": 384,
+  "keep_target": 192,
+  "weight_seed": null,
+  "weight_scale": null,
+  "weight_file": "/Users/ohhalim/git_box/cond_adapter_min/adapter_step32.npy",
+  "weight_file_sha256": "6ca4f28a1f0305c731eefde856fe835e11e16c49bfa2c9577f866c9b434cb0c9",
+  "logit_tol": 0.001
+ },
+ "run": {
+  "git_head": "15fe1a03e76054f1c9f41ea0e80956e7c3c3a516",
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "mlx": "0.25.2",
+  "cond_module_sha256": "d95dbfc4e34997ccf84ebd25d43ffcd94b80df62c4f5ff48c0f8b96bdda8de4c",
+  "check_script_sha256": "1fd46dce390be80082264423727299ec15ab46f67242406b065ae2c8e50083a0",
+  "seconds": 103.5
+ },
+ "songs": [
+  {
+   "idx": 0,
+   "requests": 73,
+   "crops": 5,
+   "condition_changes": 58,
+   "cold": 1,
+   "warm_empty": 29,
+   "compared_positions": 1734,
+   "max_abs_logit_diff": 9.34600830078125e-05,
+   "top1_disagree": 0,
+   "live_max_diff": 6.631380558013916,
+   "ok": true
+  },
+  {
+   "idx": 7,
+   "requests": 136,
+   "crops": 6,
+   "condition_changes": 96,
+   "cold": 1,
+   "warm_empty": 38,
+   "compared_positions": 1934,
+   "max_abs_logit_diff": 8.404254913330078e-05,
+   "top1_disagree": 0,
+   "live_max_diff": 4.050790309906006,
+   "ok": true
+  }
+ ],
+ "coverage": {
+  "crops": 11,
+  "condition_changes": 154,
+  "cold": 2,
+  "warm_empty": 67
+ },
+ "injection_live": true,
+ "coverage_ok": true,
+ "pass": true
+}
