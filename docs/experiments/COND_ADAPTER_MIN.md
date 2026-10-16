@@ -143,3 +143,13 @@
 - **생성(G):** a/b/c 각각 4개(2 primer × 2 seed), 48토큰씩 생성했다. 문법 위반 0, `<E>` 0이다
 - **학습 손실:** 32개 값이 요청마다 크게 흔들린다(1.42–6.35). batch 1이라 추세를 말하지 않는다
 - **한계:** 차이가 모두 0.01 nats 안팎으로 작다. 32 step, LR 1e-3에서 adapter가 거의 움직이지 않은 것으로 보인다(Claude 판단). 확인용 4곡의 개발 probe이고 통계 판정이 아니다
+- **학습 뒤 KV 재검증(15fe1a03, 104초): 통과.** 학습된 가중치로 같은 검증을 돌렸다. 최대 |logit 차| 9.3e-5와 8.4e-5, top-1은 모두 같았다. 실제와 0 조건의 최대 logit 차는 6.6과 4.1이라 주입도 작동한다. 보고: `docs/experiments/cond_adapter_min/kv_check_trained.json`
+
+## 진단 — 조건 PC와 window 오른손 PC의 겹침 (학습 없음, 사전 등록)
+
+결과가 "효과 없음"이라, 다음 방향을 정하기 전에 조건에 쓸 정보가 있는지 데이터만으로 센다. 판정은 하지 않고 기술 통계만 낸다.
+
+- 대상: #1756 3회차 내보내기 train 189곡의 적격 요청 중 wrong 조건이 정의되는 것(조건 PC가 1개 이상)
+- 요청마다: window의 pitch 토큰 PC 중 실제 조건 PC 집합에 드는 비율, tritone wrong 집합에 드는 비율, 집합 크기로 본 우연 기대값(|집합|/12)
+- 보고: 요청 평균과 토큰 합산 비율. 집합 크기(1, 2, 3+)별로 나눈다
+- 스크립트: `scripts/cond_pc_overlap.py`, 보고 `docs/experiments/cond_adapter_min/pc_overlap.json`

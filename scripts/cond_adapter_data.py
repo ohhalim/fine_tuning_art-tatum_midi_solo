@@ -48,7 +48,8 @@ def song_examples(tokens, ids, humans, t0, song=None):
             sess_toks = list(HEADER) + list(tokens[r["keep_from"]:r["win_end"]])
         tags = session_position_requests(tokens, srows, r["k"])[:len(sess_ids) - 1]
         out.append({"song": song, "k": r["k"], "ids": sess_ids, "rows": cond_rows(tags, pays), "first_label": r["ctx_len"],
-                    "label_kinds": [token_kind(t) for t in sess_toks[r["ctx_len"]:]], "payload": pays[r["k"]]})
+                    "label_kinds": [token_kind(t) for t in sess_toks[r["ctx_len"]:]], "payload": pays[r["k"]],
+                    "window_pcs": [t[1] % 12 for t in sess_toks[r["ctx_len"]:] if isinstance(t, tuple) and t[0] == "piano"]})
     return out, counts
 
 

@@ -34,6 +34,8 @@ class ExampleTest(unittest.TestCase):
             self.assertGreater(len(ex["label_kinds"]), 0)
             self.assertEqual(ex["rows"][ex["first_label"] - 1], cond_vector(ex["payload"]))   # p0 carries the current request
             self.assertTrue(all(len(r) == 13 for r in ex["rows"]))
+            self.assertEqual(len(ex["window_pcs"]), ex["label_kinds"].count("pitch"))
+            self.assertTrue(all(0 <= p < 12 for p in ex["window_pcs"]))
 
     def test_token_kinds(self):
         self.assertEqual([token_kind(t) for t in ("<T>", ("piano", 60, 64), ("onset", 10), ("dur", 20))], ["T", "pitch", "onset", "dur"])
