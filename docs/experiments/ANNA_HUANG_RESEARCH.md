@@ -14,10 +14,11 @@
 ## 1. 먼저 볼 것
 
 1. **ReaLchords·ReaLJam·GAPT 공식 코드가 공개돼 있습니다.** `lukewys/realchords-pytorch`, MIT 라이선스입니다. 체크포인트는 Hugging Face `lukewys/realchords-pytorch`에 있습니다 [원문]
-2. **#1765 6.5.3절을 바로잡습니다.** 그 문서에는 "ReaLchords는 사람이 멜로디, AI가 코드라서 우리와 방향이 반대"라고 적었습니다. 그런데 저장소에는 **코드를 받아 멜로디를 내는 온라인 모델의 학습 레시피**("RL Training for Melody Model")가 있고, 학습된 체크포인트 `rl_melody_gail_4_datasets`도 올라와 있습니다. 방향 문제는 코드 수준에서 이미 풀려 있습니다 [원문]
-3. **ReaLJam 서버는 Apple Silicon용 MLX 백엔드를 지원합니다.** `pip install realjam` 후 `realjam-start-server --mlx`로 실행합니다. 이 Mac에서 바로 체험할 수 있습니다. 단, 외부 다운로드라서 승인이 필요합니다 [원문]
-4. 남는 차이는 **표현**입니다. 저장소 모델은 16분음표 격자, 단선율 멜로디, 코드 기호 어휘를 씁니다. 우리는 실제 왼손 보이싱, 다성 오른손, Aria 토큰을 씁니다 (7절)
-5. ReaLchords는 **±6반음 전조 증강(13배)**을 씁니다. 우리 D1 Arm E는 ×12 증강이 재붕괴를 일으킨다는 결과로 증강을 기각했습니다. 레시피를 그대로 옮기면 이 결정과 충돌합니다 (8절)
+2. **먼저 밝힐 점 (2026-10-16 추가):** 1·3·4번 사실(공식 코드 공개, 코드→멜로디 레시피, MLX 백엔드)과 저장소 평가 코드는 **#1735 조사(2026-10-11)에 이미 직접 확인으로 적혀 있었습니다**(`docs/experiments/realtime_partner_research/realtime_systems_and_apple_silicon.md` 49·62행, `jazz_chord_conditioned_generation_and_eval.md` 258·349·525행). #1765와 이 문서를 쓸 때 그 문서를 대조하지 않아 새 발견처럼 적었습니다. 이 문서에서 새로 더한 것은 논문 목록, 체크포인트 크기와 이름, 따라가기 순서입니다
+3. **#1765 6.5.3절을 바로잡습니다.** 그 문서에는 "ReaLchords는 사람이 멜로디, AI가 코드라서 우리와 방향이 반대"라고 적었습니다. 그런데 저장소에는 **코드를 받아 멜로디를 내는 온라인 모델의 학습 레시피**("RL Training for Melody Model")가 있고, 학습된 체크포인트 `rl_melody_gail_4_datasets`도 올라와 있습니다. 방향 문제는 코드 수준에서 이미 풀려 있습니다 [원문]
+4. **ReaLJam 서버는 Apple Silicon용 MLX 백엔드를 지원합니다.** `pip install realjam` 후 `realjam-start-server --mlx`로 실행합니다. 이 Mac에서 바로 체험할 수 있습니다. 단, 외부 다운로드라서 승인이 필요합니다 [원문]
+5. 남는 차이는 **표현**입니다. 저장소 모델은 16분음표 격자, 단선율 멜로디, 코드 기호 어휘를 씁니다. 우리는 실제 왼손 보이싱, 다성 오른손, Aria 토큰을 씁니다 (7절)
+6. ReaLchords는 **±6반음 전조 증강(13배)**을 씁니다. 우리 D1 Arm E는 ×12 증강이 재붕괴를 일으킨다는 결과로 증강을 기각했습니다. 레시피를 그대로 옮기면 이 결정과 충돌합니다 (8절)
 
 ---
 
@@ -248,7 +249,7 @@ MIT 발표회의 Rachel Loh "Visualizing the Internal State of Music Models for 
 |---|---|---|---|---|
 | F0 | ReaLJam을 이 Mac에서 MLX로 직접 연주해 보기 | 실시간 온라인 반주 에이전트의 lookahead·commit 설계가 연주자에게 어떻게 느껴지는가. 이 Mac에서 지연은 얼마인가 | `realjam` 패키지 + 체크포인트 다운로드 **승인** | 낮음 |
 | F1 | 공개 체크포인트 `rl_melody_gail_4_datasets`에 우리 dev 4곡 왼손을 코드 기호로 바꿔 넣기 | 공개된 코드→멜로디 RL 모델이 현재 코드와 틀린 코드를 구별해 따라가는가(#1760 b/c 대조와 같은 판정) | 저장소 코드 + 체크포인트 **승인**, 왼손 → 코드 기호 인식기(자체 정확도 검사 포함) | 낮음~중간 |
-| F2 | 평가 지표 이식 | note-in-chord, 엔트로피, Vendi score를 우리 게이트에 추가해 기존 결과를 다시 잴 수 있는가 | 저장소 평가 코드(MIT, 출처 표기) | 낮음 |
+| F2 | 평가 지표 이식 | note-in-chord, 엔트로피, Vendi score를 우리 게이트에 추가해 기존 결과를 다시 잴 수 있는가. #1735가 이미 설계한 지표안 (i)–(vi)(echo율, 비입력 코드톤율, counterfactual 차등, 섭동 적응 지연, 기준선 대비, 다양성·반복 벌점; `jazz_chord_conditioned_generation_and_eval.md` Q3)에서 출발 | 저장소 평가 코드(MIT, 출처 표기) | 낮음 |
 | F3 | 우리 데이터로 레시피를 작게 재현. 첫 단계는 온라인 MLE 디코더만 | 프레임 교차 표현(왼손 코드 + 오른손 윗선)의 온라인 모델은 현재 코드를 쓰는가(b < c) | F1의 인식기, 오른손 윗선 추출. 저장소 멜로디 MLE 체크포인트에서 시작할지는 따로 결정 | 중간 |
 | F4 | StreamMusicGen 축으로 블록 계약 다시 보기 | 우리 블록 계약을 (t_f, k)로 쓰면 어디에 있는가. ReaLJam의 lookahead·commit과 어떻게 대응하는가 | 문서 작업 + 기존 모델 오프라인 격자 | 낮음 |
 | F5 | anticipation 표시 | 연주자가 AI의 다음 계획을 보면 함께 연주하기 쉬워지는가 | 실시간 루프(Phase 1) 이후 | 중간 |
