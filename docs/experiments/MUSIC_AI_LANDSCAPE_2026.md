@@ -317,7 +317,7 @@
   - **미래 가시성과 청크 길이의 절충:** StreamMusicGen의 t_f·k는 우리 블록 계약의 1박 앞섬(BEAT)·블록 길이(B)와 같은 축입니다. 우리 블록 설계를 그 틀로 다시 볼 수 있습니다
   - **계획을 보여 주는 상호작용:** ReaLJam의 anticipation 화면은 "연주자가 AI가 어디로 갈지 안다"는 설계입니다. 실시간 데모 설계 참고
   - **소통 설계:** H2H의 의도·지각 주석 체계는 상호작용 평가 설계에 쓸 수 있습니다
-- **방향 (정정, 2026-10-16):** 처음에는 "ReaLchords·GAPT는 사람이 멜로디, AI가 코드라 우리와 방향이 반대"라고 적었습니다. 공식 저장소 `lukewys/realchords-pytorch`(MIT)를 열어 보니 코드를 받아 멜로디를 내는 온라인 모델의 학습 레시피("RL Training for Melody Model")와 체크포인트 `rl_melody_gail_4_datasets`가 이미 있습니다. 남은 차이는 표현입니다(16분음표 격자, 단선율, 코드 기호 어휘) [직접 저장소]. 자세한 내용은 `ANNA_HUANG_RESEARCH.md`(#1766, PR #1767)
+- **방향 (정정, 2026-10-16):** 처음에는 "ReaLchords·GAPT는 사람이 멜로디, AI가 코드라 우리와 방향이 반대"라고 적었습니다. 공식 저장소 `lukewys/realchords-pytorch`(MIT)를 열어 보니 코드를 받아 멜로디를 내는 온라인 모델의 학습 레시피("RL Training for Melody Model")와 체크포인트 `rl_melody_gail_4_datasets`가 이미 있습니다. 남은 차이는 표현입니다(16분음표 격자, 단선율, 코드 기호 어휘) [직접 저장소]. 이 사실은 #1735 조사(2026-10-11, `realtime_partner_research/realtime_systems_and_apple_silicon.md` 62행)에 이미 있었는데, 이 문서를 쓸 때 대조하지 않았습니다. 자세한 내용은 `ANNA_HUANG_RESEARCH.md`(#1766, PR #1767)
 - ReaLJam 로컬 실행과 지연 측정은 #1768에서 진행 중입니다
 
 ## 6.6 2026-10 추가: 구글과 주요 회사가 공개한 프로그램·모델
