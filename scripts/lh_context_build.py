@@ -4,7 +4,9 @@ No model, no scoring. For every request of the given songs: build a/b/c with scr
 L8, the future-invariance check L1f (change only human onsets/offs after s_k), and L7 (every human note used is
 tokenized alone by the official AbsTokenizer from a 1 tick = 1 ms MIDI and compared with the pure-Python tokens).
 Arms are not stored as token lists: they are rebuilt from the stored notes and crop state, and each arm's sha256 is
-kept so a later scoring run can check it rebuilt the same input.
+kept so a later scoring run can check it rebuilt the same input. Each request row keeps its own checks
+(L1-L6, L8, L1f) and is 'ok' only when all are 0; a run whose report has contract_ok false exits nonzero after
+writing the report, and a consumer must require both the global contract_ok and the row status (#1773 review).
 
   .../t3_aria/.venv/bin/python scripts/lh_context_build.py --export /Users/ohhalim/git_box/lh_request_export_run3 \
       --velocity /Users/ohhalim/git_box/lh_context_run1/human_velocity --out /Users/ohhalim/git_box/lh_context_run1 \
@@ -90,6 +92,24 @@ def official_tokens(tok, notes):
     return out
 
 
+def request_status(chk):
+    """'ok' only when every per-request check (L1-L6, L8, L1f) is 0."""
+    bad = sorted(k for k, v in chk.items() if v)
+    return "ok" if not bad else "check_failed: " + ",".join(bad)
+
+
+def contract_ok(checks, counts):
+    return all(v == 0 for v in checks.values()) and counts["capacity_failure"] == 0 and counts["contract_violation"] == 0
+
+
+def finish(report, path):
+    """Write the report, then return the process exit code: nonzero when the contract does not hold."""
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(report, f, indent=1, ensure_ascii=False)
+    return 0 if report["contract_ok"] else 1
+
+
 def summarize(xs):
     return {"n": len(xs), "mean": round(statistics.mean(xs), 2), "median": statistics.median(xs)} if xs else {"n": 0}
 
@@ -135,12 +155,13 @@ def main():
                 counts["contract_violation"] += 1
                 rows_out.append({"k": srow["k"], "status": f"contract_violation: {e}"})
                 continue
-            for key, val in check_request(r).items():
-                checks[key] += val
+            chk = dict(check_request(r))
             r2 = build_request(tokens, srow, Human(perturb_future(human, srow["s"])), i, pool)
             same = all((r[x] and r[x]["tokens"]) == (r2[x] and r2[x]["tokens"]) for x in "abc") and \
                 (r["donor"], r["keep_from"], r["base_ms"]) == (r2["donor"], r2["keep_from"], r2["base_ms"])
-            checks["L1f"] += not same
+            chk["L1f"] = int(not same)
+            for key, val in chk.items():
+                checks[key] += val
             counts["cold"] += srow["k"] == 0
             counts[r["layer"]] += 1
             counts["donor_missing"] += r["donor"] == "missing"
@@ -161,7 +182,8 @@ def main():
                     imbalance[f"{arm}_mean_vel"].append(statistics.mean(n.vel for n in ns))
                     imbalance[f"{arm}_total_ms"].append(sum(n.off - n.on for n in ns))
             note = lambda n: [n.pitch, n.on, n.off, n.vel, n.held, n.raw_on, n.raw_off]  # noqa: E731
-            rows_out.append({"k": r["k"], "s": r["s"], "status": "ok", "keep_from": r["keep_from"], "base_ms": r["base_ms"],
+            rows_out.append({"k": r["k"], "s": r["s"], "status": request_status(chk), "checks": chk,
+                             "keep_from": r["keep_from"], "base_ms": r["base_ms"],
                              "extra_crop": r["extra_crop"], "window_ms": r["window_ms"], "layer": r["layer"],
                              "donor": r["donor"], "eligible_c": r["eligible_c"],
                              "own": [note(n) for n in r["own"]], "donor_notes": [note(n) for n in r["donor_notes"]],
@@ -184,18 +206,17 @@ def main():
     checks["L7"] = len(l7_bad)
 
     report = {"issue": 1772, "songs": a.songs, "w_ms": W_MS, "checks": checks,
-              "contract_ok": all(v == 0 for v in checks.values()) and counts["capacity_failure"] == 0
-              and counts["contract_violation"] == 0,
+              "contract_ok": contract_ok(checks, counts),
               "counts": counts, "l7_notes_compared": len(official), "l7_mismatch_examples": l7_bad[:10],
               "session_length": {x: summarize(v) for x, v in lens.items()},
               "b_vs_c_summary": {k: summarize(v) for k, v in imbalance.items()},
               "inputs": {"export": a.export, "velocity_manifest_sha256": sha256_file(os.path.join(a.velocity, "manifest.json")),
                          "ariautils_absolute_py_sha256": sha256_file(ariautils.tokenizer.absolute.__file__)},
               "per_song": per_song}
-    os.makedirs(os.path.dirname(a.report), exist_ok=True)
-    with open(a.report, "w") as f:
-        json.dump(report, f, indent=1, ensure_ascii=False)
+    code = finish(report, a.report)
     print(json.dumps({k: report[k] for k in ("checks", "contract_ok", "counts", "l7_notes_compared")}, ensure_ascii=False))
+    if code:
+        sys.exit(f"contract does not hold (report written to {a.report}); consumers must not use these arms")
 
 
 if __name__ == "__main__":

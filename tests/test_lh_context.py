@@ -210,5 +210,34 @@ class BuildTest(unittest.TestCase):
         self.assertGreater(extra, 0)
 
 
+class FailurePathTest(unittest.TestCase):
+    """#1773 review: a failing check must not leave the request 'ok' or the run exiting 0."""
+
+    def test_injected_check_failure_marks_request_and_run(self):
+        import json
+        import tempfile
+        from lh_context_build import contract_ok, finish, request_status
+        songs = {s: (rh_song(10 + s), lh_song(20 + s)) for s in (1, 2)}
+        pool = pool_of(songs)
+        tok, h = songs[1]
+        r = build_request(tok, session_requests(tok, 0.0)[5], Human(h), 1, pool)
+        chk = dict(check_request(r))
+        chk["L1f"] = 0
+        self.assertEqual(request_status(chk), "ok")
+        chk["L4"] = 1                                                    # the injection Astra used
+        self.assertEqual(request_status(chk), "check_failed: L4")
+        checks = {k: 0 for k in ("L1", "L1t", "L1f", "L2", "L3", "L4", "L5", "L6", "L7", "L8")}
+        checks.update({k: checks[k] + v for k, v in chk.items()})
+        counts = {"capacity_failure": 0, "contract_violation": 0}
+        self.assertFalse(contract_ok(checks, counts))
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "sub", "report.json")
+            self.assertEqual(finish({"contract_ok": contract_ok(checks, counts)}, path), 1)
+            self.assertFalse(json.load(open(path))["contract_ok"])        # written before the nonzero exit
+            checks["L4"] = 0
+            self.assertEqual(finish({"contract_ok": contract_ok(checks, counts)}, path), 0)
+            self.assertFalse(contract_ok({**checks, "L7": 1}, counts))     # the global L7 counts too
+
+
 if __name__ == "__main__":
     unittest.main()
