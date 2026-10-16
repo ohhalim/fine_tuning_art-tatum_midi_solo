@@ -1,0 +1,270 @@
+{
+ "issue": 1774,
+ "mode": "--generate",
+ "checks": {
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "vocab_17727": {
+   "ok": true,
+   "tokenizer": 17727,
+   "jps": 17727
+  },
+  "primer_06_roundtrip": {
+   "ok": true
+  },
+  "primer_18_roundtrip": {
+   "ok": true
+  },
+  "strict_loads": {
+   "ok": true
+  }
+ },
+ "result": "generate_done",
+ "stopped_at": null,
+ "inputs": {
+  "primers_json_sha256": "ec6f35b7ce04cee67f63864bbec43d3732c1dc35f950a5b0c5a8e632bb872ca9",
+  "primer_ids_sha256": {
+   "06": "3d540aab268ea85982c5c71c4442c98be8f8b43b06b80fc2d3361ee3a6154b4a",
+   "18": "fc8837c2e379e41b765e15bc6f199a30407ff556c70dc0a3f025639d5874c811"
+  },
+  "aria_ckpt_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "jps_model_sha256": "78a21df75ef79b5fbc74a28abcf3ac88a6d92bf38fe192a2acc56f62704f88af",
+  "jps_embeddings_sha256": "559f74681ee839c7fd2d0dcce9bb75384e3945dd22c40810f5e251928e416e80",
+  "jps_config": {
+   "architecture": "CrossAttentionTransformerLM",
+   "base_model": "aria-medium",
+   "cross_attention_layers": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+   ],
+   "context_length": 4,
+   "cross_attention_dropout": 0.1,
+   "gate_init": 0.1,
+   "embedding_dropout": 0.3,
+   "num_artists": 12,
+   "vocab_size": 17727,
+   "max_seq_len": 4096,
+   "training": {
+    "epochs": 15,
+    "batch_size": 4,
+    "gradient_accumulation_steps": 8,
+    "learning_rate": 5e-06,
+    "weight_decay": 0.02,
+    "warmup_epochs": 0.5,
+    "mixed_precision": "fp16"
+   }
+  },
+  "torch": "2.14.1"
+ },
+ "load_s": 5.2,
+ "order": [
+  "p06_s1_jpsA",
+  "p06_s1_base",
+  "p06_s1_jps0",
+  "p06_s1_jpsB",
+  "p06_s2_base",
+  "p06_s2_jps0",
+  "p06_s2_jpsA",
+  "p06_s2_jpsB",
+  "p18_s1_base",
+  "p18_s1_jps0",
+  "p18_s1_jpsA",
+  "p18_s1_jpsB",
+  "p18_s2_base",
+  "p18_s2_jps0",
+  "p18_s2_jpsA",
+  "p18_s2_jpsB"
+ ],
+ "cells": {
+  "p06_s1_jpsA": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 535,
+   "wall_s": 80.9,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.98019,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p06_s1_base": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 757,
+   "wall_s": 127.9,
+   "mask_changed_n": 0,
+   "pre_mask_allowed_min": 0.999214,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p06_s1_jps0": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 712,
+   "wall_s": 120.1,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.989326,
+   "thermal_before": 1,
+   "thermal_wait_s": 60,
+   "rss_max_bytes": 8738308096
+  },
+  "p06_s1_jpsB": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 658,
+   "wall_s": 106.0,
+   "mask_changed_n": 2,
+   "pre_mask_allowed_min": 0.983362,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p06_s2_base": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 367,
+   "wall_s": 45.9,
+   "mask_changed_n": 0,
+   "pre_mask_allowed_min": 0.998971,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p06_s2_jps0": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 466,
+   "wall_s": 67.1,
+   "mask_changed_n": 0,
+   "pre_mask_allowed_min": 0.993306,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p06_s2_jpsA": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 616,
+   "wall_s": 97.1,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.980662,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p06_s2_jpsB": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 676,
+   "wall_s": 110.9,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.988434,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p18_s1_base": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 700,
+   "wall_s": 124.0,
+   "mask_changed_n": 0,
+   "pre_mask_allowed_min": 0.992832,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p18_s1_jps0": {
+   "status": "done",
+   "stop": "token_cap",
+   "new_tokens": 1024,
+   "wall_s": 242.0,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.988627,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p18_s1_jpsA": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 793,
+   "wall_s": 161.7,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.981607,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p18_s1_jpsB": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 925,
+   "wall_s": 204.9,
+   "mask_changed_n": 2,
+   "pre_mask_allowed_min": 0.984622,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p18_s2_base": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 736,
+   "wall_s": 136.2,
+   "mask_changed_n": 1,
+   "pre_mask_allowed_min": 0.994982,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p18_s2_jps0": {
+   "status": "done",
+   "stop": "token_cap",
+   "new_tokens": 1024,
+   "wall_s": 238.6,
+   "mask_changed_n": 2,
+   "pre_mask_allowed_min": 0.993614,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p18_s2_jpsA": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 790,
+   "wall_s": 160.0,
+   "mask_changed_n": 2,
+   "pre_mask_allowed_min": 0.979755,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  },
+  "p18_s2_jpsB": {
+   "status": "done",
+   "stop": "window_end",
+   "new_tokens": 871,
+   "wall_s": 186.9,
+   "mask_changed_n": 2,
+   "pre_mask_allowed_min": 0.980013,
+   "thermal_before": 0,
+   "thermal_wait_s": 0,
+   "rss_max_bytes": 8738308096
+  }
+ },
+ "budget": {
+  "smoke_s": 80.9,
+  "estimate_rest_s": 1516.9,
+  "cap_s": 10800,
+  "ok": true
+ },
+ "used_s": 2210.2
+}

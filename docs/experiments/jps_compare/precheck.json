@@ -1,0 +1,94 @@
+{
+ "issue": 1774,
+ "mode": "--precheck",
+ "checks": {
+  "mps_fallback_off": {
+   "ok": true
+  },
+  "vocab_17727": {
+   "ok": true,
+   "tokenizer": 17727,
+   "jps": 17727
+  },
+  "primer_06_roundtrip": {
+   "ok": true
+  },
+  "primer_18_roundtrip": {
+   "ok": true
+  },
+  "strict_loads": {
+   "ok": true
+  },
+  "multinomial_is_exponential_race": {
+   "ok": true,
+   "matched": 32
+  },
+  "first_logits_differ_by_context": {
+   "ok": true,
+   "jps0_vs_jpsA": 3.078854560852051,
+   "jpsA_vs_jpsB": 1.7780287265777588,
+   "base_vs_jps0": 3.800462484359741
+  },
+  "same_seed_same_24_tokens": {
+   "ok": true,
+   "per_arm": {
+    "base": true,
+    "jps0": true,
+    "jpsA": true,
+    "jpsB": true
+   }
+  }
+ },
+ "result": "precheck_ok",
+ "stopped_at": null,
+ "inputs": {
+  "primers_json_sha256": "ec6f35b7ce04cee67f63864bbec43d3732c1dc35f950a5b0c5a8e632bb872ca9",
+  "primer_ids_sha256": {
+   "06": "3d540aab268ea85982c5c71c4442c98be8f8b43b06b80fc2d3361ee3a6154b4a",
+   "18": "fc8837c2e379e41b765e15bc6f199a30407ff556c70dc0a3f025639d5874c811"
+  },
+  "aria_ckpt_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "jps_model_sha256": "78a21df75ef79b5fbc74a28abcf3ac88a6d92bf38fe192a2acc56f62704f88af",
+  "jps_embeddings_sha256": "559f74681ee839c7fd2d0dcce9bb75384e3945dd22c40810f5e251928e416e80",
+  "jps_config": {
+   "architecture": "CrossAttentionTransformerLM",
+   "base_model": "aria-medium",
+   "cross_attention_layers": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+   ],
+   "context_length": 4,
+   "cross_attention_dropout": 0.1,
+   "gate_init": 0.1,
+   "embedding_dropout": 0.3,
+   "num_artists": 12,
+   "vocab_size": 17727,
+   "max_seq_len": 4096,
+   "training": {
+    "epochs": 15,
+    "batch_size": 4,
+    "gradient_accumulation_steps": 8,
+    "learning_rate": 5e-06,
+    "weight_decay": 0.02,
+    "warmup_epochs": 0.5,
+    "mixed_precision": "fp16"
+   }
+  },
+  "torch": "2.14.1"
+ },
+ "load_s": 6.3,
+ "jps_trunk_vs_aria": {
+  "shared_tensors": 148,
+  "of_base": 148,
+  "rel_diff_max": 0.05655146762728691,
+  "rel_diff_median": 0.014881954528391361,
+  "unchanged_tensors": 0,
+  "jps_only_tensors": 64
+ }
+}
