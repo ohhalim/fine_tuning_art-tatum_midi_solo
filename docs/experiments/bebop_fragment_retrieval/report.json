@@ -116,21 +116,21 @@
      "notes": 12,
      "read_back": 12,
      "roundtrip_diffs": 0,
-     "max_time_err_ms": 0.091
+     "max_time_err_ms": 0.045
     },
     {
      "file": "change_melody_k+2.mid",
      "notes": 12,
      "read_back": 12,
      "roundtrip_diffs": 0,
-     "max_time_err_ms": 0.091
+     "max_time_err_ms": 0.045
     },
     {
      "file": "change_twohand_ref.mid",
      "notes": 22,
      "read_back": 22,
      "roundtrip_diffs": 0,
-     "max_time_err_ms": 0.091
+     "max_time_err_ms": 0.045
     }
    ]
   },
@@ -188,11 +188,11 @@
     3,
     5
    ],
-   "selected_notes": 17,
-   "excluded_notes": 14,
-   "line_overlaps": 4,
+   "selected_notes": 18,
+   "excluded_notes": 15,
+   "line_overlaps": 5,
    "same_pitch_overlaps": 0,
-   "file_len_s": 3.2954,
+   "file_len_s": 3.2955,
    "files": []
   }
  },

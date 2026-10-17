@@ -124,7 +124,7 @@ def song_candidates(notes, meta):
             if q != tg["first"][1]:
                 continue
             kshift = signed_k(r, tg["first"][0])
-            cand = {"target": name, "meta": meta, "t0": round(t0, 4), "slice_source": src, "k": kshift, "first": first,
+            cand = {"target": name, "meta": meta, "t0": round(t0, 4), "t0_exact": float(t0), "slice_source": src, "k": kshift, "first": first,
                     "cluster_index": k, "dup_keys": dup}
             if name == "hold":
                 s = lab.scan(k, first["label"], t0 + WIN_S)
@@ -161,7 +161,7 @@ def notes_by_id(notes):
 def verify_t0(notes, cand):
     """Pitch classes actually sounding (start <= t < end) in the accompaniment at t0 + 30 ms vs the v1 slice."""
     line, _, acc, _ = split_song(notes)
-    t = cand["t0"] + SLICE_OFFSET_S
+    t = cand["t0_exact"] + SLICE_OFFSET_S
     here = [(nid, n) for nid, n in acc if n.start <= t < n.end]
     pcs = sorted({n.pitch % 12 for _, n in here})
     out = {"t0_check_time": round(t, 4), "t0_sounding": [{"id": nid, "pitch": n.pitch, "start": round(n.start, 4), "end": round(n.end, 4)} for nid, n in here],
@@ -179,7 +179,8 @@ def verify_t0(notes, cand):
 def extract(notes, cand):
     """Selected top-line notes restored from original IDs, excluded notes, the two-hand reference."""
     line, trunc, acc, _ = split_song(notes)
-    t0, t1 = cand["t0"], cand["t0"] + WIN_S
+    t0 = cand["t0_exact"]                       # exact: a rounded t0 can push the phrase start out of the window
+    t1 = t0 + WIN_S
     sel_ids = [nid for nid, t in line if t0 <= t.start < t1]
     nb = notes_by_id(notes)
     sel = [(nid, nb[nid]) for nid in sel_ids]

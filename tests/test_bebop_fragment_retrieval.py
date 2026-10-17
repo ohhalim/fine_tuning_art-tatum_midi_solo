@@ -69,6 +69,16 @@ class RetrievalRulesTest(unittest.TestCase):
         self.assertGreater(ex["line_overlaps"], 0)               # overlaps are recorded, not removed
         self.assertTrue(all(r["pitch"] < bf.ACC_HIGH for r in ex["excluded"]))
 
+    def test_t0_with_many_decimals_keeps_first_note(self):
+        # 213.92045454... rounds up to 213.9205; the first phrase note must still be selected
+        t0 = 213.92045454545453
+        notes = song([(t0 - 0.2, t0 + 4.0, (41, 45, 52))], rh_start=t0)
+        c = [c for c in bf.song_candidates(notes, META) if c["target"] == "hold"][0]
+        self.assertGreater(c["t0"], t0)                          # the display value is rounded up
+        ex = bf.extract(notes, c)
+        self.assertEqual(ex["selected"][0]["start"], 0.0)
+        self.assertEqual(len(ex["selected"]), sum(1 for i in range(20) if i * 0.2 < bf.WIN_S))
+
 
 if __name__ == "__main__":
     unittest.main()
