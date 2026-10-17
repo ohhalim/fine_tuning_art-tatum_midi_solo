@@ -105,9 +105,10 @@ class Labeler:
         return {"slices": n, "unknown": unknown, "unknown_s": round(unknown_s, 3), "contra": contra}
 
 
-def song_candidates(notes, meta):
-    """Candidates for both targets from one song (each a dict with a sort key)."""
-    from inference.control.lick_bank import runs
+def song_candidates(notes, meta, require_lick=False):
+    """Candidates for both targets from one song (each a dict with a sort key). require_lick: R2, the run must be a lick."""
+    import statistics
+    from inference.control.lick_bank import lick_from_run, runs
     line, trunc, acc, dup = split_song(notes)
     lab = Labeler(acc)
     nb = notes_by_id(notes)
@@ -115,7 +116,11 @@ def song_candidates(notes, meta):
     for run in runs([t for _, t in line]):
         if len(run) < MIN_RUN:
             continue
+        if require_lick and lick_from_run(run) is None:
+            continue
         t0 = run[0].start
+        run_info = {"notes": len(run), "median_ioi_s": round(statistics.median(b.start - a.start for a, b in zip(run, run[1:])), 4),
+                    "end_s": round(run[-1].end - t0, 4)}
         src, k, first = lab.phrase_label(t0)
         if first is None or first["cls"] not in OK_CLS:
             continue
@@ -124,7 +129,8 @@ def song_candidates(notes, meta):
             if q != tg["first"][1]:
                 continue
             kshift = signed_k(r, tg["first"][0])
-            cand = {"target": name, "meta": meta, "t0": round(t0, 4), "t0_exact": float(t0), "slice_source": src, "k": kshift, "first": first,
+            cand = {"target": name, "meta": meta, "run": run_info, "run_starts": [float(n.start) for n in run],
+                    "t0": round(t0, 4), "t0_exact": float(t0), "slice_source": src, "k": kshift, "first": first,
                     "cluster_index": k, "dup_keys": dup}
             if name == "hold":
                 s = lab.scan(k, first["label"], t0 + WIN_S)
@@ -188,6 +194,8 @@ def extract(notes, cand):
     excluded = [(nid, n) for nid, n in notes if t0 <= n.start < t1 and nid not in selset]
     ref = [(nid, n, n.start) for nid, n in notes if t0 <= n.start < t1] + \
           [(nid, n, n.start) for nid, n in notes if n.start < t0 < n.end]
+    run_starts = set(cand.get("run_starts", []))
+    in_run = sum(1 for _, n in sel if float(n.start) in run_starts)
     poly = sum(1 for (_, a), (_, b) in zip(sel, sel[1:]) if b.start < a.end)
     same = 0
     for i, (_, a) in enumerate(sel):
@@ -197,7 +205,7 @@ def extract(notes, cand):
             "excluded": rows(excluded),
             "twohand_ref": [{"id": nid, "pitch": n.pitch, "start": round(max(n.start, t0) - t0, 4), "end": round(n.end - t0, 4),
                              "velocity": n.velocity, "cut_start": bool(s < t0), "orig_start": round(s - t0, 4)} for nid, n, s in ref],
-            "line_overlaps": poly, "same_pitch_overlaps": same,
+            "line_overlaps": poly, "same_pitch_overlaps": same, "selected_in_run": in_run,
             "file_len_s": round(max(n.end for _, n in sel) - t0, 4) if sel else 0.0}
 
 
@@ -233,11 +241,12 @@ def file_hash(path, algo="sha256"):
 
 def main() -> None:
     manifest_path, run_dir, report_dir = sys.argv[1:4]
+    lick = "--lick" in sys.argv[4:]
     os.makedirs(run_dir, exist_ok=True)
     os.makedirs(report_dir, exist_ok=True)
     man = json.load(open(manifest_path))
     songs = [s for s in man["songs"] if s["split"] == "train"]
-    report = {"issue": 1782, "manifest_sha256": file_hash(manifest_path), "songs": len(songs), "skipped": [], "candidates": {}, "selected": {}}
+    report = {"issue": 1782, "round": "R2 lick" if lick else "R1", "manifest_sha256": file_hash(manifest_path), "songs": len(songs), "skipped": [], "candidates": {}, "selected": {}}
     cands, loaded = [], {}
     for s in songs:
         if not os.path.exists(s["source"]) or file_hash(s["source"], "sha1") != s["sha1"]:
@@ -245,7 +254,7 @@ def main() -> None:
             continue
         notes = load_notes(s["source"])
         meta = {"pianist": s["pianist"], "source": s["source"], "sha1": s["sha1"]}
-        got = song_candidates(notes, meta)
+        got = song_candidates(notes, meta, require_lick=lick)
         if got:
             loaded[s["sha1"]] = notes
         cands += got
@@ -260,7 +269,7 @@ def main() -> None:
         notes = loaded[c["meta"]["sha1"]]
         chk = verify_t0(notes, c)
         ex = extract(notes, c)
-        sel = {k: v for k, v in c.items() if k not in ("key", "scan")}
+        sel = {k: v for k, v in c.items() if k not in ("key", "scan", "run_starts")}
         sel["scan"] = [{k: v for k, v in s.items() if k != "contra"} for s in c["scan"]]
         sel.update(check=chk, extract=ex, status=chk["status"], window_s=WIN_S)
         files = []
@@ -279,9 +288,10 @@ def main() -> None:
             "first": sel["first"], "second": sel.get("second"), "tc": sel.get("tc"), "tc_target": sel.get("tc_target"),
             "scan": sel["scan"], "check_status": chk["status"], "t0_sounding_pcs": chk["t0_sounding_pcs"], "v1_slice_pcs": chk["v1_slice_pcs"],
             "selected_notes": len(ex["selected"]), "excluded_notes": len(ex["excluded"]), "line_overlaps": ex["line_overlaps"],
-            "same_pitch_overlaps": ex["same_pitch_overlaps"], "file_len_s": ex["file_len_s"], "files": files}
+            "same_pitch_overlaps": ex["same_pitch_overlaps"], "file_len_s": ex["file_len_s"], "files": files,
+            "run": c["run"], "selected_in_run": ex["selected_in_run"]}
     report["result"] = "done"
-    with open(os.path.join(report_dir, "report.json"), "w") as f:
+    with open(os.path.join(report_dir, "report_r2.json" if lick else "report.json"), "w") as f:
         json.dump(report, f, ensure_ascii=False, indent=1, default=str)
     print(json.dumps({k: report["selected"][k].get("status") for k in TARGETS}), json.dumps(report["candidates"]))
 

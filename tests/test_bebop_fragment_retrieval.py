@@ -79,6 +79,16 @@ class RetrievalRulesTest(unittest.TestCase):
         self.assertEqual(ex["selected"][0]["start"], 0.0)
         self.assertEqual(len(ex["selected"]), sum(1 for i in range(20) if i * 0.2 < bf.WIN_S))
 
+    def test_lick_filter_rejects_slow_melody_runs(self):
+        fmaj7 = (0.0, 9.0, (41, 45, 52))
+        slow = song([fmaj7], rh_n=12, rh_step=0.5, rh_dur=0.6)                # median IOI 0.5 s: melody-like
+        self.assertTrue(any(c["target"] == "hold" for c in bf.song_candidates(slow, META)))
+        self.assertFalse(any(c["target"] == "hold" for c in bf.song_candidates(slow, META, require_lick=True)))
+        fast = song([fmaj7], rh_n=20, rh_step=0.2)                           # median IOI 0.2 s, 20 notes: a lick
+        c = [c for c in bf.song_candidates(fast, META, require_lick=True) if c["target"] == "hold"][0]
+        self.assertEqual(c["run"]["notes"], 20)
+        self.assertEqual(bf.extract(fast, c)["selected_in_run"], len(bf.extract(fast, c)["selected"]))
+
 
 if __name__ == "__main__":
     unittest.main()
