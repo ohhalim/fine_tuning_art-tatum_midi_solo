@@ -23,6 +23,10 @@ for p in (HERE, os.path.join(HERE, "..")):
     sys.path.insert(0, p)
 
 TARGETS = {"change": ((0, 0, "m7"), (4, 5, "7")), "hold": ((0, 0, "maj7"),)}
+# post-hoc subsets (chosen after the main result; WJAZZD_LICK_COVERAGE.md section 8)
+SUBSETS = {"tempo_90_140": lambda i: bool(i["avgtempo"]) and 90 <= i["avgtempo"] <= 140,
+           "tempo_90_140_and_not_swing": lambda i: bool(i["avgtempo"]) and 90 <= i["avgtempo"] <= 140
+           and "SWING" not in (i["rhythmfeel"] or "") and (i["rhythmfeel"] or "") not in ("TWOBEAT", "BALLAD")}
 OFFBEAT = (0.35, 0.85)
 
 
@@ -68,6 +72,32 @@ def summarize(wins, info):
             "offbeat_pos_median_by_rhythmfeel": {k: (round(statistics.median(v), 3), len(v)) for k, v in sorted(by_feel.items()) if v}}
 
 
+def posthoc(c, info, out_path):
+    import wjazzd_retrieval as wr
+    out = {}
+    for sname, f in SUBSETS.items():
+        mel = [m for m in sorted(info) if f(info[m])]
+        res = {}
+        for tname, rel in TARGETS.items():
+            wins, pos = [], []
+            for m in mel:
+                beats = c.execute("select onset, bar, beat, chord from beats where melid=? order by onset", (m,)).fetchall()
+                rows = c.execute("select onset, pitch, duration from melody where melid=? order by onset", (m,)).fetchall()
+                for w in wr.build_windows(beats, m):
+                    if w["eligible"] and w["rel"] == rel:
+                        notes = window_notes(rows, w["start"], w["end"])
+                        if is_lick_window(notes):
+                            wins.append(m)
+                            pos += offbeat_positions(notes, w["beat_times"], w["end"])
+            res[tname] = {"lick_windows": len(wins), "solos": len(set(wins)), "performers": len({info[m]["performer"] for m in set(wins)}),
+                          "instrument": dict(collections.Counter(info[m]["instrument"] for m in set(wins)).most_common()),
+                          "rhythmfeel": dict(collections.Counter(info[m]["rhythmfeel"] for m in set(wins)).most_common()),
+                          "offbeat_pos_median": round(statistics.median(pos), 3) if pos else None, "offbeat_notes": len(pos)}
+        out[sname] = {"solos_in_subset": len(mel), **res}
+    with open(out_path, "w") as f:
+        json.dump(out, f, ensure_ascii=False, indent=1)
+
+
 def main() -> None:
     db, report_path = sys.argv[1:3]
     import wjazzd_retrieval as wr
@@ -105,6 +135,8 @@ def main() -> None:
     with open(report_path, "w") as f:
         json.dump(report, f, ensure_ascii=False, indent=1)
     print(json.dumps({k: (v["progression_only"]["windows"], v["lick"]["windows"], v["lick"]["solos"]) for k, v in report["targets"].items()}))
+    if "--posthoc" in sys.argv:
+        posthoc(c, info, sys.argv[sys.argv.index("--posthoc") + 1])
 
 
 if __name__ == "__main__":
