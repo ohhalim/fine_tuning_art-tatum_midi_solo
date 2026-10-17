@@ -1,5 +1,6 @@
 {
  "issue": 1782,
+ "round": "R1",
  "manifest_sha256": "0b878763e7a25ee3b17e41ce647046476bf6814d036744fcd1e882cdf8f5fe18",
  "songs": 189,
  "skipped": [],
@@ -95,6 +96,8 @@
     }
    ],
    "check_status": "ok",
+   "t0_match": true,
+   "tc_match": true,
    "t0_sounding_pcs": [
     3,
     5,
@@ -104,6 +107,11 @@
     3,
     5,
     8
+   ],
+   "tc_sounding_pcs": [
+    2,
+    8,
+    10
    ],
    "selected_notes": 12,
    "excluded_notes": 5,
@@ -132,7 +140,13 @@
      "roundtrip_diffs": 0,
      "max_time_err_ms": 0.045
     }
-   ]
+   ],
+   "run": {
+    "notes": 22,
+    "median_ioi_s": 0.2864,
+    "end_s": 7.7773
+   },
+   "selected_in_run": 12
   },
   "hold": {
    "status": "proxy_invalid",
@@ -178,6 +192,8 @@
     }
    ],
    "check_status": "proxy_invalid",
+   "t0_match": false,
+   "tc_match": null,
    "t0_sounding_pcs": [
     0,
     5
@@ -188,12 +204,19 @@
     3,
     5
    ],
+   "tc_sounding_pcs": null,
    "selected_notes": 18,
    "excluded_notes": 15,
    "line_overlaps": 5,
    "same_pitch_overlaps": 0,
    "file_len_s": 3.2955,
-   "files": []
+   "files": [],
+   "run": {
+    "notes": 18,
+    "median_ioi_s": 0.1295,
+    "end_s": 2.8795
+   },
+   "selected_in_run": 18
   }
  },
  "result": "done"

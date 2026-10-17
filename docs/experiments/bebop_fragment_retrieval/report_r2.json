@@ -64,6 +64,8 @@
     }
    ],
    "check_status": "proxy_invalid",
+   "t0_match": false,
+   "tc_match": null,
    "t0_sounding_pcs": [
     0,
     5
@@ -74,6 +76,7 @@
     3,
     5
    ],
+   "tc_sounding_pcs": null,
    "selected_notes": 18,
    "excluded_notes": 15,
    "line_overlaps": 5,

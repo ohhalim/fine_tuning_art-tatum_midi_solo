@@ -89,6 +89,24 @@ class RetrievalRulesTest(unittest.TestCase):
         self.assertEqual(c["run"]["notes"], 20)
         self.assertEqual(bf.extract(fast, c)["selected_in_run"], len(bf.extract(fast, c)["selected"]))
 
+    def test_tc_uses_exact_onset_and_rejects_mismatch(self):
+        # Astra's case: C·E struck at 2.000045 s, Bb 30 ms later in the same cluster; rounded tc + 30 ms misses Bb
+        lh = [(0.0, 1.95, (43, 46, 53))]
+        rh = song(lh)
+        notes = rh + [(f"i1_n{j}", pretty_midi.Note(velocity=60, pitch=p, start=s, end=4.0))
+                      for j, (p, s) in enumerate([(36, 2.000045454545), (40, 2.000045454545), (46, 2.03002)])]
+        notes.sort(key=lambda x: (x[1].start, x[1].pitch, x[0]))
+        c = [c for c in bf.song_candidates(notes, META) if c["target"] == "change"][0]
+        self.assertEqual(c["second"]["pcs"], [0, 4, 10])
+        chk = bf.verify_t0(notes, c)
+        self.assertEqual(chk["tc_sounding_pcs"], [0, 4, 10])            # exact tc: Bb is sounding
+        self.assertTrue(chk["t0_match"] and chk["tc_match"])
+        self.assertEqual(chk["status"], "ok")
+        bad = dict(c, second=dict(c["second"], pcs=[0, 4, 7, 10]))       # a v1 slice that does not match what sounds
+        chk2 = bf.verify_t0(notes, bad)
+        self.assertFalse(chk2["tc_match"])
+        self.assertEqual(chk2["status"], "proxy_invalid")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -149,7 +149,7 @@ def song_candidates(notes, meta, require_lick=False):
                 s2 = lab.scan(kc, second["label"], t0 + WIN_S)
                 if s2["contra"] is not None:
                     continue
-                cand.update(second=second, tc=round(second["onset"], 4), tc_target=round(t0 + TARGET_TC_S, 4), tc_err=round(err, 4),
+                cand.update(second=second, tc=round(second["onset"], 4), tc_exact=float(second["onset"]), tc_target=round(t0 + TARGET_TC_S, 4), tc_err=round(err, 4),
                             scan=[s1 | {"contra": None}, s2], n_clear=int(first["cls"] == "clear") + int(second["cls"] == "clear"))
             sel = [(nid, t) for nid, t in line if t0 <= t.start < t0 + WIN_S]
             pitches = [nb[nid].pitch + kshift for nid, _ in sel]
@@ -165,20 +165,25 @@ def notes_by_id(notes):
 
 
 def verify_t0(notes, cand):
-    """Pitch classes actually sounding (start <= t < end) in the accompaniment at t0 + 30 ms vs the v1 slice."""
-    line, _, acc, _ = split_song(notes)
+    """Accompaniment pitch classes actually sounding (start <= t < end) at t0 + 30 ms (and tc + 30 ms for change),
+    compared with the v1 slices. Exact times are used; rounded values are for display only. ok needs every check."""
+    _, _, acc, _ = split_song(notes)
+
+    def sounding(t):
+        here = [(nid, n) for nid, n in acc if n.start <= t < n.end]
+        return here, sorted({n.pitch % 12 for _, n in here})
+
+    rows = lambda here: [{"id": nid, "pitch": n.pitch, "start": round(n.start, 4), "end": round(n.end, 4)} for nid, n in here]  # noqa: E731
     t = cand["t0_exact"] + SLICE_OFFSET_S
-    here = [(nid, n) for nid, n in acc if n.start <= t < n.end]
-    pcs = sorted({n.pitch % 12 for _, n in here})
-    out = {"t0_check_time": round(t, 4), "t0_sounding": [{"id": nid, "pitch": n.pitch, "start": round(n.start, 4), "end": round(n.end, 4)} for nid, n in here],
-           "t0_sounding_pcs": pcs, "v1_slice_pcs": cand["first"]["pcs"], "v1_slice_onset": round(cand["first"]["onset"], 4)}
-    out["status"] = "ok" if pcs == cand["first"]["pcs"] else "proxy_invalid"
+    here, pcs = sounding(t)
+    out = {"t0_check_time": round(t, 4), "t0_sounding": rows(here), "t0_sounding_pcs": pcs, "v1_slice_pcs": cand["first"]["pcs"],
+           "v1_slice_onset": round(cand["first"]["onset"], 4), "t0_match": pcs == cand["first"]["pcs"]}
     if cand["target"] == "change":
-        t2 = cand["tc"] + SLICE_OFFSET_S
-        here2 = [(nid, n) for nid, n in acc if n.start <= t2 < n.end]
-        out["tc_check_time"] = round(t2, 4)
-        out["tc_sounding"] = [{"id": nid, "pitch": n.pitch, "start": round(n.start, 4), "end": round(n.end, 4)} for nid, n in here2]
-        out["tc_sounding_pcs"] = sorted({n.pitch % 12 for _, n in here2})
+        t2 = cand["tc_exact"] + SLICE_OFFSET_S
+        here2, pcs2 = sounding(t2)
+        out.update(tc_check_time=round(t2, 4), tc_sounding=rows(here2), tc_sounding_pcs=pcs2, v1_second_pcs=cand["second"]["pcs"],
+                   tc_match=pcs2 == cand["second"]["pcs"])
+    out["status"] = "ok" if out["t0_match"] and out.get("tc_match", True) else "proxy_invalid"
     return out
 
 
@@ -286,7 +291,8 @@ def main() -> None:
             json.dump(sel, f, ensure_ascii=False, indent=1, default=str)
         report["selected"][name] = {k: sel[k] for k in ("status", "meta", "t0", "k", "slice_source", "tc_err", "n_clear")} | {
             "first": sel["first"], "second": sel.get("second"), "tc": sel.get("tc"), "tc_target": sel.get("tc_target"),
-            "scan": sel["scan"], "check_status": chk["status"], "t0_sounding_pcs": chk["t0_sounding_pcs"], "v1_slice_pcs": chk["v1_slice_pcs"],
+            "scan": sel["scan"], "check_status": chk["status"], "t0_match": chk["t0_match"], "tc_match": chk.get("tc_match"),
+            "t0_sounding_pcs": chk["t0_sounding_pcs"], "v1_slice_pcs": chk["v1_slice_pcs"], "tc_sounding_pcs": chk.get("tc_sounding_pcs"),
             "selected_notes": len(ex["selected"]), "excluded_notes": len(ex["excluded"]), "line_overlaps": ex["line_overlaps"],
             "same_pitch_overlaps": ex["same_pitch_overlaps"], "file_len_s": ex["file_len_s"], "files": files,
             "run": c["run"], "selected_in_run": ex["selected_in_run"]}
