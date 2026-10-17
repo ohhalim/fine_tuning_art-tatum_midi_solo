@@ -1,0 +1,73 @@
+{
+ "issue": 1780,
+ "mode": "--generate",
+ "checks": {
+  "input_sha256": {
+   "ok": true,
+   "got": {
+    "actor.pth": "c14130e6b4cacf3fbb506d32e35c55f9063e083d435951880c52171aef67846b",
+    "args.yml": "cc81ffa7346e4925a1b496db6fccba3bab22f33d34bbc4e0af7ba35001ee45b2",
+    "chord_names_augmented.json": "17db1594d39324492ee263e068da5fc6100015c34b7e82fbd734de2f7636cb2b"
+   }
+  },
+  "vocab_5902": {
+   "ok": true,
+   "tokenizer": 5902
+  },
+  "chord_names_exact": {
+   "ok": true
+  },
+  "strict_load": {
+   "ok": true
+  }
+ },
+ "result": "generate_done",
+ "stopped_at": null,
+ "inputs": {
+  "sha256": {
+   "actor.pth": "c14130e6b4cacf3fbb506d32e35c55f9063e083d435951880c52171aef67846b",
+   "args.yml": "cc81ffa7346e4925a1b496db6fccba3bab22f33d34bbc4e0af7ba35001ee45b2",
+   "chord_names_augmented.json": "17db1594d39324492ee263e068da5fc6100015c34b7e82fbd734de2f7636cb2b"
+  },
+  "repo_head": "75a63248a94d2139776ec9ddc20daf4c5be3cd07",
+  "torch": "2.14.1"
+ },
+ "load_s": 0.24,
+ "cells": {
+  "P_s1": {
+   "status": "done",
+   "stop": null,
+   "wall_s": 3.68,
+   "thermal_before": 0,
+   "filter_violations": 0
+  },
+  "Q_s1": {
+   "status": "done",
+   "stop": null,
+   "wall_s": 3.49,
+   "thermal_before": 0,
+   "filter_violations": 0
+  },
+  "P_s2": {
+   "status": "done",
+   "stop": null,
+   "wall_s": 3.5,
+   "thermal_before": 0,
+   "filter_violations": 0
+  },
+  "Q_s2": {
+   "status": "done",
+   "stop": null,
+   "wall_s": 3.43,
+   "thermal_before": 0,
+   "filter_violations": 0
+  }
+ },
+ "used_s": 14.1,
+ "complete": {
+  "P_s1": true,
+  "Q_s1": true,
+  "P_s2": true,
+  "Q_s2": true
+ }
+}
