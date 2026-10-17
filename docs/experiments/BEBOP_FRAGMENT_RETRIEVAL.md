@@ -83,3 +83,47 @@
 - `scripts/bebop_fragment_retrieval.py <manifest> <run dir> <report dir>`
 - 시험 `tests/test_bebop_fragment_retrieval.py`
 - 보고 `docs/experiments/bebop_fragment_retrieval/report.json`
+
+## 10. 결과
+
+실행 2026-10-18 00:0x KST. 보고 `docs/experiments/bebop_fragment_retrieval/report.json`, 원자료와 sidecar는 저장소 밖 `/Users/ohhalim/git_box/bebop_fragment_run1/`.
+
+### 10.1 실행
+
+- train 189곡 모두 sha1 일치, 제외 0. 전체 실행 약 5초
+- 후보 수: `change` 2개(2곡, 연주자 2명), `hold` 7개(6곡, 연주자 4명)
+
+### 10.2 `change` (Gm7 → C7): 검증 통과
+
+| 항목 | 값 |
+|---|---|
+| 출처 | Duke Jordan, "How Deep Is the Ocean", t0 = 129.2795초 |
+| v1 라벨 | t0: Fm7(bass_resolved, 음높이류 Eb·F·Ab, 베이스 F2) → tc: Bb7(bass_resolved, D·Ab·Bb, 베이스 Bb2) |
+| 이조 | k = +2(Fm7→Bb7을 Gm7→C7로) |
+| 전환 시각 | 실제 tc = t0 + 2.177초, 목표 t0 + 1.875초, 차이 +0.302초(검색 허용 오차 안). 박·코드 전환 정렬 성공이라고 하지 않습니다 |
+| 반박 검사 | tc 전 슬라이스 3개 중 unknown 1개(0.832초, 미검증). tc 뒤 창 끝까지 슬라이스 없음(새 코드 지속은 tc 슬라이스 하나로만 봄) |
+| t0 실제 sounding | F2·Ab3(128.225초 시작), Eb3(129.025초 시작) → 음높이류 Eb·F·Ab = v1 슬라이스와 같음, `ok` |
+| tc 실제 sounding | D3·Bb2·Ab3 → D·Ab·Bb |
+| 선택 음 | 12음(선율 대리), 원 길이 0.13–1.73초(중앙값 0.62초), velocity 60–84. 선율 대리 안 겹침 9쌍(지속음이 다음 음과 겹침, 제거 안 함), 같은 음 겹침 0 |
+| 제외 음 | 창 안 시작 5음(반주) |
+| 양손 참고본 | 22음, 그중 5음은 t0 전에 시작해 시작을 잘랐음 |
+| 파일 | 원형 선율 대리, 이조본(k+2), 양손 참고본. 마지막 음 꼬리 때문에 MIDI 길이 5.38초, 오디오 8.26초 |
+| MIDI 왕복 | 3개 모두 음 수 일치, 최대 시각 오차 0.091 ms, 차이 0 |
+
+- 서술(판정 아님): 선택 음 12개 중 6개가 0.8초 이상 지속됩니다. 3.75초에 12음(초당 3.2음)이고, 빠른 8분·16분 릭보다 느린 선율형 조각입니다
+
+### 10.3 `hold` (Fmaj7): `proxy_invalid`
+
+- top1: Mulgrew Miller, "Yardbird Suite", t0 = 213.9205초, v1 라벨 Dbmaj7(clear, C·Db·Eb·F), k = +4
+- v1이 쓴 묶음은 t0보다 0.161초 앞(213.759초)의 슬라이스입니다. t0 + 30 ms에 실제로 울리는 반주는 C3·F3뿐이고(음높이류 C·F), Db·Eb는 이미 끝났습니다. v1 한계 B(끝난 음 잔존)에 해당합니다
+- 규칙대로 차순위를 다시 고르지 않았고, 파일을 만들지 않았습니다. 창 안 슬라이스 7개도 모두 unknown(3.045초 미검증)이었습니다
+- 결론: 이 bank와 v1 라벨로는 `hold` 목표의 검증된 후보를 내지 못했습니다. 비밥 피아노에 그런 조각이 없다는 뜻이 아닙니다
+
+### 10.4 이탈
+
+1. **검산 코드 버그 2개를 고치고 재실행했습니다.** (a) MIDI 왕복 비교가 값을 3자리로 반올림한 뒤 비교해, 실제 오차 0.091 ms인데 차이 1·1·5개로 잘못 셌습니다. (b) `cut_start`가 numpy bool이라 JSON에 문자열 "False"/"True"로 저장됐습니다. 두 곳만 고쳤고(선택·추출 규칙 변경 없음), 재실행 결과 후보 수·선택·MIDI 3개가 sha256까지 같았습니다
+
+### 10.5 청취
+
+- `change` 하나만 청취 대상입니다: 원형 선율 대리와 이조본(k+2), 양손 참고본은 참고
+- 사용자가 아직 듣지 않았으므로 품질은 미평가입니다(`quality_claimed: false`)

@@ -195,7 +195,7 @@ def extract(notes, cand):
     return {"selected": [r | {"trunc_end": round(trunc[r["id"]] - t0, 4)} for r in rows(sel)],
             "excluded": rows(excluded),
             "twohand_ref": [{"id": nid, "pitch": n.pitch, "start": round(max(n.start, t0) - t0, 4), "end": round(n.end - t0, 4),
-                             "velocity": n.velocity, "cut_start": s < t0, "orig_start": round(s - t0, 4)} for nid, n, s in ref],
+                             "velocity": n.velocity, "cut_start": bool(s < t0), "orig_start": round(s - t0, 4)} for nid, n, s in ref],
             "line_overlaps": poly, "same_pitch_overlaps": same,
             "file_len_s": round(max(n.end for _, n in sel) - t0, 4) if sel else 0.0}
 
@@ -207,10 +207,12 @@ def write_midi(rows, path, shift=0):
     inst.notes = [pretty_midi.Note(velocity=r["velocity"], pitch=r["pitch"] + shift, start=r["start"], end=r["end"]) for r in rows]
     pm.instruments.append(inst)
     pm.write(path)
-    back = sorted(((round(n.start, 3), round(n.end, 3), n.pitch, n.velocity) for n in pretty_midi.PrettyMIDI(path).instruments[0].notes))
-    want = sorted(((round(r["start"], 3), round(r["end"], 3), r["pitch"] + shift, r["velocity"]) for r in rows))
-    diffs = [(a, b) for a, b in zip(want, back) if a[2:] != b[2:] or abs(a[0] - b[0]) > 0.001 or abs(a[1] - b[1]) > 0.001]
-    return {"file": os.path.basename(path), "notes": len(rows), "read_back": len(back), "roundtrip_diffs": len(diffs) + abs(len(want) - len(back))}
+    back = sorted((n.start, n.end, n.pitch, n.velocity) for n in pretty_midi.PrettyMIDI(path).instruments[0].notes)
+    want = sorted((r["start"], r["end"], r["pitch"] + shift, r["velocity"]) for r in rows)
+    errs = [max(abs(a[0] - b[0]), abs(a[1] - b[1])) for a, b in zip(want, back)]
+    bad = sum(1 for a, b, e in zip(want, back, errs) if a[2:] != b[2:] or e > 0.001) + abs(len(want) - len(back))
+    return {"file": os.path.basename(path), "notes": len(rows), "read_back": len(back), "roundtrip_diffs": bad,
+            "max_time_err_ms": round(max(errs, default=0.0) * 1000, 3)}
 
 
 def render(mid):
