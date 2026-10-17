@@ -1,0 +1,200 @@
+{
+ "issue": 1782,
+ "manifest_sha256": "0b878763e7a25ee3b17e41ce647046476bf6814d036744fcd1e882cdf8f5fe18",
+ "songs": 189,
+ "skipped": [],
+ "candidates": {
+  "change": {
+   "n": 2,
+   "songs": 2,
+   "pianists": 2
+  },
+  "hold": {
+   "n": 7,
+   "songs": 6,
+   "pianists": 4
+  }
+ },
+ "selected": {
+  "change": {
+   "status": "ok",
+   "meta": {
+    "pianist": "Duke Jordan",
+    "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/midi_dataset/midi/studio/Duke Jordan/One For The Library/How Deep Is the Ocean.midi",
+    "sha1": "1dd6a22db18e994b634d88e47956f60ef89d115f"
+   },
+   "t0": 129.2795,
+   "k": 2,
+   "slice_source": "sounding",
+   "tc_err": 0.3023,
+   "n_clear": 0,
+   "first": {
+    "cls": "bass_resolved",
+    "label": [
+     5,
+     "m7"
+    ],
+    "cands": [
+     [
+      1,
+      "maj"
+     ],
+     [
+      5,
+      "m7"
+     ]
+    ],
+    "pcs": [
+     3,
+     5,
+     8
+    ],
+    "bass": 41,
+    "onset": 129.025
+   },
+   "second": {
+    "cls": "bass_resolved",
+    "label": [
+     10,
+     "7"
+    ],
+    "cands": [
+     [
+      4,
+      "7"
+     ],
+     [
+      5,
+      "m6"
+     ],
+     [
+      10,
+      "7"
+     ]
+    ],
+    "pcs": [
+     2,
+     8,
+     10
+    ],
+    "bass": 46,
+    "onset": 131.45681818181816
+   },
+   "tc": 131.4568,
+   "tc_target": 131.1545,
+   "scan": [
+    {
+     "slices": 3,
+     "unknown": 1,
+     "unknown_s": 0.832
+    },
+    {
+     "slices": 0,
+     "unknown": 0,
+     "unknown_s": 0.0
+    }
+   ],
+   "check_status": "ok",
+   "t0_sounding_pcs": [
+    3,
+    5,
+    8
+   ],
+   "v1_slice_pcs": [
+    3,
+    5,
+    8
+   ],
+   "selected_notes": 12,
+   "excluded_notes": 5,
+   "line_overlaps": 9,
+   "same_pitch_overlaps": 0,
+   "file_len_s": 5.3773,
+   "files": [
+    {
+     "file": "change_melody_orig.mid",
+     "notes": 12,
+     "read_back": 12,
+     "roundtrip_diffs": 0,
+     "max_time_err_ms": 0.091
+    },
+    {
+     "file": "change_melody_k+2.mid",
+     "notes": 12,
+     "read_back": 12,
+     "roundtrip_diffs": 0,
+     "max_time_err_ms": 0.091
+    },
+    {
+     "file": "change_twohand_ref.mid",
+     "notes": 22,
+     "read_back": 22,
+     "roundtrip_diffs": 0,
+     "max_time_err_ms": 0.091
+    }
+   ]
+  },
+  "hold": {
+   "status": "proxy_invalid",
+   "meta": {
+    "pianist": "Mulgrew Miller",
+    "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/midi_dataset/midi/studio/Mulgrew Miller/Mulgrew Miller Solo/Yardbird Suite.midi",
+    "sha1": "60223f0589be8c24304ae9745556fdf399c7e1a4"
+   },
+   "t0": 213.9205,
+   "k": 4,
+   "slice_source": "sounding",
+   "tc_err": 0.0,
+   "n_clear": 1,
+   "first": {
+    "cls": "clear",
+    "label": [
+     1,
+     "maj7"
+    ],
+    "cands": [
+     [
+      1,
+      "maj7"
+     ]
+    ],
+    "pcs": [
+     0,
+     1,
+     3,
+     5
+    ],
+    "bass": 39,
+    "onset": 213.7590909090909
+   },
+   "second": null,
+   "tc": null,
+   "tc_target": null,
+   "scan": [
+    {
+     "slices": 7,
+     "unknown": 7,
+     "unknown_s": 3.045
+    }
+   ],
+   "check_status": "proxy_invalid",
+   "t0_sounding_pcs": [
+    0,
+    5
+   ],
+   "v1_slice_pcs": [
+    0,
+    1,
+    3,
+    5
+   ],
+   "selected_notes": 17,
+   "excluded_notes": 14,
+   "line_overlaps": 4,
+   "same_pitch_overlaps": 0,
+   "file_len_s": 3.2954,
+   "files": []
+  }
+ },
+ "result": "done"
+}
