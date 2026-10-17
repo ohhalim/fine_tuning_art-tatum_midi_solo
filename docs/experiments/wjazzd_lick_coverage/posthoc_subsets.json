@@ -1,0 +1,76 @@
+{
+ "tempo_90_140": {
+  "solos_in_subset": 109,
+  "change": {
+   "lick_windows": 94,
+   "solos": 35,
+   "performers": 28,
+   "instrument": {
+    "ts": 13,
+    "tp": 8,
+    "as": 8,
+    "bs": 2,
+    "tb": 2,
+    "ss": 1,
+    "g": 1
+   },
+   "rhythmfeel": {
+    "SWING": 33,
+    "LATIN/SWING": 1,
+    "LATIN": 1
+   },
+   "offbeat_pos_median": 0.642,
+   "offbeat_notes": 751
+  },
+  "hold": {
+   "lick_windows": 19,
+   "solos": 10,
+   "performers": 10,
+   "instrument": {
+    "ts": 6,
+    "ss": 1,
+    "tp": 1,
+    "bs": 1,
+    "as": 1
+   },
+   "rhythmfeel": {
+    "SWING": 7,
+    "FUNK": 1,
+    "LATIN/SWING": 1,
+    "LATIN": 1
+   },
+   "offbeat_pos_median": 0.62,
+   "offbeat_notes": 167
+  }
+ },
+ "tempo_90_140_and_not_swing": {
+  "solos_in_subset": 19,
+  "change": {
+   "lick_windows": 3,
+   "solos": 1,
+   "performers": 1,
+   "instrument": {
+    "g": 1
+   },
+   "rhythmfeel": {
+    "LATIN": 1
+   },
+   "offbeat_pos_median": 0.573,
+   "offbeat_notes": 38
+  },
+  "hold": {
+   "lick_windows": 3,
+   "solos": 2,
+   "performers": 2,
+   "instrument": {
+    "ts": 2
+   },
+   "rhythmfeel": {
+    "LATIN": 1,
+    "FUNK": 1
+   },
+   "offbeat_pos_median": 0.56,
+   "offbeat_notes": 25
+  }
+ }
+}

@@ -1,0 +1,191 @@
+{
+ "issue": 1784,
+ "db_sha256": "af6a0d9debf042c3581565bd75baad591d32e166cd2ec7298519883de614bf12",
+ "solos_total": 456,
+ "eligible_windows": 22534,
+ "targets": {
+  "change": {
+   "rel": [
+    [
+     0,
+     0,
+     "m7"
+    ],
+    [
+     4,
+     5,
+     "7"
+    ]
+   ],
+   "progression_only": {
+    "windows": 1377,
+    "solo_bars": 1377,
+    "solos": 191
+   },
+   "lick": {
+    "windows": 739,
+    "solo_bars": 739,
+    "solos": 172,
+    "performers": 58,
+    "instrument": {
+     "ts": 59,
+     "tp": 39,
+     "as": 38,
+     "tb": 11,
+     "bs": 6,
+     "cl": 5,
+     "vib": 5,
+     "ss": 3,
+     "g": 3,
+     "cor": 2,
+     "bcl": 1
+    },
+    "style": {
+     "POSTBOP": 41,
+     "HARDBOP": 41,
+     "COOL": 35,
+     "BEBOP": 28,
+     "SWING": 24,
+     "TRADITIONAL": 3
+    },
+    "rhythmfeel": {
+     "SWING": 152,
+     "LATIN": 14,
+     "TWOBEAT": 3,
+     "A:LATIN/B:SWING": 1,
+     "BALLAD": 1,
+     "LATIN/SWING": 1
+    },
+    "piano_solos": 0,
+    "avgtempo_median": 181.6,
+    "offbeat_notes": 5121,
+    "offbeat_pos_median": 0.619,
+    "offbeat_pos_median_by_rhythmfeel": {
+     "A:LATIN/B:SWING": [
+      0.713,
+      9
+     ],
+     "BALLAD": [
+      0.616,
+      46
+     ],
+     "LATIN": [
+      0.586,
+      394
+     ],
+     "LATIN/SWING": [
+      0.555,
+      11
+     ],
+     "SWING": [
+      0.623,
+      4640
+     ],
+     "TWOBEAT": [
+      0.552,
+      21
+     ]
+    }
+   }
+  },
+  "hold": {
+   "rel": [
+    [
+     0,
+     0,
+     "maj7"
+    ]
+   ],
+   "progression_only": {
+    "windows": 705,
+    "solo_bars": 705,
+    "solos": 104
+   },
+   "lick": {
+    "windows": 318,
+    "solo_bars": 318,
+    "solos": 84,
+    "performers": 43,
+    "instrument": {
+     "ts": 33,
+     "tp": 25,
+     "as": 14,
+     "ss": 3,
+     "tb": 3,
+     "bs": 2,
+     "cl": 1,
+     "bcl": 1,
+     "vib": 1,
+     "g": 1
+    },
+    "style": {
+     "POSTBOP": 28,
+     "COOL": 18,
+     "HARDBOP": 16,
+     "SWING": 11,
+     "BEBOP": 10,
+     "FUSION": 1
+    },
+    "rhythmfeel": {
+     "SWING": 77,
+     "LATIN": 4,
+     "FUNK": 1,
+     "BALLAD": 1,
+     "LATIN/SWING": 1
+    },
+    "piano_solos": 0,
+    "avgtempo_median": 211.6,
+    "offbeat_notes": 2103,
+    "offbeat_pos_median": 0.618,
+    "offbeat_pos_median_by_rhythmfeel": {
+     "BALLAD": [
+      0.591,
+      32
+     ],
+     "FUNK": [
+      0.606,
+      19
+     ],
+     "LATIN": [
+      0.636,
+      58
+     ],
+     "LATIN/SWING": [
+      0.596,
+      11
+     ],
+     "SWING": [
+      0.618,
+      1983
+     ]
+    }
+   }
+  }
+ },
+ "corpus_rhythmfeel": {
+  "SWING": 361,
+  "TWOBEAT": 32,
+  "LATIN": 27,
+  "FUNK": 20,
+  "BALLAD": 10,
+  "LATIN/FUNK": 3,
+  "A:LATIN/B:SWING": 1,
+  "FUNK/SWING": 1,
+  "LATIN/SWING": 1
+ },
+ "corpus_instrument": {
+  "ts": 157,
+  "tp": 102,
+  "as": 80,
+  "tb": 26,
+  "ss": 23,
+  "cl": 15,
+  "cor": 15,
+  "vib": 12,
+  "bs": 11,
+  "p": 6,
+  "g": 6,
+  "bcl": 2,
+  "ts-c": 1
+ }
+}
