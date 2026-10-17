@@ -31,16 +31,21 @@ class InputContractTest(unittest.TestCase):
 
 
 class ScoringTest(unittest.TestCase):
-    def test_bar_scores_and_pair_diff(self):
-        # bar 3 (frames 32-47): A (P tone) and C; bar 5 (frames 64-79): Db (Q tone) at the bar's first 16th
+    def test_bar_scores_split_first16_and_pair_diff(self):
+        # bar 3 (frames 32-47): A (P tone) on the first 16th and C later; bar 5 (frames 64-79): Db (Q tone) on the first 16th
         p_notes = [(32, 34, 69), (36, 38, 72)]
         q_notes = [(32, 34, 68), (64, 66, 61)]
         bp, bq = rc.bar_scores(p_notes), rc.bar_scores(q_notes)
-        self.assertEqual(bp[3], {"n": 2, "P": 1, "Q": 0, "first16": 1})
-        self.assertEqual(bq[5], {"n": 1, "P": 0, "Q": 1, "first16": 1})
-        d = rc.pair_diff(bp, bq)
-        self.assertEqual(d[3], round(1 / 2 - (-1 / 1), 3))
-        self.assertIsNone(d[4])                                             # no notes in bar 4 on either side
+        self.assertEqual(bp[3]["all"], {"n": 2, "P": 1, "Q": 0})
+        self.assertEqual(bp[3]["first16"], {"n": 1, "P": 1, "Q": 0})
+        self.assertEqual(bp[3]["rest"], {"n": 1, "P": 0, "Q": 0})
+        self.assertEqual(bq[5]["first16"], {"n": 1, "P": 0, "Q": 1})
+        self.assertTrue(bp[3]["transition"] and bp[5]["transition"] and bp[7]["transition"])
+        self.assertFalse(bp[4]["transition"] or bp[8]["transition"])        # 4 and 8 hold Fmaj7/Fm7
+        self.assertEqual(rc.pair_diff(bp, bq)[3], round(1 / 2 - (-1 / 1), 3))
+        self.assertEqual(rc.pair_diff(bp, bq, "first16")[3], 2.0)
+        self.assertEqual(rc.pair_diff(bp, bq, "rest")[3], None)             # Q has no later onset in bar 3
+        self.assertIsNone(rc.pair_diff(bp, bq)[4])
 
     def test_phrase_metrics_seconds(self):
         notes = [(16, 18, 60), (18, 20, 62), (24, 26, 64)]                   # gap 4 frames = 0.469 s
@@ -48,6 +53,19 @@ class ScoringTest(unittest.TestCase):
         self.assertEqual(m["gen_notes"], 3)
         self.assertEqual(m["rests_ge_0.3s"], 1)
         self.assertAlmostEqual(m["dur_median_s"], round(2 * rc.FRAME_S, 3))
+
+
+class FailedCellTest(unittest.TestCase):
+    def test_short_failed_cell_is_not_a_normal_result(self):
+        full = {"status": "done", "melody": [3] * 128, "filter_violations": 0}
+        short = {"status": "failed", "stop": "cell wall 120 s", "melody": [3] * 40, "filter_violations": 0}
+        done_but_short = {"status": "done", "melody": [3] * 127, "filter_violations": 0}
+        violating = {"status": "done", "melody": [3] * 128, "filter_violations": 1}
+        cells = {("P", 1): full, ("Q", 1): short, ("P", 2): done_but_short, ("Q", 2): violating}
+        ok, bad = rc.split_cells(cells)
+        self.assertEqual(list(ok), [("P", 1)])
+        self.assertEqual(set(bad), {("Q", 1), ("P", 2), ("Q", 2)})
+        self.assertFalse(rc.cell_complete(None))
 
 
 class GenerateCellTest(unittest.TestCase):

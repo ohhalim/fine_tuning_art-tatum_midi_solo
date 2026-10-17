@@ -133,25 +133,47 @@ def generate_cell(next_logits, filter_fn, bos, primer_ids, chord_ids, seed, buf,
     return seq
 
 
+TRANSITION_BARS = {3, 5, 7}                                  # scored bars whose first frame is a chord change (4, 8 hold)
+
+
+def _count(ns, key):
+    return {"n": len(ns), "P": sum(n[2] % 12 in P_TONES[key] for n in ns), "Q": sum(n[2] % 12 in Q_TONES[key] for n in ns)}
+
+
 def bar_scores(notes):
-    """CMT_CONTINUOUS.md bar scoring on frame-time notes (start_frame, end_frame, pitch)."""
+    """CMT_CONTINUOUS.md bar scoring on frame-time notes (start_frame, end_frame, pitch), split by the bar's first 16th.
+
+    all = every onset in the bar; first16 = onset on the bar's first frame (chosen before that frame's chord is seen);
+    rest = the other onsets. transition marks bars whose first frame changes the chord (3, 5, 7); 4 and 8 hold."""
     bars = {}
     for b, key in SCORED.items():
         ns = [n for n in notes if (b - 1) * FPB <= n[0] < b * FPB]
-        bars[b] = {"n": len(ns), "P": sum(n[2] % 12 in P_TONES[key] for n in ns),
-                   "Q": sum(n[2] % 12 in Q_TONES[key] for n in ns),
-                   "first16": sum(1 for n in ns if n[0] == (b - 1) * FPB)}
+        first = [n for n in ns if n[0] == (b - 1) * FPB]
+        rest = [n for n in ns if n[0] != (b - 1) * FPB]
+        bars[b] = {"all": _count(ns, key), "first16": _count(first, key), "rest": _count(rest, key), "transition": b in TRANSITION_BARS}
     return bars
 
 
-def pair_diff(bars_p, bars_q):
+def pair_diff(bars_p, bars_q, part="all"):
     d = {}
     for b in SCORED:
-        a, c = bars_p[b], bars_q[b]
+        a, c = bars_p[b][part], bars_q[b][part]
         fa = (a["P"] - a["Q"]) / a["n"] if a["n"] else None
         fc = (c["P"] - c["Q"]) / c["n"] if c["n"] else None
         d[b] = None if fa is None or fc is None else round(fa - fc, 3)
     return d
+
+
+def cell_complete(c):
+    """A cell counts as a normal result only when done, 128 frames and no filter violation."""
+    return (c is not None and c.get("status") == "done" and len(c.get("melody", [])) == FPB * BARS
+            and c.get("filter_violations") == 0)
+
+
+def split_cells(cells):
+    ok = {k: c for k, c in cells.items() if cell_complete(c)}
+    bad = {k: c for k, c in cells.items() if not cell_complete(c)}
+    return ok, bad
 
 
 def events(notes_s, win=0.03):
@@ -332,8 +354,10 @@ def models(repo, actor_dir, run_dir, log, check, mode):
         log["cells"][name] = {k: buf.get(k) for k in ("status", "stop", "wall_s", "thermal_before", "filter_violations")}
         print(name, status, buf["wall_s"], "s")
     log["used_s"] = round(used, 2)
-    check("no_filter_violation", all(c.get("filter_violations", 0) == 0 for c in log["cells"].values()))
-    log["result"] = "generate_done"
+    complete = {name: cell_complete(json.load(open(os.path.join(cells_dir, name + ".json")))) if os.path.exists(os.path.join(cells_dir, name + ".json")) else False
+                for name in (cell_name(*c) for c in CELLS)}
+    log["complete"] = complete
+    log["result"] = "generate_done" if all(complete.values()) else "generate_partial"
 
 
 def load_cells(run_dir):
@@ -356,14 +380,15 @@ def write_midi(notes, path):
 def render(run_dir, report_dir, log, check):
     import shutil
     gen = json.load(open(os.path.join(report_dir, "generate.json")))
-    check("generate_done", gen.get("result") == "generate_done", result=gen.get("result"))
+    check("generate_finished", gen.get("result") in ("generate_done", "generate_partial"), result=gen.get("result"))
     check("renderer", shutil.which("fluidsynth") is not None and shutil.which("afconvert") is not None and os.path.exists(SF2))
-    cells = load_cells(run_dir)
-    out_dir = os.path.join(run_dir, "listening")
-    os.makedirs(out_dir, exist_ok=True)
+    ok, bad = split_cells(load_cells(run_dir))
+    log["failed_cells"] = {cell_name(*k): (c or {}).get("status", "missing") for k, c in bad.items()}
     files = {}
-    for (prog, seed), c in cells.items():
+    for (prog, seed), c in list(ok.items()) + [(k, c) for k, c in bad.items() if c and c.get("melody")]:
         name = cell_name(prog, seed)
+        out_dir = os.path.join(run_dir, "listening" if (prog, seed) in ok else "failed_partial")
+        os.makedirs(out_dir, exist_ok=True)
         notes = frames_to_notes(c["melody_names"])
         overlaps = sum(1 for a, b in zip(notes, notes[1:]) if b[0] < a[1])
         mid = os.path.join(out_dir, name + ".mid")
@@ -372,23 +397,25 @@ def render(run_dir, report_dir, log, check):
         subprocess.run(["fluidsynth", "-ni", "-q", "-F", wav, "-r", "44100", SF2, mid], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.run(["afconvert", "-f", "m4af", "-d", "aac", wav, m4a], check=True)
         os.remove(wav)
-        files[name] = {"notes": len(notes), "overlaps": overlaps, "midi_sha256": file_sha(mid)}
+        files[name] = {"notes": len(notes), "overlaps": overlaps, "midi_sha256": file_sha(mid), "complete": (prog, seed) in ok}
     check("monophonic_no_overlap", all(v["overlaps"] == 0 for v in files.values()), files=files)
     log["render"] = {"files": files, "first_listen": [cell_name(*c) for c in FIRST_LISTEN], "velocity": VELOCITY, "bpm": BPM, "soundfont": SF2}
     log["result"] = "render_done"
 
 
 def analyze(run_dir, report_dir, log, check):
-    cells = load_cells(run_dir)
-    check("four_cells", all(c is not None and c["status"] == "done" for c in cells.values()))
+    ok, bad = split_cells(load_cells(run_dir))
+    log["failed_cells"] = {cell_name(*k): (c or {}).get("status", "missing") for k, c in bad.items()}
     rows = {}
-    for (prog, seed), c in cells.items():
+    for (prog, seed), c in ok.items():
         notes = frames_to_notes(c["melody_names"])
         c7 = {b: sum(1 for n in notes if (b - 1) * FPB <= n[0] < b * FPB) for b in (2, 6)}
         rows[cell_name(prog, seed)] = {"bars": bar_scores(notes), "c7_bar_notes": c7, **phrase_metrics(notes),
                                        "chord_tone_share": chord_tone_share(notes, PROG[prog]), "wall_s": c["wall_s"]}
     log["cells"] = rows
-    log["pairs"] = {s: pair_diff(rows[cell_name("P", s)]["bars"], rows[cell_name("Q", s)]["bars"]) for s in SEEDS}
+    log["pairs"] = {s: {part: pair_diff(rows[cell_name("P", s)]["bars"], rows[cell_name("Q", s)]["bars"], part)
+                        for part in ("all", "first16", "rest")}
+                    for s in SEEDS if cell_name("P", s) in rows and cell_name("Q", s) in rows}
     log["result"] = "analyze_done"
 
 
