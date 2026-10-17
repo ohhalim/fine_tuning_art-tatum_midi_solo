@@ -1,0 +1,80 @@
+{
+ "issue": 1780,
+ "mode": "--render",
+ "checks": {
+  "generate_finished": {
+   "ok": true,
+   "result": "generate_done"
+  },
+  "renderer": {
+   "ok": true
+  },
+  "monophonic_no_overlap": {
+   "ok": true,
+   "files": {
+    "P_s1": {
+     "notes": 55,
+     "overlaps": 0,
+     "midi_sha256": "72d3f32d81353c3b1206c1eefe7ef62a3fd56b9f0292d90f048867bc5b3fb645",
+     "complete": true
+    },
+    "Q_s1": {
+     "notes": 55,
+     "overlaps": 0,
+     "midi_sha256": "14ac06ad5f7a1e885dba34f2afb3707161a98c31ce202c2a5cdf571e0d346af0",
+     "complete": true
+    },
+    "P_s2": {
+     "notes": 51,
+     "overlaps": 0,
+     "midi_sha256": "e5fb959df54cac7e395d2e08f410742598cf409c91a873ea7d10204148668ae5",
+     "complete": true
+    },
+    "Q_s2": {
+     "notes": 50,
+     "overlaps": 0,
+     "midi_sha256": "d674e79b207297fcfcbad4e1febf5f080bf36fbdde168d157e3de2054a22dda2",
+     "complete": true
+    }
+   }
+  }
+ },
+ "result": "render_done",
+ "stopped_at": null,
+ "failed_cells": {},
+ "render": {
+  "files": {
+   "P_s1": {
+    "notes": 55,
+    "overlaps": 0,
+    "midi_sha256": "72d3f32d81353c3b1206c1eefe7ef62a3fd56b9f0292d90f048867bc5b3fb645",
+    "complete": true
+   },
+   "Q_s1": {
+    "notes": 55,
+    "overlaps": 0,
+    "midi_sha256": "14ac06ad5f7a1e885dba34f2afb3707161a98c31ce202c2a5cdf571e0d346af0",
+    "complete": true
+   },
+   "P_s2": {
+    "notes": 51,
+    "overlaps": 0,
+    "midi_sha256": "e5fb959df54cac7e395d2e08f410742598cf409c91a873ea7d10204148668ae5",
+    "complete": true
+   },
+   "Q_s2": {
+    "notes": 50,
+    "overlaps": 0,
+    "midi_sha256": "d674e79b207297fcfcbad4e1febf5f080bf36fbdde168d157e3de2054a22dda2",
+    "complete": true
+   }
+  },
+  "first_listen": [
+   "P_s1",
+   "Q_s1"
+  ],
+  "velocity": 90,
+  "bpm": 128,
+  "soundfont": "/Users/ohhalim/.local/share/soundfonts/generaluser-gs/v1.471.sf2"
+ }
+}

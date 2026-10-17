@@ -1,0 +1,110 @@
+{
+ "issue": 1780,
+ "mode": "--precheck",
+ "checks": {
+  "input_sha256": {
+   "ok": true,
+   "got": {
+    "actor.pth": "c14130e6b4cacf3fbb506d32e35c55f9063e083d435951880c52171aef67846b",
+    "args.yml": "cc81ffa7346e4925a1b496db6fccba3bab22f33d34bbc4e0af7ba35001ee45b2",
+    "chord_names_augmented.json": "17db1594d39324492ee263e068da5fc6100015c34b7e82fbd734de2f7636cb2b"
+   }
+  },
+  "vocab_5902": {
+   "ok": true,
+   "tokenizer": 5902
+  },
+  "chord_names_exact": {
+   "ok": true
+  },
+  "strict_load": {
+   "ok": true
+  },
+  "primer_roundtrip": {
+   "ok": true,
+   "notes": [
+    [
+     0,
+     2,
+     67
+    ],
+    [
+     2,
+     4,
+     69
+    ],
+    [
+     4,
+     6,
+     70
+    ],
+    [
+     6,
+     8,
+     72
+    ],
+    [
+     8,
+     10,
+     74
+    ],
+    [
+     10,
+     12,
+     72
+    ],
+    [
+     12,
+     14,
+     70
+    ],
+    [
+     14,
+     16,
+     69
+    ]
+   ]
+  },
+  "chord_alignment": {
+   "ok": true,
+   "per_chord": {
+    "Gm7": {
+     "own": 0.8403,
+     "up3": 0.4491
+    },
+    "C7": {
+     "own": 0.6716,
+     "up3": 0.4671
+    },
+    "Fmaj7": {
+     "own": 0.9186,
+     "up3": 0.3875
+    },
+    "Gm7b5": {
+     "own": 0.6083,
+     "up3": 0.145
+    },
+    "Fm7": {
+     "own": 0.8715,
+     "up3": 0.5273
+    }
+   }
+  },
+  "same_seed_same_tokens": {
+   "ok": true,
+   "frames": 48
+  }
+ },
+ "result": "precheck_ok",
+ "stopped_at": null,
+ "inputs": {
+  "sha256": {
+   "actor.pth": "c14130e6b4cacf3fbb506d32e35c55f9063e083d435951880c52171aef67846b",
+   "args.yml": "cc81ffa7346e4925a1b496db6fccba3bab22f33d34bbc4e0af7ba35001ee45b2",
+   "chord_names_augmented.json": "17db1594d39324492ee263e068da5fc6100015c34b7e82fbd734de2f7636cb2b"
+  },
+  "repo_head": "75a63248a94d2139776ec9ddc20daf4c5be3cd07",
+  "torch": "2.14.1"
+ },
+ "load_s": 0.22
+}
