@@ -57,3 +57,16 @@
 - `scripts/clip18_lick.py <원 MIDI> <run dir> <report json>`
 - 시험 `tests/test_clip18_lick.py`
 - 보고 `docs/experiments/clip18_lick/report.json`
+
+## 8. 결과
+
+실행 2026-10-18 04:5x KST. 보고 `docs/experiments/clip18_lick/report.json`, 원자료 `/Users/ohhalim/git_box/clip18_lick_run1/`.
+
+- 선택된 릭: 원곡 t0 = 72.03초(클립 시작 69.5초 뒤 2.5초), 22음, 2.30초 동안(첫 onset부터 마지막 onset까지)
+- 음 간격 중앙값 0.0955초. lick_from_run 하한(0.09초) 근처입니다. 이것을 8분으로 보면 약 314 BPM, 16분으로 보면 약 157 BPM입니다. 원곡 박 정보가 없어 어느 쪽인지 정하지 않습니다
+- 선율 대리 음 길이 0.064–0.161초, velocity 49–78. 선율 대리 안 겹침 6쌍(제거 안 함)
+- 왼손 문맥: t0와 릭 안 왼손 묶음 5개 모두 v1 `unknown`입니다(실제로 울린 음높이류: D / Bb / A / C·G / C, 대부분 단음). 코드 이름을 붙이지 않았고, 이 조각을 코드–선율 쌍 자료로 쓰지 않습니다. t0의 v1 슬라이스는 실제 sounding과 같았습니다(D)
+- 원형 양손(A) 29음 = 선율 대리 22음 + 제외 음 7개(D4·F4 내성 2개, Bb3·A3·G2·C3·C2 왼손 5개). t0 전에 시작해 이어지던 음은 없었습니다
+- MIDI 왕복: A·B 모두 음 수 일치, 최대 시각 오차 0.045 ms, 차이 0
+- 오디오 길이: A 6.12초, B 5.40초(렌더 꼬리 포함)
+- 청취 전이라 미평가입니다(`quality_claimed: false`)

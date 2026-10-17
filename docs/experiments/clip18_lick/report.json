@@ -1,0 +1,99 @@
+{
+ "issue": 1786,
+ "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/midi_dataset/midi/live/Barry Harris/The Maybeck Recital Series, Vol. 12/All God's Chillun Got Rhythm - Live At Maybeck Recital Hall, Berkeley, CA  March 12, 1990.midi",
+ "source_sha256": "b31ecab70a36436c4cfbfc1b67b2551494db447c9e45cef82b26620fab9cc718",
+ "clip": [
+  69.5,
+  99.5
+ ],
+ "result": "done",
+ "context": {
+  "t0_s": 72.0318,
+  "lick_notes": 22,
+  "median_ioi_s": 0.0955,
+  "implied_tempo_bpm_if_ioi_is_eighth": 314.3,
+  "span_s": 2.3045,
+  "t0_slice_source": "sounding",
+  "t0_v1": {
+   "cls": "unknown",
+   "label": null,
+   "pcs": [
+    2
+   ],
+   "bass": 62
+  },
+  "t0_sounding_pcs": [
+   2
+  ],
+  "t0_v1_matches_sounding": true,
+  "lh_clusters_in_span": [
+   {
+    "onset": 0.0,
+    "cls": "unknown",
+    "label": null,
+    "pcs": [
+     2
+    ],
+    "bass": 62
+   },
+   {
+    "onset": 0.7682,
+    "cls": "unknown",
+    "label": null,
+    "pcs": [
+     10
+    ],
+    "bass": 58
+   },
+   {
+    "onset": 1.1841,
+    "cls": "unknown",
+    "label": null,
+    "pcs": [
+     9
+    ],
+    "bass": 57
+   },
+   {
+    "onset": 1.7273,
+    "cls": "unknown",
+    "label": null,
+    "pcs": [
+     0,
+     7
+    ],
+    "bass": 43
+   },
+   {
+    "onset": 2.3045,
+    "cls": "unknown",
+    "label": null,
+    "pcs": [
+     0
+    ],
+    "bass": 36
+   }
+  ]
+ },
+ "melody_notes": 22,
+ "twohand_notes": 29,
+ "cut_start_notes": 0,
+ "excluded_notes": 7,
+ "melody_overlaps": 6,
+ "files": [
+  {
+   "file": "A_twohand.mid",
+   "notes": 29,
+   "read_back": 29,
+   "roundtrip_diffs": 0,
+   "max_time_err_ms": 0.045
+  },
+  {
+   "file": "B_melody.mid",
+   "notes": 22,
+   "read_back": 22,
+   "roundtrip_diffs": 0,
+   "max_time_err_ms": 0.045
+  }
+ ]
+}
