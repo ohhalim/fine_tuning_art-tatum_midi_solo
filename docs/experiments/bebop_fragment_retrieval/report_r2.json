@@ -1,0 +1,95 @@
+{
+ "issue": 1782,
+ "round": "R2 lick",
+ "manifest_sha256": "0b878763e7a25ee3b17e41ce647046476bf6814d036744fcd1e882cdf8f5fe18",
+ "songs": 189,
+ "skipped": [],
+ "candidates": {
+  "change": {
+   "n": 0,
+   "songs": 0,
+   "pianists": 0
+  },
+  "hold": {
+   "n": 3,
+   "songs": 3,
+   "pianists": 3
+  }
+ },
+ "selected": {
+  "change": {
+   "status": "no_match"
+  },
+  "hold": {
+   "status": "proxy_invalid",
+   "meta": {
+    "pianist": "Mulgrew Miller",
+    "source": "/Users/ohhalim/git_box/fine_tuning_art-tatum_midi_solo/midi_dataset/midi/studio/Mulgrew Miller/Mulgrew Miller Solo/Yardbird Suite.midi",
+    "sha1": "60223f0589be8c24304ae9745556fdf399c7e1a4"
+   },
+   "t0": 213.9205,
+   "k": 4,
+   "slice_source": "sounding",
+   "tc_err": 0.0,
+   "n_clear": 1,
+   "first": {
+    "cls": "clear",
+    "label": [
+     1,
+     "maj7"
+    ],
+    "cands": [
+     [
+      1,
+      "maj7"
+     ]
+    ],
+    "pcs": [
+     0,
+     1,
+     3,
+     5
+    ],
+    "bass": 39,
+    "onset": 213.7590909090909
+   },
+   "second": null,
+   "tc": null,
+   "tc_target": null,
+   "scan": [
+    {
+     "slices": 7,
+     "unknown": 7,
+     "unknown_s": 3.045
+    }
+   ],
+   "check_status": "proxy_invalid",
+   "t0_match": false,
+   "tc_match": null,
+   "t0_sounding_pcs": [
+    0,
+    5
+   ],
+   "v1_slice_pcs": [
+    0,
+    1,
+    3,
+    5
+   ],
+   "tc_sounding_pcs": null,
+   "selected_notes": 18,
+   "excluded_notes": 15,
+   "line_overlaps": 5,
+   "same_pitch_overlaps": 0,
+   "file_len_s": 3.2955,
+   "files": [],
+   "run": {
+    "notes": 18,
+    "median_ioi_s": 0.1295,
+    "end_s": 2.8795
+   },
+   "selected_in_run": 18
+  }
+ },
+ "result": "done"
+}
