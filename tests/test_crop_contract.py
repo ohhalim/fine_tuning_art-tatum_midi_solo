@@ -218,12 +218,14 @@ class RealCallSafetyTest(unittest.TestCase):
 
             def sample():
                 st = s.grammar_state()
+                reset_first, min_onset = s.onset_floor(st)                      # the commit floor, as the real masks apply it
                 fed.append(len(s.tokens) - 1)
                 if st.expect == "note":
-                    s.append_sampled("<T>" if rng.random() < 0.1 else ("piano", rng.randint(55, 90), 64))
+                    s.append_sampled("<T>" if reset_first or rng.random() < 0.1 else ("piano", rng.randint(55, 90), 64))
                 elif st.expect == "onset":
+                    lo = max(st.last_onset, min_onset)
                     step = rng.choice([0, 0, 0, 10, 470, 940, 1900])               # often the same onset (stall)
-                    s.append_sampled(("onset", st.last_onset + step if st.last_onset + step <= 4990 else st.last_onset))
+                    s.append_sampled(("onset", lo + step if lo + step <= 4990 else lo))
                 else:
                     s.append_sampled(("dur", 10 * rng.randint(1, 50)))
             for k in range(400):

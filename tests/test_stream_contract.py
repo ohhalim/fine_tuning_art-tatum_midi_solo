@@ -115,6 +115,77 @@ class TokenStreamTest(unittest.TestCase):
             self.s.append_sampled(("piano", 64, 80))
 
 
+class CommitFloorTest(unittest.TestCase):
+    """Issue #1798: after commit_until(h) the time before h is final, also across a rollback."""
+
+    def setUp(self):
+        self.s = TokenStream(PREFIX)
+
+    def fill(self, toks):
+        for t in toks:
+            self.s.append_sampled(t)
+
+    def test_rollback_cannot_put_a_note_between_last_commit_and_horizon(self):
+        self.fill(note(62, 500, 300) + note(64, 1300, 300))
+        self.s.commit_until(1151.25)                 # commits 62@500, stops at 64@1300
+        self.s.rollback_to_committed()
+        self.s.append_sampled(("piano", 65, 80))
+        with self.assertRaises(ValueError):
+            self.s.append_sampled(("onset", 1150))   # before the floor rounded up to the 10 ms grid
+        self.s.append_sampled(("onset", 1160))
+
+    def test_floor_bound_is_reported_for_the_mask(self):
+        self.fill(note(62, 500, 300) + note(64, 1300, 300))
+        self.s.commit_until(1151.25)
+        self.s.rollback_to_committed()
+        self.assertEqual(self.s.onset_floor(), (False, 1160))
+
+    def test_floor_rounding_into_next_segment_needs_time_token_first(self):
+        self.fill(note(62, 4800, 100) + ["<T>"] + note(64, 100, 100))
+        self.s.commit_until(4995.25)                 # stops at <T>; the floor rounds up to 5000 = segment 1, onset 0
+        self.s.rollback_to_committed()
+        self.assertEqual(self.s.onset_floor(), (True, 0))
+        with self.assertRaises(ValueError):
+            self.s.append_sampled(("piano", 65, 80))
+        self.s.append_sampled("<T>")
+        self.assertEqual(self.s.onset_floor(), (False, 0))
+
+    def test_floor_inside_the_next_segment_after_committed_time_token(self):
+        self.fill(note(62, 4800, 100) + ["<T>"] + note(64, 300, 100))
+        self.s.commit_until(5200)                    # commits 62 and <T>, stops at 64@5300
+        self.s.rollback_to_committed()
+        self.assertEqual(self.s.onset_floor(), (False, 200))
+        self.s.append_sampled(("piano", 65, 80))
+        with self.assertRaises(ValueError):
+            self.s.append_sampled(("onset", 190))
+        self.s.append_sampled(("onset", 200))
+
+    def test_floor_does_not_bind_tokens_already_past_it(self):
+        self.fill(note(62, 500, 300) + note(64, 1300, 300))
+        self.s.commit_until(1151.25)                 # provisional 64@1300 stays
+        self.assertEqual(self.s.onset_floor(), (False, 1160))
+        self.fill(note(65, 1300, 100))               # same onset as the last provisional note: a chord
+        self.assertEqual(len(self.s.tokens), 3 + 9)
+
+    def test_floor_never_moves_back(self):
+        self.fill(note(62, 500, 300) + note(64, 2500, 100))
+        self.s.commit_until(2000)
+        self.s.commit_until(1000)
+        self.assertEqual(self.s.floor_ms, 2000)
+
+    def test_commit_that_did_not_reach_the_horizon_keeps_the_floor(self):
+        self.fill(note(62, 500, 300))
+        self.s.commit_until(10000)                   # ran out of tokens: the stream did not cover 10000
+        self.assertEqual(self.s.floor_ms, float("-inf"))
+        self.s.append_sampled(("piano", 64, 80))
+        self.s.append_sampled(("onset", 600))
+
+    def test_time_token_past_the_horizon_counts_as_covered(self):
+        self.fill(note(62, 4800, 100) + ["<T>"] + note(64, 100, 100))
+        self.s.commit_until(4900)                    # stops at <T>: segment 1 starts after 4900
+        self.assertEqual(self.s.floor_ms, 4900)
+
+
 class SchedulerTest(unittest.TestCase):
     def setUp(self):
         self.sch = Scheduler()
