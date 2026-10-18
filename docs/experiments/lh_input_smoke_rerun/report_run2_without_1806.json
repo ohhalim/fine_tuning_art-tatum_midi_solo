@@ -1,11 +1,17 @@
 {
  "issue": 1797,
+ "code": null,
+ "analyzer_code": {
+  "commit": "15d3ac46a6877dc737efdcac6bb75472e462fed8",
+  "branch": "exp/1807/lh-smoke-rerun",
+  "dirty_scripts": []
+ },
  "inputs": {
   "data_sha256": "8501d2aca038d763dbea2149e0ed1171ddcf0107d7d33d6a0d6e5da0c92bd5bb",
   "lh_notes_sha256": "c8b42bdce62350c390d402fddcebba9273ef5c420b1be1e6872deaefda319a5f",
   "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90"
  },
- "analyze_only": false,
+ "analyze_only": true,
  "scenarios": {
   "A_normal": {
    "a_checks": {
@@ -156,6 +162,7 @@
       "min": 0.03
      },
      "deadline_misses": 0,
+     "blocks_without_timing": [],
      "blocks_reported": 17,
      "committed_token_sha256": "1a73ec88236342995558504eff16950a82a076876f70870ccc0218a1ac0c8ec7"
     }
@@ -592,6 +599,7 @@
       "min": 0.032
      },
      "deadline_misses": 0,
+     "blocks_without_timing": [],
      "blocks_reported": 17,
      "committed_token_sha256": "1668ac19f87f25b7311805680ef8b8076bfaac03bd08ba8d3c90caa5a08d7b8a"
     }
@@ -1010,6 +1018,7 @@
       "min": 0.182
      },
      "deadline_misses": 1,
+     "blocks_without_timing": [],
      "blocks_reported": 3,
      "committed_token_sha256": "b64b15d34dbc466769618c26d22e56852469dcb67e9a4c19cafda1421e4efa5c"
     }
