@@ -100,9 +100,11 @@ def summary(xs):
     return {"n": len(s), "median": statistics.median(s), "p90": s[int(0.9 * (len(s) - 1))], "max": s[-1]} if s else None
 
 
-def build_songs(export, velocity_dir):
+def build_songs(export, velocity_dir, w_ms=None):
+    """Built requests per dev song. w_ms: left-hand window (default lh_context.W_MS; #1820 varies it)."""
     from crop_contract import CapacityFailure, session_requests
-    from lh_context import ContractViolation, Human, build_request
+    from lh_context import W_MS, ContractViolation, Human, build_request
+    w_ms = W_MS if w_ms is None else w_ms
     from lh_context_build import load_song
     manifest = json.load(open(os.path.join(velocity_dir, "manifest.json")))
     songs = {i: load_song(export, velocity_dir, i, manifest) for i in SONGS}
@@ -113,7 +115,7 @@ def build_songs(export, velocity_dir):
         built[i] = []
         for srow in session_requests(tokens, t0):
             try:
-                built[i].append(build_request(tokens, srow, h, i, pool))
+                built[i].append(build_request(tokens, srow, h, i, pool, w_ms=w_ms))
             except (CapacityFailure, ContractViolation):
                 built[i].append(None)
                 fails += 1
