@@ -53,5 +53,33 @@ class KvReuseTest(unittest.TestCase):
         self.assertEqual((rows[1]["P"], rows[1]["cause"]), (0, "crop"))
 
 
+class PrecisionEquivalenceTest(unittest.TestCase):
+    """#1813: fp32 keeps the absolute rule, other precisions are judged on the distribution gap."""
+
+    def test_logit_gap_zero_for_shifted_logits_and_known_split(self):
+        import numpy as np
+        x = np.random.default_rng(0).normal(size=(4, 9))
+        kl, tv = kv.logit_gap(x, x + 3.0)
+        self.assertAlmostEqual(kl, 0.0, places=9)
+        self.assertAlmostEqual(tv, 0.0, places=9)
+        kl, tv = kv.logit_gap(np.log(np.array([[0.5, 0.5]])), np.log(np.array([[0.9, 0.1]])))
+        self.assertAlmostEqual(kl, 0.5 * np.log(0.5 / 0.9) + 0.5 * np.log(0.5 / 0.1), places=9)
+        self.assertAlmostEqual(tv, 0.4, places=9)
+
+    def test_fp32_needs_every_top1_and_1e3(self):
+        self.assertTrue(kv.equivalence_ok("fp32", 5, 5, 1e-4, 1.0, 1.0))
+        self.assertFalse(kv.equivalence_ok("fp32", 4, 5, 1e-4, 0.0, 0.0))
+        self.assertFalse(kv.equivalence_ok("fp32", 5, 5, 2e-3, 0.0, 0.0))
+
+    def test_other_precisions_use_the_1811_gap(self):
+        self.assertTrue(kv.equivalence_ok("q8", 3, 5, 0.5, kv.EQ_KL_MEAN, kv.EQ_TV_MEAN))
+        self.assertFalse(kv.equivalence_ok("q8", 5, 5, 0.0, kv.EQ_KL_MEAN * 1.01, 0.0))
+        self.assertFalse(kv.equivalence_ok("bf16", 5, 5, 0.0, 0.0, kv.EQ_TV_MEAN * 1.01))
+
+    def test_unknown_precision_is_refused_before_loading(self):
+        with self.assertRaises(ValueError):
+            kv.load_mlx("/nonexistent", "/nonexistent", "int3")
+
+
 if __name__ == "__main__":
     unittest.main()

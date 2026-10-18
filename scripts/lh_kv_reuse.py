@@ -137,9 +137,15 @@ def count(export, velocity_dir, out_path):
         json.dump(rep, f)
 
 
-def load_mlx(aria_repo, ckpt):
+PRECISIONS = {"fp32": None, "bf16": None, "q8": 8, "q4": 4}     # quantization bits; #1811 recipe (group 32, model.model only)
+
+
+def load_mlx(aria_repo, ckpt, precision="fp32"):
+    if precision not in PRECISIONS:
+        raise ValueError(f"precision {precision!r} not in {sorted(PRECISIONS)}")
     sys.path.insert(0, aria_repo)
     import mlx.core as mx
+    import mlx.nn as nn
     import numpy as np
     from aria.config import load_model_config
     from aria.inference.model_mlx import TransformerLM
@@ -149,10 +155,16 @@ def load_mlx(aria_repo, ckpt):
     cfg = ModelConfig(**load_model_config(name="medium"))
     cfg.set_vocab_size(tok.vocab_size)
     model = TransformerLM(cfg)
-    model.load_weights(ckpt, strict=True)
+    dtype = mx.float32 if precision == "fp32" else mx.bfloat16      # weights and KV cache together, as in Aria's demo_mlx.py
+    if precision == "fp32":
+        model.load_weights(ckpt, strict=True)
+    else:
+        model.load_weights([(k, v.astype(dtype)) for k, v in mx.load(ckpt).items()], strict=True)
+    if PRECISIONS[precision] is not None:
+        nn.quantize(model.model, group_size=32, bits=PRECISIONS[precision])
     mx.eval(model.parameters())
     model.eval()
-    model.setup_cache(batch_size=1, max_seq_len=CAPACITY, dtype=mx.float32)
+    model.setup_cache(batch_size=1, max_seq_len=CAPACITY, dtype=dtype)
 
     def run(ids, start, kv_end=None):
         """Forward ids at positions start.. ; KV beyond kv_end (default: last written) is invisible. Returns all logits."""
@@ -163,6 +175,30 @@ def load_mlx(aria_repo, ckpt):
         mx.eval(o)
         return np.array(o[0].astype(mx.float32))
     return tok, run
+
+
+EQ_KL_MEAN, EQ_TV_MEAN = 0.0009, 0.0139   # #1811 q8 vs fp32 means: a reuse gap must stay within the quantization gap itself
+
+
+def logit_gap(ref, x):
+    """Mean KL(ref || x) and mean total variation over positions (rows of logits)."""
+    import numpy as np
+
+    def logp(a):
+        a = a.astype(np.float64)
+        a = a - a.max(-1, keepdims=True)
+        return a - np.log(np.exp(a).sum(-1, keepdims=True))
+    lr, lx = logp(ref), logp(x)
+    pr, px = np.exp(lr), np.exp(lx)
+    return float((pr * (lr - lx)).sum(-1).mean()), float(0.5 * np.abs(pr - px).sum(-1).mean())
+
+
+def equivalence_ok(precision, top1, positions, max_abs_last, kl_mean, tv_mean):
+    """fp32 keeps the #1793 rule (every top-1 equal, last logits within 1e-3). bf16 caches cannot meet an absolute
+    1e-3, so the other precisions are judged on the distribution gap (#1813)."""
+    if precision == "fp32":
+        return top1 == positions and max_abs_last <= 1e-3
+    return kl_mean <= EQ_KL_MEAN and tv_mean <= EQ_TV_MEAN
 
 
 def compare(run, P_ids, N_ids, P):

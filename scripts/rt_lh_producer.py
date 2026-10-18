@@ -27,7 +27,7 @@ from aria_token_validity import check as token_check  # noqa: E402
 from crop_contract import CAPACITY, KEEP_TARGET  # noqa: E402
 from lh_cache_replay import reuse_start  # noqa: E402
 from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
-from lh_kv_reuse import common_prefix, load_mlx  # noqa: E402
+from lh_kv_reuse import common_prefix, equivalence_ok, load_mlx, logit_gap  # noqa: E402
 from rt_lh_input import LHState, SessionCrop, guarded_commit  # noqa: E402
 from stream_contract import TokenStream  # noqa: E402
 
@@ -53,6 +53,7 @@ def main() -> None:
     keep_target = opt(rest, "--keep-target", int, KEEP_TARGET)
     slow_block, slow_ms = opt(rest, "--slow-block", int, -1), opt(rest, "--slow-ms", float, 0.0)
     check_blocks = set(int(x) for x in opt(rest, "--check-blocks", str, "").split(",") if x)
+    precision = opt(rest, "--precision", str, "fp32")
 
     out, progress = sys.stdout, open(progress_path, "w")
 
@@ -65,7 +66,7 @@ def main() -> None:
         progress.write(json.dumps(obj) + "\n")
         progress.flush()
 
-    tok, run = load_mlx(aria_repo, ckpt)
+    tok, run = load_mlx(aria_repo, ckpt, precision)
     V_SIZE = tok.vocab_size
     vocab = [tok.decode([i])[0] for i in range(V_SIZE)]
     to_id = {t: i for i, t in enumerate(vocab)}
@@ -218,6 +219,7 @@ def main() -> None:
 
             def on_ready():
                 ready["ns"] = time.monotonic_ns()
+                ready["samples"] = samples["n"] - n_start          # samples before the horizon was covered (#1813)
                 ready["coverage_ms"] = coverage()
                 ready["problem"] = guarded_commit(ready["ns"], deadline, ready["coverage_ms"], h, commit_and_send)
                 if ready["problem"]:
@@ -234,6 +236,7 @@ def main() -> None:
                    "ready_margin_ms": round((deadline - ready["ns"]) / 1e6, 3), "notes": ready.get("notes"),
                    "ready_s": round((ready["ns"] - marks["suffix_ready_ns"]) / 1e9, 4),   # suffix ready -> horizon covered (monotonic)
                    "enqueued_ns": ready.get("enqueued_ns"), "deadline_ns": deadline, "tokens": samples["n"] - n_start,
+                   "samples_to_ready": ready.get("samples"),
                    "reached": res["reached"], "problem": ready.get("problem"), "coverage_ms": ready.get("coverage_ms"),
                    "horizon_ms": h, "input_received": marks["input_received"],
                    "marks_ns": {"wake": wake, "snapshot": marks["snapshot_ns"], "context_ready": marks["context_ready_ns"],
@@ -264,11 +267,13 @@ def main() -> None:
         full = run([to_id[t] for t in N], 0)[start:]
         top1 = int((cached.argmax(-1) == full.argmax(-1)).sum())
         diff = float(np.abs(cached[-1] - full[-1]).max())
+        kl, tv = logit_gap(full, cached)
         eq.append({"block": c["block"], "start": start, "S": len(N) - start, "top1_equal": top1, "positions": len(full),
-                   "max_abs_last": diff, "ok": top1 == len(full) and diff <= 1e-3})
+                   "max_abs_last": diff, "kl_mean": kl, "tv_mean": tv,
+                   "ok": equivalence_ok(precision, top1, len(full), diff, kl, tv)})
     import hashlib
     v = token_check(prompt, stream.tokens[len(prompt):stream.committed_end])
-    report = {"issue": 1797, "t0_ms": t0, "wall_origin_ns": W, "capacity": capacity, "keep_target": keep_target,
+    report = {"issue": 1797, "precision": precision, "t0_ms": t0, "wall_origin_ns": W, "capacity": capacity, "keep_target": keep_target,
               "checks": {"committed_prefix_never_changed": all(snaps[i] == snaps[i + 1][:len(snaps[i])] for i in range(len(snaps) - 1)),
                          "committed_tokens_format_valid": v["valid"] and v["tail"] is None,
                          "every_block_reached_horizon": all(reached)},

@@ -4,6 +4,7 @@
 B forced crop, C slow producer. Each scenario is analysed from its saved files.
 
   rt_lh_smoke_run.py <t3_aria python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json> [--analyze-only] [--rerun]
+      [--precision fp32|bf16|q8|q4]   (issue #1813; passed to every producer, default fp32)
 """
 from __future__ import annotations
 
@@ -134,6 +135,15 @@ def rerun_checks(out, prod, capacity):
     }
 
 
+def loop_speed(prod):
+    """Milliseconds per sample from suffix ready to horizon covered, per warm block that sampled before its horizon (#1813).
+    Includes the Python sampling and grammar mask; the first sample of a block reuses the prefill logits."""
+    rows = [{"block": b["block"], "samples": b["samples_to_ready"], "ms_per_sample": round(b["ready_s"] * 1000 / b["samples_to_ready"], 3)}
+            for b in prod["blocks"] if b.get("samples_to_ready") and b.get("ready_s") is not None]
+    xs = sorted(r["ms_per_sample"] for r in rows)
+    return {"blocks": rows, "median_ms_per_sample": xs[len(xs) // 2] if xs else None}
+
+
 def analyze_lh(name, d):
     base = analyze(name, d)
     prod_p = os.path.join(d, "producer.json")
@@ -171,10 +181,14 @@ def main() -> None:
     analyze_only = "--analyze-only" in sys.argv[8:]          # rebuild the report from the saved run files, no model run
     rerun = "--rerun" in sys.argv[8:]                        # issue #1807 scenario set and criteria
     scenarios, check_blocks = (SCENARIOS_RERUN, RERUN_CHECK_BLOCKS) if rerun else (SCENARIOS, CHECK_BLOCKS)
+    tail = sys.argv[8:]
+    precision = tail[tail.index("--precision") + 1] if "--precision" in tail else None
     os.makedirs(out_dir, exist_ok=True)
-    report = {"issue": 1797, "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},
+    report = {"issue": 1797, "precision": precision or "fp32",
+              "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},
               "analyze_only": analyze_only, "scenarios": {}}
     for name, extra in scenarios.items():
+        extra = extra + (["--precision", precision] if precision else [])
         report["scenarios"][name] = (analyze_lh(name, os.path.join(out_dir, name)) if analyze_only
                                      else run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir, check_blocks))
         if rerun and "producer_report_missing" not in report["scenarios"][name]:
@@ -185,6 +199,8 @@ def main() -> None:
                 sc["rerun_checks"]["crop_happened"] = prod["crops"] >= 1
             if name == "C_slow_block2":
                 sc["rerun_checks"]["slow_block_stopped_on_deadline"] = prod["abort"] == {"reason": "deadline_miss", "block": 2}
+            sc["precision"] = prod.get("precision", "fp32")
+            sc["loop_speed"] = loop_speed(prod)
         print(name, json.dumps({k: report["scenarios"][name].get(k) for k in ("abort", "crops", "b1_input_integrity", "b2_causal", "c1_deadline")}),
               flush=True)
     run0 = os.path.join(out_dir, "A_normal_run0_analysis_crash")    # doc 9 deviation 1: first A run, no A3 checks recorded
