@@ -27,7 +27,7 @@
 | q8 | bfloat16 | bfloat16 | 8비트, 그룹 32(데모 `--quantize`) |
 | q4 | bfloat16 | bfloat16 | 4비트, 그룹 32 |
 
-- 입력: `mehldau_aria/data.json`의 test 녹음 첫 창(각 1,023토큰, 실제 Mehldau 토큰)
+- 입력: `mehldau_aria/data.json`의 test 녹음 첫 창 10개(1,017–1,024토큰, 실제 Mehldau 토큰)
 - 시간 측정: producer와 같은 forward 호출(모델 호출, `mx.eval`, logits numpy 변환)을 `perf_counter_ns`로 측정. 샘플링·문법 마스크의 Python 비용은 제외
   - 문맥 L = 256, 512, 896. 첫 test 창 앞 L토큰을 미측정 프리필 후, 실제 다음 토큰 32개를 한 개씩 디코드(위치 L..L+31), 이어서 48토큰 suffix 프리필(#1807 블록 S 46 안팎) 1회
   - 팔마다 프리필 1회와 디코드 8스텝 예열. 반복 5회, 반복마다 팔 순서를 한 칸씩 회전, 네 팔을 같은 프로세스에서 교차 측정
