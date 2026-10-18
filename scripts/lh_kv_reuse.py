@@ -137,9 +137,15 @@ def count(export, velocity_dir, out_path):
         json.dump(rep, f)
 
 
-def load_mlx(aria_repo, ckpt):
+PRECISIONS = {"fp32": None, "bf16": None, "q8": 8, "q4": 4}     # quantization bits; #1811 recipe (group 32, model.model only)
+
+
+def load_mlx(aria_repo, ckpt, precision="fp32"):
+    if precision not in PRECISIONS:
+        raise ValueError(f"precision {precision!r} not in {sorted(PRECISIONS)}")
     sys.path.insert(0, aria_repo)
     import mlx.core as mx
+    import mlx.nn as nn
     import numpy as np
     from aria.config import load_model_config
     from aria.inference.model_mlx import TransformerLM
@@ -149,10 +155,16 @@ def load_mlx(aria_repo, ckpt):
     cfg = ModelConfig(**load_model_config(name="medium"))
     cfg.set_vocab_size(tok.vocab_size)
     model = TransformerLM(cfg)
-    model.load_weights(ckpt, strict=True)
+    dtype = mx.float32 if precision == "fp32" else mx.bfloat16      # weights and KV cache together, as in Aria's demo_mlx.py
+    if precision == "fp32":
+        model.load_weights(ckpt, strict=True)
+    else:
+        model.load_weights([(k, v.astype(dtype)) for k, v in mx.load(ckpt).items()], strict=True)
+    if PRECISIONS[precision] is not None:
+        nn.quantize(model.model, group_size=32, bits=PRECISIONS[precision])
     mx.eval(model.parameters())
     model.eval()
-    model.setup_cache(batch_size=1, max_seq_len=CAPACITY, dtype=mx.float32)
+    model.setup_cache(batch_size=1, max_seq_len=CAPACITY, dtype=dtype)
 
     def run(ids, start, kv_end=None):
         """Forward ids at positions start.. ; KV beyond kv_end (default: last written) is invisible. Returns all logits."""
