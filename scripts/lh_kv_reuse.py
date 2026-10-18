@@ -142,7 +142,7 @@ def count(export, velocity_dir, out_path):
 PRECISIONS = {"fp32": None, "bf16": None, "q8": 8, "q4": 4}     # quantization bits; #1811 recipe (group 32, model.model only)
 
 
-def load_mlx(aria_repo, ckpt, precision="fp32"):
+def load_mlx(aria_repo, ckpt, precision="fp32", return_model=False):
     if precision not in PRECISIONS:
         raise ValueError(f"precision {precision!r} not in {sorted(PRECISIONS)}")
     sys.path.insert(0, aria_repo)
@@ -176,7 +176,7 @@ def load_mlx(aria_repo, ckpt, precision="fp32"):
         o = model(idxs=idxs, input_pos=pos, offset=pos[0], max_kv_pos=last)
         mx.eval(o)
         return np.array(o[0].astype(mx.float32))
-    return tok, run
+    return (tok, run, model) if return_model else (tok, run)          # model: for module swaps (#1834)
 
 
 def compare(run, P_ids, N_ids, P):
