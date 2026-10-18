@@ -384,3 +384,42 @@ class PlayableTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class IntakeLateTest(unittest.TestCase):
+    """Issue #1798: a note whose onset already passed when it is handed in is never queued."""
+
+    def test_late_note_is_rejected_whole_and_recorded(self):
+        sch = Scheduler()
+        n = sch.schedule([Note(0, 60, 80, 100, 400), Note(1, 62, 80, 300, 500)], now_ms=200)
+        self.assertEqual(n, 1)
+        self.assertEqual([x[0].note_id for x in sch.rejected_late], [0])
+        sch.tick(1000)
+        self.assertEqual([(k, nid) for _, k, nid, _ in sch.sent], [("on", 1), ("off", 1)])
+
+    def test_rejected_note_off_does_not_end_the_owner_of_its_pitch(self):
+        sch = Scheduler()
+        sch.schedule([Note(0, 60, 80, 0, 1000)], now_ms=0)
+        sch.tick(10)                                  # 60 sounding, owned by note 0
+        sch.schedule([Note(1, 60, 80, 5, 50)], now_ms=20)   # 15 ms late: its off at 50 must not end note 0
+        sch.tick(60)
+        self.assertEqual(sch.pitch_owner, {60: 0})
+        self.assertEqual([m[1] for m in sch.midi_out], ["on"])
+
+    def test_intake_grace_keeps_a_note_a_few_ms_late(self):
+        sch = Scheduler()
+        self.assertEqual(sch.schedule([Note(0, 60, 80, 100, 400)], now_ms=103), 1)
+        self.assertEqual(sch.schedule([Note(1, 62, 80, 100, 400)], now_ms=110), 0)
+
+    def test_without_intake_time_nothing_is_rejected(self):
+        sch = Scheduler()
+        self.assertEqual(sch.schedule([Note(0, 60, 80, 100, 400)]), 1)
+        self.assertEqual(sch.rejected_late, [])
+
+    def test_delivery_jitter_is_not_rejection(self):
+        sch = Scheduler()
+        sch.schedule([Note(0, 60, 80, 100, 400)], now_ms=50)
+        sch.tick(101.5)                               # polled 1.5 ms after the due time: still delivered
+        self.assertEqual(sch.midi_out[0][1:3], ("on", 60))
+        self.assertEqual(sch.midi_note, [0])
+
