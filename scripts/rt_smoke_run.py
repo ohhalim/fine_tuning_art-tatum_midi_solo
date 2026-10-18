@@ -131,8 +131,10 @@ def analyze(name, d):
         b0 = [b for b in rb if b["block"] == 0]
         block0 = round((W - b0[0]["recv_ns"]) / 1e6, 3) if b0 else None
     scheduled = snd.get("scheduled_notes")
-    warm = [b for b in prog if b["block"] > 0 and not b.get("chord_input")]
-    chord = [b for b in prog if b.get("chord_input")]
+    # a block that stopped before generating (e.g. capacity_failure, #1803) has no timing fields: counted apart
+    timed = [b for b in prog if "ready_margin_ms" in b]
+    warm = [b for b in timed if b["block"] > 0 and not b.get("chord_input")]
+    chord = [b for b in timed if b.get("chord_input")]
     exit_ok = snd["error"] is None and snd.get("port_closed") is True and not snd.get("send_failures")
     return {
         "run_meta": meta, "producer_finished_report": prod is not None,
@@ -166,8 +168,9 @@ def analyze(name, d):
                      "warm_ready_margin_ms": dist([b["ready_margin_ms"] for b in warm]),
                      "chord_ready_margin_ms": dist([b["ready_margin_ms"] for b in chord]),
                      "warm_ready_s": dist([b["ready_s"] for b in warm]), "chord_ready_s": dist([b["ready_s"] for b in chord]),
-                     "late_block_start_ms": dist([b["late_start_ms"] for b in prog if b["block"] > 0]),
-                     "deadline_misses": sum(1 for b in prog if b["block"] > 0 and b["ready_margin_ms"] < 0),
+                     "late_block_start_ms": dist([b["late_start_ms"] for b in timed if b["block"] > 0]),
+                     "deadline_misses": sum(1 for b in timed if b["block"] > 0 and b["ready_margin_ms"] < 0),
+                     "blocks_without_timing": [b["block"] for b in prog if b["block"] > 0 and "ready_margin_ms" not in b],
                      "blocks_reported": len(prog), "committed_token_sha256": None if prod is None else prod["committed_token_sha256"]},
     }
 

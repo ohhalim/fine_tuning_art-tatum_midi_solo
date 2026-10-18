@@ -1,0 +1,157 @@
+{
+ "issue": 1809,
+ "source": "사용자 청취 2026-10-18, 페이지 복사 원문 그대로 변환",
+ "memo": "Barry Harris — All God's Chillun Got Rhythm, 이거 릭 다 좋았어 속도도 괜찮고",
+ "answers": [
+  {
+   "lick": "01-1",
+   "notes_per_s": 5.6,
+   "median_ioi_s": 0.192,
+   "notes": 13,
+   "pitch_min": 60,
+   "pitch_max": 74,
+   "pick": "bad",
+   "speed": "ok"
+  },
+  {
+   "lick": "01-2",
+   "notes_per_s": 9.72,
+   "median_ioi_s": 0.0955,
+   "notes": 15,
+   "pitch_min": 55,
+   "pitch_max": 67,
+   "pick": "bad",
+   "speed": "ok"
+  },
+  {
+   "lick": "06-1",
+   "notes_per_s": 8.75,
+   "median_ioi_s": 0.0977,
+   "notes": 15,
+   "pitch_min": 55,
+   "pitch_max": 59,
+   "pick": "good",
+   "speed": "ok"
+  },
+  {
+   "lick": "06-2",
+   "notes_per_s": 6.58,
+   "median_ioi_s": 0.1273,
+   "notes": 9,
+   "pitch_min": 55,
+   "pitch_max": 75,
+   "pick": "good",
+   "speed": "ok"
+  },
+  {
+   "lick": "06-3",
+   "notes_per_s": 5.77,
+   "median_ioi_s": 0.1284,
+   "notes": 13,
+   "pitch_min": 55,
+   "pitch_max": 72,
+   "pick": "good",
+   "speed": "ok"
+  },
+  {
+   "lick": "06-4",
+   "notes_per_s": 5.46,
+   "median_ioi_s": 0.1273,
+   "notes": 12,
+   "pitch_min": 55,
+   "pitch_max": 60,
+   "pick": "bad",
+   "speed": null
+  },
+  {
+   "lick": "16-1",
+   "notes_per_s": 7.57,
+   "median_ioi_s": 0.1284,
+   "notes": 9,
+   "pitch_min": 55,
+   "pitch_max": 71,
+   "pick": "good",
+   "speed": "ok"
+  },
+  {
+   "lick": "16-2",
+   "notes_per_s": 6.82,
+   "median_ioi_s": 0.1295,
+   "notes": 20,
+   "pitch_min": 55,
+   "pitch_max": 75,
+   "pick": "bad",
+   "speed": "ok"
+  },
+  {
+   "lick": "16-3",
+   "notes_per_s": 5.0,
+   "median_ioi_s": 0.1761,
+   "notes": 13,
+   "pitch_min": 55,
+   "pitch_max": 73,
+   "pick": "bad",
+   "speed": "ok"
+  },
+  {
+   "lick": "17-1",
+   "notes_per_s": 4.21,
+   "median_ioi_s": 0.2227,
+   "notes": 15,
+   "pitch_min": 57,
+   "pitch_max": 97,
+   "pick": "bad",
+   "speed": null
+  },
+  {
+   "lick": "17-2",
+   "notes_per_s": 3.29,
+   "median_ioi_s": 0.2398,
+   "notes": 9,
+   "pitch_min": 57,
+   "pitch_max": 74,
+   "pick": null,
+   "speed": "ok"
+  },
+  {
+   "lick": "18-1",
+   "notes_per_s": 9.11,
+   "median_ioi_s": 0.0955,
+   "notes": 22,
+   "pitch_min": 60,
+   "pitch_max": 77,
+   "pick": "good",
+   "speed": "ok"
+  },
+  {
+   "lick": "18-2",
+   "notes_per_s": 7.9,
+   "median_ioi_s": 0.1273,
+   "notes": 22,
+   "pitch_min": 60,
+   "pitch_max": 81,
+   "pick": "good",
+   "speed": "ok"
+  },
+  {
+   "lick": "18-3",
+   "notes_per_s": 10.41,
+   "median_ioi_s": 0.0955,
+   "notes": 12,
+   "pitch_min": 70,
+   "pitch_max": 81,
+   "pick": "good",
+   "speed": "ok"
+  },
+  {
+   "lick": "18-4",
+   "notes_per_s": 7.81,
+   "median_ioi_s": 0.0977,
+   "notes": 10,
+   "pitch_min": 66,
+   "pitch_max": 76,
+   "pick": "good",
+   "speed": "ok"
+  }
+ ]
+}
