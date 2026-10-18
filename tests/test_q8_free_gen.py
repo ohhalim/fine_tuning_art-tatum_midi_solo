@@ -67,5 +67,54 @@ class TestsTest(unittest.TestCase):
         self.assertEqual(fg.first_divergence([1, 2], [1, 2, 3]), 2)
 
 
+class InputChecksTest(unittest.TestCase):
+    """Astra review of #1830: empty, missing, duplicate, invalid or non-duration runs give no verdict."""
+
+    def write(self, d, name, rows):
+        import json
+        p = os.path.join(d, name)
+        with open(p, "w") as f:
+            for r in rows:
+                f.write(json.dumps(r) + "\n")
+        return p
+
+    def row(self, prec, prompt, seed, valid=True, stop="duration"):
+        return {"precision": prec, "prompt": prompt, "seed": seed, "valid": valid, "stop": stop}
+
+    def test_empty_files_fail(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            ok, info = fg.input_checks(self.write(d, "a", []), self.write(d, "b", []), [(0, 1)])
+            self.assertFalse(ok)
+            self.assertEqual(info["fp32"]["missing"], [(0, 1)])
+
+    def test_duplicate_invalid_and_max_tokens_fail(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            a = self.write(d, "a", [self.row("fp32", 0, 1), self.row("fp32", 0, 1)])
+            b = self.write(d, "b", [self.row("q8", 0, 1, stop="max_tokens")])
+            ok, info = fg.input_checks(a, b, [(0, 1)])
+            self.assertFalse(ok)
+            self.assertEqual(info["fp32"]["duplicates"], [(0, 1)])
+            self.assertEqual(info["q8"]["not_duration"], [(0, 1)])
+
+    def test_complete_inputs_pass(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            exp = [(p, s) for p in (0, 1) for s in (1, 2)]
+            ok, _ = fg.input_checks(self.write(d, "a", [self.row("fp32", p, s) for p, s in exp]),
+                                    self.write(d, "b", [self.row("q8", p, s) for p, s in exp]), exp)
+            self.assertTrue(ok)
+
+
+class SeedClusterTest(unittest.TestCase):
+    def test_per_seed_mean_over_prompts(self):
+        A = {(p, s): {"stats": {"x": 1.0}} for p in (0, 1) for s in (1, 2, 3)}
+        B = {(p, s): {"stats": {"x": 1.0 + s}} for p in (0, 1) for s in (1, 2, 3)}
+        out = fg.seed_cluster(A, B, sorted(A), "x")
+        self.assertEqual(out["seeds"], 3)
+        self.assertEqual(out["median_of_seed_means"], 2.0)
+
+
 if __name__ == "__main__":
     unittest.main()
