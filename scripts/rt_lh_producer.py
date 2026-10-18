@@ -23,6 +23,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from aria_grammar_mask import GrammarMask, masked_pick  # noqa: E402
 from aria_mlx_stream_loop import BEAT, BLOCK, CAP, SEED, fill_block  # noqa: E402
+from aria_token_validity import check as token_check  # noqa: E402
 from crop_contract import CAPACITY, KEEP_TARGET  # noqa: E402
 from lh_cache_replay import reuse_start  # noqa: E402
 from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
@@ -165,7 +166,7 @@ def main() -> None:
                        "lh_notes": len(lh_notes), "lh_held": len(held), "lh_max_on": max((n.on for n in lh_notes), default=None),
                        "lh_max_end": max((n.off for n in lh_notes), default=None), "rollback_tokens": dropped}
 
-    blocks, abort = [], None
+    blocks, abort, snaps, reached = [], None, [], []
     # block 0 (cold): no left hand
     tc = time.perf_counter()
     marks0, info0 = prepare(0, t0)
@@ -178,6 +179,8 @@ def main() -> None:
         json.dump({"music_origin_ms": t0, "wall_origin_ns": W}, f)
     emit({"type": "start", "music_origin_ms": t0, "wall_origin_ns": W})
     emit({"type": "notes", "block": 0, "notes": notes_json(held0)})
+    snaps.append(list(stream.tokens[:stream.committed_end]))
+    reached.append(res0["reached"])
     note_progress({"block": 0, "cold_s": round(time.perf_counter() - tc, 4), **info0, "tokens": res0["tokens"], "reached": res0["reached"]})
     try:
         for k in range(1, n_blocks):
@@ -211,6 +214,9 @@ def main() -> None:
                    "input_received": marks["input_received"]}
             blocks.append(row)
             note_progress(row)
+            snaps.append(list(stream.tokens[:stream.committed_end]))
+            if res["reached"] is not None:
+                reached.append(res["reached"])
             if ready.get("late"):
                 abort = {"reason": "deadline_miss", "block": k}
                 emit({"type": "abort", "reason": "deadline_miss", "block": k})
@@ -231,7 +237,13 @@ def main() -> None:
         diff = float(np.abs(cached[-1] - full[-1]).max())
         eq.append({"block": c["block"], "start": start, "S": len(N) - start, "top1_equal": top1, "positions": len(full),
                    "max_abs_last": diff, "ok": top1 == len(full) and diff <= 1e-3})
+    import hashlib
+    v = token_check(prompt, stream.tokens[len(prompt):stream.committed_end])
     report = {"issue": 1797, "t0_ms": t0, "wall_origin_ns": W, "capacity": capacity, "keep_target": keep_target,
+              "checks": {"committed_prefix_never_changed": all(snaps[i] == snaps[i + 1][:len(snaps[i])] for i in range(len(snaps) - 1)),
+                         "committed_tokens_format_valid": v["valid"] and v["tail"] is None,
+                         "every_block_reached_horizon": all(reached)},
+              "committed_token_sha256": hashlib.sha256(json.dumps([to_id[t] for t in stream.tokens[:stream.committed_end]]).encode()).hexdigest(),
               "slow_block": slow_block, "slow_ms": slow_ms, "blocks": blocks, "abort": abort, "crops": crop.crops,
               "lh_counts": lh.counts, "received": received, "equivalence_sample": eq}
     with open(report_path, "w") as f:

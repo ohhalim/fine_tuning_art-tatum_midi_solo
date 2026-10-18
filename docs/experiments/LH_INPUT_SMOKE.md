@@ -73,3 +73,7 @@
 - `scripts/rt_lh_smoke_run.py <t3_aria python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json>`
 - 시험 `tests/test_rt_lh_input.py`
 - 보고 `docs/experiments/lh_input_smoke/report.json`, 원자료는 저장소 밖 `/Users/ohhalim/git_box/lh_input_smoke_run1/`
+
+## 9. 이탈
+
+1. **A 1차 실행은 분석 단계에서 멈췄습니다.** producer 보고에 #1747의 A3 검사(확정 구간 불변, 확정 토큰 형식 유효, 블록마다 지평 도달)를 넣지 않아, 재사용한 분석 함수가 `checks` 키를 찾지 못했습니다. A3는 실행 중 상태로만 확인할 수 있어 사후에 채울 수 없습니다. 1차 원자료는 `A_normal_run0_analysis_crash/`로 보존했고, producer에 A3 검사를 넣은 뒤 세 시나리오를 처음부터 다시 실행합니다(seed·입력·설정 같음). 1차 기록: 블록 15에서 deadline_miss(여유 −58 ms)로 abort, 왼손 23쌍 수신, 동등성 표본 블록 4·8·12 통과
