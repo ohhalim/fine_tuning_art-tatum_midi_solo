@@ -120,5 +120,51 @@ class ControlPointsTest(unittest.TestCase):
         self.assertIsNone(cp["NC_unfed"])
 
 
+class CoverageTest(unittest.TestCase):
+    """Astra review M1: missing cases, a missing PC_future or no applied control make contract_ok False."""
+
+    def full(self):
+        g = {m: 0.0 for m in ke.METRICS}
+        refs = {"R1": g, "R2": g, "R3": g, "R4": None}
+        ctrl = {"gap": {m: 1.0 for m in ke.METRICS}, "refs": refs}
+        out = {}
+        for n in ke.CASES:
+            controls = {k: None for k in ke.CONTROLS}
+            if n == "syn_insert":
+                controls.update(NC_unfed=ctrl, NC_skip=ctrl)
+            if n == "crop":
+                controls["NC_crop"] = ctrl
+            out[n] = {"R1_exact": True, "refs": refs, "C": g, "PC_future": g, "controls": controls}
+        return out
+
+    def test_complete_contract(self):
+        _, s = ke.summarize(self.full())
+        self.assertTrue(s["coverage"]["ok"])
+        self.assertTrue(s["contract_ok"])
+
+    def test_missing_crop_case(self):
+        out = self.full()
+        del out["crop"]
+        _, s = ke.summarize(out)
+        self.assertEqual(s["coverage"]["missing_cases"], ["crop"])
+        self.assertFalse(s["contract_ok"])
+
+    def test_missing_pc_future(self):
+        out = self.full()
+        out["s0"]["PC_future"] = None
+        _, s = ke.summarize(out)
+        self.assertFalse(s["all_PC_future_ok"])
+        self.assertEqual(s["coverage"]["pc_future_missing"], ["s0"])
+        self.assertFalse(s["contract_ok"])
+
+    def test_no_applied_control(self):
+        out = self.full()
+        for v in out.values():
+            v["controls"] = {k: None for k in ke.CONTROLS}
+        _, s = ke.summarize(out)
+        self.assertFalse(s["coverage"]["ok"])
+        self.assertFalse(s["contract_ok"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -11,9 +11,11 @@ the first change), NC_crop (old positions kept after a crop reset). Every varian
 The 2x floor and 10x detection rules are fixed operating rules, not a proof of equivalence.
 
   kv_equiv_precision.py <aria repo> <ckpt> <export dir> <velocity dir> <#1793 count json> <out json> [--precisions fp32,bf16,q8]
+  kv_equiv_precision.py --rejudge <report json>      (judgements, coverage and contract_ok from the stored gaps)
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -28,6 +30,10 @@ FLOOR_MULT, FLOOR_EPS = 2.0, {"kl": 1e-7, "tv": 1e-6}      # C and PC_future: wi
 DETECT_MULT, DETECT_EPS = 10.0, 1e-4                        # a defect control: max KL above 10 x floor + 1e-4
 UNFED = 8                                                   # NC_unfed: the last 8 shared tokens were never written
 METRICS = ("kl_last", "tv_last", "kl_max", "kl_p95", "tv_max", "masked_kl_last", "masked_tv_last")
+CASES = tuple(f"syn_{n}" for n in ("insert", "expired", "held_update", "none", "empty", "same_onset")) + \
+    tuple(f"dev_{c}" for c in ("held_update", "expired", "insert", "none")) + \
+    ("longP_1692", "longP_2142", "longP_2877", "longP_3343", "s0", "crop")     # fixed before the run (doc 3)
+CONTROLS = ("NC_unfed", "NC_skip", "NC_crop")
 
 
 def logp(x):
@@ -94,6 +100,29 @@ def judge(case):
             "controls_detected": det, "controls_all_detected": all(det.values()) if det else None}
 
 
+def coverage(cases_out):
+    """Astra review M1: the fixed 16 cases exactly, PC_future on every case, each defect control applied at least once.
+    A control that does not apply to a case keeps its reason (None plus the case's lengths and starts)."""
+    names = set(cases_out)
+    applied = {k: sorted(n for n, v in cases_out.items() if v["controls"].get(k) is not None) for k in CONTROLS}
+    pc_missing = sorted(n for n, v in cases_out.items() if v.get("PC_future") is None)
+    return {"cases_exact": names == set(CASES), "missing_cases": sorted(set(CASES) - names), "extra_cases": sorted(names - set(CASES)),
+            "pc_future_missing": pc_missing, "controls_applied": applied,
+            "ok": names == set(CASES) and not pc_missing and all(applied[k] for k in CONTROLS)}
+
+
+def summarize(cases_out):
+    """Per precision: validity, C, PC_future, controls and coverage, combined in contract_ok (any gap is False)."""
+    js = {n: judge(v) for n, v in cases_out.items()}
+    cov = coverage(cases_out)
+    undetected = [(n, k) for n, j in js.items() for k, d in j["controls_detected"].items() if not d]
+    s = {"all_valid": all(j["valid"] for j in js.values()), "all_C_ok": all(j["C_ok"] for j in js.values()),
+         "all_PC_future_ok": all(j["PC_future_ok"] is True for j in js.values()),
+         "controls_undetected": undetected, "coverage": cov}
+    s["contract_ok"] = s["all_valid"] and s["all_C_ok"] and s["all_PC_future_ok"] and not undetected and cov["ok"]
+    return js, s
+
+
 def build_cases(built, cnt):
     """#1793 --equiv cases (6 synthetic + first non-crop dev pair per cause) and #1795 cases (4 long P, S = 0, first crop)."""
     from lh_cache_replay import pick_cases
@@ -135,7 +164,26 @@ def control_points(Pi, Ni, lcp, p, changed):
     return out
 
 
+def rejudge(report_path):
+    """Recompute judgements, coverage and contract_ok from the stored gaps; no model, no threshold change."""
+    rep = json.load(open(report_path))
+    for prec, v in rep["precisions"].items():
+        js, summ = summarize(v["cases"])
+        for n in v["cases"]:
+            v["cases"][n]["judge"] = js[n]
+        for k in ("all_valid", "all_C_ok", "all_PC_future_ok", "controls_undetected", "controls_applied"):
+            v.pop(k, None)
+        v.update(summ)
+    rep["rejudged"] = True
+    with open(report_path, "w") as f:
+        json.dump(rep, f, indent=1)
+    print(json.dumps({k: {kk: v[kk] for kk in ("contract_ok", "all_valid", "all_C_ok", "all_PC_future_ok", "controls_undetected")}
+                      for k, v in rep["precisions"].items()}))
+
+
 def main() -> None:
+    if sys.argv[1] == "--rejudge":
+        return rejudge(sys.argv[2])
     aria_repo, ckpt, export, velocity_dir, count_path, out_path = sys.argv[1:7]
     tail = sys.argv[7:]
     precisions = tail[tail.index("--precisions") + 1].split(",") if "--precisions" in tail else ["fp32", "bf16", "q8"]
@@ -160,6 +208,8 @@ def main() -> None:
         enc = lambda toks: tok.encode(list(toks))  # noqa: E731
         last_134 = next(r for r in reversed(built[134]) if r)
         poison = (enc(last_134["b"]["tokens"]) * 4)[:4096]
+        assert len(poison) == 4096, len(poison)                  # every position the cases use is overwritten (Astra LOW)
+        rep.setdefault("poison", {"tokens": len(poison), "sha256": hashlib.sha256(json.dumps(poison).encode()).hexdigest()})
 
         def fresh(ids=None):
             """Poison every cache position, then write ids from 0: each variant starts from the same kind of cache."""
@@ -217,17 +267,14 @@ def main() -> None:
             j = out[name]["judge"]
             print(prec, name, "p", p, "S", L - p, "valid", j["valid"], "C_ok", j["C_ok"], "PC", j["PC_future_ok"],
                   "det", j["controls_detected"], flush=True)
-        js = [v["judge"] for v in out.values()]
-        rep["precisions"][prec] = {"cases": out, "all_valid": all(j["valid"] for j in js),
-                                   "all_C_ok": all(j["C_ok"] for j in js),
-                                   "all_PC_future_ok": all(j["PC_future_ok"] is not False for j in js),
-                                   "controls_undetected": [(n, k) for n, v in out.items()
-                                                           for k, d in v["judge"]["controls_detected"].items() if not d],
-                                   "controls_applied": sum(len(v["judge"]["controls_detected"]) for v in out.values())}
+        js, summ = summarize(out)
+        for n in out:
+            out[n]["judge"] = js[n]
+        rep["precisions"][prec] = {"cases": out, **summ}
     os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
     with open(out_path, "w") as f:
         json.dump(rep, f, indent=1)
-    print(json.dumps({k: {kk: v[kk] for kk in ("all_valid", "all_C_ok", "all_PC_future_ok", "controls_undetected", "controls_applied")}
+    print(json.dumps({k: {kk: v[kk] for kk in ("contract_ok", "all_valid", "all_C_ok", "all_PC_future_ok", "controls_undetected")}
                       for k, v in rep["precisions"].items()}))
 
 

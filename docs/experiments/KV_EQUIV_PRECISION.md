@@ -70,3 +70,12 @@
 - `scripts/kv_equiv_precision.py <aria repo> <ckpt> <export dir> <velocity dir> <count json> <out json> [--precisions fp32,bf16,q8]`
 - 시험 `tests/test_kv_equiv_precision.py`
 - 보고 `docs/experiments/kv_equiv_precision/report.json`
+
+## 9. 판정 보완 (아스트라 M1·LOW, 실행 중 추가)
+
+- 추가 시점: 실행 시작 뒤, fp32 사례 8개 출력 확인 후. 지표, 임계값, 계산은 변경 없음. 누락 방지 판정만 추가, 저장된 gap으로 재판정(`--rejudge`)
+- coverage: 고정 사례 16개 이름 정확 일치(합성 6, dev 4, longP 4, s0, crop), 모든 사례 PC_future 적용, NC_unfed·NC_skip·NC_crop 각각 1개 사례 이상 적용. 적용 불가 사례는 None과 사례 길이·시작 위치로 사유 기록
+- `contract_ok` = 무효 0, C 전부 통과, PC_future 전부 True(None은 실패), 결함 미검출 0, coverage 충족. 하나라도 빠지면 거짓
+- poison 길이 4,096 사전 assert와 토큰 sha256 기록(다음 실행부터 보고서에 남음)
+- NC_unfed 근거: lcp − 8..lcp − 1 위치에는 다른 곡(134번 마지막 요청) 토큰으로 계산된 poison KV가 남음. N의 같은 위치 토큰·문맥과 다른 KV. 미검출을 곧 정상으로 해석하지 않는 6절 규칙 유지
+- C 통과는 여러 조각에 걸친 실제 producer KV 이력의 검증이 아님(7절 경계 유지)
