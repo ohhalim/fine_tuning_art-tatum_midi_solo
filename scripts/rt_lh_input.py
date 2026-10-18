@@ -58,6 +58,26 @@ def is_late(ready_ns, deadline_ns):
     return ready_ns > deadline_ns
 
 
+def block_problem(ready_ns, deadline_ns, coverage_ms, horizon_ms):
+    """Why a block may not be committed, or None. fill_block also calls on_ready when it ran out of samples before
+    the horizon (issue #1802); such a block is incomplete and is not sent (horizon_underfill). A late block is
+    reported as deadline_miss first. deadline_ns None (the cold block) skips the time check."""
+    if deadline_ns is not None and is_late(ready_ns, deadline_ns):
+        return "deadline_miss"
+    if coverage_ms < horizon_ms:
+        return "horizon_underfill"
+    return None
+
+
+def guarded_commit(ready_ns, deadline_ns, coverage_ms, horizon_ms, commit):
+    """The producer's on_ready guard: run commit() (commit + send) only for a block with no problem.
+    Returns the problem (deadline_miss, horizon_underfill) or None."""
+    problem = block_problem(ready_ns, deadline_ns, coverage_ms, horizon_ms)
+    if problem is None:
+        commit()
+    return problem
+
+
 class SessionCrop:
     """Session state over the right-hand stream: keep_from (stream index of the first kept token, None = original
     header kept) and base_ms, as in crop_contract.session_requests."""
