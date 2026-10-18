@@ -1389,5 +1389,86 @@
   "P18": "차이 미검출",
   "P06": "차이 미검출",
   "P16": "가까워짐"
+ },
+ "paired_tests": {
+  "P18": {
+   "licks_per_min": {
+    "n": 12,
+    "diff": 3.878787878787879,
+    "mean_diff": 3.555555555555556,
+    "p": 0.142578125
+   },
+   "melody_notes_per_s": {
+    "n": 12,
+    "diff": 2.1656565656565654,
+    "mean_diff": 1.7023569023569023,
+    "p": 0.009765625
+   },
+   "liked_speed_run_share": {
+    "n": 12,
+    "diff": 0.5833333333333333,
+    "mean_diff": 0.4305555555555556,
+    "p": 0.015625
+   }
+  },
+  "P06": {
+   "licks_per_min": {
+    "n": 12,
+    "diff": 0.0,
+    "mean_diff": 1.6161616161616161,
+    "p": 0.515625
+   },
+   "melody_notes_per_s": {
+    "n": 12,
+    "diff": 0.6787878787878789,
+    "mean_diff": 0.404040404040404,
+    "p": 0.22509765625
+   },
+   "liked_speed_run_share": {
+    "n": 12,
+    "diff": 0.5,
+    "mean_diff": 0.3888888888888889,
+    "p": 0.033203125
+   }
+  },
+  "P16": {
+   "licks_per_min": {
+    "n": 12,
+    "diff": 0.0,
+    "mean_diff": 1.292929292929293,
+    "p": 0.58984375
+   },
+   "melody_notes_per_s": {
+    "n": 12,
+    "diff": 1.4545454545454546,
+    "mean_diff": 1.278563411896745,
+    "p": 0.07177734375
+   },
+   "liked_speed_run_share": {
+    "n": 11,
+    "diff": 0.6666666666666666,
+    "mean_diff": 0.5606060606060607,
+    "p": 0.015625
+   }
+  }
+ },
+ "verdict_paired": {
+  "P18": "차이 미검출",
+  "P06": "차이 미검출",
+  "P16": "차이 미검출"
+ },
+ "copy_mixed": {
+  "P18": {
+   "max_shared_intervals": 5,
+   "flag": false
+  },
+  "P06": {
+   "max_shared_intervals": 13,
+   "flag": true
+  },
+  "P16": {
+   "max_shared_intervals": 3,
+   "flag": false
+  }
  }
 }

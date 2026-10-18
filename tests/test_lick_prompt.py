@@ -65,5 +65,19 @@ class MetricsTest(unittest.TestCase):
         self.assertIsNone(m["liked_speed_run_share"])
 
 
+class PairedSignflipTest(unittest.TestCase):
+    def test_all_positive_pairs(self):
+        import lick_prompt as lp
+        out = lp.paired_signflip([(0.0, 1.0)] * 6)
+        self.assertEqual(out["n"], 6)
+        self.assertEqual(out["diff"], 1.0)
+        self.assertAlmostEqual(out["p"], 2 / 64)          # only the all-plus and all-minus patterns reach |sum| 6
+
+    def test_zero_and_empty(self):
+        import lick_prompt as lp
+        self.assertEqual(lp.paired_signflip([(1.0, 1.0)] * 3)["p"], 1.0)
+        self.assertIsNone(lp.paired_signflip([]))
+
+
 if __name__ == "__main__":
     unittest.main()

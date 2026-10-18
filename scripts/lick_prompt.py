@@ -233,6 +233,26 @@ def median_diff_stats(a, b, n=N_RESAMPLE, seed=0):
     return {"diff": obs, "ci95": [boots[int(0.025 * n)], boots[int(0.975 * n) - 1]], "p": (hits + 1) / (n + 1)}
 
 
+COPY_MIN = 8          # doc 6: longest shared top-line interval run with the prompt >= 8 marks "copy mixed"
+
+
+def paired_signflip(pairs):
+    """Seed-matched pairs [(P0 value, prompt value)]: exact two-sided sign-flip p on the mean paired difference over all
+    2^n sign patterns (Astra review of #1838: the runs share seeds, the registered test pooled them unpaired). The median
+    paired difference is reported as "diff" for the effect rule. Pairs with a missing value on either side are dropped
+    before this call."""
+    import itertools
+    d = [b - a for a, b in pairs]
+    if not d:
+        return None
+    obs = sum(d)
+    hits = total = 0
+    for signs in itertools.product((1, -1), repeat=len(d)):
+        total += 1
+        hits += abs(sum(s * x for s, x in zip(signs, d))) >= abs(obs) - 1e-12
+    return {"n": len(d), "diff": statistics.median(d), "mean_diff": obs / len(d), "p": hits / total}
+
+
 def verdict(tests):
     """Toward the liked licks: licks/min or liked-speed share up, significant at ALPHA and at least MIN_EFFECT."""
     def sig(m, sign):
@@ -281,6 +301,16 @@ def analyze(prompts_path, run_dir, report_path):
             b = [x["metrics"][m] for x in rows[name] if x["metrics"] and x["metrics"][m] is not None]
             rep["tests"][name][m] = median_diff_stats(a, b) if len(a) >= 3 and len(b) >= 3 else None
         rep["verdict"][name] = verdict(rep["tests"][name])
+        rep.setdefault("paired_tests", {})[name] = {}
+        by_seed = {x["seed"]: x for x in rows[name]}
+        for m in PRIMARY:
+            pairs = [(x["metrics"][m], by_seed[x["seed"]]["metrics"][m]) for x in base
+                     if x["metrics"] and by_seed.get(x["seed"]) and by_seed[x["seed"]]["metrics"]
+                     and x["metrics"][m] is not None and by_seed[x["seed"]]["metrics"][m] is not None]
+            rep["paired_tests"][name][m] = paired_signflip(pairs)
+        rep.setdefault("verdict_paired", {})[name] = verdict({m: t for m, t in rep["paired_tests"][name].items() if t})
+        copy_max = max((x["metrics"]["copy_ngram_with_prompt"] for x in rows[name] if x["metrics"]), default=0)
+        rep.setdefault("copy_mixed", {})[name] = {"max_shared_intervals": copy_max, "flag": copy_max >= COPY_MIN}
     with open(report_path, "w") as f:
         json.dump(rep, f, ensure_ascii=False, indent=1)
     print(json.dumps({"summary": {n: {k: (v["median"] if isinstance(v, dict) else v) for k, v in s.items()} for n, s in rep["summary"].items()},
