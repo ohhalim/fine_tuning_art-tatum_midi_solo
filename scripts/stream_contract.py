@@ -76,6 +76,21 @@ class GrammarState:
         return GrammarState("note", self.last_onset, self.segment)
 
 
+def floor_parts(floor_ms, st):
+    """(reset_first, min_onset) that a time floor puts on the next tokens from grammar state st.
+    reset_first: the floor is in a later segment, so only <T> may follow a note. min_onset: the lowest onset allowed in
+    the current segment (0 when the floor does not bind)."""
+    if floor_ms == float("-inf"):
+        return False, 0
+    seg = int(floor_ms // SEGMENT_MS)
+    rel = -(-(floor_ms - seg * SEGMENT_MS) // ONSET_STEP_MS) * ONSET_STEP_MS     # ceil to the onset grid
+    if rel >= SEGMENT_MS:
+        seg, rel = seg + 1, 0
+    if st.segment < seg:
+        return True, 0
+    return False, int(rel) if st.segment == seg else 0
+
+
 @dataclass(frozen=True)
 class Note:
     note_id: int
@@ -125,16 +140,22 @@ class TokenStream:
         """(reset_first, min_onset) the commit floor puts on the next tokens from grammar state st (default: the end).
         reset_first: the floor is in a later segment, so only <T> may follow a note. min_onset: the lowest onset
         allowed in the current segment (0 when the floor does not bind)."""
-        st = self.grammar_state() if st is None else st
-        if self.floor_ms == float("-inf"):
-            return False, 0
-        seg = int(self.floor_ms // SEGMENT_MS)
-        rel = -(-(self.floor_ms - seg * SEGMENT_MS) // ONSET_STEP_MS) * ONSET_STEP_MS     # ceil to the onset grid
-        if rel >= SEGMENT_MS:
-            seg, rel = seg + 1, 0
-        if st.segment < seg:
-            return True, 0
-        return False, int(rel) if st.segment == seg else 0
+        return floor_parts(self.floor_ms, self.grammar_state() if st is None else st)
+
+    def onsets_since_commit(self):
+        """Absolute onsets (ms) of the notes after the committed end, in order (provisional tokens only).
+        Incremental: tokens are only appended between commits and rollbacks, so the scan resumes where it stopped."""
+        c = getattr(self, "_onset_scan", None)
+        n = len(self.tokens)
+        if c is None or c[0] != self.committed_end or c[1] > n or self.tokens[c[0]:c[1]] != c[4]:
+            c = (self.committed_end, self.committed_end, self._state_at[self.committed_end], [], [])
+        start, upto, st, out, seen = c
+        for t in self.tokens[upto:n]:
+            st = st.advance(t)
+            if _kind(t) == "onset":
+                out = out + [st.segment * SEGMENT_MS + st.last_onset]
+        self._onset_scan = (start, n, st, out, self.tokens[start:n])
+        return list(out)
 
     def append_sampled(self, t):
         """A sampled token: in `tokens`, not yet in the KV."""

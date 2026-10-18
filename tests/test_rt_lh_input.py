@@ -240,5 +240,72 @@ class RerunChecksFailClosedTest(unittest.TestCase):
         self.assertFalse(self.judge(out, prod, snd)["forwarded_blocks_fit_capacity"])
 
 
+class NoteCapTest(unittest.TestCase):
+    """Issue #1819: the cap floor moves the next onset to the next block window once the current one is full."""
+
+    def test_cap_floor(self):
+        g, B = 1000.0, 937.5                          # windows [1000, 1937.5), [1937.5, 2875), ...
+        self.assertEqual(li.cap_floor([1100, 1200], 1200, g, B, 3), float("-inf"))
+        self.assertEqual(li.cap_floor([1100, 1200, 1300], 1300, g, B, 3), 1937.5)
+        self.assertEqual(li.cap_floor([1100, 1200, 1300, 2000], 2000, g, B, 3), float("-inf"))   # next window has 1
+        self.assertEqual(li.cap_floor([1100, 1200, 1300], 1300, g, B, 0), float("-inf"))         # off
+        self.assertEqual(li.cap_floor([], 900, g, B, 1), float("-inf"))                          # before the grid, empty
+
+
+class NoteCapStreamTest(unittest.TestCase):
+    """Issue #1819 (Astra M2): cap_floor with the real TokenStream and GrammarMask. A sampler that always takes the
+    earliest allowed onset (densest possible) never puts more than K notes in a window, across a 5 s segment boundary
+    and through commit -> speculate -> rollback."""
+
+    K, G, B = 3, 468.75, 937.5
+
+    def setUp(self):
+        import torch
+        from aria_grammar_mask import GrammarMask
+        from stream_contract import TokenStream
+        self.torch = torch
+        self.vocab = [("piano", 60, 80), ("dur", 100), "<T>"] + [("onset", o) for o in range(0, 5000, 10)]
+        self.gm = GrammarMask(self.vocab)
+        self.s = TokenStream([("piano", 60, 80), ("onset", 0), ("dur", 100)])
+
+    def step(self):
+        from stream_contract import SEGMENT_MS, floor_parts
+        st = self.s.grammar_state()
+        floor = max(self.s.floor_ms, li.cap_floor(self.s.onsets_since_commit(), st.segment * SEGMENT_MS + st.last_onset,
+                                                    self.G, self.B, self.K))
+        self.gm.sync(st, floor_parts(floor, st))
+        ok = [self.vocab[i] for i in self.torch.nonzero(self.gm.allowed()).flatten().tolist()]
+        onsets = [t for t in ok if isinstance(t, tuple) and t[0] == "onset"]
+        pick = (min(onsets, key=lambda t: t[1]) if onsets else ("piano", 60, 80) if ("piano", 60, 80) in ok
+                else ("dur", 100) if ("dur", 100) in ok else "<T>")
+        self.s.append_sampled(pick)
+
+    def run_until(self, ms):
+        from stream_contract import SEGMENT_MS
+        while True:
+            st = self.s.grammar_state()
+            if st.expect == "note" and st.segment * SEGMENT_MS + st.last_onset >= ms:
+                return
+            self.step()
+
+    def assert_capped(self, onsets):
+        import collections
+        per = collections.Counter(int((o - self.G) // self.B) for o in onsets)
+        self.assertLessEqual(max(per.values()), self.K, per)
+
+    def test_dense_sampler_respects_the_cap_across_segments_and_rollback(self):
+        h = self.G + self.B                                   # first commit horizon
+        self.run_until(h)
+        self.assert_capped(self.s.onsets_since_commit())
+        self.s.commit_until(h)
+        self.run_until(h + self.B)                            # speculation into the next window
+        self.assert_capped(self.s.onsets_since_commit())
+        self.s.rollback_to_committed()
+        self.run_until(5600)                                  # through the 5 s segment boundary (window [4218.75, 5156.25))
+        ons = self.s.onsets_since_commit()
+        self.assert_capped(ons)
+        self.assertTrue(any(o >= 5000 for o in ons) and any(4218.75 <= o < 5000 for o in ons))
+
+
 if __name__ == "__main__":
     unittest.main()
