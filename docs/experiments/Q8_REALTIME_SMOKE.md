@@ -49,3 +49,14 @@
 - `rt_lh_smoke_run.py <t3 python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json> --rerun --precision fp32|q8`
 - 시험 `tests/test_lh_kv_reuse.py`(정밀도 동등성 규칙), `tests/test_rt_lh_input.py`(`loop_speed`)
 - 원자료 저장소 밖 `/Users/ohhalim/git_box/q8_realtime_smoke_run1/`, 보고 `docs/experiments/q8_realtime_smoke/{fp32,q8}.json`
+
+## 8. 첫 실행 무효 (2026-10-18 21:56–21:58, #1806 미포함)
+
+- 실행 브랜치(15ddd115)가 #1808 첫 head(3e9c3a54) 위라 #1806(crop 위치에 왼손 길이 반영) 미포함. #1807 첫 재실행과 같은 원인(아스트라 H1)
+- 원자료 저장소 밖 `q8_realtime_smoke_run1/`, 보고 `q8_realtime_smoke/run1_without_1806_{fp32,q8}.json`으로 보존. 결론·기본값 전환 근거로 쓰지 않음
+- K2(사전 지정 KL·TV 구간)는 구간 충족 여부로만 기록: q8 표본 2개 KL 평균 0, TV 평균 0, 마지막 위치 최대 절대 차이 0으로 구간 안. 이 기준은 모델 정밀도 차이를 계산 경로 차이의 상한으로 쓴 것이라 동등성 판단으로 읽지 않음(아스트라 M2). 동등성은 #1815 계약으로 분리
+- 당시 판정기(fail-open) 기준 관측, 판정 아님
+  - fp32: A·B·C 기준 참, 최소 여유 A 47.0 / B 109.9 ms, 루프 ms/sample 중앙값 A 11.12 / B 10.99
+  - q8: A 최소 여유 174.5 ms, B 블록 15 `deadline_miss`(여유 −8.8 ms)로 중단, C 블록 2 중단. 루프 ms/sample 중앙값 A 6.59 / B 6.13
+  - q8 B의 블록 15 마감 초과는 q8에서도 마감 초과가 남을 수 있다는 관측. 원인 후보(블록 15 생성 샘플 수, crop 뒤 문맥) 미분리
+- 다음: develop 병합(33a29227, #1806·#1808 판정기 포함) 완료. #1815 계약 결과 뒤 producer 동등성 표본을 #1815 규칙(같은 정밀도 바닥 대비)으로 바꾼 v2 사전 등록 후 새 디렉터리로 재실행
