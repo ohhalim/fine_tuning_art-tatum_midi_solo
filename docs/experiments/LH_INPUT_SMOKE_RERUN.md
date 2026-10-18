@@ -10,7 +10,7 @@
 
 - #1797(`LH_INPUT_SMOKE.md`): 세 실행 모두 블록 4에서 마감 초과로 중단. crop(용량 400)과 블록 6 지연 주입은 미실행
 - 사후 발견: 확정 지평 앞 음(첫 실행 5/95, 재실행 1/24), 최대 394 ms 지각 송출
-- 수정: 확정 지평 하한과 접수 지각 거부(#1804), 지평 미도달 블록 중단(#1805), crop 위치 병합 길이 선택과 forward 전 용량 검사(#1806)
+- 수정: 확정 지평 하한과 접수 지각 5 ms 초과 거부(#1804), 지평 미도달 블록 중단(#1805), crop 위치 병합 길이 선택과 forward 전 용량 검사(#1806)
 
 ## 3. 실행 (실행 전 고정)
 
@@ -33,7 +33,7 @@
 모든 시나리오:
 
 1. 확정 지평 앞 음 0 (`posthoc_before_horizon`의 `notes_before_previous_horizon`)
-2. 접수 지각 거부 0 (`rejected_late_on`)
+2. 접수 지각 5 ms 초과 거부 0 (`rejected_late_on`)
 3. forward한 모든 블록이 `len_N + 예약 131 ≤ 용량`
 4. 정지는 `end` 또는 기록된 abort(`deadline_miss`, `horizon_underfill`, `capacity_failure`)
 5. 안전 종료: 미송출 note-on 0, 포트 닫힘, note-off 실패 0
