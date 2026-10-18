@@ -13,7 +13,7 @@ cleanup turns off what it can and always closes the port and writes the record (
 - if any note-off failed, the record says the stop was not clean (silence is not claimed)
 
 stdin lines: {"type": "start", "music_origin_ms", "wall_origin_ns"} | {"type": "notes", "block", "notes": [[id, pitch,
-velocity, on_ms, off_ms], ...]} | {"type": "rollback", "block"} | {"type": "end"}
+velocity, on_ms, off_ms], ...]} | {"type": "rollback", "block"} | {"type": "end"} | {"type": "abort", "reason", "block"}
 
   rt_sender.py <port name> <capture ready file> <out json>
 """
@@ -55,13 +55,16 @@ def drain(q):
         return out
 
 
+ABNORMAL = ("eof", "reader_error", "abort")
+
+
 class Sender:
     def __init__(self, port, clock_ns=time.monotonic_ns):
         self.port, self.clock_ns = port, clock_ns
         self.sch = Scheduler()
         self.origin = None                 # (music_origin_ms, wall_origin_ns)
         self.sent_upto = 0
-        self.end = None                    # "end" | "eof" | "reader_error"
+        self.end = None                    # "end" | "eof" | "reader_error" | "abort"
         self.log = {"sent": [], "send_failures": [], "cancelled_unsent_on": [], "received_blocks": [], "scheduled_notes": 0, "dropped_velocity0": 0,
                     "extended_zero_length": 0, "end": None, "error": None, "origin": None}
 
@@ -87,6 +90,9 @@ class Sender:
         elif t == "reader_error":
             self.log["error"] = m["error"]
             self.end = "reader_error"
+        elif t == "abort":                 # the producer stopped the run (e.g. deadline_miss): same as an abnormal end
+            self.log["abort"] = {k: m.get(k) for k in ("reason", "block")}
+            self.end = "abort"
         elif t == "end" or (t == "eof" and self.end is None):
             self.end = t                   # an eof after a normal end is the producer exiting: ignored
 
@@ -118,7 +124,7 @@ class Sender:
         known (Astra re-review of #1749); a normal end keeps playing out what is scheduled. Returns True when done."""
         for m in msgs:
             self.handle(m)
-        if self.end in ("eof", "reader_error"):
+        if self.end in ABNORMAL:
             return True
         self.step()
         return self.done()
@@ -129,7 +135,7 @@ class Sender:
             self.flush()
 
     def done(self):
-        return self.end in ("eof", "reader_error") or (self.end == "end" and not self.sch.pending)
+        return self.end in ABNORMAL or (self.end == "end" and not self.sch.pending)
 
     def cleanup(self):
         """Stop, try every remaining note-off once, close the port. Each part is guarded."""

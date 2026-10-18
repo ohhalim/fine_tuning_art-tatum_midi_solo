@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+"""Run the opt-in left-hand input smoke (issue #1797, docs/experiments/LH_INPUT_SMOKE.md): feeder (virtual LH port)
+-> producer (MLX venv, LH input thread) -> sender (virtual model port) -> independent capture. Scenarios A normal,
+B forced crop, C slow producer. Each scenario is analysed from its saved files.
+
+  rt_lh_smoke_run.py <t3_aria python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json>
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import time
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+from rt_smoke_run import analyze  # noqa: E402
+
+BLOCKS = 17                                      # cold + 16 blocks = 8 bars at 128 BPM
+SCENARIOS = {
+    "A_normal": [],
+    "B_forced_crop": ["--capacity", "400", "--keep-target", "200"],
+    "C_slow_producer": ["--slow-block", "6", "--slow-ms", "600"],
+}
+CHECK_BLOCKS = "4,8,12"
+
+
+def sha(path):
+    return hashlib.sha256(open(path, "rb").read()).hexdigest()
+
+
+def run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir):
+    d = os.path.join(out_dir, name)
+    os.makedirs(d, exist_ok=True)
+    f = {k: os.path.join(d, v) for k, v in {"ready": "capture.ready", "stop": "capture.stop", "cap": "capture.json", "snd": "sender.json",
+                                             "prog": "producer_progress.jsonl", "prod": "producer.json", "perr": "producer.stderr",
+                                             "serr": "sender.stderr", "origin": "origin.json", "fready": "feeder.ready", "feed": "feeder.json"}.items()}
+    for k in ("ready", "stop", "origin", "fready"):
+        if os.path.exists(f[k]):
+            os.remove(f[k])
+    out_port, lh_port = f"lh_smoke_out_{name}_{os.getpid()}", f"lh_smoke_in_{name}_{os.getpid()}"
+    sender = subprocess.Popen([sys.executable, os.path.join(HERE, "rt_sender.py"), out_port, f["ready"], f["snd"]],
+                              stdin=subprocess.PIPE, stderr=open(f["serr"], "w"))
+    capture = subprocess.Popen([sys.executable, os.path.join(HERE, "rt_capture.py"), out_port, f["ready"], f["stop"], f["cap"], "240"])
+    feeder = subprocess.Popen([sys.executable, os.path.join(HERE, "rt_lh_feeder.py"), lh_port, lh_notes, f["origin"], f["fready"], f["feed"]])
+    t = time.monotonic()
+    while not os.path.exists(f["fready"]) and time.monotonic() - t < 30:
+        time.sleep(0.02)
+    args = [t3_py, os.path.join(HERE, "rt_lh_producer.py"), aria_repo, ckpt, data, str(BLOCKS), lh_port, f["origin"], f["prog"], f["prod"],
+            "--check-blocks", CHECK_BLOCKS if name == "A_normal" else ""] + extra
+    producer = subprocess.Popen(args, stdout=sender.stdin, stderr=open(f["perr"], "w"))
+    sender.stdin.close()
+    producer.wait(timeout=600)
+    sender.wait(timeout=120)
+    feeder.wait(timeout=120)
+    open(f["stop"], "w").close()
+    capture.wait(timeout=30)
+    with open(os.path.join(d, "run_meta.json"), "w") as m:
+        json.dump({"ports": [out_port, lh_port], "args": args[1:], "producer_returncode": producer.returncode,
+                   "sender_returncode": sender.returncode, "capture_returncode": capture.returncode,
+                   "feeder_returncode": feeder.returncode}, m)
+    return analyze_lh(name, d)
+
+
+def analyze_lh(name, d):
+    base = analyze(name, d)
+    prod_p = os.path.join(d, "producer.json")
+    prod = json.load(open(prod_p)) if os.path.exists(prod_p) else None
+    feed = json.load(open(os.path.join(d, "feeder.json")))
+    snd = json.load(open(os.path.join(d, "sender.json")))
+    out = {"a_checks": base}
+    if prod is None:
+        out["producer_report_missing"] = True
+        return out
+    got = [(r["type"], r.get("pitch")) for r in prod["received"] if r["type"] in ("note_on", "note_off") and not r.get("before_origin")]
+    sent = [("note_on" if s["kind"] == "note_on" else "note_off", s["pitch"]) for s in feed["sent"]]
+    blocks = prod["blocks"]
+    s_k = {b["block"]: prod["t0_ms"] + b["block"] * 937.5 for b in blocks}
+    causal = all((b["lh_max_on"] is None or b["lh_max_on"] < s_k[b["block"]]) and
+                 (b["lh_max_end"] is None or b["lh_max_end"] <= s_k[b["block"]]) for b in blocks)
+    margins = [b["ready_margin_ms"] for b in blocks]
+    out.update({
+        "b1_input_integrity": {"ok": got == sent[:len(got)] and len(got) == len(sent), "received": len(got), "sent": len(sent)},
+        "b2_causal": causal,
+        "b3_equivalence_sample": prod["equivalence_sample"],
+        "c1_deadline": {"blocks": len(blocks), "late": sum(1 for x in margins if x < 0), "margin_min_ms": min(margins) if margins else None,
+                        "margin_median_ms": sorted(margins)[len(margins) // 2] if margins else None},
+        "abort": prod["abort"], "crops": prod["crops"], "lh_counts": prod["lh_counts"],
+        "c2_safe_stop": {"sender_end": snd.get("end"), "pending_on_at_stop": snd.get("pending_on_at_stop"),
+                         "sounding_at_stop": snd.get("sounding_at_stop"), "port_closed": snd.get("port_closed"),
+                         "stop_offs_failed": snd.get("stop_offs_failed")},
+        "reuse": [{k: b[k] for k in ("block", "crop", "P_reuse", "V", "S", "len_N", "lh_notes", "lh_held", "suffix_ms", "ready_margin_ms", "tokens")}
+                  for b in blocks]})
+    return out
+
+
+def main() -> None:
+    t3_py, aria_repo, ckpt, data, lh_notes, out_dir, report_path = sys.argv[1:8]
+    os.makedirs(out_dir, exist_ok=True)
+    report = {"issue": 1797, "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},
+              "scenarios": {}}
+    for name, extra in SCENARIOS.items():
+        report["scenarios"][name] = run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir)
+        print(name, json.dumps({k: report["scenarios"][name].get(k) for k in ("abort", "crops", "b1_input_integrity", "b2_causal", "c1_deadline")}),
+              flush=True)
+    os.makedirs(os.path.dirname(os.path.abspath(report_path)), exist_ok=True)
+    with open(report_path, "w") as f:
+        json.dump(report, f, indent=1)
+
+
+if __name__ == "__main__":
+    main()
