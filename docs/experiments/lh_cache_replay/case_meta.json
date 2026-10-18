@@ -1,0 +1,56 @@
+{
+ "longP_1692": {
+  "cont_len": 4,
+  "filler_for_n30": 25,
+  "filler_for_n15": 10,
+  "Pseq_sha16": "2c4c8f7d73cfd8b9",
+  "N_sha16": "8b8e9d59552ff8c0",
+  "V_fed": 1820,
+  "V_unfed": 1819
+ },
+ "longP_2142": {
+  "cont_len": 24,
+  "filler_for_n30": 5,
+  "filler_for_n15": 0,
+  "Pseq_sha16": "44e6622ac2e40ec3",
+  "N_sha16": "cc68b6d06d7784c1",
+  "V_fed": 2396,
+  "V_unfed": 2395
+ },
+ "longP_2877": {
+  "cont_len": 39,
+  "filler_for_n30": 0,
+  "filler_for_n15": 0,
+  "Pseq_sha16": "8b5ee064b419d236",
+  "N_sha16": "4f751b35b553eaad",
+  "V_fed": 3203,
+  "V_unfed": 3202
+ },
+ "longP_3343": {
+  "cont_len": 6,
+  "filler_for_n30": 23,
+  "filler_for_n15": 8,
+  "Pseq_sha16": "3ca79d4ff594d23d",
+  "N_sha16": "0c2cfdfd45e09b22",
+  "V_fed": 3363,
+  "V_unfed": 3362
+ },
+ "crop": {
+  "cont_len": 27,
+  "filler_for_n30": 2,
+  "filler_for_n15": 0,
+  "Pseq_sha16": "98a7456a31ce4c17",
+  "N_sha16": "0ea7920192415722",
+  "V_fed": 3968,
+  "V_unfed": 3967
+ },
+ "s0": {
+  "cont_len": 18,
+  "filler_for_n30": 11,
+  "filler_for_n15": 0,
+  "Pseq_sha16": "0901d30b6e2982d6",
+  "N_sha16": "1b2849548aa58d0c",
+  "V_fed": 3965,
+  "V_unfed": 3964
+ }
+}
