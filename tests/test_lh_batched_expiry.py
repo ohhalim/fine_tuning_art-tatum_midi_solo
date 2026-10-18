@@ -53,5 +53,15 @@ class VerdictTest(unittest.TestCase):
             self.assertFalse(be.verdict(v, self.cur())["worth_contract_experiment"], key)
 
 
+class WorstRowsTest(unittest.TestCase):
+    def test_largest_s_and_largest_estimate_are_separate(self):
+        import lh_batched_expiry as be
+        rows = [{"S": 300, "P": 100, "est_ms": 90.0}, {"S": 250, "P": 3000, "est_ms": 120.0}]
+        s_row, est_row = be.worst_rows(rows)
+        self.assertEqual(s_row["S"], 300)
+        self.assertEqual(est_row["est_ms"], 120.0)
+        self.assertEqual(be.worst_rows([]), (None, None))
+
+
 if __name__ == "__main__":
     unittest.main()

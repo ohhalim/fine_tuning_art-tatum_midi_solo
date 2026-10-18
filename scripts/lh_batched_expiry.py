@@ -59,13 +59,21 @@ def tag_expiry(rows, reqs):
     return out
 
 
+def worst_rows(nc):
+    """The largest-S pair (the gate) and the largest estimated-time pair, which can differ: the estimate grows with P too
+    (Astra review of #1836)."""
+    if not nc:
+        return None, None
+    return max(nc, key=lambda x: x["S"]), max(nc, key=lambda x: x["est_ms"])
+
+
 def variant_report(built, fails, coef):
     rows = [dict(x, song=i) for i, reqs in built.items() for x in tag_expiry(pair_rows(reqs, "b"), reqs)]
     nc = [x for x in rows if x["cause"] != "crop"]
     reqs = [r for rs in built.values() for r in rs if r is not None]
     for x in nc:
         x["est_ms"] = cost_at(coef, x["P"], x["S"])
-    worst = max(nc, key=lambda x: x["S"]) if nc else None
+    worst, worst_est = worst_rows(nc)
     large = [x for x in nc if x["est_ms"] >= LARGE_MS]
     P_med = statistics.median(x["P"] for x in nc) if nc else None
     S = summary([x["S"] for x in nc])
@@ -77,6 +85,7 @@ def variant_report(built, fails, coef):
             "expiry_pairs": sum(1 for x in nc if x["expiry"]), "non_expiry_pairs": sum(1 for x in nc if not x["expiry"]),
             "S_by_cause": {c: summary([x["S"] for x in nc if x["cause"] == c]) for c in sorted({x["cause"] for x in nc})},
             "worst": None if worst is None else {k: worst[k] for k in ("song", "k", "P", "S", "cause", "expiry", "est_ms")},
+            "worst_est": None if worst_est is None else {k: worst_est[k] for k in ("song", "k", "P", "S", "cause", "expiry", "est_ms")},
             "large_pairs": len(large), "large_fraction": len(large) / len(nc) if nc else None,
             "window_ms": summary([r["window_ms"] for r in reqs if r["k"] >= 1]),
             "lh_notes": summary([r["lh_notes"] for r in reqs]),
