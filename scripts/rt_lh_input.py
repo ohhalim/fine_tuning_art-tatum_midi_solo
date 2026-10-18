@@ -120,6 +120,18 @@ class SessionCrop:
         return True
 
 
+def cap_floor(onsets, position_ms, grid0, block_ms, cap):
+    """Note cap per block window (issue #1819). Windows are [grid0 + i * block_ms, grid0 + (i + 1) * block_ms), the
+    blocks' commit windows. When the window holding position_ms (the stream's current time) already has `cap` notes
+    among the provisional onsets, the next onset must start in the next window: that window start is returned as a
+    floor for the grammar mask. Otherwise -inf (no floor). cap 0 means off."""
+    if not cap:
+        return float("-inf")
+    w = (position_ms - grid0) // block_ms
+    n = sum(1 for o in onsets if (o - grid0) // block_ms == w)
+    return grid0 + (w + 1) * block_ms if n >= cap else float("-inf")
+
+
 class LHReplay:
     """Deterministic left hand for paired A/B runs (issue #1825). The feeder's note list is turned into the same
     time-ordered events the feeder would send (rt_lh_feeder.events: offs before ons at equal times), placed at music time

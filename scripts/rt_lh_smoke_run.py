@@ -5,6 +5,7 @@ B forced crop, C slow producer. Each scenario is analysed from its saved files.
 
   rt_lh_smoke_run.py <t3_aria python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json> [--analyze-only] [--rerun]
       [--precision fp32|bf16|q8|q4]   (issue #1813; passed to every producer, default fp32)
+      [--note-cap K] [--seed N] [--scenarios A_normal,B_crop_early]   (issue #1819)
       [--lh-replay]   (issue #1825; no feeder, the producer reads <lh notes json> by music time; B1 reported not applicable)
 """
 from __future__ import annotations
@@ -176,6 +177,16 @@ def loop_speed(prod):
     return {"blocks": rows, "median_ms_per_sample": xs[len(xs) // 2] if xs else None}
 
 
+def density(prod):
+    """Per warm block: notes committed for its window, samples before the horizon, of those under the note cap (#1819)."""
+    rows = [{"block": b["block"], "notes": b.get("notes"), "samples": b.get("samples_to_ready"), "capped": b.get("capped_to_ready"),
+             "margin_ms": b.get("ready_margin_ms")} for b in prod["blocks"] if b.get("samples_to_ready") is not None]
+    smp = [r["samples"] for r in rows]
+    return {"blocks": rows, "max_samples": max(smp) if smp else None,
+            "blocks_capped_before_ready": sum(1 for r in rows if r["capped"]),
+            "max_notes": max((r["notes"] for r in rows if r["notes"] is not None), default=None)}
+
+
 def analyze_lh(name, d):
     base = analyze(name, d)
     prod_p = os.path.join(d, "producer.json")
@@ -233,20 +244,25 @@ def main() -> None:
     rerun = "--rerun" in sys.argv[8:]                        # issue #1807 scenario set and criteria
     scenarios, check_blocks = (SCENARIOS_RERUN, RERUN_CHECK_BLOCKS) if rerun else (SCENARIOS, CHECK_BLOCKS)
     tail = sys.argv[8:]
-    precision = tail[tail.index("--precision") + 1] if "--precision" in tail else None
+    flag = lambda name: tail[tail.index(name) + 1] if name in tail else None  # noqa: E731
+    precision, note_cap, seed, only = flag("--precision"), flag("--note-cap"), flag("--seed"), flag("--scenarios")
+    passed = [x for f in ("--precision", "--note-cap", "--seed") if flag(f) for x in (f, flag(f))]
+    if only:                                                   # issue #1819: a subset of the scenario set
+        scenarios = {k: v for k, v in scenarios.items() if k in only.split(",")}
     lh_replay = "--lh-replay" in tail                        # issue #1825: deterministic left hand, no feeder
     os.makedirs(out_dir, exist_ok=True)
     prev_code = None
     if analyze_only and os.path.exists(report_path):            # keep the code that ran; the analyzer is recorded apart
         prev_code = json.load(open(report_path)).get("code")
-    report = {"issue": 1797, "precision": precision or "fp32", "lh_mode": "replay" if lh_replay else "live",
+    report = {"issue": 1797, "precision": precision or "fp32", "note_cap": int(note_cap or 0), "seed": seed,
+              "lh_mode": "replay" if lh_replay else "live",
               "code": prev_code if analyze_only else code_provenance(), "analyzer_code": code_provenance(),
               "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},
               "analyze_only": analyze_only, "scenarios": {}}
     if analyze_only:
         report["lh_mode"] = recorded_lh_mode(out_dir, scenarios, report["lh_mode"])
     for name, extra in scenarios.items():
-        extra = extra + (["--precision", precision] if precision else [])
+        extra = extra + passed
         report["scenarios"][name] = (analyze_lh(name, os.path.join(out_dir, name)) if analyze_only
                                      else run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir, check_blocks,
                                                        lh_replay=lh_replay))
@@ -261,6 +277,7 @@ def main() -> None:
                 sc["rerun_checks"]["slow_block_stopped_on_deadline"] = prod["abort"] == {"reason": "deadline_miss", "block": 2}
             sc["precision"] = prod.get("precision", "fp32")
             sc["loop_speed"] = loop_speed(prod)
+            sc["density"] = density(prod)
         print(name, json.dumps({k: report["scenarios"][name].get(k) for k in ("abort", "crops", "b1_input_integrity", "b2_causal", "c1_deadline")}),
               flush=True)
     run0 = os.path.join(out_dir, "A_normal_run0_analysis_crash")    # doc 9 deviation 1: first A run, no A3 checks recorded

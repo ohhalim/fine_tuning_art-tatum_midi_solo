@@ -419,5 +419,27 @@ class IntakeLateTest(unittest.TestCase):
         self.assertEqual(sch.midi_note, [0])
 
 
+class OnsetScanTest(unittest.TestCase):
+    """Issue #1819: provisional onsets for the note cap, incremental across appends, commits and rollbacks."""
+
+    def test_onsets_follow_appends_commit_and_rollback(self):
+        from stream_contract import floor_parts
+        s = TokenStream(PREFIX)
+        for t in note(62, 500, 300) + note(64, 1300, 300):
+            s.append_sampled(t)
+        self.assertEqual(s.onsets_since_commit(), [500, 1300])
+        for t in ["<T>"] + note(65, 100, 100):
+            s.append_sampled(t)
+        self.assertEqual(s.onsets_since_commit(), [500, 1300, 5100])
+        s.commit_until(1151.25)                      # 62@500 committed
+        self.assertEqual(s.onsets_since_commit(), [1300, 5100])
+        s.rollback_to_committed()
+        self.assertEqual(s.onsets_since_commit(), [])
+        for t in note(66, 1200, 100):
+            s.append_sampled(t)
+        self.assertEqual(s.onsets_since_commit(), [1200])
+        self.assertEqual(floor_parts(s.floor_ms, s.grammar_state()), s.onset_floor())
+
+
 if __name__ == "__main__":
     unittest.main()
