@@ -24,7 +24,7 @@ sys.path.insert(0, HERE)
 from aria_grammar_mask import GrammarMask, masked_pick  # noqa: E402
 from aria_mlx_stream_loop import BEAT, BLOCK, CAP, SEED, fill_block  # noqa: E402
 from aria_token_validity import check as token_check  # noqa: E402
-from crop_contract import CAPACITY, KEEP_TARGET  # noqa: E402
+from crop_contract import CAPACITY, KEEP_TARGET, CapacityFailure, needs_crop  # noqa: E402
 from lh_cache_replay import reuse_start  # noqa: E402
 from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
 from lh_kv_reuse import common_prefix, equivalence_ok, load_mlx, logit_gap  # noqa: E402
@@ -149,11 +149,16 @@ def main() -> None:
         if dropped:
             del model["seq"][len(model["seq"]) - dropped:]
             model["V"] = min(model["V"], len(model["seq"]))
-        lh_notes = [] if k == 0 else window_notes(Human(lh.human()), s_k, max(s_k - W_MS, crop.base_ms))
-        changed = crop.maybe_crop(stream.tokens, stream.committed_end, 3 * len(lh_notes))
-        if changed and k > 0:
-            lh_notes = window_notes(Human(lh.human()), s_k, max(s_k - W_MS, crop.base_ms))
+        human = Human(lh.human())
+
+        def lh_for(base):
+            return [] if k == 0 else window_notes(human, s_k, max(s_k - W_MS, base))
+
+        changed = crop.maybe_crop(stream.tokens, stream.committed_end, lambda sess, base: len(merge(sess, base, lh_for(base))[0]))
+        lh_notes = lh_for(crop.base_ms)
         N, tags = merge(crop.session(stream.tokens, stream.committed_end), crop.base_ms, lh_notes)
+        if needs_crop(len(N), CAP, capacity):            # the merged request plus one block of generation must fit (#1803)
+            raise CapacityFailure(f"block {k}: merged request {len(N)} + reserve does not fit {capacity}")
         marks["context_ready_ns"] = time.monotonic_ns()
         if k == slow_block:
             time.sleep(slow_ms / 1000)
@@ -173,9 +178,13 @@ def main() -> None:
     blocks, abort, snaps, reached = [], None, [], []
     # block 0 (cold): no left hand, no deadline, but it must reach its horizon (#1802)
     tc = time.perf_counter()
-    marks0, info0 = prepare(0, t0)
     h0 = t0 + BLOCK + BEAT
     held0, cold = [], {}
+    try:
+        marks0, info0 = prepare(0, t0)
+    except CapacityFailure as e:                       # the prompt alone does not fit: nothing generated or sent (#1803)
+        marks0, info0 = {}, {}
+        cold.update(problem="capacity_failure", detail=str(e)[:200])
 
     def on_ready0():
         cold["problem"] = guarded_commit(time.monotonic_ns(), None, coverage(), h0, lambda: held0.extend(stream.commit_until(h0)))
@@ -183,22 +192,26 @@ def main() -> None:
             raise Abort()
 
     n0 = samples["n"]
-    try:
-        res0 = fill_block(sample_one, coverage, on_ready0, h0, h0 + BLOCK, CAP)
-    except Abort:
-        res0 = {"reached": False}
+    if cold.get("problem"):
+        res0 = {"reached": None}
+    else:
+        try:
+            res0 = fill_block(sample_one, coverage, on_ready0, h0, h0 + BLOCK, CAP)
+        except Abort:
+            res0 = {"reached": False}
     W = time.monotonic_ns() + int(LEAD_S * 1e9)
     origin.update(W=W)
     with open(origin_path, "w") as f:
         json.dump({"music_origin_ms": t0, "wall_origin_ns": W}, f)
     emit({"type": "start", "music_origin_ms": t0, "wall_origin_ns": W})
     if cold.get("problem"):
-        abort = {"reason": cold["problem"], "block": 0}
-        emit({"type": "abort", **abort})
+        abort = {"reason": cold["problem"], "block": 0, **({"detail": cold["detail"]} if "detail" in cold else {})}
+        emit({"type": "abort", "reason": cold["problem"], "block": 0})
     else:
         emit({"type": "notes", "block": 0, "notes": notes_json(held0)})
     snaps.append(list(stream.tokens[:stream.committed_end]))
-    reached.append(res0["reached"])
+    if res0["reached"] is not None:
+        reached.append(res0["reached"])
     note_progress({"block": 0, "cold_s": round(time.perf_counter() - tc, 4), **info0, "tokens": samples["n"] - n0,
                    "reached": res0["reached"], "problem": cold.get("problem")})
     try:
@@ -209,7 +222,13 @@ def main() -> None:
             s_k = t0 + k * BLOCK
             h = s_k + BLOCK + BEAT
             deadline = W + int((k * BLOCK + BEAT) * 1e6)
-            marks, info = prepare(k, s_k)
+            try:
+                marks, info = prepare(k, s_k)
+            except CapacityFailure as e:                   # no cut fits: stop before any forward, nothing sent (#1803)
+                abort = {"reason": "capacity_failure", "block": k, "detail": str(e)[:200]}
+                emit({"type": "abort", "reason": "capacity_failure", "block": k})
+                note_progress({"block": k, "problem": "capacity_failure", "detail": abort["detail"]})
+                break
             ready = {}
 
             def commit_and_send():

@@ -68,6 +68,42 @@ class CropAndDeadlineTest(unittest.TestCase):
         self.assertTrue(li.is_late(101, 100))
 
 
+class CropWithLeftHandTest(unittest.TestCase):
+    """Issue #1803: the cut is chosen on the merged request, and a request that cannot fit stops."""
+
+    def setUp(self):
+        from crop_contract import HEADER
+        self.rh = list(HEADER) + ["<T>"] + [x for i in range(60) for x in (("piano", 72, 60), ("onset", 10 * i), ("dur", 10))]
+
+    def merged_len(self, n_lh, s_k=10000):
+        human = Human([li.LiveNote(40 + i % 12, 5000 + 50 * i, 5000 + 50 * i + 20, 60) for i in range(n_lh)])
+        return lambda sess, base: len(merge(sess, base, window_notes(human, s_k, max(s_k - 7500, base)))[0])
+
+    def test_left_hand_that_cannot_fit_is_a_capacity_failure(self):
+        from crop_contract import CapacityFailure
+        for n_lh in (80, 30):                        # merged 422 and 272 (+ reserve 131) against capacity 400
+            crop = li.SessionCrop(cap=64, capacity=400, keep_target=200)
+            with self.assertRaises(CapacityFailure):
+                crop.maybe_crop(self.rh, len(self.rh), self.merged_len(n_lh))
+
+    def test_cut_moves_later_when_the_left_hand_needs_room(self):
+        seg = [x for i in range(20) for x in (("piano", 72, 60), ("onset", 10 * i), ("dur", 10))]
+        toks = [("prefix", "instrument", "piano"), "<S>"] + seg + ["<T>"] + seg + ["<T>"] + seg
+        lh_after = {0: 100, 5000: 100, 10000: 0}      # left-hand tokens left in the window for each base
+        crop = li.SessionCrop(cap=64, capacity=300, keep_target=130)
+        self.assertTrue(crop.maybe_crop(toks, len(toks), lambda sess, base: len(sess) + lh_after[base]))
+        # right hand alone keeps 123 <= 130 from the first <T> (base 5000), but merged that is 223 + reserve 131 > 300
+        self.assertEqual(crop.base_ms, 10000)
+
+    def test_right_hand_only_cut_would_not_fit_here(self):
+        from crop_contract import choose_cut, needs_crop
+        seg = [x for i in range(20) for x in (("piano", 72, 60), ("onset", 10 * i), ("dur", 10))]
+        toks = [("prefix", "instrument", "piano"), "<S>"] + seg + ["<T>"] + seg + ["<T>"] + seg
+        j = choose_cut(toks, len(toks), 64, 300, 130)
+        self.assertEqual(toks[:j + 1].count("<T>"), 1)            # base 5000
+        self.assertTrue(needs_crop(2 + len(toks) - (j + 1) + 100, 64, 300))
+
+
 class UnderfillTest(unittest.TestCase):
     """Issue #1802: fill_block calls on_ready also when it ran out of samples before the horizon."""
 
@@ -131,6 +167,77 @@ class LoopSpeedTest(unittest.TestCase):
         self.assertEqual([r["block"] for r in out["blocks"]], [1, 3])
         self.assertEqual([r["ms_per_sample"] for r in out["blocks"]], [10.0, 15.0])
         self.assertEqual(out["median_ms_per_sample"], 15.0)
+
+
+class RerunChecksFailClosedTest(unittest.TestCase):
+    """#1807 judge must not pass a missing record, an EOF end or a mapping gap (Astra review M1)."""
+
+    def base(self):
+        import copy
+        from rt_lh_smoke_run import BLOCKS, REQUIRED_A_CHECKS
+        out = {"posthoc_before_horizon": {"notes_before_previous_horizon": [], "unmatched_on": 0, "rejected_late_on": []},
+               "a_checks": {"checks": {k: {"ok": True} for k in REQUIRED_A_CHECKS}},
+               "c2_safe_stop": {"pending_on_at_stop": 0, "port_closed": True, "stop_offs_failed": 0},
+               "b1_input_integrity": {"ok": True}, "b2_causal": True}
+        prod = {"abort": None, "blocks": [{"block": k, "len_N": 100} for k in range(1, BLOCKS)]}
+        snd = {"end": "end"}
+        return copy.deepcopy(out), prod, snd
+
+    def judge(self, out, prod, snd):
+        from rt_lh_smoke_run import rerun_checks
+        return rerun_checks(out, prod, 4160, snd)
+
+    def test_complete_normal_record_passes(self):
+        self.assertTrue(all(self.judge(*self.base()).values()))
+
+    def test_eof_end_without_abort_fails(self):
+        out, prod, snd = self.base()
+        snd["end"] = "eof"
+        self.assertFalse(self.judge(out, prod, snd)["stop_is_recorded_abort_or_end"])
+
+    def test_missing_warm_block_fails(self):
+        out, prod, snd = self.base()
+        prod["blocks"].pop()
+        self.assertFalse(self.judge(out, prod, snd)["stop_is_recorded_abort_or_end"])
+
+    def test_abort_must_match_the_sender_record(self):
+        out, prod, snd = self.base()
+        prod["abort"] = {"reason": "deadline_miss", "block": 2}
+        prod["blocks"] = prod["blocks"][:2]
+        snd.update(end="abort", abort={"reason": "deadline_miss", "block": 2})
+        self.assertTrue(self.judge(out, prod, snd)["stop_is_recorded_abort_or_end"])
+        snd["abort"] = {"reason": "deadline_miss", "block": 3}
+        self.assertFalse(self.judge(out, prod, snd)["stop_is_recorded_abort_or_end"])
+        snd.pop("abort")
+        self.assertFalse(self.judge(out, prod, snd)["stop_is_recorded_abort_or_end"])
+
+    def test_empty_or_partial_existing_checks_fail(self):
+        out, prod, snd = self.base()
+        out["a_checks"]["checks"] = {}
+        self.assertFalse(self.judge(out, prod, snd)["existing_checks"])
+        out, prod, snd = self.base()
+        out["a_checks"]["checks"]["sender_exit"] = {}
+        self.assertFalse(self.judge(out, prod, snd)["existing_checks"])
+        out, prod, snd = self.base()
+        del out["a_checks"]["checks"]["A2_capture_alternates_per_pitch"]
+        self.assertFalse(self.judge(out, prod, snd)["existing_checks"])
+
+    def test_unmatched_on_and_missing_rejection_record_fail(self):
+        out, prod, snd = self.base()
+        out["posthoc_before_horizon"]["unmatched_on"] = 99
+        self.assertFalse(self.judge(out, prod, snd)["no_note_before_previous_horizon"])
+        out, prod, snd = self.base()
+        del out["posthoc_before_horizon"]["rejected_late_on"]
+        self.assertFalse(self.judge(out, prod, snd)["no_late_intake_rejection"])
+
+    def test_missing_stop_offs_record_and_no_forward_fail(self):
+        out, prod, snd = self.base()
+        out["c2_safe_stop"]["stop_offs_failed"] = None
+        self.assertFalse(self.judge(out, prod, snd)["safe_stop"])
+        out, prod, snd = self.base()
+        for b in prod["blocks"]:
+            b["len_N"] = None
+        self.assertFalse(self.judge(out, prod, snd)["forwarded_blocks_fit_capacity"])
 
 
 if __name__ == "__main__":

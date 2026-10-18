@@ -1,0 +1,1109 @@
+{
+ "issue": 1797,
+ "code": null,
+ "analyzer_code": {
+  "commit": "15d3ac46a6877dc737efdcac6bb75472e462fed8",
+  "branch": "exp/1807/lh-smoke-rerun",
+  "dirty_scripts": []
+ },
+ "inputs": {
+  "data_sha256": "8501d2aca038d763dbea2149e0ed1171ddcf0107d7d33d6a0d6e5da0c92bd5bb",
+  "lh_notes_sha256": "c8b42bdce62350c390d402fddcebba9273ef5c420b1be1e6872deaefda319a5f",
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90"
+ },
+ "analyze_only": true,
+ "scenarios": {
+  "A_normal": {
+   "a_checks": {
+    "run_meta": {
+     "ports": [
+      "lh_smoke_out_A_normal_70179",
+      "lh_smoke_in_A_normal_70179"
+     ],
+     "args": [
+      "/Users/ohhalim/git_box/wt_rc_1780/scripts/rt_lh_producer.py",
+      "/Users/ohhalim/git_box/t3_aria/aria",
+      "/Users/ohhalim/git_box/t3_aria/ckpt/model-gen.safetensors",
+      "/Users/ohhalim/git_box/mehldau_aria/data.json",
+      "17",
+      "lh_smoke_in_A_normal_70179",
+      "/Users/ohhalim/git_box/lh_input_smoke_run2/A_normal/origin.json",
+      "/Users/ohhalim/git_box/lh_input_smoke_run2/A_normal/producer_progress.jsonl",
+      "/Users/ohhalim/git_box/lh_input_smoke_run2/A_normal/producer.json",
+      "--check-blocks",
+      "2,3"
+     ],
+     "producer_returncode": 0,
+     "sender_returncode": 0,
+     "capture_returncode": 0,
+     "feeder_returncode": 0
+    },
+    "producer_finished_report": true,
+    "producer_last_progress_block": 16,
+    "scheduler_expected_saved": true,
+    "sender": {
+     "end": "end",
+     "error": null,
+     "port_closed": true,
+     "pending_at_stop": 0,
+     "sounding_at_stop": 0,
+     "send_failures": 0,
+     "cancelled_unsent_on": 0,
+     "clean_stop": true,
+     "dropped_velocity0": 0,
+     "extended_zero_length": 0,
+     "blocks_received": 17
+    },
+    "checks": {
+     "A1a_scheduler_expected_equals_sent": {
+      "ok": true,
+      "left": 208,
+      "right": 208,
+      "first_difference": null,
+      "send_failures": 0,
+      "cancelled_unsent_on": 0
+     },
+     "A1b_sent_equals_capture": {
+      "ok": true,
+      "left": 208,
+      "right": 208,
+      "first_difference": null
+     },
+     "A2_capture_alternates_per_pitch": {
+      "ok": true
+     },
+     "A3_logical_on_off_pairs": {
+      "ok": true,
+      "on": 104,
+      "off": 104
+     },
+     "A3_midi_on_equals_logical_on": {
+      "ok": true,
+      "midi_on": 104,
+      "logical_on": 104
+     },
+     "A3_scheduled_notes_accounted": {
+      "ok": true,
+      "scheduled": 104,
+      "delivered_on": 104,
+      "cancelled_on_at_stop": 0
+     },
+     "A3_producer_contract": {
+      "ok": true,
+      "detail": {
+       "committed_prefix_never_changed": true,
+       "committed_tokens_format_valid": true,
+       "every_block_reached_horizon": true
+      }
+     },
+     "sender_exit": {
+      "ok": true,
+      "recorded_ok": true,
+      "process_exit_verified": true
+     }
+    },
+    "timing": {
+     "send_return_minus_scheduled_ms": {
+      "n": 208,
+      "median": 0.845,
+      "p99_nearest_rank": 7.277,
+      "max": 11.661,
+      "min": 0.06
+     },
+     "capture_minus_send_return_ms": {
+      "n": 208,
+      "median": 0.093,
+      "p99_nearest_rank": 0.378,
+      "max": 0.431,
+      "min": -4.123
+     },
+     "capture_minus_scheduled_ms": {
+      "n": 208,
+      "median": 0.933,
+      "p99_nearest_rank": 7.146,
+      "max": 11.929,
+      "min": 0.143
+     }
+    },
+    "sender_schedule": {
+     "margin_to_deadline_ms": {
+      "n": 16,
+      "median": 148.967,
+      "p99_nearest_rank": 339.962,
+      "max": 339.962,
+      "min": 34.615
+     },
+     "block0_ms_before_W": 998.329,
+     "deadline_misses": 0
+    },
+    "producer": {
+     "cold_prebuffer_s": 0.5791,
+     "warm_ready_margin_ms": {
+      "n": 16,
+      "median": 149.753,
+      "p99_nearest_rank": 340.682,
+      "max": 340.682,
+      "min": 35.05
+     },
+     "chord_ready_margin_ms": null,
+     "warm_ready_s": {
+      "n": 16,
+      "median": 0.265,
+      "p99_nearest_rank": 0.333,
+      "max": 0.333,
+      "min": 0.081
+     },
+     "chord_ready_s": null,
+     "late_block_start_ms": {
+      "n": 16,
+      "median": 0.273,
+      "p99_nearest_rank": 0.529,
+      "max": 0.529,
+      "min": 0.03
+     },
+     "deadline_misses": 0,
+     "blocks_without_timing": [],
+     "blocks_reported": 17,
+     "committed_token_sha256": "1a73ec88236342995558504eff16950a82a076876f70870ccc0218a1ac0c8ec7"
+    }
+   },
+   "posthoc_before_horizon": {
+    "notes_before_previous_horizon": [],
+    "unmatched_on": 0,
+    "rejected_late_on": [],
+    "notes_on": 104,
+    "send_late_max_ms": 11.661,
+    "sent_over_10ms_late": 1
+   },
+   "b1_input_integrity": {
+    "ok": true,
+    "received": 55,
+    "sent": 56,
+    "sent_before_final_drain": 55,
+    "sent_after_final_drain": 1
+   },
+   "b2_causal": true,
+   "b3_equivalence_sample": [
+    {
+     "block": 2,
+     "start": 111,
+     "S": 37,
+     "top1_equal": 37,
+     "positions": 37,
+     "max_abs_last": 0.0,
+     "ok": true
+    },
+    {
+     "block": 3,
+     "start": 113,
+     "S": 53,
+     "top1_equal": 53,
+     "positions": 53,
+     "max_abs_last": 0.0,
+     "ok": true
+    }
+   ],
+   "c1_deadline": {
+    "blocks": 16,
+    "late": 0,
+    "margin_min_ms": 35.05,
+    "margin_median_ms": 151.486
+   },
+   "abort": null,
+   "crops": 0,
+   "lh_counts": {
+    "on": 28,
+    "off": 27,
+    "retrigger": 0,
+    "velocity0_off": 0,
+    "unknown_off": 0,
+    "cc64_ignored": 0,
+    "other_ignored": 0
+   },
+   "c2_safe_stop": {
+    "sender_end": "end",
+    "pending_on_at_stop": 0,
+    "sounding_at_stop": 0,
+    "port_closed": true,
+    "stop_offs_failed": 0
+   },
+   "reuse": [
+    {
+     "block": 1,
+     "crop": false,
+     "P_reuse": 122,
+     "V": 123,
+     "S": 1,
+     "len_N": 123,
+     "lh_notes": 0,
+     "lh_held": 0,
+     "suffix_ms": 124.429,
+     "ready_margin_ms": 142.953,
+     "tokens": 37
+    },
+    {
+     "block": 2,
+     "crop": false,
+     "P_reuse": 111,
+     "V": 139,
+     "S": 37,
+     "len_N": 148,
+     "lh_notes": 3,
+     "lh_held": 3,
+     "suffix_ms": 39.246,
+     "ready_margin_ms": 221.985,
+     "tokens": 42
+    },
+    {
+     "block": 3,
+     "crop": false,
+     "P_reuse": 113,
+     "V": 163,
+     "S": 53,
+     "len_N": 166,
+     "lh_notes": 4,
+     "lh_held": 1,
+     "suffix_ms": 45.4,
+     "ready_margin_ms": 155.106,
+     "tokens": 36
+    },
+    {
+     "block": 4,
+     "crop": false,
+     "P_reuse": 150,
+     "V": 187,
+     "S": 46,
+     "len_N": 196,
+     "lh_notes": 7,
+     "lh_held": 0,
+     "suffix_ms": 43.398,
+     "ready_margin_ms": 151.486,
+     "tokens": 27
+    },
+    {
+     "block": 5,
+     "crop": false,
+     "P_reuse": 216,
+     "V": 217,
+     "S": 1,
+     "len_N": 217,
+     "lh_notes": 7,
+     "lh_held": 0,
+     "suffix_ms": 16.847,
+     "ready_margin_ms": 158.821,
+     "tokens": 34
+    },
+    {
+     "block": 6,
+     "crop": false,
+     "P_reuse": 232,
+     "V": 238,
+     "S": 9,
+     "len_N": 241,
+     "lh_notes": 8,
+     "lh_held": 1,
+     "suffix_ms": 46.233,
+     "ready_margin_ms": 340.682,
+     "tokens": 13
+    },
+    {
+     "block": 7,
+     "crop": false,
+     "P_reuse": 234,
+     "V": 247,
+     "S": 19,
+     "len_N": 253,
+     "lh_notes": 10,
+     "lh_held": 2,
+     "suffix_ms": 43.923,
+     "ready_margin_ms": 208.345,
+     "tokens": 37
+    },
+    {
+     "block": 8,
+     "crop": false,
+     "P_reuse": 234,
+     "V": 269,
+     "S": 38,
+     "len_N": 272,
+     "lh_notes": 11,
+     "lh_held": 1,
+     "suffix_ms": 49.699,
+     "ready_margin_ms": 283.324,
+     "tokens": 21
+    },
+    {
+     "block": 9,
+     "crop": false,
+     "P_reuse": 262,
+     "V": 281,
+     "S": 25,
+     "len_N": 287,
+     "lh_notes": 13,
+     "lh_held": 2,
+     "suffix_ms": 52.693,
+     "ready_margin_ms": 120.282,
+     "tokens": 51
+    },
+    {
+     "block": 10,
+     "crop": false,
+     "P_reuse": 111,
+     "V": 311,
+     "S": 203,
+     "len_N": 314,
+     "lh_notes": 14,
+     "lh_held": 1,
+     "suffix_ms": 95.174,
+     "ready_margin_ms": 77.03,
+     "tokens": 36
+    },
+    {
+     "block": 11,
+     "crop": false,
+     "P_reuse": 139,
+     "V": 338,
+     "S": 202,
+     "len_N": 341,
+     "lh_notes": 15,
+     "lh_held": 2,
+     "suffix_ms": 91.065,
+     "ready_margin_ms": 115.697,
+     "tokens": 58
+    },
+    {
+     "block": 12,
+     "crop": false,
+     "P_reuse": 151,
+     "V": 362,
+     "S": 205,
+     "len_N": 356,
+     "lh_notes": 13,
+     "lh_held": 1,
+     "suffix_ms": 89.687,
+     "ready_margin_ms": 72.666,
+     "tokens": 43
+    },
+    {
+     "block": 13,
+     "crop": false,
+     "P_reuse": 340,
+     "V": 381,
+     "S": 47,
+     "len_N": 387,
+     "lh_notes": 15,
+     "lh_held": 1,
+     "suffix_ms": 40.408,
+     "ready_margin_ms": 296.748,
+     "tokens": 21
+    },
+    {
+     "block": 14,
+     "crop": false,
+     "P_reuse": 211,
+     "V": 396,
+     "S": 185,
+     "len_N": 396,
+     "lh_notes": 15,
+     "lh_held": 1,
+     "suffix_ms": 79.392,
+     "ready_margin_ms": 148.021,
+     "tokens": 42
+    },
+    {
+     "block": 15,
+     "crop": false,
+     "P_reuse": 211,
+     "V": 414,
+     "S": 197,
+     "len_N": 408,
+     "lh_notes": 13,
+     "lh_held": 0,
+     "suffix_ms": 97.454,
+     "ready_margin_ms": 35.05,
+     "tokens": 42
+    },
+    {
+     "block": 16,
+     "crop": false,
+     "P_reuse": 230,
+     "V": 435,
+     "S": 211,
+     "len_N": 441,
+     "lh_notes": 15,
+     "lh_held": 1,
+     "suffix_ms": 111.067,
+     "ready_margin_ms": 66.639,
+     "tokens": 55
+    }
+   ],
+   "rerun_checks": {
+    "no_note_before_previous_horizon": true,
+    "no_late_intake_rejection": true,
+    "forwarded_blocks_fit_capacity": true,
+    "stop_is_recorded_abort_or_end": true,
+    "safe_stop": true,
+    "existing_checks": true
+   }
+  },
+  "B_crop_early": {
+   "a_checks": {
+    "run_meta": {
+     "ports": [
+      "lh_smoke_out_B_crop_early_70179",
+      "lh_smoke_in_B_crop_early_70179"
+     ],
+     "args": [
+      "/Users/ohhalim/git_box/wt_rc_1780/scripts/rt_lh_producer.py",
+      "/Users/ohhalim/git_box/t3_aria/aria",
+      "/Users/ohhalim/git_box/t3_aria/ckpt/model-gen.safetensors",
+      "/Users/ohhalim/git_box/mehldau_aria/data.json",
+      "17",
+      "lh_smoke_in_B_crop_early_70179",
+      "/Users/ohhalim/git_box/lh_input_smoke_run2/B_crop_early/origin.json",
+      "/Users/ohhalim/git_box/lh_input_smoke_run2/B_crop_early/producer_progress.jsonl",
+      "/Users/ohhalim/git_box/lh_input_smoke_run2/B_crop_early/producer.json",
+      "--check-blocks",
+      "",
+      "--capacity",
+      "260",
+      "--keep-target",
+      "120"
+     ],
+     "producer_returncode": 0,
+     "sender_returncode": 0,
+     "capture_returncode": 0,
+     "feeder_returncode": 0
+    },
+    "producer_finished_report": true,
+    "producer_last_progress_block": 16,
+    "scheduler_expected_saved": true,
+    "sender": {
+     "end": "end",
+     "error": null,
+     "port_closed": true,
+     "pending_at_stop": 0,
+     "sounding_at_stop": 0,
+     "send_failures": 0,
+     "cancelled_unsent_on": 0,
+     "clean_stop": true,
+     "dropped_velocity0": 0,
+     "extended_zero_length": 0,
+     "blocks_received": 17
+    },
+    "checks": {
+     "A1a_scheduler_expected_equals_sent": {
+      "ok": true,
+      "left": 208,
+      "right": 208,
+      "first_difference": null,
+      "send_failures": 0,
+      "cancelled_unsent_on": 0
+     },
+     "A1b_sent_equals_capture": {
+      "ok": true,
+      "left": 208,
+      "right": 208,
+      "first_difference": null
+     },
+     "A2_capture_alternates_per_pitch": {
+      "ok": true
+     },
+     "A3_logical_on_off_pairs": {
+      "ok": true,
+      "on": 104,
+      "off": 104
+     },
+     "A3_midi_on_equals_logical_on": {
+      "ok": true,
+      "midi_on": 104,
+      "logical_on": 104
+     },
+     "A3_scheduled_notes_accounted": {
+      "ok": true,
+      "scheduled": 104,
+      "delivered_on": 104,
+      "cancelled_on_at_stop": 0
+     },
+     "A3_producer_contract": {
+      "ok": true,
+      "detail": {
+       "committed_prefix_never_changed": true,
+       "committed_tokens_format_valid": true,
+       "every_block_reached_horizon": true
+      }
+     },
+     "sender_exit": {
+      "ok": true,
+      "recorded_ok": true,
+      "process_exit_verified": true
+     }
+    },
+    "timing": {
+     "send_return_minus_scheduled_ms": {
+      "n": 208,
+      "median": 0.711,
+      "p99_nearest_rank": 3.997,
+      "max": 10.951,
+      "min": 0.03
+     },
+     "capture_minus_send_return_ms": {
+      "n": 208,
+      "median": 0.109,
+      "p99_nearest_rank": 0.367,
+      "max": 0.779,
+      "min": -0.438
+     },
+     "capture_minus_scheduled_ms": {
+      "n": 208,
+      "median": 0.804,
+      "p99_nearest_rank": 3.955,
+      "max": 11.02,
+      "min": 0.105
+     }
+    },
+    "sender_schedule": {
+     "margin_to_deadline_ms": {
+      "n": 16,
+      "median": 177.777,
+      "p99_nearest_rank": 321.687,
+      "max": 321.687,
+      "min": 91.931
+     },
+     "block0_ms_before_W": 998.983,
+     "deadline_misses": 0
+    },
+    "producer": {
+     "cold_prebuffer_s": 0.5058,
+     "warm_ready_margin_ms": {
+      "n": 16,
+      "median": 178.239,
+      "p99_nearest_rank": 322.068,
+      "max": 322.068,
+      "min": 92.998
+     },
+     "chord_ready_margin_ms": null,
+     "warm_ready_s": {
+      "n": 16,
+      "median": 0.244,
+      "p99_nearest_rank": 0.335,
+      "max": 0.335,
+      "min": 0.132
+     },
+     "chord_ready_s": null,
+     "late_block_start_ms": {
+      "n": 16,
+      "median": 0.343,
+      "p99_nearest_rank": 0.534,
+      "max": 0.534,
+      "min": 0.032
+     },
+     "deadline_misses": 0,
+     "blocks_without_timing": [],
+     "blocks_reported": 17,
+     "committed_token_sha256": "1668ac19f87f25b7311805680ef8b8076bfaac03bd08ba8d3c90caa5a08d7b8a"
+    }
+   },
+   "posthoc_before_horizon": {
+    "notes_before_previous_horizon": [],
+    "unmatched_on": 0,
+    "rejected_late_on": [],
+    "notes_on": 104,
+    "send_late_max_ms": 10.951,
+    "sent_over_10ms_late": 2
+   },
+   "b1_input_integrity": {
+    "ok": true,
+    "received": 53,
+    "sent": 56,
+    "sent_before_final_drain": 53,
+    "sent_after_final_drain": 3
+   },
+   "b2_causal": true,
+   "b3_equivalence_sample": [],
+   "c1_deadline": {
+    "blocks": 16,
+    "late": 0,
+    "margin_min_ms": 92.998,
+    "margin_median_ms": 178.456
+   },
+   "abort": null,
+   "crops": 4,
+   "lh_counts": {
+    "on": 27,
+    "off": 26,
+    "retrigger": 0,
+    "velocity0_off": 0,
+    "unknown_off": 0,
+    "cc64_ignored": 0,
+    "other_ignored": 0
+   },
+   "c2_safe_stop": {
+    "sender_end": "end",
+    "pending_on_at_stop": 0,
+    "sounding_at_stop": 0,
+    "port_closed": true,
+    "stop_offs_failed": 0
+   },
+   "reuse": [
+    {
+     "block": 1,
+     "crop": false,
+     "P_reuse": 122,
+     "V": 123,
+     "S": 1,
+     "len_N": 123,
+     "lh_notes": 0,
+     "lh_held": 0,
+     "suffix_ms": 119.135,
+     "ready_margin_ms": 141.545,
+     "tokens": 37
+    },
+    {
+     "block": 2,
+     "crop": true,
+     "P_reuse": 0,
+     "V": 139,
+     "S": 93,
+     "len_N": 93,
+     "lh_notes": 3,
+     "lh_held": 3,
+     "suffix_ms": 62.125,
+     "ready_margin_ms": 185.537,
+     "tokens": 48
+    },
+    {
+     "block": 3,
+     "crop": false,
+     "P_reuse": 58,
+     "V": 111,
+     "S": 56,
+     "len_N": 114,
+     "lh_notes": 4,
+     "lh_held": 1,
+     "suffix_ms": 43.034,
+     "ready_margin_ms": 206.788,
+     "tokens": 36
+    },
+    {
+     "block": 4,
+     "crop": true,
+     "P_reuse": 0,
+     "V": 132,
+     "S": 50,
+     "len_N": 50,
+     "lh_notes": 4,
+     "lh_held": 0,
+     "suffix_ms": 39.179,
+     "ready_margin_ms": 178.456,
+     "tokens": 48
+    },
+    {
+     "block": 5,
+     "crop": false,
+     "P_reuse": 70,
+     "V": 71,
+     "S": 1,
+     "len_N": 71,
+     "lh_notes": 4,
+     "lh_held": 0,
+     "suffix_ms": 14.39,
+     "ready_margin_ms": 322.068,
+     "tokens": 13
+    },
+    {
+     "block": 6,
+     "crop": false,
+     "P_reuse": 77,
+     "V": 83,
+     "S": 9,
+     "len_N": 86,
+     "lh_notes": 5,
+     "lh_held": 1,
+     "suffix_ms": 18.009,
+     "ready_margin_ms": 274.853,
+     "tokens": 34
+    },
+    {
+     "block": 7,
+     "crop": false,
+     "P_reuse": 79,
+     "V": 101,
+     "S": 28,
+     "len_N": 107,
+     "lh_notes": 7,
+     "lh_held": 2,
+     "suffix_ms": 40.527,
+     "ready_margin_ms": 164.616,
+     "tokens": 28
+    },
+    {
+     "block": 8,
+     "crop": false,
+     "P_reuse": 79,
+     "V": 126,
+     "S": 50,
+     "len_N": 129,
+     "lh_notes": 8,
+     "lh_held": 1,
+     "suffix_ms": 46.298,
+     "ready_margin_ms": 171.351,
+     "tokens": 36
+    },
+    {
+     "block": 9,
+     "crop": true,
+     "P_reuse": 0,
+     "V": 147,
+     "S": 44,
+     "len_N": 44,
+     "lh_notes": 3,
+     "lh_held": 2,
+     "suffix_ms": 44.261,
+     "ready_margin_ms": 178.023,
+     "tokens": 45
+    },
+    {
+     "block": 10,
+     "crop": false,
+     "P_reuse": 19,
+     "V": 62,
+     "S": 55,
+     "len_N": 74,
+     "lh_notes": 7,
+     "lh_held": 1,
+     "suffix_ms": 46.133,
+     "ready_margin_ms": 170.546,
+     "tokens": 45
+    },
+    {
+     "block": 11,
+     "crop": false,
+     "P_reuse": 55,
+     "V": 95,
+     "S": 46,
+     "len_N": 101,
+     "lh_notes": 9,
+     "lh_held": 2,
+     "suffix_ms": 42.899,
+     "ready_margin_ms": 183.562,
+     "tokens": 40
+    },
+    {
+     "block": 12,
+     "crop": false,
+     "P_reuse": 76,
+     "V": 119,
+     "S": 46,
+     "len_N": 122,
+     "lh_notes": 10,
+     "lh_held": 1,
+     "suffix_ms": 51.779,
+     "ready_margin_ms": 194.402,
+     "tokens": 40
+    },
+    {
+     "block": 13,
+     "crop": true,
+     "P_reuse": 0,
+     "V": 138,
+     "S": 11,
+     "len_N": 11,
+     "lh_notes": 0,
+     "lh_held": 0,
+     "suffix_ms": 20.277,
+     "ready_margin_ms": 254.134,
+     "tokens": 33
+    },
+    {
+     "block": 14,
+     "crop": false,
+     "P_reuse": 20,
+     "V": 26,
+     "S": 9,
+     "len_N": 29,
+     "lh_notes": 1,
+     "lh_held": 1,
+     "suffix_ms": 40.353,
+     "ready_margin_ms": 92.998,
+     "tokens": 39
+    },
+    {
+     "block": 15,
+     "crop": false,
+     "P_reuse": 22,
+     "V": 53,
+     "S": 31,
+     "len_N": 53,
+     "lh_notes": 1,
+     "lh_held": 0,
+     "suffix_ms": 49.302,
+     "ready_margin_ms": 119.625,
+     "tokens": 45
+    },
+    {
+     "block": 16,
+     "crop": false,
+     "P_reuse": 50,
+     "V": 77,
+     "S": 36,
+     "len_N": 86,
+     "lh_notes": 4,
+     "lh_held": 1,
+     "suffix_ms": 46.495,
+     "ready_margin_ms": 147.816,
+     "tokens": 49
+    }
+   ],
+   "rerun_checks": {
+    "no_note_before_previous_horizon": true,
+    "no_late_intake_rejection": true,
+    "forwarded_blocks_fit_capacity": true,
+    "stop_is_recorded_abort_or_end": true,
+    "safe_stop": true,
+    "existing_checks": true,
+    "crop_happened": true
+   }
+  },
+  "C_slow_block2": {
+   "a_checks": {
+    "run_meta": {
+     "ports": [
+      "lh_smoke_out_C_slow_block2_70179",
+      "lh_smoke_in_C_slow_block2_70179"
+     ],
+     "args": [
+      "/Users/ohhalim/git_box/wt_rc_1780/scripts/rt_lh_producer.py",
+      "/Users/ohhalim/git_box/t3_aria/aria",
+      "/Users/ohhalim/git_box/t3_aria/ckpt/model-gen.safetensors",
+      "/Users/ohhalim/git_box/mehldau_aria/data.json",
+      "17",
+      "lh_smoke_in_C_slow_block2_70179",
+      "/Users/ohhalim/git_box/lh_input_smoke_run2/C_slow_block2/origin.json",
+      "/Users/ohhalim/git_box/lh_input_smoke_run2/C_slow_block2/producer_progress.jsonl",
+      "/Users/ohhalim/git_box/lh_input_smoke_run2/C_slow_block2/producer.json",
+      "--check-blocks",
+      "",
+      "--slow-block",
+      "2",
+      "--slow-ms",
+      "600"
+     ],
+     "producer_returncode": 0,
+     "sender_returncode": 0,
+     "capture_returncode": 0,
+     "feeder_returncode": 0
+    },
+    "producer_finished_report": true,
+    "producer_last_progress_block": 2,
+    "scheduler_expected_saved": true,
+    "sender": {
+     "end": "abort",
+     "error": null,
+     "port_closed": true,
+     "pending_at_stop": 0,
+     "sounding_at_stop": 0,
+     "send_failures": 0,
+     "cancelled_unsent_on": 0,
+     "clean_stop": true,
+     "dropped_velocity0": 0,
+     "extended_zero_length": 0,
+     "blocks_received": 2
+    },
+    "checks": {
+     "A1a_scheduler_expected_equals_sent": {
+      "ok": true,
+      "left": 24,
+      "right": 24,
+      "first_difference": null,
+      "send_failures": 0,
+      "cancelled_unsent_on": 0
+     },
+     "A1b_sent_equals_capture": {
+      "ok": true,
+      "left": 24,
+      "right": 24,
+      "first_difference": null
+     },
+     "A2_capture_alternates_per_pitch": {
+      "ok": true
+     },
+     "A3_logical_on_off_pairs": {
+      "ok": true,
+      "on": 12,
+      "off": 12
+     },
+     "A3_midi_on_equals_logical_on": {
+      "ok": true,
+      "midi_on": 12,
+      "logical_on": 12
+     },
+     "A3_scheduled_notes_accounted": {
+      "ok": true,
+      "scheduled": 12,
+      "delivered_on": 12,
+      "cancelled_on_at_stop": 0
+     },
+     "A3_producer_contract": {
+      "ok": true,
+      "detail": {
+       "committed_prefix_never_changed": true,
+       "committed_tokens_format_valid": true,
+       "every_block_reached_horizon": true
+      }
+     },
+     "sender_exit": {
+      "ok": true,
+      "recorded_ok": true,
+      "process_exit_verified": true
+     }
+    },
+    "timing": {
+     "send_return_minus_scheduled_ms": {
+      "n": 24,
+      "median": 1.102,
+      "p99_nearest_rank": 3.812,
+      "max": 3.812,
+      "min": 0.082
+     },
+     "capture_minus_send_return_ms": {
+      "n": 24,
+      "median": 0.101,
+      "p99_nearest_rank": 0.389,
+      "max": 0.389,
+      "min": -0.347
+     },
+     "capture_minus_scheduled_ms": {
+      "n": 24,
+      "median": 1.204,
+      "p99_nearest_rank": 3.796,
+      "max": 3.796,
+      "min": 0.197
+     }
+    },
+    "sender_schedule": {
+     "margin_to_deadline_ms": {
+      "n": 1,
+      "median": 162.128,
+      "p99_nearest_rank": 162.128,
+      "max": 162.128,
+      "min": 162.128
+     },
+     "block0_ms_before_W": 998.692,
+     "deadline_misses": 0
+    },
+    "producer": {
+     "cold_prebuffer_s": 0.5109,
+     "warm_ready_margin_ms": {
+      "n": 2,
+      "median": -119.632,
+      "p99_nearest_rank": 162.597,
+      "max": 162.597,
+      "min": -401.86
+     },
+     "chord_ready_margin_ms": null,
+     "warm_ready_s": {
+      "n": 2,
+      "median": 0.215,
+      "p99_nearest_rank": 0.217,
+      "max": 0.217,
+      "min": 0.213
+     },
+     "chord_ready_s": null,
+     "late_block_start_ms": {
+      "n": 2,
+      "median": 0.298,
+      "p99_nearest_rank": 0.415,
+      "max": 0.415,
+      "min": 0.182
+     },
+     "deadline_misses": 1,
+     "blocks_without_timing": [],
+     "blocks_reported": 3,
+     "committed_token_sha256": "b64b15d34dbc466769618c26d22e56852469dcb67e9a4c19cafda1421e4efa5c"
+    }
+   },
+   "posthoc_before_horizon": {
+    "notes_before_previous_horizon": [],
+    "unmatched_on": 0,
+    "rejected_late_on": [],
+    "notes_on": 12,
+    "send_late_max_ms": 3.812,
+    "sent_over_10ms_late": 0
+   },
+   "b1_input_integrity": {
+    "ok": true,
+    "received": 7,
+    "sent": 56,
+    "sent_before_final_drain": 7,
+    "sent_after_final_drain": 49
+   },
+   "b2_causal": true,
+   "b3_equivalence_sample": [],
+   "c1_deadline": {
+    "blocks": 2,
+    "late": 1,
+    "margin_min_ms": -401.86,
+    "margin_median_ms": 162.597
+   },
+   "abort": {
+    "reason": "deadline_miss",
+    "block": 2
+   },
+   "crops": 0,
+   "lh_counts": {
+    "on": 4,
+    "off": 3,
+    "retrigger": 0,
+    "velocity0_off": 0,
+    "unknown_off": 0,
+    "cc64_ignored": 0,
+    "other_ignored": 0
+   },
+   "c2_safe_stop": {
+    "sender_end": "abort",
+    "pending_on_at_stop": 0,
+    "sounding_at_stop": 0,
+    "port_closed": true,
+    "stop_offs_failed": 0
+   },
+   "reuse": [
+    {
+     "block": 1,
+     "crop": false,
+     "P_reuse": 122,
+     "V": 123,
+     "S": 1,
+     "len_N": 123,
+     "lh_notes": 0,
+     "lh_held": 0,
+     "suffix_ms": 88.698,
+     "ready_margin_ms": 162.597,
+     "tokens": 37
+    },
+    {
+     "block": 2,
+     "crop": false,
+     "P_reuse": 111,
+     "V": 139,
+     "S": 37,
+     "len_N": 148,
+     "lh_notes": 3,
+     "lh_held": 3,
+     "suffix_ms": 656.309,
+     "ready_margin_ms": -401.86,
+     "tokens": 18
+    }
+   ],
+   "rerun_checks": {
+    "no_note_before_previous_horizon": true,
+    "no_late_intake_rejection": true,
+    "forwarded_blocks_fit_capacity": true,
+    "stop_is_recorded_abort_or_end": true,
+    "safe_stop": true,
+    "existing_checks": true,
+    "slow_block_stopped_on_deadline": true
+   }
+  }
+ }
+}

@@ -231,10 +231,11 @@ class MainLoopPathTest(unittest.TestCase):
 
 
 class AnalyzeTest(unittest.TestCase):
-    def write(self, d, sender, capture):
+    def write(self, d, sender, capture, extra_rows=()):
         json.dump(sender, open(os.path.join(d, "sender.json"), "w"))
         json.dump({"messages": capture}, open(os.path.join(d, "capture.json"), "w"))
-        open(os.path.join(d, "producer_progress.jsonl"), "w").write(json.dumps({"block": 0, "cold_s": 0.1}) + "\n")
+        rows = [{"block": 0, "cold_s": 0.1}] + list(extra_rows)
+        open(os.path.join(d, "producer_progress.jsonl"), "w").write("".join(json.dumps(r) + "\n" for r in rows))
 
     def sender_log(self, sent, expected, logical, scheduled):
         return {"sent": sent, "expected_midi": expected, "logical_sent": logical, "scheduled_notes": scheduled,
@@ -254,6 +255,18 @@ class AnalyzeTest(unittest.TestCase):
         self.assertTrue(r["checks"]["A1b_sent_equals_capture"]["ok"])
         self.assertFalse(r["checks"]["A1a_scheduler_expected_equals_sent"]["ok"])
         self.assertFalse(r["checks"]["A3_scheduled_notes_accounted"]["ok"])
+
+    def test_block_stopped_before_generation_does_not_break_the_analysis(self):
+        sent = [{"kind": "on", "pitch": 60, "velocity": 80, "scheduled_ns": 0, "send_return_ns": 1},
+                {"kind": "off", "pitch": 60, "velocity": 0, "scheduled_ns": 10, "send_return_ns": 11}]
+        capture = [{"capture_ns": 2, "bytes": [0x90, 60, 80]}, {"capture_ns": 12, "bytes": [0x80, 60, 0]}]
+        rows = [{"block": 1, "late_start_ms": 0.1, "ready_margin_ms": 50.0, "ready_s": 0.2},
+                {"block": 2, "problem": "capacity_failure", "detail": "no <T> fits"}]
+        with tempfile.TemporaryDirectory() as d:
+            self.write(d, self.sender_log(sent, [["on", 60, 80, 0], ["off", 60, 0, 10]], [[0, "on", 0, 60], [10, "off", 0, 60]], 1), capture, rows)
+            r = analyze("t", d)
+        self.assertEqual(r["producer"]["blocks_without_timing"], [2])
+        self.assertEqual(r["producer"]["deadline_misses"], 0)
 
     def test_without_return_codes_exit_is_not_claimed(self):
         sent = [{"kind": "on", "pitch": 60, "velocity": 80, "scheduled_ns": 0, "send_return_ns": 1},

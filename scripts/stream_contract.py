@@ -245,9 +245,9 @@ class Scheduler:
         self.midi_due = []     # the scheduled (event) time of each midi_out entry; midi_out holds the delivery time
         self.midi_note = []    # the note_id of each midi_out entry
         self.pitch_owner = {}  # pitch -> note_id that currently owns it in the MIDI stream
-        self.rejected_late = []  # notes whose onset had already passed when they were handed in (issue #1798)
+        self.rejected_late = []  # notes handed in more than INTAKE_GRACE_MS after their onset (issue #1798)
 
-    INTAKE_GRACE_MS = 5.0      # a note handed in up to this late is still queued: the sender's 1 ms poll and the pipe
+    INTAKE_GRACE_MS = 5.0      # provisional operating allowance for the 1 ms poll and the pipe, not a derived bound
 
     def schedule(self, notes, now_ms=None):
         """Notes must be playable: 0 <= pitch <= 127, 1 <= velocity <= 127, off_ms > on_ms. A batch with any bad note
