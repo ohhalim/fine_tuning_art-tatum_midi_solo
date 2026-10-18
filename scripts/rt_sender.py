@@ -142,8 +142,7 @@ class Sender:
         for m in msgs:
             self.handle(m)
         if self.playing_out():             # abort with stop_at_ms: committed notes due up to it are still sent
-            self.step(limit_ms=self.stop_at_ms)
-            return self.music_now() >= self.stop_at_ms
+            return self.step(limit_ms=self.stop_at_ms) >= self.stop_at_ms     # done only once ticked to stop_at
         if self.end in ABNORMAL:
             return True
         self.step()
@@ -153,16 +152,20 @@ class Sender:
         return self.end == "abort" and self.stop_at_ms is not None and self.origin is not None
 
     def step(self, limit_ms=None):
-        """Tick to the music clock (never past limit_ms, never back) and send what became due."""
-        if self.origin is not None:
-            t = self.music_now() if limit_ms is None else min(self.music_now(), limit_ms)
-            if t >= self.sch.last_tick_ms:             # tick(t) refuses a clock that went back
-                self.sch.tick(t)
-            self.flush()
+        """Tick to the music clock (never past limit_ms, never back) and send what became due. One clock read per step;
+        returns the time actually ticked to, so completion is judged on the same reading (Astra review of #1824)."""
+        if self.origin is None:
+            return float("-inf")
+        now = self.music_now()
+        t = now if limit_ms is None else min(now, limit_ms)
+        if t >= self.sch.last_tick_ms:                 # tick(t) refuses a clock that went back
+            self.sch.tick(t)
+        self.flush()
+        return self.sch.last_tick_ms
 
     def done(self):
         if self.playing_out():
-            return self.music_now() >= self.stop_at_ms
+            return self.sch.last_tick_ms >= self.stop_at_ms
         return self.end in ABNORMAL or (self.end == "end" and not self.sch.pending)
 
     def cleanup(self):

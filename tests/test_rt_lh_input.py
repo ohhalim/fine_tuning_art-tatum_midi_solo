@@ -317,6 +317,23 @@ class LHReplayTest(unittest.TestCase):
         self.assertEqual(r.events, [(self.T0 + t, k, p, v) for t, k, p, v in events(self.NOTES, self.OFF)])
 
 
+class RecordedLhModeTest(unittest.TestCase):
+    def test_mode_comes_from_the_producer_records(self):
+        import json as _json
+        import tempfile
+        from rt_lh_smoke_run import recorded_lh_mode
+        with tempfile.TemporaryDirectory() as d:
+            for name, mode in (("A", "replay"), ("B", "replay")):
+                os.makedirs(os.path.join(d, name))
+                with open(os.path.join(d, name, "producer.json"), "w") as f:
+                    _json.dump({"lh_source": {"mode": mode}}, f)
+            self.assertEqual(recorded_lh_mode(d, ["A", "B"], "live"), "replay")      # CLI flag omitted on re-analysis
+            with open(os.path.join(d, "B", "producer.json"), "w") as f:
+                _json.dump({"lh_source": {"mode": "live"}}, f)
+            self.assertEqual(recorded_lh_mode(d, ["A", "B"], "live"), "mixed")
+            self.assertEqual(recorded_lh_mode(d, ["C"], "live"), "live")               # nothing recorded
+
+
 class NoteCapTest(unittest.TestCase):
     """Issue #1819: the cap floor moves the next onset to the next block window once the current one is full."""
 
