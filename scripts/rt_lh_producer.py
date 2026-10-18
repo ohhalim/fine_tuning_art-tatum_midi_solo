@@ -9,6 +9,7 @@ crop, last token recomputed when S = 0), then fill_block. If a block's commit/sc
 
   rt_lh_producer.py <aria repo> <ckpt> <data json> <blocks> <lh port> <origin json> <progress jsonl> <report json>
       [--capacity N] [--keep-target N] [--slow-block K --slow-ms MS] [--check-blocks 4,8,12]
+      [--precision fp32|bf16|q8|q4] [--note-cap K] [--seed N]
 """
 from __future__ import annotations
 
@@ -29,8 +30,8 @@ from lh_cache_replay import reuse_start  # noqa: E402
 from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
 from lh_kv_reuse import common_prefix, load_mlx  # noqa: E402
 from kv_equiv_precision import gaps as eq_gaps, judge as eq_judge  # noqa: E402
-from rt_lh_input import LHState, SessionCrop, guarded_commit  # noqa: E402
-from stream_contract import TokenStream  # noqa: E402
+from rt_lh_input import LHState, SessionCrop, cap_floor, guarded_commit  # noqa: E402
+from stream_contract import SEGMENT_MS, TokenStream, floor_parts  # noqa: E402
 
 LEAD_S = 1.0
 
@@ -55,6 +56,8 @@ def main() -> None:
     slow_block, slow_ms = opt(rest, "--slow-block", int, -1), opt(rest, "--slow-ms", float, 0.0)
     check_blocks = set(int(x) for x in opt(rest, "--check-blocks", str, "").split(",") if x)
     precision = opt(rest, "--precision", str, "fp32")
+    note_cap = opt(rest, "--note-cap", int, 0)              # notes per block commit window, 0 = off (#1819)
+    seed = opt(rest, "--seed", int, SEED)
 
     out, progress = sys.stdout, open(progress_path, "w")
 
@@ -75,7 +78,7 @@ def main() -> None:
     stream = TokenStream(prompt)
     gm = GrammarMask(vocab)
     no_end = torch.tensor([t not in ("<D>", "<E>") for t in vocab])
-    gen = torch.Generator().manual_seed(SEED)
+    gen = torch.Generator().manual_seed(seed)
 
     # model input actually in the KV (positions 0..V-1) and the tokens after it not written yet
     model = {"seq": [], "V": 0, "last": None}
@@ -87,13 +90,19 @@ def main() -> None:
             model["V"] = len(seq)
         return model["last"]
 
-    samples = {"n": 0}                       # every sample, so an aborted block still has its count
+    samples = {"n": 0, "capped": 0}          # every sample, so an aborted block still has its count; capped: under the note cap
 
     def sample_one():
         samples["n"] += 1
         p = torch.softmax(torch.from_numpy(write_pending()), -1)
         st = stream.grammar_state()
-        gm.sync(st, stream.onset_floor(st))
+        floor = stream.floor_ms
+        if note_cap:                         # the current block window is full: the next onset goes to the next window
+            cf = cap_floor(stream.onsets_since_commit(), st.segment * SEGMENT_MS + st.last_onset, t0 + BEAT, BLOCK, note_cap)
+            if cf > floor:
+                floor = cf
+                samples["capped"] += 1
+        gm.sync(st, floor_parts(floor, st))
         ok = gm.allowed() & no_end
         a = p[ok].sum().item()
         if not (math.isfinite(a) and a > 0):
@@ -240,12 +249,13 @@ def main() -> None:
             def on_ready():
                 ready["ns"] = time.monotonic_ns()
                 ready["samples"] = samples["n"] - n_start          # samples before the horizon was covered (#1813)
+                ready["capped"] = samples["capped"] - c_start      # of those, under the note cap (#1819)
                 ready["coverage_ms"] = coverage()
                 ready["problem"] = guarded_commit(ready["ns"], deadline, ready["coverage_ms"], h, commit_and_send)
                 if ready["problem"]:
                     raise Abort()
 
-            n_start = samples["n"]
+            n_start, c_start = samples["n"], samples["capped"]
             try:
                 res = fill_block(sample_one, coverage, on_ready, h, h + BLOCK, CAP)
             except Abort:                                  # underfill is a known miss; a late block's coverage is not judged
@@ -256,7 +266,8 @@ def main() -> None:
                    "ready_margin_ms": round((deadline - ready["ns"]) / 1e6, 3), "notes": ready.get("notes"),
                    "ready_s": round((ready["ns"] - marks["suffix_ready_ns"]) / 1e9, 4),   # suffix ready -> horizon covered (monotonic)
                    "enqueued_ns": ready.get("enqueued_ns"), "deadline_ns": deadline, "tokens": samples["n"] - n_start,
-                   "samples_to_ready": ready.get("samples"),
+                   "samples_to_ready": ready.get("samples"), "capped_to_ready": ready.get("capped"),
+                   "capped_samples": samples["capped"] - c_start,
                    "reached": res["reached"], "problem": ready.get("problem"), "coverage_ms": ready.get("coverage_ms"),
                    "horizon_ms": h, "input_received": marks["input_received"],
                    "marks_ns": {"wake": wake, "snapshot": marks["snapshot_ns"], "context_ready": marks["context_ready_ns"],
@@ -308,7 +319,7 @@ def main() -> None:
                    "C_ok": j["C_ok"], "ok": j["valid"] and j["C_ok"] and (legacy or precision != "fp32")})
     import hashlib
     v = token_check(prompt, stream.tokens[len(prompt):stream.committed_end])
-    report = {"issue": 1797, "precision": precision, "t0_ms": t0, "wall_origin_ns": W, "capacity": capacity, "keep_target": keep_target,
+    report = {"issue": 1797, "precision": precision, "note_cap": note_cap, "seed": seed, "t0_ms": t0, "wall_origin_ns": W, "capacity": capacity, "keep_target": keep_target,
               "checks": {"committed_prefix_never_changed": all(snaps[i] == snaps[i + 1][:len(snaps[i])] for i in range(len(snaps) - 1)),
                          "committed_tokens_format_valid": v["valid"] and v["tail"] is None,
                          "every_block_reached_horizon": all(reached)},

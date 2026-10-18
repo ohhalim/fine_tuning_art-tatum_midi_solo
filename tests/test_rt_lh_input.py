@@ -240,5 +240,17 @@ class RerunChecksFailClosedTest(unittest.TestCase):
         self.assertFalse(self.judge(out, prod, snd)["forwarded_blocks_fit_capacity"])
 
 
+class NoteCapTest(unittest.TestCase):
+    """Issue #1819: the cap floor moves the next onset to the next block window once the current one is full."""
+
+    def test_cap_floor(self):
+        g, B = 1000.0, 937.5                          # windows [1000, 1937.5), [1937.5, 2875), ...
+        self.assertEqual(li.cap_floor([1100, 1200], 1200, g, B, 3), float("-inf"))
+        self.assertEqual(li.cap_floor([1100, 1200, 1300], 1300, g, B, 3), 1937.5)
+        self.assertEqual(li.cap_floor([1100, 1200, 1300, 2000], 2000, g, B, 3), float("-inf"))   # next window has 1
+        self.assertEqual(li.cap_floor([1100, 1200, 1300], 1300, g, B, 0), float("-inf"))         # off
+        self.assertEqual(li.cap_floor([], 900, g, B, 1), float("-inf"))                          # before the grid, empty
+
+
 if __name__ == "__main__":
     unittest.main()
