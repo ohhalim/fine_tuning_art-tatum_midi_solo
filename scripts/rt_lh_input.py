@@ -118,3 +118,39 @@ class SessionCrop:
         self.keep_from, self.base_ms = cut + 1, base
         self.crops += 1
         return True
+
+
+def cap_floor(onsets, position_ms, grid0, block_ms, cap):
+    """Note cap per block window (issue #1819). Windows are [grid0 + i * block_ms, grid0 + (i + 1) * block_ms), the
+    blocks' commit windows. When the window holding position_ms (the stream's current time) already has `cap` notes
+    among the provisional onsets, the next onset must start in the next window: that window start is returned as a
+    floor for the grammar mask. Otherwise -inf (no floor). cap 0 means off."""
+    if not cap:
+        return float("-inf")
+    w = (position_ms - grid0) // block_ms
+    n = sum(1 for o in onsets if (o - grid0) // block_ms == w)
+    return grid0 + (w + 1) * block_ms if n >= cap else float("-inf")
+
+
+class LHReplay:
+    """Deterministic left hand for paired A/B runs (issue #1825). The feeder's note list is turned into the same
+    time-ordered events the feeder would send (rt_lh_feeder.events: offs before ons at equal times), placed at music time
+    t0 + offset + note time, and fed to an LHState by music time instead of MIDI arrival. feed_until(lh, s_k) feeds every
+    event at or before s_k, which equals the live LHState of a zero-jitter feed drained at any time in [s_k, s_k + B):
+    a note-on after s_k is outside the window (onset < s_k), a note-off after s_k only marks a held note that the
+    window cuts at s_k anyway."""
+
+    def __init__(self, notes, t0_ms, offset_ms=937.5):
+        from rt_lh_feeder import events
+        self.events = [(t0_ms + t, kind, pitch, vel) for t, kind, pitch, vel in events(notes, offset_ms)]
+        self.fed = 0
+
+    def feed_until(self, lh, s_ms):
+        """Feed the unfed events with music time <= s_ms; returns them as (m_ms, kind, pitch, velocity)."""
+        out = []
+        while self.fed < len(self.events) and self.events[self.fed][0] <= s_ms:
+            ev = self.events[self.fed]
+            lh.feed(ev[1], ev[0], ev[2], ev[3])
+            out.append(ev)
+            self.fed += 1
+        return out
