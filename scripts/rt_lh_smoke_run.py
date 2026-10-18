@@ -214,6 +214,19 @@ def analyze_lh(name, d):
     return out
 
 
+def recorded_lh_mode(out_dir, names, fallback):
+    """The left-hand mode the producers recorded (lh_source.mode), so an analyze-only run without the CLI flag is not
+    mislabelled: "replay", "live", "mixed", or the CLI fallback when no producer recorded it (Astra review of #1828)."""
+    modes = set()
+    for n in names:
+        p = os.path.join(out_dir, n, "producer.json")
+        if os.path.exists(p):
+            m = (json.load(open(p)).get("lh_source") or {}).get("mode")
+            if m:
+                modes.add(m)
+    return fallback if not modes else modes.pop() if len(modes) == 1 else "mixed"
+
+
 def main() -> None:
     t3_py, aria_repo, ckpt, data, lh_notes, out_dir, report_path = sys.argv[1:8]
     analyze_only = "--analyze-only" in sys.argv[8:]          # rebuild the report from the saved run files, no model run
@@ -230,6 +243,8 @@ def main() -> None:
               "code": prev_code if analyze_only else code_provenance(), "analyzer_code": code_provenance(),
               "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},
               "analyze_only": analyze_only, "scenarios": {}}
+    if analyze_only:
+        report["lh_mode"] = recorded_lh_mode(out_dir, scenarios, report["lh_mode"])
     for name, extra in scenarios.items():
         extra = extra + (["--precision", precision] if precision else [])
         report["scenarios"][name] = (analyze_lh(name, os.path.join(out_dir, name)) if analyze_only
