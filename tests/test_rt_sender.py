@@ -107,6 +107,23 @@ class SenderTest(unittest.TestCase):
         self.assertEqual(sorted(m[1] for m in port.sent if m[0] == "note_off"), [60, 64])
         self.assertEqual(len(log["expected_midi"]), 4)
 
+    def test_abort_stops_before_any_new_note_and_cleanup_turns_off(self):
+        clock = Clock()
+        port = FakePort()
+        s = Sender(port, clock)
+        start(s, clock)                              # 60 and 64 sounding
+        s.handle({"type": "notes", "block": 1, "notes": [[2, 67, 80, 500, 900]]})
+        clock.ns = int(600e6)                        # 67 is due, but the abort arrives first
+        done = s.process([{"type": "abort", "reason": "deadline_miss", "block": 1}])
+        self.assertTrue(done)
+        self.assertNotIn(("note_on", 67, 80), port.sent)
+        log = s.cleanup()
+        self.assertEqual(log["end"], "abort")
+        self.assertEqual(log["abort"], {"reason": "deadline_miss", "block": 1})
+        self.assertEqual(sorted(m[1] for m in port.sent if m[0] == "note_off"), [60, 64])
+        self.assertEqual(log["pending_on_at_stop"], 1)  # 67 was still pending in the scheduler and is dropped by stop
+        self.assertNotIn(("note_on", 67, 80), port.sent)
+
     def test_normal_end_waits_for_pending_and_ignores_the_following_eof(self):
         clock = Clock()
         s = Sender(FakePort(), clock)
