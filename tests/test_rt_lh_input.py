@@ -7,7 +7,7 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 import rt_lh_input as li  # noqa: E402
-from lh_context import Human, merge, window_notes  # noqa: E402
+from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
 from lh_cache_replay import reuse_start  # noqa: E402
 
 
@@ -238,6 +238,167 @@ class RerunChecksFailClosedTest(unittest.TestCase):
         for b in prod["blocks"]:
             b["len_N"] = None
         self.assertFalse(self.judge(out, prod, snd)["forwarded_blocks_fit_capacity"])
+
+    def test_b1_not_applicable_counts_only_for_a_replay_run(self):
+        """#1825: a replay run has no feeder; B1 is not applicable, never a pass, and only accepted when the producer
+        says its left hand came from replay."""
+        out, prod, snd = self.base()
+        out["b1_input_integrity"] = {"ok": None, "not_applicable": True}
+        self.assertFalse(self.judge(out, prod, snd)["existing_checks"])          # a live run cannot skip B1
+        prod["lh_source"] = {"mode": "replay"}
+        self.assertTrue(self.judge(out, prod, snd)["existing_checks"])
+        out["b1_input_integrity"] = {"ok": None}                                 # neither a pass nor not applicable
+        self.assertFalse(self.judge(out, prod, snd)["existing_checks"])
+
+
+class LHReplayTest(unittest.TestCase):
+    """#1825: the left hand read by music time equals a zero-jitter live feed drained at any time in [s_k, s_k + B)."""
+
+    T0, OFF = 7870.0, 937.5
+    # music time of note time t is T0 + OFF + t; block starts s_k = T0 + k * 937.5, so t = (k - 1) * 937.5 is s_k
+    NOTES = [[47, 0.0, 1472.727, 50], [52, 415.909, 1472.727, 57], [51, 831.818, 1472.727, 52],
+             [40, 500.0, 937.5, 60],                # off exactly at s_2
+             [53, 1000.0, 1877.0, 60],              # off 2 ms after s_3: seen live only with late >= 2
+             [50, 1500.0, 2400.0, 70], [50, 1900.0, 2600.0, 71],   # re-strike of a held pitch
+             [45, 1875.0, 2812.5, 55],              # on exactly at s_3, off exactly at s_4
+             [55, 2814.0, 3000.0, 60]]              # on 1.5 ms after s_4: seen live only with late >= 1.5
+
+    def live(self, s, late):
+        """Zero-jitter live state: every feeder event that arrived by the snapshot at music time s + late."""
+        from rt_lh_feeder import events
+        lh = li.LHState()
+        for t, kind, pitch, vel in events(self.NOTES, self.OFF):
+            if self.T0 + t <= s + late:
+                lh.feed(kind, self.T0 + t, pitch, vel)
+        return lh
+
+    def test_replay_matches_zero_jitter_live_at_every_block(self):
+        B = 937.5
+        for late in (0.0, 0.5, 5.0, 400.0):
+            replay, lh_r = li.LHReplay(self.NOTES, self.T0, self.OFF), li.LHState()
+            for k in range(1, 6):
+                s_k = self.T0 + k * B
+                replay.feed_until(lh_r, s_k)
+                start = max(s_k - W_MS, 0.0)
+                want = window_notes(Human(self.live(s_k, late).human()), s_k, start)
+                got = window_notes(Human(lh_r.human()), s_k, start)
+                self.assertEqual(got, want, (late, k))
+
+    def test_feed_is_deterministic_and_idempotent(self):
+        a, b = li.LHReplay(self.NOTES, self.T0, self.OFF), li.LHReplay(self.NOTES, self.T0, self.OFF)
+        la, lb = li.LHState(), li.LHState()
+        for k in range(1, 6):
+            s_k = self.T0 + k * 937.5
+            fa = a.feed_until(la, s_k)
+            self.assertEqual(a.feed_until(la, s_k), [])                         # nothing is fed twice
+            self.assertEqual(fa, b.feed_until(lb, s_k))
+            self.assertEqual([vars(n) for n in la.human()], [vars(n) for n in lb.human()])
+
+    def test_live_arrival_jitter_can_change_tokens_replay_cannot(self):
+        """Positive control for the #1825 cause: #1819 s3/s4 A, note 47 arrived 0.7 vs 4.4 ms late; cut at s_2 its
+        length 937 vs 933 ms falls on 940 vs 930 ms tokens. Replay always uses the planned time."""
+        from lh_context import note_tokens
+        s_2 = self.T0 + 2 * 937.5
+
+        def tokens(arrival_late):
+            lh = li.LHState()
+            lh.feed("note_on", self.T0 + self.OFF + arrival_late, 47, 50)
+            return [note_tokens(n) for n in window_notes(Human(lh.human()), s_2, 0.0)]
+        self.assertNotEqual(tokens(0.69), tokens(4.38))
+        r1, r2, l1, l2 = li.LHReplay(self.NOTES[:1], self.T0), li.LHReplay(self.NOTES[:1], self.T0), li.LHState(), li.LHState()
+        r1.feed_until(l1, s_2)
+        r2.feed_until(l2, s_2)
+        self.assertEqual([note_tokens(n) for n in window_notes(Human(l1.human()), s_2, 0.0)],
+                         [note_tokens(n) for n in window_notes(Human(l2.human()), s_2, 0.0)])
+
+    def test_events_are_the_feeder_events_on_the_music_clock(self):
+        from rt_lh_feeder import events
+        r = li.LHReplay(self.NOTES, self.T0, self.OFF)
+        self.assertEqual(r.events, [(self.T0 + t, k, p, v) for t, k, p, v in events(self.NOTES, self.OFF)])
+
+
+class RecordedLhModeTest(unittest.TestCase):
+    def test_mode_comes_from_the_producer_records(self):
+        import json as _json
+        import tempfile
+        from rt_lh_smoke_run import recorded_lh_mode
+        with tempfile.TemporaryDirectory() as d:
+            for name, mode in (("A", "replay"), ("B", "replay")):
+                os.makedirs(os.path.join(d, name))
+                with open(os.path.join(d, name, "producer.json"), "w") as f:
+                    _json.dump({"lh_source": {"mode": mode}}, f)
+            self.assertEqual(recorded_lh_mode(d, ["A", "B"], "live"), "replay")      # CLI flag omitted on re-analysis
+            with open(os.path.join(d, "B", "producer.json"), "w") as f:
+                _json.dump({"lh_source": {"mode": "live"}}, f)
+            self.assertEqual(recorded_lh_mode(d, ["A", "B"], "live"), "mixed")
+            self.assertEqual(recorded_lh_mode(d, ["C"], "live"), "live")               # nothing recorded
+
+
+class NoteCapTest(unittest.TestCase):
+    """Issue #1819: the cap floor moves the next onset to the next block window once the current one is full."""
+
+    def test_cap_floor(self):
+        g, B = 1000.0, 937.5                          # windows [1000, 1937.5), [1937.5, 2875), ...
+        self.assertEqual(li.cap_floor([1100, 1200], 1200, g, B, 3), float("-inf"))
+        self.assertEqual(li.cap_floor([1100, 1200, 1300], 1300, g, B, 3), 1937.5)
+        self.assertEqual(li.cap_floor([1100, 1200, 1300, 2000], 2000, g, B, 3), float("-inf"))   # next window has 1
+        self.assertEqual(li.cap_floor([1100, 1200, 1300], 1300, g, B, 0), float("-inf"))         # off
+        self.assertEqual(li.cap_floor([], 900, g, B, 1), float("-inf"))                          # before the grid, empty
+
+
+class NoteCapStreamTest(unittest.TestCase):
+    """Issue #1819 (Astra M2): cap_floor with the real TokenStream and GrammarMask. A sampler that always takes the
+    earliest allowed onset (densest possible) never puts more than K notes in a window, across a 5 s segment boundary
+    and through commit -> speculate -> rollback."""
+
+    K, G, B = 3, 468.75, 937.5
+
+    def setUp(self):
+        import torch
+        from aria_grammar_mask import GrammarMask
+        from stream_contract import TokenStream
+        self.torch = torch
+        self.vocab = [("piano", 60, 80), ("dur", 100), "<T>"] + [("onset", o) for o in range(0, 5000, 10)]
+        self.gm = GrammarMask(self.vocab)
+        self.s = TokenStream([("piano", 60, 80), ("onset", 0), ("dur", 100)])
+
+    def step(self):
+        from stream_contract import SEGMENT_MS, floor_parts
+        st = self.s.grammar_state()
+        floor = max(self.s.floor_ms, li.cap_floor(self.s.onsets_since_commit(), st.segment * SEGMENT_MS + st.last_onset,
+                                                    self.G, self.B, self.K))
+        self.gm.sync(st, floor_parts(floor, st))
+        ok = [self.vocab[i] for i in self.torch.nonzero(self.gm.allowed()).flatten().tolist()]
+        onsets = [t for t in ok if isinstance(t, tuple) and t[0] == "onset"]
+        pick = (min(onsets, key=lambda t: t[1]) if onsets else ("piano", 60, 80) if ("piano", 60, 80) in ok
+                else ("dur", 100) if ("dur", 100) in ok else "<T>")
+        self.s.append_sampled(pick)
+
+    def run_until(self, ms):
+        from stream_contract import SEGMENT_MS
+        while True:
+            st = self.s.grammar_state()
+            if st.expect == "note" and st.segment * SEGMENT_MS + st.last_onset >= ms:
+                return
+            self.step()
+
+    def assert_capped(self, onsets):
+        import collections
+        per = collections.Counter(int((o - self.G) // self.B) for o in onsets)
+        self.assertLessEqual(max(per.values()), self.K, per)
+
+    def test_dense_sampler_respects_the_cap_across_segments_and_rollback(self):
+        h = self.G + self.B                                   # first commit horizon
+        self.run_until(h)
+        self.assert_capped(self.s.onsets_since_commit())
+        self.s.commit_until(h)
+        self.run_until(h + self.B)                            # speculation into the next window
+        self.assert_capped(self.s.onsets_since_commit())
+        self.s.rollback_to_committed()
+        self.run_until(5600)                                  # through the 5 s segment boundary (window [4218.75, 5156.25))
+        ons = self.s.onsets_since_commit()
+        self.assert_capped(ons)
+        self.assertTrue(any(o >= 5000 for o in ons) and any(4218.75 <= o < 5000 for o in ons))
 
 
 if __name__ == "__main__":

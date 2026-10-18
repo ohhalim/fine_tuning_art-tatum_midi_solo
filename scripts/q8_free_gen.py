@@ -211,6 +211,36 @@ def load(path, precision):
     return {(r["prompt"], r["seed"]): r for r in map(json.loads, open(path)) if r["precision"] == precision}
 
 
+def input_checks(fp32_path, q8_path, expected):
+    """Preconditions before any verdict (Astra review of #1830): every expected (prompt, seed) exactly once per
+    precision, each run format-valid and stopped by reaching the duration. Any failure means no verdict."""
+    out = {}
+    for prec, path in (("fp32", fp32_path), ("q8", q8_path)):
+        rows = [r for r in map(json.loads, open(path)) if r["precision"] == prec]
+        keys = [(r["prompt"], r["seed"]) for r in rows]
+        seen, dup = set(), set()
+        for k in keys:
+            (dup if k in seen else seen).add(k)
+        out[prec] = {"rows": len(rows), "duplicates": sorted(dup), "missing": sorted(set(expected) - seen),
+                     "unexpected": sorted(seen - set(expected)),
+                     "invalid": sorted((r["prompt"], r["seed"]) for r in rows if not r["valid"]),
+                     "not_duration": sorted((r["prompt"], r["seed"]) for r in rows if r["stop"] != "duration")}
+    ok = all(not v[k] for v in out.values() for k in ("duplicates", "missing", "unexpected", "invalid", "not_duration"))
+    return ok, out
+
+
+def seed_cluster(A, B, keys, stat):
+    """Post-hoc sensitivity (not the registered verdict): the four prompts reuse the same seeds, so their pairs share
+    sampling noise. Average the q8 - fp32 differences over prompts per seed and test those per-seed means."""
+    per = {}
+    for k in keys:
+        x, y = A[k]["stats"][stat], B[k]["stats"][stat]
+        if x is not None and y is not None:
+            per.setdefault(k[1], []).append(y - x)
+    means = [statistics.fmean(v) for _, v in sorted(per.items())]
+    return {"seeds": len(means), "median_of_seed_means": statistics.median(means) if means else None, "wilcoxon": wilcoxon(means)}
+
+
 def first_divergence(a, b):
     for i, (x, y) in enumerate(zip(a, b)):
         if x != y:
@@ -218,7 +248,9 @@ def first_divergence(a, b):
     return None if len(a) == len(b) else min(len(a), len(b))
 
 
-def compare(fp32_path, q8_path, report_path):
+def compare(fp32_path, q8_path, report_path, expected=None):
+    expected = expected if expected is not None else [(p, s) for p in PROMPTS for s in SEEDS]
+    inputs_ok, inputs = input_checks(fp32_path, q8_path, expected)
     A, B = load(fp32_path, "fp32"), load(q8_path, "q8")
     keys = sorted(set(A) & set(B))
     rep = {"issue": 1823, "rule": {"alpha_bonferroni": ALPHA, "min_abs_rank_biserial": MIN_EFFECT, "stats": STATS},
@@ -239,11 +271,16 @@ def compare(fp32_path, q8_path, report_path):
                          "min": min(dv) if dv else None, "max": max(dv) if dv else None}
     detected = [s for s in STATS if rep["stats"][s]["detected"]]
     all_valid = rep["valid"]["fp32"] == rep["valid"]["q8"] == len(keys)
-    rep["verdict"] = {"detected_stats": detected, "all_valid": all_valid,
-                      "summary": ("차이 검출" if detected else "이 n에서 검출된 차이 없음") + ("" if all_valid else ", 형식 무효 실행 있음")}
+    rep["inputs"] = inputs
+    rep["sensitivity_seed_cluster"] = {s: seed_cluster(A, B, keys, s) for s in STATS}
+    summary = ("차이 검출" if detected else "이 n에서 검출된 차이 없음") + ("" if all_valid else ", 형식 무효 실행 있음")
+    rep["verdict"] = {"detected_stats": detected, "all_valid": all_valid, "inputs_ok": inputs_ok,
+                      "summary": summary if inputs_ok else "판단 불가(입력 조건 미충족)"}
     with open(report_path, "w") as f:
         json.dump(rep, f, ensure_ascii=False, indent=1)
     print(json.dumps(rep["verdict"], ensure_ascii=False))
+    if not inputs_ok:
+        sys.exit(2)
     return rep
 
 
