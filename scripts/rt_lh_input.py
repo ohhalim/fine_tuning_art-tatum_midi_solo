@@ -70,16 +70,31 @@ class SessionCrop:
         from crop_contract import HEADER
         return list(tokens[:committed_end]) if self.keep_from is None else list(HEADER) + list(tokens[self.keep_from:committed_end])
 
-    def maybe_crop(self, tokens, committed_end, extra_tokens=0):
-        """Crop when the session plus extra_tokens (the left-hand tokens of the b context) would not fit. Returns True on a crop."""
-        from crop_contract import HEADER, choose_cut, needs_crop
+    def maybe_crop(self, tokens, committed_end, merged_len=None):
+        """Crop when the request built from the session would not fit. merged_len(session, base_ms) -> length of the
+        merged request (right hand + the left hand windowed for that base); default: the session alone.
+        The cut is chosen on that merged length, not on the right hand alone (issue #1803), in the order of
+        crop_contract.choose_cut: the earliest <T> that leaves the request <= keep_target, else the latest that is
+        still safe, else CapacityFailure. Returns True on a crop."""
+        from crop_contract import HEADER, CapacityFailure, check_settings, needs_crop
         from stream_contract import SEGMENT_MS
+        merged_len = merged_len or (lambda sess, base: len(sess))
         sess = self.session(tokens, committed_end)
-        if not needs_crop(len(sess) + extra_tokens, self.cap, self.capacity):
+        if not needs_crop(merged_len(sess, self.base_ms), self.cap, self.capacity):
             return False
-        j = choose_cut(sess, len(sess), self.cap, self.capacity, self.keep_target)
-        removed_t = sess[:j + 1].count("<T>")
+        check_settings(self.cap, self.capacity, self.keep_target)
+        cands = []
+        for j, t in enumerate(sess):
+            if t != "<T>":
+                continue
+            base = self.base_ms + sess[:j + 1].count("<T>") * SEGMENT_MS
+            cands.append((j, base, merged_len(list(HEADER) + sess[j + 1:], base)))
+        within = [c for c in cands if c[2] <= self.keep_target]
+        safe = [c for c in cands if not needs_crop(c[2], self.cap, self.capacity)]
+        if not within and not safe:
+            raise CapacityFailure(f"no <T> among {len(cands)} leaves the merged request under {self.capacity}")
+        j, base, _ = within[0] if within else safe[-1]
         cut = j if self.keep_from is None else self.keep_from + j - len(HEADER)
-        self.keep_from, self.base_ms = cut + 1, self.base_ms + removed_t * SEGMENT_MS
+        self.keep_from, self.base_ms = cut + 1, base
         self.crops += 1
         return True

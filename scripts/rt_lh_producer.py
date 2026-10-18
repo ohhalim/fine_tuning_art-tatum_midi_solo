@@ -24,7 +24,7 @@ sys.path.insert(0, HERE)
 from aria_grammar_mask import GrammarMask, masked_pick  # noqa: E402
 from aria_mlx_stream_loop import BEAT, BLOCK, CAP, SEED, fill_block  # noqa: E402
 from aria_token_validity import check as token_check  # noqa: E402
-from crop_contract import CAPACITY, KEEP_TARGET  # noqa: E402
+from crop_contract import CAPACITY, KEEP_TARGET, CapacityFailure, needs_crop  # noqa: E402
 from lh_cache_replay import reuse_start  # noqa: E402
 from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
 from lh_kv_reuse import common_prefix, load_mlx  # noqa: E402
@@ -145,11 +145,16 @@ def main() -> None:
         if dropped:
             del model["seq"][len(model["seq"]) - dropped:]
             model["V"] = min(model["V"], len(model["seq"]))
-        lh_notes = [] if k == 0 else window_notes(Human(lh.human()), s_k, max(s_k - W_MS, crop.base_ms))
-        changed = crop.maybe_crop(stream.tokens, stream.committed_end, 3 * len(lh_notes))
-        if changed and k > 0:
-            lh_notes = window_notes(Human(lh.human()), s_k, max(s_k - W_MS, crop.base_ms))
+        human = Human(lh.human())
+
+        def lh_for(base):
+            return [] if k == 0 else window_notes(human, s_k, max(s_k - W_MS, base))
+
+        changed = crop.maybe_crop(stream.tokens, stream.committed_end, lambda sess, base: len(merge(sess, base, lh_for(base))[0]))
+        lh_notes = lh_for(crop.base_ms)
         N, tags = merge(crop.session(stream.tokens, stream.committed_end), crop.base_ms, lh_notes)
+        if needs_crop(len(N), CAP, capacity):            # the merged request plus one block of generation must fit (#1803)
+            raise CapacityFailure(f"block {k}: merged request {len(N)} + reserve does not fit {capacity}")
         marks["context_ready_ns"] = time.monotonic_ns()
         if k == slow_block:
             time.sleep(slow_ms / 1000)
@@ -190,7 +195,13 @@ def main() -> None:
             s_k = t0 + k * BLOCK
             h = s_k + BLOCK + BEAT
             deadline = W + int((k * BLOCK + BEAT) * 1e6)
-            marks, info = prepare(k, s_k)
+            try:
+                marks, info = prepare(k, s_k)
+            except CapacityFailure as e:                   # no cut fits: stop before any forward, nothing sent (#1803)
+                abort = {"reason": "capacity_failure", "block": k, "detail": str(e)[:200]}
+                emit({"type": "abort", "reason": "capacity_failure", "block": k})
+                note_progress({"block": k, "problem": "capacity_failure", "detail": abort["detail"]})
+                break
             ready = {}
 
             def on_ready():

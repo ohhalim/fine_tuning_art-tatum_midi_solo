@@ -68,6 +68,33 @@ class CropAndDeadlineTest(unittest.TestCase):
         self.assertTrue(li.is_late(101, 100))
 
 
+class CropWithLeftHandTest(unittest.TestCase):
+    """Issue #1803: the cut is chosen on the merged request, and a request that cannot fit stops."""
+
+    def setUp(self):
+        from crop_contract import HEADER
+        self.rh = list(HEADER) + ["<T>"] + [x for i in range(60) for x in (("piano", 72, 60), ("onset", 10 * i), ("dur", 10))]
+
+    def merged_len(self, n_lh, s_k=10000):
+        human = Human([li.LiveNote(40 + i % 12, 5000 + 50 * i, 5000 + 50 * i + 20, 60) for i in range(n_lh)])
+        return lambda sess, base: len(merge(sess, base, window_notes(human, s_k, max(s_k - 7500, base)))[0])
+
+    def test_left_hand_that_cannot_fit_is_a_capacity_failure(self):
+        from crop_contract import CapacityFailure
+        for n_lh in (80, 30):                        # merged 422 and 272 (+ reserve 131) against capacity 400
+            crop = li.SessionCrop(cap=64, capacity=400, keep_target=200)
+            with self.assertRaises(CapacityFailure):
+                crop.maybe_crop(self.rh, len(self.rh), self.merged_len(n_lh))
+
+    def test_cut_moves_later_when_the_left_hand_needs_room(self):
+        seg = [x for i in range(20) for x in (("piano", 72, 60), ("onset", 10 * i), ("dur", 10))]
+        toks = [("prefix", "instrument", "piano"), "<S>"] + seg + ["<T>"] + seg + ["<T>"] + seg
+        lh_after = {0: 100, 5000: 100, 10000: 0}      # left-hand tokens left in the window for each base
+        crop = li.SessionCrop(cap=64, capacity=200, keep_target=69)
+        self.assertTrue(crop.maybe_crop(toks, len(toks), lambda sess, base: len(sess) + lh_after[base]))
+        self.assertEqual(crop.base_ms, 10000)         # right hand alone would keep from the first <T> (base 5000)
+
+
 class FeederOrderTest(unittest.TestCase):
     def test_events_sorted_offs_first_at_same_time(self):
         import rt_lh_feeder as fd
