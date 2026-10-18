@@ -1,0 +1,1393 @@
+{
+ "issue": 1827,
+ "alpha": 0.005555555555555556,
+ "min_effect": {
+  "licks_per_min": 2.0,
+  "melody_notes_per_s": 1.0,
+  "liked_speed_run_share": 0.15
+ },
+ "runs": {
+  "P0": [
+   {
+    "seed": 1,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 69,
+     "melody_notes": 42,
+     "runs_8plus": 2,
+     "licks": 2,
+     "licks_per_min": 7.757575757575758,
+     "melody_notes_per_s": 2.7151515151515153,
+     "all_notes_per_s": 4.460606060606061,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      4.91,
+      3.42
+     ],
+     "register_share_g3": 0.6376811594202898,
+     "melody_median_ioi_s": 0.2400000000000002,
+     "melody_window_max": 5,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 2,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 65,
+     "melody_notes": 41,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 2.6505050505050507,
+     "all_notes_per_s": 4.202020202020202,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      3.57
+     ],
+     "register_share_g3": 0.676923076923077,
+     "melody_median_ioi_s": 0.26000000000000034,
+     "melody_window_max": 5,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 3,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 75,
+     "melody_notes": 52,
+     "runs_8plus": 1,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 3.3616161616161615,
+     "all_notes_per_s": 4.848484848484849,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [],
+     "register_share_g3": 0.7866666666666666,
+     "melody_median_ioi_s": 0.2400000000000011,
+     "melody_window_max": 6,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 4,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 69,
+     "melody_notes": 49,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 3.1676767676767676,
+     "all_notes_per_s": 4.460606060606061,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      3.93
+     ],
+     "register_share_g3": 0.8260869565217391,
+     "melody_median_ioi_s": 0.2549999999999999,
+     "melody_window_max": 6,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 5,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 84,
+     "melody_notes": 58,
+     "runs_8plus": 3,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 3.7494949494949497,
+     "all_notes_per_s": 5.430303030303031,
+     "liked_speed_run_share": 0.3333333333333333,
+     "lick_speeds": [
+      3.57
+     ],
+     "register_share_g3": 0.8571428571428571,
+     "melody_median_ioi_s": 0.22000000000000064,
+     "melody_window_max": 8,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 6,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 53,
+     "melody_notes": 42,
+     "runs_8plus": 2,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 2.7151515151515153,
+     "all_notes_per_s": 3.426262626262626,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [],
+     "register_share_g3": 0.7924528301886793,
+     "melody_median_ioi_s": 0.27000000000000046,
+     "melody_window_max": 5,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 7,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 61,
+     "melody_notes": 45,
+     "runs_8plus": 3,
+     "licks": 2,
+     "licks_per_min": 7.757575757575758,
+     "melody_notes_per_s": 2.909090909090909,
+     "all_notes_per_s": 3.9434343434343435,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      3.53,
+      2.66
+     ],
+     "register_share_g3": 0.8360655737704918,
+     "melody_median_ioi_s": 0.25500000000000034,
+     "melody_window_max": 5,
+     "copy_ngram_with_prompt": 4
+    }
+   },
+   {
+    "seed": 8,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 132,
+     "melody_notes": 81,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 5.236363636363636,
+     "all_notes_per_s": 8.533333333333333,
+     "liked_speed_run_share": 0.5,
+     "lick_speeds": [
+      4.09
+     ],
+     "register_share_g3": 0.7878787878787878,
+     "melody_median_ioi_s": 0.14000000000000057,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 1
+    }
+   },
+   {
+    "seed": 9,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 69,
+     "melody_notes": 40,
+     "runs_8plus": 2,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 2.585858585858586,
+     "all_notes_per_s": 4.460606060606061,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [],
+     "register_share_g3": 0.6666666666666666,
+     "melody_median_ioi_s": 0.35,
+     "melody_window_max": 4,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 10,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 86,
+     "melody_notes": 57,
+     "runs_8plus": 1,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 3.684848484848485,
+     "all_notes_per_s": 5.55959595959596,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [],
+     "register_share_g3": 0.872093023255814,
+     "melody_median_ioi_s": 0.2350000000000002,
+     "melody_window_max": 6,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 11,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 62,
+     "melody_notes": 47,
+     "runs_8plus": 1,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 3.0383838383838384,
+     "all_notes_per_s": 4.008080808080808,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [],
+     "register_share_g3": 0.8870967741935484,
+     "melody_median_ioi_s": 0.26500000000000057,
+     "melody_window_max": 6,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 12,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 60,
+     "melody_notes": 48,
+     "runs_8plus": 3,
+     "licks": 2,
+     "licks_per_min": 7.757575757575758,
+     "melody_notes_per_s": 3.103030303030303,
+     "all_notes_per_s": 3.878787878787879,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      3.44,
+      4.96
+     ],
+     "register_share_g3": 0.8166666666666667,
+     "melody_median_ioi_s": 0.24000000000000002,
+     "melody_window_max": 6,
+     "copy_ngram_with_prompt": 4
+    }
+   }
+  ],
+  "P18": [
+   {
+    "seed": 1,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 168,
+     "melody_notes": 84,
+     "runs_8plus": 4,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 5.430303030303031,
+     "all_notes_per_s": 10.860606060606061,
+     "liked_speed_run_share": 0.5,
+     "lick_speeds": [
+      6.53
+     ],
+     "register_share_g3": 0.7738095238095238,
+     "melody_median_ioi_s": 0.16999999999999993,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 5
+    }
+   },
+   {
+    "seed": 2,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 169,
+     "melody_notes": 107,
+     "runs_8plus": 4,
+     "licks": 2,
+     "licks_per_min": 7.757575757575758,
+     "melody_notes_per_s": 6.917171717171717,
+     "all_notes_per_s": 10.925252525252525,
+     "liked_speed_run_share": 1.0,
+     "lick_speeds": [
+      7.41,
+      6.82
+     ],
+     "register_share_g3": 0.727810650887574,
+     "melody_median_ioi_s": 0.10999999999999943,
+     "melody_window_max": 11,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 3,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 175,
+     "melody_notes": 56,
+     "runs_8plus": 3,
+     "licks": 2,
+     "licks_per_min": 7.757575757575758,
+     "melody_notes_per_s": 3.6202020202020204,
+     "all_notes_per_s": 11.313131313131313,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      4.67,
+      3.65
+     ],
+     "register_share_g3": 0.6914285714285714,
+     "melody_median_ioi_s": 0.23000000000000043,
+     "melody_window_max": 5,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 4,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 130,
+     "melody_notes": 87,
+     "runs_8plus": 3,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 5.624242424242424,
+     "all_notes_per_s": 8.404040404040405,
+     "liked_speed_run_share": 0.6666666666666666,
+     "lick_speeds": [
+      6.34
+     ],
+     "register_share_g3": 0.8,
+     "melody_median_ioi_s": 0.120000000000001,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 5,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 132,
+     "melody_notes": 34,
+     "runs_8plus": 1,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 2.197979797979798,
+     "all_notes_per_s": 8.533333333333333,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [],
+     "register_share_g3": 0.5909090909090909,
+     "melody_median_ioi_s": 0.42,
+     "melody_window_max": 5,
+     "copy_ngram_with_prompt": 1
+    }
+   },
+   {
+    "seed": 6,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 118,
+     "melody_notes": 59,
+     "runs_8plus": 3,
+     "licks": 3,
+     "licks_per_min": 11.636363636363637,
+     "melody_notes_per_s": 3.8141414141414143,
+     "all_notes_per_s": 7.6282828282828286,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      4.38,
+      5.06,
+      5.75
+     ],
+     "register_share_g3": 0.5677966101694916,
+     "melody_median_ioi_s": 0.18499999999999983,
+     "melody_window_max": 6,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 7,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 117,
+     "melody_notes": 54,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 3.4909090909090907,
+     "all_notes_per_s": 7.5636363636363635,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      3.92
+     ],
+     "register_share_g3": 0.5042735042735043,
+     "melody_median_ioi_s": 0.25,
+     "melody_window_max": 6,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 8,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 141,
+     "melody_notes": 72,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 4.654545454545454,
+     "all_notes_per_s": 9.115151515151515,
+     "liked_speed_run_share": 0.5,
+     "lick_speeds": [
+      6.25
+     ],
+     "register_share_g3": 0.723404255319149,
+     "melody_median_ioi_s": 0.19,
+     "melody_window_max": 7,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 9,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 185,
+     "melody_notes": 98,
+     "runs_8plus": 6,
+     "licks": 5,
+     "licks_per_min": 19.393939393939394,
+     "melody_notes_per_s": 6.335353535353535,
+     "all_notes_per_s": 11.95959595959596,
+     "liked_speed_run_share": 0.8333333333333334,
+     "lick_speeds": [
+      4.27,
+      6.36,
+      5.79,
+      7.95,
+      10.11
+     ],
+     "register_share_g3": 0.6810810810810811,
+     "melody_median_ioi_s": 0.10999999999999988,
+     "melody_window_max": 12,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 10,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 146,
+     "melody_notes": 86,
+     "runs_8plus": 4,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 5.55959595959596,
+     "all_notes_per_s": 9.438383838383839,
+     "liked_speed_run_share": 0.75,
+     "lick_speeds": [
+      7.41
+     ],
+     "register_share_g3": 0.7054794520547946,
+     "melody_median_ioi_s": 0.13000000000000012,
+     "melody_window_max": 10,
+     "copy_ngram_with_prompt": 4
+    }
+   },
+   {
+    "seed": 11,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 161,
+     "melody_notes": 95,
+     "runs_8plus": 3,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 6.141414141414141,
+     "all_notes_per_s": 10.408080808080808,
+     "liked_speed_run_share": 1.0,
+     "lick_speeds": [
+      10.24
+     ],
+     "register_share_g3": 0.7763975155279503,
+     "melody_median_ioi_s": 0.1200000000000001,
+     "melody_window_max": 12,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 12,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 155,
+     "melody_notes": 86,
+     "runs_8plus": 4,
+     "licks": 3,
+     "licks_per_min": 11.636363636363637,
+     "melody_notes_per_s": 5.55959595959596,
+     "all_notes_per_s": 10.02020202020202,
+     "liked_speed_run_share": 0.75,
+     "lick_speeds": [
+      6.15,
+      6.94,
+      7.05
+     ],
+     "register_share_g3": 0.6129032258064516,
+     "melody_median_ioi_s": 0.13999999999999968,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 3
+    }
+   }
+  ],
+  "P06": [
+   {
+    "seed": 1,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 134,
+     "melody_notes": 69,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 4.460606060606061,
+     "all_notes_per_s": 8.662626262626263,
+     "liked_speed_run_share": 0.5,
+     "lick_speeds": [
+      10.14
+     ],
+     "register_share_g3": 0.7388059701492538,
+     "melody_median_ioi_s": 0.1999999999999993,
+     "melody_window_max": 8,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 2,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 105,
+     "melody_notes": 64,
+     "runs_8plus": 4,
+     "licks": 4,
+     "licks_per_min": 15.515151515151516,
+     "melody_notes_per_s": 4.137373737373737,
+     "all_notes_per_s": 6.787878787878788,
+     "liked_speed_run_share": 1.0,
+     "lick_speeds": [
+      9.52,
+      7.22,
+      6.67,
+      7.19
+     ],
+     "register_share_g3": 0.7238095238095238,
+     "melody_median_ioi_s": 0.1200000000000001,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 13
+    }
+   },
+   {
+    "seed": 3,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 96,
+     "melody_notes": 44,
+     "runs_8plus": 1,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 2.8444444444444446,
+     "all_notes_per_s": 6.206060606060606,
+     "liked_speed_run_share": 1.0,
+     "lick_speeds": [],
+     "register_share_g3": 0.59375,
+     "melody_median_ioi_s": 0.23000000000000043,
+     "melody_window_max": 8,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 4,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 140,
+     "melody_notes": 43,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 2.77979797979798,
+     "all_notes_per_s": 9.05050505050505,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      3.72
+     ],
+     "register_share_g3": 0.6642857142857143,
+     "melody_median_ioi_s": 0.25,
+     "melody_window_max": 6,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 5,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 159,
+     "melody_notes": 54,
+     "runs_8plus": 1,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 3.4909090909090907,
+     "all_notes_per_s": 10.27878787878788,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [],
+     "register_share_g3": 0.7484276729559748,
+     "melody_median_ioi_s": 0.22000000000000064,
+     "melody_window_max": 7,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 6,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 166,
+     "melody_notes": 54,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 3.4909090909090907,
+     "all_notes_per_s": 10.731313131313131,
+     "liked_speed_run_share": 0.5,
+     "lick_speeds": [
+      4.31
+     ],
+     "register_share_g3": 0.6204819277108434,
+     "melody_median_ioi_s": 0.1999999999999993,
+     "melody_window_max": 10,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 7,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 152,
+     "melody_notes": 52,
+     "runs_8plus": 1,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 3.3616161616161615,
+     "all_notes_per_s": 9.826262626262626,
+     "liked_speed_run_share": 1.0,
+     "lick_speeds": [],
+     "register_share_g3": 0.5263157894736842,
+     "melody_median_ioi_s": 0.1700000000000017,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 8,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 165,
+     "melody_notes": 48,
+     "runs_8plus": 1,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 3.103030303030303,
+     "all_notes_per_s": 10.666666666666666,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      4.9
+     ],
+     "register_share_g3": 0.9575757575757575,
+     "melody_median_ioi_s": 0.28999999999999915,
+     "melody_window_max": 6,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 9,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 146,
+     "melody_notes": 58,
+     "runs_8plus": 4,
+     "licks": 4,
+     "licks_per_min": 15.515151515151516,
+     "melody_notes_per_s": 3.7494949494949497,
+     "all_notes_per_s": 9.438383838383839,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      5.06,
+      5.52,
+      4.5,
+      4.37
+     ],
+     "register_share_g3": 0.684931506849315,
+     "melody_median_ioi_s": 0.20000000000000107,
+     "melody_window_max": 7,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 10,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 191,
+     "melody_notes": 67,
+     "runs_8plus": 3,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 4.331313131313132,
+     "all_notes_per_s": 12.347474747474747,
+     "liked_speed_run_share": 0.6666666666666666,
+     "lick_speeds": [],
+     "register_share_g3": 0.5130890052356021,
+     "melody_median_ioi_s": 0.20000000000000062,
+     "melody_window_max": 8,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 11,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 137,
+     "melody_notes": 58,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 3.7494949494949497,
+     "all_notes_per_s": 8.856565656565657,
+     "liked_speed_run_share": 0.5,
+     "lick_speeds": [
+      8.27
+     ],
+     "register_share_g3": 0.5328467153284672,
+     "melody_median_ioi_s": 0.1899999999999995,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 3
+    }
+   },
+   {
+    "seed": 12,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 168,
+     "melody_notes": 66,
+     "runs_8plus": 3,
+     "licks": 2,
+     "licks_per_min": 7.757575757575758,
+     "melody_notes_per_s": 4.266666666666667,
+     "all_notes_per_s": 10.860606060606061,
+     "liked_speed_run_share": 0.3333333333333333,
+     "lick_speeds": [
+      4.24,
+      3.86
+     ],
+     "register_share_g3": 0.75,
+     "melody_median_ioi_s": 0.21999999999999975,
+     "melody_window_max": 10,
+     "copy_ngram_with_prompt": 2
+    }
+   }
+  ],
+  "P16": [
+   {
+    "seed": 1,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 151,
+     "melody_notes": 47,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 3.0383838383838384,
+     "all_notes_per_s": 9.761616161616162,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      4.19
+     ],
+     "register_share_g3": 0.3576158940397351,
+     "melody_median_ioi_s": 0.2450000000000001,
+     "melody_window_max": 8,
+     "copy_ngram_with_prompt": 1
+    }
+   },
+   {
+    "seed": 2,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 170,
+     "melody_notes": 43,
+     "runs_8plus": 1,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 2.77979797979798,
+     "all_notes_per_s": 10.98989898989899,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [],
+     "register_share_g3": 0.3588235294117647,
+     "melody_median_ioi_s": 0.1900000000000004,
+     "melody_window_max": 7,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 3,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 151,
+     "melody_notes": 85,
+     "runs_8plus": 4,
+     "licks": 3,
+     "licks_per_min": 11.636363636363637,
+     "melody_notes_per_s": 5.494949494949495,
+     "all_notes_per_s": 9.761616161616162,
+     "liked_speed_run_share": 1.0,
+     "lick_speeds": [
+      5.83,
+      7.69,
+      6.88
+     ],
+     "register_share_g3": 0.6622516556291391,
+     "melody_median_ioi_s": 0.120000000000001,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 4,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 148,
+     "melody_notes": 92,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 5.947474747474748,
+     "all_notes_per_s": 9.567676767676767,
+     "liked_speed_run_share": 1.0,
+     "lick_speeds": [
+      7.42
+     ],
+     "register_share_g3": 0.722972972972973,
+     "melody_median_ioi_s": 0.13000000000000034,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 5,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 131,
+     "melody_notes": 41,
+     "runs_8plus": 0,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 2.6505050505050507,
+     "all_notes_per_s": 8.468686868686868,
+     "liked_speed_run_share": null,
+     "lick_speeds": [],
+     "register_share_g3": 0.3282442748091603,
+     "melody_median_ioi_s": 0.335,
+     "melody_window_max": 5,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 6,
+    "underfill_block": 4,
+    "token_valid": true,
+    "span_s": 4.21875,
+    "metrics": {
+     "notes": 63,
+     "melody_notes": 29,
+     "runs_8plus": 1,
+     "licks": 0,
+     "licks_per_min": 0.0,
+     "melody_notes_per_s": 6.874074074074074,
+     "all_notes_per_s": 14.933333333333334,
+     "liked_speed_run_share": 1.0,
+     "lick_speeds": [],
+     "register_share_g3": 0.8571428571428571,
+     "melody_median_ioi_s": 0.1200000000000001,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 1
+    }
+   },
+   {
+    "seed": 7,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 171,
+     "melody_notes": 90,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 5.818181818181818,
+     "all_notes_per_s": 11.054545454545455,
+     "liked_speed_run_share": 0.5,
+     "lick_speeds": [
+      4.56
+     ],
+     "register_share_g3": 0.5964912280701754,
+     "melody_median_ioi_s": 0.14000000000000012,
+     "melody_window_max": 13,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 8,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 82,
+     "melody_notes": 33,
+     "runs_8plus": 1,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 2.1333333333333333,
+     "all_notes_per_s": 5.301010101010101,
+     "liked_speed_run_share": 0.0,
+     "lick_speeds": [
+      3.83
+     ],
+     "register_share_g3": 0.4146341463414634,
+     "melody_median_ioi_s": 0.16500000000000015,
+     "melody_window_max": 8,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 9,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 178,
+     "melody_notes": 96,
+     "runs_8plus": 4,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 6.206060606060606,
+     "all_notes_per_s": 11.507070707070707,
+     "liked_speed_run_share": 1.0,
+     "lick_speeds": [
+      7.19
+     ],
+     "register_share_g3": 0.6966292134831461,
+     "melody_median_ioi_s": 0.11999999999999966,
+     "melody_window_max": 12,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 10,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 163,
+     "melody_notes": 58,
+     "runs_8plus": 3,
+     "licks": 3,
+     "licks_per_min": 11.636363636363637,
+     "melody_notes_per_s": 3.7494949494949497,
+     "all_notes_per_s": 10.537373737373738,
+     "liked_speed_run_share": 0.6666666666666666,
+     "lick_speeds": [
+      6.85,
+      7.07,
+      5.11
+     ],
+     "register_share_g3": 0.44171779141104295,
+     "melody_median_ioi_s": 0.13,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 11,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 139,
+     "melody_notes": 59,
+     "runs_8plus": 2,
+     "licks": 2,
+     "licks_per_min": 7.757575757575758,
+     "melody_notes_per_s": 3.8141414141414143,
+     "all_notes_per_s": 8.985858585858585,
+     "liked_speed_run_share": 0.5,
+     "lick_speeds": [
+      5.24,
+      7.62
+     ],
+     "register_share_g3": 0.6330935251798561,
+     "melody_median_ioi_s": 0.1399999999999988,
+     "melody_window_max": 8,
+     "copy_ngram_with_prompt": 2
+    }
+   },
+   {
+    "seed": 12,
+    "underfill_block": null,
+    "token_valid": true,
+    "span_s": 15.46875,
+    "metrics": {
+     "notes": 145,
+     "melody_notes": 89,
+     "runs_8plus": 2,
+     "licks": 1,
+     "licks_per_min": 3.878787878787879,
+     "melody_notes_per_s": 5.753535353535353,
+     "all_notes_per_s": 9.373737373737374,
+     "liked_speed_run_share": 1.0,
+     "lick_speeds": [
+      8.13
+     ],
+     "register_share_g3": 0.7241379310344828,
+     "melody_median_ioi_s": 0.12999999999999945,
+     "melody_window_max": 9,
+     "copy_ngram_with_prompt": 3
+    }
+   }
+  ]
+ },
+ "summary": {
+  "P0": {
+   "runs": 12,
+   "underfill": 0,
+   "token_invalid": 0,
+   "licks_total": 10,
+   "licks_per_min": {
+    "median": 3.878787878787879,
+    "min": 0.0,
+    "max": 7.757575757575758
+   },
+   "melody_notes_per_s": {
+    "median": 3.070707070707071,
+    "min": 2.585858585858586,
+    "max": 5.236363636363636
+   },
+   "liked_speed_run_share": {
+    "median": 0.0,
+    "min": 0.0,
+    "max": 0.5
+   },
+   "all_notes_per_s": {
+    "median": 4.460606060606061,
+    "min": 3.426262626262626,
+    "max": 8.533333333333333
+   },
+   "register_share_g3": {
+    "median": 0.804559748427673,
+    "min": 0.6376811594202898,
+    "max": 0.8870967741935484
+   },
+   "melody_median_ioi_s": {
+    "median": 0.2475000000000005,
+    "min": 0.14000000000000057,
+    "max": 0.35
+   },
+   "melody_window_max": {
+    "median": 6.0,
+    "min": 4,
+    "max": 9
+   },
+   "copy_ngram_with_prompt": {
+    "median": 3.0,
+    "min": 1,
+    "max": 4
+   }
+  },
+  "P18": {
+   "runs": 12,
+   "underfill": 0,
+   "token_invalid": 0,
+   "licks_total": 21,
+   "licks_per_min": {
+    "median": 3.878787878787879,
+    "min": 0.0,
+    "max": 19.393939393939394
+   },
+   "melody_notes_per_s": {
+    "median": 5.494949494949495,
+    "min": 2.197979797979798,
+    "max": 6.917171717171717
+   },
+   "liked_speed_run_share": {
+    "median": 0.5833333333333333,
+    "min": 0.0,
+    "max": 1.0
+   },
+   "all_notes_per_s": {
+    "median": 9.72929292929293,
+    "min": 7.5636363636363635,
+    "max": 11.95959595959596
+   },
+   "register_share_g3": {
+    "median": 0.698454011741683,
+    "min": 0.5042735042735043,
+    "max": 0.8
+   },
+   "melody_median_ioi_s": {
+    "median": 0.1549999999999998,
+    "min": 0.10999999999999943,
+    "max": 0.42
+   },
+   "melody_window_max": {
+    "median": 9.0,
+    "min": 5,
+    "max": 12
+   },
+   "copy_ngram_with_prompt": {
+    "median": 3.0,
+    "min": 1,
+    "max": 5
+   }
+  },
+  "P06": {
+   "runs": 12,
+   "underfill": 0,
+   "token_invalid": 0,
+   "licks_total": 15,
+   "licks_per_min": {
+    "median": 3.878787878787879,
+    "min": 0.0,
+    "max": 15.515151515151516
+   },
+   "melody_notes_per_s": {
+    "median": 3.6202020202020204,
+    "min": 2.77979797979798,
+    "max": 4.460606060606061
+   },
+   "liked_speed_run_share": {
+    "median": 0.5,
+    "min": 0.0,
+    "max": 1.0
+   },
+   "all_notes_per_s": {
+    "median": 9.632323232323232,
+    "min": 6.206060606060606,
+    "max": 12.347474747474747
+   },
+   "register_share_g3": {
+    "median": 0.6746086105675146,
+    "min": 0.5130890052356021,
+    "max": 0.9575757575757575
+   },
+   "melody_median_ioi_s": {
+    "median": 0.20000000000000084,
+    "min": 0.1200000000000001,
+    "max": 0.28999999999999915
+   },
+   "melody_window_max": {
+    "median": 8.0,
+    "min": 6,
+    "max": 10
+   },
+   "copy_ngram_with_prompt": {
+    "median": 3.0,
+    "min": 2,
+    "max": 13
+   }
+  },
+  "P16": {
+   "runs": 12,
+   "underfill": 1,
+   "token_invalid": 0,
+   "licks_total": 14,
+   "licks_per_min": {
+    "median": 3.878787878787879,
+    "min": 0.0,
+    "max": 11.636363636363637
+   },
+   "melody_notes_per_s": {
+    "median": 4.654545454545454,
+    "min": 2.1333333333333333,
+    "max": 6.874074074074074
+   },
+   "liked_speed_run_share": {
+    "median": 0.6666666666666666,
+    "min": 0.0,
+    "max": 1.0
+   },
+   "all_notes_per_s": {
+    "median": 9.761616161616162,
+    "min": 5.301010101010101,
+    "max": 14.933333333333334
+   },
+   "register_share_g3": {
+    "median": 0.6147923766250157,
+    "min": 0.3282442748091603,
+    "max": 0.8571428571428571
+   },
+   "melody_median_ioi_s": {
+    "median": 0.13499999999999956,
+    "min": 0.11999999999999966,
+    "max": 0.335
+   },
+   "melody_window_max": {
+    "median": 9.0,
+    "min": 5,
+    "max": 13
+   },
+   "copy_ngram_with_prompt": {
+    "median": 2.0,
+    "min": 1,
+    "max": 3
+   }
+  }
+ },
+ "tests": {
+  "P18": {
+   "licks_per_min": {
+    "diff": 0.0,
+    "ci95": [
+     -1.9393939393939394,
+     7.757575757575758
+    ],
+    "p": 1.0
+   },
+   "melody_notes_per_s": {
+    "diff": 2.424242424242424,
+    "ci95": [
+     0.6141414141414141,
+     2.876767676767677
+    ],
+    "p": 0.0012998700129987
+   },
+   "liked_speed_run_share": {
+    "diff": 0.5833333333333333,
+    "ci95": [
+     0.0,
+     0.7916666666666667
+    ],
+    "p": 0.0091990800919908
+   }
+  },
+  "P06": {
+   "licks_per_min": {
+    "diff": 0.0,
+    "ci95": [
+     -3.878787878787879,
+     3.878787878787879
+    ],
+    "p": 1.0
+   },
+   "melody_notes_per_s": {
+    "diff": 0.5494949494949495,
+    "ci95": [
+     0.0,
+     1.2282828282828282
+    ],
+    "p": 0.11158884111588842
+   },
+   "liked_speed_run_share": {
+    "diff": 0.5,
+    "ci95": [
+     0.0,
+     0.8333333333333333
+    ],
+    "p": 0.028097190280971903
+   }
+  },
+  "P16": {
+   "licks_per_min": {
+    "diff": 0.0,
+    "ci95": [
+     -1.9393939393939394,
+     3.878787878787879
+    ],
+    "p": 1.0
+   },
+   "melody_notes_per_s": {
+    "diff": 1.5838383838383834,
+    "ci95": [
+     -0.19393939393939386,
+     2.9737373737373742
+    ],
+    "p": 0.0178982101789821
+   },
+   "liked_speed_run_share": {
+    "diff": 0.6666666666666666,
+    "ci95": [
+     0.0,
+     1.0
+    ],
+    "p": 0.004299570042995701
+   }
+  }
+ },
+ "verdict": {
+  "P18": "차이 미검출",
+  "P06": "차이 미검출",
+  "P16": "가까워짐"
+ }
+}
