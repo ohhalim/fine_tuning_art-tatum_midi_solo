@@ -3,7 +3,7 @@
 -> producer (MLX venv, LH input thread) -> sender (virtual model port) -> independent capture. Scenarios A normal,
 B forced crop, C slow producer. Each scenario is analysed from its saved files.
 
-  rt_lh_smoke_run.py <t3_aria python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json> [--analyze-only]
+  rt_lh_smoke_run.py <t3_aria python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json> [--analyze-only] [--rerun]
 """
 from __future__ import annotations
 
@@ -25,13 +25,22 @@ SCENARIOS = {
     "C_slow_producer": ["--slow-block", "6", "--slow-ms", "600"],
 }
 CHECK_BLOCKS = "4,8,12"
+# issue #1807 (docs/experiments/LH_INPUT_SMOKE_RERUN.md): the crop and the slow block are placed before block 4, where
+# every #1797 run stopped. Capacity 260 / keep 120 crops at block 2 (offline estimate from the #1797 record: merged
+# request 148 > 260 - reserve 131, cut at the prompt's <T>, 93 kept); the slow block is block 2.
+SCENARIOS_RERUN = {
+    "A_normal": [],
+    "B_crop_early": ["--capacity", "260", "--keep-target", "120"],
+    "C_slow_block2": ["--slow-block", "2", "--slow-ms", "600"],
+}
+RERUN_CHECK_BLOCKS = "2,3"
 
 
 def sha(path):
     return hashlib.sha256(open(path, "rb").read()).hexdigest()
 
 
-def run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir):
+def run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir, check_blocks=CHECK_BLOCKS):
     d = os.path.join(out_dir, name)
     os.makedirs(d, exist_ok=True)
     f = {k: os.path.join(d, v) for k, v in {"ready": "capture.ready", "stop": "capture.stop", "cap": "capture.json", "snd": "sender.json",
@@ -49,7 +58,7 @@ def run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir):
     while not os.path.exists(f["fready"]) and time.monotonic() - t < 30:
         time.sleep(0.02)
     args = [t3_py, os.path.join(HERE, "rt_lh_producer.py"), aria_repo, ckpt, data, str(BLOCKS), lh_port, f["origin"], f["prog"], f["prod"],
-            "--check-blocks", CHECK_BLOCKS if name == "A_normal" else ""] + extra
+            "--check-blocks", check_blocks if name == "A_normal" else ""] + extra
     producer = subprocess.Popen(args, stdout=sender.stdin, stderr=open(f["perr"], "w"))
     sender.stdin.close()
     producer.wait(timeout=600)
@@ -106,6 +115,25 @@ def before_horizon(d):
             "send_late_max_ms": round(max(late), 3) if late else None, "sent_over_10ms_late": sum(1 for x in late if x > 10)}
 
 
+def rerun_checks(out, prod, capacity):
+    """Issue #1807 criteria, fixed before the run. Each is True / False, or None when it does not apply."""
+    from crop_contract import reserve
+    from aria_mlx_stream_loop import CAP
+    ph = out["posthoc_before_horizon"]
+    stop = prod["abort"]
+    forwarded = [b for b in prod["blocks"] if b.get("len_N") is not None]
+    return {
+        "no_note_before_previous_horizon": len(ph["notes_before_previous_horizon"]) == 0,
+        "no_late_intake_rejection": not ph.get("rejected_late_on"),
+        "forwarded_blocks_fit_capacity": all(b["len_N"] + reserve(CAP) <= capacity for b in forwarded),
+        "stop_is_recorded_abort_or_end": stop is None or stop["reason"] in ("deadline_miss", "horizon_underfill", "capacity_failure"),
+        "safe_stop": (out["c2_safe_stop"]["pending_on_at_stop"] == 0 and out["c2_safe_stop"]["port_closed"] is True
+                      and not out["c2_safe_stop"]["stop_offs_failed"]),
+        "existing_checks": all(v.get("ok") is not False for v in out["a_checks"]["checks"].values())
+                           and out["b1_input_integrity"]["ok"] and out["b2_causal"],
+    }
+
+
 def analyze_lh(name, d):
     base = analyze(name, d)
     prod_p = os.path.join(d, "producer.json")
@@ -141,12 +169,22 @@ def analyze_lh(name, d):
 def main() -> None:
     t3_py, aria_repo, ckpt, data, lh_notes, out_dir, report_path = sys.argv[1:8]
     analyze_only = "--analyze-only" in sys.argv[8:]          # rebuild the report from the saved run files, no model run
+    rerun = "--rerun" in sys.argv[8:]                        # issue #1807 scenario set and criteria
+    scenarios, check_blocks = (SCENARIOS_RERUN, RERUN_CHECK_BLOCKS) if rerun else (SCENARIOS, CHECK_BLOCKS)
     os.makedirs(out_dir, exist_ok=True)
     report = {"issue": 1797, "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},
               "analyze_only": analyze_only, "scenarios": {}}
-    for name, extra in SCENARIOS.items():
+    for name, extra in scenarios.items():
         report["scenarios"][name] = (analyze_lh(name, os.path.join(out_dir, name)) if analyze_only
-                                     else run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir))
+                                     else run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir, check_blocks))
+        if rerun and "producer_report_missing" not in report["scenarios"][name]:
+            prod = json.load(open(os.path.join(out_dir, name, "producer.json")))
+            sc = report["scenarios"][name]
+            sc["rerun_checks"] = rerun_checks(sc, prod, prod["capacity"])
+            if name == "B_crop_early":
+                sc["rerun_checks"]["crop_happened"] = prod["crops"] >= 1
+            if name == "C_slow_block2":
+                sc["rerun_checks"]["slow_block_stopped_on_deadline"] = prod["abort"] == {"reason": "deadline_miss", "block": 2}
         print(name, json.dumps({k: report["scenarios"][name].get(k) for k in ("abort", "crops", "b1_input_integrity", "b2_causal", "c1_deadline")}),
               flush=True)
     run0 = os.path.join(out_dir, "A_normal_run0_analysis_crash")    # doc 9 deviation 1: first A run, no A3 checks recorded
