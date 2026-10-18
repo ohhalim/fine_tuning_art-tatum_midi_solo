@@ -53,5 +53,13 @@ class KvReuseTest(unittest.TestCase):
         self.assertEqual((rows[1]["P"], rows[1]["cause"]), (0, "crop"))
 
 
+class PrecisionEquivalenceTest(unittest.TestCase):
+    """#1813: precision names are checked before any import."""
+
+    def test_unknown_precision_is_refused_before_loading(self):
+        with self.assertRaises(ValueError):
+            kv.load_mlx("/nonexistent", "/nonexistent", "int3")
+
+
 if __name__ == "__main__":
     unittest.main()

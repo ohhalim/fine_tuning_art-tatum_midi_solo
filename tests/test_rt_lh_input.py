@@ -155,6 +155,20 @@ class InputIntegrityTest(unittest.TestCase):
         self.assertFalse(b1([sent[1], sent[0]], sent, rows, final_drain_ns=100_000_000)["ok"])  # order changed
 
 
+class LoopSpeedTest(unittest.TestCase):
+    def test_only_warm_blocks_that_sampled_before_the_horizon(self):
+        from rt_lh_smoke_run import loop_speed
+        prod = {"blocks": [{"block": 1, "samples_to_ready": 10, "ready_s": 0.1},
+                           {"block": 2, "samples_to_ready": 0, "ready_s": 0.0},          # horizon already covered
+                           {"block": 3, "samples_to_ready": 20, "ready_s": 0.3},
+                           {"block": 4, "samples_to_ready": None, "ready_s": None},       # capacity failure row
+                           {"block": 5, "ready_s": 0.2}]}                                 # pre-#1813 row
+        out = loop_speed(prod)
+        self.assertEqual([r["block"] for r in out["blocks"]], [1, 3])
+        self.assertEqual([r["ms_per_sample"] for r in out["blocks"]], [10.0, 15.0])
+        self.assertEqual(out["median_ms_per_sample"], 15.0)
+
+
 class RerunChecksFailClosedTest(unittest.TestCase):
     """#1807 judge must not pass a missing record, an EOF end or a mapping gap (Astra review M1)."""
 

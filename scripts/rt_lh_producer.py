@@ -28,6 +28,7 @@ from crop_contract import CAPACITY, KEEP_TARGET, CapacityFailure, needs_crop  # 
 from lh_cache_replay import reuse_start  # noqa: E402
 from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
 from lh_kv_reuse import common_prefix, load_mlx  # noqa: E402
+from kv_equiv_precision import gaps as eq_gaps, judge as eq_judge  # noqa: E402
 from rt_lh_input import LHState, SessionCrop, guarded_commit  # noqa: E402
 from stream_contract import TokenStream  # noqa: E402
 
@@ -53,6 +54,7 @@ def main() -> None:
     keep_target = opt(rest, "--keep-target", int, KEEP_TARGET)
     slow_block, slow_ms = opt(rest, "--slow-block", int, -1), opt(rest, "--slow-ms", float, 0.0)
     check_blocks = set(int(x) for x in opt(rest, "--check-blocks", str, "").split(",") if x)
+    precision = opt(rest, "--precision", str, "fp32")
 
     out, progress = sys.stdout, open(progress_path, "w")
 
@@ -65,7 +67,7 @@ def main() -> None:
         progress.write(json.dumps(obj) + "\n")
         progress.flush()
 
-    tok, run = load_mlx(aria_repo, ckpt)
+    tok, run = load_mlx(aria_repo, ckpt, precision)
     V_SIZE = tok.vocab_size
     vocab = [tok.decode([i])[0] for i in range(V_SIZE)]
     to_id = {t: i for i, t in enumerate(vocab)}
@@ -237,6 +239,7 @@ def main() -> None:
 
             def on_ready():
                 ready["ns"] = time.monotonic_ns()
+                ready["samples"] = samples["n"] - n_start          # samples before the horizon was covered (#1813)
                 ready["coverage_ms"] = coverage()
                 ready["problem"] = guarded_commit(ready["ns"], deadline, ready["coverage_ms"], h, commit_and_send)
                 if ready["problem"]:
@@ -253,6 +256,7 @@ def main() -> None:
                    "ready_margin_ms": round((deadline - ready["ns"]) / 1e6, 3), "notes": ready.get("notes"),
                    "ready_s": round((ready["ns"] - marks["suffix_ready_ns"]) / 1e9, 4),   # suffix ready -> horizon covered (monotonic)
                    "enqueued_ns": ready.get("enqueued_ns"), "deadline_ns": deadline, "tokens": samples["n"] - n_start,
+                   "samples_to_ready": ready.get("samples"),
                    "reached": res["reached"], "problem": ready.get("problem"), "coverage_ms": ready.get("coverage_ms"),
                    "horizon_ms": h, "input_received": marks["input_received"],
                    "marks_ns": {"wake": wake, "snapshot": marks["snapshot_ns"], "context_ready": marks["context_ready_ns"],
@@ -273,21 +277,38 @@ def main() -> None:
         final_drain_ns = time.monotonic_ns()   # messages sent after this are outside B1 (doc 9, deviation 2)
         drain()
         port.close()
-    # post-run equivalence sample (outside the timed loop)
+    # post-run equivalence sample (outside the timed loop): the cached suffix against the same precision's own noise floor
+    # (#1815 rules: R1 repeat, R2 split at start, R3 token by token; last position also under the sampler's mask).
+    # fp32 must also keep the #1793 rule (every top-1 equal, last logits within 1e-3).
     eq = []
     for c in checks:
         prev, V, N, start = c["prev_seq"], c["V"], c["N"], c["start"]
+        ids = [to_id[t] for t in N]
+        L = len(ids)
         if V:
             run([to_id[t] for t in prev[:V]], 0)
-        cached = run([to_id[t] for t in N[start:]], start, kv_end=len(N) - 1)
-        full = run([to_id[t] for t in N], 0)[start:]
+        cached = run(ids[start:], start, kv_end=L - 1)
+        full = run(ids, 0)[start:]
+        raw = {"R1": run(ids, 0)[start:]}
+        if start > 0:
+            run(ids[:start], 0)
+            raw["R2"] = run(ids[start:], start)
+            run(ids[:start], 0)
+        raw["R3"] = np.stack([run([ids[i]], i)[-1] for i in range(start, L)])
+        gm.sync(TokenStream(list(N)).grammar_state())
+        allowed = (gm.allowed() & no_end).numpy()
+        refs = {r: (eq_gaps(full, raw[r], allowed) if r in raw else None) for r in ("R1", "R2", "R3", "R4")}
+        cgap = eq_gaps(full, cached, allowed)
+        j = eq_judge({"R1_exact": bool(np.array_equal(full, raw["R1"])), "refs": refs, "C": cgap, "PC_future": None, "controls": {}})
         top1 = int((cached.argmax(-1) == full.argmax(-1)).sum())
         diff = float(np.abs(cached[-1] - full[-1]).max())
-        eq.append({"block": c["block"], "start": start, "S": len(N) - start, "top1_equal": top1, "positions": len(full),
-                   "max_abs_last": diff, "ok": top1 == len(full) and diff <= 1e-3})
+        legacy = top1 == len(full) and diff <= 1e-3
+        eq.append({"block": c["block"], "start": start, "S": L - start, "top1_equal": top1, "positions": len(full),
+                   "max_abs_last": diff, "legacy_1793_ok": legacy, "C_gap": cgap, "floor": j["floor"], "valid": j["valid"],
+                   "C_ok": j["C_ok"], "ok": j["valid"] and j["C_ok"] and (legacy or precision != "fp32")})
     import hashlib
     v = token_check(prompt, stream.tokens[len(prompt):stream.committed_end])
-    report = {"issue": 1797, "t0_ms": t0, "wall_origin_ns": W, "capacity": capacity, "keep_target": keep_target,
+    report = {"issue": 1797, "precision": precision, "t0_ms": t0, "wall_origin_ns": W, "capacity": capacity, "keep_target": keep_target,
               "checks": {"committed_prefix_never_changed": all(snaps[i] == snaps[i + 1][:len(snaps[i])] for i in range(len(snaps) - 1)),
                          "committed_tokens_format_valid": v["valid"] and v["tail"] is None,
                          "every_block_reached_horizon": all(reached)},
