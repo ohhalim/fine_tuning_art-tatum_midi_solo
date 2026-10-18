@@ -1,0 +1,80 @@
+{
+ "issue": 1760,
+ "rule": "train songs by sha1, skip taken titles, first 8 train / next 4 dev",
+ "train": [
+  {
+   "idx": 129,
+   "title": "misterioso",
+   "pianist": "Kenny Barron",
+   "sha1": "00cd9ddc4f86e6cee56d1433f44370a96ae6561f"
+  },
+  {
+   "idx": 26,
+   "title": "tribute to duke",
+   "pianist": "Barry Harris",
+   "sha1": "014e32f2cf862c8c736874369c2f7f8a7f010049"
+  },
+  {
+   "idx": 8,
+   "title": "would you like to take a walk",
+   "pianist": "Barry Harris",
+   "sha1": "024135574c6692e59390a20fe858fc9f82725987"
+  },
+  {
+   "idx": 149,
+   "title": "i got it bad and that ain't good",
+   "pianist": "Junior Mance",
+   "sha1": "0360d8c2a77e85e940c1d3e6dc44c51dcdbe4fd9"
+  },
+  {
+   "idx": 79,
+   "title": "don't blame me",
+   "pianist": "Hank Jones",
+   "sha1": "0748cd3b66849972568c0fa5195cc2bad8125b9a"
+  },
+  {
+   "idx": 115,
+   "title": "my heart skips a beat",
+   "pianist": "Duke Jordan",
+   "sha1": "07d31b724cf15dfc7a1d2194ead6a039e5936341"
+  },
+  {
+   "idx": 15,
+   "title": "blue monk",
+   "pianist": "Barry Harris",
+   "sha1": "07f4f11779f531779f67aa944540f0ce31eb18f1"
+  },
+  {
+   "idx": 75,
+   "title": "what did i do to be so black and blue",
+   "pianist": "Hank Jones",
+   "sha1": "0893a1210c8f2e348ff38b55f6ad45ee00b4ec8e"
+  }
+ ],
+ "dev": [
+  {
+   "idx": 44,
+   "title": "con alma",
+   "pianist": "Cedar Walton",
+   "sha1": "08d141cb12999d6659fa1175e4d5dc682ad5333a"
+  },
+  {
+   "idx": 68,
+   "title": "honeysuckle rose",
+   "pianist": "Hank Jones",
+   "sha1": "0a5cf8376b6b13f885fa305983c44743a27b5ddf"
+  },
+  {
+   "idx": 185,
+   "title": "announcement",
+   "pianist": "Bill Charlap",
+   "sha1": "0af50eb4d5b0e4b9e59ccdc52a73d05914383266"
+  },
+  {
+   "idx": 134,
+   "title": "ballad for benny carter",
+   "pianist": "Kenny Barron",
+   "sha1": "0b0d96b63f401c1231187314b5f7085c936c5db7"
+  }
+ ]
+}

@@ -1,0 +1,65 @@
+{
+ "issue": 1760,
+ "step": "F",
+ "doc": "docs/experiments/COND_ADAPTER_MIN.md",
+ "training": false,
+ "quality_claimed": false,
+ "params": {
+  "songs": [
+   0,
+   7
+  ],
+  "excerpt_notes": 500,
+  "cap": 16,
+  "capacity": 384,
+  "keep_target": 192,
+  "weight_seed": 1760,
+  "weight_scale": 0.05,
+  "logit_tol": 0.001
+ },
+ "run": {
+  "git_head": "42a28bee58c1e8c269bc9c85e8c3442adb465fb0",
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "mlx": "0.25.2",
+  "cond_module_sha256": "d95dbfc4e34997ccf84ebd25d43ffcd94b80df62c4f5ff48c0f8b96bdda8de4c",
+  "check_script_sha256": "a1977da85dc1508a3bbb9bd3e01eb15c139110334e788e2393a884a4612c27c7",
+  "seconds": 127.8
+ },
+ "songs": [
+  {
+   "idx": 0,
+   "requests": 73,
+   "crops": 5,
+   "condition_changes": 58,
+   "cold": 1,
+   "warm_empty": 29,
+   "compared_positions": 1734,
+   "max_abs_logit_diff": 9.34600830078125e-05,
+   "top1_disagree": 0,
+   "live_max_diff": 11.825922012329102,
+   "ok": true
+  },
+  {
+   "idx": 7,
+   "requests": 136,
+   "crops": 6,
+   "condition_changes": 96,
+   "cold": 1,
+   "warm_empty": 38,
+   "compared_positions": 1934,
+   "max_abs_logit_diff": 5.054473876953125e-05,
+   "top1_disagree": 0,
+   "live_max_diff": 10.45275592803955,
+   "ok": true
+  }
+ ],
+ "coverage": {
+  "crops": 11,
+  "condition_changes": 154,
+  "cold": 2,
+  "warm_empty": 67
+ },
+ "injection_live": true,
+ "coverage_ok": true,
+ "pass": true
+}

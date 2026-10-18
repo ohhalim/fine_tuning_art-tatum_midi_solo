@@ -1,0 +1,20 @@
+{
+ "issue": 1760,
+ "step": "diagnostic 2",
+ "alpha": 1.1400000000000001,
+ "train_requests": 1297,
+ "results": {
+  "dev": {
+   "requests": 771,
+   "notes": 3473,
+   "gain_real_nats_per_note": 0.0022,
+   "gain_wrong_nats_per_note": -0.00542
+  },
+  "all189": {
+   "requests": 36250,
+   "notes": 211724,
+   "gain_real_nats_per_note": 0.00312,
+   "gain_wrong_nats_per_note": -0.00342
+  }
+ }
+}
