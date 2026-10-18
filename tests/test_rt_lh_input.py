@@ -77,23 +77,29 @@ class UnderfillTest(unittest.TestCase):
         self.assertIsNone(li.block_problem(99, 100, 50, 50))
         self.assertEqual(li.block_problem(10 ** 18, None, 40, 50), "horizon_underfill")   # cold block: no deadline
 
+    def test_guard_commits_only_a_block_without_problem(self):
+        calls = []
+        self.assertEqual(li.guarded_commit(0, 1, 40, 50, lambda: calls.append(1)), "horizon_underfill")
+        self.assertEqual(li.guarded_commit(2, 1, 50, 50, lambda: calls.append(1)), "deadline_miss")
+        self.assertEqual(calls, [])
+        self.assertIsNone(li.guarded_commit(0, 1, 50, 50, lambda: calls.append(1)))
+        self.assertEqual(calls, [1])
+
     def test_underfilled_block_is_neither_committed_nor_sent(self):
         from aria_mlx_stream_loop import fill_block
 
         class Stop(Exception):
             pass
 
-        committed, sent = [], []
+        committed = []
 
-        def on_ready():
-            if li.block_problem(0, 1, 0, 100):       # coverage stays 0, horizon 100
+        def on_ready():                              # the producer's on_ready shape around the same guard
+            if li.guarded_commit(0, 1, 0, 100, lambda: committed.append(1)):   # coverage stays 0, horizon 100
                 raise Stop()
-            committed.append(1)
-            sent.append(1)
 
         with self.assertRaises(Stop):
             fill_block(lambda: None, lambda: 0, on_ready, 100, 200, 64)
-        self.assertEqual((committed, sent), ([], []))
+        self.assertEqual(committed, [])
 
 
 class FeederOrderTest(unittest.TestCase):

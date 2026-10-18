@@ -28,7 +28,7 @@ from crop_contract import CAPACITY, KEEP_TARGET  # noqa: E402
 from lh_cache_replay import reuse_start  # noqa: E402
 from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
 from lh_kv_reuse import common_prefix, load_mlx  # noqa: E402
-from rt_lh_input import LHState, SessionCrop, block_problem  # noqa: E402
+from rt_lh_input import LHState, SessionCrop, guarded_commit  # noqa: E402
 from stream_contract import TokenStream  # noqa: E402
 
 LEAD_S = 1.0
@@ -177,10 +177,9 @@ def main() -> None:
     held0, cold = [], {}
 
     def on_ready0():
-        cold["problem"] = block_problem(time.monotonic_ns(), None, coverage(), h0)
+        cold["problem"] = guarded_commit(time.monotonic_ns(), None, coverage(), h0, lambda: held0.extend(stream.commit_until(h0)))
         if cold["problem"]:
             raise Abort()
-        held0.extend(stream.commit_until(h0))
 
     n0 = samples["n"]
     try:
@@ -212,21 +211,23 @@ def main() -> None:
             marks, info = prepare(k, s_k)
             ready = {}
 
-            def on_ready():
-                ready["ns"] = time.monotonic_ns()
-                ready["coverage_ms"] = coverage()
-                ready["problem"] = block_problem(ready["ns"], deadline, ready["coverage_ms"], h)
-                if ready["problem"]:
-                    raise Abort()
+            def commit_and_send():
                 notes = stream.commit_until(h)
                 ready["notes"] = len(notes)
                 ready["enqueued_ns"] = emit({"type": "notes", "block": k, "notes": notes_json(notes)})
 
+            def on_ready():
+                ready["ns"] = time.monotonic_ns()
+                ready["coverage_ms"] = coverage()
+                ready["problem"] = guarded_commit(ready["ns"], deadline, ready["coverage_ms"], h, commit_and_send)
+                if ready["problem"]:
+                    raise Abort()
+
             n_start = samples["n"]
             try:
                 res = fill_block(sample_one, coverage, on_ready, h, h + BLOCK, CAP)
-            except Abort:
-                res = {"reached": None}
+            except Abort:                                  # underfill is a known miss; a late block's coverage is not judged
+                res = {"reached": False if ready.get("problem") == "horizon_underfill" else None}
             row = {"block": k, **info, "late_start_ms": round((marks["snapshot_ns"] - wake) / 1e6, 3),
                    "context_ms": round((marks["context_ready_ns"] - marks["snapshot_ns"]) / 1e6, 3),
                    "suffix_ms": round((marks["suffix_ready_ns"] - marks["context_ready_ns"]) / 1e6, 3),
