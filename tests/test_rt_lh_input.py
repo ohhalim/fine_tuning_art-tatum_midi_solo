@@ -90,9 +90,18 @@ class CropWithLeftHandTest(unittest.TestCase):
         seg = [x for i in range(20) for x in (("piano", 72, 60), ("onset", 10 * i), ("dur", 10))]
         toks = [("prefix", "instrument", "piano"), "<S>"] + seg + ["<T>"] + seg + ["<T>"] + seg
         lh_after = {0: 100, 5000: 100, 10000: 0}      # left-hand tokens left in the window for each base
-        crop = li.SessionCrop(cap=64, capacity=200, keep_target=69)
+        crop = li.SessionCrop(cap=64, capacity=300, keep_target=130)
         self.assertTrue(crop.maybe_crop(toks, len(toks), lambda sess, base: len(sess) + lh_after[base]))
-        self.assertEqual(crop.base_ms, 10000)         # right hand alone would keep from the first <T> (base 5000)
+        # right hand alone keeps 123 <= 130 from the first <T> (base 5000), but merged that is 223 + reserve 131 > 300
+        self.assertEqual(crop.base_ms, 10000)
+
+    def test_right_hand_only_cut_would_not_fit_here(self):
+        from crop_contract import choose_cut, needs_crop
+        seg = [x for i in range(20) for x in (("piano", 72, 60), ("onset", 10 * i), ("dur", 10))]
+        toks = [("prefix", "instrument", "piano"), "<S>"] + seg + ["<T>"] + seg + ["<T>"] + seg
+        j = choose_cut(toks, len(toks), 64, 300, 130)
+        self.assertEqual(toks[:j + 1].count("<T>"), 1)            # base 5000
+        self.assertTrue(needs_crop(2 + len(toks) - (j + 1) + 100, 64, 300))
 
 
 class UnderfillTest(unittest.TestCase):

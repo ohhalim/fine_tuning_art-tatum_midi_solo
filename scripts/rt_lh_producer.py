@@ -177,9 +177,13 @@ def main() -> None:
     blocks, abort, snaps, reached = [], None, [], []
     # block 0 (cold): no left hand, no deadline, but it must reach its horizon (#1802)
     tc = time.perf_counter()
-    marks0, info0 = prepare(0, t0)
     h0 = t0 + BLOCK + BEAT
     held0, cold = [], {}
+    try:
+        marks0, info0 = prepare(0, t0)
+    except CapacityFailure as e:                       # the prompt alone does not fit: nothing generated or sent (#1803)
+        marks0, info0 = {}, {}
+        cold.update(problem="capacity_failure", detail=str(e)[:200])
 
     def on_ready0():
         cold["problem"] = guarded_commit(time.monotonic_ns(), None, coverage(), h0, lambda: held0.extend(stream.commit_until(h0)))
@@ -187,22 +191,26 @@ def main() -> None:
             raise Abort()
 
     n0 = samples["n"]
-    try:
-        res0 = fill_block(sample_one, coverage, on_ready0, h0, h0 + BLOCK, CAP)
-    except Abort:
-        res0 = {"reached": False}
+    if cold.get("problem"):
+        res0 = {"reached": None}
+    else:
+        try:
+            res0 = fill_block(sample_one, coverage, on_ready0, h0, h0 + BLOCK, CAP)
+        except Abort:
+            res0 = {"reached": False}
     W = time.monotonic_ns() + int(LEAD_S * 1e9)
     origin.update(W=W)
     with open(origin_path, "w") as f:
         json.dump({"music_origin_ms": t0, "wall_origin_ns": W}, f)
     emit({"type": "start", "music_origin_ms": t0, "wall_origin_ns": W})
     if cold.get("problem"):
-        abort = {"reason": cold["problem"], "block": 0}
-        emit({"type": "abort", **abort})
+        abort = {"reason": cold["problem"], "block": 0, **({"detail": cold["detail"]} if "detail" in cold else {})}
+        emit({"type": "abort", "reason": cold["problem"], "block": 0})
     else:
         emit({"type": "notes", "block": 0, "notes": notes_json(held0)})
     snaps.append(list(stream.tokens[:stream.committed_end]))
-    reached.append(res0["reached"])
+    if res0["reached"] is not None:
+        reached.append(res0["reached"])
     note_progress({"block": 0, "cold_s": round(time.perf_counter() - tc, 4), **info0, "tokens": samples["n"] - n0,
                    "reached": res0["reached"], "problem": cold.get("problem")})
     try:
