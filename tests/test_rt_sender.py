@@ -184,7 +184,7 @@ class MainLoopPathTest(unittest.TestCase):
 
     def lines(self, tail):
         return ['{"type": "start", "music_origin_ms": 0, "wall_origin_ns": 0}\n',
-                '{"type": "notes", "block": 0, "notes": [[0, 60, 80, 0, 1000]]}\n'] + tail
+                '{"type": "notes", "block": 0, "notes": [[0, 60, 80, 10, 1000]]}\n'] + tail   # due at 10 ms, handed in on time
 
     def test_eof_with_a_due_note_starts_no_note(self):
         port = FakePort()

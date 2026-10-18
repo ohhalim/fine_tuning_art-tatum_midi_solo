@@ -381,11 +381,6 @@ class PlayableTest(unittest.TestCase):
         self.assertEqual(sch.sounding, {})
         self.assertEqual([m[1] for m in sch.midi_out], ["on", "off"])
 
-
-if __name__ == "__main__":
-    unittest.main()
-
-
 class IntakeLateTest(unittest.TestCase):
     """Issue #1798: a note whose onset already passed when it is handed in is never queued."""
 
@@ -423,3 +418,6 @@ class IntakeLateTest(unittest.TestCase):
         self.assertEqual(sch.midi_out[0][1:3], ("on", 60))
         self.assertEqual(sch.midi_note, [0])
 
+
+if __name__ == "__main__":
+    unittest.main()
