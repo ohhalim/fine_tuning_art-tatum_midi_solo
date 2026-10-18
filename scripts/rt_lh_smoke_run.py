@@ -87,6 +87,8 @@ def before_horizon(d):
     block_of = lambda i: next(b for b, e in ends if i < e)
     # logical_sent holds the delivery time; the planned onset is the sender row's due_ms (matched by kind, pitch, delivery)
     due_of = {(r["kind"], r["pitch"], r["tick_ms"]): (r["due_ms"], r["send_return_ns"] - r["scheduled_ns"]) for r in snd["sent"]}
+    if snd["sent"] and "block" in snd["sent"][0]:      # since #1798 the sender records note_id and block per row
+        block_of = {r["note_id"]: r["block"] for r in snd["sent"] if r["kind"] == "on"}.get
     rows, unmatched = [], 0
     for tick, kind, nid, pitch in snd["logical_sent"]:
         if kind != "on":
@@ -100,7 +102,7 @@ def before_horizon(d):
             rows.append({"block": k, "note_id": nid, "pitch": pitch, "planned_on_ms": due, "delivered_ms": round(tick, 3),
                          "before_horizon_ms": round(h_prev - due, 3), "send_late_ms": round(late_ns / 1e6, 3)})
     late = [(r["send_return_ns"] - r["scheduled_ns"]) / 1e6 for r in snd["sent"]]
-    return {"notes_before_previous_horizon": rows, "unmatched_on": unmatched, "notes_on": sum(1 for x in snd["logical_sent"] if x[1] == "on"),
+    return {"notes_before_previous_horizon": rows, "unmatched_on": unmatched, "rejected_late_on": snd.get("rejected_late_on"), "notes_on": sum(1 for x in snd["logical_sent"] if x[1] == "on"),
             "send_late_max_ms": round(max(late), 3) if late else None, "sent_over_10ms_late": sum(1 for x in late if x > 10)}
 
 

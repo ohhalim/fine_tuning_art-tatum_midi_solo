@@ -66,7 +66,8 @@ class Sender:
         self.sent_upto = 0
         self.end = None                    # "end" | "eof" | "reader_error" | "abort"
         self.log = {"sent": [], "send_failures": [], "cancelled_unsent_on": [], "received_blocks": [], "scheduled_notes": 0, "dropped_velocity0": 0,
-                    "extended_zero_length": 0, "end": None, "error": None, "origin": None}
+                    "extended_zero_length": 0, "rejected_late_on": [], "end": None, "error": None, "origin": None}
+        self.block_of = {}                 # note_id -> block it arrived in
 
     def music_now(self):
         return self.origin[0] + (self.clock_ns() - self.origin[1]) / 1e6
@@ -84,8 +85,14 @@ class Sender:
             kept, dropped = playable(notes)
             self.log["dropped_velocity0"] += len(dropped)
             self.log["extended_zero_length"] += sum(1 for n in notes if n.velocity > 0 and n.off_ms <= n.on_ms)
-            self.sch.schedule(kept)
-            self.log["scheduled_notes"] += len(kept)
+            now = self.music_now() if self.origin else None
+            before = len(self.sch.rejected_late)
+            self.log["scheduled_notes"] += self.sch.schedule(kept, now)
+            for n, at in self.sch.rejected_late[before:]:      # onset already passed at intake: never sent (issue #1798)
+                self.log["rejected_late_on"].append({"note_id": n.note_id, "block": m["block"], "pitch": n.pitch,
+                                                     "on_ms": n.on_ms, "intake_ms": round(at, 3)})
+            for n in notes:
+                self.block_of[n.note_id] = m["block"]
             self.log["received_blocks"].append({"block": m["block"], "notes": len(notes), "recv_ns": self.clock_ns()})
         elif t == "reader_error":
             self.log["error"] = m["error"]
@@ -115,7 +122,9 @@ class Sender:
                 if not best_effort:
                     raise
                 continue
+            nid = self.sch.midi_note[i]
             self.log["sent"].append({"index": i, "kind": kind, "pitch": pitch, "velocity": vel, "tick_ms": ms, "due_ms": due,
+                                     "note_id": nid, "block": self.block_of.get(nid),
                                      "scheduled_ns": self.scheduled_ns(due), "send_return_ns": self.clock_ns()})
 
     def process(self, msgs):

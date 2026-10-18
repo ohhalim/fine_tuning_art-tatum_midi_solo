@@ -28,17 +28,24 @@ class GrammarMask:
         self.note_ok = torch.tensor([kind(t) == "piano" or t in ("<T>", "<D>", "<E>") for t in vocab])
         self.dur_ok = torch.tensor([kind(t) == "dur" for t in vocab])
         self.onset_val = torch.tensor([t[1] if kind(t) == "onset" else -1 for t in vocab])
+        self.reset_only = torch.tensor([t == "<T>" for t in vocab])
         self.last, self.expect = 0, "note"
+        self.min_onset, self.reset_first = 0, False      # commit floor (issue #1798), off by default
 
     def start(self, prompt_tokens):
         self.last, self.expect = segment_state(prompt_tokens)
 
+    def sync(self, state, floor=(False, 0)):
+        """Take the grammar state and the commit floor (TokenStream.onset_floor()) of a stream."""
+        self.expect, self.last = state.expect, state.last_onset
+        self.reset_first, self.min_onset = floor
+
     def allowed(self):
         if self.expect == "note":
-            return self.note_ok
+            return self.reset_only if self.reset_first else self.note_ok
         if self.expect == "dur":
             return self.dur_ok
-        return self.onset_val >= self.last
+        return self.onset_val >= max(self.last, self.min_onset)
 
     def advance(self, t):
         """Move past an allowed token. A disallowed token is a caller bug, not something to resync from."""

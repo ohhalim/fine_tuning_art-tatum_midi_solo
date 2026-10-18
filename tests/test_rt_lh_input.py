@@ -95,6 +95,40 @@ class CropWithLeftHandTest(unittest.TestCase):
         self.assertEqual(crop.base_ms, 10000)         # right hand alone would keep from the first <T> (base 5000)
 
 
+class UnderfillTest(unittest.TestCase):
+    """Issue #1802: fill_block calls on_ready also when it ran out of samples before the horizon."""
+
+    def test_block_problem_order(self):
+        self.assertEqual(li.block_problem(101, 100, 0, 50), "deadline_miss")
+        self.assertEqual(li.block_problem(99, 100, 40, 50), "horizon_underfill")
+        self.assertIsNone(li.block_problem(99, 100, 50, 50))
+        self.assertEqual(li.block_problem(10 ** 18, None, 40, 50), "horizon_underfill")   # cold block: no deadline
+
+    def test_guard_commits_only_a_block_without_problem(self):
+        calls = []
+        self.assertEqual(li.guarded_commit(0, 1, 40, 50, lambda: calls.append(1)), "horizon_underfill")
+        self.assertEqual(li.guarded_commit(2, 1, 50, 50, lambda: calls.append(1)), "deadline_miss")
+        self.assertEqual(calls, [])
+        self.assertIsNone(li.guarded_commit(0, 1, 50, 50, lambda: calls.append(1)))
+        self.assertEqual(calls, [1])
+
+    def test_underfilled_block_is_neither_committed_nor_sent(self):
+        from aria_mlx_stream_loop import fill_block
+
+        class Stop(Exception):
+            pass
+
+        committed = []
+
+        def on_ready():                              # the producer's on_ready shape around the same guard
+            if li.guarded_commit(0, 1, 0, 100, lambda: committed.append(1)):   # coverage stays 0, horizon 100
+                raise Stop()
+
+        with self.assertRaises(Stop):
+            fill_block(lambda: None, lambda: 0, on_ready, 100, 200, 64)
+        self.assertEqual(committed, [])
+
+
 class FeederOrderTest(unittest.TestCase):
     def test_events_sorted_offs_first_at_same_time(self):
         import rt_lh_feeder as fd
