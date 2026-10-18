@@ -19,7 +19,7 @@ stdin lines: {"type": "start", "music_origin_ms", "wall_origin_ns"} | {"type": "
 velocity, on_ms, off_ms], ...]} | {"type": "rollback", "block"} | {"type": "end"} | {"type": "abort", "reason", "block",
 "stop_at_ms"?}
 
-  rt_sender.py <port name> <capture ready file> <out json>
+  rt_sender.py <port name> <capture ready file> <out json> [--existing-port]
 """
 from __future__ import annotations
 
@@ -199,10 +199,10 @@ class Sender:
 
 
 class MidoPort:
-    def __init__(self, name):
+    def __init__(self, name, virtual=True):
         import mido
         self._mido = mido
-        self._port = mido.open_output(name, virtual=True)
+        self._port = mido.open_output(name, virtual=virtual)      # virtual=False: an existing port such as an IAC bus (#1826)
 
     def send(self, m):
         kind, pitch, vel = m
@@ -215,7 +215,7 @@ class MidoPort:
 def main() -> None:
     port_name, ready_file, out_path = sys.argv[1:4]
     q = queue.Queue()
-    s = Sender(MidoPort(port_name))
+    s = Sender(MidoPort(port_name, virtual="--existing-port" not in sys.argv[4:]))
     s.log["port"] = port_name
     threading.Thread(target=reader, args=(sys.stdin, q), daemon=True).start()
     try:

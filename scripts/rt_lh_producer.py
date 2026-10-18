@@ -10,7 +10,7 @@ A warm-block abort carries stop_at_ms = s_k + one beat, the end of the music alr
 plays the committed notes up to it and then stops, whatever the reason and whenever it is sent (issue #1821).
 
   rt_lh_producer.py <aria repo> <ckpt> <data json> <blocks> <lh port> <origin json> <progress jsonl> <report json>
-      [--capacity N] [--keep-target N] [--slow-block K --slow-ms MS] [--check-blocks 4,8,12]
+      [--capacity N] [--keep-target N] [--slow-block K --slow-ms MS] [--check-blocks 4,8,12] [--lead-s S]
       [--precision fp32|bf16|q8|q4] [--note-cap K] [--seed N]
       [--lh-replay <notes json> [--lh-offset-ms MS]]   (issue #1825: left hand by music time, <lh port> ignored, no MIDI input)
 """
@@ -59,6 +59,7 @@ def main() -> None:
     slow_block, slow_ms = opt(rest, "--slow-block", int, -1), opt(rest, "--slow-ms", float, 0.0)
     check_blocks = set(int(x) for x in opt(rest, "--check-blocks", str, "").split(",") if x)
     precision = opt(rest, "--precision", str, "fp32")
+    lead_s = opt(rest, "--lead-s", float, LEAD_S)            # wall time from the end of the cold block to the music origin (#1826)
     note_cap = opt(rest, "--note-cap", int, 0)              # notes per block commit window, 0 = off (#1819)
     seed = opt(rest, "--seed", int, SEED)
     replay_path = opt(rest, "--lh-replay", str, None)         # deterministic left hand for paired runs (#1825)
@@ -224,7 +225,7 @@ def main() -> None:
             res0 = fill_block(sample_one, coverage, on_ready0, h0, h0 + BLOCK, CAP)
         except Abort:
             res0 = {"reached": False}
-    W = time.monotonic_ns() + int(LEAD_S * 1e9)
+    W = time.monotonic_ns() + int(lead_s * 1e9)
     origin.update(W=W)
     with open(origin_path, "w") as f:
         json.dump({"music_origin_ms": t0, "wall_origin_ns": W}, f)
