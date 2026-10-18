@@ -48,3 +48,12 @@
 
 - `rt_lh_smoke_run.py <t3 python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json> --rerun --precision q8 --note-cap K --seed N --scenarios A_normal,B_crop_early`
 - 시험 `tests/test_stream_contract.py`(`OnsetScanTest`), `tests/test_rt_lh_input.py`(`NoteCapTest`)
+
+## 8. 판정 해석 보완 (아스트라 M1·M2·LOW, 실행 중 추가)
+
+- 추가 시점: 16 실행 중 8개 완료 시점, 결과 집계 전. 기존 지표·임계값·원자료 변경 없음, 해석 규칙만 강화
+- D2 해석: 첫 실패 뒤 실행이 끝나므로 마감 초과 절대 개수만 비교하지 않음. 팔별 예정·시도·송출 완료 블록 수, 16블록 완주 실행 수, 중단 사유 전부 병기. underfill·capacity_failure 등으로 먼저 끝난 실행은 마감 초과 0이어도 성공이 아니라 불완전으로 분리. 같은 seed·시나리오 짝의 첫 실패 블록과 완주 여부 중심으로 해석
+- D1 범위: 3K + 5는 warm 블록에서 rollback 뒤 확정 창 하나를 채우는 샘플 수(창 안 음 토큰, segment `<T>`, 지평을 넘는 첫 음) 가정. cold 블록, 블록 총 상한 64, 추측 생성, forward 횟수·시간 상한과 다름. K1·D1 통과는 음악적 적합성 근거 아님
+- `capped_to_ready`·`capped_samples`는 하한 활성 샘플 수. dur 자리에서는 마스크가 하한을 무시하므로 실제 마스크 개입·선택 변화 수가 아님. D3 발동 블록은 "지평 전 하한 활성 블록"으로 명명. 실제 선택 변화 측정은 이 단위 범위 밖
+- 결과 설명에 상한 팔에서 onset이 실제로 다음 창으로 밀렸는지, 쉼·동시음 밀도 변화를 포함한 뒤 청취 대상으로 판단
+- 결합 회귀 시험 추가: 실제 TokenStream + GrammarMask + cap_floor, 가장 이른 onset만 고르는 밀집 표본기로 5 s segment 경계와 commit → 추측 → rollback에서 창당 K 이하(`NoteCapStreamTest`)
