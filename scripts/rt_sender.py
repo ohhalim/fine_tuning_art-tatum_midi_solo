@@ -7,13 +7,17 @@ is sent once. Whatever ends the run (end message, EOF when the producer dies, a 
 cleanup turns off what it can and always closes the port and writes the record (Astra review of #1747):
 - an abnormal end (EOF without end, a broken input line) is acted on before the next tick, so a due note-on is not
   sent after it; a normal end still plays out what is scheduled
+- a producer abort with stop_at_ms (the end of the music it already committed, issue #1821) keeps sending the
+  committed notes due up to stop_at_ms and stops there; an abort sent after stop_at_ms, or without it, stops at once
 - every remaining note-off is tried once on its own; a failed send is recorded, not retried in a loop
-- a note-on that was not sent before the stop is cancelled and recorded, never sent (no note starts after a stop)
+- a note-on that was not sent before the stop is cancelled and recorded, never sent (no note starts after a stop):
+  cancelled_unsent_on for one already released to midi_out, cancelled_pending_on for one still scheduled
 - the port close and the record write are each guarded, so one failure does not skip the other
 - if any note-off failed, the record says the stop was not clean (silence is not claimed)
 
 stdin lines: {"type": "start", "music_origin_ms", "wall_origin_ns"} | {"type": "notes", "block", "notes": [[id, pitch,
-velocity, on_ms, off_ms], ...]} | {"type": "rollback", "block"} | {"type": "end"} | {"type": "abort", "reason", "block"}
+velocity, on_ms, off_ms], ...]} | {"type": "rollback", "block"} | {"type": "end"} | {"type": "abort", "reason", "block",
+"stop_at_ms"?}
 
   rt_sender.py <port name> <capture ready file> <out json> [--existing-port]
 """
@@ -65,6 +69,7 @@ class Sender:
         self.origin = None                 # (music_origin_ms, wall_origin_ns)
         self.sent_upto = 0
         self.end = None                    # "end" | "eof" | "reader_error" | "abort"
+        self.stop_at_ms = None             # an abort's end of committed music (issue #1821)
         self.log = {"sent": [], "send_failures": [], "cancelled_unsent_on": [], "received_blocks": [], "scheduled_notes": 0, "dropped_velocity0": 0,
                     "extended_zero_length": 0, "rejected_late_on": [], "end": None, "error": None, "origin": None}
         self.block_of = {}                 # note_id -> block it arrived in
@@ -97,8 +102,11 @@ class Sender:
         elif t == "reader_error":
             self.log["error"] = m["error"]
             self.end = "reader_error"
-        elif t == "abort":                 # the producer stopped the run (e.g. deadline_miss): same as an abnormal end
-            self.log["abort"] = {k: m.get(k) for k in ("reason", "block")}
+        elif t == "abort":                 # the producer stopped the run (e.g. deadline_miss): an abnormal end, which
+            self.log["abort"] = {k: m.get(k) for k in ("reason", "block")}       # still plays the committed music up to
+            self.log["abort_stop_at_ms"] = m.get("stop_at_ms")                    # stop_at_ms when it gives one (#1821)
+            late = self.origin is None or m.get("stop_at_ms") is None or self.music_now() >= m["stop_at_ms"]
+            self.stop_at_ms = None if late else m["stop_at_ms"]  # already past (deadline_miss): stop at once, no tick
             self.end = "abort"
         elif t == "end" or (t == "eof" and self.end is None):
             self.end = t                   # an eof after a normal end is the producer exiting: ignored
@@ -133,17 +141,31 @@ class Sender:
         known (Astra re-review of #1749); a normal end keeps playing out what is scheduled. Returns True when done."""
         for m in msgs:
             self.handle(m)
+        if self.playing_out():             # abort with stop_at_ms: committed notes due up to it are still sent
+            return self.step(limit_ms=self.stop_at_ms) >= self.stop_at_ms     # done only once ticked to stop_at
         if self.end in ABNORMAL:
             return True
         self.step()
         return self.done()
 
-    def step(self):
-        if self.origin is not None:
-            self.sch.tick(self.music_now())
-            self.flush()
+    def playing_out(self):
+        return self.end == "abort" and self.stop_at_ms is not None and self.origin is not None
+
+    def step(self, limit_ms=None):
+        """Tick to the music clock (never past limit_ms, never back) and send what became due. One clock read per step;
+        returns the time actually ticked to, so completion is judged on the same reading (Astra review of #1824)."""
+        if self.origin is None:
+            return float("-inf")
+        now = self.music_now()
+        t = now if limit_ms is None else min(now, limit_ms)
+        if t >= self.sch.last_tick_ms:                 # tick(t) refuses a clock that went back
+            self.sch.tick(t)
+        self.flush()
+        return self.sch.last_tick_ms
 
     def done(self):
+        if self.playing_out():
+            return self.sch.last_tick_ms >= self.stop_at_ms
         return self.end in ABNORMAL or (self.end == "end" and not self.sch.pending)
 
     def cleanup(self):
@@ -153,6 +175,8 @@ class Sender:
             self.log["pending_at_stop"] = len(self.sch.pending)
             self.log["pending_on_at_stop"] = sum(1 for e in self.sch.pending if e.kind == "on")
             self.log["sounding_at_stop"] = len(self.sch.pitch_owner)
+            self.log["cancelled_pending_on"] = [{"note_id": e.note_id, "pitch": e.pitch, "on_ms": e.time_ms}
+                                                for e in self.sch.pending if e.kind == "on"]
             failures_before = len(self.log["send_failures"])
             self.sch.stop(now)
             self.flush(best_effort=True)
