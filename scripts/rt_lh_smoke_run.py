@@ -5,6 +5,7 @@ B forced crop, C slow producer. Each scenario is analysed from its saved files.
 
   rt_lh_smoke_run.py <t3_aria python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json> [--analyze-only] [--rerun]
       [--precision fp32|bf16|q8|q4]   (issue #1813; passed to every producer, default fp32)
+      [--lh-replay]   (issue #1825; no feeder, the producer reads <lh notes json> by music time; B1 reported not applicable)
 """
 from __future__ import annotations
 
@@ -49,7 +50,8 @@ def code_provenance():
             "dirty_scripts": git("status", "--porcelain", "--", ".").splitlines()}
 
 
-def run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir, check_blocks=CHECK_BLOCKS):
+def run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir, check_blocks=CHECK_BLOCKS, lh_replay=False):
+    """lh_replay (issue #1825): no feeder process and no LH MIDI port; the producer reads the left hand by music time."""
     d = os.path.join(out_dir, name)
     os.makedirs(d, exist_ok=True)
     f = {k: os.path.join(d, v) for k, v in {"ready": "capture.ready", "stop": "capture.stop", "cap": "capture.json", "snd": "sender.json",
@@ -62,23 +64,29 @@ def run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir, c
     sender = subprocess.Popen([sys.executable, os.path.join(HERE, "rt_sender.py"), out_port, f["ready"], f["snd"]],
                               stdin=subprocess.PIPE, stderr=open(f["serr"], "w"))
     capture = subprocess.Popen([sys.executable, os.path.join(HERE, "rt_capture.py"), out_port, f["ready"], f["stop"], f["cap"], "240"])
-    feeder = subprocess.Popen([sys.executable, os.path.join(HERE, "rt_lh_feeder.py"), lh_port, lh_notes, f["origin"], f["fready"], f["feed"]])
-    t = time.monotonic()
-    while not os.path.exists(f["fready"]) and time.monotonic() - t < 30:
-        time.sleep(0.02)
+    feeder = None
+    if lh_replay:
+        lh_port, extra = "-", extra + ["--lh-replay", lh_notes]
+    else:
+        feeder = subprocess.Popen([sys.executable, os.path.join(HERE, "rt_lh_feeder.py"), lh_port, lh_notes, f["origin"], f["fready"], f["feed"]])
+        t = time.monotonic()
+        while not os.path.exists(f["fready"]) and time.monotonic() - t < 30:
+            time.sleep(0.02)
     args = [t3_py, os.path.join(HERE, "rt_lh_producer.py"), aria_repo, ckpt, data, str(BLOCKS), lh_port, f["origin"], f["prog"], f["prod"],
             "--check-blocks", check_blocks if name == "A_normal" else ""] + extra
     producer = subprocess.Popen(args, stdout=sender.stdin, stderr=open(f["perr"], "w"))
     sender.stdin.close()
     producer.wait(timeout=600)
     sender.wait(timeout=120)
-    feeder.wait(timeout=120)
+    if feeder is not None:
+        feeder.wait(timeout=120)
     open(f["stop"], "w").close()
     capture.wait(timeout=30)
     with open(os.path.join(d, "run_meta.json"), "w") as m:
         json.dump({"ports": [out_port, lh_port], "args": args[1:], "producer_returncode": producer.returncode,
                    "sender_returncode": sender.returncode, "capture_returncode": capture.returncode,
-                   "feeder_returncode": feeder.returncode}, m)
+                   "feeder_returncode": None if feeder is None else feeder.returncode,
+                   "lh_mode": "replay" if lh_replay else "live"}, m)
     return analyze_lh(name, d)
 
 
@@ -146,6 +154,8 @@ def rerun_checks(out, prod, capacity, snd):
                    and snd.get("abort") == {"reason": stop.get("reason"), "block": stop.get("block")})
     checks = out["a_checks"].get("checks") or {}
     safe = out["c2_safe_stop"]
+    b1v = out["b1_input_integrity"]               # a replay run has no feeder: B1 is not applicable, never a pass (#1825)
+    b1_ok = b1v.get("ok") is True or (b1v.get("not_applicable") is True and (prod.get("lh_source") or {}).get("mode") == "replay")
     return {
         "no_note_before_previous_horizon": ph.get("notes_before_previous_horizon") == [] and ph.get("unmatched_on") == 0,
         "no_late_intake_rejection": ph.get("rejected_late_on") == [],
@@ -153,7 +163,7 @@ def rerun_checks(out, prod, capacity, snd):
         "stop_is_recorded_abort_or_end": stop_ok,
         "safe_stop": safe.get("pending_on_at_stop") == 0 and safe.get("port_closed") is True and safe.get("stop_offs_failed") == 0,
         "existing_checks": all((checks.get(k) or {}).get("ok") is True for k in REQUIRED_A_CHECKS)
-                           and out["b1_input_integrity"].get("ok") is True and out["b2_causal"] is True,
+                           and b1_ok and out["b2_causal"] is True,
     }
 
 
@@ -170,21 +180,27 @@ def analyze_lh(name, d):
     base = analyze(name, d)
     prod_p = os.path.join(d, "producer.json")
     prod = json.load(open(prod_p)) if os.path.exists(prod_p) else None
-    feed = json.load(open(os.path.join(d, "feeder.json")))
     snd = json.load(open(os.path.join(d, "sender.json")))
     out = {"a_checks": base, "posthoc_before_horizon": before_horizon(d)}
     if prod is None:
         out["producer_report_missing"] = True
         return out
-    got = [(r["type"], r.get("pitch")) for r in prod["received"] if r["type"] in ("note_on", "note_off") and not r.get("before_origin")]
-    sent = [("note_on" if s["kind"] == "note_on" else "note_off", s["pitch"]) for s in feed["sent"]]
+    replay = (prod.get("lh_source") or {}).get("mode") == "replay"
+    if replay:                                    # issue #1825: no feeder, the left hand was read by music time
+        input_check = {"ok": None, "not_applicable": True, "reason": "lh replay: no feeder, left hand read by music time",
+                       "replay_events_fed": sum(1 for r in prod["received"] if r.get("replay"))}
+    else:
+        feed = json.load(open(os.path.join(d, "feeder.json")))
+        got = [(r["type"], r.get("pitch")) for r in prod["received"] if r["type"] in ("note_on", "note_off") and not r.get("before_origin")]
+        sent = [("note_on" if s["kind"] == "note_on" else "note_off", s["pitch"]) for s in feed["sent"]]
+        input_check = b1(got, sent, feed["sent"], prod.get("final_drain_ns"))
     blocks = prod["blocks"]
     s_k = {b["block"]: prod["t0_ms"] + b["block"] * 937.5 for b in blocks}
     causal = all((b["lh_max_on"] is None or b["lh_max_on"] < s_k[b["block"]]) and
                  (b["lh_max_end"] is None or b["lh_max_end"] <= s_k[b["block"]]) for b in blocks)
     margins = [b["ready_margin_ms"] for b in blocks]
     out.update({
-        "b1_input_integrity": b1(got, sent, feed["sent"], prod.get("final_drain_ns")),
+        "b1_input_integrity": input_check,
         "b2_causal": causal,
         "b3_equivalence_sample": prod["equivalence_sample"],
         "c1_deadline": {"blocks": len(blocks), "late": sum(1 for x in margins if x < 0), "margin_min_ms": min(margins) if margins else None,
@@ -205,18 +221,20 @@ def main() -> None:
     scenarios, check_blocks = (SCENARIOS_RERUN, RERUN_CHECK_BLOCKS) if rerun else (SCENARIOS, CHECK_BLOCKS)
     tail = sys.argv[8:]
     precision = tail[tail.index("--precision") + 1] if "--precision" in tail else None
+    lh_replay = "--lh-replay" in tail                        # issue #1825: deterministic left hand, no feeder
     os.makedirs(out_dir, exist_ok=True)
     prev_code = None
     if analyze_only and os.path.exists(report_path):            # keep the code that ran; the analyzer is recorded apart
         prev_code = json.load(open(report_path)).get("code")
-    report = {"issue": 1797, "precision": precision or "fp32",
+    report = {"issue": 1797, "precision": precision or "fp32", "lh_mode": "replay" if lh_replay else "live",
               "code": prev_code if analyze_only else code_provenance(), "analyzer_code": code_provenance(),
               "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},
               "analyze_only": analyze_only, "scenarios": {}}
     for name, extra in scenarios.items():
         extra = extra + (["--precision", precision] if precision else [])
         report["scenarios"][name] = (analyze_lh(name, os.path.join(out_dir, name)) if analyze_only
-                                     else run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir, check_blocks))
+                                     else run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir, check_blocks,
+                                                       lh_replay=lh_replay))
         if rerun and "producer_report_missing" not in report["scenarios"][name]:
             prod = json.load(open(os.path.join(out_dir, name, "producer.json")))
             snd = json.load(open(os.path.join(out_dir, name, "sender.json")))
