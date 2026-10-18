@@ -163,8 +163,8 @@ def main() -> None:
         marks["suffix_ready_ns"] = time.monotonic_ns()
         held = [n for n in lh_notes if n.held]
         return marks, {"crop": changed, "base_ms": crop.base_ms, "P_reuse": start, "V": V, "S": len(N) - start, "len_N": len(N),
-                       "lh_notes": len(lh_notes), "lh_held": len(held), "lh_max_on": max((n.on for n in lh_notes), default=None),
-                       "lh_max_end": max((n.off for n in lh_notes), default=None), "rollback_tokens": dropped}
+                       "lh_notes": len(lh_notes), "lh_held": len(held), "lh_max_on": max((n.raw_on for n in lh_notes), default=None),
+                       "lh_max_end": max((n.raw_off for n in lh_notes), default=None), "rollback_tokens": dropped}
 
     blocks, abort, snaps, reached = [], None, [], []
     # block 0 (cold): no left hand
@@ -210,6 +210,7 @@ def main() -> None:
                    "context_ms": round((marks["context_ready_ns"] - marks["snapshot_ns"]) / 1e6, 3),
                    "suffix_ms": round((marks["suffix_ready_ns"] - marks["context_ready_ns"]) / 1e6, 3),
                    "ready_margin_ms": round((deadline - ready["ns"]) / 1e6, 3), "notes": ready.get("notes"),
+                   "ready_s": round((ready["ns"] - marks["suffix_ready_ns"]) / 1e9, 4),   # suffix ready -> horizon covered (monotonic)
                    "enqueued_ns": ready.get("enqueued_ns"), "deadline_ns": deadline, "tokens": res["tokens"], "reached": res["reached"],
                    "input_received": marks["input_received"]}
             blocks.append(row)
@@ -224,6 +225,8 @@ def main() -> None:
         else:
             emit({"type": "end"})
     finally:
+        final_drain_ns = time.monotonic_ns()   # messages sent after this are outside B1 (doc 9, deviation 2)
+        drain()
         port.close()
     # post-run equivalence sample (outside the timed loop)
     eq = []
@@ -245,7 +248,7 @@ def main() -> None:
                          "every_block_reached_horizon": all(reached)},
               "committed_token_sha256": hashlib.sha256(json.dumps([to_id[t] for t in stream.tokens[:stream.committed_end]]).encode()).hexdigest(),
               "slow_block": slow_block, "slow_ms": slow_ms, "blocks": blocks, "abort": abort, "crops": crop.crops,
-              "lh_counts": lh.counts, "received": received, "equivalence_sample": eq}
+              "lh_counts": lh.counts, "received": received, "final_drain_ns": final_drain_ns, "equivalence_sample": eq}
     with open(report_path, "w") as f:
         json.dump(report, f)
 

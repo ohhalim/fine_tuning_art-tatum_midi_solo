@@ -75,5 +75,15 @@ class FeederOrderTest(unittest.TestCase):
         self.assertEqual(ev, [(1000, "note_on", 40, 70), (1500, "note_off", 40, 0), (1500, "note_on", 43, 60), (1900, "note_off", 43, 0)])
 
 
+class InputIntegrityTest(unittest.TestCase):
+    def test_b1_requires_every_message_sent_before_final_drain(self):
+        from rt_lh_smoke_run import b1
+        sent = [("note_on", 40), ("note_off", 40), ("note_on", 43)]
+        rows = [{"send_ns": 1_000_000}, {"send_ns": 50_000_000}, {"send_ns": 99_500_000}]
+        self.assertTrue(b1(sent[:2], sent, rows, final_drain_ns=100_000_000)["ok"])       # third is inside the 2 ms guard
+        self.assertFalse(b1(sent[:1], sent, rows, final_drain_ns=100_000_000)["ok"])      # second was due and is missing
+        self.assertFalse(b1([sent[1], sent[0]], sent, rows, final_drain_ns=100_000_000)["ok"])  # order changed
+
+
 if __name__ == "__main__":
     unittest.main()

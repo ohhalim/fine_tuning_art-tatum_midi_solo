@@ -64,6 +64,17 @@ def run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir):
     return analyze_lh(name, d)
 
 
+B1_GUARD_NS = 2_000_000        # a message sent within 2 ms of the final drain may still be in flight
+
+
+def b1(got, sent, sent_rows, final_drain_ns):
+    """Received = the in-order prefix of what the feeder sent, and nothing sent before the producer's final drain
+    (minus the in-flight guard) is missing (doc 9, deviation 2). Messages sent later are counted, not required."""
+    due = sum(1 for r in sent_rows if final_drain_ns is not None and r["send_ns"] < final_drain_ns - B1_GUARD_NS)
+    return {"ok": got == sent[:len(got)] and len(got) >= due, "received": len(got), "sent": len(sent),
+            "sent_before_final_drain": due, "sent_after_final_drain": len(sent) - due}
+
+
 def analyze_lh(name, d):
     base = analyze(name, d)
     prod_p = os.path.join(d, "producer.json")
@@ -82,7 +93,7 @@ def analyze_lh(name, d):
                  (b["lh_max_end"] is None or b["lh_max_end"] <= s_k[b["block"]]) for b in blocks)
     margins = [b["ready_margin_ms"] for b in blocks]
     out.update({
-        "b1_input_integrity": {"ok": got == sent[:len(got)] and len(got) == len(sent), "received": len(got), "sent": len(sent)},
+        "b1_input_integrity": b1(got, sent, feed["sent"], prod.get("final_drain_ns")),
         "b2_causal": causal,
         "b3_equivalence_sample": prod["equivalence_sample"],
         "c1_deadline": {"blocks": len(blocks), "late": sum(1 for x in margins if x < 0), "margin_min_ms": min(margins) if margins else None,
