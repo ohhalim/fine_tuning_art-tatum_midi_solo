@@ -187,6 +187,41 @@
  "prediction": {
   "decode_first_ms": 11.76,
   "decode_rest_ms": 11.9,
+  "extra_forwards": "n - 1",
+  "b_context": {
+   "n": 1314,
+   "median_ms": 727.1,
+   "p90_ms": 1363.2,
+   "max_ms": 1866.0,
+   "within_deadline": 439,
+   "within_share": 0.334
+  },
+  "a_context": {
+   "n": 1314,
+   "median_ms": 715.8,
+   "p90_ms": 1346.3,
+   "max_ms": 1835.9,
+   "within_deadline": 448,
+   "within_share": 0.341
+  },
+  "b_context_decode_by_length": {
+   "n": 1314,
+   "median_ms": 724.0,
+   "p90_ms": 1400.7,
+   "max_ms": 1960.5,
+   "within_deadline": 452,
+   "within_share": 0.344
+  },
+  "clamped_below_grid": {
+   "b": 49,
+   "a": 58,
+   "min_b": 2
+  },
+  "note": "prediction from the grid curve; p90 is over the request-length distribution, not real-time jitter; not an end-to-end measurement; usefulness of the left-hand conditioning is not tested"
+ },
+ "prediction_v1": {
+  "decode_first_ms": 11.76,
+  "decode_rest_ms": 11.9,
   "b_context": {
    "n": 1314,
    "median_ms": 739.0,
@@ -204,5 +239,19 @@
    "within_share": 0.332
   },
   "note": "prediction from the grid curve; not an end-to-end real-time measurement"
+ },
+ "provenance": {
+  "arms_files": {
+   "044.json.gz": "2274f2913010e5ee420069248065ec09291f33aeb96ed94d3ca6664595bf42b7",
+   "068.json.gz": "ad5d880925bd70286685484419e10d499be648534162a9ff8d88eaaf12983835",
+   "134.json.gz": "180c6333f77f9394234f5d7c36834bee839691befcb75b9021b94cedc97657d6",
+   "185.json.gz": "e80cca7da86acf21207b4302156475af13e986930f3b86eef8cd6ab9c975bf7a"
+  },
+  "requests": 1314,
+  "checkpoint_sha256": "5e6b07ee2680f0044deea30da613d89b12e3e30d012d1812b388d6b8d8306c90",
+  "aria_repo_head": "c2f67bc90b49335543c0249fe00fb84a9337faf8",
+  "dtype": "float32",
+  "machine": "macOS-26.6.2-arm64-arm-64bit",
+  "python": "3.12.9"
  }
 }

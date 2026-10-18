@@ -17,12 +17,20 @@ class PredictTest(unittest.TestCase):
         self.assertEqual(lp.interp(xs, ys, 50), 10.0)
         self.assertEqual(lp.interp(xs, ys, 999), 60.0)
 
-    def test_predict_adds_first_and_rest_decode(self):
+    def test_extra_forwards_after_prefill(self):
+        self.assertEqual([lp.extra_forwards(n) for n in (0, 1, 2, 5)], [0, 0, 1, 4])
+
+    def test_predict_counts_n_minus_one_forwards(self):
         curve = [(100, 100.0), (1000, 400.0)]
-        ms, s = lp.predict([(100, 0), (100, 1), (1000, 11)], curve, decode_first_ms=20.0, decode_rest_ms=10.0, deadline=450)
-        self.assertEqual(ms, [100.0, 120.0, 400.0 + 20.0 + 10 * 10.0])
-        self.assertEqual(s["within_deadline"], 2)
-        self.assertEqual(s["max_ms"], 520.0)
+        ms, s = lp.predict([(100, 0), (100, 1), (100, 2), (1000, 11)], curve, decode_first_ms=20.0, decode_rest_ms=10.0, deadline=450)
+        self.assertEqual(ms, [100.0, 100.0, 120.0, 400.0 + 20.0 + 9 * 10.0])
+        self.assertEqual(s["within_deadline"], 3)
+        self.assertEqual(s["max_ms"], 510.0)
+
+    def test_predict_decode_by_length(self):
+        curve = [(100, 0.0), (1000, 0.0)]
+        ms, _ = lp.predict([(550, 3)], curve, 0.0, 0.0, decode_by_length=[(100, 10.0, 10.0), (1000, 20.0, 20.0)])
+        self.assertEqual(ms, [15.0 + 15.0])
 
 
 if __name__ == "__main__":
