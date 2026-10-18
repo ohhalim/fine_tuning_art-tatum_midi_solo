@@ -40,6 +40,14 @@ def sha(path):
     return hashlib.sha256(open(path, "rb").read()).hexdigest()
 
 
+def code_provenance():
+    """Commit and uncommitted changes of the scripts that ran, so a report names the code it came from (#1807 deviation 4)."""
+    def git(*a):
+        return subprocess.run(["git", "-C", HERE, *a], capture_output=True, text=True).stdout.strip()
+    return {"commit": git("rev-parse", "HEAD"), "branch": git("rev-parse", "--abbrev-ref", "HEAD"),
+            "dirty_scripts": git("status", "--porcelain", "--", ".").splitlines()}
+
+
 def run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir, check_blocks=CHECK_BLOCKS):
     d = os.path.join(out_dir, name)
     os.makedirs(d, exist_ok=True)
@@ -172,7 +180,8 @@ def main() -> None:
     rerun = "--rerun" in sys.argv[8:]                        # issue #1807 scenario set and criteria
     scenarios, check_blocks = (SCENARIOS_RERUN, RERUN_CHECK_BLOCKS) if rerun else (SCENARIOS, CHECK_BLOCKS)
     os.makedirs(out_dir, exist_ok=True)
-    report = {"issue": 1797, "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},
+    report = {"issue": 1797, "code": code_provenance(),
+              "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},
               "analyze_only": analyze_only, "scenarios": {}}
     for name, extra in scenarios.items():
         report["scenarios"][name] = (analyze_lh(name, os.path.join(out_dir, name)) if analyze_only
