@@ -229,9 +229,41 @@ def equiv(aria_repo, ckpt, export, velocity_dir, count_path, out_path):
         res["dev"][c] = {"song": x["song"], "k": x["k"], **compare(run, enc(P_tok), enc(N_tok), x["P"])}
         print("dev", c, res["dev"][c], flush=True)
     res["all_ok"] = all(v["ok"] for v in list(res["synthetic"].values()) + list(res["dev"].values()))
+    res["inputs"] = {"count_sha256": file_sha(count_path), "checkpoint_sha256": file_sha(ckpt)}
     with open(out_path, "w") as f:
         json.dump(res, f, indent=1)
     print("all_ok", res["all_ok"])
+    if not res["all_ok"]:
+        sys.exit(1)
+
+
+def file_sha(path):
+    import hashlib
+    with open(path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()
+
+
+def resummarize(cost_path, full_path, count_path):
+    """Post-hoc sensitivity on the stored measurement (no model): length-based decode at L = P + S and joint (P, S, n) counts."""
+    import lh_prefill_deadline as lp
+    c, full, cnt = json.load(open(cost_path)), json.load(open(full_path)), json.load(open(count_path))
+    by = sorted((int(L), v["decode_first_median_ms"], v["decode_rest_median_ms"]) for L, v in full["by_length"].items())
+    xs = [a for a, _, _ in by]
+    nc = [x for x in cnt["b"]["rows"] if x["cause"] != "crop"]
+    for pt in c["points"]:
+        L = pt["P"] + pt["S"]
+        f, r = lp.interp(xs, [b for _, b, _ in by], L), lp.interp(xs, [cc for _, _, cc in by], L)
+        pt["decode_by_length_at"] = L
+        pt["request_ms_n50_by_length"] = round(pt["T_ms"] + f + (c["n50"] - 2) * r, 1)
+        pt["request_ms_n90_by_length"] = round(pt["T_ms"] + f + (c["n90"] - 2) * r, 1)
+        pt["dominated_and_n_le_n90"] = sum(1 for x in nc if x["P"] <= pt["P"] and x["S"] <= pt["S"] and x["n"] <= c["n90"])
+    c["sensitivity_note"] = ("post-hoc: decode interpolated by context length at L = P + S (not growing during decode); "
+                             "joint counts are dominated pairs with n <= n90; no pass-rate claim from these")
+    c["inputs"] = {"count_sha256": file_sha(count_path), "full_report_sha256": file_sha(full_path)}
+    with open(cost_path, "w") as f:
+        json.dump(c, f, indent=1)
+    print(json.dumps([{k: pt[k] for k in ("label", "request_ms_n90", "request_ms_n90_by_length", "dominated_pairs", "dominated_and_n_le_n90")}
+                      for pt in c["points"]]))
 
 
 def representative_points(rows):
@@ -254,8 +286,11 @@ def cost(aria_repo, ckpt, export, count_path, full_path, out_path):
     import lh_prefill_deadline as lp
     cnt, full = json.load(open(count_path)), json.load(open(full_path))
     eq_path = os.path.join(os.path.dirname(out_path), "equiv.json")
-    if not json.load(open(eq_path)).get("all_ok"):
-        sys.exit("equivalence did not pass: no cost conclusion (doc 4)")
+    eq = json.load(open(eq_path)) if os.path.exists(eq_path) else {}
+    if not eq.get("all_ok") or eq.get("inputs", {}).get("count_sha256") not in (None, file_sha(count_path)):
+        sys.exit("equivalence missing, failed or built from another count: no cost conclusion (doc 4)")
+    if cnt.get("build_failures"):
+        sys.exit("count has build failures: fail closed")
     rows = cnt["b"]["rows"]
     pts = representative_points(rows)
     songs = sorted(((len(d["token_ids"]), d["token_ids"]) for d in
@@ -294,4 +329,4 @@ def cost(aria_repo, ckpt, export, count_path, full_path, out_path):
 
 if __name__ == "__main__":
     mode, args = sys.argv[1], sys.argv[2:]
-    {"--count": count, "--equiv": equiv, "--cost": cost}[mode](*args)
+    {"--count": count, "--equiv": equiv, "--cost": cost, "--resummarize": resummarize}[mode](*args)

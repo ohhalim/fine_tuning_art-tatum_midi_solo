@@ -15,7 +15,11 @@
    ],
    "request_ms_n50": 221.3,
    "request_ms_n90": 399.8,
-   "dominated_pairs": 398
+   "dominated_pairs": 398,
+   "decode_by_length_at": 1808,
+   "request_ms_n50_by_length": 221.4,
+   "request_ms_n90_by_length": 400.1,
+   "dominated_and_n_le_n90": 395
   },
   {
    "label": "S90",
@@ -31,7 +35,11 @@
    ],
    "request_ms_n50": 263.6,
    "request_ms_n90": 442.1,
-   "dominated_pairs": 755
+   "dominated_pairs": 755,
+   "decode_by_length_at": 2390,
+   "request_ms_n50_by_length": 270.0,
+   "request_ms_n90_by_length": 455.4,
+   "dominated_and_n_le_n90": 729
   },
   {
    "label": "S99",
@@ -47,7 +55,11 @@
    ],
    "request_ms_n50": 295.0,
    "request_ms_n90": 473.5,
-   "dominated_pairs": 1014
+   "dominated_pairs": 1014,
+   "decode_by_length_at": 3179,
+   "request_ms_n50_by_length": 315.9,
+   "request_ms_n90_by_length": 515.2,
+   "dominated_and_n_le_n90": 948
   },
   {
    "label": "P90_S90",
@@ -63,7 +75,11 @@
    ],
    "request_ms_n50": 278.0,
    "request_ms_n90": 456.5,
-   "dominated_pairs": 1064
+   "dominated_pairs": 1064,
+   "decode_by_length_at": 3591,
+   "request_ms_n50_by_length": 306.4,
+   "request_ms_n90_by_length": 506.2,
+   "dominated_and_n_le_n90": 1014
   }
  ],
  "n50": 15,
@@ -82,5 +98,10 @@
   561.8,
   603.0
  ],
- "note": "teacher-forced token sequences; not a free-generation success rate; not end-to-end"
+ "note": "teacher-forced token sequences; not a free-generation success rate; not end-to-end",
+ "sensitivity_note": "post-hoc: decode interpolated by context length at L = P + S (not growing during decode); joint counts are dominated pairs with n <= n90; no pass-rate claim from these",
+ "inputs": {
+  "count_sha256": "5390a379957119cb9217b561f897a101b1c2b96083e0439bff92608647151a90",
+  "full_report_sha256": "411f9481ae37ba759686fa0ddd76e50543a4302f9484f9b94d22535373dba8ec"
+ }
 }
