@@ -76,14 +76,65 @@ class SummaryTest(unittest.TestCase):
         sender = {"end": "abort", "sent": [{"kind": "on"}, {"kind": "off"}], "rejected_late_on": [], "pending_on_at_stop": 0,
                   "sounding_at_stop": 0, "stop_offs_failed": 0, "port_closed": True, "clean_stop": True}
         s = rp.summarize(rows, None, sender, {"messages": [1, 2]})
-        self.assertEqual((s["blocks_done"], s["deadline_misses"], s["margin_min_ms"]), (2, 1, -5.0))
+        self.assertEqual((s["blocks_timed"], s["deadline_misses"], s["margin_min_ms"]), (2, 1, -5.0))
         self.assertEqual(s["abort"], {"reason": "deadline_miss", "block": 2})
         self.assertEqual((s["notes_on_sent"], s["captured_messages"], s["sent_messages"]), (1, 2, 2))
 
     def test_summary_survives_missing_records(self):
         s = rp.summarize([], None, None)
-        self.assertEqual(s["blocks_done"], 0)
+        self.assertEqual(s["blocks_timed"], 0)
         self.assertIsNone(s["abort"])
+
+
+class ShutdownOrderTest(unittest.TestCase):
+    """Astra review of #1833: on a user stop the sender is signalled before a slow producer is waited for."""
+
+    class Fake:
+        def __init__(self, name, log, exits_on_signal=True):
+            self.name, self.log, self.exits, self.done = name, log, exits_on_signal, False
+
+        def poll(self):
+            return 0 if self.done else None
+
+        def send_signal(self, sig):
+            self.log.append(("signal", self.name, sig))
+            if self.exits:
+                self.done = True
+
+        def wait(self, timeout=None):
+            self.log.append(("wait", self.name))
+            if not self.done:
+                import subprocess
+                raise subprocess.TimeoutExpired(self.name, timeout)
+
+        def terminate(self):
+            self.log.append(("terminate", self.name))
+            self.done = True
+
+        def kill(self):
+            self.done = True
+
+    def test_user_stop_signals_sender_before_waiting_on_a_slow_producer(self):
+        import signal
+        import threading
+        log = []
+        procs = {"sender": self.Fake("sender", log), "producer": self.Fake("producer", log, exits_on_signal=False)}
+        stop = threading.Event()
+        rp.shutdown(procs, True, stop, 1)
+        self.assertTrue(stop.is_set())
+        first_wait = log.index(("wait", "producer"))
+        self.assertLess(log.index(("signal", "sender", signal.SIGINT)), first_wait)
+        self.assertEqual(sum(1 for e in log if e[:2] == ("signal", "sender")), 1)   # once: cleanup is not cut
+        self.assertIn(("terminate", "producer"), log)
+
+    def test_normal_end_lets_the_sender_drain_first(self):
+        import threading
+        log = []
+        procs = {"sender": self.Fake("sender", log), "producer": self.Fake("producer", log)}
+        procs["producer"].done = True                 # the producer already finished
+        stop = threading.Event()
+        rp.shutdown(procs, False, stop, 1)
+        self.assertEqual(log[0], ("wait", "sender"))  # play-out wait before any signal to the sender
 
 
 if __name__ == "__main__":

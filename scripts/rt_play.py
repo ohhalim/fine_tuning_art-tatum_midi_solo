@@ -113,7 +113,8 @@ def summarize(progress_rows, producer, sender, capture=None):
     """One record of the session from what the processes wrote (any of them may be missing after a crash)."""
     warm = [r for r in progress_rows if r.get("block", 0) >= 1 and r.get("ready_margin_ms") is not None]
     margins = sorted(r["ready_margin_ms"] for r in warm)
-    out = {"blocks_done": len(warm), "deadline_misses": sum(1 for m in margins if m < 0),
+    out = {"blocks_timed": len(warm), "blocks_committed": sum(1 for r in warm if not r.get("problem")),
+           "deadline_misses": sum(1 for m in margins if m < 0),
            "margin_min_ms": margins[0] if margins else None,
            "margin_median_ms": margins[len(margins) // 2] if margins else None,
            "abort": (producer or {}).get("abort") or next(({"reason": r["problem"], "block": r["block"]} for r in progress_rows
@@ -175,10 +176,12 @@ def _child_signals():
 
 
 def stop_process(p, sig, wait_s):
+    """Send sig (None: none, the signal was already sent) and wait; terminate, then kill, if it does not exit."""
     if p is None or p.poll() is not None:
         return
     try:
-        p.send_signal(sig)
+        if sig is not None:
+            p.send_signal(sig)
         p.wait(timeout=wait_s)
     except subprocess.TimeoutExpired:
         p.terminate()
@@ -186,6 +189,34 @@ def stop_process(p, sig, wait_s):
             p.wait(timeout=5)
         except subprocess.TimeoutExpired:
             p.kill()
+
+
+def shutdown(procs, interrupted, stop, sender_drain_s):
+    """Stop order (Astra review of #1833). A user stop (Ctrl-C, SIGTERM): the click and the sender stop first and at the
+    same time as the producer is signalled, so the sender does not keep sending scheduled note-ons while a slow producer
+    is waited for; each child gets SIGINT once (a second one could cut the sender's note-off cleanup). A normal end: the
+    producer has finished, the sender plays out what is scheduled, then stops."""
+    sender, producer = procs.get("sender"), procs.get("producer")
+    if interrupted:
+        stop.set()
+        for p in (sender, producer):
+            if p is not None and p.poll() is None:
+                try:
+                    p.send_signal(signal.SIGINT)
+                except Exception:
+                    pass
+        stop_process(sender, None, 15)
+        stop_process(producer, None, 5)
+    else:
+        stop_process(producer, signal.SIGINT, 5)
+        if sender is not None and sender.poll() is None:
+            try:
+                sender.wait(timeout=sender_drain_s)
+            except subprocess.TimeoutExpired:
+                pass
+        stop.set()
+        stop_process(sender, signal.SIGINT, 15)
+    stop_process(procs.get("feeder"), signal.SIGTERM, 5)
 
 
 def progress_line(r):
@@ -254,15 +285,7 @@ def run(cfg):
         interrupted = True
         print("\n정지 중: 소리 나는 음 끄는 중...", flush=True)
     finally:
-        stop_process(procs.get("producer"), signal.SIGINT, 5)         # the sender then reads EOF and cleans up
-        if not interrupted and procs.get("sender") is not None:
-            try:                                                      # a normal end: the sender plays out what is scheduled
-                procs["sender"].wait(timeout=2 * BLOCK / 1000 + 10)
-            except subprocess.TimeoutExpired:
-                pass
-        stop.set()
-        stop_process(procs.get("sender"), signal.SIGINT, 15)
-        stop_process(procs.get("feeder"), signal.SIGTERM, 5)
+        shutdown(procs, interrupted, stop, 2 * BLOCK / 1000 + 10)
         if "capture" in procs:
             open(f["stop"], "w").close()
             try:
