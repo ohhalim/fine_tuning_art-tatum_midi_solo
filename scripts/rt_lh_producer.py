@@ -8,7 +8,7 @@ crop, last token recomputed when S = 0), then fill_block. If a block's commit/sc
 (W + k*B + one beat) it sends {"type": "abort", "reason": "deadline_miss"} instead of the notes and stops.
 
   rt_lh_producer.py <aria repo> <ckpt> <data json> <blocks> <lh port> <origin json> <progress jsonl> <report json>
-      [--capacity N] [--keep-target N] [--slow-block K --slow-ms MS] [--check-blocks 4,8,12]
+      [--capacity N] [--keep-target N] [--slow-block K --slow-ms MS] [--check-blocks 4,8,12] [--precision P] [--lead-s S]
 """
 from __future__ import annotations
 
@@ -55,6 +55,7 @@ def main() -> None:
     slow_block, slow_ms = opt(rest, "--slow-block", int, -1), opt(rest, "--slow-ms", float, 0.0)
     check_blocks = set(int(x) for x in opt(rest, "--check-blocks", str, "").split(",") if x)
     precision = opt(rest, "--precision", str, "fp32")
+    lead_s = opt(rest, "--lead-s", float, LEAD_S)            # wall time from the end of the cold block to the music origin (#1826)
 
     out, progress = sys.stdout, open(progress_path, "w")
 
@@ -200,7 +201,7 @@ def main() -> None:
             res0 = fill_block(sample_one, coverage, on_ready0, h0, h0 + BLOCK, CAP)
         except Abort:
             res0 = {"reached": False}
-    W = time.monotonic_ns() + int(LEAD_S * 1e9)
+    W = time.monotonic_ns() + int(lead_s * 1e9)
     origin.update(W=W)
     with open(origin_path, "w") as f:
         json.dump({"music_origin_ms": t0, "wall_origin_ns": W}, f)
