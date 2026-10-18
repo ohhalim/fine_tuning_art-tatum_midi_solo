@@ -177,30 +177,6 @@ def load_mlx(aria_repo, ckpt, precision="fp32"):
     return tok, run
 
 
-EQ_KL_MEAN, EQ_TV_MEAN = 0.0009, 0.0139   # #1811 q8 vs fp32 means: a reuse gap must stay within the quantization gap itself
-
-
-def logit_gap(ref, x):
-    """Mean KL(ref || x) and mean total variation over positions (rows of logits)."""
-    import numpy as np
-
-    def logp(a):
-        a = a.astype(np.float64)
-        a = a - a.max(-1, keepdims=True)
-        return a - np.log(np.exp(a).sum(-1, keepdims=True))
-    lr, lx = logp(ref), logp(x)
-    pr, px = np.exp(lr), np.exp(lx)
-    return float((pr * (lr - lx)).sum(-1).mean()), float(0.5 * np.abs(pr - px).sum(-1).mean())
-
-
-def equivalence_ok(precision, top1, positions, max_abs_last, kl_mean, tv_mean):
-    """fp32 keeps the #1793 rule (every top-1 equal, last logits within 1e-3). bf16 caches cannot meet an absolute
-    1e-3, so the other precisions are judged on the distribution gap (#1813)."""
-    if precision == "fp32":
-        return top1 == positions and max_abs_last <= 1e-3
-    return kl_mean <= EQ_KL_MEAN and tv_mean <= EQ_TV_MEAN
-
-
 def compare(run, P_ids, N_ids, P):
     """Full prefill of N vs cached suffix (Pseq KV kept up to P, N[P:] recomputed, later old KV masked)."""
     import numpy as np
