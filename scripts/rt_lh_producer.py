@@ -28,14 +28,14 @@ from crop_contract import CAPACITY, KEEP_TARGET  # noqa: E402
 from lh_cache_replay import reuse_start  # noqa: E402
 from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
 from lh_kv_reuse import common_prefix, load_mlx  # noqa: E402
-from rt_lh_input import LHState, SessionCrop, is_late  # noqa: E402
+from rt_lh_input import LHState, SessionCrop, block_problem  # noqa: E402
 from stream_contract import TokenStream  # noqa: E402
 
 LEAD_S = 1.0
 
 
 class Abort(Exception):
-    pass
+    """A block that may not be committed (deadline_miss, horizon_underfill); the run stops without sending it."""
 
 
 def opt(argv, name, cast, default):
@@ -85,7 +85,10 @@ def main() -> None:
             model["V"] = len(seq)
         return model["last"]
 
+    samples = {"n": 0}                       # every sample, so an aborted block still has its count
+
     def sample_one():
+        samples["n"] += 1
         p = torch.softmax(torch.from_numpy(write_pending()), -1)
         st = stream.grammar_state()
         gm.expect, gm.last = st.expect, st.last_onset
@@ -167,23 +170,39 @@ def main() -> None:
                        "lh_max_end": max((n.raw_off for n in lh_notes), default=None), "rollback_tokens": dropped}
 
     blocks, abort, snaps, reached = [], None, [], []
-    # block 0 (cold): no left hand
+    # block 0 (cold): no left hand, no deadline, but it must reach its horizon (#1802)
     tc = time.perf_counter()
     marks0, info0 = prepare(0, t0)
     h0 = t0 + BLOCK + BEAT
-    held0 = []
-    res0 = fill_block(sample_one, coverage, lambda: held0.extend(stream.commit_until(h0)), h0, h0 + BLOCK, CAP)
+    held0, cold = [], {}
+
+    def on_ready0():
+        cold["problem"] = block_problem(time.monotonic_ns(), None, coverage(), h0)
+        if cold["problem"]:
+            raise Abort()
+        held0.extend(stream.commit_until(h0))
+
+    n0 = samples["n"]
+    try:
+        res0 = fill_block(sample_one, coverage, on_ready0, h0, h0 + BLOCK, CAP)
+    except Abort:
+        res0 = {"reached": False}
     W = time.monotonic_ns() + int(LEAD_S * 1e9)
     origin.update(W=W)
     with open(origin_path, "w") as f:
         json.dump({"music_origin_ms": t0, "wall_origin_ns": W}, f)
     emit({"type": "start", "music_origin_ms": t0, "wall_origin_ns": W})
-    emit({"type": "notes", "block": 0, "notes": notes_json(held0)})
+    if cold.get("problem"):
+        abort = {"reason": cold["problem"], "block": 0}
+        emit({"type": "abort", **abort})
+    else:
+        emit({"type": "notes", "block": 0, "notes": notes_json(held0)})
     snaps.append(list(stream.tokens[:stream.committed_end]))
     reached.append(res0["reached"])
-    note_progress({"block": 0, "cold_s": round(time.perf_counter() - tc, 4), **info0, "tokens": res0["tokens"], "reached": res0["reached"]})
+    note_progress({"block": 0, "cold_s": round(time.perf_counter() - tc, 4), **info0, "tokens": samples["n"] - n0,
+                   "reached": res0["reached"], "problem": cold.get("problem")})
     try:
-        for k in range(1, n_blocks):
+        for k in range(1, n_blocks if abort is None else 1):
             wake = W + int(k * BLOCK * 1e6)
             while time.monotonic_ns() < wake:
                 time.sleep(max(0.0, min(0.002, (wake - time.monotonic_ns()) / 1e9)))
@@ -195,35 +214,41 @@ def main() -> None:
 
             def on_ready():
                 ready["ns"] = time.monotonic_ns()
-                if is_late(ready["ns"], deadline):
-                    ready["late"] = True
+                ready["coverage_ms"] = coverage()
+                ready["problem"] = block_problem(ready["ns"], deadline, ready["coverage_ms"], h)
+                if ready["problem"]:
                     raise Abort()
                 notes = stream.commit_until(h)
                 ready["notes"] = len(notes)
                 ready["enqueued_ns"] = emit({"type": "notes", "block": k, "notes": notes_json(notes)})
 
+            n_start = samples["n"]
             try:
                 res = fill_block(sample_one, coverage, on_ready, h, h + BLOCK, CAP)
             except Abort:
-                res = {"tokens": None, "reached": None}
+                res = {"reached": None}
             row = {"block": k, **info, "late_start_ms": round((marks["snapshot_ns"] - wake) / 1e6, 3),
                    "context_ms": round((marks["context_ready_ns"] - marks["snapshot_ns"]) / 1e6, 3),
                    "suffix_ms": round((marks["suffix_ready_ns"] - marks["context_ready_ns"]) / 1e6, 3),
                    "ready_margin_ms": round((deadline - ready["ns"]) / 1e6, 3), "notes": ready.get("notes"),
                    "ready_s": round((ready["ns"] - marks["suffix_ready_ns"]) / 1e9, 4),   # suffix ready -> horizon covered (monotonic)
-                   "enqueued_ns": ready.get("enqueued_ns"), "deadline_ns": deadline, "tokens": res["tokens"], "reached": res["reached"],
-                   "input_received": marks["input_received"]}
+                   "enqueued_ns": ready.get("enqueued_ns"), "deadline_ns": deadline, "tokens": samples["n"] - n_start,
+                   "reached": res["reached"], "problem": ready.get("problem"), "coverage_ms": ready.get("coverage_ms"),
+                   "horizon_ms": h, "input_received": marks["input_received"],
+                   "marks_ns": {"wake": wake, "snapshot": marks["snapshot_ns"], "context_ready": marks["context_ready_ns"],
+                                "suffix_ready": marks["suffix_ready_ns"], "ready": ready.get("ns"), "enqueued": ready.get("enqueued_ns")}}
             blocks.append(row)
             note_progress(row)
             snaps.append(list(stream.tokens[:stream.committed_end]))
             if res["reached"] is not None:
                 reached.append(res["reached"])
-            if ready.get("late"):
-                abort = {"reason": "deadline_miss", "block": k}
-                emit({"type": "abort", "reason": "deadline_miss", "block": k})
+            if ready.get("problem"):
+                abort = {"reason": ready["problem"], "block": k}
+                emit({"type": "abort", **abort})
                 break
         else:
-            emit({"type": "end"})
+            if abort is None:
+                emit({"type": "end"})
     finally:
         final_drain_ns = time.monotonic_ns()   # messages sent after this are outside B1 (doc 9, deviation 2)
         drain()

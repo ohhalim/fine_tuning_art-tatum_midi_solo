@@ -68,6 +68,34 @@ class CropAndDeadlineTest(unittest.TestCase):
         self.assertTrue(li.is_late(101, 100))
 
 
+class UnderfillTest(unittest.TestCase):
+    """Issue #1802: fill_block calls on_ready also when it ran out of samples before the horizon."""
+
+    def test_block_problem_order(self):
+        self.assertEqual(li.block_problem(101, 100, 0, 50), "deadline_miss")
+        self.assertEqual(li.block_problem(99, 100, 40, 50), "horizon_underfill")
+        self.assertIsNone(li.block_problem(99, 100, 50, 50))
+        self.assertEqual(li.block_problem(10 ** 18, None, 40, 50), "horizon_underfill")   # cold block: no deadline
+
+    def test_underfilled_block_is_neither_committed_nor_sent(self):
+        from aria_mlx_stream_loop import fill_block
+
+        class Stop(Exception):
+            pass
+
+        committed, sent = [], []
+
+        def on_ready():
+            if li.block_problem(0, 1, 0, 100):       # coverage stays 0, horizon 100
+                raise Stop()
+            committed.append(1)
+            sent.append(1)
+
+        with self.assertRaises(Stop):
+            fill_block(lambda: None, lambda: 0, on_ready, 100, 200, 64)
+        self.assertEqual((committed, sent), ([], []))
+
+
 class FeederOrderTest(unittest.TestCase):
     def test_events_sorted_offs_first_at_same_time(self):
         import rt_lh_feeder as fd
