@@ -249,8 +249,9 @@ def donor_for(target_song, k, s, length, own, pool):
     return song, k2, s2, moved
 
 
-def build_request(tokens, srow, human, song, pool, w_ms=W_MS, cap=CAP, capacity=CAPACITY, keep_target=KEEP_TARGET):
-    """The three inputs of one request. Returns a dict with per-arm tokens, tags, label start, plus metadata."""
+def build_request(tokens, srow, human, song, pool, w_ms=W_MS, cap=CAP, capacity=CAPACITY, keep_target=KEEP_TARGET, window_start=None):
+    """The three inputs of one request. Returns a dict with per-arm tokens, tags, label start, plus metadata.
+    window_start(srow, base) -> left-hand window start replaces max(s - w_ms, base) (issue #1831 offline variants)."""
     k, s = srow["k"], srow["s"]
     cont = list(tokens[srow["ctx_end"]:srow["cont_end"]])
 
@@ -258,7 +259,7 @@ def build_request(tokens, srow, human, song, pool, w_ms=W_MS, cap=CAP, capacity=
         ctx = _ctx(tokens, srow, keep_from)
         if k < 1:
             return ctx, [], None, w_ms
-        start = max(s - w_ms, base)
+        start = window_start(srow, base) if window_start else max(s - w_ms, base)
         own = window_notes(human, s, start)
         donor = donor_for(song, k, s, s - start, own, pool) if own else None
         return ctx, own, donor, s - start
