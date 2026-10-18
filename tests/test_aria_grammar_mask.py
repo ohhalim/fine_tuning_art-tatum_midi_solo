@@ -47,6 +47,27 @@ class GrammarMaskTest(unittest.TestCase):
         self.gm.advance(("piano", 60, 80))
         self.assertIn(("onset", 0), allowed_tokens(self.gm))
 
+    def test_commit_floor_raises_min_onset_and_forces_time_token(self):
+        self.gm.advance(("piano", 60, 80))
+        self.gm.min_onset = 20
+        self.assertEqual({t for t in allowed_tokens(self.gm) if t[0] == "onset"}, {("onset", 20)})
+        self.gm.advance(("onset", 20))
+        self.gm.advance(("dur", 100))
+        self.gm.reset_first = True
+        self.assertEqual(allowed_tokens(self.gm), {"<T>"})
+
+    def test_sync_takes_state_and_floor_from_a_stream(self):
+        from stream_contract import TokenStream
+        s = TokenStream([("piano", 60, 80), ("onset", 0), ("dur", 100)])
+        for t in [("piano", 64, 70), ("onset", 20), ("dur", 100)]:
+            s.append_sampled(t)
+        s.commit_until(15)                           # stops at the note at 20: the floor is 15
+        s.rollback_to_committed()
+        s.append_sampled(("piano", 64, 70))
+        st = s.grammar_state()
+        self.gm.sync(st, s.onset_floor(st))
+        self.assertEqual({t for t in allowed_tokens(self.gm) if t[0] == "onset"}, {("onset", 20)})
+
     def test_eos_and_non_piano_only_where_allowed(self):
         self.assertNotIn(("organ", 60, 80), allowed_tokens(self.gm))
         self.gm.advance(("piano", 60, 80))

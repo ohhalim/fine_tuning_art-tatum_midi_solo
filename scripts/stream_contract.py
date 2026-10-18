@@ -13,6 +13,12 @@ TokenStream (rules 1, 2, 3, 5, 6, 8 of the contract)
   the horizon reaches the next segment. Committed tokens are never changed by a rollback.
 - rollback_to_committed() drops the provisional tokens, moves kv_valid_length / next_write_pos back to committed_end
   and restores the grammar state saved at committed_end.
+- commit floor (issue #1798): a commit_until(h) whose walk reached a token at or past h (a complete note with onset
+  >= h, or a <T> into a segment starting after h) declares the music time before h final, so floor_ms becomes h.
+  A token appended later may not put a note before the floor: inside the floor's segment the onset must be at least
+  the floor rounded up to the 10 ms grid, and before that segment only <T> may follow a note. Without this, notes
+  sampled after a rollback could land between the last committed note and h and reach the scheduler already late.
+  A commit that ran out of tokens before h (the stream did not cover h) does not move the floor.
 - request_full_reset() (adapter swap, context trim) drops provisional tokens and marks the KV invalid: the whole
   committed context must be prefilled again.
 
@@ -34,6 +40,7 @@ from dataclasses import dataclass, field
 
 SEGMENT_MS = 5000
 MIN_DUR_MS = 10           # the tokenizer's time step: a zero-length note gets this length (issue #1747)
+ONSET_STEP_MS = 10        # onset grid of the Aria abs tokenizer
 
 
 def _kind(t):
@@ -111,11 +118,33 @@ class TokenStream:
         self.committed_end = self.kv_valid_length = self.next_write_pos = len(self.prefix)
         self._state_at = {len(self.prefix): st}
         self._next_note_id = 0
+        self.floor_ms = float("-inf")            # music time before it is final (last successful commit horizon)
 
     # model side -------------------------------------------------------------
+    def onset_floor(self, st=None):
+        """(reset_first, min_onset) the commit floor puts on the next tokens from grammar state st (default: the end).
+        reset_first: the floor is in a later segment, so only <T> may follow a note. min_onset: the lowest onset
+        allowed in the current segment (0 when the floor does not bind)."""
+        st = self.grammar_state() if st is None else st
+        if self.floor_ms == float("-inf"):
+            return False, 0
+        seg = int(self.floor_ms // SEGMENT_MS)
+        rel = -(-(self.floor_ms - seg * SEGMENT_MS) // ONSET_STEP_MS) * ONSET_STEP_MS     # ceil to the onset grid
+        if rel >= SEGMENT_MS:
+            seg, rel = seg + 1, 0
+        if st.segment < seg:
+            return True, 0
+        return False, int(rel) if st.segment == seg else 0
+
     def append_sampled(self, t):
         """A sampled token: in `tokens`, not yet in the KV."""
-        self.grammar_state().advance(t)          # raises if the token breaks the grammar
+        st = self.grammar_state()
+        nxt = st.advance(t)                      # raises if the token breaks the grammar
+        reset_first, min_onset = self.onset_floor(st)
+        if reset_first and _kind(t) == "piano":
+            raise ValueError(f"note before the commit floor {self.floor_ms}: segment {st.segment} needs <T> first")
+        if st.expect == "onset" and nxt.last_onset < min_onset:
+            raise ValueError(f"onset {t} before the commit floor {self.floor_ms} (min onset {min_onset})")
         self.tokens.append(t)
 
     def mark_written(self, upto):
@@ -143,11 +172,13 @@ class TokenStream:
     def commit_until(self, horizon_ms):
         """Commit complete notes with onset < horizon_ms (and <T> once the horizon reaches the next segment)."""
         out, i, st = [], self.committed_end, self._state_at[self.committed_end]
+        covered = False                                     # the walk met a token at or past the horizon
         while i < len(self.tokens):
             t = self.tokens[i]
             k = _kind(t)
             if k == "<T>":
                 if (st.segment + 1) * SEGMENT_MS > horizon_ms:
+                    covered = True
                     break
                 st, i = st.advance(t), i + 1
             elif k in ("<D>", "<E>"):
@@ -158,6 +189,7 @@ class TokenStream:
                 on_t, dur_t = self.tokens[i + 1], self.tokens[i + 2]
                 on_ms = st.segment * SEGMENT_MS + on_t[1]
                 if on_ms >= horizon_ms:
+                    covered = True
                     break
                 out.append(Note(self._next_note_id, t[1], t[2], on_ms, on_ms + dur_t[1]))
                 self._next_note_id += 1
@@ -168,6 +200,8 @@ class TokenStream:
                 raise ValueError(f"commit walk hit {t} at {i}")
             self.committed_end = i
             self._state_at[i] = st
+        if covered:
+            self.floor_ms = max(self.floor_ms, horizon_ms)
         return out
 
     def rollback_to_committed(self):
@@ -209,16 +243,27 @@ class Scheduler:
         self._next_event_id = 0
         self.midi_out = []     # (time_ms, "on"|"off", pitch, velocity): what goes to the synth on one channel
         self.midi_due = []     # the scheduled (event) time of each midi_out entry; midi_out holds the delivery time
+        self.midi_note = []    # the note_id of each midi_out entry
         self.pitch_owner = {}  # pitch -> note_id that currently owns it in the MIDI stream
+        self.rejected_late = []  # notes whose onset had already passed when they were handed in (issue #1798)
 
-    def schedule(self, notes):
+    INTAKE_GRACE_MS = 5.0      # a note handed in up to this late is still queued: the sender's 1 ms poll and the pipe
+
+    def schedule(self, notes, now_ms=None):
         """Notes must be playable: 0 <= pitch <= 127, 1 <= velocity <= 127, off_ms > on_ms. A batch with any bad note
-        is rejected as a whole before anything is queued (use playable() first)."""
+        is rejected as a whole before anything is queued (use playable() first).
+        With now_ms, a note whose onset is more than INTAKE_GRACE_MS before now_ms is not queued at all (neither its
+        on nor its off) and is recorded in rejected_late: it would only start late. This is the intake check; the
+        delivery of queued events by tick() keeps its ordinary polling jitter. Returns the number of notes queued."""
         bad = [n for n in notes if not (0 <= n.pitch <= 127 and 1 <= n.velocity <= 127 and n.off_ms > n.on_ms)]
         if bad:
             raise ValueError(f"unplayable notes: {bad[:3]}")
         if not self.accepting:
             return 0
+        if now_ms is not None:
+            cut = now_ms - self.INTAKE_GRACE_MS
+            self.rejected_late.extend((n, now_ms) for n in notes if n.on_ms < cut)
+            notes = [n for n in notes if n.on_ms >= cut]
         for n in notes:
             for time_ms, kind, vel in ((n.on_ms, "on", n.velocity), (n.off_ms, "off", 0)):
                 self.pending.append(Event(time_ms, kind, n.note_id, n.pitch, vel, self.generation, self._next_event_id))
@@ -248,12 +293,15 @@ class Scheduler:
             if p in self.pitch_owner:                      # retrigger: end the sounding note on this pitch first
                 self.midi_out.append((now_ms, "off", p, 0))
                 self.midi_due.append(event.time_ms)
+                self.midi_note.append(self.pitch_owner[p])
             self.midi_out.append((now_ms, "on", p, event.velocity))
             self.midi_due.append(event.time_ms)
+            self.midi_note.append(event.note_id)
             self.pitch_owner[p] = event.note_id
         elif self.pitch_owner.get(p) == event.note_id:
             self.midi_out.append((now_ms, "off", p, 0))
             self.midi_due.append(event.time_ms)
+            self.midi_note.append(event.note_id)
             del self.pitch_owner[p]
         # else: this note lost its pitch to a retrigger; its note-off is not sent
 
@@ -274,6 +322,7 @@ class Scheduler:
         for p in sorted(self.pitch_owner):
             self.midi_out.append((now_ms, "off", p, 0))
             self.midi_due.append(now_ms)                 # a stop flush is due when it happens
+            self.midi_note.append(self.pitch_owner[p])
         self.pitch_owner.clear()
 
     def restart(self):

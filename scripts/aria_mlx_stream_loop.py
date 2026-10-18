@@ -143,7 +143,7 @@ def main() -> None:
         lg = next_logits()
         p = torch.softmax(torch.from_numpy(lg), -1)
         st = stream.grammar_state()
-        gm.expect, gm.last = st.expect, st.last_onset
+        gm.sync(st, stream.onset_floor(st))
         ok = gm.allowed() & no_end
         a = p[ok].sum().item()
         if not (math.isfinite(a) and a > 0):
