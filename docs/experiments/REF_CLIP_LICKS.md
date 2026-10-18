@@ -39,3 +39,11 @@
 - `scripts/ref_clip_licks.py <clips.json> <midi root> <run dir> <report json>`
 - 시험 `tests/test_ref_clip_licks.py`
 - 원자료 저장소 밖 `/Users/ohhalim/git_box/ref_clip_licks_run1/`, 보고 `docs/experiments/ref_clip_licks/report.json`
+
+## 7. 추출 결과 (2026-10-18 16시대, 청취 전)
+
+- 릭 15개, 미리 센 개수와 일치(01 2, 04 0, 06 4, 13 0, 16 3, 17 2, 18 4, 22 0). MIDI 왕복 차이 전부 0
+- 탈락: 24음 초과 14개(01 2, 13 1, 16 1, 17 2, 18 3, 22 5), 속도·박 조건 2개(16 1, 17 1). 04는 8음 이상 빠른 프레이즈 없음
+- 속도: 초당 3.29음(17-2)부터 10.41음(18-3)까지. 클립 18 첫 릭은 초당 9.11음(첫 onset부터 마지막 onset 기준, 음 간격 중앙값 0.0955초로 환산하면 10.5음)
+- 06 릭 4개 중 3개가 최저음 G3(55). 선율 대리 하한에 걸친 구간
+- 청취 페이지 `/Users/ohhalim/git_box/ref_clip_licks_run1/index.html`
