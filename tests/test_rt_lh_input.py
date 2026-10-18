@@ -155,5 +155,76 @@ class InputIntegrityTest(unittest.TestCase):
         self.assertFalse(b1([sent[1], sent[0]], sent, rows, final_drain_ns=100_000_000)["ok"])  # order changed
 
 
+class RerunChecksFailClosedTest(unittest.TestCase):
+    """#1807 judge must not pass a missing record, an EOF end or a mapping gap (Astra review M1)."""
+
+    def base(self):
+        import copy
+        from rt_lh_smoke_run import BLOCKS, REQUIRED_A_CHECKS
+        out = {"posthoc_before_horizon": {"notes_before_previous_horizon": [], "unmatched_on": 0, "rejected_late_on": []},
+               "a_checks": {"checks": {k: {"ok": True} for k in REQUIRED_A_CHECKS}},
+               "c2_safe_stop": {"pending_on_at_stop": 0, "port_closed": True, "stop_offs_failed": 0},
+               "b1_input_integrity": {"ok": True}, "b2_causal": True}
+        prod = {"abort": None, "blocks": [{"block": k, "len_N": 100} for k in range(1, BLOCKS)]}
+        snd = {"end": "end"}
+        return copy.deepcopy(out), prod, snd
+
+    def judge(self, out, prod, snd):
+        from rt_lh_smoke_run import rerun_checks
+        return rerun_checks(out, prod, 4160, snd)
+
+    def test_complete_normal_record_passes(self):
+        self.assertTrue(all(self.judge(*self.base()).values()))
+
+    def test_eof_end_without_abort_fails(self):
+        out, prod, snd = self.base()
+        snd["end"] = "eof"
+        self.assertFalse(self.judge(out, prod, snd)["stop_is_recorded_abort_or_end"])
+
+    def test_missing_warm_block_fails(self):
+        out, prod, snd = self.base()
+        prod["blocks"].pop()
+        self.assertFalse(self.judge(out, prod, snd)["stop_is_recorded_abort_or_end"])
+
+    def test_abort_must_match_the_sender_record(self):
+        out, prod, snd = self.base()
+        prod["abort"] = {"reason": "deadline_miss", "block": 2}
+        prod["blocks"] = prod["blocks"][:2]
+        snd.update(end="abort", abort={"reason": "deadline_miss", "block": 2})
+        self.assertTrue(self.judge(out, prod, snd)["stop_is_recorded_abort_or_end"])
+        snd["abort"] = {"reason": "deadline_miss", "block": 3}
+        self.assertFalse(self.judge(out, prod, snd)["stop_is_recorded_abort_or_end"])
+        snd.pop("abort")
+        self.assertFalse(self.judge(out, prod, snd)["stop_is_recorded_abort_or_end"])
+
+    def test_empty_or_partial_existing_checks_fail(self):
+        out, prod, snd = self.base()
+        out["a_checks"]["checks"] = {}
+        self.assertFalse(self.judge(out, prod, snd)["existing_checks"])
+        out, prod, snd = self.base()
+        out["a_checks"]["checks"]["sender_exit"] = {}
+        self.assertFalse(self.judge(out, prod, snd)["existing_checks"])
+        out, prod, snd = self.base()
+        del out["a_checks"]["checks"]["A2_capture_alternates_per_pitch"]
+        self.assertFalse(self.judge(out, prod, snd)["existing_checks"])
+
+    def test_unmatched_on_and_missing_rejection_record_fail(self):
+        out, prod, snd = self.base()
+        out["posthoc_before_horizon"]["unmatched_on"] = 99
+        self.assertFalse(self.judge(out, prod, snd)["no_note_before_previous_horizon"])
+        out, prod, snd = self.base()
+        del out["posthoc_before_horizon"]["rejected_late_on"]
+        self.assertFalse(self.judge(out, prod, snd)["no_late_intake_rejection"])
+
+    def test_missing_stop_offs_record_and_no_forward_fail(self):
+        out, prod, snd = self.base()
+        out["c2_safe_stop"]["stop_offs_failed"] = None
+        self.assertFalse(self.judge(out, prod, snd)["safe_stop"])
+        out, prod, snd = self.base()
+        for b in prod["blocks"]:
+            b["len_N"] = None
+        self.assertFalse(self.judge(out, prod, snd)["forwarded_blocks_fit_capacity"])
+
+
 if __name__ == "__main__":
     unittest.main()

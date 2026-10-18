@@ -123,22 +123,36 @@ def before_horizon(d):
             "send_late_max_ms": round(max(late), 3) if late else None, "sent_over_10ms_late": sum(1 for x in late if x > 10)}
 
 
-def rerun_checks(out, prod, capacity):
-    """Issue #1807 criteria, fixed before the run. Each is True / False, or None when it does not apply."""
+REQUIRED_A_CHECKS = ("A1a_scheduler_expected_equals_sent", "A1b_sent_equals_capture", "A2_capture_alternates_per_pitch",
+                     "A3_logical_on_off_pairs", "A3_midi_on_equals_logical_on", "A3_scheduled_notes_accounted",
+                     "A3_producer_contract", "sender_exit")
+STOP_REASONS = ("deadline_miss", "horizon_underfill", "capacity_failure")
+
+
+def rerun_checks(out, prod, capacity, snd):
+    """Issue #1807 criteria, fixed before the run. Fail closed: a missing key, a missing check or a mismatch is False.
+    A normal end needs the sender's own end record and every warm block; an abort needs the sender's abort record to
+    name the producer's reason and block (Astra review M1)."""
     from crop_contract import reserve
     from aria_mlx_stream_loop import CAP
     ph = out["posthoc_before_horizon"]
     stop = prod["abort"]
     forwarded = [b for b in prod["blocks"] if b.get("len_N") is not None]
+    if stop is None:
+        stop_ok = snd.get("end") == "end" and [b["block"] for b in prod["blocks"]] == list(range(1, BLOCKS))
+    else:
+        stop_ok = (stop.get("reason") in STOP_REASONS and snd.get("end") == "abort"
+                   and snd.get("abort") == {"reason": stop.get("reason"), "block": stop.get("block")})
+    checks = out["a_checks"].get("checks") or {}
+    safe = out["c2_safe_stop"]
     return {
-        "no_note_before_previous_horizon": len(ph["notes_before_previous_horizon"]) == 0,
-        "no_late_intake_rejection": not ph.get("rejected_late_on"),
-        "forwarded_blocks_fit_capacity": all(b["len_N"] + reserve(CAP) <= capacity for b in forwarded),
-        "stop_is_recorded_abort_or_end": stop is None or stop["reason"] in ("deadline_miss", "horizon_underfill", "capacity_failure"),
-        "safe_stop": (out["c2_safe_stop"]["pending_on_at_stop"] == 0 and out["c2_safe_stop"]["port_closed"] is True
-                      and not out["c2_safe_stop"]["stop_offs_failed"]),
-        "existing_checks": all(v.get("ok") is not False for v in out["a_checks"]["checks"].values())
-                           and out["b1_input_integrity"]["ok"] and out["b2_causal"],
+        "no_note_before_previous_horizon": ph.get("notes_before_previous_horizon") == [] and ph.get("unmatched_on") == 0,
+        "no_late_intake_rejection": ph.get("rejected_late_on") == [],
+        "forwarded_blocks_fit_capacity": bool(forwarded) and all(b["len_N"] + reserve(CAP) <= capacity for b in forwarded),
+        "stop_is_recorded_abort_or_end": stop_ok,
+        "safe_stop": safe.get("pending_on_at_stop") == 0 and safe.get("port_closed") is True and safe.get("stop_offs_failed") == 0,
+        "existing_checks": all((checks.get(k) or {}).get("ok") is True for k in REQUIRED_A_CHECKS)
+                           and out["b1_input_integrity"].get("ok") is True and out["b2_causal"] is True,
     }
 
 
@@ -180,7 +194,10 @@ def main() -> None:
     rerun = "--rerun" in sys.argv[8:]                        # issue #1807 scenario set and criteria
     scenarios, check_blocks = (SCENARIOS_RERUN, RERUN_CHECK_BLOCKS) if rerun else (SCENARIOS, CHECK_BLOCKS)
     os.makedirs(out_dir, exist_ok=True)
-    report = {"issue": 1797, "code": code_provenance(),
+    prev_code = None
+    if analyze_only and os.path.exists(report_path):            # keep the code that ran; the analyzer is recorded apart
+        prev_code = json.load(open(report_path)).get("code")
+    report = {"issue": 1797, "code": prev_code if analyze_only else code_provenance(), "analyzer_code": code_provenance(),
               "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},
               "analyze_only": analyze_only, "scenarios": {}}
     for name, extra in scenarios.items():
@@ -188,8 +205,9 @@ def main() -> None:
                                      else run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir, check_blocks))
         if rerun and "producer_report_missing" not in report["scenarios"][name]:
             prod = json.load(open(os.path.join(out_dir, name, "producer.json")))
+            snd = json.load(open(os.path.join(out_dir, name, "sender.json")))
             sc = report["scenarios"][name]
-            sc["rerun_checks"] = rerun_checks(sc, prod, prod["capacity"])
+            sc["rerun_checks"] = rerun_checks(sc, prod, prod["capacity"], snd)
             if name == "B_crop_early":
                 sc["rerun_checks"]["crop_happened"] = prod["crops"] >= 1
             if name == "C_slow_block2":
