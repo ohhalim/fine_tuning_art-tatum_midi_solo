@@ -172,6 +172,8 @@ def main() -> None:
         json.dump(report, f, ensure_ascii=False, indent=1)
     print(json.dumps({"pass": report["pass"], "coverage": cover, "injection_live": report["injection_live"],
                       "seconds": report["run"]["seconds"]}))
+    if not report["pass"]:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

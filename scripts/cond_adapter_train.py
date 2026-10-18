@@ -29,11 +29,30 @@ from stream_contract import GrammarState  # noqa: E402
 
 STEPS, LR, EVAL_PER_SONG = 32, 1e-3, 48
 GEN_PRIMERS, GEN_SEEDS, GEN_TOKENS = ((0, 10), (1, 10)), (1, 2), 48     # (dev song position, example position)
-WALL_LIMIT_S = 3600
+WALL_LIMIT_S = 3600     # training-loop limit; evaluation and generation after it are not bounded (expected/watch limit only)
 
 
 def sha256_bytes(b):
     return hashlib.sha256(b).hexdigest()
+
+
+def step_guard(loss_value, elapsed_s, limit_s=WALL_LIMIT_S):
+    """Reason to stop before the optimizer step, or None (non-finite loss, or over the training wall limit)."""
+    if not math.isfinite(loss_value):
+        return f"nonfinite loss {loss_value}"
+    if elapsed_s > limit_s:
+        return f"wall limit {limit_s} s"
+    return None
+
+
+def stop(report, report_path, reason):
+    """Save the report with the reason and exit non-zero; nothing runs after a stop (no evaluation, no generation)."""
+    report["stopped_at"] = reason
+    os.makedirs(os.path.dirname(os.path.abspath(report_path)), exist_ok=True)
+    with open(report_path, "w") as f:
+        json.dump(report, f, ensure_ascii=False, indent=1)
+    print(json.dumps({"stopped_at": reason}))
+    sys.exit(1)
 
 
 def main() -> None:
@@ -139,6 +158,8 @@ def main() -> None:
     report["checks"] = {"step0_arms_identical": all(p0[k]["mean_nll"] == p0[k.replace("b_real", arm)]["mean_nll"]
                                                     for k in p0 if "/b_real/" in k for arm in ("a_off", "c_wrong")
                                                     if k.replace("b_real", arm) in p0)}
+    if not report["checks"]["step0_arms_identical"]:
+        stop(report, report_path, "step 0 arms differ (adapter is not a no-op before training)")
     opt = torch.optim.Adam([adapter.weight], lr=LR)
     losses = []
     for ex in train_pick:
@@ -147,12 +168,14 @@ def main() -> None:
         state["cond"] = None
         f = ex["first_label"]
         loss = torch.nn.functional.cross_entropy(lg[0, f - 1:].float(), torch.tensor(ex["ids"][f:], device=dev))
+        losses.append(round(float(loss.item()), 5))
+        reason = step_guard(float(loss.item()), time.time() - t_start)
+        if reason:
+            report["train_losses"] = losses
+            stop(report, report_path, reason)
         opt.zero_grad()
         loss.backward()
         opt.step()
-        losses.append(round(float(loss.item()), 5))
-        if not math.isfinite(losses[-1]) or time.time() - t_start > WALL_LIMIT_S:
-            break
     report["train_losses"] = losses
     os.makedirs(out_dir, exist_ok=True)
     w = adapter.weight.detach().cpu().numpy().astype(np.float32)
@@ -209,6 +232,8 @@ def main() -> None:
     with open(report_path, "w") as f:
         json.dump(report, f, ensure_ascii=False, indent=1)
     print(json.dumps({"checks": report["checks"], "seconds": report["run"]["seconds"]}))
+    if not all(report["checks"].values()):
+        sys.exit(1)
 
 
 if __name__ == "__main__":

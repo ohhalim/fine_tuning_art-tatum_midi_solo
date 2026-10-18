@@ -132,6 +132,8 @@ def main() -> None:
     with open(report_path, "w") as f:
         json.dump(report, f, ensure_ascii=False, indent=1)
     print(json.dumps({k: report[k] for k in ("example", "phases", "checks", "pass")}))
+    if not report["pass"]:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
