@@ -3,7 +3,7 @@
 -> producer (MLX venv, LH input thread) -> sender (virtual model port) -> independent capture. Scenarios A normal,
 B forced crop, C slow producer. Each scenario is analysed from its saved files.
 
-  rt_lh_smoke_run.py <t3_aria python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json>
+  rt_lh_smoke_run.py <t3_aria python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json> [--analyze-only]
 """
 from __future__ import annotations
 
@@ -75,13 +75,42 @@ def b1(got, sent, sent_rows, final_drain_ns):
             "sent_before_final_drain": due, "sent_after_final_drain": len(sent) - due}
 
 
+def before_horizon(d):
+    """Post-hoc (not preregistered): notes a block delivered with an onset before the previous block's commit horizon
+    h_{k-1} = s_k + beat (the time already declared final), and how late the sender put each note on the wire."""
+    snd = json.load(open(os.path.join(d, "sender.json")))
+    t0, W = snd["origin"]
+    ends, c = [], 0
+    for b in snd["received_blocks"]:
+        c += b["notes"]
+        ends.append((b["block"], c))
+    block_of = lambda i: next(b for b, e in ends if i < e)
+    # logical_sent holds the delivery time; the planned onset is the sender row's due_ms (matched by kind, pitch, delivery)
+    due_of = {(r["kind"], r["pitch"], r["tick_ms"]): (r["due_ms"], r["send_return_ns"] - r["scheduled_ns"]) for r in snd["sent"]}
+    rows, unmatched = [], 0
+    for tick, kind, nid, pitch in snd["logical_sent"]:
+        if kind != "on":
+            continue
+        if ("on", pitch, tick) not in due_of:
+            unmatched += 1
+            continue
+        due, late_ns = due_of[("on", pitch, tick)]
+        k, h_prev = block_of(nid), t0 + block_of(nid) * 937.5 + 468.75
+        if k > 0 and due < h_prev:
+            rows.append({"block": k, "note_id": nid, "pitch": pitch, "planned_on_ms": due, "delivered_ms": round(tick, 3),
+                         "before_horizon_ms": round(h_prev - due, 3), "send_late_ms": round(late_ns / 1e6, 3)})
+    late = [(r["send_return_ns"] - r["scheduled_ns"]) / 1e6 for r in snd["sent"]]
+    return {"notes_before_previous_horizon": rows, "unmatched_on": unmatched, "notes_on": sum(1 for x in snd["logical_sent"] if x[1] == "on"),
+            "send_late_max_ms": round(max(late), 3) if late else None, "sent_over_10ms_late": sum(1 for x in late if x > 10)}
+
+
 def analyze_lh(name, d):
     base = analyze(name, d)
     prod_p = os.path.join(d, "producer.json")
     prod = json.load(open(prod_p)) if os.path.exists(prod_p) else None
     feed = json.load(open(os.path.join(d, "feeder.json")))
     snd = json.load(open(os.path.join(d, "sender.json")))
-    out = {"a_checks": base}
+    out = {"a_checks": base, "posthoc_before_horizon": before_horizon(d)}
     if prod is None:
         out["producer_report_missing"] = True
         return out
@@ -109,13 +138,21 @@ def analyze_lh(name, d):
 
 def main() -> None:
     t3_py, aria_repo, ckpt, data, lh_notes, out_dir, report_path = sys.argv[1:8]
+    analyze_only = "--analyze-only" in sys.argv[8:]          # rebuild the report from the saved run files, no model run
     os.makedirs(out_dir, exist_ok=True)
     report = {"issue": 1797, "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},
-              "scenarios": {}}
+              "analyze_only": analyze_only, "scenarios": {}}
     for name, extra in SCENARIOS.items():
-        report["scenarios"][name] = run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir)
+        report["scenarios"][name] = (analyze_lh(name, os.path.join(out_dir, name)) if analyze_only
+                                     else run_scenario(name, extra, t3_py, aria_repo, ckpt, data, lh_notes, out_dir))
         print(name, json.dumps({k: report["scenarios"][name].get(k) for k in ("abort", "crops", "b1_input_integrity", "b2_causal", "c1_deadline")}),
               flush=True)
+    run0 = os.path.join(out_dir, "A_normal_run0_analysis_crash")    # doc 9 deviation 1: first A run, no A3 checks recorded
+    if analyze_only and os.path.isdir(run0):
+        rows = [json.loads(x) for x in open(os.path.join(run0, "producer_progress.jsonl")) if x.strip()]
+        report["run0_supplement"] = {"blocks": [{k: r.get(k) for k in ("block", "S", "len_N", "suffix_ms", "ready_margin_ms", "tokens")} for r in rows],
+                                     "abort": json.load(open(os.path.join(run0, "producer.json")))["abort"],
+                                     "posthoc_before_horizon": before_horizon(run0)}
     os.makedirs(os.path.dirname(os.path.abspath(report_path)), exist_ok=True)
     with open(report_path, "w") as f:
         json.dump(report, f, indent=1)
