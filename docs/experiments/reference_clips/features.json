@@ -1,0 +1,286 @@
+{
+ "issue": 1762,
+ "params": {
+  "low": 48,
+  "high": 84,
+  "chord_ms": 50.0,
+  "chord_min": 3,
+  "line_gap_ms": 250.0
+ },
+ "clips": {
+  "01": {
+   "group": "liked",
+   "notes": 260,
+   "low_share": 0.0346,
+   "high_share": 0.0,
+   "comping_per_s": 0.67,
+   "lick_len_median": 2.0,
+   "lick_len_p90": 10,
+   "semitone_step_share": 0.1351,
+   "notes_per_s": 8.715
+  },
+  "04": {
+   "group": "liked",
+   "notes": 358,
+   "low_share": 0.0112,
+   "high_share": 0.0,
+   "comping_per_s": 0.233,
+   "lick_len_median": 136.5,
+   "lick_len_p90": 176,
+   "semitone_step_share": 0.0332,
+   "notes_per_s": 11.937
+  },
+  "06": {
+   "group": "liked",
+   "notes": 272,
+   "low_share": 0.2206,
+   "high_share": 0.0,
+   "comping_per_s": 0.0,
+   "lick_len_median": 14.5,
+   "lick_len_p90": 46,
+   "semitone_step_share": 0.3036,
+   "notes_per_s": 9.076
+  },
+  "13": {
+   "group": "liked",
+   "notes": 454,
+   "low_share": 0.0507,
+   "high_share": 0.1388,
+   "comping_per_s": 1.303,
+   "lick_len_median": 3,
+   "lick_len_p90": 80,
+   "semitone_step_share": 0.0522,
+   "notes_per_s": 15.165
+  },
+  "16": {
+   "group": "liked",
+   "notes": 269,
+   "low_share": 0.223,
+   "high_share": 0.0223,
+   "comping_per_s": 0.0,
+   "lick_len_median": 13.0,
+   "lick_len_p90": 205,
+   "semitone_step_share": 0.0723,
+   "notes_per_s": 8.979
+  },
+  "17": {
+   "group": "liked",
+   "notes": 152,
+   "low_share": 0.0921,
+   "high_share": 0.1118,
+   "comping_per_s": 0.2,
+   "lick_len_median": 1.0,
+   "lick_len_p90": 7,
+   "semitone_step_share": 0.0633,
+   "notes_per_s": 5.067
+  },
+  "18": {
+   "group": "liked",
+   "notes": 360,
+   "low_share": 0.1167,
+   "high_share": 0.0028,
+   "comping_per_s": 1.338,
+   "lick_len_median": 4,
+   "lick_len_p90": 16,
+   "semitone_step_share": 0.2302,
+   "notes_per_s": 12.041
+  },
+  "22": {
+   "group": "liked",
+   "notes": 395,
+   "low_share": 0.1241,
+   "high_share": 0.038,
+   "comping_per_s": 0.801,
+   "lick_len_median": 2.5,
+   "lick_len_p90": 25,
+   "semitone_step_share": 0.1732,
+   "notes_per_s": 13.187
+  },
+  "02": {
+   "group": "not",
+   "notes": 399,
+   "low_share": 0.0602,
+   "high_share": 0.208,
+   "comping_per_s": 2.569,
+   "lick_len_median": 1,
+   "lick_len_p90": 4,
+   "semitone_step_share": 0.0294,
+   "notes_per_s": 13.314
+  },
+  "05": {
+   "group": "not",
+   "notes": 322,
+   "low_share": 0.0528,
+   "high_share": 0.1242,
+   "comping_per_s": 1.637,
+   "lick_len_median": 1,
+   "lick_len_p90": 3,
+   "semitone_step_share": 0.0,
+   "notes_per_s": 10.756
+  },
+  "07": {
+   "group": "not",
+   "notes": 150,
+   "low_share": 0.0867,
+   "high_share": 0.0133,
+   "comping_per_s": 0.467,
+   "lick_len_median": 1,
+   "lick_len_p90": 3,
+   "semitone_step_share": 0.1739,
+   "notes_per_s": 5.004
+  },
+  "08": {
+   "group": "not",
+   "notes": 219,
+   "low_share": 0.0,
+   "high_share": 0.1918,
+   "comping_per_s": 0.606,
+   "lick_len_median": 1.0,
+   "lick_len_p90": 6,
+   "semitone_step_share": 0.122,
+   "notes_per_s": 7.371
+  },
+  "09": {
+   "group": "not",
+   "notes": 257,
+   "low_share": 0.035,
+   "high_share": 0.0,
+   "comping_per_s": 0.0,
+   "lick_len_median": 127.5,
+   "lick_len_p90": 230,
+   "semitone_step_share": 0.0,
+   "notes_per_s": 8.594
+  },
+  "10": {
+   "group": "not",
+   "notes": 169,
+   "low_share": 0.0296,
+   "high_share": 0.0473,
+   "comping_per_s": 0.507,
+   "lick_len_median": 1,
+   "lick_len_p90": 4,
+   "semitone_step_share": 0.25,
+   "notes_per_s": 5.714
+  },
+  "11": {
+   "group": "not",
+   "notes": 130,
+   "low_share": 0.1231,
+   "high_share": 0.0,
+   "comping_per_s": 0.899,
+   "lick_len_median": 1,
+   "lick_len_p90": 8,
+   "semitone_step_share": 0.1429,
+   "notes_per_s": 4.493
+  },
+  "12": {
+   "group": "not",
+   "notes": 230,
+   "low_share": 0.0783,
+   "high_share": 0.0696,
+   "comping_per_s": 0.939,
+   "lick_len_median": 2,
+   "lick_len_p90": 5,
+   "semitone_step_share": 0.5758,
+   "notes_per_s": 7.711
+  },
+  "14": {
+   "group": "not",
+   "notes": 202,
+   "low_share": 0.0743,
+   "high_share": 0.0,
+   "comping_per_s": 1.07,
+   "lick_len_median": 1,
+   "lick_len_p90": 3,
+   "semitone_step_share": 0.0833,
+   "notes_per_s": 6.753
+  },
+  "15": {
+   "group": "not",
+   "notes": 226,
+   "low_share": 0.1416,
+   "high_share": 0.0,
+   "comping_per_s": 0.2,
+   "lick_len_median": 16,
+   "lick_len_p90": 48,
+   "semitone_step_share": 0.0127,
+   "notes_per_s": 7.549
+  }
+ },
+ "summary": {
+  "liked": {
+   "low_share": {
+    "median": 0.10439999999999999,
+    "min": 0.0112,
+    "max": 0.223
+   },
+   "high_share": {
+    "median": 0.01255,
+    "min": 0.0,
+    "max": 0.1388
+   },
+   "comping_per_s": {
+    "median": 0.4515,
+    "min": 0.0,
+    "max": 1.338
+   },
+   "lick_len_median": {
+    "median": 3.5,
+    "min": 1.0,
+    "max": 136.5
+   },
+   "lick_len_p90": {
+    "median": 35.5,
+    "min": 7,
+    "max": 205
+   },
+   "semitone_step_share": {
+    "median": 0.1037,
+    "min": 0.0332,
+    "max": 0.3036
+   },
+   "notes_per_s": {
+    "median": 10.506499999999999,
+    "min": 5.067,
+    "max": 15.165
+   }
+  },
+  "not": {
+   "low_share": {
+    "median": 0.06725,
+    "min": 0.0,
+    "max": 0.1416
+   },
+   "high_share": {
+    "median": 0.0303,
+    "min": 0.0,
+    "max": 0.208
+   },
+   "comping_per_s": {
+    "median": 0.7525,
+    "min": 0.0,
+    "max": 2.569
+   },
+   "lick_len_median": {
+    "median": 1.0,
+    "min": 1,
+    "max": 127.5
+   },
+   "lick_len_p90": {
+    "median": 4.5,
+    "min": 3,
+    "max": 230
+   },
+   "semitone_step_share": {
+    "median": 0.10264999999999999,
+    "min": 0.0,
+    "max": 0.5758
+   },
+   "notes_per_s": {
+    "median": 7.460000000000001,
+    "min": 4.493,
+    "max": 13.314
+   }
+  }
+ }
+}
