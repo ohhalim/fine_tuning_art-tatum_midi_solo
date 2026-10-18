@@ -12,6 +12,7 @@ plays the committed notes up to it and then stops, whatever the reason and whene
   rt_lh_producer.py <aria repo> <ckpt> <data json> <blocks> <lh port> <origin json> <progress jsonl> <report json>
       [--capacity N] [--keep-target N] [--slow-block K --slow-ms MS] [--check-blocks 4,8,12]
       [--precision fp32|bf16|q8|q4] [--note-cap K] [--seed N]
+      [--lh-replay <notes json> [--lh-offset-ms MS]]   (issue #1825: left hand by music time, <lh port> ignored, no MIDI input)
 """
 from __future__ import annotations
 
@@ -32,7 +33,7 @@ from lh_cache_replay import reuse_start  # noqa: E402
 from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
 from lh_kv_reuse import common_prefix, load_mlx  # noqa: E402
 from kv_equiv_precision import gaps as eq_gaps, judge as eq_judge  # noqa: E402
-from rt_lh_input import LHState, SessionCrop, cap_floor, guarded_commit  # noqa: E402
+from rt_lh_input import LHReplay, LHState, SessionCrop, cap_floor, guarded_commit  # noqa: E402
 from stream_contract import SEGMENT_MS, TokenStream, floor_parts  # noqa: E402
 
 LEAD_S = 1.0
@@ -60,6 +61,8 @@ def main() -> None:
     precision = opt(rest, "--precision", str, "fp32")
     note_cap = opt(rest, "--note-cap", int, 0)              # notes per block commit window, 0 = off (#1819)
     seed = opt(rest, "--seed", int, SEED)
+    replay_path = opt(rest, "--lh-replay", str, None)         # deterministic left hand for paired runs (#1825)
+    replay_offset = opt(rest, "--lh-offset-ms", float, 937.5)  # the feeder's default offset
 
     out, progress = sys.stdout, open(progress_path, "w")
 
@@ -122,11 +125,12 @@ def main() -> None:
         return [[n.note_id, n.pitch, n.velocity, int(round(n.on_ms)), int(round(n.off_ms))] for n in notes]
 
     lhq = queue.Queue()
-    port = mido.open_input(lh_port, callback=lambda msg: lhq.put((time.monotonic_ns(), msg)))
+    port = None if replay_path else mido.open_input(lh_port, callback=lambda msg: lhq.put((time.monotonic_ns(), msg)))
     lh = LHState()
     received = []
     crop = SessionCrop(CAP, capacity, keep_target)
     t0 = coverage()
+    replay = LHReplay(json.load(open(replay_path)), t0, replay_offset) if replay_path else None
     origin = {}
     checks = []
 
@@ -152,10 +156,19 @@ def main() -> None:
                 lh.feed(msg.type, m_ms)
             received.append(rec)
 
+    def observe(s_k):
+        """Live: drain what arrived. Replay: feed the events at or before s_k by music time (#1825)."""
+        if replay is None:
+            drain()
+            return
+        for m_ms, kind, pitch, vel in replay.feed_until(lh, s_k):
+            received.append({"ns": time.monotonic_ns(), "type": kind, "m_ms": m_ms, "pitch": pitch, "velocity": vel,
+                             "replay": True})
+
     def prepare(k, s_k):
         """Snapshot, b context, KV reuse. Returns timing marks and reuse numbers."""
         marks = {"snapshot_ns": time.monotonic_ns()}
-        drain()
+        observe(s_k)
         marks["input_received"] = len(received)
         dropped = stream.rollback_to_committed()
         if dropped:
@@ -288,8 +301,9 @@ def main() -> None:
                 emit({"type": "end"})
     finally:
         final_drain_ns = time.monotonic_ns()   # messages sent after this are outside B1 (doc 9, deviation 2)
-        drain()
-        port.close()
+        if port is not None:
+            drain()
+            port.close()
     # post-run equivalence sample (outside the timed loop): the cached suffix against the same precision's own noise floor
     # (#1815 rules: R1 repeat, R2 split at start, R3 token by token; last position also under the sampler's mask).
     # fp32 must also keep the #1793 rule (every top-1 equal, last logits within 1e-3).
@@ -327,7 +341,9 @@ def main() -> None:
                          "every_block_reached_horizon": all(reached)},
               "committed_token_sha256": hashlib.sha256(json.dumps([to_id[t] for t in stream.tokens[:stream.committed_end]]).encode()).hexdigest(),
               "slow_block": slow_block, "slow_ms": slow_ms, "blocks": blocks, "abort": abort, "crops": crop.crops,
-              "lh_counts": lh.counts, "received": received, "final_drain_ns": final_drain_ns, "equivalence_sample": eq}
+              "lh_counts": lh.counts, "received": received, "final_drain_ns": final_drain_ns, "equivalence_sample": eq,
+              "lh_source": ({"mode": "replay", "notes_sha256": hashlib.sha256(open(replay_path, "rb").read()).hexdigest(),
+                             "offset_ms": replay_offset} if replay_path else {"mode": "live", "port": lh_port})}
     with open(report_path, "w") as f:
         json.dump(report, f)
 
