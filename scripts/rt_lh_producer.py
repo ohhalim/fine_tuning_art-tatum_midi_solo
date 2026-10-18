@@ -91,7 +91,7 @@ def main() -> None:
         samples["n"] += 1
         p = torch.softmax(torch.from_numpy(write_pending()), -1)
         st = stream.grammar_state()
-        gm.expect, gm.last = st.expect, st.last_onset
+        gm.sync(st, stream.onset_floor(st))
         ok = gm.allowed() & no_end
         a = p[ok].sum().item()
         if not (math.isfinite(a) and a > 0):

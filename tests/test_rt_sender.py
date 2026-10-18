@@ -107,6 +107,21 @@ class SenderTest(unittest.TestCase):
         self.assertEqual(sorted(m[1] for m in port.sent if m[0] == "note_off"), [60, 64])
         self.assertEqual(len(log["expected_midi"]), 4)
 
+    def test_note_already_late_at_intake_is_recorded_and_never_sent(self):
+        clock = Clock()
+        port = FakePort()
+        s = Sender(port, clock)
+        start(s, clock)                              # music now 10 ms
+        clock.ns = int(300e6)
+        s.handle({"type": "notes", "block": 1, "notes": [[2, 67, 80, 250, 900], [3, 69, 80, 400, 900]]})
+        clock.ns = int(500e6)
+        s.step()
+        self.assertNotIn(("note_on", 67, 80), port.sent)
+        self.assertIn(("note_on", 69, 80), port.sent)
+        self.assertEqual([(r["note_id"], r["block"], r["on_ms"]) for r in s.log["rejected_late_on"]], [(2, 1, 250)])
+        self.assertEqual(s.log["scheduled_notes"], 3)
+        self.assertEqual({(r["note_id"], r["block"]) for r in s.log["sent"] if r["kind"] == "on"}, {(0, 0), (1, 0), (3, 1)})
+
     def test_abort_stops_before_any_new_note_and_cleanup_turns_off(self):
         clock = Clock()
         port = FakePort()
@@ -169,7 +184,7 @@ class MainLoopPathTest(unittest.TestCase):
 
     def lines(self, tail):
         return ['{"type": "start", "music_origin_ms": 0, "wall_origin_ns": 0}\n',
-                '{"type": "notes", "block": 0, "notes": [[0, 60, 80, 0, 1000]]}\n'] + tail
+                '{"type": "notes", "block": 0, "notes": [[0, 60, 80, 10, 1000]]}\n'] + tail   # due at 10 ms, handed in on time
 
     def test_eof_with_a_due_note_starts_no_note(self):
         port = FakePort()
@@ -193,9 +208,10 @@ class MainLoopPathTest(unittest.TestCase):
         q = queue.Queue()
         reader(self.lines([]), q)
         msgs = drain(q)
-        eof = msgs.pop()                                                  # deliver start + notes first
+        eof = msgs.pop()                                                  # deliver start + notes first, before the note is due
+        self.assertFalse(s.process(msgs))
         clock.ns = int(10e6)
-        self.assertFalse(s.process(msgs))                                 # note-on sent
+        self.assertFalse(s.process([]))                                   # note-on sent
         self.assertTrue(s.process([eof]))
         s.cleanup()
         self.assertEqual(port.sent, [("note_on", 60, 80), ("note_off", 60, 0)])
@@ -206,8 +222,9 @@ class MainLoopPathTest(unittest.TestCase):
         s = Sender(port, clock)
         q = queue.Queue()
         reader(self.lines(['{"type": "end"}\n']), q)
+        self.assertFalse(s.process(drain(q)))                             # notes handed in before they are due, then end + eof
         clock.ns = int(10e6)
-        self.assertFalse(s.process(drain(q)))                             # end + eof, note still playing
+        self.assertFalse(s.process([]))                                   # note still playing
         clock.ns = int(1500e6)
         self.assertTrue(s.process([]))
         self.assertEqual(port.sent, [("note_on", 60, 80), ("note_off", 60, 0)])
