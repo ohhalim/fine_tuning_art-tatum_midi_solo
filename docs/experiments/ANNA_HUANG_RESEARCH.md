@@ -16,7 +16,7 @@
 1. **ReaLchords·ReaLJam·GAPT 공식 코드가 공개돼 있습니다.** `lukewys/realchords-pytorch`, MIT 라이선스입니다. 체크포인트는 Hugging Face `lukewys/realchords-pytorch`에 있습니다 [원문]
 2. **먼저 밝힐 점 (2026-10-16 추가):** 1·3·4번 사실(공식 코드 공개, 코드→멜로디 레시피, MLX 백엔드)과 저장소 평가 코드는 **#1735 조사(2026-10-11)에 이미 직접 확인으로 적혀 있었습니다**(`docs/experiments/realtime_partner_research/realtime_systems_and_apple_silicon.md` 49·62행, `jazz_chord_conditioned_generation_and_eval.md` 258·349·525행). #1765와 이 문서를 쓸 때 그 문서를 대조하지 않아 새 발견처럼 적었습니다. 이 문서에서 새로 더한 것은 논문 목록, 체크포인트 크기와 이름, 따라가기 순서입니다
 3. **#1765 6.5.3절을 바로잡습니다.** 그 문서에는 "ReaLchords는 사람이 멜로디, AI가 코드라서 우리와 방향이 반대"라고 적었습니다. 그런데 저장소에는 **코드를 받아 멜로디를 내는 온라인 모델의 학습 레시피**("RL Training for Melody Model")가 있고, 학습된 체크포인트 `rl_melody_gail_4_datasets`도 올라와 있습니다. 방향 문제는 코드 수준에서 이미 풀려 있습니다 [원문]
-4. **ReaLJam 서버는 Apple Silicon용 MLX 백엔드를 지원합니다.** `pip install realjam` 후 `realjam-start-server --mlx`로 실행합니다. 이 Mac에서 바로 체험할 수 있습니다. 단, 외부 다운로드라서 승인이 필요합니다 [원문]
+4. **ReaLJam 저장소 README는 Apple Silicon용 MLX 백엔드(`realjam-start-server --mlx`)를 소개합니다** [원문]. 다만 실제로 확인해 보니 PyPI `realjam` 1.0.1 배포본에는 MLX가 없고 체크포인트 링크도 404였습니다. 이 Mac에서 돌린 검증된 경로는 저장소 git `75a63248` 코드를 직접 쓰는 것입니다(`REALJAM_LOCAL.md` 1절, #1769). README 소개와 배포된 wheel이 같다는 검증은 아닙니다
 5. 남는 차이는 **표현**입니다. 저장소 모델은 16분음표 격자, 단선율 멜로디, 코드 기호 어휘를 씁니다. 우리는 실제 왼손 보이싱, 다성 오른손, Aria 토큰을 씁니다 (7절)
 6. ReaLchords는 **±6반음 전조 증강(13배)**을 씁니다. 우리 D1 Arm E에서는 ×12 증강이 재붕괴를 일으켰습니다. 다만 다른 모델의 과거 실패가 이 모델에서도 증강이 무효라는 증거는 아닙니다(8절, 아스트라 교정)
 
@@ -216,7 +216,7 @@ MIT 발표회의 Rachel Loh "Visualizing the Internal State of Music Models for 
 | 모델 | 디코더 512차원, 8층, 8헤드, dropout 0.1, bf16, 30,000스텝, 배치 64. RL 결과 `actor.pth`가 79.3 MB라 fp32 기준 약 2,000만 파라미터 [판단, 파일 크기로 환산] |
 | 증강 | ±6반음 전조(13배) |
 | RL | 단일 GPU, 48 GB VRAM 기준. rollout 배치 384, 1,000스텝, 100스텝마다 저장·평가 |
-| ReaLJam | PyPI `realjam` 1.0.1(MIT, 휠 0.06 MB). 의존성에 torch, x-transformers 2.1.2, note_seq, onnxruntime 1.21.0, numpy<2.0 등. `realjam-start-server --mlx`(Apple Silicon). 체크포인트는 실행 시 자동 다운로드 |
+| ReaLJam | PyPI `realjam` 1.0.1(MIT, 휠 0.06 MB). 의존성에 torch, x-transformers 2.1.2, note_seq, onnxruntime 1.21.0, numpy<2.0 등. README는 `--mlx`를 소개하지만 배포본에는 MLX가 없었음(검증된 실행 경로는 `REALJAM_LOCAL.md`, git `75a63248`) |
 
 ---
 
@@ -237,7 +237,7 @@ MIT 발표회의 Rachel Loh "Visualizing the Internal State of Music Models for 
 
 - 방향(코드 → 멜로디)은 이미 풀려 있습니다. 남은 차이는 표현과 데이터입니다
 - 저장소 모델을 그대로 쓰려면 왼손 보이싱을 코드 기호로 바꾸는 인식기와 오른손을 맨 윗선 하나로 줄이는 단계가 필요합니다. 둘 다 정보를 버립니다
-- #1760에서 Aria + adapter는 현재 코드를 쓰지 못했습니다(b 2.77425 > c 2.76603). ReaLchords 표현은 코드 토큰이 매 프레임 같은 시퀀스 안에 들어갑니다. 이 표현이 조건 사용을 더 쉽게 만드는지는 열린 질문이고, 작은 실험 하나로 확인할 수 있습니다
+- #1760에서 Aria + adapter는 "현재 코드 사용" 대조 기준을 충족하지 못했습니다(b 2.77425 > c 2.76603). 현재 코드를 전혀 쓰지 못한다는 증명은 아닙니다. ReaLchords 표현은 코드 토큰이 매 프레임 같은 시퀀스 안에 들어갑니다. 이 표현이 조건 사용을 더 쉽게 만드는지는 열린 질문이고, 작은 실험 하나로 확인할 수 있습니다
 
 ---
 
@@ -264,6 +264,7 @@ MIT 발표회의 Rachel Loh "Visualizing the Internal State of Music Models for 
 - 기본 코드와 교체 코드를 같은 문맥·seed로 넣고, 모델 표현으로의 왕복 손실(roundtrip), 출력, 지연을 기록합니다
 - F3, RL, 활성값 조종은 아직 병행하지 않습니다
 - F1에 쓸 체크포인트 다운로드는 사용자 승인 범위를 다시 확인한 뒤에 합니다(현재 승인은 ReaLJam용만)
+- **(2026-10-18 추가)** 위 F0–F6 순서와 승인 상태는 2026-10-16 당시 기록입니다. F1에 해당하는 실행은 #1781로 했습니다(사용자 승인 후 체크포인트 받음, 명시 코드 일정 P/Q 4칸). 사용자가 받아들이지 않아 이 경로는 종료했습니다(`REALCHORDS_MELODY_PQ.md` 12.4)
 
 기존 결정과 충돌하는 점
 
@@ -287,7 +288,7 @@ MIT 발표회의 Rachel Loh "Visualizing the Internal State of Music Models for 
 - Radcliffe 펠로우, 21M.569 강의, KCL 특강은 검색 요약만 봤습니다
 - GAPT의 ICLR 2026 채택은 이전 세션에서 확인했고, 이번 arXiv 코멘트에는 학회명이 없습니다
 - JazzSAMBA 데이터 공개 범위와 라이선스는 확인하지 못했습니다
-- `rl_melody_gail_4_datasets` 체크포인트는 돌려 보지 않았습니다
+- (2026-10-16 당시) `rl_melody_gail_4_datasets` 체크포인트는 돌려 보지 않았습니다. 이후 #1781에서 P/Q 4칸을 실제로 생성했고 사용자가 받아들이지 않았습니다(`REALCHORDS_MELODY_PQ.md` 12.4)
 - Google Scholar는 열지 않았고, DBLP API는 막혀 있었습니다
 
 ---
