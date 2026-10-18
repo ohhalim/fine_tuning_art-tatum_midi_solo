@@ -6,6 +6,8 @@ block start s_k: drains the queue into LHState, takes the #1773 window snapshot 
 the b context over the committed right hand, reuses the KV up to P_reuse = min(common prefix, KV valid end) (0 after a
 crop, last token recomputed when S = 0), then fill_block. If a block's commit/schedule happens after its deadline
 (W + k*B + one beat) it sends {"type": "abort", "reason": "deadline_miss"} instead of the notes and stops.
+A warm-block abort carries stop_at_ms = s_k + one beat, the end of the music already committed (h_{k-1}): the sender
+plays the committed notes up to it and then stops, whatever the reason and whenever it is sent (issue #1821).
 
   rt_lh_producer.py <aria repo> <ckpt> <data json> <blocks> <lh port> <origin json> <progress jsonl> <report json>
       [--capacity N] [--keep-target N] [--slow-block K --slow-ms MS] [--check-blocks 4,8,12]
@@ -249,7 +251,7 @@ def main() -> None:
                 marks, info = prepare(k, s_k)
             except CapacityFailure as e:                   # no cut fits: stop before any forward, nothing sent (#1803)
                 abort = {"reason": "capacity_failure", "block": k, "detail": str(e)[:200]}
-                emit({"type": "abort", "reason": "capacity_failure", "block": k})
+                emit({"type": "abort", "reason": "capacity_failure", "block": k, "stop_at_ms": s_k + BEAT})
                 note_progress({"block": k, "problem": "capacity_failure", "detail": abort["detail"]})
                 break
             ready = {}
@@ -292,7 +294,7 @@ def main() -> None:
                 reached.append(res["reached"])
             if ready.get("problem"):
                 abort = {"reason": ready["problem"], "block": k}
-                emit({"type": "abort", **abort})
+                emit({"type": "abort", **abort, "stop_at_ms": s_k + BEAT})
                 break
         else:
             if abort is None:

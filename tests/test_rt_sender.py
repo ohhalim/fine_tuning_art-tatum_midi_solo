@@ -137,7 +137,86 @@ class SenderTest(unittest.TestCase):
         self.assertEqual(log["abort"], {"reason": "deadline_miss", "block": 1})
         self.assertEqual(sorted(m[1] for m in port.sent if m[0] == "note_off"), [60, 64])
         self.assertEqual(log["pending_on_at_stop"], 1)  # 67 was still pending in the scheduler and is dropped by stop
+        self.assertEqual(log["cancelled_pending_on"], [{"note_id": 2, "pitch": 67, "on_ms": 500}])
         self.assertNotIn(("note_on", 67, 80), port.sent)
+
+    def test_abort_with_stop_at_plays_the_committed_notes_then_stops(self):
+        """Issue #1821: a capacity_failure abort at block wake, before the previous block's committed notes started."""
+        clock = Clock()
+        port = FakePort()
+        s = Sender(port, clock)
+        start(s, clock)                              # 60 and 64 sounding
+        s.handle({"type": "notes", "block": 1, "notes": [[2, 67, 80, 500, 900]]})
+        clock.ns = int(100e6)
+        self.assertFalse(s.process([{"type": "abort", "reason": "capacity_failure", "block": 2, "stop_at_ms": 600}]))
+        self.assertNotIn(("note_on", 67, 80), port.sent)
+        self.assertFalse(s.process([{"type": "eof"}]))   # the producer exits after the abort: play-out goes on
+        clock.ns = int(550e6)
+        self.assertFalse(s.process([]))
+        self.assertIn(("note_on", 67, 80), port.sent)   # committed, due before stop_at
+        clock.ns = int(650e6)
+        self.assertTrue(s.process([]))
+        log = s.cleanup()
+        self.assertEqual(log["end"], "abort")
+        self.assertEqual(log["abort"], {"reason": "capacity_failure", "block": 2})
+        self.assertEqual(log["abort_stop_at_ms"], 600)
+        self.assertEqual(log["pending_on_at_stop"], 0)
+        self.assertEqual(log["cancelled_pending_on"], [])
+        self.assertEqual(sorted(m[1] for m in port.sent if m[0] == "note_off"), [60, 64, 67])
+        self.assertTrue(log["clean_stop"])
+
+    def test_play_out_completion_uses_the_ticked_time_not_a_later_clock_read(self):
+        """Astra review of #1824: the step saw 590 and a later read saw 610; the note at 595 must still be sent."""
+        class Advancing(Clock):
+            def __call__(self):
+                v = self.ns
+                self.ns += int(20e6) if self.advance else 0
+                return v
+        clock = Advancing()
+        clock.advance = False
+        port = FakePort()
+        s = Sender(port, clock)
+        start(s, clock)
+        s.handle({"type": "notes", "block": 1, "notes": [[2, 67, 80, 595, 900]]})
+        clock.ns = int(100e6)
+        self.assertFalse(s.process([{"type": "abort", "reason": "capacity_failure", "block": 2, "stop_at_ms": 600}]))
+        clock.ns, clock.advance = int(590e6), True   # this step reads 590, any later read would be past 600
+        self.assertFalse(s.process([]))
+        self.assertFalse(s.done())
+        self.assertNotIn(("note_on", 67, 80), port.sent)
+        self.assertTrue(s.process([]))               # next read is past 600: ticked to 600, the note at 595 goes out
+        self.assertIn(("note_on", 67, 80), port.sent)
+        self.assertTrue(s.done())
+        log = s.cleanup()
+        self.assertEqual(log["pending_on_at_stop"], 0)
+        self.assertEqual(log["cancelled_pending_on"], [])
+
+    def test_play_out_never_sends_a_note_on_due_after_stop_at(self):
+        clock = Clock()
+        port = FakePort()
+        s = Sender(port, clock)
+        start(s, clock)
+        s.handle({"type": "notes", "block": 1, "notes": [[3, 69, 80, 650, 800]]})
+        clock.ns = int(100e6)
+        self.assertFalse(s.process([{"type": "abort", "reason": "horizon_underfill", "block": 2, "stop_at_ms": 600}]))
+        clock.ns = int(700e6)                        # 69 is due by the clock, but after stop_at
+        self.assertTrue(s.process([]))
+        log = s.cleanup()
+        self.assertNotIn(("note_on", 69, 80), port.sent)
+        self.assertEqual(log["pending_on_at_stop"], 1)
+        self.assertEqual(log["cancelled_pending_on"], [{"note_id": 3, "pitch": 69, "on_ms": 650}])
+
+    def test_abort_after_stop_at_stops_at_once_like_before(self):
+        clock = Clock()
+        port = FakePort()
+        s = Sender(port, clock)
+        start(s, clock)
+        s.handle({"type": "notes", "block": 1, "notes": [[2, 67, 80, 500, 900]]})
+        clock.ns = int(700e6)                        # deadline_miss: the abort comes after the committed music ended
+        self.assertTrue(s.process([{"type": "abort", "reason": "deadline_miss", "block": 2, "stop_at_ms": 600}]))
+        log = s.cleanup()
+        self.assertNotIn(("note_on", 67, 80), port.sent)   # no tick after the abort is known (same as without stop_at)
+        self.assertEqual(log["cancelled_pending_on"], [{"note_id": 2, "pitch": 67, "on_ms": 500}])
 
     def test_normal_end_waits_for_pending_and_ignores_the_following_eof(self):
         clock = Clock()
