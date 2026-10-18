@@ -55,5 +55,15 @@ class SeedsTest(unittest.TestCase):
         self.assertEqual(len(qd.SEEDS) * len(qd.PROMPTS), 768)
 
 
+class SeedClusterBlockTest(unittest.TestCase):
+    def test_seed_means_and_rule(self):
+        import q8_density as qd
+        A = {(p, s): {"stats": {"x": 5.0}} for p in (0, 1) for s in range(1, 11)}
+        B = {(p, s): {"stats": {"x": 5.0 + (0.01 if p == 0 else -0.01)}} for p in (0, 1) for s in range(1, 11)}
+        out = qd.seed_cluster_block(A, B, sorted(A), "x")
+        self.assertEqual(out["seeds"], 10)
+        self.assertAlmostEqual(out["hl_diff"], 0.0, places=9)
+
+
 if __name__ == "__main__":
     unittest.main()

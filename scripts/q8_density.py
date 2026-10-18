@@ -17,7 +17,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from q8_free_gen import load, wilcoxon  # noqa: E402
+from q8_free_gen import input_checks, load, wilcoxon  # noqa: E402
 
 PRIMARY = "notes_per_s"
 SECONDARY = ("win_max", "win_median")
@@ -65,9 +65,23 @@ def stat_block(A, B, keys, s):
                               for p in sorted({k[0] for k, _, _ in rows})}}
 
 
+def seed_cluster_block(A, B, keys, s):
+    """Post-hoc sensitivity (Astra review of #1830/#1837): the four prompts reuse each seed, so their pairs share
+    sampling noise. Per seed, average q8 - fp32 over prompts; HL with 99% interval and signed-rank on the seed means."""
+    per = {}
+    for k in keys:
+        x, y = A[k]["stats"][s], B[k]["stats"][s]
+        if x is not None and y is not None:
+            per.setdefault(k[1], []).append(y - x)
+    means = [statistics.fmean(v) for _, v in sorted(per.items())]
+    hl, (lo, hi) = hodges_lehmann(means)
+    return {"seeds": len(means), "hl_diff": hl, "ci99": [lo, hi], "wilcoxon": wilcoxon(means), "verdict_rule_applied": verdict(lo, hi)}
+
+
 def compare(fp32_path, q8_path, report_path):
-    A, B = load(fp32_path, "fp32"), load(q8_path, "q8")
     expected = {(p, s) for p in PROMPTS for s in SEEDS}
+    inputs_ok, inputs = input_checks(fp32_path, q8_path, sorted(expected))
+    A, B = load(fp32_path, "fp32"), load(q8_path, "q8")
     keys = sorted(set(A) & set(B) & expected)
     rep = {"issue": 1832, "rule": {"primary": PRIMARY, "secondary": SECONDARY, "alpha": ALPHA, "ci": 0.99, "margin": MARGIN},
            "pairs": len(keys), "missing": sorted(expected - (set(A) & set(B))),
@@ -77,12 +91,17 @@ def compare(fp32_path, q8_path, report_path):
            "stats": {s: stat_block(A, B, keys, s) for s in (PRIMARY,) + SECONDARY}}
     p = rep["stats"][PRIMARY]
     lo, hi = p["ci99"]
-    rep["verdict"] = {"primary": verdict(lo, hi), "replicates_1823_direction": p["hl_diff"] < 0,
+    rep["inputs"] = inputs
+    rep["sensitivity_seed_cluster"] = {s: seed_cluster_block(A, B, keys, s) for s in (PRIMARY,) + SECONDARY}
+    rep["verdict"] = {"primary": verdict(lo, hi) if inputs_ok else "판단 불가(입력 조건 미충족)",
+                      "replicates_1823_direction": p["hl_diff"] < 0, "inputs_ok": inputs_ok,
                       "all_valid": rep["valid"]["fp32"] == rep["valid"]["q8"] == len(keys), "complete": not rep["missing"]}
     with open(report_path, "w") as f:
         json.dump(rep, f, ensure_ascii=False, indent=1)
     print(json.dumps({"pairs": len(keys), "hl": p["hl_diff"], "ci99": p["ci99"], "p": p["wilcoxon"]["p"],
                       "r": p["wilcoxon"]["r"], **rep["verdict"]}, ensure_ascii=False))
+    if not inputs_ok:
+        sys.exit(2)
     return rep
 
 

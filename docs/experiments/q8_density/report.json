@@ -102,9 +102,78 @@
    }
   }
  },
+ "inputs": {
+  "fp32": {
+   "rows": 768,
+   "duplicates": [],
+   "missing": [],
+   "unexpected": [],
+   "invalid": [],
+   "not_duration": []
+  },
+  "q8": {
+   "rows": 768,
+   "duplicates": [],
+   "missing": [],
+   "unexpected": [],
+   "invalid": [],
+   "not_duration": []
+  }
+ },
+ "sensitivity_seed_cluster": {
+  "notes_per_s": {
+   "seeds": 192,
+   "hl_diff": -0.03749999999999998,
+   "ci99": [
+    -0.2333333333333334,
+    0.15416666666666656
+   ],
+   "wilcoxon": {
+    "n": 191,
+    "w_plus": 8781.5,
+    "z": -0.5052295675220624,
+    "p": 0.6133976054204446,
+    "r": -0.042157504363001745
+   },
+   "verdict_rule_applied": "실용 차이 없음"
+  },
+  "win_max": {
+   "seeds": 192,
+   "hl_diff": -0.125,
+   "ci99": [
+    -0.5,
+    0.375
+   ],
+   "wilcoxon": {
+    "n": 179,
+    "w_plus": 7625.5,
+    "z": -0.6190414230623186,
+    "p": 0.5358890707203833,
+    "r": -0.053320918684047175
+   },
+   "verdict_rule_applied": "미결"
+  },
+  "win_median": {
+   "seeds": 192,
+   "hl_diff": -0.0625,
+   "ci99": [
+    -0.25,
+    0.125
+   ],
+   "wilcoxon": {
+    "n": 180,
+    "w_plus": 7589.5,
+    "z": -0.7944127965439677,
+    "p": 0.42695515695318187,
+    "r": -0.0682013505217925
+   },
+   "verdict_rule_applied": "실용 차이 없음"
+  }
+ },
  "verdict": {
   "primary": "실용 차이 없음",
   "replicates_1823_direction": true,
+  "inputs_ok": true,
   "all_valid": true,
   "complete": true
  }
