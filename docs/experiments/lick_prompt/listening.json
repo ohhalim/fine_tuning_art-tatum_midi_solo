@@ -1,0 +1,79 @@
+{
+ "source": "사용자 청취 2026-10-19",
+ "answers": {
+  "x01": "아님",
+  "x02": "아님",
+  "x03": "아님",
+  "x04": "아님",
+  "x05": "아님",
+  "x06": "아님",
+  "x07": "-",
+  "x08": "아님",
+  "x09": "아님",
+  "x10": "아님",
+  "x11": "아님",
+  "x12": "원하는 릭에 가까움"
+ },
+ "key": [
+  {
+   "excerpt": "x01",
+   "prompt": "P06",
+   "seed": 2
+  },
+  {
+   "excerpt": "x02",
+   "prompt": "P18",
+   "seed": 3
+  },
+  {
+   "excerpt": "x03",
+   "prompt": "P06",
+   "seed": 1
+  },
+  {
+   "excerpt": "x04",
+   "prompt": "P16",
+   "seed": 1
+  },
+  {
+   "excerpt": "x05",
+   "prompt": "P0",
+   "seed": 1
+  },
+  {
+   "excerpt": "x06",
+   "prompt": "P0",
+   "seed": 2
+  },
+  {
+   "excerpt": "x07",
+   "prompt": "P0",
+   "seed": 3
+  },
+  {
+   "excerpt": "x08",
+   "prompt": "P16",
+   "seed": 3
+  },
+  {
+   "excerpt": "x09",
+   "prompt": "P16",
+   "seed": 2
+  },
+  {
+   "excerpt": "x10",
+   "prompt": "P18",
+   "seed": 1
+  },
+  {
+   "excerpt": "x11",
+   "prompt": "P06",
+   "seed": 3
+  },
+  {
+   "excerpt": "x12",
+   "prompt": "P18",
+   "seed": 2
+  }
+ ]
+}
