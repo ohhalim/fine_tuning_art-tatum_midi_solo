@@ -32,3 +32,34 @@ class SignTestTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ReviewFixesTest(unittest.TestCase):
+    """Astra review of #1845: length differences, overflow-free tilt, finite CLI values."""
+
+    def test_extra_rows_or_notes_count_as_a_difference(self):
+        import density_tilt_eval as de
+        a = [{"block": 1, "tokens": 5, "notes": 2, "S": 3}]
+        b = a + [{"block": 2, "tokens": 6, "notes": 2, "S": 3}]
+        self.assertEqual(de.first_block_diff(a, b), 2)
+        self.assertEqual(de.first_note_on_diff([(60, 80, 0, 1)], [(60, 80, 0, 1), (62, 80, 10, 1)]), 1)
+        self.assertIsNone(de.first_note_on_diff([(60, 80, 0, 1)], [(60, 80, 0, 1), (62, 80, 10, 5)], comparable_until=3))
+
+    def test_large_tilt_does_not_overflow(self):
+        import torch
+        import rt_lh_input as li
+        p = torch.tensor([0.5, 0.5], dtype=torch.float32)
+        allowed = torch.tensor([True, True])
+        out = li.tilted_probs(p, torch.tensor([1]), torch.tensor([20 * 1 * 468.75 / 100.0]), allowed)
+        self.assertTrue(torch.isfinite(out).all())
+        self.assertGreater(out[1].item(), out[0].item())
+        same = li.tilted_probs(p, torch.tensor([1]), torch.tensor([0.0]), allowed)
+        self.assertAlmostEqual(same[0].item(), same[1].item(), places=6)
+
+    def test_rt_play_refuses_non_finite_tilt(self):
+        import argparse
+        import rt_play as rp
+        for bad in ("nan", "inf", "-1"):
+            with self.assertRaises(argparse.ArgumentTypeError):
+                rp.non_negative_float(bad)
+        self.assertEqual(rp.non_negative_float("1.5"), 1.5)

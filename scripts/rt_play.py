@@ -92,10 +92,11 @@ def non_negative_int(text):
 
 def non_negative_float(text):
     """argparse type: a number >= 0 (density tilt strength, #1844)."""
+    import math
     v = float(text)
-    if v < 0:
+    if not math.isfinite(v) or v < 0:
         import argparse
-        raise argparse.ArgumentTypeError(f"0 이상이어야 함: {v}")
+        raise argparse.ArgumentTypeError(f"0 이상의 유한한 수여야 함: {v}")
     return v
 
 

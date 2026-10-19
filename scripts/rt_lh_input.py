@@ -179,3 +179,12 @@ class LHReplay:
             out.append(ev)
             self.fed += 1
         return out
+
+
+def tilted_probs(p, idx, bias, allowed):
+    """Add bias (log space) to p[idx] and rescale so the largest allowed entry is 1: no overflow for large finite biases
+    (Astra review of #1845). masked_pick is scale-invariant, so the result needs no normalization."""
+    import torch
+    lp = torch.log(p.double())
+    lp[idx] = lp[idx] + torch.as_tensor(bias, dtype=torch.float64)
+    return torch.exp(lp - lp[allowed].max()).to(p.dtype)

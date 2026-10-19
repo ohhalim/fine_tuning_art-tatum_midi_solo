@@ -404,38 +404,44 @@
   }
  ],
  "p0_violations": [],
+ "pairs_valid": 32,
+ "t3_pairs": 18,
  "arms": {
   "off": {
+   "runs": 32,
    "k1_all": true,
    "complete16": 16,
    "deadline_misses": 4,
    "capacity_failures": 12,
+   "warm_blocks": 420,
    "median_notes": 5.0,
+   "mean_notes": 6.072115384615385,
    "dense_share": 0.0985576923076923,
    "max_notes": 19,
-   "mean_notes": 6.072115384615385,
    "max_samples": 63,
    "p95_samples": 42,
    "tilted_block_share": 0.0,
    "median_ms_per_sample": 6.4655000000000005,
    "chord_share_median": 0.2593103448275862,
-   "longest_rest_ms_median": 272.5
+   "max_onset_gap_ms_median": 272.5
   },
   "tilt": {
+   "runs": 32,
    "k1_all": true,
    "complete16": 21,
    "deadline_misses": 0,
    "capacity_failures": 11,
+   "warm_blocks": 436,
    "median_notes": 6.0,
+   "mean_notes": 5.9036697247706424,
    "dense_share": 0.03669724770642202,
    "max_notes": 11,
-   "mean_notes": 5.9036697247706424,
    "max_samples": 37,
    "p95_samples": 33,
    "tilted_block_share": 0.19954128440366972,
    "median_ms_per_sample": 6.4239999999999995,
    "chord_share_median": 0.20754540348249392,
-   "longest_rest_ms_median": 270.0
+   "max_onset_gap_ms_median": 270.0
   }
  },
  "judge": {

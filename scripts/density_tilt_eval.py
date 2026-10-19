@@ -56,10 +56,17 @@ def calib(run_dir, out):
     print(json.dumps(rep, ensure_ascii=False))
 
 
+REQUIRED_CHECKS = ("no_note_before_previous_horizon", "no_late_intake_rejection", "forwarded_blocks_fit_capacity",
+                   "stop_is_recorded_abort_or_end", "safe_stop", "existing_checks")
+
+
 def first_block_diff(a, b):
+    """First block whose row differs; a row present on one side only counts as a difference (Astra review of #1845)."""
     for x, y in zip(a, b):
         if (x["tokens"], x.get("notes"), x["S"]) != (y["tokens"], y.get("notes"), y["S"]):
             return x["block"]
+    if len(a) != len(b):
+        return (a if len(a) > len(b) else b)[min(len(a), len(b))]["block"]
     return None
 
 
@@ -67,16 +74,23 @@ def note_ons(snd):
     return [(r["pitch"], r["velocity"], r["due_ms"], r.get("block")) for r in snd["sent"] if r["kind"] == "on"]
 
 
-def first_note_on_diff(a, b):
+def first_note_on_diff(a, b, comparable_until=None):
+    """First block whose sent note-on differs. An extra note-on on one side counts only before comparable_until (the
+    earlier stop of the two runs: past it the shorter run simply ended)."""
     for x, y in zip(a, b):
         if x[:3] != y[:3]:
             blocks = [v for v in (x[3], y[3]) if v is not None]
-            return min(blocks) if blocks else None
+            return min(blocks) if blocks else -1
+    if len(a) != len(b):
+        extra = (a if len(a) > len(b) else b)[min(len(a), len(b))]
+        if comparable_until is None or (extra[3] is not None and extra[3] < comparable_until):
+            return extra[3] if extra[3] is not None else -1
     return None
 
 
 def texture(snd):
-    """Chord share (note-ons within 30 ms of the previous) and the median longest rest per block window."""
+    """Chord share (note-ons within 30 ms of the previous) and, per block, the largest gap between note-on times. The
+    gap is an onset interval, not silence: sounding notes and block edges are ignored (Astra review of #1845)."""
     ons = sorted(r["due_ms"] for r in snd["sent"] if r["kind"] == "on")
     chord = sum(1 for a, b in zip(ons, ons[1:]) if b - a < CHORD_MS) / max(1, len(ons) - 1)
     by_block = {}
@@ -84,7 +98,7 @@ def texture(snd):
         if r["kind"] == "on" and r.get("block") is not None:
             by_block.setdefault(r["block"], []).append(r["due_ms"])
     rests = [max((b - a for a, b in zip(sorted(v), sorted(v)[1:])), default=0.0) for v in by_block.values() if len(v) > 1]
-    return {"chord_share": chord, "median_longest_rest_ms": statistics.median(rests) if rests else None}
+    return {"chord_share": chord, "median_max_onset_gap_ms": statistics.median(rests) if rests else None}
 
 
 def sign_test_p(k, n):
@@ -95,60 +109,70 @@ def sign_test_p(k, n):
     return min(1.0, 2 * tail)
 
 
+def run_record(run_dir, arm, s, sc):
+    d = os.path.join(run_dir, f"test_{arm}_s{s}", sc)
+    rep = json.load(open(os.path.join(run_dir, f"test_{arm}_s{s}.json")))["scenarios"][sc]
+    prod, snd = json.load(open(os.path.join(d, "producer.json"))), json.load(open(os.path.join(d, "sender.json")))
+    checks = rep.get("rerun_checks") or {}
+    return {"rep": rep, "prod": prod, "snd": snd, "abort": prod["abort"], "warm": warm(prod),
+            "k1": all(checks.get(k) is True for k in REQUIRED_CHECKS)}
+
+
+def pair_record(run_dir, s, sc):
+    o, t = run_record(run_dir, "off", s, sc), run_record(run_dir, "tilt", s, sc)
+    first_tilt = next((b["block"] for b in t["prod"]["blocks"] if b.get("tilted_samples")), None)
+    stop = min(len(o["warm"]), len(t["warm"])) + 1          # past the earlier stop the shorter run simply ended
+    fb = first_block_diff(o["prod"]["blocks"], t["prod"]["blocks"])
+    fn = first_note_on_diff(note_ons(o["snd"]), note_ons(t["snd"]), comparable_until=stop)
+    ok = lambda f: f is None or (first_tilt is not None and f >= first_tilt)  # noqa: E731
+    return {"seed": s, "scenario": sc, "first_tilt_block": first_tilt, "first_block_row_diff": fb,
+            "first_note_on_diff_block": fn, "p0": ok(fb) and ok(fn), "runs": {"off": o, "tilt": t}}
+
+
+def arm_summary(runs):
+    notes = [b["notes"] for r in runs for b in r["warm"] if b.get("notes") is not None]
+    sm = sorted(b["samples_to_ready"] for r in runs for b in r["warm"])
+    warm_n = sum(len(r["warm"]) for r in runs)
+    ms = [r["rep"]["loop_speed"]["median_ms_per_sample"] for r in runs
+          if r["rep"].get("loop_speed", {}).get("median_ms_per_sample") is not None]
+    tx = [texture(r["snd"]) for r in runs]
+    gaps = [x["median_max_onset_gap_ms"] for x in tx if x["median_max_onset_gap_ms"] is not None]
+    reason = lambda r, why: bool(r["abort"]) and r["abort"]["reason"] == why  # noqa: E731
+    return {"runs": len(runs), "k1_all": all(r["k1"] for r in runs),
+            "complete16": sum(1 for r in runs if r["abort"] is None and len(r["warm"]) == 16),
+            "deadline_misses": sum(1 for r in runs if reason(r, "deadline_miss")),
+            "capacity_failures": sum(1 for r in runs if reason(r, "capacity_failure")),
+            "warm_blocks": warm_n, "median_notes": statistics.median(notes), "mean_notes": statistics.fmean(notes),
+            "dense_share": sum(1 for x in notes if x >= 11) / len(notes), "max_notes": max(notes),
+            "max_samples": sm[-1], "p95_samples": sm[int(0.95 * (len(sm) - 1))],
+            "tilted_block_share": sum(1 for r in runs for b in r["warm"] if b.get("tilted_to_ready")) / warm_n if warm_n else None,
+            "median_ms_per_sample": statistics.median(ms) if ms else None,
+            "chord_share_median": statistics.median(x["chord_share"] for x in tx),
+            "max_onset_gap_ms_median": statistics.median(gaps) if gaps else None}
+
+
 def test(run_dir, out):
-    pairs, arms = [], {a: {"notes": [], "samples": [], "k1": True, "complete": 0, "misses": 0, "capacity": 0,
-                           "tilted_blocks": 0, "warm_blocks": 0, "ms": [], "chord": [], "rest": []} for a in ("off", "tilt")}
-    for s in TEST_SEEDS:
-        for sc in SCENARIOS:
-            row = {}
-            for arm in ("off", "tilt"):
-                d = os.path.join(run_dir, f"test_{arm}_s{s}", sc)
-                rep = json.load(open(os.path.join(run_dir, f"test_{arm}_s{s}.json")))["scenarios"][sc]
-                prod, snd = json.load(open(os.path.join(d, "producer.json"))), json.load(open(os.path.join(d, "sender.json")))
-                A = arms[arm]
-                A["k1"] &= all(v is True for v in rep["rerun_checks"].values())
-                ab = prod["abort"]
-                wb = warm(prod)
-                A["complete"] += ab is None and len(wb) == 16
-                A["misses"] += bool(ab and ab["reason"] == "deadline_miss")
-                A["capacity"] += bool(ab and ab["reason"] == "capacity_failure")
-                A["notes"] += [b["notes"] for b in wb if b.get("notes") is not None]
-                A["samples"] += [b["samples_to_ready"] for b in wb]
-                A["tilted_blocks"] += sum(1 for b in wb if b.get("tilted_to_ready"))
-                A["warm_blocks"] += len(wb)
-                if rep.get("loop_speed", {}).get("median_ms_per_sample") is not None:
-                    A["ms"].append(rep["loop_speed"]["median_ms_per_sample"])
-                tx = texture(snd)
-                A["chord"].append(tx["chord_share"])
-                if tx["median_longest_rest_ms"] is not None:
-                    A["rest"].append(tx["median_longest_rest_ms"])
-                row[arm] = (prod, snd, ab)
-            (po, so, ao), (pt, st, at) = row["off"], row["tilt"]
-            first_tilt = next((b["block"] for b in pt["blocks"] if b.get("tilted_samples")), None)
-            fb, fn = first_block_diff(po["blocks"], pt["blocks"]), first_note_on_diff(note_ons(so), note_ons(st))
-            ok = lambda f: f is None or (first_tilt is not None and f >= first_tilt)  # noqa: E731
-            pairs.append({"seed": s, "scenario": sc, "first_tilt_block": first_tilt, "first_block_row_diff": fb,
-                          "first_note_on_diff_block": fn, "p0": ok(fb) and ok(fn),
-                          "off": ao and [ao["reason"], ao["block"]], "tilt": at and [at["reason"], at["block"]]})
+    """Fail closed (Astra review of #1845): K1 needs every required check key True; pairs failing P0 are left out of
+    T1, T2 and T3; T3 counts only pairs where neither run stopped on capacity_failure (an incomplete partner is not a
+    deadline avoided)."""
+    pairs = [pair_record(run_dir, s, sc) for s in TEST_SEEDS for sc in SCENARIOS]
     valid = [p for p in pairs if p["p0"]]
-    miss = lambda x: bool(x) and x[0] == "deadline_miss"  # noqa: E731
-    off_only = sum(1 for p in valid if p["first_tilt_block"] is not None and miss(p["off"]) and not miss(p["tilt"]))
-    tilt_only = sum(1 for p in valid if p["first_tilt_block"] is not None and miss(p["tilt"]) and not miss(p["off"]))
-    summ = {}
-    for a, A in arms.items():
-        sm = sorted(A["samples"])
-        summ[a] = {"k1_all": A["k1"], "complete16": A["complete"], "deadline_misses": A["misses"], "capacity_failures": A["capacity"],
-                   "median_notes": statistics.median(A["notes"]), "dense_share": sum(1 for x in A["notes"] if x >= 11) / len(A["notes"]), "max_notes": max(A["notes"]), "mean_notes": statistics.fmean(A["notes"]),
-                   "max_samples": sm[-1], "p95_samples": sm[int(0.95 * (len(sm) - 1))],
-                   "tilted_block_share": A["tilted_blocks"] / A["warm_blocks"] if A["warm_blocks"] else None,
-                   "median_ms_per_sample": statistics.median(A["ms"]) if A["ms"] else None,
-                   "chord_share_median": statistics.median(A["chord"]), "longest_rest_ms_median": statistics.median(A["rest"]) if A["rest"] else None}
+    summ = {a: arm_summary([p["runs"][a] for p in valid]) for a in ("off", "tilt")}
+    k1 = all(p["runs"][a]["k1"] for p in pairs for a in ("off", "tilt"))
+    miss = lambda r: bool(r["abort"]) and r["abort"]["reason"] == "deadline_miss"  # noqa: E731
+    cap = lambda r: bool(r["abort"]) and r["abort"]["reason"] == "capacity_failure"  # noqa: E731
+    t3 = [p for p in valid if p["first_tilt_block"] is not None and not cap(p["runs"]["off"]) and not cap(p["runs"]["tilt"])]
+    off_only = sum(1 for p in t3 if miss(p["runs"]["off"]) and not miss(p["runs"]["tilt"]))
+    tilt_only = sum(1 for p in t3 if miss(p["runs"]["tilt"]) and not miss(p["runs"]["off"]))
     o, t = summ["off"], summ["tilt"]
-    rep = {"issue": 1844, "pairs": pairs, "p0_violations": [p for p in pairs if not p["p0"]], "arms": summ,
-           "judge": {"K1": o["k1_all"] and t["k1_all"],
-                     "T1": t["dense_share"] < o["dense_share"] and t["max_notes"] <= o["max_notes"],      # doc 6 revision
+    strip = lambda p: {k: v for k, v in p.items() if k != "runs"} | {  # noqa: E731
+        a: (p["runs"][a]["abort"] and [p["runs"][a]["abort"]["reason"], p["runs"][a]["abort"]["block"]]) for a in ("off", "tilt")}
+    rep = {"issue": 1844, "pairs": [strip(p) for p in pairs], "p0_violations": [strip(p) for p in pairs if not p["p0"]],
+           "pairs_valid": len(valid), "t3_pairs": len(t3), "arms": summ,
+           "judge": {"K1": k1, "T1": t["dense_share"] < o["dense_share"] and t["max_notes"] <= o["max_notes"],
                      "T2": t["max_samples"] < o["max_samples"],
-                     "T3": {"off_only_miss": off_only, "tilt_only_miss": tilt_only, "sign_p": sign_test_p(min(off_only, tilt_only), off_only + tilt_only)}}}
+                     "T3": {"off_only_miss": off_only, "tilt_only_miss": tilt_only,
+                            "sign_p": sign_test_p(min(off_only, tilt_only), off_only + tilt_only)}}}
     json.dump(rep, open(out, "w"), ensure_ascii=False, indent=1)
     print(json.dumps({k: v for k, v in rep.items() if k != "pairs"}, ensure_ascii=False))
 

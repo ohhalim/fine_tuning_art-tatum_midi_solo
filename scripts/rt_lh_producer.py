@@ -33,7 +33,7 @@ from lh_cache_replay import reuse_start  # noqa: E402
 from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
 from lh_kv_reuse import common_prefix, load_mlx  # noqa: E402
 from kv_equiv_precision import gaps as eq_gaps, judge as eq_judge  # noqa: E402
-from rt_lh_input import LHReplay, LHState, SessionCrop, cap_floor, guarded_commit, TILT_GAP_MS, window_count  # noqa: E402
+from rt_lh_input import tilted_probs, LHReplay, LHState, SessionCrop, cap_floor, guarded_commit, TILT_GAP_MS, window_count  # noqa: E402
 from stream_contract import SEGMENT_MS, TokenStream, floor_parts  # noqa: E402
 
 LEAD_S = 1.0
@@ -65,7 +65,7 @@ def main() -> None:
         sys.exit(f"--note-cap must be >= 0, got {note_cap}")    # a negative cap would push every onset (#1841 review)
     tilt_lam = opt(rest, "--density-tilt", float, 0.0)       # onset tilt toward later onsets as the window fills (#1844)
     tilt_n0 = opt(rest, "--density-n0", int, 8)
-    if tilt_lam < 0 or tilt_n0 < 0:
+    if not math.isfinite(tilt_lam) or tilt_lam < 0 or tilt_n0 < 0:
         sys.exit(f"--density-tilt and --density-n0 must be >= 0, got {tilt_lam}, {tilt_n0}")
     seed = opt(rest, "--seed", int, SEED)
     replay_path = opt(rest, "--lh-replay", str, None)         # deterministic left hand for paired runs (#1825)
@@ -123,8 +123,7 @@ def main() -> None:
             n_win = window_count(stream.onsets_since_commit(), st.segment * SEGMENT_MS + st.last_onset, t0 + BEAT, BLOCK)
             if n_win > tilt_n0:
                 gap = torch.clamp(onset_val - st.last_onset, min=0.0, max=TILT_GAP_MS)    # same as rt_lh_input.tilt_bias
-                p = p.clone()
-                p[onset_idx] = p[onset_idx] * torch.exp(tilt_lam * (n_win - tilt_n0) * gap / 100.0).to(p.dtype)
+                p = tilted_probs(p, onset_idx, tilt_lam * (n_win - tilt_n0) * gap / 100.0, ok)
                 samples["tilted"] += 1
         a = p[ok].sum().item()
         if not (math.isfinite(a) and a > 0):
