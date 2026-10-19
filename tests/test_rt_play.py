@@ -56,6 +56,19 @@ class SessionTest(unittest.TestCase):
         self.assertEqual(rp.sender_cmd(self.cfg(True), files)[-1], "--existing-port")
         self.assertNotIn("--existing-port", rp.sender_cmd(self.cfg(False), files))
 
+    def test_note_cap_only_when_asked(self):
+        files = {"origin": "o", "progress": "p", "producer": "r", "ready": "y", "sender": "s"}
+        self.assertNotIn("--note-cap", rp.producer_cmd(self.cfg(True), files))
+        cfg = dict(self.cfg(True), note_cap=12)
+        self.assertEqual(rp.producer_cmd(cfg, files)[-2:], ["--note-cap", "12"])
+        self.assertNotIn("--note-cap", rp.producer_cmd(dict(self.cfg(True), note_cap=0), files))   # explicit 0: off
+
+    def test_negative_note_cap_is_refused_before_anything_starts(self):
+        from unittest import mock
+        with mock.patch.object(rp, "run") as run, mock.patch("sys.stderr"), self.assertRaises(SystemExit):
+            rp.main(["--dry-run", "--note-cap", "-1"])
+        run.assert_not_called()
+
     def test_click_times(self):
         t = rp.click_times(10_000_000_000, 4, 8)
         self.assertEqual(len(t), 12)

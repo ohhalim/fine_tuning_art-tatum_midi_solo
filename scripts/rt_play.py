@@ -81,10 +81,20 @@ def lead_for(count_in_beats):
     return max(1.0, round(count_in_beats * BEAT / 1000 + 0.25, 3))
 
 
+def non_negative_int(text):
+    """argparse type: an integer >= 0 (a negative note cap would push every onset to the next window, #1841 review)."""
+    v = int(text)
+    if v < 0:
+        import argparse
+        raise argparse.ArgumentTypeError(f"0 이상이어야 함: {v}")
+    return v
+
+
 def producer_cmd(cfg, files):
     return [cfg["t3_py"], os.path.join(HERE, "rt_lh_producer.py"), cfg["aria_repo"], cfg["ckpt"], cfg["data"],
             str(cfg["blocks"]), cfg["lh_port"], files["origin"], files["progress"], files["producer"],
-            "--precision", cfg["precision"], "--lead-s", str(cfg["lead_s"])]
+            "--precision", cfg["precision"], "--lead-s", str(cfg["lead_s"])] + \
+        (["--note-cap", str(cfg["note_cap"])] if cfg.get("note_cap") else [])      # off unless asked (#1840)
 
 
 def sender_cmd(cfg, files):
@@ -316,6 +326,7 @@ def main(argv=None):
     ap.add_argument("--minutes", type=float, default=3.0)
     ap.add_argument("--blocks", type=int, help="블록 수(시작 전 블록 포함). --minutes보다 우선")
     ap.add_argument("--precision", default="q8", choices=("q8", "fp32", "bf16"))
+    ap.add_argument("--note-cap", type=non_negative_int, default=0, help="2박 블록 창당 음 수 상한(#1819). 0이면 끔(기본)")
     ap.add_argument("--click", action="store_true", help=f"박 클릭을 가상 포트 '{CLICK_PORT}'로(채널 10)")
     ap.add_argument("--count-in", type=int, default=4, help="클릭 카운트인 박 수")
     ap.add_argument("--dry-run", action="store_true", help="가상 포트와 가짜 왼손으로 연결 확인")
@@ -336,7 +347,7 @@ def main(argv=None):
         return 0
     tag = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     cfg = {"py": sys.executable, "t3_py": a.t3_py, "aria_repo": a.aria_repo, "ckpt": a.ckpt, "data": a.data,
-           "precision": a.precision, "click": a.click, "count_in": a.count_in, "dry_run": a.dry_run,
+           "precision": a.precision, "note_cap": a.note_cap, "click": a.click, "count_in": a.count_in, "dry_run": a.dry_run,
            "blocks": a.blocks or (9 if a.dry_run else blocks_for(a.minutes)), "bpm": BPM}
     cfg["lead_s"] = lead_for(a.count_in if a.click else 0)
     if a.dry_run:
