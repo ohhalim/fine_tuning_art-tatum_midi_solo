@@ -1,0 +1,48 @@
+{
+ "issue": 1844,
+ "rows": {
+  "0": {
+   "blocks": 121,
+   "median_notes": 5,
+   "max_notes": 16,
+   "mean_notes": 5.6115702479338845,
+   "max_samples": 51
+  },
+  "0.1": {
+   "blocks": 126,
+   "median_notes": 6.0,
+   "max_notes": 15,
+   "mean_notes": 6.285714285714286,
+   "max_samples": 49
+  },
+  "0.25": {
+   "blocks": 128,
+   "median_notes": 6.0,
+   "max_notes": 14,
+   "mean_notes": 6.546875,
+   "max_samples": 45
+  },
+  "0.5": {
+   "blocks": 128,
+   "median_notes": 6.0,
+   "max_notes": 12,
+   "mean_notes": 6.21875,
+   "max_samples": 39
+  },
+  "1.0": {
+   "blocks": 128,
+   "median_notes": 5.0,
+   "max_notes": 11,
+   "mean_notes": 5.671875,
+   "max_samples": 37
+  }
+ },
+ "drop_vs_off": {
+  "0.1": -0.2,
+  "0.25": -0.2,
+  "0.5": -0.2,
+  "1.0": 0.0
+ },
+ "chosen_lam": "1.0",
+ "why": "최대 12 이하 중 20%에 가장 가까움(감소율 기준 미달)"
+}

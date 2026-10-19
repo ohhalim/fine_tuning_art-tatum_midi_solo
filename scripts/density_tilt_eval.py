@@ -138,7 +138,7 @@ def test(run_dir, out):
     for a, A in arms.items():
         sm = sorted(A["samples"])
         summ[a] = {"k1_all": A["k1"], "complete16": A["complete"], "deadline_misses": A["misses"], "capacity_failures": A["capacity"],
-                   "median_notes": statistics.median(A["notes"]), "max_notes": max(A["notes"]), "mean_notes": statistics.fmean(A["notes"]),
+                   "median_notes": statistics.median(A["notes"]), "dense_share": sum(1 for x in A["notes"] if x >= 11) / len(A["notes"]), "max_notes": max(A["notes"]), "mean_notes": statistics.fmean(A["notes"]),
                    "max_samples": sm[-1], "p95_samples": sm[int(0.95 * (len(sm) - 1))],
                    "tilted_block_share": A["tilted_blocks"] / A["warm_blocks"] if A["warm_blocks"] else None,
                    "median_ms_per_sample": statistics.median(A["ms"]) if A["ms"] else None,
@@ -146,7 +146,7 @@ def test(run_dir, out):
     o, t = summ["off"], summ["tilt"]
     rep = {"issue": 1844, "pairs": pairs, "p0_violations": [p for p in pairs if not p["p0"]], "arms": summ,
            "judge": {"K1": o["k1_all"] and t["k1_all"],
-                     "T1": t["median_notes"] < o["median_notes"] and t["max_notes"] <= o["max_notes"],
+                     "T1": t["dense_share"] < o["dense_share"] and t["max_notes"] <= o["max_notes"],      # doc 6 revision
                      "T2": t["max_samples"] < o["max_samples"],
                      "T3": {"off_only_miss": off_only, "tilt_only_miss": tilt_only, "sign_p": sign_test_p(min(off_only, tilt_only), off_only + tilt_only)}}}
     json.dump(rep, open(out, "w"), ensure_ascii=False, indent=1)
