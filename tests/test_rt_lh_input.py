@@ -401,5 +401,51 @@ class NoteCapStreamTest(unittest.TestCase):
         self.assertTrue(any(o >= 5000 for o in ons) and any(4218.75 <= o < 5000 for o in ons))
 
 
+class DensityTiltTest(unittest.TestCase):
+    """Issue #1844: a smooth onset tilt instead of the hard note cap."""
+
+    def test_bias_is_zero_until_n0_then_grows_with_gap(self):
+        self.assertEqual(li.tilt_bias(500, 100, 8, 1.0, 8), 0.0)               # window not over n0
+        self.assertEqual(li.tilt_bias(100, 100, 12, 1.0, 8), 0.0)              # chord tone: minimum
+        self.assertAlmostEqual(li.tilt_bias(200, 100, 10, 1.0, 8), 2 * 100 / 100)
+        self.assertAlmostEqual(li.tilt_bias(5000, 100, 10, 1.0, 8), 2 * li.TILT_GAP_MS / 100)   # capped gap
+        self.assertEqual(li.tilt_bias(500, 100, 20, 0.0, 8), 0.0)              # off
+
+    def test_weights_leave_non_onsets_alone(self):
+        w = li.tilt_weights([None, 100, 300], 100, 10, 1.0, 8)
+        self.assertEqual(w[0], 1.0)
+        self.assertEqual(w[1], 1.0)
+        self.assertGreater(w[2], 1.0)
+
+    def test_window_count_matches_cap_grid(self):
+        g, B = 1000.0, 937.5
+        self.assertEqual(li.window_count([1100, 1200, 2000], 1200, g, B), 2)
+        self.assertEqual(li.window_count([1100, 1200, 2000], 2100, g, B), 1)
+
+    def test_tilt_with_stream_and_mask_moves_the_next_onset_later(self):
+        """With equal probabilities over allowed onsets, the tilt makes the latest allowed onset the most likely, and
+        the grammar mask (onset >= last onset, commit floor) still holds."""
+        import torch
+        from aria_grammar_mask import GrammarMask
+        from stream_contract import SEGMENT_MS, TokenStream, floor_parts
+        vocab = [("piano", 60, 80), ("dur", 100), "<T>"] + [("onset", o) for o in range(0, 5000, 10)]
+        gm, s = GrammarMask(vocab), TokenStream([("piano", 60, 80), ("onset", 0), ("dur", 100)])
+        for o in range(1000, 1100, 10):                    # 10 notes in the window [468.75, 1406.25)
+            for tk in (("piano", 60, 80), ("onset", o), ("dur", 100)):
+                s.append_sampled(tk)
+        s.append_sampled(("piano", 60, 80))
+        st = s.grammar_state()
+        gm.sync(st, floor_parts(s.floor_ms, st))
+        ok = gm.allowed()
+        onset_of = [t[1] if isinstance(t, tuple) and t[0] == "onset" else None for t in vocab]
+        n = li.window_count(s.onsets_since_commit(), st.segment * SEGMENT_MS + st.last_onset, 468.75, 937.5)
+        self.assertEqual(n, 10)
+        w = torch.tensor(li.tilt_weights(onset_of, st.last_onset, n, 1.0, 8))
+        p = torch.where(ok, torch.ones(len(vocab)), torch.zeros(len(vocab))) * w
+        best = vocab[int(torch.argmax(p))]
+        self.assertGreaterEqual(best[1], st.last_onset + li.TILT_GAP_MS)
+        self.assertTrue(bool(ok[int(torch.argmax(p))]))
+
+
 if __name__ == "__main__":
     unittest.main()
