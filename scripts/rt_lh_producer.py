@@ -61,6 +61,8 @@ def main() -> None:
     precision = opt(rest, "--precision", str, "fp32")
     lead_s = opt(rest, "--lead-s", float, LEAD_S)            # wall time from the end of the cold block to the music origin (#1826)
     note_cap = opt(rest, "--note-cap", int, 0)              # notes per block commit window, 0 = off (#1819)
+    if note_cap < 0:
+        sys.exit(f"--note-cap must be >= 0, got {note_cap}")    # a negative cap would push every onset (#1841 review)
     seed = opt(rest, "--seed", int, SEED)
     replay_path = opt(rest, "--lh-replay", str, None)         # deterministic left hand for paired runs (#1825)
     replay_offset = opt(rest, "--lh-offset-ms", float, 937.5)  # the feeder's default offset
