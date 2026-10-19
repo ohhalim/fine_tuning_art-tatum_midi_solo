@@ -132,6 +132,31 @@ def cap_floor(onsets, position_ms, grid0, block_ms, cap):
     return grid0 + (w + 1) * block_ms if n >= cap else float("-inf")
 
 
+TILT_GAP_MS = 468.75     # density tilt: the onset gap that earns the full bias (one beat at 128 BPM), #1844
+
+
+def window_count(onsets, position_ms, grid0, block_ms):
+    """Provisional notes in the block commit window holding position_ms (same grid as cap_floor)."""
+    w = (position_ms - grid0) // block_ms
+    return sum(1 for o in onsets if (o - grid0) // block_ms == w)
+
+
+def tilt_bias(onset_ms, last_onset_ms, n_window, lam, n0, gap_ms=TILT_GAP_MS):
+    """Additive logit for one onset token (issue #1844): 0 until the window holds more than n0 notes, then grows with
+    how far the onset is after the last one, capped at gap_ms. A chord tone (same onset) gets 0, the minimum.
+    lam 0 means off."""
+    if not lam or n_window <= n0:
+        return 0.0
+    return lam * (n_window - n0) * min(max(onset_ms - last_onset_ms, 0.0), gap_ms) / 100.0
+
+
+def tilt_weights(onset_of, last_onset_ms, n_window, lam, n0, gap_ms=TILT_GAP_MS):
+    """Multipliers exp(bias) over the vocabulary; onset_of[i] is the token's onset (ms in segment) or None for
+    non-onset tokens (weight 1). Multiplying probabilities by exp(bias) equals adding bias to the logits."""
+    import math
+    return [1.0 if o is None else math.exp(tilt_bias(o, last_onset_ms, n_window, lam, n0, gap_ms)) for o in onset_of]
+
+
 class LHReplay:
     """Deterministic left hand for paired A/B runs (issue #1825). The feeder's note list is turned into the same
     time-ordered events the feeder would send (rt_lh_feeder.events: offs before ons at equal times), placed at music time
@@ -154,3 +179,12 @@ class LHReplay:
             out.append(ev)
             self.fed += 1
         return out
+
+
+def tilted_probs(p, idx, bias, allowed):
+    """Add bias (log space) to p[idx] and rescale so the largest allowed entry is 1: no overflow for large finite biases
+    (Astra review of #1845). masked_pick is scale-invariant, so the result needs no normalization."""
+    import torch
+    lp = torch.log(p.double())
+    lp[idx] = lp[idx] + torch.as_tensor(bias, dtype=torch.float64)
+    return torch.exp(lp - lp[allowed].max()).to(p.dtype)

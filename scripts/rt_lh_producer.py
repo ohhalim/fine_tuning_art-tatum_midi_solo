@@ -11,7 +11,7 @@ plays the committed notes up to it and then stops, whatever the reason and whene
 
   rt_lh_producer.py <aria repo> <ckpt> <data json> <blocks> <lh port> <origin json> <progress jsonl> <report json>
       [--capacity N] [--keep-target N] [--slow-block K --slow-ms MS] [--check-blocks 4,8,12] [--lead-s S]
-      [--precision fp32|bf16|q8|q4] [--note-cap K] [--seed N]
+      [--precision fp32|bf16|q8|q4] [--note-cap K] [--seed N] [--density-tilt LAM [--density-n0 N0]]
       [--lh-replay <notes json> [--lh-offset-ms MS]]   (issue #1825: left hand by music time, <lh port> ignored, no MIDI input)
 """
 from __future__ import annotations
@@ -33,7 +33,7 @@ from lh_cache_replay import reuse_start  # noqa: E402
 from lh_context import W_MS, Human, merge, window_notes  # noqa: E402
 from lh_kv_reuse import common_prefix, load_mlx  # noqa: E402
 from kv_equiv_precision import gaps as eq_gaps, judge as eq_judge  # noqa: E402
-from rt_lh_input import LHReplay, LHState, SessionCrop, cap_floor, guarded_commit  # noqa: E402
+from rt_lh_input import tilted_probs, LHReplay, LHState, SessionCrop, cap_floor, guarded_commit, TILT_GAP_MS, window_count  # noqa: E402
 from stream_contract import SEGMENT_MS, TokenStream, floor_parts  # noqa: E402
 
 LEAD_S = 1.0
@@ -63,6 +63,10 @@ def main() -> None:
     note_cap = opt(rest, "--note-cap", int, 0)              # notes per block commit window, 0 = off (#1819)
     if note_cap < 0:
         sys.exit(f"--note-cap must be >= 0, got {note_cap}")    # a negative cap would push every onset (#1841 review)
+    tilt_lam = opt(rest, "--density-tilt", float, 0.0)       # onset tilt toward later onsets as the window fills (#1844)
+    tilt_n0 = opt(rest, "--density-n0", int, 8)
+    if not math.isfinite(tilt_lam) or tilt_lam < 0 or tilt_n0 < 0:
+        sys.exit(f"--density-tilt and --density-n0 must be >= 0, got {tilt_lam}, {tilt_n0}")
     seed = opt(rest, "--seed", int, SEED)
     replay_path = opt(rest, "--lh-replay", str, None)         # deterministic left hand for paired runs (#1825)
     replay_offset = opt(rest, "--lh-offset-ms", float, 937.5)  # the feeder's default offset
@@ -82,6 +86,9 @@ def main() -> None:
     V_SIZE = tok.vocab_size
     vocab = [tok.decode([i])[0] for i in range(V_SIZE)]
     to_id = {t: i for i, t in enumerate(vocab)}
+    onset_of = [t[1] if isinstance(t, tuple) and t[0] == "onset" else None for t in vocab]
+    onset_idx = torch.tensor([i for i, o in enumerate(onset_of) if o is not None], dtype=torch.long)
+    onset_val = torch.tensor([float(o) for o in onset_of if o is not None], dtype=torch.float64)
     prompt = tok.decode(json.load(open(data_path))["prompts"][0]["ids"])
     stream = TokenStream(prompt)
     gm = GrammarMask(vocab)
@@ -98,7 +105,7 @@ def main() -> None:
             model["V"] = len(seq)
         return model["last"]
 
-    samples = {"n": 0, "capped": 0}          # every sample, so an aborted block still has its count; capped: under the note cap
+    samples = {"n": 0, "capped": 0, "tilted": 0}          # every sample, so an aborted block still has its count; capped: under the note cap
 
     def sample_one():
         samples["n"] += 1
@@ -112,6 +119,12 @@ def main() -> None:
                 samples["capped"] += 1
         gm.sync(st, floor_parts(floor, st))
         ok = gm.allowed() & no_end
+        if tilt_lam and st.expect == "onset":     # soft density control: later onsets favoured as the window fills
+            n_win = window_count(stream.onsets_since_commit(), st.segment * SEGMENT_MS + st.last_onset, t0 + BEAT, BLOCK)
+            if n_win > tilt_n0:
+                gap = torch.clamp(onset_val - st.last_onset, min=0.0, max=TILT_GAP_MS)    # same as rt_lh_input.tilt_bias
+                p = tilted_probs(p, onset_idx, tilt_lam * (n_win - tilt_n0) * gap / 100.0, ok)
+                samples["tilted"] += 1
         a = p[ok].sum().item()
         if not (math.isfinite(a) and a > 0):
             raise RuntimeError(f"allowed mass {a}")
@@ -268,12 +281,13 @@ def main() -> None:
                 ready["ns"] = time.monotonic_ns()
                 ready["samples"] = samples["n"] - n_start          # samples before the horizon was covered (#1813)
                 ready["capped"] = samples["capped"] - c_start      # of those, under the note cap (#1819)
+                ready["tilted"] = samples["tilted"] - d_start      # of those, with the density tilt applied (#1844)
                 ready["coverage_ms"] = coverage()
                 ready["problem"] = guarded_commit(ready["ns"], deadline, ready["coverage_ms"], h, commit_and_send)
                 if ready["problem"]:
                     raise Abort()
 
-            n_start, c_start = samples["n"], samples["capped"]
+            n_start, c_start, d_start = samples["n"], samples["capped"], samples["tilted"]
             try:
                 res = fill_block(sample_one, coverage, on_ready, h, h + BLOCK, CAP)
             except Abort:                                  # underfill is a known miss; a late block's coverage is not judged
@@ -286,6 +300,7 @@ def main() -> None:
                    "enqueued_ns": ready.get("enqueued_ns"), "deadline_ns": deadline, "tokens": samples["n"] - n_start,
                    "samples_to_ready": ready.get("samples"), "capped_to_ready": ready.get("capped"),
                    "capped_samples": samples["capped"] - c_start,
+                   "tilted_to_ready": ready.get("tilted"), "tilted_samples": samples["tilted"] - d_start,
                    "reached": res["reached"], "problem": ready.get("problem"), "coverage_ms": ready.get("coverage_ms"),
                    "horizon_ms": h, "input_received": marks["input_received"],
                    "marks_ns": {"wake": wake, "snapshot": marks["snapshot_ns"], "context_ready": marks["context_ready_ns"],
@@ -338,7 +353,7 @@ def main() -> None:
                    "C_ok": j["C_ok"], "ok": j["valid"] and j["C_ok"] and (legacy or precision != "fp32")})
     import hashlib
     v = token_check(prompt, stream.tokens[len(prompt):stream.committed_end])
-    report = {"issue": 1797, "precision": precision, "note_cap": note_cap, "seed": seed, "t0_ms": t0, "wall_origin_ns": W, "capacity": capacity, "keep_target": keep_target,
+    report = {"issue": 1797, "precision": precision, "note_cap": note_cap, "density_tilt": tilt_lam, "density_n0": tilt_n0, "seed": seed, "t0_ms": t0, "wall_origin_ns": W, "capacity": capacity, "keep_target": keep_target,
               "checks": {"committed_prefix_never_changed": all(snaps[i] == snaps[i + 1][:len(snaps[i])] for i in range(len(snaps) - 1)),
                          "committed_tokens_format_valid": v["valid"] and v["tail"] is None,
                          "every_block_reached_horizon": all(reached)},

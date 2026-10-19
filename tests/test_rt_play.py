@@ -150,5 +150,21 @@ class ShutdownOrderTest(unittest.TestCase):
         self.assertEqual(log[0], ("wait", "sender"))  # play-out wait before any signal to the sender
 
 
+class DensityTiltArgsTest(unittest.TestCase):
+    def test_tilt_passed_only_when_asked(self):
+        cfg = {"py": "py", "t3_py": "t3", "aria_repo": "aria", "ckpt": "ck", "data": "d", "blocks": 9, "lh_port": "x",
+               "precision": "q8", "lead_s": 1.0}
+        files = {"origin": "o", "progress": "p", "producer": "r"}
+        self.assertNotIn("--density-tilt", rp.producer_cmd(cfg, files))
+        cmd = rp.producer_cmd(dict(cfg, density_tilt=1.0, density_n0=8), files)
+        self.assertEqual(cmd[-4:], ["--density-tilt", "1.0", "--density-n0", "8"])
+
+    def test_negative_tilt_refused(self):
+        from unittest import mock
+        with mock.patch.object(rp, "run") as run, mock.patch("sys.stderr"), self.assertRaises(SystemExit):
+            rp.main(["--dry-run", "--density-tilt", "-1"])
+        run.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()

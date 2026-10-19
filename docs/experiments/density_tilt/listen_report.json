@@ -1,0 +1,481 @@
+{
+ "issue": 1844,
+ "items": [
+  {
+   "label": "짧은 발췌 seed 1 블록 3 앞뒤",
+   "seed": 1,
+   "block": 3,
+   "A": {
+    "audio": "p1_b3_A.m4a",
+    "midi": "p1_b3_A.mid",
+    "windows": [
+     2,
+     4
+    ],
+    "model_notes": 19,
+    "read_back": 19,
+    "per_window": {
+     "2": 5,
+     "3": 10,
+     "4": 4
+    },
+    "max_window": 10,
+    "max_chord": 4,
+    "longest_rest_ms": 6.2,
+    "arm": "off"
+   },
+   "B": {
+    "audio": "p1_b3_B.m4a",
+    "midi": "p1_b3_B.mid",
+    "windows": [
+     2,
+     4
+    ],
+    "model_notes": 18,
+    "read_back": 18,
+    "per_window": {
+     "2": 5,
+     "3": 9,
+     "4": 4
+    },
+    "max_window": 9,
+    "max_chord": 4,
+    "longest_rest_ms": 6.2,
+    "arm": "tilt"
+   }
+  },
+  {
+   "label": "짧은 발췌 seed 2 블록 12 앞뒤",
+   "seed": 2,
+   "block": 12,
+   "A": {
+    "audio": "p2_b12_A.m4a",
+    "midi": "p2_b12_A.mid",
+    "windows": [
+     11,
+     13
+    ],
+    "model_notes": 22,
+    "read_back": 22,
+    "per_window": {
+     "11": 6,
+     "12": 11,
+     "13": 5
+    },
+    "max_window": 11,
+    "max_chord": 3,
+    "longest_rest_ms": 218.8,
+    "arm": "off"
+   },
+   "B": {
+    "audio": "p2_b12_B.m4a",
+    "midi": "p2_b12_B.mid",
+    "windows": [
+     11,
+     13
+    ],
+    "model_notes": 22,
+    "read_back": 22,
+    "per_window": {
+     "11": 6,
+     "12": 11,
+     "13": 5
+    },
+    "max_window": 11,
+    "max_chord": 3,
+    "longest_rest_ms": 218.8,
+    "arm": "tilt"
+   }
+  },
+  {
+   "label": "짧은 발췌 seed 3 블록 7 앞뒤",
+   "seed": 3,
+   "block": 7,
+   "A": {
+    "audio": "p3_b7_A.m4a",
+    "midi": "p3_b7_A.mid",
+    "windows": [
+     6,
+     8
+    ],
+    "model_notes": 23,
+    "read_back": 23,
+    "per_window": {
+     "6": 5,
+     "7": 9,
+     "8": 9
+    },
+    "max_window": 9,
+    "max_chord": 3,
+    "longest_rest_ms": 396.2,
+    "arm": "tilt"
+   },
+   "B": {
+    "audio": "p3_b7_B.m4a",
+    "midi": "p3_b7_B.mid",
+    "windows": [
+     6,
+     8
+    ],
+    "model_notes": 17,
+    "read_back": 17,
+    "per_window": {
+     "6": 5,
+     "7": 7,
+     "8": 5
+    },
+    "max_window": 7,
+    "max_chord": 2,
+    "longest_rest_ms": 396.2,
+    "arm": "off"
+   }
+  },
+  {
+   "label": "짧은 발췌 seed 4 블록 2 앞뒤",
+   "seed": 4,
+   "block": 2,
+   "A": {
+    "audio": "p4_b2_A.m4a",
+    "midi": "p4_b2_A.mid",
+    "windows": [
+     1,
+     3
+    ],
+    "model_notes": 23,
+    "read_back": 23,
+    "per_window": {
+     "1": 4,
+     "2": 9,
+     "3": 10
+    },
+    "max_window": 10,
+    "max_chord": 3,
+    "longest_rest_ms": 83.8,
+    "arm": "tilt"
+   },
+   "B": {
+    "audio": "p4_b2_B.m4a",
+    "midi": "p4_b2_B.mid",
+    "windows": [
+     1,
+     3
+    ],
+    "model_notes": 28,
+    "read_back": 28,
+    "per_window": {
+     "1": 4,
+     "2": 9,
+     "3": 15
+    },
+    "max_window": 15,
+    "max_chord": 3,
+    "longest_rest_ms": 83.8,
+    "arm": "off"
+   }
+  },
+  {
+   "label": "짧은 발췌 seed 5 블록 5 앞뒤",
+   "seed": 5,
+   "block": 5,
+   "A": {
+    "audio": "p5_b5_A.m4a",
+    "midi": "p5_b5_A.mid",
+    "windows": [
+     4,
+     6
+    ],
+    "model_notes": 29,
+    "read_back": 29,
+    "per_window": {
+     "4": 1,
+     "5": 11,
+     "6": 17
+    },
+    "max_window": 17,
+    "max_chord": 2,
+    "longest_rest_ms": 511.2,
+    "arm": "off"
+   },
+   "B": {
+    "audio": "p5_b5_B.m4a",
+    "midi": "p5_b5_B.mid",
+    "windows": [
+     4,
+     6
+    ],
+    "model_notes": 18,
+    "read_back": 18,
+    "per_window": {
+     "4": 1,
+     "5": 10,
+     "6": 7
+    },
+    "max_window": 10,
+    "max_chord": 3,
+    "longest_rest_ms": 511.2,
+    "arm": "tilt"
+   }
+  },
+  {
+   "label": "짧은 발췌 seed 6 블록 7 앞뒤",
+   "seed": 6,
+   "block": 7,
+   "A": {
+    "audio": "p6_b7_A.m4a",
+    "midi": "p6_b7_A.mid",
+    "windows": [
+     6,
+     8
+    ],
+    "model_notes": 17,
+    "read_back": 17,
+    "per_window": {
+     "6": 5,
+     "7": 9,
+     "8": 3
+    },
+    "max_window": 9,
+    "max_chord": 2,
+    "longest_rest_ms": 216.2,
+    "arm": "off"
+   },
+   "B": {
+    "audio": "p6_b7_B.m4a",
+    "midi": "p6_b7_B.mid",
+    "windows": [
+     6,
+     8
+    ],
+    "model_notes": 20,
+    "read_back": 20,
+    "per_window": {
+     "6": 5,
+     "7": 9,
+     "8": 6
+    },
+    "max_window": 9,
+    "max_chord": 2,
+    "longest_rest_ms": 216.2,
+    "arm": "tilt"
+   }
+  },
+  {
+   "label": "짧은 발췌 seed 7 블록 11 앞뒤",
+   "seed": 7,
+   "block": 11,
+   "A": {
+    "audio": "p7_b11_A.m4a",
+    "midi": "p7_b11_A.mid",
+    "windows": [
+     10,
+     12
+    ],
+    "model_notes": 25,
+    "read_back": 25,
+    "per_window": {
+     "10": 7,
+     "11": 9,
+     "12": 9
+    },
+    "max_window": 9,
+    "max_chord": 2,
+    "longest_rest_ms": 190,
+    "arm": "tilt"
+   },
+   "B": {
+    "audio": "p7_b11_B.m4a",
+    "midi": "p7_b11_B.mid",
+    "windows": [
+     10,
+     12
+    ],
+    "model_notes": 25,
+    "read_back": 25,
+    "per_window": {
+     "10": 7,
+     "11": 10,
+     "12": 8
+    },
+    "max_window": 10,
+    "max_chord": 2,
+    "longest_rest_ms": 190,
+    "arm": "off"
+   }
+  },
+  {
+   "label": "짧은 발췌 seed 8 블록 2 앞뒤",
+   "seed": 8,
+   "block": 2,
+   "A": {
+    "audio": "p8_b2_A.m4a",
+    "midi": "p8_b2_A.mid",
+    "windows": [
+     1,
+     3
+    ],
+    "model_notes": 23,
+    "read_back": 23,
+    "per_window": {
+     "1": 5,
+     "2": 9,
+     "3": 9
+    },
+    "max_window": 9,
+    "max_chord": 2,
+    "longest_rest_ms": 83.8,
+    "arm": "off"
+   },
+   "B": {
+    "audio": "p8_b2_B.m4a",
+    "midi": "p8_b2_B.mid",
+    "windows": [
+     1,
+     3
+    ],
+    "model_notes": 23,
+    "read_back": 23,
+    "per_window": {
+     "1": 5,
+     "2": 9,
+     "3": 9
+    },
+    "max_window": 9,
+    "max_chord": 2,
+    "longest_rest_ms": 83.8,
+    "arm": "tilt"
+   }
+  },
+  {
+   "label": "긴 발췌 seed 8 전체",
+   "seed": 8,
+   "block": null,
+   "A": {
+    "audio": "full_s8_A.m4a",
+    "midi": "full_s8_A.mid",
+    "windows": [
+     0,
+     17
+    ],
+    "model_notes": 80,
+    "read_back": 80,
+    "per_window": {
+     "0": 4,
+     "1": 5,
+     "2": 9,
+     "3": 9,
+     "4": 8,
+     "5": 9,
+     "6": 6,
+     "7": 4,
+     "8": 6,
+     "9": 5,
+     "10": 8,
+     "11": 3,
+     "12": 4
+    },
+    "max_window": 9,
+    "max_chord": 4,
+    "longest_rest_ms": 4653.9,
+    "arm": "off"
+   },
+   "B": {
+    "audio": "full_s8_B.m4a",
+    "midi": "full_s8_B.mid",
+    "windows": [
+     0,
+     17
+    ],
+    "model_notes": 143,
+    "read_back": 143,
+    "per_window": {
+     "0": 4,
+     "1": 5,
+     "2": 9,
+     "3": 9,
+     "4": 8,
+     "5": 9,
+     "6": 6,
+     "7": 8,
+     "8": 10,
+     "9": 6,
+     "10": 8,
+     "11": 8,
+     "12": 11,
+     "13": 10,
+     "14": 11,
+     "15": 10,
+     "16": 11
+    },
+    "max_window": 11,
+    "max_chord": 4,
+    "longest_rest_ms": 1033.8,
+    "arm": "tilt"
+   }
+  }
+ ],
+ "key": [
+  {
+   "item": 1,
+   "seed": 1,
+   "block": 3,
+   "A": "off",
+   "B": "tilt"
+  },
+  {
+   "item": 2,
+   "seed": 2,
+   "block": 12,
+   "A": "off",
+   "B": "tilt"
+  },
+  {
+   "item": 3,
+   "seed": 3,
+   "block": 7,
+   "A": "tilt",
+   "B": "off"
+  },
+  {
+   "item": 4,
+   "seed": 4,
+   "block": 2,
+   "A": "tilt",
+   "B": "off"
+  },
+  {
+   "item": 5,
+   "seed": 5,
+   "block": 5,
+   "A": "off",
+   "B": "tilt"
+  },
+  {
+   "item": 6,
+   "seed": 6,
+   "block": 7,
+   "A": "off",
+   "B": "tilt"
+  },
+  {
+   "item": 7,
+   "seed": 7,
+   "block": 11,
+   "A": "tilt",
+   "B": "off"
+  },
+  {
+   "item": 8,
+   "seed": 8,
+   "block": 2,
+   "A": "off",
+   "B": "tilt"
+  },
+  {
+   "item": 9,
+   "seed": 8,
+   "block": "full",
+   "A": "off",
+   "B": "tilt"
+  }
+ ]
+}

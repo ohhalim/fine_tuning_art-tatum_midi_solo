@@ -6,6 +6,7 @@ B forced crop, C slow producer. Each scenario is analysed from its saved files.
   rt_lh_smoke_run.py <t3_aria python> <aria repo> <ckpt> <data json> <lh notes json> <out dir> <report json> [--analyze-only] [--rerun]
       [--precision fp32|bf16|q8|q4]   (issue #1813; passed to every producer, default fp32)
       [--note-cap K] [--seed N] [--scenarios A_normal,B_crop_early]   (issue #1819)
+      [--density-tilt LAM] [--density-n0 N0]   (issue #1844, passed to every producer)
       [--lh-replay]   (issue #1825; no feeder, the producer reads <lh notes json> by music time; B1 reported not applicable)
 """
 from __future__ import annotations
@@ -180,10 +181,12 @@ def loop_speed(prod):
 def density(prod):
     """Per warm block: notes committed for its window, samples before the horizon, of those under the note cap (#1819)."""
     rows = [{"block": b["block"], "notes": b.get("notes"), "samples": b.get("samples_to_ready"), "capped": b.get("capped_to_ready"),
-             "margin_ms": b.get("ready_margin_ms")} for b in prod["blocks"] if b.get("samples_to_ready") is not None]
+             "tilted": b.get("tilted_to_ready"), "margin_ms": b.get("ready_margin_ms")}
+            for b in prod["blocks"] if b.get("samples_to_ready") is not None]
     smp = [r["samples"] for r in rows]
     return {"blocks": rows, "max_samples": max(smp) if smp else None,
             "blocks_capped_before_ready": sum(1 for r in rows if r["capped"]),
+            "blocks_tilted_before_ready": sum(1 for r in rows if r["tilted"]),
             "max_notes": max((r["notes"] for r in rows if r["notes"] is not None), default=None)}
 
 
@@ -246,7 +249,7 @@ def main() -> None:
     tail = sys.argv[8:]
     flag = lambda name: tail[tail.index(name) + 1] if name in tail else None  # noqa: E731
     precision, note_cap, seed, only = flag("--precision"), flag("--note-cap"), flag("--seed"), flag("--scenarios")
-    passed = [x for f in ("--precision", "--note-cap", "--seed") if flag(f) for x in (f, flag(f))]
+    passed = [x for f in ("--precision", "--note-cap", "--seed", "--density-tilt", "--density-n0") if flag(f) for x in (f, flag(f))]
     if only:                                                   # issue #1819: a subset of the scenario set
         scenarios = {k: v for k, v in scenarios.items() if k in only.split(",")}
     lh_replay = "--lh-replay" in tail                        # issue #1825: deterministic left hand, no feeder
@@ -255,6 +258,7 @@ def main() -> None:
     if analyze_only and os.path.exists(report_path):            # keep the code that ran; the analyzer is recorded apart
         prev_code = json.load(open(report_path)).get("code")
     report = {"issue": 1797, "precision": precision or "fp32", "note_cap": int(note_cap or 0), "seed": seed,
+              "density_tilt": float(flag("--density-tilt") or 0), "density_n0": flag("--density-n0"),
               "lh_mode": "replay" if lh_replay else "live",
               "code": prev_code if analyze_only else code_provenance(), "analyzer_code": code_provenance(),
               "inputs": {"data_sha256": sha(data), "lh_notes_sha256": sha(lh_notes), "checkpoint_sha256": sha(ckpt)},

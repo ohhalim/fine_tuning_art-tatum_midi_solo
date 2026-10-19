@@ -1,0 +1,457 @@
+{
+ "issue": 1844,
+ "pairs": [
+  {
+   "seed": 1,
+   "scenario": "A_normal",
+   "first_tilt_block": 3,
+   "first_block_row_diff": 3,
+   "first_note_on_diff_block": 3,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 1,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 2,
+   "first_block_row_diff": 7,
+   "first_note_on_diff_block": 8,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    12
+   ],
+   "tilt": [
+    "capacity_failure",
+    12
+   ]
+  },
+  {
+   "seed": 2,
+   "scenario": "A_normal",
+   "first_tilt_block": 12,
+   "first_block_row_diff": 15,
+   "first_note_on_diff_block": 12,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 2,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 12,
+   "first_block_row_diff": 14,
+   "first_note_on_diff_block": 15,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 3,
+   "scenario": "A_normal",
+   "first_tilt_block": 6,
+   "first_block_row_diff": 6,
+   "first_note_on_diff_block": 7,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 3,
+   "scenario": "B_crop_early",
+   "first_tilt_block": null,
+   "first_block_row_diff": null,
+   "first_note_on_diff_block": null,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    12
+   ],
+   "tilt": [
+    "capacity_failure",
+    12
+   ]
+  },
+  {
+   "seed": 4,
+   "scenario": "A_normal",
+   "first_tilt_block": 2,
+   "first_block_row_diff": 3,
+   "first_note_on_diff_block": 3,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 4,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 3,
+   "first_block_row_diff": 4,
+   "first_note_on_diff_block": 4,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    6
+   ],
+   "tilt": [
+    "capacity_failure",
+    7
+   ]
+  },
+  {
+   "seed": 5,
+   "scenario": "A_normal",
+   "first_tilt_block": 2,
+   "first_block_row_diff": 5,
+   "first_note_on_diff_block": 5,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 5,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 7,
+   "first_block_row_diff": 7,
+   "first_note_on_diff_block": 7,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    11
+   ],
+   "tilt": [
+    "capacity_failure",
+    12
+   ]
+  },
+  {
+   "seed": 6,
+   "scenario": "A_normal",
+   "first_tilt_block": 7,
+   "first_block_row_diff": 7,
+   "first_note_on_diff_block": 8,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 6,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 5,
+   "first_block_row_diff": null,
+   "first_note_on_diff_block": null,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    7
+   ],
+   "tilt": [
+    "capacity_failure",
+    7
+   ]
+  },
+  {
+   "seed": 7,
+   "scenario": "A_normal",
+   "first_tilt_block": 11,
+   "first_block_row_diff": 11,
+   "first_note_on_diff_block": 11,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 7,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 5,
+   "first_block_row_diff": 6,
+   "first_note_on_diff_block": 7,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    12
+   ],
+   "tilt": null
+  },
+  {
+   "seed": 8,
+   "scenario": "A_normal",
+   "first_tilt_block": 2,
+   "first_block_row_diff": 5,
+   "first_note_on_diff_block": 6,
+   "p0": true,
+   "off": [
+    "deadline_miss",
+    13
+   ],
+   "tilt": null
+  },
+  {
+   "seed": 8,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 4,
+   "first_block_row_diff": 9,
+   "first_note_on_diff_block": 9,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    12
+   ],
+   "tilt": [
+    "capacity_failure",
+    12
+   ]
+  },
+  {
+   "seed": 9,
+   "scenario": "A_normal",
+   "first_tilt_block": 11,
+   "first_block_row_diff": null,
+   "first_note_on_diff_block": null,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 9,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 4,
+   "first_block_row_diff": 4,
+   "first_note_on_diff_block": 5,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    11
+   ],
+   "tilt": null
+  },
+  {
+   "seed": 10,
+   "scenario": "A_normal",
+   "first_tilt_block": 6,
+   "first_block_row_diff": 12,
+   "first_note_on_diff_block": 13,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 10,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 7,
+   "first_block_row_diff": 7,
+   "first_note_on_diff_block": 8,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    12
+   ],
+   "tilt": [
+    "capacity_failure",
+    11
+   ]
+  },
+  {
+   "seed": 11,
+   "scenario": "A_normal",
+   "first_tilt_block": 4,
+   "first_block_row_diff": null,
+   "first_note_on_diff_block": null,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 11,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 3,
+   "first_block_row_diff": 3,
+   "first_note_on_diff_block": 4,
+   "p0": true,
+   "off": null,
+   "tilt": [
+    "capacity_failure",
+    12
+   ]
+  },
+  {
+   "seed": 12,
+   "scenario": "A_normal",
+   "first_tilt_block": 11,
+   "first_block_row_diff": 11,
+   "first_note_on_diff_block": 11,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 12,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 5,
+   "first_block_row_diff": 5,
+   "first_note_on_diff_block": 5,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    7
+   ],
+   "tilt": [
+    "capacity_failure",
+    7
+   ]
+  },
+  {
+   "seed": 13,
+   "scenario": "A_normal",
+   "first_tilt_block": 3,
+   "first_block_row_diff": 3,
+   "first_note_on_diff_block": 4,
+   "p0": true,
+   "off": [
+    "deadline_miss",
+    13
+   ],
+   "tilt": null
+  },
+  {
+   "seed": 13,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 4,
+   "first_block_row_diff": 4,
+   "first_note_on_diff_block": 5,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    12
+   ],
+   "tilt": [
+    "capacity_failure",
+    12
+   ]
+  },
+  {
+   "seed": 14,
+   "scenario": "A_normal",
+   "first_tilt_block": 3,
+   "first_block_row_diff": 5,
+   "first_note_on_diff_block": 5,
+   "p0": true,
+   "off": [
+    "deadline_miss",
+    15
+   ],
+   "tilt": null
+  },
+  {
+   "seed": 14,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 3,
+   "first_block_row_diff": 4,
+   "first_note_on_diff_block": 4,
+   "p0": true,
+   "off": [
+    "capacity_failure",
+    6
+   ],
+   "tilt": [
+    "capacity_failure",
+    7
+   ]
+  },
+  {
+   "seed": 15,
+   "scenario": "A_normal",
+   "first_tilt_block": 6,
+   "first_block_row_diff": 6,
+   "first_note_on_diff_block": 6,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 15,
+   "scenario": "B_crop_early",
+   "first_tilt_block": null,
+   "first_block_row_diff": null,
+   "first_note_on_diff_block": null,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  },
+  {
+   "seed": 16,
+   "scenario": "A_normal",
+   "first_tilt_block": 5,
+   "first_block_row_diff": 7,
+   "first_note_on_diff_block": 8,
+   "p0": true,
+   "off": [
+    "deadline_miss",
+    15
+   ],
+   "tilt": null
+  },
+  {
+   "seed": 16,
+   "scenario": "B_crop_early",
+   "first_tilt_block": 16,
+   "first_block_row_diff": null,
+   "first_note_on_diff_block": null,
+   "p0": true,
+   "off": null,
+   "tilt": null
+  }
+ ],
+ "p0_violations": [],
+ "pairs_valid": 32,
+ "t3_pairs": 18,
+ "arms": {
+  "off": {
+   "runs": 32,
+   "k1_all": true,
+   "complete16": 16,
+   "deadline_misses": 4,
+   "capacity_failures": 12,
+   "warm_blocks": 420,
+   "median_notes": 5.0,
+   "mean_notes": 6.072115384615385,
+   "dense_share": 0.0985576923076923,
+   "max_notes": 19,
+   "max_samples": 63,
+   "p95_samples": 42,
+   "tilted_block_share": 0.0,
+   "median_ms_per_sample": 6.4655000000000005,
+   "chord_share_median": 0.2593103448275862,
+   "max_onset_gap_ms_median": 272.5
+  },
+  "tilt": {
+   "runs": 32,
+   "k1_all": true,
+   "complete16": 21,
+   "deadline_misses": 0,
+   "capacity_failures": 11,
+   "warm_blocks": 436,
+   "median_notes": 6.0,
+   "mean_notes": 5.9036697247706424,
+   "dense_share": 0.03669724770642202,
+   "max_notes": 11,
+   "max_samples": 37,
+   "p95_samples": 33,
+   "tilted_block_share": 0.19954128440366972,
+   "median_ms_per_sample": 6.4239999999999995,
+   "chord_share_median": 0.20754540348249392,
+   "max_onset_gap_ms_median": 270.0
+  }
+ },
+ "judge": {
+  "K1": true,
+  "T1": true,
+  "T2": true,
+  "T3": {
+   "off_only_miss": 4,
+   "tilt_only_miss": 0,
+   "sign_p": 0.125
+  }
+ }
+}
