@@ -543,5 +543,82 @@
   "all_valid": true,
   "inputs_ok": true,
   "summary": "이 n에서 검출된 차이 없음"
+ },
+ "listening": {
+  "dir": "/Users/ohhalim/git_box/q8_free_gen_run1",
+  "items": [
+   {
+    "prompt": 0,
+    "seed": 1,
+    "key": {
+     "A": "q8",
+     "B": "fp32"
+    },
+    "A": {
+     "audio": "p0_s1_A.m4a",
+     "notes": 90,
+     "roundtrip_diffs": 5
+    },
+    "B": {
+     "audio": "p0_s1_B.m4a",
+     "notes": 83,
+     "roundtrip_diffs": 6
+    }
+   },
+   {
+    "prompt": 0,
+    "seed": 2,
+    "key": {
+     "A": "q8",
+     "B": "fp32"
+    },
+    "A": {
+     "audio": "p0_s2_A.m4a",
+     "notes": 82,
+     "roundtrip_diffs": 2
+    },
+    "B": {
+     "audio": "p0_s2_B.m4a",
+     "notes": 62,
+     "roundtrip_diffs": 4
+    }
+   },
+   {
+    "prompt": 3,
+    "seed": 1,
+    "key": {
+     "A": "fp32",
+     "B": "q8"
+    },
+    "A": {
+     "audio": "p3_s1_A.m4a",
+     "notes": 144,
+     "roundtrip_diffs": 0
+    },
+    "B": {
+     "audio": "p3_s1_B.m4a",
+     "notes": 127,
+     "roundtrip_diffs": 0
+    }
+   },
+   {
+    "prompt": 3,
+    "seed": 2,
+    "key": {
+     "A": "q8",
+     "B": "fp32"
+    },
+    "A": {
+     "audio": "p3_s2_A.m4a",
+     "notes": 148,
+     "roundtrip_diffs": 1
+    },
+    "B": {
+     "audio": "p3_s2_B.m4a",
+     "notes": 152,
+     "roundtrip_diffs": 0
+    }
+   }
+  ]
  }
 }
